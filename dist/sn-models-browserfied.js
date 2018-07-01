@@ -5,9 +5,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -15,73 +15,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Mfa = exports.Mfa = function (_SFItem) {
-  _inherits(Mfa, _SFItem);
-
-  function Mfa(json_obj) {
-    _classCallCheck(this, Mfa);
-
-    return _possibleConstructorReturn(this, (Mfa.__proto__ || Object.getPrototypeOf(Mfa)).call(this, json_obj));
-  }
-
-  // mapContentToLocalProperties(content) {
-  //   super.mapContentToLocalProperties(content)
-  //   this.serverContent = content;
-  // }
-  //
-  // structureParams() {
-  //   return _.merge(this.serverContent, super.structureParams());
-  // }
-
-  _createClass(Mfa, [{
-    key: "doNotEncrypt",
-    value: function doNotEncrypt() {
-      return true;
-    }
-  }, {
-    key: "content_type",
-    get: function get() {
-      return "SF|MFA";
-    }
-  }]);
-
-  return Mfa;
-}(SFItem);
-
-;
-var ServerExtension = exports.ServerExtension = function (_SFItem2) {
-  _inherits(ServerExtension, _SFItem2);
-
-  function ServerExtension() {
-    _classCallCheck(this, ServerExtension);
-
-    return _possibleConstructorReturn(this, (ServerExtension.__proto__ || Object.getPrototypeOf(ServerExtension)).apply(this, arguments));
-  }
-
-  _createClass(ServerExtension, [{
-    key: "mapContentToLocalProperties",
-    value: function mapContentToLocalProperties(content) {
-      _get(ServerExtension.prototype.__proto__ || Object.getPrototypeOf(ServerExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
-      this.url = content.url;
-    }
-  }, {
-    key: "doNotEncrypt",
-    value: function doNotEncrypt() {
-      return true;
-    }
-  }, {
-    key: "content_type",
-    get: function get() {
-      return "SF|Extension";
-    }
-  }]);
-
-  return ServerExtension;
-}(SFItem);
-
-;
-var Component = exports.Component = function (_SFItem3) {
-  _inherits(Component, _SFItem3);
+var Component = exports.Component = function (_SFItem) {
+  _inherits(Component, _SFItem);
 
   function Component(json_obj) {
     _classCallCheck(this, Component);
@@ -90,20 +25,20 @@ var Component = exports.Component = function (_SFItem3) {
     // which may have window set, you may get a cross-origin exception since you'll be trying to copy the window. So we clear it here.
     json_obj.window = null;
 
-    var _this3 = _possibleConstructorReturn(this, (Component.__proto__ || Object.getPrototypeOf(Component)).call(this, json_obj));
+    var _this = _possibleConstructorReturn(this, (Component.__proto__ || Object.getPrototypeOf(Component)).call(this, json_obj));
 
-    if (!_this3.componentData) {
-      _this3.componentData = {};
+    if (!_this.componentData) {
+      _this.componentData = {};
     }
 
-    if (!_this3.disassociatedItemIds) {
-      _this3.disassociatedItemIds = [];
+    if (!_this.disassociatedItemIds) {
+      _this.disassociatedItemIds = [];
     }
 
-    if (!_this3.associatedItemIds) {
-      _this3.associatedItemIds = [];
+    if (!_this.associatedItemIds) {
+      _this.associatedItemIds = [];
     }
-    return _this3;
+    return _this;
   }
 
   _createClass(Component, [{
@@ -254,21 +189,21 @@ var Component = exports.Component = function (_SFItem3) {
 }(SFItem);
 
 ;
-var Editor = exports.Editor = function (_SFItem4) {
-  _inherits(Editor, _SFItem4);
+var Editor = exports.Editor = function (_SFItem2) {
+  _inherits(Editor, _SFItem2);
 
   function Editor(json_obj) {
     _classCallCheck(this, Editor);
 
-    var _this4 = _possibleConstructorReturn(this, (Editor.__proto__ || Object.getPrototypeOf(Editor)).call(this, json_obj));
+    var _this2 = _possibleConstructorReturn(this, (Editor.__proto__ || Object.getPrototypeOf(Editor)).call(this, json_obj));
 
-    if (!_this4.notes) {
-      _this4.notes = [];
+    if (!_this2.notes) {
+      _this2.notes = [];
     }
-    if (!_this4.data) {
-      _this4.data = {};
+    if (!_this2.data) {
+      _this2.data = {};
     }
-    return _this4;
+    return _this2;
   }
 
   _createClass(Editor, [{
@@ -400,18 +335,18 @@ var Extension = exports.Extension = function (_Component) {
   function Extension(json) {
     _classCallCheck(this, Extension);
 
-    var _this5 = _possibleConstructorReturn(this, (Extension.__proto__ || Object.getPrototypeOf(Extension)).call(this, json));
+    var _this3 = _possibleConstructorReturn(this, (Extension.__proto__ || Object.getPrototypeOf(Extension)).call(this, json));
 
     if (json.actions) {
-      _this5.actions = json.actions.map(function (action) {
+      _this3.actions = json.actions.map(function (action) {
         return new Action(action);
       });
     }
 
-    if (!_this5.actions) {
-      _this5.actions = [];
+    if (!_this3.actions) {
+      _this3.actions = [];
     }
-    return _this5;
+    return _this3;
   }
 
   _createClass(Extension, [{
@@ -460,25 +395,25 @@ var Extension = exports.Extension = function (_Component) {
 }(Component);
 
 ;
-var Note = exports.Note = function (_SFItem5) {
-  _inherits(Note, _SFItem5);
+var Note = exports.Note = function (_SFItem3) {
+  _inherits(Note, _SFItem3);
 
   function Note(json_obj) {
     _classCallCheck(this, Note);
 
-    var _this6 = _possibleConstructorReturn(this, (Note.__proto__ || Object.getPrototypeOf(Note)).call(this, json_obj));
+    var _this4 = _possibleConstructorReturn(this, (Note.__proto__ || Object.getPrototypeOf(Note)).call(this, json_obj));
 
-    if (!_this6.text) {
+    if (!_this4.text) {
       // Some external editors can't handle a null value for text.
       // Notes created on mobile with no text have a null value for it,
       // so we'll just set a default here.
-      _this6.text = "";
+      _this4.text = "";
     }
 
-    if (!_this6.tags) {
-      _this6.tags = [];
+    if (!_this4.tags) {
+      _this4.tags = [];
     }
-    return _this6;
+    return _this4;
   }
 
   _createClass(Note, [{
@@ -605,18 +540,18 @@ var Note = exports.Note = function (_SFItem5) {
 }(SFItem);
 
 ;
-var Tag = exports.Tag = function (_SFItem6) {
-  _inherits(Tag, _SFItem6);
+var Tag = exports.Tag = function (_SFItem4) {
+  _inherits(Tag, _SFItem4);
 
   function Tag(json_obj) {
     _classCallCheck(this, Tag);
 
-    var _this7 = _possibleConstructorReturn(this, (Tag.__proto__ || Object.getPrototypeOf(Tag)).call(this, json_obj));
+    var _this5 = _possibleConstructorReturn(this, (Tag.__proto__ || Object.getPrototypeOf(Tag)).call(this, json_obj));
 
-    if (!_this7.notes) {
-      _this7.notes = [];
+    if (!_this5.notes) {
+      _this5.notes = [];
     }
-    return _this7;
+    return _this5;
   }
 
   _createClass(Tag, [{
@@ -676,11 +611,11 @@ var Tag = exports.Tag = function (_SFItem6) {
   }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      var _this8 = this;
+      var _this6 = this;
 
       this.notes.forEach(function (note) {
-        _.remove(note.tags, { uuid: _this8.uuid });
-        note.setIsNoLongerBeingReferencedBy(_this8);
+        _.remove(note.tags, { uuid: _this6.uuid });
+        note.setIsNoLongerBeingReferencedBy(_this6);
       });
 
       this.notes.length = 0;
@@ -742,10 +677,10 @@ var Theme = exports.Theme = function (_Component2) {
   function Theme(json_obj) {
     _classCallCheck(this, Theme);
 
-    var _this9 = _possibleConstructorReturn(this, (Theme.__proto__ || Object.getPrototypeOf(Theme)).call(this, json_obj));
+    var _this7 = _possibleConstructorReturn(this, (Theme.__proto__ || Object.getPrototypeOf(Theme)).call(this, json_obj));
 
-    _this9.area = "themes";
-    return _this9;
+    _this7.area = "themes";
+    return _this7;
   }
 
   _createClass(Theme, [{
@@ -759,8 +694,8 @@ var Theme = exports.Theme = function (_Component2) {
 }(Component);
 
 ;
-var EncryptedStorage = exports.EncryptedStorage = function (_SFItem7) {
-  _inherits(EncryptedStorage, _SFItem7);
+var EncryptedStorage = exports.EncryptedStorage = function (_SFItem5) {
+  _inherits(EncryptedStorage, _SFItem5);
 
   function EncryptedStorage() {
     _classCallCheck(this, EncryptedStorage);
@@ -782,6 +717,71 @@ var EncryptedStorage = exports.EncryptedStorage = function (_SFItem7) {
   }]);
 
   return EncryptedStorage;
+}(SFItem);
+
+;
+var Mfa = exports.Mfa = function (_SFItem6) {
+  _inherits(Mfa, _SFItem6);
+
+  function Mfa(json_obj) {
+    _classCallCheck(this, Mfa);
+
+    return _possibleConstructorReturn(this, (Mfa.__proto__ || Object.getPrototypeOf(Mfa)).call(this, json_obj));
+  }
+
+  // mapContentToLocalProperties(content) {
+  //   super.mapContentToLocalProperties(content)
+  //   this.serverContent = content;
+  // }
+  //
+  // structureParams() {
+  //   return _.merge(this.serverContent, super.structureParams());
+  // }
+
+  _createClass(Mfa, [{
+    key: "doNotEncrypt",
+    value: function doNotEncrypt() {
+      return true;
+    }
+  }, {
+    key: "content_type",
+    get: function get() {
+      return "SF|MFA";
+    }
+  }]);
+
+  return Mfa;
+}(SFItem);
+
+;
+var ServerExtension = exports.ServerExtension = function (_SFItem7) {
+  _inherits(ServerExtension, _SFItem7);
+
+  function ServerExtension() {
+    _classCallCheck(this, ServerExtension);
+
+    return _possibleConstructorReturn(this, (ServerExtension.__proto__ || Object.getPrototypeOf(ServerExtension)).apply(this, arguments));
+  }
+
+  _createClass(ServerExtension, [{
+    key: "mapContentToLocalProperties",
+    value: function mapContentToLocalProperties(content) {
+      _get(ServerExtension.prototype.__proto__ || Object.getPrototypeOf(ServerExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
+      this.url = content.url;
+    }
+  }, {
+    key: "doNotEncrypt",
+    value: function doNotEncrypt() {
+      return true;
+    }
+  }, {
+    key: "content_type",
+    get: function get() {
+      return "SF|Extension";
+    }
+  }]);
+
+  return ServerExtension;
 }(SFItem);
 
 ;if (typeof window !== 'undefined' && window !== null) {

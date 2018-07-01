@@ -1,43 +1,4 @@
-export class Mfa extends SFItem {
-
-  constructor(json_obj) {
-    super(json_obj);
-  }
-
-  // mapContentToLocalProperties(content) {
-  //   super.mapContentToLocalProperties(content)
-  //   this.serverContent = content;
-  // }
-  //
-  // structureParams() {
-  //   return _.merge(this.serverContent, super.structureParams());
-  // }
-
-  get content_type() {
-    return "SF|MFA";
-  }
-
-  doNotEncrypt() {
-    return true;
-  }
-
-}
-;export class ServerExtension extends SFItem {
-
-  mapContentToLocalProperties(content) {
-    super.mapContentToLocalProperties(content)
-    this.url = content.url;
-  }
-
-  get content_type() {
-    return "SF|Extension";
-  }
-
-  doNotEncrypt() {
-    return true;
-  }
-}
-;export class Component extends SFItem {
+export class Component extends SFItem {
 
   constructor(json_obj) {
     // If making a copy of an existing component (usually during sign in if you have a component active in the session),
@@ -555,6 +516,45 @@ export class Extension extends Component {
     return "SN|EncryptedStorage";
   }
 
+}
+;export class Mfa extends SFItem {
+
+  constructor(json_obj) {
+    super(json_obj);
+  }
+
+  // mapContentToLocalProperties(content) {
+  //   super.mapContentToLocalProperties(content)
+  //   this.serverContent = content;
+  // }
+  //
+  // structureParams() {
+  //   return _.merge(this.serverContent, super.structureParams());
+  // }
+
+  get content_type() {
+    return "SF|MFA";
+  }
+
+  doNotEncrypt() {
+    return true;
+  }
+
+}
+;export class ServerExtension extends SFItem {
+
+  mapContentToLocalProperties(content) {
+    super.mapContentToLocalProperties(content)
+    this.url = content.url;
+  }
+
+  get content_type() {
+    return "SF|Extension";
+  }
+
+  doNotEncrypt() {
+    return true;
+  }
 }
 ;if(typeof window !== 'undefined' && window !== null) {
   // window is for some reason defined in React Native, but throws an exception when you try to set to it
