@@ -360,12 +360,12 @@ export class Extension extends Component {
 
   setIsBeingReferencedBy(item) {
     super.setIsBeingReferencedBy(item);
-    this.savedTagsString = null;
+    this.clearSavedTagsString();
   }
 
   setIsNoLongerBeingReferencedBy(item) {
     super.setIsNoLongerBeingReferencedBy(item);
-    this.savedTagsString = null;
+    this.clearSavedTagsString();
   }
 
   isBeingRemovedLocally() {
@@ -388,6 +388,10 @@ export class Extension extends Component {
     }
   }
 
+  tagDidFinishSyncing(tag) {
+    this.clearSavedTagsString();
+  }
+
   safeText() {
     return this.text || "";
   }
@@ -404,6 +408,10 @@ export class Extension extends Component {
     return "Note";
   }
 
+  clearSavedTagsString() {
+    this.savedTagsString = null;
+  }
+
   tagsString() {
     this.savedTagsString = Tag.arrayToDisplayString(this.tags);
     return this.savedTagsString;
@@ -413,6 +421,10 @@ export class Extension extends Component {
 
   constructor(json_obj) {
     super(json_obj);
+
+    if(!this.content_type) {
+      this.content_type = "Tag";
+    }
 
     if(!this.notes) {
       this.notes = [];
@@ -484,8 +496,14 @@ export class Extension extends Component {
     }
   }
 
-  get content_type() {
-    return "Tag";
+  didFinishSyncing() {
+    for(var note of this.notes) {
+      note.tagDidFinishSyncing(this);
+    }
+  }
+
+  isSmartTag() {
+    return this.content_type == "SN|SmartTag";
   }
 
   static arrayToDisplayString(tags) {
@@ -556,11 +574,27 @@ export class Extension extends Component {
     return true;
   }
 }
+;export class SmartTag extends Tag {
+
+  isReferencingArchivedNotes() {
+    var predicate = this.content.predicate;
+    if(Array.isArray(predicate))  {
+      predicate = SFPredicate.fromArray(predicate);
+    }
+    return predicate.keypath.includes("archived");
+  }
+
+  get content_type() {
+    return "SN|SmartTag";
+  }
+
+}
 ;if(typeof window !== 'undefined' && window !== null) {
   // window is for some reason defined in React Native, but throws an exception when you try to set to it
   try {
     window.Note = Note;
     window.Tag = Tag;
+    window.SmartTag = SmartTag;
     window.Mfa = Mfa;
     window.ServerExtension = ServerExtension;
     window.Component = Component;

@@ -19,7 +19,10 @@ module.exports = function(grunt) {
 
       lib: {
         src: [
-          'lib/models/**/*.js',
+          'lib/models/app/*.js',
+          'lib/models/local/*.js',
+          'lib/models/server/*.js',
+          'lib/models/subclasses/*.js',
           'lib/main.js'
         ],
         dest: 'dist/lib.js',

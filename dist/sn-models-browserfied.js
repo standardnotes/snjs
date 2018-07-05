@@ -454,13 +454,13 @@ var Note = exports.Note = function (_SFItem3) {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
       _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "setIsBeingReferencedBy", this).call(this, item);
-      this.savedTagsString = null;
+      this.clearSavedTagsString();
     }
   }, {
     key: "setIsNoLongerBeingReferencedBy",
     value: function setIsNoLongerBeingReferencedBy(item) {
       _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item);
-      this.savedTagsString = null;
+      this.clearSavedTagsString();
     }
   }, {
     key: "isBeingRemovedLocally",
@@ -501,6 +501,11 @@ var Note = exports.Note = function (_SFItem3) {
       }
     }
   }, {
+    key: "tagDidFinishSyncing",
+    value: function tagDidFinishSyncing(tag) {
+      this.clearSavedTagsString();
+    }
+  }, {
     key: "safeText",
     value: function safeText() {
       return this.text || "";
@@ -514,6 +519,11 @@ var Note = exports.Note = function (_SFItem3) {
     key: "toJSON",
     value: function toJSON() {
       return { uuid: this.uuid };
+    }
+  }, {
+    key: "clearSavedTagsString",
+    value: function clearSavedTagsString() {
+      this.savedTagsString = null;
     }
   }, {
     key: "tagsString",
@@ -547,6 +557,10 @@ var Tag = exports.Tag = function (_SFItem4) {
     _classCallCheck(this, Tag);
 
     var _this5 = _possibleConstructorReturn(this, (Tag.__proto__ || Object.getPrototypeOf(Tag)).call(this, json_obj));
+
+    if (!_this5.content_type) {
+      _this5.content_type = "Tag";
+    }
 
     if (!_this5.notes) {
       _this5.notes = [];
@@ -652,9 +666,37 @@ var Tag = exports.Tag = function (_SFItem4) {
       }
     }
   }, {
-    key: "content_type",
-    get: function get() {
-      return "Tag";
+    key: "didFinishSyncing",
+    value: function didFinishSyncing() {
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = this.notes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var note = _step3.value;
+
+          note.tagDidFinishSyncing(this);
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+    }
+  }, {
+    key: "isSmartTag",
+    value: function isSmartTag() {
+      return this.content_type == "SN|SmartTag";
     }
   }], [{
     key: "arrayToDisplayString",
@@ -784,11 +826,41 @@ var ServerExtension = exports.ServerExtension = function (_SFItem7) {
   return ServerExtension;
 }(SFItem);
 
+;
+var SmartTag = exports.SmartTag = function (_Tag) {
+  _inherits(SmartTag, _Tag);
+
+  function SmartTag() {
+    _classCallCheck(this, SmartTag);
+
+    return _possibleConstructorReturn(this, (SmartTag.__proto__ || Object.getPrototypeOf(SmartTag)).apply(this, arguments));
+  }
+
+  _createClass(SmartTag, [{
+    key: "isReferencingArchivedNotes",
+    value: function isReferencingArchivedNotes() {
+      var predicate = this.content.predicate;
+      if (Array.isArray(predicate)) {
+        predicate = SFPredicate.fromArray(predicate);
+      }
+      return predicate.keypath.includes("archived");
+    }
+  }, {
+    key: "content_type",
+    get: function get() {
+      return "SN|SmartTag";
+    }
+  }]);
+
+  return SmartTag;
+}(Tag);
+
 ;if (typeof window !== 'undefined' && window !== null) {
   // window is for some reason defined in React Native, but throws an exception when you try to set to it
   try {
     window.Note = Note;
     window.Tag = Tag;
+    window.SmartTag = SmartTag;
     window.Mfa = Mfa;
     window.ServerExtension = ServerExtension;
     window.Component = Component;
