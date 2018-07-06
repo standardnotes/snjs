@@ -23,11 +23,16 @@ export class Component extends SFItem {
   mapContentToLocalProperties(content) {
     super.mapContentToLocalProperties(content)
     /* Legacy */
-    this.url = content.url || content.hosted_url;
+    // We don't want to set the url directly, as we'd like to phase it out.
+    // If the content.url exists, we'll transfer it to legacy_url
+    // We'll only need to set this if content.hosted_url is blank, otherwise, hosted_url is the url replacement.
+    if(!content.hosted_url) {
+      this.legacy_url = content.url;
+    }
 
     /* New */
     this.local_url = content.local_url;
-    this.hosted_url = content.hosted_url || content.url;
+    this.hosted_url = content.hosted_url;
     this.offlineOnly = content.offlineOnly;
 
     if(content.valid_until) {
@@ -67,7 +72,7 @@ export class Component extends SFItem {
 
   structureParams() {
     var params = {
-      url: this.url,
+      legacy_url: this.legacy_url,
       hosted_url: this.hosted_url,
       local_url: this.local_url,
       valid_until: this.valid_until,
@@ -114,6 +119,22 @@ export class Component extends SFItem {
 
   getLastSize() {
     return this.getAppDataItem("lastSize");
+  }
+
+  /*
+    The key used to look up data that this component may have saved to an item.
+    This key will be look up on the item, and not on itself.
+   */
+  getClientDataKey() {
+    if(this.legacy_url) {
+      return this.legacy_url;
+    } else {
+      return this.uuid;
+    }
+  }
+
+  hasValidHostedUrl() {
+    return this.hosted_url || this.legacy_url;
   }
 
   keysToIgnoreWhenCheckingContentEquality() {

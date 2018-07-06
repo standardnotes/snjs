@@ -45,11 +45,16 @@ var Component = exports.Component = function (_SFItem) {
     value: function mapContentToLocalProperties(content) {
       _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "mapContentToLocalProperties", this).call(this, content);
       /* Legacy */
-      this.url = content.url || content.hosted_url;
+      // We don't want to set the url directly, as we'd like to phase it out.
+      // If the content.url exists, we'll transfer it to legacy_url
+      // We'll only need to set this if content.hosted_url is blank, otherwise, hosted_url is the url replacement.
+      if (!content.hosted_url) {
+        this.legacy_url = content.url;
+      }
 
       /* New */
       this.local_url = content.local_url;
-      this.hosted_url = content.hosted_url || content.url;
+      this.hosted_url = content.hosted_url;
       this.offlineOnly = content.offlineOnly;
 
       if (content.valid_until) {
@@ -91,7 +96,7 @@ var Component = exports.Component = function (_SFItem) {
     key: "structureParams",
     value: function structureParams() {
       var params = {
-        url: this.url,
+        legacy_url: this.legacy_url,
         hosted_url: this.hosted_url,
         local_url: this.local_url,
         valid_until: this.valid_until,
@@ -140,6 +145,26 @@ var Component = exports.Component = function (_SFItem) {
     key: "getLastSize",
     value: function getLastSize() {
       return this.getAppDataItem("lastSize");
+    }
+
+    /*
+      The key used to look up data that this component may have saved to an item.
+      This key will be look up on the item, and not on itself.
+     */
+
+  }, {
+    key: "getClientDataKey",
+    value: function getClientDataKey() {
+      if (this.legacy_url) {
+        return this.legacy_url;
+      } else {
+        return this.uuid;
+      }
+    }
+  }, {
+    key: "hasValidHostedUrl",
+    value: function hasValidHostedUrl() {
+      return this.hosted_url || this.legacy_url;
     }
   }, {
     key: "keysToIgnoreWhenCheckingContentEquality",
