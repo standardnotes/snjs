@@ -281,7 +281,7 @@ export class Component extends SFItem {
   }
 }
 
-export class Extension extends Component {
+export class Extension extends SFItem {
   constructor(json) {
       super(json);
 
@@ -305,7 +305,9 @@ export class Extension extends Component {
   mapContentToLocalProperties(content) {
     super.mapContentToLocalProperties(content)
     this.description = content.description;
-
+    this.url = content.url;
+    this.name = content.name;
+    this.package_info = content.package_info;
     this.supported_types = content.supported_types;
     if(content.actions) {
       this.actions = content.actions.map(function(action){
@@ -320,6 +322,9 @@ export class Extension extends Component {
 
   structureParams() {
     var params = {
+      name: this.name,
+      url: this.url,
+      package_info: this.package_info,
       description: this.description,
       actions: this.actions.map((a) => {return _.omit(a, ["subrows", "subactions"])}),
       supported_types: this.supported_types

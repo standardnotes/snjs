@@ -354,8 +354,8 @@ var Action = exports.Action = function Action(json) {
   }
 };
 
-var Extension = exports.Extension = function (_Component) {
-  _inherits(Extension, _Component);
+var Extension = exports.Extension = function (_SFItem3) {
+  _inherits(Extension, _SFItem3);
 
   function Extension(json) {
     _classCallCheck(this, Extension);
@@ -386,7 +386,9 @@ var Extension = exports.Extension = function (_Component) {
     value: function mapContentToLocalProperties(content) {
       _get(Extension.prototype.__proto__ || Object.getPrototypeOf(Extension.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.description = content.description;
-
+      this.url = content.url;
+      this.name = content.name;
+      this.package_info = content.package_info;
       this.supported_types = content.supported_types;
       if (content.actions) {
         this.actions = content.actions.map(function (action) {
@@ -398,6 +400,9 @@ var Extension = exports.Extension = function (_Component) {
     key: "structureParams",
     value: function structureParams() {
       var params = {
+        name: this.name,
+        url: this.url,
+        package_info: this.package_info,
         description: this.description,
         actions: this.actions.map(function (a) {
           return _.omit(a, ["subrows", "subactions"]);
@@ -417,11 +422,11 @@ var Extension = exports.Extension = function (_Component) {
   }]);
 
   return Extension;
-}(Component);
+}(SFItem);
 
 ;
-var Note = exports.Note = function (_SFItem3) {
-  _inherits(Note, _SFItem3);
+var Note = exports.Note = function (_SFItem4) {
+  _inherits(Note, _SFItem4);
 
   function Note(json_obj) {
     _classCallCheck(this, Note);
@@ -575,8 +580,8 @@ var Note = exports.Note = function (_SFItem3) {
 }(SFItem);
 
 ;
-var Tag = exports.Tag = function (_SFItem4) {
-  _inherits(Tag, _SFItem4);
+var Tag = exports.Tag = function (_SFItem5) {
+  _inherits(Tag, _SFItem5);
 
   function Tag(json_obj) {
     _classCallCheck(this, Tag);
@@ -738,8 +743,8 @@ var Tag = exports.Tag = function (_SFItem4) {
 }(SFItem);
 
 ;
-var Theme = exports.Theme = function (_Component2) {
-  _inherits(Theme, _Component2);
+var Theme = exports.Theme = function (_Component) {
+  _inherits(Theme, _Component);
 
   function Theme(json_obj) {
     _classCallCheck(this, Theme);
@@ -761,8 +766,8 @@ var Theme = exports.Theme = function (_Component2) {
 }(Component);
 
 ;
-var EncryptedStorage = exports.EncryptedStorage = function (_SFItem5) {
-  _inherits(EncryptedStorage, _SFItem5);
+var EncryptedStorage = exports.EncryptedStorage = function (_SFItem6) {
+  _inherits(EncryptedStorage, _SFItem6);
 
   function EncryptedStorage() {
     _classCallCheck(this, EncryptedStorage);
@@ -787,8 +792,8 @@ var EncryptedStorage = exports.EncryptedStorage = function (_SFItem5) {
 }(SFItem);
 
 ;
-var Mfa = exports.Mfa = function (_SFItem6) {
-  _inherits(Mfa, _SFItem6);
+var Mfa = exports.Mfa = function (_SFItem7) {
+  _inherits(Mfa, _SFItem7);
 
   function Mfa(json_obj) {
     _classCallCheck(this, Mfa);
@@ -821,8 +826,8 @@ var Mfa = exports.Mfa = function (_SFItem6) {
 }(SFItem);
 
 ;
-var ServerExtension = exports.ServerExtension = function (_SFItem7) {
-  _inherits(ServerExtension, _SFItem7);
+var ServerExtension = exports.ServerExtension = function (_SFItem8) {
+  _inherits(ServerExtension, _SFItem8);
 
   function ServerExtension() {
     _classCallCheck(this, ServerExtension);
