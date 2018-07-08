@@ -1,4 +1,4 @@
-export class Component extends SFItem {
+export class SNComponent extends SFItem {
 
   constructor(json_obj) {
     // If making a copy of an existing component (usually during sign in if you have a component active in the session),
@@ -166,7 +166,7 @@ export class Component extends SFItem {
     return this.disassociatedItemIds.indexOf(item.uuid) !== -1;
   }
 }
-;export class Editor extends SFItem {
+;export class SNEditor extends SFItem {
 
   constructor(json_obj) {
     super(json_obj);
@@ -281,7 +281,7 @@ export class Component extends SFItem {
   }
 }
 
-export class Extension extends SFItem {
+export class SNExtension extends SFItem {
   constructor(json) {
       super(json);
 
@@ -336,7 +336,7 @@ export class Extension extends SFItem {
   }
 
 }
-;export class Note extends SFItem {
+;export class SNNote extends SFItem {
 
   constructor(json_obj) {
     super(json_obj);
@@ -434,16 +434,20 @@ export class Extension extends SFItem {
     return "Note";
   }
 
+  get displayName() {
+    return "Note";
+  }
+
   clearSavedTagsString() {
     this.savedTagsString = null;
   }
 
   tagsString() {
-    this.savedTagsString = Tag.arrayToDisplayString(this.tags);
+    this.savedTagsString = SNTag.arrayToDisplayString(this.tags);
     return this.savedTagsString;
   }
 }
-;export class Tag extends SFItem {
+;export class SNTag extends SFItem {
 
   constructor(json_obj) {
     super(json_obj);
@@ -532,24 +536,17 @@ export class Extension extends SFItem {
     return this.content_type == "SN|SmartTag";
   }
 
+  get displayName() {
+    return "Tag";
+  }
+
   static arrayToDisplayString(tags) {
     return tags.sort((a, b) => {return a.title > b.title}).map(function(tag, i){
       return "#" + tag.title;
     }).join(" ");
   }
 }
-;export class Theme extends Component {
-
-  constructor(json_obj) {
-    super(json_obj);
-    this.area = "themes";
-  }
-
-  get content_type() {
-    return "SN|Theme";
-  }
-}
-;export class EncryptedStorage extends SFItem {
+;export class SNEncryptedStorage extends SFItem {
 
   mapContentToLocalProperties(content) {
     super.mapContentToLocalProperties(content)
@@ -561,7 +558,7 @@ export class Extension extends SFItem {
   }
 
 }
-;export class Mfa extends SFItem {
+;export class SNMfa extends SFItem {
 
   constructor(json_obj) {
     super(json_obj);
@@ -585,7 +582,7 @@ export class Extension extends SFItem {
   }
 
 }
-;export class ServerExtension extends SFItem {
+;export class SNServerExtension extends SFItem {
 
   mapContentToLocalProperties(content) {
     super.mapContentToLocalProperties(content)
@@ -600,7 +597,7 @@ export class Extension extends SFItem {
     return true;
   }
 }
-;export class SmartTag extends Tag {
+;export class SNSmartTag extends SNTag {
 
   isReferencingArchivedNotes() {
     var predicate = this.content.predicate;
@@ -615,19 +612,36 @@ export class Extension extends SFItem {
   }
 
 }
-;if(typeof window !== 'undefined' && window !== null) {
+;export class SNTheme extends SNComponent {
+
+  constructor(json_obj) {
+    super(json_obj);
+    this.area = "themes";
+  }
+
+  get content_type() {
+    return "SN|Theme";
+  }
+
+  get displayName() {
+    return "Theme";
+  }
+}
+;import {SFItem} from 'standard-file-js';
+
+if(typeof window !== 'undefined' && window !== null) {
   // window is for some reason defined in React Native, but throws an exception when you try to set to it
   try {
-    window.Note = Note;
-    window.Tag = Tag;
-    window.SmartTag = SmartTag;
-    window.Mfa = Mfa;
-    window.ServerExtension = ServerExtension;
-    window.Component = Component;
-    window.Editor = Editor;
-    window.Extension = Extension;
-    window.Theme = Theme;
-    window.EncryptedStorage = EncryptedStorage;
+    window.SNNote = SNNote;
+    window.SNTag = SNTag;
+    window.SNSmartTag = SNSmartTag;
+    window.SNMfa = SNMfa;
+    window.SNServerExtension = SNServerExtension;
+    window.SNComponent = SNComponent;
+    window.SNEditor = SNEditor;
+    window.SNExtension = SNExtension;
+    window.SNTheme = SNTheme;
+    window.SNEncryptedStorage = SNEncryptedStorage;
   } catch (e) {
     console.log("Exception while exporting window variables", e);
   }

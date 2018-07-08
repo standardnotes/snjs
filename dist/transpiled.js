@@ -3,10 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SNTheme = exports.SNSmartTag = exports.SNServerExtension = exports.SNMfa = exports.SNEncryptedStorage = exports.SNTag = exports.SNNote = exports.SNExtension = exports.Action = exports.SNEditor = exports.SNComponent = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _standardFileJs = require("standard-file-js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14,17 +17,17 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Component = exports.Component = function (_SFItem) {
-  _inherits(Component, _SFItem);
+var SNComponent = exports.SNComponent = function (_SFItem) {
+  _inherits(SNComponent, _SFItem);
 
-  function Component(json_obj) {
-    _classCallCheck(this, Component);
+  function SNComponent(json_obj) {
+    _classCallCheck(this, SNComponent);
 
     // If making a copy of an existing component (usually during sign in if you have a component active in the session),
     // which may have window set, you may get a cross-origin exception since you'll be trying to copy the window. So we clear it here.
     json_obj.window = null;
 
-    var _this = _possibleConstructorReturn(this, (Component.__proto__ || Object.getPrototypeOf(Component)).call(this, json_obj));
+    var _this = _possibleConstructorReturn(this, (SNComponent.__proto__ || Object.getPrototypeOf(SNComponent)).call(this, json_obj));
 
     if (!_this.componentData) {
       _this.componentData = {};
@@ -40,10 +43,10 @@ var Component = exports.Component = function (_SFItem) {
     return _this;
   }
 
-  _createClass(Component, [{
+  _createClass(SNComponent, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "mapContentToLocalProperties", this).call(this, content);
       /* Legacy */
       // We don't want to set the url directly, as we'd like to phase it out.
       // If the content.url exists, we'll transfer it to legacy_url
@@ -88,7 +91,7 @@ var Component = exports.Component = function (_SFItem) {
   }, {
     key: "handleDeletedContent",
     value: function handleDeletedContent() {
-      _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "handleDeletedContent", this).call(this);
+      _get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "handleDeletedContent", this).call(this);
 
       this.active = false;
     }
@@ -112,7 +115,7 @@ var Component = exports.Component = function (_SFItem) {
         associatedItemIds: this.associatedItemIds
       };
 
-      var superParams = _get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "structureParams", this).call(this);
+      var superParams = _get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
     }
@@ -169,7 +172,7 @@ var Component = exports.Component = function (_SFItem) {
   }, {
     key: "keysToIgnoreWhenCheckingContentEquality",
     value: function keysToIgnoreWhenCheckingContentEquality() {
-      return ["active"].concat(_get(Component.prototype.__proto__ || Object.getPrototypeOf(Component.prototype), "keysToIgnoreWhenCheckingContentEquality", this).call(this));
+      return ["active"].concat(_get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "keysToIgnoreWhenCheckingContentEquality", this).call(this));
     }
 
     /*
@@ -209,17 +212,17 @@ var Component = exports.Component = function (_SFItem) {
     }
   }]);
 
-  return Component;
-}(SFItem);
+  return SNComponent;
+}(_standardFileJs.SFItem);
 
 ;
-var Editor = exports.Editor = function (_SFItem2) {
-  _inherits(Editor, _SFItem2);
+var SNEditor = exports.SNEditor = function (_SFItem2) {
+  _inherits(SNEditor, _SFItem2);
 
-  function Editor(json_obj) {
-    _classCallCheck(this, Editor);
+  function SNEditor(json_obj) {
+    _classCallCheck(this, SNEditor);
 
-    var _this2 = _possibleConstructorReturn(this, (Editor.__proto__ || Object.getPrototypeOf(Editor)).call(this, json_obj));
+    var _this2 = _possibleConstructorReturn(this, (SNEditor.__proto__ || Object.getPrototypeOf(SNEditor)).call(this, json_obj));
 
     if (!_this2.notes) {
       _this2.notes = [];
@@ -230,10 +233,10 @@ var Editor = exports.Editor = function (_SFItem2) {
     return _this2;
   }
 
-  _createClass(Editor, [{
+  _createClass(SNEditor, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.url = content.url;
       this.name = content.name;
       this.data = content.data || {};
@@ -251,7 +254,7 @@ var Editor = exports.Editor = function (_SFItem2) {
         systemEditor: this.systemEditor
       };
 
-      var superParams = _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "structureParams", this).call(this);
+      var superParams = _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
     }
@@ -272,7 +275,7 @@ var Editor = exports.Editor = function (_SFItem2) {
           this.notes.push(item);
         }
       }
-      _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "addItemAsRelationship", this).call(this, item);
+      _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "addItemAsRelationship", this).call(this, item);
     }
   }, {
     key: "removeItemAsRelationship",
@@ -280,18 +283,18 @@ var Editor = exports.Editor = function (_SFItem2) {
       if (item.content_type == "Note") {
         _.pull(this.notes, item);
       }
-      _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "removeItemAsRelationship", this).call(this, item);
+      _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "removeItemAsRelationship", this).call(this, item);
     }
   }, {
     key: "removeAndDirtyAllRelationships",
     value: function removeAndDirtyAllRelationships() {
-      _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "removeAndDirtyAllRelationships", this).call(this);
+      _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "removeAndDirtyAllRelationships", this).call(this);
       this.notes = [];
     }
   }, {
     key: "removeReferencesNotPresentIn",
     value: function removeReferencesNotPresentIn(references) {
-      _get(Editor.prototype.__proto__ || Object.getPrototypeOf(Editor.prototype), "removeReferencesNotPresentIn", this).call(this, references);
+      _get(SNEditor.prototype.__proto__ || Object.getPrototypeOf(SNEditor.prototype), "removeReferencesNotPresentIn", this).call(this, references);
 
       var uuids = references.map(function (ref) {
         return ref.uuid;
@@ -337,8 +340,8 @@ var Editor = exports.Editor = function (_SFItem2) {
     }
   }]);
 
-  return Editor;
-}(SFItem);
+  return SNEditor;
+}(_standardFileJs.SFItem);
 
 ;
 var Action = exports.Action = function Action(json) {
@@ -353,13 +356,13 @@ var Action = exports.Action = function Action(json) {
   }
 };
 
-var Extension = exports.Extension = function (_SFItem3) {
-  _inherits(Extension, _SFItem3);
+var SNExtension = exports.SNExtension = function (_SFItem3) {
+  _inherits(SNExtension, _SFItem3);
 
-  function Extension(json) {
-    _classCallCheck(this, Extension);
+  function SNExtension(json) {
+    _classCallCheck(this, SNExtension);
 
-    var _this3 = _possibleConstructorReturn(this, (Extension.__proto__ || Object.getPrototypeOf(Extension)).call(this, json));
+    var _this3 = _possibleConstructorReturn(this, (SNExtension.__proto__ || Object.getPrototypeOf(SNExtension)).call(this, json));
 
     if (json.actions) {
       _this3.actions = json.actions.map(function (action) {
@@ -373,7 +376,7 @@ var Extension = exports.Extension = function (_SFItem3) {
     return _this3;
   }
 
-  _createClass(Extension, [{
+  _createClass(SNExtension, [{
     key: "actionsWithContextForItem",
     value: function actionsWithContextForItem(item) {
       return this.actions.filter(function (action) {
@@ -383,7 +386,7 @@ var Extension = exports.Extension = function (_SFItem3) {
   }, {
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(Extension.prototype.__proto__ || Object.getPrototypeOf(Extension.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNExtension.prototype.__proto__ || Object.getPrototypeOf(SNExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.description = content.description;
       this.url = content.url;
       this.name = content.name;
@@ -409,7 +412,7 @@ var Extension = exports.Extension = function (_SFItem3) {
         supported_types: this.supported_types
       };
 
-      var superParams = _get(Extension.prototype.__proto__ || Object.getPrototypeOf(Extension.prototype), "structureParams", this).call(this);
+      var superParams = _get(SNExtension.prototype.__proto__ || Object.getPrototypeOf(SNExtension.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
     }
@@ -420,17 +423,17 @@ var Extension = exports.Extension = function (_SFItem3) {
     }
   }]);
 
-  return Extension;
-}(SFItem);
+  return SNExtension;
+}(_standardFileJs.SFItem);
 
 ;
-var Note = exports.Note = function (_SFItem4) {
-  _inherits(Note, _SFItem4);
+var SNNote = exports.SNNote = function (_SFItem4) {
+  _inherits(SNNote, _SFItem4);
 
-  function Note(json_obj) {
-    _classCallCheck(this, Note);
+  function SNNote(json_obj) {
+    _classCallCheck(this, SNNote);
 
-    var _this4 = _possibleConstructorReturn(this, (Note.__proto__ || Object.getPrototypeOf(Note)).call(this, json_obj));
+    var _this4 = _possibleConstructorReturn(this, (SNNote.__proto__ || Object.getPrototypeOf(SNNote)).call(this, json_obj));
 
     if (!_this4.text) {
       // Some external editors can't handle a null value for text.
@@ -445,10 +448,10 @@ var Note = exports.Note = function (_SFItem4) {
     return _this4;
   }
 
-  _createClass(Note, [{
+  _createClass(SNNote, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.title = content.title;
       this.text = content.text;
     }
@@ -460,7 +463,7 @@ var Note = exports.Note = function (_SFItem4) {
         text: this.text
       };
 
-      var superParams = _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "structureParams", this).call(this);
+      var superParams = _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
     }
@@ -477,18 +480,18 @@ var Note = exports.Note = function (_SFItem4) {
       if (item.content_type == "Tag") {
         item.addItemAsRelationship(this);
       }
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "addItemAsRelationship", this).call(this, item);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "addItemAsRelationship", this).call(this, item);
     }
   }, {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "setIsBeingReferencedBy", this).call(this, item);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "setIsBeingReferencedBy", this).call(this, item);
       this.clearSavedTagsString();
     }
   }, {
     key: "setIsNoLongerBeingReferencedBy",
     value: function setIsNoLongerBeingReferencedBy(item) {
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item);
       this.clearSavedTagsString();
     }
   }, {
@@ -497,12 +500,12 @@ var Note = exports.Note = function (_SFItem4) {
       this.tags.forEach(function (tag) {
         _.remove(tag.notes, { uuid: this.uuid });
       }.bind(this));
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "isBeingRemovedLocally", this).call(this);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "isBeingRemovedLocally", this).call(this);
     }
   }, {
     key: "informReferencesOfUUIDChange",
     value: function informReferencesOfUUIDChange(oldUUID, newUUID) {
-      _get(Note.prototype.__proto__ || Object.getPrototypeOf(Note.prototype), "informReferencesOfUUIDChange", this).call(this);
+      _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "informReferencesOfUUIDChange", this).call(this);
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -557,11 +560,16 @@ var Note = exports.Note = function (_SFItem4) {
   }, {
     key: "tagsString",
     value: function tagsString() {
-      this.savedTagsString = Tag.arrayToDisplayString(this.tags);
+      this.savedTagsString = SNTag.arrayToDisplayString(this.tags);
       return this.savedTagsString;
     }
   }, {
     key: "content_type",
+    get: function get() {
+      return "Note";
+    }
+  }, {
+    key: "displayName",
     get: function get() {
       return "Note";
     }
@@ -575,17 +583,17 @@ var Note = exports.Note = function (_SFItem4) {
     }
   }]);
 
-  return Note;
-}(SFItem);
+  return SNNote;
+}(_standardFileJs.SFItem);
 
 ;
-var Tag = exports.Tag = function (_SFItem5) {
-  _inherits(Tag, _SFItem5);
+var SNTag = exports.SNTag = function (_SFItem5) {
+  _inherits(SNTag, _SFItem5);
 
-  function Tag(json_obj) {
-    _classCallCheck(this, Tag);
+  function SNTag(json_obj) {
+    _classCallCheck(this, SNTag);
 
-    var _this5 = _possibleConstructorReturn(this, (Tag.__proto__ || Object.getPrototypeOf(Tag)).call(this, json_obj));
+    var _this5 = _possibleConstructorReturn(this, (SNTag.__proto__ || Object.getPrototypeOf(SNTag)).call(this, json_obj));
 
     if (!_this5.content_type) {
       _this5.content_type = "Tag";
@@ -597,10 +605,10 @@ var Tag = exports.Tag = function (_SFItem5) {
     return _this5;
   }
 
-  _createClass(Tag, [{
+  _createClass(SNTag, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(Tag.prototype.__proto__ || Object.getPrototypeOf(Tag.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNTag.prototype.__proto__ || Object.getPrototypeOf(SNTag.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.title = content.title;
     }
   }, {
@@ -610,7 +618,7 @@ var Tag = exports.Tag = function (_SFItem5) {
         title: this.title
       };
 
-      var superParams = _get(Tag.prototype.__proto__ || Object.getPrototypeOf(Tag.prototype), "structureParams", this).call(this);
+      var superParams = _get(SNTag.prototype.__proto__ || Object.getPrototypeOf(SNTag.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
     }
@@ -623,7 +631,7 @@ var Tag = exports.Tag = function (_SFItem5) {
           item.tags.push(this);
         }
       }
-      _get(Tag.prototype.__proto__ || Object.getPrototypeOf(Tag.prototype), "addItemAsRelationship", this).call(this, item);
+      _get(SNTag.prototype.__proto__ || Object.getPrototypeOf(SNTag.prototype), "addItemAsRelationship", this).call(this, item);
     }
   }, {
     key: "removeItemAsRelationship",
@@ -632,7 +640,7 @@ var Tag = exports.Tag = function (_SFItem5) {
         _.remove(this.notes, { uuid: item.uuid });
         _.remove(item.tags, { uuid: this.uuid });
       }
-      _get(Tag.prototype.__proto__ || Object.getPrototypeOf(Tag.prototype), "removeItemAsRelationship", this).call(this, item);
+      _get(SNTag.prototype.__proto__ || Object.getPrototypeOf(SNTag.prototype), "removeItemAsRelationship", this).call(this, item);
     }
   }, {
     key: "updateLocalRelationships",
@@ -663,7 +671,7 @@ var Tag = exports.Tag = function (_SFItem5) {
 
       this.notes.length = 0;
 
-      _get(Tag.prototype.__proto__ || Object.getPrototypeOf(Tag.prototype), "isBeingRemovedLocally", this).call(this);
+      _get(SNTag.prototype.__proto__ || Object.getPrototypeOf(SNTag.prototype), "isBeingRemovedLocally", this).call(this);
     }
   }, {
     key: "informReferencesOfUUIDChange",
@@ -727,6 +735,11 @@ var Tag = exports.Tag = function (_SFItem5) {
     value: function isSmartTag() {
       return this.content_type == "SN|SmartTag";
     }
+  }, {
+    key: "displayName",
+    get: function get() {
+      return "Tag";
+    }
   }], [{
     key: "arrayToDisplayString",
     value: function arrayToDisplayString(tags) {
@@ -738,46 +751,23 @@ var Tag = exports.Tag = function (_SFItem5) {
     }
   }]);
 
-  return Tag;
-}(SFItem);
+  return SNTag;
+}(_standardFileJs.SFItem);
 
 ;
-var Theme = exports.Theme = function (_Component) {
-  _inherits(Theme, _Component);
+var SNEncryptedStorage = exports.SNEncryptedStorage = function (_SFItem6) {
+  _inherits(SNEncryptedStorage, _SFItem6);
 
-  function Theme(json_obj) {
-    _classCallCheck(this, Theme);
+  function SNEncryptedStorage() {
+    _classCallCheck(this, SNEncryptedStorage);
 
-    var _this7 = _possibleConstructorReturn(this, (Theme.__proto__ || Object.getPrototypeOf(Theme)).call(this, json_obj));
-
-    _this7.area = "themes";
-    return _this7;
+    return _possibleConstructorReturn(this, (SNEncryptedStorage.__proto__ || Object.getPrototypeOf(SNEncryptedStorage)).apply(this, arguments));
   }
 
-  _createClass(Theme, [{
-    key: "content_type",
-    get: function get() {
-      return "SN|Theme";
-    }
-  }]);
-
-  return Theme;
-}(Component);
-
-;
-var EncryptedStorage = exports.EncryptedStorage = function (_SFItem6) {
-  _inherits(EncryptedStorage, _SFItem6);
-
-  function EncryptedStorage() {
-    _classCallCheck(this, EncryptedStorage);
-
-    return _possibleConstructorReturn(this, (EncryptedStorage.__proto__ || Object.getPrototypeOf(EncryptedStorage)).apply(this, arguments));
-  }
-
-  _createClass(EncryptedStorage, [{
+  _createClass(SNEncryptedStorage, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(EncryptedStorage.prototype.__proto__ || Object.getPrototypeOf(EncryptedStorage.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNEncryptedStorage.prototype.__proto__ || Object.getPrototypeOf(SNEncryptedStorage.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.storage = content.storage;
     }
   }, {
@@ -787,17 +777,17 @@ var EncryptedStorage = exports.EncryptedStorage = function (_SFItem6) {
     }
   }]);
 
-  return EncryptedStorage;
-}(SFItem);
+  return SNEncryptedStorage;
+}(_standardFileJs.SFItem);
 
 ;
-var Mfa = exports.Mfa = function (_SFItem7) {
-  _inherits(Mfa, _SFItem7);
+var SNMfa = exports.SNMfa = function (_SFItem7) {
+  _inherits(SNMfa, _SFItem7);
 
-  function Mfa(json_obj) {
-    _classCallCheck(this, Mfa);
+  function SNMfa(json_obj) {
+    _classCallCheck(this, SNMfa);
 
-    return _possibleConstructorReturn(this, (Mfa.__proto__ || Object.getPrototypeOf(Mfa)).call(this, json_obj));
+    return _possibleConstructorReturn(this, (SNMfa.__proto__ || Object.getPrototypeOf(SNMfa)).call(this, json_obj));
   }
 
   // mapContentToLocalProperties(content) {
@@ -809,7 +799,7 @@ var Mfa = exports.Mfa = function (_SFItem7) {
   //   return _.merge(this.serverContent, super.structureParams());
   // }
 
-  _createClass(Mfa, [{
+  _createClass(SNMfa, [{
     key: "doNotEncrypt",
     value: function doNotEncrypt() {
       return true;
@@ -821,23 +811,23 @@ var Mfa = exports.Mfa = function (_SFItem7) {
     }
   }]);
 
-  return Mfa;
-}(SFItem);
+  return SNMfa;
+}(_standardFileJs.SFItem);
 
 ;
-var ServerExtension = exports.ServerExtension = function (_SFItem8) {
-  _inherits(ServerExtension, _SFItem8);
+var SNServerExtension = exports.SNServerExtension = function (_SFItem8) {
+  _inherits(SNServerExtension, _SFItem8);
 
-  function ServerExtension() {
-    _classCallCheck(this, ServerExtension);
+  function SNServerExtension() {
+    _classCallCheck(this, SNServerExtension);
 
-    return _possibleConstructorReturn(this, (ServerExtension.__proto__ || Object.getPrototypeOf(ServerExtension)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (SNServerExtension.__proto__ || Object.getPrototypeOf(SNServerExtension)).apply(this, arguments));
   }
 
-  _createClass(ServerExtension, [{
+  _createClass(SNServerExtension, [{
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(content) {
-      _get(ServerExtension.prototype.__proto__ || Object.getPrototypeOf(ServerExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
+      _get(SNServerExtension.prototype.__proto__ || Object.getPrototypeOf(SNServerExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
       this.url = content.url;
     }
   }, {
@@ -852,20 +842,20 @@ var ServerExtension = exports.ServerExtension = function (_SFItem8) {
     }
   }]);
 
-  return ServerExtension;
-}(SFItem);
+  return SNServerExtension;
+}(_standardFileJs.SFItem);
 
 ;
-var SmartTag = exports.SmartTag = function (_Tag) {
-  _inherits(SmartTag, _Tag);
+var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
+  _inherits(SNSmartTag, _SNTag);
 
-  function SmartTag() {
-    _classCallCheck(this, SmartTag);
+  function SNSmartTag() {
+    _classCallCheck(this, SNSmartTag);
 
-    return _possibleConstructorReturn(this, (SmartTag.__proto__ || Object.getPrototypeOf(SmartTag)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (SNSmartTag.__proto__ || Object.getPrototypeOf(SNSmartTag)).apply(this, arguments));
   }
 
-  _createClass(SmartTag, [{
+  _createClass(SNSmartTag, [{
     key: "isReferencingArchivedNotes",
     value: function isReferencingArchivedNotes() {
       var predicate = this.content.predicate;
@@ -881,22 +871,52 @@ var SmartTag = exports.SmartTag = function (_Tag) {
     }
   }]);
 
-  return SmartTag;
-}(Tag);
+  return SNSmartTag;
+}(SNTag);
 
-;if (typeof window !== 'undefined' && window !== null) {
+;
+var SNTheme = exports.SNTheme = function (_SNComponent) {
+  _inherits(SNTheme, _SNComponent);
+
+  function SNTheme(json_obj) {
+    _classCallCheck(this, SNTheme);
+
+    var _this11 = _possibleConstructorReturn(this, (SNTheme.__proto__ || Object.getPrototypeOf(SNTheme)).call(this, json_obj));
+
+    _this11.area = "themes";
+    return _this11;
+  }
+
+  _createClass(SNTheme, [{
+    key: "content_type",
+    get: function get() {
+      return "SN|Theme";
+    }
+  }, {
+    key: "displayName",
+    get: function get() {
+      return "Theme";
+    }
+  }]);
+
+  return SNTheme;
+}(SNComponent);
+
+;
+
+if (typeof window !== 'undefined' && window !== null) {
   // window is for some reason defined in React Native, but throws an exception when you try to set to it
   try {
-    window.Note = Note;
-    window.Tag = Tag;
-    window.SmartTag = SmartTag;
-    window.Mfa = Mfa;
-    window.ServerExtension = ServerExtension;
-    window.Component = Component;
-    window.Editor = Editor;
-    window.Extension = Extension;
-    window.Theme = Theme;
-    window.EncryptedStorage = EncryptedStorage;
+    window.SNNote = SNNote;
+    window.SNTag = SNTag;
+    window.SNSmartTag = SNSmartTag;
+    window.SNMfa = SNMfa;
+    window.SNServerExtension = SNServerExtension;
+    window.SNComponent = SNComponent;
+    window.SNEditor = SNEditor;
+    window.SNExtension = SNExtension;
+    window.SNTheme = SNTheme;
+    window.SNEncryptedStorage = SNEncryptedStorage;
   } catch (e) {
     console.log("Exception while exporting window variables", e);
   }

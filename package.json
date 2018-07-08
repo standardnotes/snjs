@@ -22,5 +22,8 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-newer": "^1.2.0",
     "browserify": "^16.2.2"
+  },
+  "dependencies": {
+    "standard-file-js": "file:~/Desktop/sf/sfjs"
   }
 }
