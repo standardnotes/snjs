@@ -57,7 +57,7 @@ var SNComponent = exports.SNComponent = function (_SFItem) {
 
       /* New */
       this.local_url = content.local_url;
-      this.hosted_url = content.hosted_url;
+      this.hosted_url = content.hosted_url || content.url;
       this.offlineOnly = content.offlineOnly;
 
       if (content.valid_until) {
@@ -118,11 +118,6 @@ var SNComponent = exports.SNComponent = function (_SFItem) {
       var superParams = _get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "structureParams", this).call(this);
       Object.assign(superParams, params);
       return superParams;
-    }
-  }, {
-    key: "toJSON",
-    value: function toJSON() {
-      return { uuid: this.uuid };
     }
   }, {
     key: "isEditor",
@@ -312,11 +307,6 @@ var SNEditor = exports.SNEditor = function (_SFItem2) {
         _.remove(this.notes, { uuid: oldUUID });
         this.notes.push(newItem);
       }
-    }
-  }, {
-    key: "toJSON",
-    value: function toJSON() {
-      return { uuid: this.uuid };
     }
   }, {
     key: "setData",
@@ -546,11 +536,6 @@ var SNNote = exports.SNNote = function (_SFItem4) {
     key: "safeTitle",
     value: function safeTitle() {
       return this.title || "";
-    }
-  }, {
-    key: "toJSON",
-    value: function toJSON() {
-      return { uuid: this.uuid };
     }
   }, {
     key: "clearSavedTagsString",
@@ -888,6 +873,47 @@ var SNTheme = exports.SNTheme = function (_SNComponent) {
   }
 
   _createClass(SNTheme, [{
+    key: "setMobileRules",
+    value: function setMobileRules(rules) {
+      this.setAppDataItem("mobileRules", rules);
+    }
+  }, {
+    key: "getMobileRules",
+    value: function getMobileRules() {
+      return this.getAppDataItem("mobileRules") || { constants: {}, rules: {} };
+    }
+
+    // Same as getMobileRules but without default value
+
+  }, {
+    key: "hasMobileRules",
+    value: function hasMobileRules() {
+      return this.getAppDataItem("mobileRules");
+    }
+  }, {
+    key: "setNotAvailOnMobile",
+    value: function setNotAvailOnMobile(na) {
+      this.setAppDataItem("notAvailableOnMobile", na);
+    }
+  }, {
+    key: "getNotAvailOnMobile",
+    value: function getNotAvailOnMobile() {
+      return this.getAppDataItem("notAvailableOnMobile");
+    }
+
+    /* We must not use .active because if you set that to true, it will also activate that theme on desktop/web */
+
+  }, {
+    key: "setMobileActive",
+    value: function setMobileActive(active) {
+      this.setAppDataItem("mobileActive", active);
+    }
+  }, {
+    key: "isMobileActive",
+    value: function isMobileActive() {
+      return this.getAppDataItem("mobileActive");
+    }
+  }, {
     key: "content_type",
     get: function get() {
       return "SN|Theme";
@@ -918,7 +944,7 @@ if (typeof window !== 'undefined' && window !== null) {
     window.SNTheme = SNTheme;
     window.SNEncryptedStorage = SNEncryptedStorage;
   } catch (e) {
-    console.log("Exception while exporting window variables", e);
+    console.log("Exception while exporting sn-models window variables", e);
   }
 }
 //# sourceMappingURL=transpiled.js.map

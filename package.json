@@ -24,6 +24,6 @@
     "browserify": "^16.2.2"
   },
   "dependencies": {
-    "standard-file-js": "file:~/Desktop/sf/sfjs"
+    "standard-file-js": "0.3.2"
   }
 }

@@ -32,7 +32,7 @@ export class SNComponent extends SFItem {
 
     /* New */
     this.local_url = content.local_url;
-    this.hosted_url = content.hosted_url;
+    this.hosted_url = content.hosted_url || content.url;
     this.offlineOnly = content.offlineOnly;
 
     if(content.valid_until) {
@@ -91,10 +91,6 @@ export class SNComponent extends SFItem {
     var superParams = super.structureParams();
     Object.assign(superParams, params);
     return superParams;
-  }
-
-  toJSON() {
-    return {uuid: this.uuid}
   }
 
   get content_type() {
@@ -246,10 +242,6 @@ export class SNComponent extends SFItem {
       _.remove(this.notes, {uuid: oldUUID});
       this.notes.push(newItem);
     }
-  }
-
-  toJSON() {
-    return {uuid: this.uuid}
   }
 
   get content_type() {
@@ -424,10 +416,6 @@ export class SNExtension extends SFItem {
 
   safeTitle() {
     return this.title || "";
-  }
-
-  toJSON() {
-    return {uuid: this.uuid}
   }
 
   get content_type() {
@@ -626,6 +614,36 @@ export class SNExtension extends SFItem {
   get displayName() {
     return "Theme";
   }
+
+  setMobileRules(rules) {
+    this.setAppDataItem("mobileRules", rules);
+  }
+
+  getMobileRules() {
+    return this.getAppDataItem("mobileRules") || {constants: {}, rules: {}};
+  }
+
+  // Same as getMobileRules but without default value
+  hasMobileRules() {
+    return this.getAppDataItem("mobileRules");
+  }
+
+  setNotAvailOnMobile(na) {
+    this.setAppDataItem("notAvailableOnMobile", na);
+  }
+
+  getNotAvailOnMobile() {
+    return this.getAppDataItem("notAvailableOnMobile");
+  }
+
+  /* We must not use .active because if you set that to true, it will also activate that theme on desktop/web */
+  setMobileActive(active) {
+    this.setAppDataItem("mobileActive", active);
+  }
+
+  isMobileActive() {
+    return this.getAppDataItem("mobileActive");
+  }
 }
 ;import {SFItem} from 'standard-file-js';
 
@@ -643,6 +661,6 @@ if(typeof window !== 'undefined' && window !== null) {
     window.SNTheme = SNTheme;
     window.SNEncryptedStorage = SNEncryptedStorage;
   } catch (e) {
-    console.log("Exception while exporting window variables", e);
+    console.log("Exception while exporting sn-models window variables", e);
   }
 }
