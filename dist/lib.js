@@ -607,6 +607,10 @@ export class SNExtension extends SFItem {
     this.area = "themes";
   }
 
+  isLayerable() {
+    return this.package_info && this.package_info.layerable;
+  }
+
   get content_type() {
     return "SN|Theme";
   }

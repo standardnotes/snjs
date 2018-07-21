@@ -873,6 +873,11 @@ var SNTheme = exports.SNTheme = function (_SNComponent) {
   }
 
   _createClass(SNTheme, [{
+    key: "isLayerable",
+    value: function isLayerable() {
+      return this.package_info && this.package_info.layerable;
+    }
+  }, {
     key: "setMobileRules",
     value: function setMobileRules(rules) {
       this.setAppDataItem("mobileRules", rules);
