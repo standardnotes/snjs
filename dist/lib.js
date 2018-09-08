@@ -117,6 +117,13 @@ export class SNComponent extends SFItem {
     return this.getAppDataItem("lastSize");
   }
 
+  acceptsThemes() {
+    if(this.content.package_info && "acceptsThemes" in this.content.package_info) {
+      return this.content.package_info.acceptsThemes;
+    }
+    return true;
+  }
+
   /*
     The key used to look up data that this component may have saved to an item.
     This key will be look up on the item, and not on itself.

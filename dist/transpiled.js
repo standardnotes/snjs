@@ -144,6 +144,14 @@ var SNComponent = exports.SNComponent = function (_SFItem) {
     value: function getLastSize() {
       return this.getAppDataItem("lastSize");
     }
+  }, {
+    key: "acceptsThemes",
+    value: function acceptsThemes() {
+      if (this.content.package_info && "acceptsThemes" in this.content.package_info) {
+        return this.content.package_info.acceptsThemes;
+      }
+      return true;
+    }
 
     /*
       The key used to look up data that this component may have saved to an item.
