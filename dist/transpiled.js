@@ -842,12 +842,6 @@ var SNServerExtension = exports.SNServerExtension = function (_SFItem8) {
 var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
   _inherits(SNSmartTag, _SNTag);
 
-  function SNSmartTag() {
-    _classCallCheck(this, SNSmartTag);
-
-    return _possibleConstructorReturn(this, (SNSmartTag.__proto__ || Object.getPrototypeOf(SNSmartTag)).apply(this, arguments));
-  }
-
   _createClass(SNSmartTag, [{
     key: "isReferencingArchivedNotes",
     value: function isReferencingArchivedNotes() {
@@ -857,16 +851,51 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
       }
       return predicate.keypath.includes("archived");
     }
-  }, {
-    key: "content_type",
-    get: function get() {
-      return "SN|SmartTag";
+  }]);
+
+  function SNSmartTag(json_ob) {
+    _classCallCheck(this, SNSmartTag);
+
+    var _this10 = _possibleConstructorReturn(this, (SNSmartTag.__proto__ || Object.getPrototypeOf(SNSmartTag)).call(this, json_ob));
+
+    _this10.content_type = "SN|SmartTag";
+    return _this10;
+  }
+
+  _createClass(SNSmartTag, null, [{
+    key: "systemSmartTags",
+    value: function systemSmartTags() {
+      return [new SNSmartTag({
+        uuid: SNSmartTag.SystemSmartTagIdAllNotes,
+        content: {
+          title: "All notes",
+          isAllTag: true,
+          predicate: new SFPredicate.fromArray(["content_type", "=", "Note"])
+        }
+      }), new SNSmartTag({
+        uuid: SNSmartTag.SystemSmartTagIdArchivedNotes,
+        content: {
+          title: "Archived",
+          isArchiveTag: true,
+          predicate: new SFPredicate.fromArray(["archived", "=", true])
+        }
+      }), new SNSmartTag({
+        uuid: SNSmartTag.SystemSmartTagIdTrashedNotes,
+        content: {
+          title: "Trash",
+          isTrashTag: true,
+          predicate: new SFPredicate.fromArray(["trashed", "=", true])
+        }
+      })];
     }
   }]);
 
   return SNSmartTag;
 }(SNTag);
 
+SNSmartTag.SystemSmartTagIdAllNotes = "all-notes";
+SNSmartTag.SystemSmartTagIdArchivedNotes = "archived-notes";
+SNSmartTag.SystemSmartTagIdTrashedNotes = "trashed-notes";
 ;
 var SNTheme = exports.SNTheme = function (_SNComponent) {
   _inherits(SNTheme, _SNComponent);
