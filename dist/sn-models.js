@@ -884,7 +884,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         content: {
           title: "Trash",
           isTrashTag: true,
-          predicate: new SFPredicate.fromArray(["trashed", "=", true])
+          predicate: new SFPredicate.fromArray(["content.trashed", "=", true])
         }
       })];
     }
