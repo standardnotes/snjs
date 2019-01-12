@@ -843,17 +843,6 @@ var SNServerExtension = exports.SNServerExtension = function (_SFItem8) {
 var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
   _inherits(SNSmartTag, _SNTag);
 
-  _createClass(SNSmartTag, [{
-    key: "isReferencingArchivedNotes",
-    value: function isReferencingArchivedNotes() {
-      var predicate = this.content.predicate;
-      if (Array.isArray(predicate)) {
-        predicate = SFPredicate.fromArray(predicate);
-      }
-      return predicate.keypath.includes("archived");
-    }
-  }]);
-
   function SNSmartTag(json_ob) {
     _classCallCheck(this, SNSmartTag);
 
@@ -870,6 +859,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         uuid: SNSmartTag.SystemSmartTagIdAllNotes,
         content: {
           title: "All notes",
+          isSystemTag: true,
           isAllTag: true,
           predicate: new SFPredicate.fromArray(["content_type", "=", "Note"])
         }
@@ -877,6 +867,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         uuid: SNSmartTag.SystemSmartTagIdArchivedNotes,
         content: {
           title: "Archived",
+          isSystemTag: true,
           isArchiveTag: true,
           predicate: new SFPredicate.fromArray(["archived", "=", true])
         }
@@ -884,6 +875,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         uuid: SNSmartTag.SystemSmartTagIdTrashedNotes,
         content: {
           title: "Trash",
+          isSystemTag: true,
           isTrashTag: true,
           predicate: new SFPredicate.fromArray(["content.trashed", "=", true])
         }

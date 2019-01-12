@@ -594,14 +594,6 @@ export class SNExtension extends SFItem {
 }
 ;export class SNSmartTag extends SNTag {
 
-  isReferencingArchivedNotes() {
-    var predicate = this.content.predicate;
-    if(Array.isArray(predicate))  {
-      predicate = SFPredicate.fromArray(predicate);
-    }
-    return predicate.keypath.includes("archived");
-  }
-
   constructor(json_ob) {
     super(json_ob);
     this.content_type = "SN|SmartTag";
@@ -613,6 +605,7 @@ export class SNExtension extends SFItem {
         uuid: SNSmartTag.SystemSmartTagIdAllNotes,
         content: {
           title: "All notes",
+          isSystemTag: true,
           isAllTag: true,
           predicate: new SFPredicate.fromArray(["content_type", "=", "Note"])
         }
@@ -621,6 +614,7 @@ export class SNExtension extends SFItem {
         uuid: SNSmartTag.SystemSmartTagIdArchivedNotes,
         content: {
           title: "Archived",
+          isSystemTag: true,
           isArchiveTag: true,
           predicate: new SFPredicate.fromArray(["archived", "=", true])
         }
@@ -629,6 +623,7 @@ export class SNExtension extends SFItem {
         uuid: SNSmartTag.SystemSmartTagIdTrashedNotes,
         content: {
           title: "Trash",
+          isSystemTag: true,
           isTrashTag: true,
           predicate: new SFPredicate.fromArray(["content.trashed", "=", true])
         }
