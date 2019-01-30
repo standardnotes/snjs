@@ -176,7 +176,7 @@ var SNComponent = exports.SNComponent = function (_SFItem) {
   }, {
     key: "keysToIgnoreWhenCheckingContentEquality",
     value: function keysToIgnoreWhenCheckingContentEquality() {
-      return ["active"].concat(_get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "keysToIgnoreWhenCheckingContentEquality", this).call(this));
+      return ["active", "disassociatedItemIds", "associatedItemIds"].concat(_get(SNComponent.prototype.__proto__ || Object.getPrototypeOf(SNComponent.prototype), "keysToIgnoreWhenCheckingContentEquality", this).call(this));
     }
 
     /*
