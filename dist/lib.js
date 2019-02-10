@@ -603,6 +603,7 @@ export class SNExtension extends SFItem {
     return [
       new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdAllNotes,
+        dummy: true,
         content: {
           title: "All notes",
           isSystemTag: true,
@@ -612,6 +613,7 @@ export class SNExtension extends SFItem {
       }),
       new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdArchivedNotes,
+        dummy: true,
         content: {
           title: "Archived",
           isSystemTag: true,
@@ -621,6 +623,7 @@ export class SNExtension extends SFItem {
       }),
       new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdTrashedNotes,
+        dummy: true,
         content: {
           title: "Trash",
           isSystemTag: true,

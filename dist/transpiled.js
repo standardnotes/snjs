@@ -856,6 +856,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
     value: function systemSmartTags() {
       return [new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdAllNotes,
+        dummy: true,
         content: {
           title: "All notes",
           isSystemTag: true,
@@ -864,6 +865,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         }
       }), new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdArchivedNotes,
+        dummy: true,
         content: {
           title: "Archived",
           isSystemTag: true,
@@ -872,6 +874,7 @@ var SNSmartTag = exports.SNSmartTag = function (_SNTag) {
         }
       }), new SNSmartTag({
         uuid: SNSmartTag.SystemSmartTagIdTrashedNotes,
+        dummy: true,
         content: {
           title: "Trash",
           isSystemTag: true,
