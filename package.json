@@ -1,7 +1,7 @@
 {
-  "name": "sn-models",
-  "version": "0.1.14",
-  "main": "dist/sn-models.js",
+  "name": "snjs",
+  "version": "0.2.0",
+  "main": "dist/snjs.js",
   "scripts": {
     "test": "mocha --require babel-register"
   },
@@ -22,9 +22,9 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-newer": "^1.2.0",
     "browserify": "^16.2.2",
-    "standard-file-js": "^0.3.2"
+    "standard-file-js": "^0.3.58"
   },
   "peerDependencies": {
-    "standard-file-js": "^0.3.2"
+    "standard-file-js": "^0.3.58"
   }
 }

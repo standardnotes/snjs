@@ -19,6 +19,7 @@ module.exports = function(grunt) {
 
       lib: {
         src: [
+          'lib/services/**/*.js',
           'lib/models/app/*.js',
           'lib/models/local/*.js',
           'lib/models/server/*.js',
@@ -30,7 +31,7 @@ module.exports = function(grunt) {
 
       dist: {
         src: ['dist/transpiled.js'],
-        dest: 'dist/sn-models.js',
+        dest: 'dist/snjs.js',
       },
     },
 
@@ -55,15 +56,15 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          'dist/sn-models-browserfied.js': 'dist/sn-models.js'
+          'dist/snjs-browserfied.js': 'dist/snjs.js'
         }
       },
     },
 
      uglify: {
        compiled: {
-         src: ['dist/sn-models.js'],
-         dest: 'dist/sn-models.min.js'
+         src: ['dist/snjs.js'],
+         dest: 'dist/snjs.min.js'
        }
     }
   });
