@@ -1018,7 +1018,7 @@ export class SNComponentManager {
     }
   }
 
-  reloadComponent(component) {
+  async reloadComponent(component) {
     //
     // Do soft deactivate
     //
@@ -1049,24 +1049,30 @@ export class SNComponentManager {
     // Do soft activate
     //
 
-    this.$timeout(() => {
-      component.active = true;
-      for(var handler of this.handlers) {
-        if(handler.areas.includes(component.area) || handler.areas.includes("*")) {
-          // See comment in activateComponent regarding safeApply and awaitTimeout
-          this.$uiRunner(() => {
-            handler.activationHandler && handler.activationHandler(component);
-          })
+    return new Promise((resolve, reject) => {
+      this.$timeout(() => {
+        component.active = true;
+        for(var handler of this.handlers) {
+          if(handler.areas.includes(component.area) || handler.areas.includes("*")) {
+            // See comment in activateComponent regarding safeApply and awaitTimeout
+            this.$uiRunner(() => {
+              handler.activationHandler && handler.activationHandler(component);
+              resolve();
+            })
+          }
         }
-      }
 
-      if(!this.activeComponents.includes(component)) {
-        this.activeComponents.push(component);
-      }
+        if(!this.activeComponents.includes(component)) {
+          this.activeComponents.push(component);
+        }
 
-      if(component.area == "themes") {
-        this.postActiveThemesToAllComponents();
-      }
+        if(component.area == "themes") {
+          this.postActiveThemesToAllComponents();
+        }
+        // Resolve again in case first resolve in for loop isn't reached.
+        // Should be no effect if resolved twice, only first will be used.
+        resolve();
+      })
     })
   }
 

@@ -1754,105 +1754,151 @@ var SNComponentManager = exports.SNComponentManager = function () {
     }
   }, {
     key: "reloadComponent",
-    value: function reloadComponent(component) {
-      var _this18 = this;
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(component) {
+        var _this18 = this;
 
-      //
-      // Do soft deactivate
-      //
-      component.active = false;
+        var _loop8, _iteratorNormalCompletion27, _didIteratorError27, _iteratorError27, _iterator27, _step27, handler;
 
-      var _loop8 = function _loop8(handler) {
-        if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
-          // See comment in activateComponent regarding safeApply and awaitTimeout
-          _this18.$uiRunner(function () {
-            handler.activationHandler && handler.activationHandler(component);
-          });
-        }
-      };
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                //
+                // Do soft deactivate
+                //
+                component.active = false;
 
-      var _iteratorNormalCompletion27 = true;
-      var _didIteratorError27 = false;
-      var _iteratorError27 = undefined;
+                _loop8 = function _loop8(handler) {
+                  if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                    // See comment in activateComponent regarding safeApply and awaitTimeout
+                    _this18.$uiRunner(function () {
+                      handler.activationHandler && handler.activationHandler(component);
+                    });
+                  }
+                };
 
-      try {
-        for (var _iterator27 = this.handlers[Symbol.iterator](), _step27; !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
-          var handler = _step27.value;
+                _iteratorNormalCompletion27 = true;
+                _didIteratorError27 = false;
+                _iteratorError27 = undefined;
+                _context2.prev = 5;
+                for (_iterator27 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
+                  handler = _step27.value;
 
-          _loop8(handler);
-        }
-      } catch (err) {
-        _didIteratorError27 = true;
-        _iteratorError27 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion27 && _iterator27.return) {
-            _iterator27.return();
+                  _loop8(handler);
+                }
+
+                _context2.next = 13;
+                break;
+
+              case 9:
+                _context2.prev = 9;
+                _context2.t0 = _context2["catch"](5);
+                _didIteratorError27 = true;
+                _iteratorError27 = _context2.t0;
+
+              case 13:
+                _context2.prev = 13;
+                _context2.prev = 14;
+
+                if (!_iteratorNormalCompletion27 && _iterator27.return) {
+                  _iterator27.return();
+                }
+
+              case 16:
+                _context2.prev = 16;
+
+                if (!_didIteratorError27) {
+                  _context2.next = 19;
+                  break;
+                }
+
+                throw _iteratorError27;
+
+              case 19:
+                return _context2.finish(16);
+
+              case 20:
+                return _context2.finish(13);
+
+              case 21:
+                this.streamObservers = this.streamObservers.filter(function (o) {
+                  return o.component !== component;
+                });
+
+                this.contextStreamObservers = this.contextStreamObservers.filter(function (o) {
+                  return o.component !== component;
+                });
+
+                if (component.area == "themes") {
+                  this.postActiveThemesToAllComponents();
+                }
+
+                //
+                // Do soft activate
+                //
+
+                return _context2.abrupt("return", new Promise(function (resolve, reject) {
+                  _this18.$timeout(function () {
+                    component.active = true;
+                    var _iteratorNormalCompletion28 = true;
+                    var _didIteratorError28 = false;
+                    var _iteratorError28 = undefined;
+
+                    try {
+                      for (var _iterator28 = _this18.handlers[Symbol.iterator](), _step28; !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
+                        var handler = _step28.value;
+
+                        if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                          // See comment in activateComponent regarding safeApply and awaitTimeout
+                          _this18.$uiRunner(function () {
+                            handler.activationHandler && handler.activationHandler(component);
+                            resolve();
+                          });
+                        }
+                      }
+                    } catch (err) {
+                      _didIteratorError28 = true;
+                      _iteratorError28 = err;
+                    } finally {
+                      try {
+                        if (!_iteratorNormalCompletion28 && _iterator28.return) {
+                          _iterator28.return();
+                        }
+                      } finally {
+                        if (_didIteratorError28) {
+                          throw _iteratorError28;
+                        }
+                      }
+                    }
+
+                    if (!_this18.activeComponents.includes(component)) {
+                      _this18.activeComponents.push(component);
+                    }
+
+                    if (component.area == "themes") {
+                      _this18.postActiveThemesToAllComponents();
+                    }
+                    // Resolve again in case first resolve in for loop isn't reached.
+                    // Should be no effect if resolved twice, only first will be used.
+                    resolve();
+                  });
+                }));
+
+              case 25:
+              case "end":
+                return _context2.stop();
+            }
           }
-        } finally {
-          if (_didIteratorError27) {
-            throw _iteratorError27;
-          }
-        }
+        }, _callee2, this, [[5, 9, 13, 21], [14,, 16, 20]]);
+      }));
+
+      function reloadComponent(_x7) {
+        return _ref3.apply(this, arguments);
       }
 
-      this.streamObservers = this.streamObservers.filter(function (o) {
-        return o.component !== component;
-      });
-
-      this.contextStreamObservers = this.contextStreamObservers.filter(function (o) {
-        return o.component !== component;
-      });
-
-      if (component.area == "themes") {
-        this.postActiveThemesToAllComponents();
-      }
-
-      //
-      // Do soft activate
-      //
-
-      this.$timeout(function () {
-        component.active = true;
-        var _iteratorNormalCompletion28 = true;
-        var _didIteratorError28 = false;
-        var _iteratorError28 = undefined;
-
-        try {
-          for (var _iterator28 = _this18.handlers[Symbol.iterator](), _step28; !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
-            var handler = _step28.value;
-
-            if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
-              // See comment in activateComponent regarding safeApply and awaitTimeout
-              _this18.$uiRunner(function () {
-                handler.activationHandler && handler.activationHandler(component);
-              });
-            }
-          }
-        } catch (err) {
-          _didIteratorError28 = true;
-          _iteratorError28 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion28 && _iterator28.return) {
-              _iterator28.return();
-            }
-          } finally {
-            if (_didIteratorError28) {
-              throw _iteratorError28;
-            }
-          }
-        }
-
-        if (!_this18.activeComponents.includes(component)) {
-          _this18.activeComponents.push(component);
-        }
-
-        if (component.area == "themes") {
-          _this18.postActiveThemesToAllComponents();
-        }
-      });
-    }
+      return reloadComponent;
+    }()
   }, {
     key: "deleteComponent",
     value: function deleteComponent(component) {
