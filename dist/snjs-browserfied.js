@@ -577,6 +577,11 @@ var SNComponentManager = exports.SNComponentManager = function () {
     value: function urlForComponent(component) {
       var offlinePrefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
+      // offlineOnly is available only on desktop, and not on web or mobile.
+      if (component.offlineOnly && !this.isDesktop) {
+        return null;
+      }
+
       if (component.offlineOnly || this.isDesktop && component.local_url) {
         return component.local_url && component.local_url.replace("sn://", offlinePrefix + this.desktopManager.getApplicationDataPath() + "/");
       } else {
@@ -759,7 +764,10 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
           // Do not pass in actual items here, otherwise that would be destructive.
           // Instead, generic JS/JSON objects should be passed.
-          console.assert(typeof responseItem.setDirty !== 'function');
+          if (typeof responseItem.setDirty === 'function') {
+            console.error("Attempting to pass object. Use JSON.");
+            continue;
+          }
 
           var _iteratorNormalCompletion12 = true;
           var _didIteratorError12 = false;
@@ -1463,7 +1471,8 @@ var SNComponentManager = exports.SNComponentManager = function () {
               component.permissions.push(permission);
             } else {
               // Permission already exists, but content_types may have been expanded
-              matchingPermission.content_types = _.uniq(matchingPermission.content_types.concat(permission.content_types));
+              var contentTypes = matchingPermission.content_types || [];
+              matchingPermission.content_types = _.uniq(contentTypes.concat(permission.content_types));
             }
           };
 
