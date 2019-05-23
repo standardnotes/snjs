@@ -82,18 +82,6 @@ var SNComponentManager = exports.SNComponentManager = function () {
       var _this = this;
 
       this.modelManager.addItemSyncObserver("component-manager", "*", function (allItems, validItems, deletedItems, source, sourceKey) {
-
-        /* If the source of these new or updated items is from a Component itself saving items, we don't need to notify
-          components again of the same item. Regarding notifying other components than the issuing component, other mapping sources
-          will take care of that, like SFModelManager.MappingSourceRemoteSaved
-           Update: We will now check sourceKey to determine whether the incoming change should be sent to
-          a component. If sourceKey == component.uuid, it will be skipped. This way, if one component triggers a change,
-          it's sent to other components.
-         */
-        // if(source == SFModelManager.MappingSourceComponentRetrieved) {
-        //   return;
-        // }
-
         var syncedComponents = allItems.filter(function (item) {
           return item.content_type === "SN|Component" || item.content_type == "SN|Theme";
         });
@@ -485,16 +473,15 @@ var SNComponentManager = exports.SNComponentManager = function () {
       params.content = item.createContentJSONFromProperties();
       params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {};
 
-      /* This means the this function is being triggered through a remote Saving response, which should not update
-        actual local content values. The reason is, Save responses may be delayed, and a user may have changed some values
-        in between the Save was initiated, and the time it completes. So we only want to update actual content values (and not just metadata)
-        when its another source, like SFModelManager.MappingSourceRemoteRetrieved.
-         3/7/18: Add MappingSourceLocalSaved as well to handle fully offline saving. github.com/standardnotes/forum/issues/169
-       */
+      // isMetadataUpdate implies that the extension should make reference of updated metadata,
+      // but not update content values as they may be stale relative to what the extension currently has
+      // Changes are always metadata updates if the mapping source is SFModelManager.MappingSourceRemoteSaved || source == SFModelManager.MappingSourceLocalSaved.
+      //
       if (source && (source == SFModelManager.MappingSourceRemoteSaved || source == SFModelManager.MappingSourceLocalSaved)) {
         params.isMetadataUpdate = true;
       }
-      this.removePrivatePropertiesFromResponseItems([params], component);
+
+      this.removePrivatePropertiesFromResponseItems([params], component, { type: "outgoing" });
       return params;
     }
   }, {
@@ -741,6 +728,63 @@ var SNComponentManager = exports.SNComponentManager = function () {
     value: function removePrivatePropertiesFromResponseItems(responseItems, component) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+      // can be 'incoming' or 'outgoing'. We want to remove updated_at if incoming, but keep it if outgoing
+      if (options.type == "incoming") {
+        var privateTopLevelProperties = ["updated_at"];
+        // Maintaining our own updated_at value is imperative for sync to work properly, we ignore any incoming value.
+        var _iteratorNormalCompletion11 = true;
+        var _didIteratorError11 = false;
+        var _iteratorError11 = undefined;
+
+        try {
+          for (var _iterator11 = responseItems[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+            var responseItem = _step11.value;
+
+            if (typeof responseItem.setDirty === 'function') {
+              console.error("Attempting to pass object. Use JSON.");
+              continue;
+            }
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
+
+            try {
+              for (var _iterator12 = privateTopLevelProperties[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                var privateProperty = _step12.value;
+
+                delete responseItem[privateProperty];
+              }
+            } catch (err) {
+              _didIteratorError12 = true;
+              _iteratorError12 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                  _iterator12.return();
+                }
+              } finally {
+                if (_didIteratorError12) {
+                  throw _iteratorError12;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          _didIteratorError11 = true;
+          _iteratorError11 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion11 && _iterator11.return) {
+              _iterator11.return();
+            }
+          } finally {
+            if (_didIteratorError11) {
+              throw _iteratorError11;
+            }
+          }
+        }
+      }
+
       if (component) {
         // System extensions can bypass this step
         if (this.nativeExtManager && this.nativeExtManager.isSystemExtension(component)) {
@@ -748,63 +792,63 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }
       }
       // Don't allow component to overwrite these properties.
-      var privateProperties = ["autoupdateDisabled", "permissions", "active"];
+      var privateContentProperties = ["autoupdateDisabled", "permissions", "active"];
       if (options) {
         if (options.includeUrls) {
-          privateProperties = privateProperties.concat(["url", "hosted_url", "local_url"]);
+          privateContentProperties = privateContentProperties.concat(["url", "hosted_url", "local_url"]);
         }
       }
-      var _iteratorNormalCompletion11 = true;
-      var _didIteratorError11 = false;
-      var _iteratorError11 = undefined;
+      var _iteratorNormalCompletion13 = true;
+      var _didIteratorError13 = false;
+      var _iteratorError13 = undefined;
 
       try {
-        for (var _iterator11 = responseItems[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-          var responseItem = _step11.value;
+        for (var _iterator13 = responseItems[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+          var _responseItem = _step13.value;
 
           // Do not pass in actual items here, otherwise that would be destructive.
           // Instead, generic JS/JSON objects should be passed.
-          if (typeof responseItem.setDirty === 'function') {
+          if (typeof _responseItem.setDirty === 'function') {
             console.error("Attempting to pass object. Use JSON.");
             continue;
           }
 
-          var _iteratorNormalCompletion12 = true;
-          var _didIteratorError12 = false;
-          var _iteratorError12 = undefined;
+          var _iteratorNormalCompletion14 = true;
+          var _didIteratorError14 = false;
+          var _iteratorError14 = undefined;
 
           try {
-            for (var _iterator12 = privateProperties[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-              var prop = _step12.value;
+            for (var _iterator14 = privateContentProperties[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+              var prop = _step14.value;
 
-              delete responseItem.content[prop];
+              delete _responseItem.content[prop];
             }
           } catch (err) {
-            _didIteratorError12 = true;
-            _iteratorError12 = err;
+            _didIteratorError14 = true;
+            _iteratorError14 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                _iterator12.return();
+              if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                _iterator14.return();
               }
             } finally {
-              if (_didIteratorError12) {
-                throw _iteratorError12;
+              if (_didIteratorError14) {
+                throw _iteratorError14;
               }
             }
           }
         }
       } catch (err) {
-        _didIteratorError11 = true;
-        _iteratorError11 = err;
+        _didIteratorError13 = true;
+        _iteratorError13 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion11 && _iterator11.return) {
-            _iterator11.return();
+          if (!_iteratorNormalCompletion13 && _iterator13.return) {
+            _iterator13.return();
           }
         } finally {
-          if (_didIteratorError11) {
-            throw _iteratorError11;
+          if (_didIteratorError13) {
+            throw _iteratorError13;
           }
         }
       }
@@ -832,27 +876,27 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
         // push immediately now
         var items = [];
-        var _iteratorNormalCompletion13 = true;
-        var _didIteratorError13 = false;
-        var _iteratorError13 = undefined;
+        var _iteratorNormalCompletion15 = true;
+        var _didIteratorError15 = false;
+        var _iteratorError15 = undefined;
 
         try {
-          for (var _iterator13 = message.data.content_types[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-            var contentType = _step13.value;
+          for (var _iterator15 = message.data.content_types[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+            var contentType = _step15.value;
 
             items = items.concat(_this6.modelManager.validItemsForContentType(contentType));
           }
         } catch (err) {
-          _didIteratorError13 = true;
-          _iteratorError13 = err;
+          _didIteratorError15 = true;
+          _iteratorError15 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion13 && _iterator13.return) {
-              _iterator13.return();
+            if (!_iteratorNormalCompletion15 && _iterator15.return) {
+              _iterator15.return();
             }
           } finally {
-            if (_didIteratorError13) {
-              throw _iteratorError13;
+            if (_didIteratorError15) {
+              throw _iteratorError15;
             }
           }
         }
@@ -880,13 +924,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }
 
         // push immediately now
-        var _iteratorNormalCompletion14 = true;
-        var _didIteratorError14 = false;
-        var _iteratorError14 = undefined;
+        var _iteratorNormalCompletion16 = true;
+        var _didIteratorError16 = false;
+        var _iteratorError16 = undefined;
 
         try {
-          for (var _iterator14 = _this7.handlersForArea(component.area)[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-            var handler = _step14.value;
+          for (var _iterator16 = _this7.handlersForArea(component.area)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+            var handler = _step16.value;
 
             if (handler.contextRequestHandler) {
               var itemInContext = handler.contextRequestHandler(component);
@@ -896,16 +940,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
             }
           }
         } catch (err) {
-          _didIteratorError14 = true;
-          _iteratorError14 = err;
+          _didIteratorError16 = true;
+          _iteratorError16 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion14 && _iterator14.return) {
-              _iterator14.return();
+            if (!_iteratorNormalCompletion16 && _iterator16.return) {
+              _iterator16.return();
             }
           } finally {
-            if (_didIteratorError14) {
-              throw _iteratorError14;
+            if (_didIteratorError16) {
+              throw _iteratorError16;
             }
           }
         }
@@ -924,13 +968,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
     key: "itemIdsInContextJurisdictionForComponent",
     value: function itemIdsInContextJurisdictionForComponent(component) {
       var itemIds = [];
-      var _iteratorNormalCompletion15 = true;
-      var _didIteratorError15 = false;
-      var _iteratorError15 = undefined;
+      var _iteratorNormalCompletion17 = true;
+      var _didIteratorError17 = false;
+      var _iteratorError17 = undefined;
 
       try {
-        for (var _iterator15 = this.handlersForArea(component.area)[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-          var handler = _step15.value;
+        for (var _iterator17 = this.handlersForArea(component.area)[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+          var handler = _step17.value;
 
           if (handler.contextRequestHandler) {
             var itemInContext = handler.contextRequestHandler(component);
@@ -940,16 +984,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
           }
         }
       } catch (err) {
-        _didIteratorError15 = true;
-        _iteratorError15 = err;
+        _didIteratorError17 = true;
+        _iteratorError17 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion15 && _iterator15.return) {
-            _iterator15.return();
+          if (!_iteratorNormalCompletion17 && _iterator17.return) {
+            _iterator17.return();
           }
         } finally {
-          if (_didIteratorError15) {
-            throw _iteratorError15;
+          if (_didIteratorError17) {
+            throw _iteratorError17;
           }
         }
       }
@@ -976,13 +1020,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
       // Pending as in needed to be accounted for in permissions.
       var pendingResponseItems = responseItems.slice();
 
-      var _iteratorNormalCompletion16 = true;
-      var _didIteratorError16 = false;
-      var _iteratorError16 = undefined;
+      var _iteratorNormalCompletion18 = true;
+      var _didIteratorError18 = false;
+      var _iteratorError18 = undefined;
 
       try {
-        for (var _iterator16 = responseItems.slice()[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-          var responseItem = _step16.value;
+        for (var _iterator18 = responseItems.slice()[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+          var responseItem = _step18.value;
 
           if (itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
             requiredPermissions.push({
@@ -996,16 +1040,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
         // Check to see if additional privileges are required
       } catch (err) {
-        _didIteratorError16 = true;
-        _iteratorError16 = err;
+        _didIteratorError18 = true;
+        _iteratorError18 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion16 && _iterator16.return) {
-            _iterator16.return();
+          if (!_iteratorNormalCompletion18 && _iterator18.return) {
+            _iterator18.return();
           }
         } finally {
-          if (_didIteratorError16) {
-            throw _iteratorError16;
+          if (_didIteratorError18) {
+            throw _iteratorError18;
           }
         }
       }
@@ -1022,7 +1066,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
       this.runWithPermissions(component, requiredPermissions, function () {
 
-        _this8.removePrivatePropertiesFromResponseItems(responseItems, component, { includeUrls: true });
+        _this8.removePrivatePropertiesFromResponseItems(responseItems, component, { includeUrls: true, type: "incoming" });
 
         /*
         We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
@@ -1035,13 +1079,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
         });
         var items = _this8.modelManager.findItems(ids);
         var lockedCount = 0;
-        var _iteratorNormalCompletion17 = true;
-        var _didIteratorError17 = false;
-        var _iteratorError17 = undefined;
+        var _iteratorNormalCompletion19 = true;
+        var _didIteratorError19 = false;
+        var _iteratorError19 = undefined;
 
         try {
-          for (var _iterator17 = items[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
-            var item = _step17.value;
+          for (var _iterator19 = items[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+            var item = _step19.value;
 
             if (item.locked) {
               _.remove(responseItems, { uuid: item.uuid });
@@ -1049,16 +1093,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
             }
           }
         } catch (err) {
-          _didIteratorError17 = true;
-          _iteratorError17 = err;
+          _didIteratorError19 = true;
+          _iteratorError19 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion17 && _iterator17.return) {
-              _iterator17.return();
+            if (!_iteratorNormalCompletion19 && _iterator19.return) {
+              _iterator19.return();
             }
           } finally {
-            if (_didIteratorError17) {
-              throw _iteratorError17;
+            if (_didIteratorError19) {
+              throw _iteratorError19;
             }
           }
         }
@@ -1071,42 +1115,39 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
         var localItems = _this8.modelManager.mapResponseItemsToLocalModels(responseItems, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
 
-        var _iteratorNormalCompletion18 = true;
-        var _didIteratorError18 = false;
-        var _iteratorError18 = undefined;
+        var _iteratorNormalCompletion20 = true;
+        var _didIteratorError20 = false;
+        var _iteratorError20 = undefined;
 
         try {
-          for (var _iterator18 = responseItems[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-            var _responseItem = _step18.value;
+          for (var _iterator20 = responseItems[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
+            var _responseItem2 = _step20.value;
 
-            var _item = _.find(localItems, { uuid: _responseItem.uuid });
+            var _item = _.find(localItems, { uuid: _responseItem2.uuid });
             if (!_item) {
               // An item this extension is trying to save was possibly removed locally, notify user
-              _this8.alertManager.alert({ text: "The extension " + component.name + " is trying to save an item with type " + _responseItem.content_type + ", but that item does not exist. Please restart this extension and try again." });
+              _this8.alertManager.alert({ text: "The extension " + component.name + " is trying to save an item with type " + _responseItem2.content_type + ", but that item does not exist. Please restart this extension and try again." });
               continue;
             }
 
-            // 8/2018: Why did we have this here? `mapResponseItemsToLocalModels` takes care of merging item content. We definitely shouldn't be doing this directly.
-            // _.merge(item.content, responseItem.content);
-
             if (!_item.locked) {
-              if (_responseItem.clientData) {
-                _item.setDomainDataItem(component.getClientDataKey(), _responseItem.clientData, SNComponentManager.ClientDataDomain);
+              if (_responseItem2.clientData) {
+                _item.setDomainDataItem(component.getClientDataKey(), _responseItem2.clientData, SNComponentManager.ClientDataDomain);
               }
-              _item.setDirty(true);
+              _this8.modelManager.setItemDirty(_item, true, true, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
             }
           }
         } catch (err) {
-          _didIteratorError18 = true;
-          _iteratorError18 = err;
+          _didIteratorError20 = true;
+          _iteratorError20 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion18 && _iterator18.return) {
-              _iterator18.return();
+            if (!_iteratorNormalCompletion20 && _iterator20.return) {
+              _iterator20.return();
             }
           } finally {
-            if (_didIteratorError18) {
-              throw _iteratorError18;
+            if (_didIteratorError20) {
+              throw _iteratorError20;
             }
           }
         }
@@ -1133,7 +1174,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
       }];
 
       this.runWithPermissions(component, requiredPermissions, function () {
-        var duplicate = _this9.modelManager.duplicateItem(item);
+        var duplicate = _this9.modelManager.duplicateItemAndAdd(item);
         _this9.syncManager.sync();
 
         _this9.replyToMessage(component, message, { item: _this9.jsonForItem(duplicate, component) });
@@ -1154,15 +1195,15 @@ var SNComponentManager = exports.SNComponentManager = function () {
       }];
 
       this.runWithPermissions(component, requiredPermissions, function () {
-        _this10.removePrivatePropertiesFromResponseItems(responseItems, component);
+        _this10.removePrivatePropertiesFromResponseItems(responseItems, component, { type: "incoming" });
         var processedItems = [];
-        var _iteratorNormalCompletion19 = true;
-        var _didIteratorError19 = false;
-        var _iteratorError19 = undefined;
+        var _iteratorNormalCompletion21 = true;
+        var _didIteratorError21 = false;
+        var _iteratorError21 = undefined;
 
         try {
-          for (var _iterator19 = responseItems[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
-            var responseItem = _step19.value;
+          for (var _iterator21 = responseItems[Symbol.iterator](), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {
+            var responseItem = _step21.value;
 
             var item = _this10.modelManager.createItem(responseItem);
             if (responseItem.clientData) {
@@ -1170,20 +1211,20 @@ var SNComponentManager = exports.SNComponentManager = function () {
             }
             _this10.modelManager.addItem(item);
             _this10.modelManager.resolveReferencesForItem(item, true);
-            item.setDirty(true);
+            _this10.modelManager.setItemDirty(item, true);
             processedItems.push(item);
           }
         } catch (err) {
-          _didIteratorError19 = true;
-          _iteratorError19 = err;
+          _didIteratorError21 = true;
+          _iteratorError21 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion19 && _iterator19.return) {
-              _iterator19.return();
+            if (!_iteratorNormalCompletion21 && _iterator21.return) {
+              _iterator21.return();
             }
           } finally {
-            if (_didIteratorError19) {
-              throw _iteratorError19;
+            if (_didIteratorError21) {
+              throw _iteratorError21;
             }
           }
         }
@@ -1217,13 +1258,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
         var reply = null;
         if (confirm("Are you sure you want to delete " + itemsData.length + " " + noun + "?")) {
           // Filter for any components and deactivate before deleting
-          var _iteratorNormalCompletion20 = true;
-          var _didIteratorError20 = false;
-          var _iteratorError20 = undefined;
+          var _iteratorNormalCompletion22 = true;
+          var _didIteratorError22 = false;
+          var _iteratorError22 = undefined;
 
           try {
-            for (var _iterator20 = itemsData[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
-              var itemData = _step20.value;
+            for (var _iterator22 = itemsData[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
+              var itemData = _step22.value;
 
               var model = _this11.modelManager.findItem(itemData.uuid);
               if (["SN|Component", "SN|Theme"].includes(model.content_type)) {
@@ -1235,16 +1276,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
               _this11.modelManager.notifySyncObserversOfModels([model], SFModelManager.MappingSourceRemoteSaved);
             }
           } catch (err) {
-            _didIteratorError20 = true;
-            _iteratorError20 = err;
+            _didIteratorError22 = true;
+            _iteratorError22 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion20 && _iterator20.return) {
-                _iterator20.return();
+              if (!_iteratorNormalCompletion22 && _iterator22.return) {
+                _iterator22.return();
               }
             } finally {
-              if (_didIteratorError20) {
-                throw _iteratorError20;
+              if (_didIteratorError22) {
+                throw _iteratorError22;
               }
             }
           }
@@ -1276,7 +1317,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
       // A component setting its own data does not require special permissions
       this.runWithPermissions(component, [], function () {
         component.componentData = message.data.componentData;
-        component.setDirty(true);
+        _this13.modelManager.setItemDirty(component, true);
         _this13.syncManager.sync();
       });
     }
@@ -1305,29 +1346,29 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
             if (!component.isLayerable()) {
               setTimeout(function () {
-                var _iteratorNormalCompletion21 = true;
-                var _didIteratorError21 = false;
-                var _iteratorError21 = undefined;
+                var _iteratorNormalCompletion23 = true;
+                var _didIteratorError23 = false;
+                var _iteratorError23 = undefined;
 
                 try {
-                  for (var _iterator21 = activeThemes[Symbol.iterator](), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {
-                    var theme = _step21.value;
+                  for (var _iterator23 = activeThemes[Symbol.iterator](), _step23; !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
+                    var theme = _step23.value;
 
                     if (theme && !theme.isLayerable()) {
                       _this14.deactivateComponent(theme);
                     }
                   }
                 } catch (err) {
-                  _didIteratorError21 = true;
-                  _iteratorError21 = err;
+                  _didIteratorError23 = true;
+                  _iteratorError23 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion21 && _iterator21.return) {
-                      _iterator21.return();
+                    if (!_iteratorNormalCompletion23 && _iterator23.return) {
+                      _iterator23.return();
                     }
                   } finally {
-                    if (_didIteratorError21) {
-                      throw _iteratorError21;
+                    if (_didIteratorError23) {
+                      throw _iteratorError23;
                     }
                   }
                 }
@@ -1381,28 +1422,28 @@ var SNComponentManager = exports.SNComponentManager = function () {
           return "continue";
         }
 
-        var _iteratorNormalCompletion23 = true;
-        var _didIteratorError23 = false;
-        var _iteratorError23 = undefined;
+        var _iteratorNormalCompletion25 = true;
+        var _didIteratorError25 = false;
+        var _iteratorError25 = undefined;
 
         try {
-          for (var _iterator23 = respectiveAcquired.content_types[Symbol.iterator](), _step23; !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
-            var acquiredContentType = _step23.value;
+          for (var _iterator25 = respectiveAcquired.content_types[Symbol.iterator](), _step25; !(_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done); _iteratorNormalCompletion25 = true) {
+            var acquiredContentType = _step25.value;
 
             // console.log("Removing content_type", acquiredContentType, "from", requiredContentTypes);
             _.pull(requiredContentTypes, acquiredContentType);
           }
         } catch (err) {
-          _didIteratorError23 = true;
-          _iteratorError23 = err;
+          _didIteratorError25 = true;
+          _iteratorError25 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion23 && _iterator23.return) {
-              _iterator23.return();
+            if (!_iteratorNormalCompletion25 && _iterator25.return) {
+              _iterator25.return();
             }
           } finally {
-            if (_didIteratorError23) {
-              throw _iteratorError23;
+            if (_didIteratorError25) {
+              throw _iteratorError25;
             }
           }
         }
@@ -1413,29 +1454,29 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }
       };
 
-      var _iteratorNormalCompletion22 = true;
-      var _didIteratorError22 = false;
-      var _iteratorError22 = undefined;
+      var _iteratorNormalCompletion24 = true;
+      var _didIteratorError24 = false;
+      var _iteratorError24 = undefined;
 
       try {
-        for (var _iterator22 = requiredPermissions.slice()[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
-          var required = _step22.value;
+        for (var _iterator24 = requiredPermissions.slice()[Symbol.iterator](), _step24; !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {
+          var required = _step24.value;
 
           var _ret4 = _loop4(required);
 
           if (_ret4 === "continue") continue;
         }
       } catch (err) {
-        _didIteratorError22 = true;
-        _iteratorError22 = err;
+        _didIteratorError24 = true;
+        _iteratorError24 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion22 && _iterator22.return) {
-            _iterator22.return();
+          if (!_iteratorNormalCompletion24 && _iterator24.return) {
+            _iterator24.return();
           }
         } finally {
-          if (_didIteratorError22) {
-            throw _iteratorError22;
+          if (_didIteratorError24) {
+            throw _iteratorError24;
           }
         }
       }
@@ -1476,32 +1517,32 @@ var SNComponentManager = exports.SNComponentManager = function () {
             }
           };
 
-          var _iteratorNormalCompletion24 = true;
-          var _didIteratorError24 = false;
-          var _iteratorError24 = undefined;
+          var _iteratorNormalCompletion26 = true;
+          var _didIteratorError26 = false;
+          var _iteratorError26 = undefined;
 
           try {
-            for (var _iterator24 = permissions[Symbol.iterator](), _step24; !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {
-              var permission = _step24.value;
+            for (var _iterator26 = permissions[Symbol.iterator](), _step26; !(_iteratorNormalCompletion26 = (_step26 = _iterator26.next()).done); _iteratorNormalCompletion26 = true) {
+              var permission = _step26.value;
 
               _loop5(permission);
             }
           } catch (err) {
-            _didIteratorError24 = true;
-            _iteratorError24 = err;
+            _didIteratorError26 = true;
+            _iteratorError26 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion24 && _iterator24.return) {
-                _iterator24.return();
+              if (!_iteratorNormalCompletion26 && _iterator26.return) {
+                _iterator26.return();
               }
             } finally {
-              if (_didIteratorError24) {
-                throw _iteratorError24;
+              if (_didIteratorError26) {
+                throw _iteratorError26;
               }
             }
           }
 
-          component.setDirty(true);
+          _this15.modelManager.setItemDirty(component, true);
           _this15.syncManager.sync();
         }
 
@@ -1659,33 +1700,33 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }
       };
 
-      var _iteratorNormalCompletion25 = true;
-      var _didIteratorError25 = false;
-      var _iteratorError25 = undefined;
+      var _iteratorNormalCompletion27 = true;
+      var _didIteratorError27 = false;
+      var _iteratorError27 = undefined;
 
       try {
-        for (var _iterator25 = this.handlers[Symbol.iterator](), _step25; !(_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done); _iteratorNormalCompletion25 = true) {
-          var handler = _step25.value;
+        for (var _iterator27 = this.handlers[Symbol.iterator](), _step27; !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
+          var handler = _step27.value;
 
           _loop6(handler);
         }
       } catch (err) {
-        _didIteratorError25 = true;
-        _iteratorError25 = err;
+        _didIteratorError27 = true;
+        _iteratorError27 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion25 && _iterator25.return) {
-            _iterator25.return();
+          if (!_iteratorNormalCompletion27 && _iterator27.return) {
+            _iterator27.return();
           }
         } finally {
-          if (_didIteratorError25) {
-            throw _iteratorError25;
+          if (_didIteratorError27) {
+            throw _iteratorError27;
           }
         }
       }
 
       if (didChange && !dontSync) {
-        component.setDirty(true);
+        this.modelManager.setItemDirty(component, true);
         this.syncManager.sync();
       }
 
@@ -1717,33 +1758,33 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }
       };
 
-      var _iteratorNormalCompletion26 = true;
-      var _didIteratorError26 = false;
-      var _iteratorError26 = undefined;
+      var _iteratorNormalCompletion28 = true;
+      var _didIteratorError28 = false;
+      var _iteratorError28 = undefined;
 
       try {
-        for (var _iterator26 = this.handlers[Symbol.iterator](), _step26; !(_iteratorNormalCompletion26 = (_step26 = _iterator26.next()).done); _iteratorNormalCompletion26 = true) {
-          var handler = _step26.value;
+        for (var _iterator28 = this.handlers[Symbol.iterator](), _step28; !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
+          var handler = _step28.value;
 
           _loop7(handler);
         }
       } catch (err) {
-        _didIteratorError26 = true;
-        _iteratorError26 = err;
+        _didIteratorError28 = true;
+        _iteratorError28 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion26 && _iterator26.return) {
-            _iterator26.return();
+          if (!_iteratorNormalCompletion28 && _iterator28.return) {
+            _iterator28.return();
           }
         } finally {
-          if (_didIteratorError26) {
-            throw _iteratorError26;
+          if (_didIteratorError28) {
+            throw _iteratorError28;
           }
         }
       }
 
       if (didChange && !dontSync) {
-        component.setDirty(true);
+        this.modelManager.setItemDirty(component, true);
         this.syncManager.sync();
       }
 
@@ -1767,7 +1808,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
       var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(component) {
         var _this18 = this;
 
-        var _loop8, _iteratorNormalCompletion27, _didIteratorError27, _iteratorError27, _iterator27, _step27, handler;
+        var _loop8, _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, handler;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -1787,12 +1828,12 @@ var SNComponentManager = exports.SNComponentManager = function () {
                   }
                 };
 
-                _iteratorNormalCompletion27 = true;
-                _didIteratorError27 = false;
-                _iteratorError27 = undefined;
+                _iteratorNormalCompletion29 = true;
+                _didIteratorError29 = false;
+                _iteratorError29 = undefined;
                 _context2.prev = 5;
-                for (_iterator27 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
-                  handler = _step27.value;
+                for (_iterator29 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
+                  handler = _step29.value;
 
                   _loop8(handler);
                 }
@@ -1803,26 +1844,26 @@ var SNComponentManager = exports.SNComponentManager = function () {
               case 9:
                 _context2.prev = 9;
                 _context2.t0 = _context2["catch"](5);
-                _didIteratorError27 = true;
-                _iteratorError27 = _context2.t0;
+                _didIteratorError29 = true;
+                _iteratorError29 = _context2.t0;
 
               case 13:
                 _context2.prev = 13;
                 _context2.prev = 14;
 
-                if (!_iteratorNormalCompletion27 && _iterator27.return) {
-                  _iterator27.return();
+                if (!_iteratorNormalCompletion29 && _iterator29.return) {
+                  _iterator29.return();
                 }
 
               case 16:
                 _context2.prev = 16;
 
-                if (!_didIteratorError27) {
+                if (!_didIteratorError29) {
                   _context2.next = 19;
                   break;
                 }
 
-                throw _iteratorError27;
+                throw _iteratorError29;
 
               case 19:
                 return _context2.finish(16);
@@ -1850,13 +1891,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 return _context2.abrupt("return", new Promise(function (resolve, reject) {
                   _this18.$timeout(function () {
                     component.active = true;
-                    var _iteratorNormalCompletion28 = true;
-                    var _didIteratorError28 = false;
-                    var _iteratorError28 = undefined;
+                    var _iteratorNormalCompletion30 = true;
+                    var _didIteratorError30 = false;
+                    var _iteratorError30 = undefined;
 
                     try {
-                      for (var _iterator28 = _this18.handlers[Symbol.iterator](), _step28; !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
-                        var handler = _step28.value;
+                      for (var _iterator30 = _this18.handlers[Symbol.iterator](), _step30; !(_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done); _iteratorNormalCompletion30 = true) {
+                        var handler = _step30.value;
 
                         if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
                           // See comment in activateComponent regarding safeApply and awaitTimeout
@@ -1867,16 +1908,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
                         }
                       }
                     } catch (err) {
-                      _didIteratorError28 = true;
-                      _iteratorError28 = err;
+                      _didIteratorError30 = true;
+                      _iteratorError30 = err;
                     } finally {
                       try {
-                        if (!_iteratorNormalCompletion28 && _iterator28.return) {
-                          _iterator28.return();
+                        if (!_iteratorNormalCompletion30 && _iterator30.return) {
+                          _iterator30.return();
                         }
                       } finally {
-                        if (_didIteratorError28) {
-                          throw _iteratorError28;
+                        if (_didIteratorError30) {
+                          throw _iteratorError30;
                         }
                       }
                     }
@@ -1922,13 +1963,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "iframeForComponent",
     value: function iframeForComponent(component) {
-      var _iteratorNormalCompletion29 = true;
-      var _didIteratorError29 = false;
-      var _iteratorError29 = undefined;
+      var _iteratorNormalCompletion31 = true;
+      var _didIteratorError31 = false;
+      var _iteratorError31 = undefined;
 
       try {
-        for (var _iterator29 = Array.from(document.getElementsByTagName("iframe"))[Symbol.iterator](), _step29; !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
-          var frame = _step29.value;
+        for (var _iterator31 = Array.from(document.getElementsByTagName("iframe"))[Symbol.iterator](), _step31; !(_iteratorNormalCompletion31 = (_step31 = _iterator31.next()).done); _iteratorNormalCompletion31 = true) {
+          var frame = _step31.value;
 
           var componentId = frame.dataset.componentId;
           if (componentId === component.uuid) {
@@ -1936,16 +1977,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
           }
         }
       } catch (err) {
-        _didIteratorError29 = true;
-        _iteratorError29 = err;
+        _didIteratorError31 = true;
+        _iteratorError31 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion29 && _iterator29.return) {
-            _iterator29.return();
+          if (!_iteratorNormalCompletion31 && _iterator31.return) {
+            _iterator31.return();
           }
         } finally {
-          if (_didIteratorError29) {
-            throw _iteratorError29;
+          if (_didIteratorError31) {
+            throw _iteratorError31;
           }
         }
       }
@@ -1954,28 +1995,28 @@ var SNComponentManager = exports.SNComponentManager = function () {
     key: "focusChangedForComponent",
     value: function focusChangedForComponent(component) {
       var focused = document.activeElement == this.iframeForComponent(component);
-      var _iteratorNormalCompletion30 = true;
-      var _didIteratorError30 = false;
-      var _iteratorError30 = undefined;
+      var _iteratorNormalCompletion32 = true;
+      var _didIteratorError32 = false;
+      var _iteratorError32 = undefined;
 
       try {
-        for (var _iterator30 = this.handlers[Symbol.iterator](), _step30; !(_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done); _iteratorNormalCompletion30 = true) {
-          var handler = _step30.value;
+        for (var _iterator32 = this.handlers[Symbol.iterator](), _step32; !(_iteratorNormalCompletion32 = (_step32 = _iterator32.next()).done); _iteratorNormalCompletion32 = true) {
+          var handler = _step32.value;
 
           // Notify all handlers, and not just ones that match this component type
           handler.focusHandler && handler.focusHandler(component, focused);
         }
       } catch (err) {
-        _didIteratorError30 = true;
-        _iteratorError30 = err;
+        _didIteratorError32 = true;
+        _iteratorError32 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion30 && _iterator30.return) {
-            _iterator30.return();
+          if (!_iteratorNormalCompletion32 && _iterator32.return) {
+            _iterator32.return();
           }
         } finally {
-          if (_didIteratorError30) {
-            throw _iteratorError30;
+          if (_didIteratorError32) {
+            throw _iteratorError32;
           }
         }
       }
@@ -2028,13 +2069,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
     key: "editorForNote",
     value: function editorForNote(note) {
       var editors = this.componentsForArea("editor-editor");
-      var _iteratorNormalCompletion31 = true;
-      var _didIteratorError31 = false;
-      var _iteratorError31 = undefined;
+      var _iteratorNormalCompletion33 = true;
+      var _didIteratorError33 = false;
+      var _iteratorError33 = undefined;
 
       try {
-        for (var _iterator31 = editors[Symbol.iterator](), _step31; !(_iteratorNormalCompletion31 = (_step31 = _iterator31.next()).done); _iteratorNormalCompletion31 = true) {
-          var editor = _step31.value;
+        for (var _iterator33 = editors[Symbol.iterator](), _step33; !(_iteratorNormalCompletion33 = (_step33 = _iterator33.next()).done); _iteratorNormalCompletion33 = true) {
+          var editor = _step33.value;
 
           if (editor.isExplicitlyEnabledForItem(note)) {
             return editor;
@@ -2043,16 +2084,16 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
         // No editor found for note. Use default editor, if note does not prefer system editor
       } catch (err) {
-        _didIteratorError31 = true;
-        _iteratorError31 = err;
+        _didIteratorError33 = true;
+        _iteratorError33 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion31 && _iterator31.return) {
-            _iterator31.return();
+          if (!_iteratorNormalCompletion33 && _iterator33.return) {
+            _iterator33.return();
           }
         } finally {
-          if (_didIteratorError31) {
-            throw _iteratorError31;
+          if (_didIteratorError33) {
+            throw _iteratorError33;
           }
         }
       }
@@ -2632,28 +2673,28 @@ var SNNote = exports.SNNote = function (_SFItem4) {
     key: "informReferencesOfUUIDChange",
     value: function informReferencesOfUUIDChange(oldUUID, newUUID) {
       _get(SNNote.prototype.__proto__ || Object.getPrototypeOf(SNNote.prototype), "informReferencesOfUUIDChange", this).call(this);
-      var _iteratorNormalCompletion32 = true;
-      var _didIteratorError32 = false;
-      var _iteratorError32 = undefined;
+      var _iteratorNormalCompletion34 = true;
+      var _didIteratorError34 = false;
+      var _iteratorError34 = undefined;
 
       try {
-        for (var _iterator32 = this.tags[Symbol.iterator](), _step32; !(_iteratorNormalCompletion32 = (_step32 = _iterator32.next()).done); _iteratorNormalCompletion32 = true) {
-          var tag = _step32.value;
+        for (var _iterator34 = this.tags[Symbol.iterator](), _step34; !(_iteratorNormalCompletion34 = (_step34 = _iterator34.next()).done); _iteratorNormalCompletion34 = true) {
+          var tag = _step34.value;
 
           _.remove(tag.notes, { uuid: oldUUID });
           tag.notes.push(this);
         }
       } catch (err) {
-        _didIteratorError32 = true;
-        _iteratorError32 = err;
+        _didIteratorError34 = true;
+        _iteratorError34 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion32 && _iterator32.return) {
-            _iterator32.return();
+          if (!_iteratorNormalCompletion34 && _iterator34.return) {
+            _iterator34.return();
           }
         } finally {
-          if (_didIteratorError32) {
-            throw _iteratorError32;
+          if (_didIteratorError34) {
+            throw _iteratorError34;
           }
         }
       }
@@ -2797,28 +2838,28 @@ var SNTag = exports.SNTag = function (_SFItem5) {
   }, {
     key: "informReferencesOfUUIDChange",
     value: function informReferencesOfUUIDChange(oldUUID, newUUID) {
-      var _iteratorNormalCompletion33 = true;
-      var _didIteratorError33 = false;
-      var _iteratorError33 = undefined;
+      var _iteratorNormalCompletion35 = true;
+      var _didIteratorError35 = false;
+      var _iteratorError35 = undefined;
 
       try {
-        for (var _iterator33 = this.notes[Symbol.iterator](), _step33; !(_iteratorNormalCompletion33 = (_step33 = _iterator33.next()).done); _iteratorNormalCompletion33 = true) {
-          var note = _step33.value;
+        for (var _iterator35 = this.notes[Symbol.iterator](), _step35; !(_iteratorNormalCompletion35 = (_step35 = _iterator35.next()).done); _iteratorNormalCompletion35 = true) {
+          var note = _step35.value;
 
           _.remove(note.tags, { uuid: oldUUID });
           note.tags.push(this);
         }
       } catch (err) {
-        _didIteratorError33 = true;
-        _iteratorError33 = err;
+        _didIteratorError35 = true;
+        _iteratorError35 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion33 && _iterator33.return) {
-            _iterator33.return();
+          if (!_iteratorNormalCompletion35 && _iterator35.return) {
+            _iterator35.return();
           }
         } finally {
-          if (_didIteratorError33) {
-            throw _iteratorError33;
+          if (_didIteratorError35) {
+            throw _iteratorError35;
           }
         }
       }
@@ -2826,27 +2867,27 @@ var SNTag = exports.SNTag = function (_SFItem5) {
   }, {
     key: "didFinishSyncing",
     value: function didFinishSyncing() {
-      var _iteratorNormalCompletion34 = true;
-      var _didIteratorError34 = false;
-      var _iteratorError34 = undefined;
+      var _iteratorNormalCompletion36 = true;
+      var _didIteratorError36 = false;
+      var _iteratorError36 = undefined;
 
       try {
-        for (var _iterator34 = this.notes[Symbol.iterator](), _step34; !(_iteratorNormalCompletion34 = (_step34 = _iterator34.next()).done); _iteratorNormalCompletion34 = true) {
-          var note = _step34.value;
+        for (var _iterator36 = this.notes[Symbol.iterator](), _step36; !(_iteratorNormalCompletion36 = (_step36 = _iterator36.next()).done); _iteratorNormalCompletion36 = true) {
+          var note = _step36.value;
 
           note.tagDidFinishSyncing(this);
         }
       } catch (err) {
-        _didIteratorError34 = true;
-        _iteratorError34 = err;
+        _didIteratorError36 = true;
+        _iteratorError36 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion34 && _iterator34.return) {
-            _iterator34.return();
+          if (!_iteratorNormalCompletion36 && _iterator36.return) {
+            _iterator36.return();
           }
         } finally {
-          if (_didIteratorError34) {
-            throw _iteratorError34;
+          if (_didIteratorError36) {
+            throw _iteratorError36;
           }
         }
       }

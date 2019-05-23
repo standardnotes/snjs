@@ -1,6 +1,6 @@
 {
   "name": "snjs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "dist/snjs.js",
   "scripts": {
     "test": "mocha --require babel-register"
@@ -25,6 +25,6 @@
     "standard-file-js": "^0.3.58"
   },
   "peerDependencies": {
-    "standard-file-js": "^0.3.58"
+    "standard-file-js": "^0.3.60"
   }
 }

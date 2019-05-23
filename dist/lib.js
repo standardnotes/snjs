@@ -43,19 +43,6 @@ export class SNComponentManager {
 
   configureForGeneralUsage() {
     this.modelManager.addItemSyncObserver("component-manager", "*", (allItems, validItems, deletedItems, source, sourceKey) => {
-
-      /* If the source of these new or updated items is from a Component itself saving items, we don't need to notify
-        components again of the same item. Regarding notifying other components than the issuing component, other mapping sources
-        will take care of that, like SFModelManager.MappingSourceRemoteSaved
-
-        Update: We will now check sourceKey to determine whether the incoming change should be sent to
-        a component. If sourceKey == component.uuid, it will be skipped. This way, if one component triggers a change,
-        it's sent to other components.
-       */
-      // if(source == SFModelManager.MappingSourceComponentRetrieved) {
-      //   return;
-      // }
-
       let syncedComponents = allItems.filter((item) => {
         return item.content_type === "SN|Component" || item.content_type == "SN|Theme"
       });
@@ -249,17 +236,15 @@ export class SNComponentManager {
     params.content = item.createContentJSONFromProperties();
     params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {};
 
-    /* This means the this function is being triggered through a remote Saving response, which should not update
-      actual local content values. The reason is, Save responses may be delayed, and a user may have changed some values
-      in between the Save was initiated, and the time it completes. So we only want to update actual content values (and not just metadata)
-      when its another source, like SFModelManager.MappingSourceRemoteRetrieved.
-
-      3/7/18: Add MappingSourceLocalSaved as well to handle fully offline saving. github.com/standardnotes/forum/issues/169
-     */
+    // isMetadataUpdate implies that the extension should make reference of updated metadata,
+    // but not update content values as they may be stale relative to what the extension currently has
+    // Changes are always metadata updates if the mapping source is SFModelManager.MappingSourceRemoteSaved || source == SFModelManager.MappingSourceLocalSaved.
+    //
     if(source && (source == SFModelManager.MappingSourceRemoteSaved || source == SFModelManager.MappingSourceLocalSaved)) {
       params.isMetadataUpdate = true;
     }
-    this.removePrivatePropertiesFromResponseItems([params], component);
+
+    this.removePrivatePropertiesFromResponseItems([params], component, {type: "outgoing"});
     return params;
   }
 
@@ -450,6 +435,21 @@ export class SNComponentManager {
   }
 
   removePrivatePropertiesFromResponseItems(responseItems, component, options = {}) {
+    // can be 'incoming' or 'outgoing'. We want to remove updated_at if incoming, but keep it if outgoing
+    if(options.type == "incoming") {
+      let privateTopLevelProperties = ["updated_at"];
+      // Maintaining our own updated_at value is imperative for sync to work properly, we ignore any incoming value.
+      for(let responseItem of responseItems) {
+        if(typeof responseItem.setDirty === 'function') {
+          console.error("Attempting to pass object. Use JSON.");
+          continue;
+        }
+        for(let privateProperty of privateTopLevelProperties) {
+          delete responseItem[privateProperty];
+        }
+      }
+    }
+
     if(component) {
       // System extensions can bypass this step
       if(this.nativeExtManager && this.nativeExtManager.isSystemExtension(component)) {
@@ -457,9 +457,9 @@ export class SNComponentManager {
       }
     }
     // Don't allow component to overwrite these properties.
-    let privateProperties = ["autoupdateDisabled", "permissions", "active"];
+    let privateContentProperties = ["autoupdateDisabled", "permissions", "active"];
     if(options) {
-      if(options.includeUrls) { privateProperties = privateProperties.concat(["url", "hosted_url", "local_url"])}
+      if(options.includeUrls) { privateContentProperties = privateContentProperties.concat(["url", "hosted_url", "local_url"])}
     }
     for(let responseItem of responseItems) {
       // Do not pass in actual items here, otherwise that would be destructive.
@@ -469,7 +469,7 @@ export class SNComponentManager {
         continue;
       }
 
-      for(var prop of privateProperties) {
+      for(var prop of privateContentProperties) {
         delete responseItem.content[prop];
       }
     }
@@ -588,7 +588,7 @@ export class SNComponentManager {
 
     this.runWithPermissions(component, requiredPermissions, () => {
 
-      this.removePrivatePropertiesFromResponseItems(responseItems, component, {includeUrls: true});
+      this.removePrivatePropertiesFromResponseItems(responseItems, component, {includeUrls: true, type: "incoming"});
 
       /*
       We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
@@ -622,14 +622,11 @@ export class SNComponentManager {
           continue;
         }
 
-        // 8/2018: Why did we have this here? `mapResponseItemsToLocalModels` takes care of merging item content. We definitely shouldn't be doing this directly.
-        // _.merge(item.content, responseItem.content);
-
         if(!item.locked) {
           if(responseItem.clientData) {
             item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
           }
-          item.setDirty(true);
+          this.modelManager.setItemDirty(item, true, true, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
         }
       }
 
@@ -654,7 +651,7 @@ export class SNComponentManager {
     ];
 
     this.runWithPermissions(component, requiredPermissions, () => {
-      var duplicate = this.modelManager.duplicateItem(item);
+      var duplicate = this.modelManager.duplicateItemAndAdd(item);
       this.syncManager.sync();
 
       this.replyToMessage(component, message, {item: this.jsonForItem(duplicate, component)});
@@ -672,7 +669,7 @@ export class SNComponentManager {
     ];
 
     this.runWithPermissions(component, requiredPermissions, () => {
-      this.removePrivatePropertiesFromResponseItems(responseItems, component);
+      this.removePrivatePropertiesFromResponseItems(responseItems, component, {type: "incoming"});
       var processedItems = [];
       for(let responseItem of responseItems) {
         var item = this.modelManager.createItem(responseItem);
@@ -681,7 +678,7 @@ export class SNComponentManager {
         }
         this.modelManager.addItem(item);
         this.modelManager.resolveReferencesForItem(item, true);
-        item.setDirty(true);
+        this.modelManager.setItemDirty(item, true);
         processedItems.push(item);
       }
 
@@ -745,7 +742,7 @@ export class SNComponentManager {
     // A component setting its own data does not require special permissions
     this.runWithPermissions(component, [], () => {
       component.componentData = message.data.componentData;
-      component.setDirty(true);
+      this.modelManager.setItemDirty(component, true);
       this.syncManager.sync();
     });
   }
@@ -862,7 +859,7 @@ export class SNComponentManager {
             matchingPermission.content_types = _.uniq(contentTypes.concat(permission.content_types));
           }
         }
-        component.setDirty(true);
+        this.modelManager.setItemDirty(component, true);
         this.syncManager.sync();
       }
 
@@ -980,7 +977,7 @@ export class SNComponentManager {
     }
 
     if(didChange && !dontSync) {
-      component.setDirty(true);
+      this.modelManager.setItemDirty(component, true);
       this.syncManager.sync();
     }
 
@@ -1008,7 +1005,7 @@ export class SNComponentManager {
     }
 
     if(didChange && !dontSync) {
-      component.setDirty(true);
+      this.modelManager.setItemDirty(component, true);
       this.syncManager.sync();
     }
 
