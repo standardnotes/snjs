@@ -1008,158 +1008,287 @@ var SNComponentManager = exports.SNComponentManager = function () {
     }
   }, {
     key: "handleSaveItemsMessage",
-    value: function handleSaveItemsMessage(component, message) {
-      var _this8 = this;
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(component, message) {
+        var _this8 = this;
 
-      var responseItems = message.data.items;
-      var requiredPermissions = [];
+        var responseItems, requiredPermissions, itemIdsInContextJurisdiction, pendingResponseItems, _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, responseItem, requiredContentTypes;
 
-      var itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                responseItems = message.data.items;
+                requiredPermissions = [];
+                itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
 
-      // Pending as in needed to be accounted for in permissions.
-      var pendingResponseItems = responseItems.slice();
+                // Pending as in needed to be accounted for in permissions.
 
-      var _iteratorNormalCompletion18 = true;
-      var _didIteratorError18 = false;
-      var _iteratorError18 = undefined;
+                pendingResponseItems = responseItems.slice();
+                _iteratorNormalCompletion18 = true;
+                _didIteratorError18 = false;
+                _iteratorError18 = undefined;
+                _context2.prev = 7;
+                _iterator18 = responseItems.slice()[Symbol.iterator]();
 
-      try {
-        for (var _iterator18 = responseItems.slice()[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-          var responseItem = _step18.value;
+              case 9:
+                if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
+                  _context2.next = 18;
+                  break;
+                }
 
-          if (itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
-            requiredPermissions.push({
-              name: "stream-context-item"
-            });
-            _.pull(pendingResponseItems, responseItem);
-            // We break because there can only be one context item
-            break;
+                responseItem = _step18.value;
+
+                if (!itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
+                  _context2.next = 15;
+                  break;
+                }
+
+                requiredPermissions.push({
+                  name: "stream-context-item"
+                });
+                _.pull(pendingResponseItems, responseItem);
+                // We break because there can only be one context item
+                return _context2.abrupt("break", 18);
+
+              case 15:
+                _iteratorNormalCompletion18 = true;
+                _context2.next = 9;
+                break;
+
+              case 18:
+                _context2.next = 24;
+                break;
+
+              case 20:
+                _context2.prev = 20;
+                _context2.t0 = _context2["catch"](7);
+                _didIteratorError18 = true;
+                _iteratorError18 = _context2.t0;
+
+              case 24:
+                _context2.prev = 24;
+                _context2.prev = 25;
+
+                if (!_iteratorNormalCompletion18 && _iterator18.return) {
+                  _iterator18.return();
+                }
+
+              case 27:
+                _context2.prev = 27;
+
+                if (!_didIteratorError18) {
+                  _context2.next = 30;
+                  break;
+                }
+
+                throw _iteratorError18;
+
+              case 30:
+                return _context2.finish(27);
+
+              case 31:
+                return _context2.finish(24);
+
+              case 32:
+
+                // Check to see if additional privileges are required
+                if (pendingResponseItems.length > 0) {
+                  requiredContentTypes = _.uniq(pendingResponseItems.map(function (i) {
+                    return i.content_type;
+                  })).sort();
+
+                  requiredPermissions.push({
+                    name: "stream-items",
+                    content_types: requiredContentTypes
+                  });
+                }
+
+                this.runWithPermissions(component, requiredPermissions, _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+                  var ids, items, lockedCount, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, item, itemNoun, auxVerb, localItems, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, _responseItem2, _item;
+
+                  return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+
+                          _this8.removePrivatePropertiesFromResponseItems(responseItems, component, { includeUrls: true, type: "incoming" });
+
+                          /*
+                          We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
+                          this would update them server side via sync, but would never make its way back to the UI.
+                          */
+
+                          // Filter locked items
+                          ids = responseItems.map(function (i) {
+                            return i.uuid;
+                          });
+                          items = _this8.modelManager.findItems(ids);
+                          lockedCount = 0;
+                          _iteratorNormalCompletion19 = true;
+                          _didIteratorError19 = false;
+                          _iteratorError19 = undefined;
+                          _context.prev = 7;
+
+                          for (_iterator19 = items[Symbol.iterator](); !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+                            item = _step19.value;
+
+                            if (item.locked) {
+                              _.remove(responseItems, { uuid: item.uuid });
+                              lockedCount++;
+                            }
+                          }
+
+                          _context.next = 15;
+                          break;
+
+                        case 11:
+                          _context.prev = 11;
+                          _context.t0 = _context["catch"](7);
+                          _didIteratorError19 = true;
+                          _iteratorError19 = _context.t0;
+
+                        case 15:
+                          _context.prev = 15;
+                          _context.prev = 16;
+
+                          if (!_iteratorNormalCompletion19 && _iterator19.return) {
+                            _iterator19.return();
+                          }
+
+                        case 18:
+                          _context.prev = 18;
+
+                          if (!_didIteratorError19) {
+                            _context.next = 21;
+                            break;
+                          }
+
+                          throw _iteratorError19;
+
+                        case 21:
+                          return _context.finish(18);
+
+                        case 22:
+                          return _context.finish(15);
+
+                        case 23:
+                          if (lockedCount > 0) {
+                            itemNoun = lockedCount == 1 ? "item" : "items";
+                            auxVerb = lockedCount == 1 ? "is" : "are";
+
+                            _this8.alertManager.alert({ title: 'Items Locked', text: lockedCount + " " + itemNoun + " you are attempting to save " + auxVerb + " locked and cannot be edited." });
+                          }
+
+                          _context.next = 26;
+                          return _this8.modelManager.mapResponseItemsToLocalModels(responseItems, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
+
+                        case 26:
+                          localItems = _context.sent;
+                          _iteratorNormalCompletion20 = true;
+                          _didIteratorError20 = false;
+                          _iteratorError20 = undefined;
+                          _context.prev = 30;
+                          _iterator20 = responseItems[Symbol.iterator]();
+
+                        case 32:
+                          if (_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done) {
+                            _context.next = 42;
+                            break;
+                          }
+
+                          _responseItem2 = _step20.value;
+                          _item = _.find(localItems, { uuid: _responseItem2.uuid });
+
+                          if (_item) {
+                            _context.next = 38;
+                            break;
+                          }
+
+                          // An item this extension is trying to save was possibly removed locally, notify user
+                          _this8.alertManager.alert({ text: "The extension " + component.name + " is trying to save an item with type " + _responseItem2.content_type + ", but that item does not exist. Please restart this extension and try again." });
+                          return _context.abrupt("continue", 39);
+
+                        case 38:
+
+                          if (!_item.locked) {
+                            if (_responseItem2.clientData) {
+                              _item.setDomainDataItem(component.getClientDataKey(), _responseItem2.clientData, SNComponentManager.ClientDataDomain);
+                            }
+                            _this8.modelManager.setItemDirty(_item, true, true, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
+                          }
+
+                        case 39:
+                          _iteratorNormalCompletion20 = true;
+                          _context.next = 32;
+                          break;
+
+                        case 42:
+                          _context.next = 48;
+                          break;
+
+                        case 44:
+                          _context.prev = 44;
+                          _context.t1 = _context["catch"](30);
+                          _didIteratorError20 = true;
+                          _iteratorError20 = _context.t1;
+
+                        case 48:
+                          _context.prev = 48;
+                          _context.prev = 49;
+
+                          if (!_iteratorNormalCompletion20 && _iterator20.return) {
+                            _iterator20.return();
+                          }
+
+                        case 51:
+                          _context.prev = 51;
+
+                          if (!_didIteratorError20) {
+                            _context.next = 54;
+                            break;
+                          }
+
+                          throw _iteratorError20;
+
+                        case 54:
+                          return _context.finish(51);
+
+                        case 55:
+                          return _context.finish(48);
+
+                        case 56:
+
+                          _this8.syncManager.sync().then(function (response) {
+                            // Allow handlers to be notified when a save begins and ends, to update the UI
+                            var saveMessage = Object.assign({}, message);
+                            saveMessage.action = response && response.error ? "save-error" : "save-success";
+                            _this8.replyToMessage(component, message, { error: response && response.error });
+                            _this8.handleMessage(component, saveMessage);
+                          });
+
+                        case 57:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  }, _callee, _this8, [[7, 11, 15, 23], [16,, 18, 22], [30, 44, 48, 56], [49,, 51, 55]]);
+                })));
+
+              case 34:
+              case "end":
+                return _context2.stop();
+            }
           }
-        }
+        }, _callee2, this, [[7, 20, 24, 32], [25,, 27, 31]]);
+      }));
 
-        // Check to see if additional privileges are required
-      } catch (err) {
-        _didIteratorError18 = true;
-        _iteratorError18 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion18 && _iterator18.return) {
-            _iterator18.return();
-          }
-        } finally {
-          if (_didIteratorError18) {
-            throw _iteratorError18;
-          }
-        }
+      function handleSaveItemsMessage(_x3, _x4) {
+        return _ref2.apply(this, arguments);
       }
 
-      if (pendingResponseItems.length > 0) {
-        var requiredContentTypes = _.uniq(pendingResponseItems.map(function (i) {
-          return i.content_type;
-        })).sort();
-        requiredPermissions.push({
-          name: "stream-items",
-          content_types: requiredContentTypes
-        });
-      }
-
-      this.runWithPermissions(component, requiredPermissions, function () {
-
-        _this8.removePrivatePropertiesFromResponseItems(responseItems, component, { includeUrls: true, type: "incoming" });
-
-        /*
-        We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
-        this would update them server side via sync, but would never make its way back to the UI.
-        */
-
-        // Filter locked items
-        var ids = responseItems.map(function (i) {
-          return i.uuid;
-        });
-        var items = _this8.modelManager.findItems(ids);
-        var lockedCount = 0;
-        var _iteratorNormalCompletion19 = true;
-        var _didIteratorError19 = false;
-        var _iteratorError19 = undefined;
-
-        try {
-          for (var _iterator19 = items[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
-            var item = _step19.value;
-
-            if (item.locked) {
-              _.remove(responseItems, { uuid: item.uuid });
-              lockedCount++;
-            }
-          }
-        } catch (err) {
-          _didIteratorError19 = true;
-          _iteratorError19 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion19 && _iterator19.return) {
-              _iterator19.return();
-            }
-          } finally {
-            if (_didIteratorError19) {
-              throw _iteratorError19;
-            }
-          }
-        }
-
-        if (lockedCount > 0) {
-          var itemNoun = lockedCount == 1 ? "item" : "items";
-          var auxVerb = lockedCount == 1 ? "is" : "are";
-          _this8.alertManager.alert({ title: 'Items Locked', text: lockedCount + " " + itemNoun + " you are attempting to save " + auxVerb + " locked and cannot be edited." });
-        }
-
-        var localItems = _this8.modelManager.mapResponseItemsToLocalModels(responseItems, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
-
-        var _iteratorNormalCompletion20 = true;
-        var _didIteratorError20 = false;
-        var _iteratorError20 = undefined;
-
-        try {
-          for (var _iterator20 = responseItems[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
-            var _responseItem2 = _step20.value;
-
-            var _item = _.find(localItems, { uuid: _responseItem2.uuid });
-            if (!_item) {
-              // An item this extension is trying to save was possibly removed locally, notify user
-              _this8.alertManager.alert({ text: "The extension " + component.name + " is trying to save an item with type " + _responseItem2.content_type + ", but that item does not exist. Please restart this extension and try again." });
-              continue;
-            }
-
-            if (!_item.locked) {
-              if (_responseItem2.clientData) {
-                _item.setDomainDataItem(component.getClientDataKey(), _responseItem2.clientData, SNComponentManager.ClientDataDomain);
-              }
-              _this8.modelManager.setItemDirty(_item, true, true, SFModelManager.MappingSourceComponentRetrieved, component.uuid);
-            }
-          }
-        } catch (err) {
-          _didIteratorError20 = true;
-          _iteratorError20 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion20 && _iterator20.return) {
-              _iterator20.return();
-            }
-          } finally {
-            if (_didIteratorError20) {
-              throw _iteratorError20;
-            }
-          }
-        }
-
-        _this8.syncManager.sync().then(function (response) {
-          // Allow handlers to be notified when a save begins and ends, to update the UI
-          var saveMessage = Object.assign({}, message);
-          saveMessage.action = response && response.error ? "save-error" : "save-success";
-          _this8.replyToMessage(component, message, { error: response && response.error });
-          _this8.handleMessage(component, saveMessage);
-        });
-      });
-    }
+      return handleSaveItemsMessage;
+    }()
   }, {
     key: "handleDuplicateItemMessage",
     value: function handleDuplicateItemMessage(component, message) {
@@ -1622,10 +1751,10 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "registerComponentWindow",
     value: function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(component, componentWindow) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(component, componentWindow) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (component.window === componentWindow) {
                   if (this.loggingEnabled) {
@@ -1637,11 +1766,11 @@ var SNComponentManager = exports.SNComponentManager = function () {
                   console.log("Web|componentManager|registerComponentWindow", component);
                 }
                 component.window = componentWindow;
-                _context.next = 5;
+                _context3.next = 5;
                 return SFJS.crypto.generateUUID();
 
               case 5:
-                component.sessionKey = _context.sent;
+                component.sessionKey = _context3.sent;
 
                 this.sendMessageToComponent(component, {
                   action: "component-registered",
@@ -1663,14 +1792,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
               case 9:
               case "end":
-                return _context.stop();
+                return _context3.stop();
             }
           }
-        }, _callee, this);
+        }, _callee3, this);
       }));
 
-      function registerComponentWindow(_x3, _x4) {
-        return _ref2.apply(this, arguments);
+      function registerComponentWindow(_x5, _x6) {
+        return _ref4.apply(this, arguments);
       }
 
       return registerComponentWindow;
@@ -1804,14 +1933,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "reloadComponent",
     value: function () {
-      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(component) {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(component) {
         var _this18 = this;
 
         var _loop8, _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, handler;
 
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 //
                 // Do soft deactivate
@@ -1830,45 +1959,45 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 _iteratorNormalCompletion29 = true;
                 _didIteratorError29 = false;
                 _iteratorError29 = undefined;
-                _context2.prev = 5;
+                _context4.prev = 5;
                 for (_iterator29 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
                   handler = _step29.value;
 
                   _loop8(handler);
                 }
 
-                _context2.next = 13;
+                _context4.next = 13;
                 break;
 
               case 9:
-                _context2.prev = 9;
-                _context2.t0 = _context2["catch"](5);
+                _context4.prev = 9;
+                _context4.t0 = _context4["catch"](5);
                 _didIteratorError29 = true;
-                _iteratorError29 = _context2.t0;
+                _iteratorError29 = _context4.t0;
 
               case 13:
-                _context2.prev = 13;
-                _context2.prev = 14;
+                _context4.prev = 13;
+                _context4.prev = 14;
 
                 if (!_iteratorNormalCompletion29 && _iterator29.return) {
                   _iterator29.return();
                 }
 
               case 16:
-                _context2.prev = 16;
+                _context4.prev = 16;
 
                 if (!_didIteratorError29) {
-                  _context2.next = 19;
+                  _context4.next = 19;
                   break;
                 }
 
                 throw _iteratorError29;
 
               case 19:
-                return _context2.finish(16);
+                return _context4.finish(16);
 
               case 20:
-                return _context2.finish(13);
+                return _context4.finish(13);
 
               case 21:
                 this.streamObservers = this.streamObservers.filter(function (o) {
@@ -1887,7 +2016,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 // Do soft activate
                 //
 
-                return _context2.abrupt("return", new Promise(function (resolve, reject) {
+                return _context4.abrupt("return", new Promise(function (resolve, reject) {
                   _this18.$timeout(function () {
                     component.active = true;
                     var _iteratorNormalCompletion30 = true;
@@ -1936,14 +2065,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
               case 25:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this, [[5, 9, 13, 21], [14,, 16, 20]]);
+        }, _callee4, this, [[5, 9, 13, 21], [14,, 16, 20]]);
       }));
 
-      function reloadComponent(_x7) {
-        return _ref3.apply(this, arguments);
+      function reloadComponent(_x9) {
+        return _ref5.apply(this, arguments);
       }
 
       return reloadComponent;
