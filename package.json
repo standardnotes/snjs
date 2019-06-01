@@ -1,6 +1,6 @@
 {
   "name": "snjs",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "main": "dist/snjs.js",
   "scripts": {
     "test": "mocha --require babel-register"
@@ -22,9 +22,9 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-newer": "^1.2.0",
     "browserify": "^16.2.2",
-    "standard-file-js": "^0.3.58"
+    "standard-file-js": "^0.3.61"
   },
   "peerDependencies": {
-    "standard-file-js": "^0.3.58"
+    "standard-file-js": "^0.3.61"
   }
 }
