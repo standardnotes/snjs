@@ -1396,6 +1396,10 @@ var SNComponentManager = exports.SNComponentManager = function () {
               var itemData = _step22.value;
 
               var model = _this11.modelManager.findItem(itemData.uuid);
+              if (!model) {
+                _this11.alertManager.alert({ text: "The item you are trying to delete cannot be found." });
+                continue;
+              }
               if (["SN|Component", "SN|Theme"].includes(model.content_type)) {
                 _this11.deactivateComponent(model, true);
               }

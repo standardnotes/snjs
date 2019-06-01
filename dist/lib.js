@@ -712,6 +712,10 @@ export class SNComponentManager {
         // Filter for any components and deactivate before deleting
         for(var itemData of itemsData) {
           var model = this.modelManager.findItem(itemData.uuid);
+          if(!model) {
+            this.alertManager.alert({text: `The item you are trying to delete cannot be found.`})
+            continue;
+          }
           if(["SN|Component", "SN|Theme"].includes(model.content_type)) {
             this.deactivateComponent(model, true);
           }
