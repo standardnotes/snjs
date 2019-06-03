@@ -1685,11 +1685,10 @@ var SNComponentManager = exports.SNComponentManager = function () {
             return false;
           }
 
-          /* Use with numbers and strings, not objects */
           var containsObjectSubset = function containsObjectSubset(source, target) {
             return !target.some(function (val) {
               return !source.find(function (candidate) {
-                return candidate == val;
+                return JSON.stringify(candidate) === JSON.stringify(val);
               });
             });
           };

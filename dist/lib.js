@@ -874,9 +874,8 @@ export class SNComponentManager {
           return false;
         }
 
-        /* Use with numbers and strings, not objects */
         const containsObjectSubset = function(source, target) {
-          return !target.some(val => !source.find((candidate) => candidate == val));
+          return !target.some(val => !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val)));
         }
 
         if(pendingDialog.component == component) {
