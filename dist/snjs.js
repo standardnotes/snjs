@@ -1380,57 +1380,121 @@ var SNComponentManager = exports.SNComponentManager = function () {
         content_types: requiredContentTypes
       }];
 
-      this.runWithPermissions(component, requiredPermissions, function () {
-        var itemsData = message.data.items;
-        var noun = itemsData.length == 1 ? "item" : "items";
-        var reply = null;
-        if (confirm("Are you sure you want to delete " + itemsData.length + " " + noun + "?")) {
-          // Filter for any components and deactivate before deleting
-          var _iteratorNormalCompletion22 = true;
-          var _didIteratorError22 = false;
-          var _iteratorError22 = undefined;
+      this.runWithPermissions(component, requiredPermissions, _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        var itemsData, noun, reply, didConfirm, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, itemData, model;
 
-          try {
-            for (var _iterator22 = itemsData[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
-              var itemData = _step22.value;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                itemsData = message.data.items;
+                noun = itemsData.length == 1 ? "item" : "items";
+                reply = null;
+                didConfirm = true;
 
-              var model = _this11.modelManager.findItem(itemData.uuid);
-              if (!model) {
+                _this11.alertManager.confirm({ text: "Are you sure you want to delete " + itemsData.length + " " + noun + "?" }).catch(function () {
+                  didConfirm = false;
+                });
+
+                if (!didConfirm) {
+                  _context3.next = 41;
+                  break;
+                }
+
+                // Filter for any components and deactivate before deleting
+                _iteratorNormalCompletion22 = true;
+                _didIteratorError22 = false;
+                _iteratorError22 = undefined;
+                _context3.prev = 9;
+                _iterator22 = itemsData[Symbol.iterator]();
+
+              case 11:
+                if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
+                  _context3.next = 23;
+                  break;
+                }
+
+                itemData = _step22.value;
+                model = _this11.modelManager.findItem(itemData.uuid);
+
+                if (model) {
+                  _context3.next = 17;
+                  break;
+                }
+
                 _this11.alertManager.alert({ text: "The item you are trying to delete cannot be found." });
-                continue;
-              }
-              if (["SN|Component", "SN|Theme"].includes(model.content_type)) {
-                _this11.deactivateComponent(model, true);
-              }
-              _this11.modelManager.setItemToBeDeleted(model);
-              // Currently extensions are not notified of association until a full server sync completes.
-              // We manually notify observers.
-              _this11.modelManager.notifySyncObserversOfModels([model], SFModelManager.MappingSourceRemoteSaved);
-            }
-          } catch (err) {
-            _didIteratorError22 = true;
-            _iteratorError22 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion22 && _iterator22.return) {
-                _iterator22.return();
-              }
-            } finally {
-              if (_didIteratorError22) {
+                return _context3.abrupt("continue", 20);
+
+              case 17:
+                if (["SN|Component", "SN|Theme"].includes(model.content_type)) {
+                  _this11.deactivateComponent(model, true);
+                }
+                _this11.modelManager.setItemToBeDeleted(model);
+                // Currently extensions are not notified of association until a full server sync completes.
+                // We manually notify observers.
+                _this11.modelManager.notifySyncObserversOfModels([model], SFModelManager.MappingSourceRemoteSaved);
+
+              case 20:
+                _iteratorNormalCompletion22 = true;
+                _context3.next = 11;
+                break;
+
+              case 23:
+                _context3.next = 29;
+                break;
+
+              case 25:
+                _context3.prev = 25;
+                _context3.t0 = _context3["catch"](9);
+                _didIteratorError22 = true;
+                _iteratorError22 = _context3.t0;
+
+              case 29:
+                _context3.prev = 29;
+                _context3.prev = 30;
+
+                if (!_iteratorNormalCompletion22 && _iterator22.return) {
+                  _iterator22.return();
+                }
+
+              case 32:
+                _context3.prev = 32;
+
+                if (!_didIteratorError22) {
+                  _context3.next = 35;
+                  break;
+                }
+
                 throw _iteratorError22;
-              }
+
+              case 35:
+                return _context3.finish(32);
+
+              case 36:
+                return _context3.finish(29);
+
+              case 37:
+
+                _this11.syncManager.sync();
+                reply = { deleted: true };
+                _context3.next = 42;
+                break;
+
+              case 41:
+                // Rejected by user
+                reply = { deleted: false };
+
+              case 42:
+
+                _this11.replyToMessage(component, message, reply);
+
+              case 43:
+              case "end":
+                return _context3.stop();
             }
           }
-
-          _this11.syncManager.sync();
-          reply = { deleted: true };
-        } else {
-          // Rejected by user
-          reply = { deleted: false };
-        }
-
-        _this11.replyToMessage(component, message, reply);
-      });
+        }, _callee3, _this11, [[9, 25, 29, 37], [30,, 32, 36]]);
+      })));
     }
   }, {
     key: "handleRequestPermissionsMessage",
@@ -1754,10 +1818,10 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "registerComponentWindow",
     value: function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(component, componentWindow) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(component, componentWindow) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (component.window === componentWindow) {
                   if (this.loggingEnabled) {
@@ -1769,11 +1833,11 @@ var SNComponentManager = exports.SNComponentManager = function () {
                   console.log("Web|componentManager|registerComponentWindow", component);
                 }
                 component.window = componentWindow;
-                _context3.next = 5;
+                _context4.next = 5;
                 return SFJS.crypto.generateUUID();
 
               case 5:
-                component.sessionKey = _context3.sent;
+                component.sessionKey = _context4.sent;
 
                 this.sendMessageToComponent(component, {
                   action: "component-registered",
@@ -1795,14 +1859,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
               case 9:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       function registerComponentWindow(_x5, _x6) {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       }
 
       return registerComponentWindow;
@@ -1936,14 +2000,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "reloadComponent",
     value: function () {
-      var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(component) {
+      var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(component) {
         var _this18 = this;
 
         var _loop8, _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, handler;
 
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 //
                 // Do soft deactivate
@@ -1962,45 +2026,45 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 _iteratorNormalCompletion29 = true;
                 _didIteratorError29 = false;
                 _iteratorError29 = undefined;
-                _context4.prev = 5;
+                _context5.prev = 5;
                 for (_iterator29 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
                   handler = _step29.value;
 
                   _loop8(handler);
                 }
 
-                _context4.next = 13;
+                _context5.next = 13;
                 break;
 
               case 9:
-                _context4.prev = 9;
-                _context4.t0 = _context4["catch"](5);
+                _context5.prev = 9;
+                _context5.t0 = _context5["catch"](5);
                 _didIteratorError29 = true;
-                _iteratorError29 = _context4.t0;
+                _iteratorError29 = _context5.t0;
 
               case 13:
-                _context4.prev = 13;
-                _context4.prev = 14;
+                _context5.prev = 13;
+                _context5.prev = 14;
 
                 if (!_iteratorNormalCompletion29 && _iterator29.return) {
                   _iterator29.return();
                 }
 
               case 16:
-                _context4.prev = 16;
+                _context5.prev = 16;
 
                 if (!_didIteratorError29) {
-                  _context4.next = 19;
+                  _context5.next = 19;
                   break;
                 }
 
                 throw _iteratorError29;
 
               case 19:
-                return _context4.finish(16);
+                return _context5.finish(16);
 
               case 20:
-                return _context4.finish(13);
+                return _context5.finish(13);
 
               case 21:
                 this.streamObservers = this.streamObservers.filter(function (o) {
@@ -2019,7 +2083,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 // Do soft activate
                 //
 
-                return _context4.abrupt("return", new Promise(function (resolve, reject) {
+                return _context5.abrupt("return", new Promise(function (resolve, reject) {
                   _this18.$timeout(function () {
                     component.active = true;
                     var _iteratorNormalCompletion30 = true;
@@ -2068,14 +2132,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
 
               case 25:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this, [[5, 9, 13, 21], [14,, 16, 20]]);
+        }, _callee5, this, [[5, 9, 13, 21], [14,, 16, 20]]);
       }));
 
       function reloadComponent(_x9) {
-        return _ref5.apply(this, arguments);
+        return _ref6.apply(this, arguments);
       }
 
       return reloadComponent;

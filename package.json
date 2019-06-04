@@ -1,6 +1,6 @@
 {
   "name": "snjs",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "main": "dist/snjs.js",
   "scripts": {
     "test": "mocha --require babel-register"

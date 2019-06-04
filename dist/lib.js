@@ -704,11 +704,18 @@ export class SNComponentManager {
       }
     ];
 
-    this.runWithPermissions(component, requiredPermissions, () => {
+    this.runWithPermissions(component, requiredPermissions, async () => {
       var itemsData = message.data.items;
       var noun = itemsData.length == 1 ? "item" : "items";
       var reply = null;
-      if(confirm(`Are you sure you want to delete ${itemsData.length} ${noun}?`)) {
+
+      let didConfirm = true;
+      this.alertManager.confirm({text: `Are you sure you want to delete ${itemsData.length} ${noun}?`})
+      .catch(() => {
+        didConfirm = false;
+      })
+
+      if(didConfirm) {
         // Filter for any components and deactivate before deleting
         for(var itemData of itemsData) {
           var model = this.modelManager.findItem(itemData.uuid);
