@@ -1391,13 +1391,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 noun = itemsData.length == 1 ? "item" : "items";
                 reply = null;
                 didConfirm = true;
-
-                _this11.alertManager.confirm({ text: "Are you sure you want to delete " + itemsData.length + " " + noun + "?" }).catch(function () {
+                _context3.next = 6;
+                return _this11.alertManager.confirm({ text: "Are you sure you want to delete " + itemsData.length + " " + noun + "?" }).catch(function () {
                   didConfirm = false;
                 });
 
+              case 6:
                 if (!didConfirm) {
-                  _context3.next = 41;
+                  _context3.next = 42;
                   break;
                 }
 
@@ -1405,12 +1406,12 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 _iteratorNormalCompletion22 = true;
                 _didIteratorError22 = false;
                 _iteratorError22 = undefined;
-                _context3.prev = 9;
+                _context3.prev = 10;
                 _iterator22 = itemsData[Symbol.iterator]();
 
-              case 11:
+              case 12:
                 if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
-                  _context3.next = 23;
+                  _context3.next = 24;
                   break;
                 }
 
@@ -1418,14 +1419,14 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 model = _this11.modelManager.findItem(itemData.uuid);
 
                 if (model) {
-                  _context3.next = 17;
+                  _context3.next = 18;
                   break;
                 }
 
                 _this11.alertManager.alert({ text: "The item you are trying to delete cannot be found." });
-                return _context3.abrupt("continue", 20);
+                return _context3.abrupt("continue", 21);
 
-              case 17:
+              case 18:
                 if (["SN|Component", "SN|Theme"].includes(model.content_type)) {
                   _this11.deactivateComponent(model, true);
                 }
@@ -1434,66 +1435,66 @@ var SNComponentManager = exports.SNComponentManager = function () {
                 // We manually notify observers.
                 _this11.modelManager.notifySyncObserversOfModels([model], SFModelManager.MappingSourceRemoteSaved);
 
-              case 20:
+              case 21:
                 _iteratorNormalCompletion22 = true;
-                _context3.next = 11;
+                _context3.next = 12;
                 break;
 
-              case 23:
-                _context3.next = 29;
+              case 24:
+                _context3.next = 30;
                 break;
 
-              case 25:
-                _context3.prev = 25;
-                _context3.t0 = _context3["catch"](9);
+              case 26:
+                _context3.prev = 26;
+                _context3.t0 = _context3["catch"](10);
                 _didIteratorError22 = true;
                 _iteratorError22 = _context3.t0;
 
-              case 29:
-                _context3.prev = 29;
+              case 30:
                 _context3.prev = 30;
+                _context3.prev = 31;
 
                 if (!_iteratorNormalCompletion22 && _iterator22.return) {
                   _iterator22.return();
                 }
 
-              case 32:
-                _context3.prev = 32;
+              case 33:
+                _context3.prev = 33;
 
                 if (!_didIteratorError22) {
-                  _context3.next = 35;
+                  _context3.next = 36;
                   break;
                 }
 
                 throw _iteratorError22;
 
-              case 35:
-                return _context3.finish(32);
-
               case 36:
-                return _context3.finish(29);
+                return _context3.finish(33);
 
               case 37:
+                return _context3.finish(30);
+
+              case 38:
 
                 _this11.syncManager.sync();
                 reply = { deleted: true };
-                _context3.next = 42;
+                _context3.next = 43;
                 break;
 
-              case 41:
+              case 42:
                 // Rejected by user
                 reply = { deleted: false };
 
-              case 42:
+              case 43:
 
                 _this11.replyToMessage(component, message, reply);
 
-              case 43:
+              case 44:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, _this11, [[9, 25, 29, 37], [30,, 32, 36]]);
+        }, _callee3, _this11, [[10, 26, 30, 38], [31,, 33, 37]]);
       })));
     }
   }, {
