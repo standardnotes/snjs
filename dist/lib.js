@@ -288,7 +288,7 @@ export class SNComponentManager {
       console.log("Web|sendMessageToComponent", component, message);
     }
 
-    var origin = this.urlForComponent(component, "file://");
+    let origin = this.urlForComponent(component);
     if(!origin.startsWith("http") && !origin.startsWith("file")) {
       // Native extension running in web, prefix current host
       origin = window.location.href + origin;
@@ -316,14 +316,14 @@ export class SNComponentManager {
     })
   }
 
-  urlForComponent(component, offlinePrefix = "") {
+  urlForComponent(component) {
     // offlineOnly is available only on desktop, and not on web or mobile.
     if(component.offlineOnly && !this.isDesktop) {
       return null;
     }
 
     if(component.offlineOnly || (this.isDesktop && component.local_url)) {
-      return component.local_url && component.local_url.replace("sn://", offlinePrefix + this.desktopManager.getApplicationDataPath() + "/");
+      return component.local_url && component.local_url.replace("sn://", this.desktopManager.getExtServerHost());
     } else {
       let url = component.hosted_url || component.legacy_url;
       if(this.isMobile) {

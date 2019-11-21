@@ -534,7 +534,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
         console.log("Web|sendMessageToComponent", component, message);
       }
 
-      var origin = this.urlForComponent(component, "file://");
+      var origin = this.urlForComponent(component);
       if (!origin.startsWith("http") && !origin.startsWith("file")) {
         // Native extension running in web, prefix current host
         origin = window.location.href + origin;
@@ -561,15 +561,13 @@ var SNComponentManager = exports.SNComponentManager = function () {
   }, {
     key: "urlForComponent",
     value: function urlForComponent(component) {
-      var offlinePrefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-
       // offlineOnly is available only on desktop, and not on web or mobile.
       if (component.offlineOnly && !this.isDesktop) {
         return null;
       }
 
       if (component.offlineOnly || this.isDesktop && component.local_url) {
-        return component.local_url && component.local_url.replace("sn://", offlinePrefix + this.desktopManager.getApplicationDataPath() + "/");
+        return component.local_url && component.local_url.replace("sn://", this.desktopManager.getExtServerHost());
       } else {
         var url = component.hosted_url || component.legacy_url;
         if (this.isMobile) {
@@ -1283,7 +1281,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }, _callee2, this, [[7, 20, 24, 32], [25,, 27, 31]]);
       }));
 
-      function handleSaveItemsMessage(_x3, _x4) {
+      function handleSaveItemsMessage(_x2, _x3) {
         return _ref2.apply(this, arguments);
       }
 
@@ -1866,7 +1864,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }, _callee4, this);
       }));
 
-      function registerComponentWindow(_x5, _x6) {
+      function registerComponentWindow(_x4, _x5) {
         return _ref5.apply(this, arguments);
       }
 
@@ -2139,7 +2137,7 @@ var SNComponentManager = exports.SNComponentManager = function () {
         }, _callee5, this, [[5, 9, 13, 21], [14,, 16, 20]]);
       }));
 
-      function reloadComponent(_x9) {
+      function reloadComponent(_x8) {
         return _ref6.apply(this, arguments);
       }
 
