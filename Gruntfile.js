@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     watch: {
       js: {
         files: ['lib/**/*.js'],
-        tasks: ['concat:lib', 'babel', 'concat:dist', 'browserify'],
+        tasks: ['concat:lib', 'babel', 'concat:vendor', 'concat:dist', 'concat:regenerator', 'browserify'],
         options: {
           spawn: false,
         },
@@ -20,17 +20,31 @@ module.exports = function(grunt) {
       lib: {
         src: [
           'lib/services/**/*.js',
-          'lib/models/app/*.js',
-          'lib/models/local/*.js',
-          'lib/models/server/*.js',
-          'lib/models/subclasses/*.js',
-          'lib/main.js'
+          'lib/models/core/*.js',
+          'lib/models/**/*.js',
+          'lib/crypto/**/*.js',
+          'lib/standard_notes.js'
         ],
         dest: 'dist/lib.js',
       },
 
+      vendor: {
+        src: ['vendor/cryptojs/*.js'],
+        dest: 'dist/vendor.js',
+      },
+
+      regenerator: {
+        src: ['node_modules/regenerator-runtime/runtime.js'],
+        dest: 'dist/regenerator.js'
+      },
+
+      lodash: {
+        src: ['vendor/lodash/lodash.custom.min.js'],
+        dest: 'dist/lodash.min.js'
+      },
+
       dist: {
-        src: ['dist/transpiled.js'],
+        src: ['dist/vendor.js', 'dist/transpiled.js'],
         dest: 'dist/snjs.js',
       },
     },
@@ -56,14 +70,14 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          'dist/snjs-browserfied.js': 'dist/snjs.js'
+          'dist/snjs.js': 'dist/snjs.js'
         }
       },
     },
 
      uglify: {
        compiled: {
-         src: ['dist/snjs.js'],
+         src: ['dist/regenerator.js', 'dist/snjs.js'],
          dest: 'dist/snjs.min.js'
        }
     }
@@ -76,5 +90,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['concat:lib', 'babel', 'concat:dist', 'browserify']);
+  grunt.registerTask('default', ['concat:lib', 'babel', 'concat:lodash', 'concat:vendor', 'concat:dist', 'concat:regenerator', 'browserify']);
+  grunt.registerTask('minify', ['uglify']);
 };
