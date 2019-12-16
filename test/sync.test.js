@@ -2,7 +2,6 @@ import '../dist/regenerator.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
-import '../vendor/lodash/lodash.custom.js';
 import Factory from './lib/factory.js';
 import MemoryStorageManager from './lib/memoryStorageManager.js';
 
@@ -1148,7 +1147,8 @@ describe('sync discordance', () => {
 
     // Delete item locally only without notifying server. We should then be in discordance.
     // Don't use localModelManager.removeItemLocally(item), as it saves some state about itemsPendingDeletion. Use internal API
-    _.remove(localModelManager.items, {uuid: item.uuid});
+
+    localModelManager.items = localModelManager.items.filter((candidate) => candidate.uuid != item.uuid);
     delete localModelManager.itemsHash[item.uuid]
 
     await localSyncManager.sync({performIntegrityCheck: true});

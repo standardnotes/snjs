@@ -2,7 +2,6 @@ import '../dist/regenerator.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
-import '../vendor/lodash/lodash.custom.js';
 import Factory from './lib/factory.js';
 
 SFItem.AppDomain = "org.standardnotes.sn";
@@ -33,10 +32,6 @@ const createItem = () => {
 
 describe('app models', () => {
   var createdItem;
-
-  it('lodash should be defined', () => {
-    expect(_).to.not.be.null;
-  });
 
   it('lodash merge should behave as expected', () => {
     var a = {

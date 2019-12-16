@@ -2,7 +2,6 @@ import '../../dist/regenerator.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
-import '../../vendor/lodash/lodash.custom.js';
 
 import LocalStorageManager from './localStorageManager.js';
 const sf_default = new StandardNotes();

@@ -13,7 +13,10 @@
 <body>
   <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
+  <script src="../dist/snjs.js"></script>
   <script>
+    Object.assign(window, SNLibrary);
+
     const SHUFFLE = false;
     let SEED = (Math.random() * 100) / 100;
     if(SHUFFLE) {
