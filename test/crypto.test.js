@@ -3,45 +3,45 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 
-const sf_cryptoweb = new StandardNotes(new SFCryptoWeb());
-const sf_cryptojs = new StandardNotes(new SFCryptoJS());
+const sn_webcryptoManager = new SNCryptoManager(new SFCryptoWeb());
+const sn_cryptojsManager = new SNCryptoManager(new SFCryptoJS());
 
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 describe('crypto', () => {
   it('checks version to make sure its 003', () => {
-    expect(sf_cryptoweb.version()).to.equal("003");
+    expect(sn_webcryptoManager.version()).to.equal("003");
   });
 
   it('checks supported versions to make sure it includes 001, 002, 003', () => {
-    expect(sf_cryptoweb.supportedVersions()).to.eql(["001", "002", "003"]);
+    expect(sn_webcryptoManager.supportedVersions()).to.eql(["001", "002", "003"]);
   });
 
   it('cryptojs should not support costs greater than 5000', () => {
-    expect(sf_cryptojs.supportsPasswordDerivationCost(5001)).to.equal(false);
+    expect(sn_cryptojsManager.supportsPasswordDerivationCost(5001)).to.equal(false);
   });
 
   it('cryptoweb should support costs greater than 5000', () => {
-    expect(sf_cryptoweb.supportsPasswordDerivationCost(5001)).to.equal(true);
+    expect(sn_webcryptoManager.supportsPasswordDerivationCost(5001)).to.equal(true);
   });
 
   it('version comparison of 002 should be older than library version', () => {
-    expect(sf_cryptoweb.isVersionNewerThanLibraryVersion("002")).to.equal(false);
+    expect(sn_webcryptoManager.isVersionNewerThanLibraryVersion("002")).to.equal(false);
   });
 
   it('version comparison of 004 should be newer than library version', () => {
-    expect(sf_cryptoweb.isVersionNewerThanLibraryVersion("004")).to.equal(true);
+    expect(sn_webcryptoManager.isVersionNewerThanLibraryVersion("004")).to.equal(true);
   });
 
   it('library version should not be outdated', () => {
-    var currentVersion = sf_cryptoweb.version();
-    expect(sf_cryptoweb.isProtocolVersionOutdated(currentVersion)).to.equal(false);
+    var currentVersion = sn_webcryptoManager.version();
+    expect(sn_webcryptoManager.isProtocolVersionOutdated(currentVersion)).to.equal(false);
   });
 
   it('cost minimum for 003 to be 110,000', () => {
-    var currentVersion = sf_cryptoweb.version();
-    expect(sf_cryptoweb.costMinimumForVersion("003")).to.equal(110000);
+    var currentVersion = sn_webcryptoManager.version();
+    expect(sn_webcryptoManager.costMinimumForVersion("003")).to.equal(110000);
   });
 });
 
@@ -59,7 +59,7 @@ describe('crypto operations', () => {
 
   before((done) => {
     // runs before all tests in this block
-    sf_cryptoweb.crypto.generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
+    sn_webcryptoManager.generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
       _authParams = result.authParams;
       _keys = result.keys;
       done();
@@ -67,11 +67,11 @@ describe('crypto operations', () => {
   });
 
   it('generates valid uuid', () => {
-    expect(sf_cryptoweb.crypto.generateUUIDSync().length).to.equal(36);
+    expect(sn_webcryptoManager.crypto.generateUUIDSync().length).to.equal(36);
   });
 
   it('generates valid keys for registration', () => {
-    return expect(sf_cryptoweb.crypto.generateInitialKeysAndAuthParamsForUser(_identifier, _password)).to.be.fulfilled.then((result) => {
+    return expect(sn_webcryptoManager.generateInitialKeysAndAuthParamsForUser(_identifier, _password)).to.be.fulfilled.then((result) => {
       expect(result).to.have.property("keys");
       expect(result).to.have.property("authParams");
 
@@ -87,7 +87,7 @@ describe('crypto operations', () => {
   });
 
   it('generates existing keys for auth params', () => {
-    return expect(sf_cryptoweb.crypto.computeEncryptionKeysForUser(_password, _authParams)).to.be.fulfilled.then((result) => {
+    return expect(sn_webcryptoManager.computeEncryptionKeysForUser(_password, _authParams)).to.be.fulfilled.then((result) => {
       expect(result).to.have.property("pw");
       expect(result).to.have.property("ak");
       expect(result).to.have.property("mk");
@@ -98,7 +98,7 @@ describe('crypto operations', () => {
   it('throws error if auth params is missing identifier', () => {
     var params = Object.assign({}, _authParams);
     params.identifier = null;
-    return expect(sf_cryptoweb.crypto.computeEncryptionKeysForUser(_password, params)).to.be.fulfilled.then((result) => {
+    return expect(sn_webcryptoManager.computeEncryptionKeysForUser(_password, params)).to.be.fulfilled.then((result) => {
       expect(result).to.be.undefined;
     })
   });
@@ -106,44 +106,44 @@ describe('crypto operations', () => {
   it('properly encodes base64', () => {
     var source = "hello world";
     var target = "aGVsbG8gd29ybGQ=";
-    return expect(sf_cryptoweb.crypto.base64(source)).to.eventually.equal(target);
-    return expect(sf_cryptojs.crypto.base64(source)).to.eventually.equal(target);
+    return expect(sn_webcryptoManager.crypto.base64(source)).to.eventually.equal(target);
+    return expect(sn_cryptojsManager.crypto.base64(source)).to.eventually.equal(target);
   });
 
   it('properly decodes base64', () => {
     var source = "aGVsbG8gd29ybGQ=";
     var target = "hello world";
-    return expect(sf_cryptoweb.crypto.base64Decode(source)).to.eventually.equal(target);
-    return expect(sf_cryptojs.crypto.base64Decode(source)).to.eventually.equal(target);
+    return expect(sn_webcryptoManager.crypto.base64Decode(source)).to.eventually.equal(target);
+    return expect(sn_cryptojsManager.crypto.base64Decode(source)).to.eventually.equal(target);
   });
 
   it('generates proper length generic key', async () => {
     var length = 256;
-    let wc_result = await sf_cryptoweb.crypto.generateRandomKey(length);
+    let wc_result = await sn_webcryptoManager.crypto.generateRandomKey(length);
     expect(wc_result.length).to.equal(length/4);
 
-    let cj_result = await sf_cryptojs.crypto.generateRandomKey(length);
+    let cj_result = await sn_cryptojsManager.crypto.generateRandomKey(length);
     expect(cj_result.length).to.equal(length/4);
   });
 
   it('generates proper length item key', async () => {
-    let wc_result = await sf_cryptoweb.crypto.generateItemEncryptionKey()
+    let wc_result = await sn_webcryptoManager.crypto.generateItemEncryptionKey()
     expect(wc_result.length).to.equal(128);
 
-    let cj_result = await sf_cryptojs.crypto.generateItemEncryptionKey()
+    let cj_result = await sn_cryptojsManager.crypto.generateItemEncryptionKey()
     expect(cj_result.length).to.equal(128);
   });
 
   it('properly encrypts and decrypts', async () => {
     var text = "hello world";
     var key = _keys.mk;
-    var iv = await sf_cryptoweb.crypto.generateRandomKey(128);
-    let wc_encryptionResult = await sf_cryptoweb.crypto.encryptText(text, key, iv);
-    let wc_decryptionResult = await sf_cryptoweb.crypto.decryptText({contentCiphertext: wc_encryptionResult, encryptionKey: key, iv: iv})
+    var iv = await sn_webcryptoManager.crypto.generateRandomKey(128);
+    let wc_encryptionResult = await sn_webcryptoManager.defaultOperator().encryptText(text, key, iv);
+    let wc_decryptionResult = await sn_webcryptoManager.defaultOperator().decryptText({contentCiphertext: wc_encryptionResult, encryptionKey: key, iv: iv})
     expect(wc_decryptionResult).to.equal(text);
 
-    let cj_encryptionResult = await sf_cryptojs.crypto.encryptText(text, key, iv);
-    let cj_decryptionResult = await sf_cryptojs.crypto.decryptText({contentCiphertext: cj_encryptionResult, encryptionKey: key, iv: iv})
+    let cj_encryptionResult = await sn_cryptojsManager.defaultOperator().encryptText(text, key, iv);
+    let cj_decryptionResult = await sn_cryptojsManager.defaultOperator().decryptText({contentCiphertext: cj_encryptionResult, encryptionKey: key, iv: iv})
     expect(cj_decryptionResult).to.equal(text);
   });
 

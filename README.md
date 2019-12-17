@@ -13,21 +13,17 @@ This library can be used in any JavaScript environment, including web, desktop, 
 1. Import these two files in your page, either via a packager like Grunt or Webpack, or via regular HTML script tags:
 
 ```javascript
-<script src="regenerator.js"></script>
 <script src="snjs.js"></script>
 ```
 
-(`regenerator.js` is only required in web environments. If in native environment, install the package independently via `npm install --save regenerator-runtime` and include it in your build.)
-
 ## Usage
 
-On the web, `SNJS` will be available as a global window variable accessible via `window.SNJS` or just `SNJS`.
+On the web, SNJS objects will be available as on the global window, such as `window.cryptoManager`.
 
 If in a module environment, you can import it via:
 
 ```javascript
-import { StandardNotes } from 'snjs';
-let SNJS = new StandardNotes();
+import { cryptoManager } from 'snjs';
 ```
 
 ### Generating keys for user
@@ -35,7 +31,7 @@ let SNJS = new StandardNotes();
 #### New user (registration):
 
 ```javascript
-SNJS.crypto.generateInitialKeysAndAuthParamsForUser(email, password).then((results) => {
+cryptoManager.generateInitialKeysAndAuthParamsForUser(email, password).then((results) => {
   let keys = results.keys;
   let authParams = results.authParams;
 
@@ -49,7 +45,7 @@ SNJS.crypto.generateInitialKeysAndAuthParamsForUser(email, password).then((resul
 
 ```javascript
 let authParams = getPreviouslyCreatedAuthParams();
-SNJS.crypto.computeEncryptionKeysForUser(password, authParams).then((keys) => {
+cryptoManager.computeEncryptionKeysForUser(password, authParams).then((keys) => {
   let serverPassword = keys.pw;
   let encryptionKey = keys.mk;
   let authenticationKey = keys.ak;
@@ -65,13 +61,13 @@ SNJS.crypto.computeEncryptionKeysForUser(password, authParams).then((keys) => {
 
 ### Encrypting and decrypting items
 
-Use `SNJS.itemTransformer` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
+Use `cryptoManager` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
 
 #### Encrypt:
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-SNJS.itemTransformer.encryptItem(item, keys, authParams).then(() => {
+cryptoManager.encryptItem(item, keys, authParams).then(() => {
  // item.content is now encrypted
 })
 ```
@@ -80,7 +76,7 @@ SNJS.itemTransformer.encryptItem(item, keys, authParams).then(() => {
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-SNJS.itemTransformer.decryptItem(item, keys).then(() => {
+cryptoManager.decryptItem(item, keys).then(() => {
  // item.content is now decrypted
 })
 ```

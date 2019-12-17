@@ -16,7 +16,7 @@ const createModelManager = () => {
 
 const createItemParams = () => {
   var params = {
-    uuid: SNJS.crypto.generateUUIDSync(),
+    uuid: cryptoManager.crypto.generateUUIDSync(),
     content_type: "Note",
     content: {
       title: "hello",
@@ -346,7 +346,7 @@ describe("mapping performance", () => {
     var tags = [], notes = [];
     for(var i = 0; i < tagCount; i++) {
       var tag = {
-        uuid: SNJS.crypto.generateUUIDSync(),
+        uuid: cryptoManager.crypto.generateUUIDSync(),
         content_type: "Tag",
         content: {
           title: `${Math.random()}`,
@@ -358,7 +358,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: SNJS.crypto.generateUUIDSync(),
+        uuid: cryptoManager.crypto.generateUUIDSync(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,
@@ -412,7 +412,7 @@ describe("mapping performance", () => {
     var notes = [];
 
     var tag = {
-      uuid: SNJS.crypto.generateUUIDSync(),
+      uuid: cryptoManager.crypto.generateUUIDSync(),
       content_type: "Tag",
       content: {
         title: `${Math.random()}`,
@@ -422,7 +422,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: SNJS.crypto.generateUUIDSync(),
+        uuid: cryptoManager.crypto.generateUUIDSync(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,

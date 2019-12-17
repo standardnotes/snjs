@@ -15,7 +15,7 @@ const createModelManager = () => {
 
 const createItemParams = () => {
   var params = {
-    uuid: SNJS.crypto.generateUUIDSync(),
+    uuid: cryptoManager.crypto.generateUUIDSync(),
     content_type: "Item",
     content: {
       title: "Hello",

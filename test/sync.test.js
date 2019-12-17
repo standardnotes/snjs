@@ -111,8 +111,8 @@ describe('offline syncing', () => {
 });
 
 describe('online syncing', () => {
-  var email = Factory.globalStandardNotes().crypto.generateUUIDSync();
-  var password = Factory.globalStandardNotes().crypto.generateUUIDSync();
+  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
   var totalItemCount = 0;
 
   const syncOptions = {
@@ -303,7 +303,7 @@ describe('online syncing', () => {
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await SNJS.itemTransformer.decryptItem(itemParams, keys);
+    await cryptoManager.decryptItem(itemParams, keys);
     items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
@@ -959,7 +959,7 @@ describe('sync params', () => {
 
   before((done) => {
     // runs once before all tests in this block
-    Factory.globalStandardNotes().crypto.generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
+    Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
       _authParams = result.authParams;
       _keys = result.keys;
       done();
@@ -975,7 +975,7 @@ describe('sync params', () => {
     expect(itemParams.content_type).to.not.be.null;
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalStandardNotes().version());
+      return string.startsWith(Factory.globalCryptoManager().version());
     });
   });
 
@@ -1004,7 +1004,7 @@ describe('sync params', () => {
     expect(itemParams.deleted).to.not.be.null;
     expect(itemParams.errorDecrypting).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalStandardNotes().version());
+      return string.startsWith(Factory.globalCryptoManager().version());
     });
   });
 
@@ -1017,7 +1017,7 @@ describe('sync params', () => {
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.deleted).to.not.be.ok;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalStandardNotes().version());
+      return string.startsWith(Factory.globalCryptoManager().version());
     });
   });
 
@@ -1034,8 +1034,8 @@ describe('sync params', () => {
 });
 
 describe('sync discordance', () => {
-  var email = Factory.globalStandardNotes().crypto.generateUUIDSync();
-  var password = Factory.globalStandardNotes().crypto.generateUUIDSync();
+  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
   var totalItemCount = 0;
 
   let localStorageManager = new MemoryStorageManager();

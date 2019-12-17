@@ -7,7 +7,7 @@
   <script src="../dist/snjs.js"></script>
 
   <script>
-    console.log("Loaded:", SF, window.SNJS, window.StandardNotes);
+    console.log("Loaded:", window.cryptoManager);
   </script>
 </head>
 
@@ -122,7 +122,7 @@
 
           for(var item of data.items) {
             try {
-              await SNJS.itemTransformer.decryptItem(item, keys);
+              await cryptoManager.decryptItem(item, keys);
               if(typeof item.content == "string") {
                 item.content = JSON.parse(item.content);
               }
@@ -160,7 +160,7 @@
             return;
           }
 
-          SNJS.crypto.computeEncryptionKeysForUser(password, auth_params).then(function(result){
+          cryptoManager.computeEncryptionKeysForUser(password, auth_params).then(function(result){
             keys = result;
             if(result) {
               onKeyReady();

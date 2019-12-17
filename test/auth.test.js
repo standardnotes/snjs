@@ -9,8 +9,8 @@ var expect = chai.expect;
 
 describe("basic auth", () => {
   let url = "http://localhost:3000";
-  let email = Factory.globalStandardNotes().crypto.generateUUIDSync();
-  let password = Factory.globalStandardNotes().crypto.generateUUIDSync();
+  let email = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  let password = Factory.globalCryptoManager().crypto.generateUUIDSync();
   var _keys;
 
   before(async () => {
@@ -66,7 +66,7 @@ describe("basic auth", () => {
 
     var strict = false;
 
-    var result = await Factory.globalStandardNotes().crypto.generateInitialKeysAndAuthParamsForUser(email, password);
+    var result = await Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(email, password);
     var newKeys = result.keys;
     var newAuthParams = result.authParams;
 
@@ -134,7 +134,7 @@ describe("basic auth", () => {
     var strict = false;
 
     for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalStandardNotes().crypto.generateInitialKeysAndAuthParamsForUser(email, password);
+      var result = await Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(email, password);
       var newKeys = result.keys;
       var newAuthParams = result.authParams;
 

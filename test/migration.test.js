@@ -8,8 +8,8 @@ chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 describe('migrations', () => {
-  var email = Factory.globalStandardNotes().crypto.generateUUIDSync();
-  var password = Factory.globalStandardNotes().crypto.generateUUIDSync();
+  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
@@ -196,8 +196,8 @@ describe('migrations', () => {
     expect(item.content.foo).to.not.equal(randValue);
 
     // sign in, migrations should run again
-    var email = Factory.globalStandardNotes().crypto.generateUUIDSync();
-    var password = Factory.globalStandardNotes().crypto.generateUUIDSync();
+    var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
+    var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
     await Factory.newRegisteredUser(email, password);
     authManager.notifyEvent(SFAuthManager.DidSignInEvent);
 
