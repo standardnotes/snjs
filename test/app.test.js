@@ -1,4 +1,4 @@
-import '../dist/regenerator.js';
+import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
@@ -15,19 +15,11 @@ const createModelManager = () => {
 }
 
 const createItemParams = () => {
-  var params = {
-    uuid: cryptoManager.crypto.generateUUIDSync(),
-    content_type: "Note",
-    content: {
-      title: "hello",
-      text: "world"
-    }
-  };
-  return params;
+  return Factory.createItemParams();
 }
 
 const createItem = () => {
-  return new SFItem(createItemParams());
+  return Factory.createItem();
 }
 
 describe('app models', () => {
@@ -346,7 +338,7 @@ describe("mapping performance", () => {
     var tags = [], notes = [];
     for(var i = 0; i < tagCount; i++) {
       var tag = {
-        uuid: cryptoManager.crypto.generateUUIDSync(),
+        uuid: protocolManager.crypto.generateUUIDSync(),
         content_type: "Tag",
         content: {
           title: `${Math.random()}`,
@@ -358,7 +350,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: cryptoManager.crypto.generateUUIDSync(),
+        uuid: protocolManager.crypto.generateUUIDSync(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,
@@ -412,7 +404,7 @@ describe("mapping performance", () => {
     var notes = [];
 
     var tag = {
-      uuid: cryptoManager.crypto.generateUUIDSync(),
+      uuid: protocolManager.crypto.generateUUIDSync(),
       content_type: "Tag",
       content: {
         title: `${Math.random()}`,
@@ -422,7 +414,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: cryptoManager.crypto.generateUUIDSync(),
+        uuid: protocolManager.crypto.generateUUIDSync(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,

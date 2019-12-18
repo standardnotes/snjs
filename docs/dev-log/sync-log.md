@@ -1,17 +1,19 @@
-## Sync
+## 1: Sync
 
 It's incredibly important to keep track of the thinking behind the sync algorithm. I can't help but write paragraphs of comments behind every line, so that it's easier to track in the future, but I'm thinking putting it in a dedicated doc might be better.
 
 In May 2019, the sync system is undergoing some refactors to account for the weakness in the ability to account for conflicts via multipage requests. The limitation is clearly demonstrated by two scenarios:
 
-#### Scenario A:
+### 1.1 Scenarios
+
+#### 1.1.1 Scenario A:
 
 - Upload limit: 2, Download limit: 1
 - Create two items and sync them normally.
 - Simulate stale items by modifying these items locally, and clearing our sync token. These stale changes reflect out-of-date changes that should not overwrite server values.
 - Sync again. Now, both items will be uploaded. On the server, since the limit is 1, only 1 item will be in retrieved_items. When check_for_conflicts is called, since the second item does not appear in retrieved_items, the save will go through immediately. We will then lose whatever value the server had.
 
-#### Scenario B:
+#### 1.1.2 Scenario B:
 
 - Upload limit: 1, Download limit: 2
 - Create two items and sync them normally.
@@ -34,7 +36,7 @@ The solution to this problem I am implementing in the 20190520 version of the cl
 
 The scenarios from above still require custom conflict work on the client side:
 
-#### Scenario A:
+#### 1.1.3 Scenario A:
 
 - Upload limit: 2, Download limit: 1
 - Create two items and sync them normally.
@@ -49,7 +51,7 @@ So, to account for this, the client will also handle retrieved_items in a specia
   - If the item in retrieved is also found in either saved_items of the current local sync request, or in allSavedItems of the global sync request, then we remove it from retrieved items. This implies that we never map server values onto local values if we have attempted to save this item in the same global request. If a conflict is necessary, the server will have returned the server value as part of a conflict item.
   - ~~If the item has not yet been saved, because it's coming up still in the global request, which we can determine by checking if localItem.dirty, then we also omit the retrieved_item, but, we create a manual conflict here and add it to the current response.conflicts.~~ Although, why would we need to do create a manual conflict? If the item is dirty, and it's in retrieved_items, it would imply the local value is out of date with the server. In this case, when the item goes to save, it would be conflicted by the server. We should omit it from retrieved_items but not create a conflict.
 
-#### Scenario B:
+#### 1.1.4 Scenario B:
 
 - Upload limit: 1, Download limit: 2
 - Create two items and sync them normally.
@@ -58,7 +60,7 @@ So, to account for this, the client will also handle retrieved_items in a specia
 - However, as explained above, we filter through retrieved_items and remove anything that is presently dirty.
 - Upon next sync, the last item will be sent up, and no items received. The item will have an inferior updated_at date, so it will be returned to client as a conflict, who will keep-server and duplicate with local value.
 
-### Content references changes during conflict handling
+### 1.2 Content references changes during conflict handling
 
 Consider the following scenario:
 
@@ -81,7 +83,7 @@ To account for this:
   - If the only difference between the current item ref and the server value are references, then we keep the local references and ignore the server references, and set the existing item as dirty.
   - If the difference is more than references, then we will need to keep both. The server item will be kept, and the local item ref will be duplicated.
 
-### keep-local vs. keep-server
+### 1.3 keep-local vs. keep-server
 
 Generally, when a sync conflict occurs, it means the client is trying to save something to the server that has an inferior updated_at value. In this case, since the server has the newer value, we want to keep the server copy as the final version of the item belonging to this UUID, and create a new item with the local item's values.
 
@@ -93,7 +95,7 @@ So, when looping through conflicts, we check the following:
 
 (As part of this, we'll also be modifying item.setDirty behavior so that it does not update client_updated_at by default. It must be explicitly told to do so.)
 
-### Deletion
+### 1.4 Deletion
 
 If client A deletes an item, and a client with an outdated sync token modifies this item with a change, we want to keep the local changes. This is one out of two possible approaches: we could also say that if the server says this item is deleted, then it must be deleted everywhere, no exceptions. However, one drawback to that is if the user opens the outdated client, forgets the item was deleted, and makes a change, then this change will be lost if we say the server has the final word.
 
@@ -101,7 +103,7 @@ We're going with the delete-all approach. There should be no reason that we keep
 
 What an item is marked as deleted locally, but not on the server? In that case it must also be marked as dirty. The practical example is if a client marks the item to be deleted, and loses connection right away. Then from another client some changes are made to this item. Then back on the first client, we retrieve the server item which says the item is not deleted, but the client says it is. In this case, we want to keep the server copy, and ignore the client wanting to delete this item.
 
-### Latency
+### 1.5 Latency
 
 What if while a user is typing on a slow connection, and old response comes in? That is:
 
@@ -110,7 +112,7 @@ What if while a user is typing on a slow connection, and old response comes in? 
 
 This is handled by the fact that every time you mark an item as dirty, it's dirtyCount goes up. Before an item is officially about to be synced, we set its dirtyCount as 0. When a sync request completes, we only clear that item as dirty if its dirtyCount is still 0. If the dirty count is greater than 0, we know the item has been dirtied again since we began syncing it.
 
-### Syncing while local data has not yet loaded
+### 1.6 Syncing while local data has not yet loaded
 
 Local data must be fully loaded before we accept anything from the server. This is because if we retrieve items from the server before local data has loaded, then their values will be overwritten by the local data values immediately on load. Instead, we must wait until local data has fully loaded before talking to the server.
 
@@ -122,14 +124,30 @@ The interface allows users to create new notes while their data is loading, and 
 
 - When a user signs out, assuming we don't reload the interface (we do reload on web but not mobile), then we will keep the flag that indicates that local data has loaded. The client is not required to call loadLocalItems after a sign out.
 
-### Dirty
+### 1.7 Dirty
 
 Items coming back from the server on a fresh sign in on will be saved to disk with the `dirty` and `dirtiedDate` values `undefined`. Items created locally will have these values be defined. But if you ever see undefined, that's why.
 
-### Null updated_at value
+### 1.8 Null updated_at value
 
 Since updated_at is such an important field, we need to handle the case when it may have no value, for whatever reason. Assume for example that you import a backup file and for some reason the updated_at fields are corrupted. In this case, we would want to default the updated_at value to 1970-01-01. This will essentially convey to the server that this item should be treated as an old change, and to conflict as necessary.  
 
-### Syncing while syncing
+### 1.9 Syncing while syncing
 
-Let's say a client wants to await a sync request and do something when it completes. Let's say there's an automatic timer than syncs every 10 seconds, but each sync request takes 20 seconds to complete. In this case, if we always await when syncManager.performSyncAgainOnCompletion is true, then the client's initial await will never resolve, as it will continue looping. We can pass an option to sync called 'chainWithCurrentResolveCycle', and if true, then 
+Let's say a client wants to await a sync request and do something when it completes. Let's say there's an automatic timer than syncs every 10 seconds, but each sync request takes 20 seconds to complete. In this case, if we always await when syncManager.performSyncAgainOnCompletion is true, then the client's initial await will never resolve, as it will continue looping. We can pass an option to sync called 'chainWithCurrentResolveCycle', and if true, then
+
+### 1.10 Retrieving an item that is locally dirty
+
+_12/18/2019_
+
+If clientA is offline, and makes a bunch of changes on a note and closes the app, then accidentally modifies the same note on clientB, then when clientA regains connection, it will sync the note, and since the remote updated_at value differs, the note will be conflicted.
+
+However, what if, because of pagination, clientA first downloads the item from the server in one sync request, then saves it through a subsequent sync. In this case, whatever local changes existed would be lost.
+
+We need to put in place checks where if a remote item is received and the local item is dirty with different content, the local item is conflicted and preserved.
+
+(Note that we also need to put this check in place in resolveOutOfSync, but this will be likely delayed.)
+
+# Known Issues
+
+- #1 Calling syncManager.sync() 5 times won't actually sync 5 times. It will instead sync likely only 2 times. This means that if we are awaiting on 5 unique sync promises to resolve, they may all resolve at once, as a consequence of all queued callbacks resolving indiscriminately on any sync completion.

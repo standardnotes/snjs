@@ -1,4 +1,4 @@
-import '../dist/regenerator.js';
+import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
@@ -96,17 +96,19 @@ describe('offline syncing', () => {
     expect(models.length).to.equal(1);
 
     let text = `${Math.random()}`;
-    item.content.text = text;
+    item.text = text;
     localModelManager.setItemDirty(item);
 
     // wait ~latency, then check to make sure that the local data load hasn't overwritten our dirty values.
 
     await Factory.sleep((latency/1000) + 0.1);
+    await localSyncManager.sync();
+    expect(localModelManager.findItem(item.uuid).text).to.equal(text);
     expect(localModelManager.findItem(item.uuid).content.text).to.equal(text);
 
     models = await Factory.globalStorageManager().getAllModels()
     expect(models.length).to.equal(1);
-    expect(modelManager.allItems.length).to.equal(1);
+    expect(localModelManager.allItems.length).to.equal(1);
   }).timeout(5000);
 });
 
@@ -303,11 +305,55 @@ describe('online syncing', () => {
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await cryptoManager.decryptItem(itemParams, keys);
+    await protocolManager.decryptItem(itemParams, keys);
     items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
     expect(mappedItem.content.title).to.equal(originalTitle);
+  }).timeout(60000);
+
+  it("should create conflicted copy if incoming server item attempts to overwrite local dirty item", async () => {
+    // See sync-log.md 1.10.
+    await syncManager.loadLocalItems();
+    // create an item and sync it
+    var item = Factory.createItem();
+    modelManager.addItem(item);
+    modelManager.setItemDirty(item);
+    await syncManager.sync(syncOptions);
+    totalItemCount++;
+
+    let models = await Factory.globalStorageManager().getAllModels();
+    expect(models.length).to.equal(totalItemCount);
+
+    let originalValue = item.title;
+    let dirtyValue = `${Math.random()}`;
+
+    // modify this item locally to have differing contents from server
+    item.title = dirtyValue;
+    // Intentionally don't change updated_at. We want to simulate a chaotic case where
+    // for some reason we receive an item with different content but the same updated_at.
+    // item.updated_at = Factory.yesterday();
+    modelManager.setItemDirty(item);
+
+    // Download all items from the server, which will include this item.
+    await syncManager.clearSyncToken();
+    await syncManager.sync(syncOptions)
+
+    // We expect this item to be duplicated
+    totalItemCount++;
+
+    let memModels = modelManager.allItems;
+    expect(memModels.length).to.equal(totalItemCount);
+
+    let originalItem = modelManager.findItem(item.uuid);
+    let duplicateItem = memModels.find((i) => i.content.conflict_of === item.uuid);
+
+    expect(originalItem.title).to.equal(dirtyValue);
+    expect(duplicateItem.title).to.equal(originalValue);
+    expect(originalItem.title).to.not.equal(duplicateItem.title);
+
+    let storedModels = await Factory.globalStorageManager().getAllModels();
+    expect(storedModels.length).to.equal(totalItemCount);
   }).timeout(60000);
 
   it("should handle sync conflicts by duplicating differing data", async () => {
@@ -323,7 +369,7 @@ describe('online syncing', () => {
     expect(models.length).to.equal(totalItemCount);
 
     // modify this item to have stale values
-    item.content.title = `${Math.random()}`;
+    item.title = `${Math.random()}`;
     item.updated_at = Factory.yesterday();
     modelManager.setItemDirty(item);
 
@@ -351,7 +397,7 @@ describe('online syncing', () => {
 
     // modify this item to have stale values
     let newTitle = `${Math.random()}`;
-    item.content.title = newTitle;
+    item.title = newTitle;
     // Do not set updated_at to old value. We we intentionally want to avoid that scenario, since that's easily handled.
     // We're testing the case where we save something that will be retrieved.
     // Actually, as explained in sync-log, this would never happen. updated_at would always have an inferior value if it were in retrieved items and is dirty. (except if the sync token is explicitely cleared, but that never happens)
@@ -362,8 +408,6 @@ describe('online syncing', () => {
     totalItemCount++;
 
     await syncManager.clearSyncToken();
-    // wait about 1s, which is the value the dev server will ignore conflicting changes
-    await Factory.sleep(1.1);
     await syncManager.sync(syncOptions)
 
     // We expect the item title to be the new title, and not rolled back to original value
@@ -532,7 +576,7 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
 
     let yesterday = Factory.yesterday();
-    item.content.text = "Stale text";
+    item.text = "Stale text";
     item.updated_at = yesterday;
     modelManager.setItemDirty(item, true);
     await syncManager.sync(syncOptions);
@@ -571,7 +615,7 @@ describe('online syncing', () => {
   it('should keep an item dirty thats been modified after low latency sync request began', async () => {
     await syncManager.loadLocalItems();
     let note = Factory.createItem();
-    note.content.text = "Initial value";
+    note.text = "Initial value";
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     totalItemCount += 1;
@@ -587,7 +631,7 @@ describe('online syncing', () => {
 
     // While that sync is going on, we want to modify this item many times.
     let text = `${Math.random()}`;
-    note.content.text = text;
+    note.text = text;
     // We want dirty count to be greater than 1.
     note.setDirty(true);
     note.setDirty(true);
@@ -599,6 +643,10 @@ describe('online syncing', () => {
     let midSync = syncManager.sync(syncOptions);
 
     await Promise.all([slowSync, midSync]);
+
+    // Awaiting above may not properly wait for 2 distinct requests. See Known Issues #1
+    await Factory.sleep(0.5);
+
     // client B
     await syncManager.clearSyncToken();
     await syncManager.sync(syncOptions);
@@ -606,6 +654,7 @@ describe('online syncing', () => {
     // Expect that the server value and client value match, and no conflicts are created.
     expect(modelManager.allItems.length).to.equal(totalItemCount);
     expect(modelManager.findItem(note.uuid).content.text).to.equal(text);
+    expect(modelManager.findItem(note.uuid).text).to.equal(text);
   }).timeout(60000);
 
   it("should sync an item twice if it's marked dirty while a sync is ongoing", async () => {
@@ -655,11 +704,8 @@ describe('online syncing', () => {
 
   it('duplicating an item should maintian its relationships', async () => {
     await syncManager.loadLocalItems();
-    var originalItem1 = Factory.createItem();
-    originalItem1.content_type = "Foo";
-
-    var originalItem2 = Factory.createItem();
-    originalItem2.content_type = "Bar";
+    var originalItem1 = Factory.createItem("Foo");
+    var originalItem2 = Factory.createItem("Bar");
 
     originalItem1.addItemAsRelationship(originalItem2);
     await modelManager.mapResponseItemsToLocalModels([originalItem1, originalItem2]);
@@ -681,12 +727,11 @@ describe('online syncing', () => {
 
     expect(modelManager.allItems.length).to.equal(totalItemCount);
 
+    // Non-Note items should set .content directly
     originalItem1.content.title = `${Math.random()}`
     originalItem1.updated_at = Factory.yesterday();
     modelManager.setItemDirty(originalItem1, true);
 
-    // wait about 1s, which is the value the dev server will ignore conflicting changes
-    await Factory.sleep(1.1);
     await syncManager.sync(syncOptions);
     // item should now be conflicted and a copy created
     totalItemCount++;
@@ -740,6 +785,7 @@ describe('online syncing', () => {
       expect(downloadedItems.length).to.equal(totalItemCount);
       // ensure it's decrypted
       expect(downloadedItems[0].content.text.length).to.be.above(1);
+      expect(downloadedItems[0].text.length).to.be.above(1);
     })
   }).timeout(60000);
 
@@ -765,7 +811,7 @@ describe('online syncing', () => {
     expect(localModelManager.getDirtyItems().length).to.equal(0);
 
     let item = Factory.createItem();
-    item.content.text = `${Math.random()}`;
+    item.text = `${Math.random()}`;
     localModelManager.addItem(item);
     localModelManager.setItemDirty(item);
     totalItemCount++;
@@ -795,6 +841,7 @@ describe('online syncing', () => {
 
     let currentItem = localModelManager.findItem(item.uuid);
     expect(currentItem.content.text).to.equal(item.content.text);
+    expect(currentItem.text).to.equal(item.text);
     expect(currentItem.dirty).to.not.be.ok;
   }).timeout(60000);
 
@@ -811,8 +858,7 @@ describe('online syncing', () => {
     let contentTypes = ["A", "B", "C"];
     let itemCount = 6;
     for(var i = 0; i < itemCount; i++) {
-      var item = Factory.createItem();
-      item.content_type = contentTypes[Math.floor(i/2)];
+      var item = Factory.createItem(contentTypes[Math.floor(i/2)]);
       modelManager.setItemDirty(item, true);
       localModelManager.addItem(item);
     }
@@ -839,18 +885,6 @@ describe('online syncing', () => {
 
   it("handles stale data in bulk", async () => {
     await syncManager.loadLocalItems();
-    let itemCount = 160;
-    // syncManager.PerSyncItemUploadLimit = 1;
-    // syncManager.ServerItemDownloadLimit = 2;
-
-    for(var i = 0; i < itemCount; i++) {
-      var item = Factory.createItem();
-      modelManager.setItemDirty(item, true);
-      modelManager.addItem(item);
-    }
-
-    totalItemCount += itemCount;
-    await syncManager.loadLocalItems();
     await syncManager.sync(syncOptions);
     let items = modelManager.allItems;
     expect(items.length).to.equal(totalItemCount);
@@ -871,15 +905,17 @@ describe('online syncing', () => {
 
     let yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     for(let item of items) {
-      item.content.text = `${Math.random()}`;
-      item.updated_at = yesterday;
-      modelManager.setItemDirty(item, true);
+      // Use .text here, assuming it's a Note
+      if(item.content_type === "Note") {
+        item.text = `${Math.random()}`;
+        item.updated_at = yesterday;
+        modelManager.setItemDirty(item, true);
+        // We expect all the notes to be duplicated.
+        totalItemCount++;
+      }
     }
 
     await syncManager.sync(syncOptions);
-
-    // We expect all the models to have been duplicated now, exactly.
-    totalItemCount *= 2;
 
     items = modelManager.allItems;
     expect(items.length).to.equal(totalItemCount);
@@ -917,8 +953,7 @@ describe('online syncing', () => {
       then when the incoming tag is being processed, it will also think it has changed, since our local value now doesn't match
       what's coming in. The solution is to get all values ahead of time before any changes are made.
     */
-    var tag = Factory.createItem();
-    tag.content_type = "Tag";
+    var tag = Factory.createItem("Tag");
 
     var note = Factory.createItem();
     modelManager.addItem(note);
@@ -933,7 +968,7 @@ describe('online syncing', () => {
     // conflict the note
     let newText = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    note.content.text = newText;
+    note.text = newText;
     modelManager.setItemDirty(note, true);
 
     // conflict the tag but keep its content the same
@@ -1143,6 +1178,8 @@ describe('sync discordance', () => {
     localModelManager.setItemDirty(item, true);
     itemCount++;
 
+    // localSyncManager.loggingEnabled = true;
+
     await localSyncManager.sync();
 
     // Delete item locally only without notifying server. We should then be in discordance.
@@ -1166,7 +1203,9 @@ describe('sync discordance', () => {
     // lets enter back into out of sync
     item = localModelManager.allItems[0];
     // now lets change the local content without syncing it.
-    item.content.text = "discordance";
+    item.text = "discordance";
+    // typically this is done by setDirty, but because we don't want to sync it, we'll apply this directly.
+    item.collapseCustomPropertiesIntoContent();
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)
     // we expect that the remote content coming in doesn't wipe out our pending change. A conflict should be created

@@ -1,4 +1,4 @@
-import '../dist/regenerator.js';
+import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
@@ -47,7 +47,7 @@ describe('session history', () => {
   })
 
   const setTextAndSync = async (item, text) => {
-    item.content.text = text;
+    item.text = text;
     modelManager.setItemDirty(item, true);
     return syncManager.sync();
   }
@@ -80,7 +80,7 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(1);
 
     // sync with different contents, should create new entry
-    item.content.title = Math.random();
+    item.title = Math.random();
     modelManager.setItemDirty(item, true);
     await syncManager.sync();
     expect(itemHistory.entries.length).to.equal(2);
@@ -141,7 +141,7 @@ describe('session history', () => {
     var item = Factory.createItem();
     modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
-    item.content.text = stringOfSize(100);
+    item.text = stringOfSize(100);
     await syncManager.sync();
 
     var itemHistory = historyManager.historyForItem(item);

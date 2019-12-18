@@ -1,4 +1,4 @@
-import '../dist/regenerator.js';
+import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';

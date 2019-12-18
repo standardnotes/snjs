@@ -1,4 +1,4 @@
-import '../dist/regenerator.js';
+import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
@@ -15,7 +15,7 @@ const createModelManager = () => {
 
 const createItemParams = () => {
   var params = {
-    uuid: cryptoManager.crypto.generateUUIDSync(),
+    uuid: protocolManager.crypto.generateUUIDSync(),
     content_type: "Item",
     content: {
       title: "Hello",
@@ -276,6 +276,7 @@ describe("predicates", () => {
     var item = createItem();
     item.content.title = "123";
     let modelManager = createModelManager();
+    item.setDirty(true);
     modelManager.addItem(item);
     // match only letters
     var predicate = new SFPredicate("content.title", "matches", "^[a-zA-Z]+$");

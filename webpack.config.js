@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -14,7 +13,7 @@ module.exports = {
         "@Lib": path.resolve(__dirname, "lib"),
         "@Services": path.resolve(__dirname, "lib/services"),
         "@Models": path.resolve(__dirname, "lib/models"),
-        "@Crypto": path.resolve(__dirname, "lib/crypto")
+        "@Protocol": path.resolve(__dirname, "lib/protocol")
       }
     },
     output: {
@@ -35,11 +34,6 @@ module.exports = {
         }
       ]
     },
-    plugins: [
-      new CopyWebpackPlugin([
-        { from: './node_modules/regenerator-runtime/runtime.js', to: 'regenerator.js' },
-      ])
-    ],
     stats: {
       colors: true
     },

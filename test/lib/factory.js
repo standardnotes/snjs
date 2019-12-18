@@ -1,10 +1,10 @@
-import '../../dist/regenerator.js';
+import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 
 import LocalStorageManager from './localStorageManager.js';
-const sf_default = new SNCryptoManager();
+const sf_default = new SNProtocolManager();
 SFItem.AppDomain = "org.standardnotes.sn";
 
 var _globalStorageManager = null;
@@ -48,7 +48,7 @@ export default class Factory {
   }
 
   static globalCryptoManager() {
-    if(_globalCryptoManager == null) { _globalCryptoManager = new SNCryptoManager(); }
+    if(_globalCryptoManager == null) { _globalCryptoManager = new SNProtocolManager(); }
     return _globalCryptoManager;
   }
 
@@ -60,10 +60,10 @@ export default class Factory {
     return new LocalStorageManager();
   }
 
-  static createItemParams() {
+  static createItemParams(contentType) {
     var params = {
-      uuid: cryptoManager.crypto.generateUUIDSync(),
-      content_type: "Note",
+      uuid: protocolManager.crypto.generateUUIDSync(),
+      content_type: contentType || "Note",
       content: {
         title: "hello",
         text: "world"
@@ -72,8 +72,12 @@ export default class Factory {
     return params;
   }
 
-  static createItem() {
-    return new SFItem(this.createItemParams());
+  static createItem(contentType) {
+    if(!contentType) {
+      return new SNNote(this.createItemParams());
+    } else {
+      return new SFItem(this.createItemParams(contentType));
+    }
   }
 
   static serverURL() {

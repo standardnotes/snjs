@@ -18,12 +18,12 @@ This library can be used in any JavaScript environment, including web, desktop, 
 
 ## Usage
 
-On the web, SNJS objects will be available as on the global window, such as `window.cryptoManager`.
+On the web, SNJS objects will be available as on the global window, such as `window.protocolManager`.
 
 If in a module environment, you can import it via:
 
 ```javascript
-import { cryptoManager } from 'snjs';
+import { protocolManager } from 'snjs';
 ```
 
 ### Generating keys for user
@@ -31,7 +31,7 @@ import { cryptoManager } from 'snjs';
 #### New user (registration):
 
 ```javascript
-cryptoManager.generateInitialKeysAndAuthParamsForUser(email, password).then((results) => {
+protocolManager.generateInitialKeysAndAuthParamsForUser(email, password).then((results) => {
   let keys = results.keys;
   let authParams = results.authParams;
 
@@ -45,7 +45,7 @@ cryptoManager.generateInitialKeysAndAuthParamsForUser(email, password).then((res
 
 ```javascript
 let authParams = getPreviouslyCreatedAuthParams();
-cryptoManager.computeEncryptionKeysForUser(password, authParams).then((keys) => {
+protocolManager.computeEncryptionKeysForUser(password, authParams).then((keys) => {
   let serverPassword = keys.pw;
   let encryptionKey = keys.mk;
   let authenticationKey = keys.ak;
@@ -61,13 +61,13 @@ cryptoManager.computeEncryptionKeysForUser(password, authParams).then((keys) => 
 
 ### Encrypting and decrypting items
 
-Use `cryptoManager` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
+Use `protocolManager` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
 
 #### Encrypt:
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-cryptoManager.encryptItem(item, keys, authParams).then(() => {
+protocolManager.encryptItem(item, keys, authParams).then(() => {
  // item.content is now encrypted
 })
 ```
@@ -76,7 +76,7 @@ cryptoManager.encryptItem(item, keys, authParams).then(() => {
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-cryptoManager.decryptItem(item, keys).then(() => {
+protocolManager.decryptItem(item, keys).then(() => {
  // item.content is now decrypted
 })
 ```
