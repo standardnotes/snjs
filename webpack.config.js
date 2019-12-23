@@ -23,9 +23,6 @@ module.exports = {
       libraryTarget: 'umd',
       umdNamedDefine: true
     },
-    optimization: {
-      minimize: true,
-    },
     module: {
       rules: [
         {

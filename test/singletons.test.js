@@ -21,20 +21,21 @@ syncManager.setKeyRequestHandler(async () => {
   };
 })
 
-describe("singletons", () => {
+describe.only("singletons", () => {
 
   it("only resolves to 1 item", async () => {
-    await syncManager.loadLocalItems();
-
     let item1 = Factory.createItem();
     let item2 = Factory.createItem();
-    modelManager.addItems([item1, item2]);
-    modelManager.setItemsDirty([item1, item2], true);
-
+    let item3 = Factory.createItem();
     let contentTypePredicate = new SFPredicate("content_type", "=", item1.content_type);
     singletonManager.registerSingleton([contentTypePredicate]);
 
-    expect(modelManager.allItems.length).to.equal(2);
+    await syncManager.loadLocalItems();
+
+    modelManager.addItems([item1, item2, item3]);
+    modelManager.setItemsDirty([item1, item2, item3], true);
+
+    expect(modelManager.allItems.length).to.equal(3);
 
     await syncManager.sync();
 
@@ -45,6 +46,7 @@ describe("singletons", () => {
 
         // after sync, only 1 should remain
         expect(modelManager.allItems.length).to.equal(1);
+        expect(modelManager.allItems[0].uuid).to.equal(item1.uuid);
         resolve();
       }, 100);
     })
