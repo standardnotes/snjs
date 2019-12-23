@@ -21,7 +21,7 @@ syncManager.setKeyRequestHandler(async () => {
   };
 })
 
-describe.only("singletons", () => {
+describe("singletons", () => {
 
   it("only resolves to 1 item", async () => {
     let item1 = Factory.createItem();
