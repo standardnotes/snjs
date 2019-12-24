@@ -66,7 +66,7 @@ describe("basic auth", () => {
 
     var strict = false;
 
-    var result = await Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(email, password);
+    var result = await Factory.globalCryptoManager().createKeysAndAuthParams({identifier: email, password: password});
     var newKeys = result.keys;
     var newAuthParams = result.authParams;
 
@@ -134,7 +134,7 @@ describe("basic auth", () => {
     var strict = false;
 
     for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(email, password);
+      var result = await Factory.globalCryptoManager().createKeysAndAuthParams({identifier: email, password});
       var newKeys = result.keys;
       var newAuthParams = result.authParams;
 

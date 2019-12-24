@@ -994,7 +994,7 @@ describe('sync params', () => {
 
   before((done) => {
     // runs once before all tests in this block
-    Factory.globalCryptoManager().generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
+    Factory.globalCryptoManager().createKeysAndAuthParams({identifier: _identifier, password: _password}).then((result) => {
       _authParams = result.authParams;
       _keys = result.keys;
       done();

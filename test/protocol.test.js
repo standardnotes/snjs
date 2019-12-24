@@ -4,7 +4,6 @@ import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 
 const sn_webprotocolManager = new SNProtocolManager(new SNWebCrypto());
-const sn_cryptojsManager = new SNProtocolManager(new SNCryptoJS());
 
 chai.use(chaiAsPromised);
 var expect = chai.expect;
@@ -16,10 +15,6 @@ describe('protocol', () => {
 
   it('checks supported versions to make sure it includes 001, 002, 003', () => {
     expect(sn_webprotocolManager.supportedVersions()).to.eql(["001", "002", "003"]);
-  });
-
-  it('cryptojs should not support costs greater than 5000', () => {
-    expect(sn_cryptojsManager.supportsPasswordDerivationCost(5001)).to.equal(false);
   });
 
   it('cryptoweb should support costs greater than 5000', () => {
@@ -53,7 +48,7 @@ describe('protocol operations', () => {
 
   before((done) => {
     // runs before all tests in this block
-    sn_webprotocolManager.generateInitialKeysAndAuthParamsForUser(_identifier, _password).then((result) => {
+    sn_webprotocolManager.createKeysAndAuthParams({identifier: _identifier, password: _password}).then((result) => {
       _authParams = result.authParams;
       _keys = result.keys;
       done();
@@ -61,7 +56,7 @@ describe('protocol operations', () => {
   });
 
   it('generates valid keys for registration', () => {
-    return expect(sn_webprotocolManager.generateInitialKeysAndAuthParamsForUser(_identifier, _password)).to.be.fulfilled.then((result) => {
+    return expect(sn_webprotocolManager.createKeysAndAuthParams({identifier: _identifier, password: _password})).to.be.fulfilled.then((result) => {
       expect(result).to.have.property("keys");
       expect(result).to.have.property("authParams");
 
@@ -83,14 +78,10 @@ describe('protocol operations', () => {
     let wc_encryptionResult = await sn_webprotocolManager.defaultOperator().encryptText(text, key, iv);
     let wc_decryptionResult = await sn_webprotocolManager.defaultOperator().decryptText({contentCiphertext: wc_encryptionResult, encryptionKey: key, iv: iv})
     expect(wc_decryptionResult).to.equal(text);
-
-    let cj_encryptionResult = await sn_cryptojsManager.defaultOperator().encryptText(text, key, iv);
-    let cj_decryptionResult = await sn_cryptojsManager.defaultOperator().decryptText({contentCiphertext: cj_encryptionResult, encryptionKey: key, iv: iv})
-    expect(cj_decryptionResult).to.equal(text);
   });
 
   it('generates existing keys for auth params', () => {
-    return expect(sn_webprotocolManager.computeEncryptionKeysForUser(_password, _authParams)).to.be.fulfilled.then((result) => {
+    return expect(sn_webprotocolManager.computeEncryptionKeys(_password, _authParams)).to.be.fulfilled.then((result) => {
       expect(result).to.have.property("pw");
       expect(result).to.have.property("ak");
       expect(result).to.have.property("mk");
@@ -101,7 +92,7 @@ describe('protocol operations', () => {
   it('throws error if auth params is missing identifier', () => {
     var params = Object.assign({}, _authParams);
     params.identifier = null;
-    return expect(sn_webprotocolManager.computeEncryptionKeysForUser(_password, params)).to.be.fulfilled.then((result) => {
+    return expect(sn_webprotocolManager.computeEncryptionKeys(_password, params)).to.be.fulfilled.then((result) => {
       expect(result).to.be.undefined;
     })
   });

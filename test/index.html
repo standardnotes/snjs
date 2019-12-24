@@ -160,7 +160,7 @@
             return;
           }
 
-          protocolManager.computeEncryptionKeysForUser(password, auth_params).then(function(result){
+          protocolManager.computeEncryptionKeys(password, auth_params).then(function(result){
             keys = result;
             if(result) {
               onKeyReady();

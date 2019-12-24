@@ -31,7 +31,7 @@ import { protocolManager } from 'snjs';
 #### New user (registration):
 
 ```javascript
-protocolManager.generateInitialKeysAndAuthParamsForUser(email, password).then((results) => {
+protocolManager.createKeysAndAuthParams({identifier: email, password: password}).then((results) => {
   let keys = results.keys;
   let authParams = results.authParams;
 
@@ -45,7 +45,7 @@ protocolManager.generateInitialKeysAndAuthParamsForUser(email, password).then((r
 
 ```javascript
 let authParams = getPreviouslyCreatedAuthParams();
-protocolManager.computeEncryptionKeysForUser(password, authParams).then((keys) => {
+protocolManager.computeEncryptionKeys({password, authParams}).then((keys) => {
   let serverPassword = keys.pw;
   let encryptionKey = keys.mk;
   let authenticationKey = keys.ak;
