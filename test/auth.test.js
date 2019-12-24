@@ -70,7 +70,7 @@ describe("basic auth", () => {
     var newKeys = result.keys;
     var newAuthParams = result.authParams;
 
-    var response = await Factory.globalAuthManager().changePassword(url, email, _keys.pw, newKeys, newAuthParams);
+    var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newAuthParams);
     expect(response.error).to.not.be.ok;
 
     expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -138,7 +138,7 @@ describe("basic auth", () => {
       var newKeys = result.keys;
       var newAuthParams = result.authParams;
 
-      var response = await Factory.globalAuthManager().changePassword(url, email, _keys.pw, newKeys, newAuthParams);
+      var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newAuthParams);
       expect(response.error).to.not.be.ok;
 
       expect(modelManager.allItems.length).to.equal(totalItemCount);

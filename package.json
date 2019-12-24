@@ -28,7 +28,7 @@
     "serve-static": "^1.14.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
-    "sncrypto": "1.0.0"
+    "sncrypto": "file:~/Desktop/sn/dev/sncrypto"
   },
   "dependencies": {
     "lodash": "^4.17.15"

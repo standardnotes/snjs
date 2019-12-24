@@ -9,12 +9,12 @@ chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 describe('protocol', () => {
-  it('checks version to make sure its 003', () => {
-    expect(sn_webprotocolManager.version()).to.equal("003");
+  it('checks version to make sure its 004', () => {
+    expect(sn_webprotocolManager.version()).to.equal("004");
   });
 
-  it('checks supported versions to make sure it includes 001, 002, 003', () => {
-    expect(sn_webprotocolManager.supportedVersions()).to.eql(["001", "002", "003"]);
+  it('checks supported versions to make sure it includes 001, 002, 003, 004', () => {
+    expect(sn_webprotocolManager.supportedVersions()).to.eql(["001", "002", "003", "004"]);
   });
 
   it('cryptoweb should support costs greater than 5000', () => {
@@ -25,8 +25,8 @@ describe('protocol', () => {
     expect(sn_webprotocolManager.isVersionNewerThanLibraryVersion("002")).to.equal(false);
   });
 
-  it('version comparison of 004 should be newer than library version', () => {
-    expect(sn_webprotocolManager.isVersionNewerThanLibraryVersion("004")).to.equal(true);
+  it('version comparison of 005 should be newer than library version', () => {
+    expect(sn_webprotocolManager.isVersionNewerThanLibraryVersion("005")).to.equal(true);
   });
 
   it('library version should not be outdated', () => {
@@ -39,62 +39,3 @@ describe('protocol', () => {
     expect(sn_webprotocolManager.costMinimumForVersion("003")).to.equal(110000);
   });
 });
-
-describe('protocol operations', () => {
-
-  var _identifier = "hello@test.com";
-  var _password = "password";
-  var _authParams, _keys;
-
-  before((done) => {
-    // runs before all tests in this block
-    sn_webprotocolManager.createKeysAndAuthParams({identifier: _identifier, password: _password}).then((result) => {
-      _authParams = result.authParams;
-      _keys = result.keys;
-      done();
-    })
-  });
-
-  it('generates valid keys for registration', () => {
-    return expect(sn_webprotocolManager.createKeysAndAuthParams({identifier: _identifier, password: _password})).to.be.fulfilled.then((result) => {
-      expect(result).to.have.property("keys");
-      expect(result).to.have.property("authParams");
-
-      expect(result.keys).to.have.property("pw");
-      expect(result.keys).to.have.property("ak");
-      expect(result.keys).to.have.property("mk");
-
-      expect(result.authParams).to.have.property("pw_nonce");
-      expect(result.authParams).to.have.property("pw_cost");
-      expect(result.authParams).to.have.property("identifier");
-      expect(result.authParams).to.have.property("version");
-    })
-  });
-
-  it('properly encrypts and decrypts', async () => {
-    var text = "hello world";
-    var key = _keys.mk;
-    var iv = await sn_webprotocolManager.crypto.generateRandomKey(128);
-    let wc_encryptionResult = await sn_webprotocolManager.defaultOperator().encryptText(text, key, iv);
-    let wc_decryptionResult = await sn_webprotocolManager.defaultOperator().decryptText({contentCiphertext: wc_encryptionResult, encryptionKey: key, iv: iv})
-    expect(wc_decryptionResult).to.equal(text);
-  });
-
-  it('generates existing keys for auth params', () => {
-    return expect(sn_webprotocolManager.computeEncryptionKeys(_password, _authParams)).to.be.fulfilled.then((result) => {
-      expect(result).to.have.property("pw");
-      expect(result).to.have.property("ak");
-      expect(result).to.have.property("mk");
-      expect(result).to.eql(_keys);
-    })
-  });
-
-  it('throws error if auth params is missing identifier', () => {
-    var params = Object.assign({}, _authParams);
-    params.identifier = null;
-    return expect(sn_webprotocolManager.computeEncryptionKeys(_password, params)).to.be.fulfilled.then((result) => {
-      expect(result).to.be.undefined;
-    })
-  });
-
-})

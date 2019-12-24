@@ -32,12 +32,12 @@ import { protocolManager } from 'snjs';
 
 ```javascript
 protocolManager.createKeysAndAuthParams({identifier: email, password: password}).then((results) => {
-  let keys = results.keys;
-  let authParams = results.authParams;
+  const keys = results.keys;
+  const authParams = results.authParams;
 
-  let serverPassword = keys.pw;
-  let encryptionKey = keys.mk;
-  let authenticationKey = keys.ak;
+  const serverPassword = keys.serverAuthenticationValue;
+  const masterKey = keys.masterKey;
+  const itemsMasterKey = keys.itemsMasterKey;
 });
 ```
 
@@ -46,18 +46,18 @@ protocolManager.createKeysAndAuthParams({identifier: email, password: password})
 ```javascript
 let authParams = getPreviouslyCreatedAuthParams();
 protocolManager.computeEncryptionKeys({password, authParams}).then((keys) => {
-  let serverPassword = keys.pw;
-  let encryptionKey = keys.mk;
-  let authenticationKey = keys.ak;
+  const serverPassword = keys.serverAuthenticationValue;
+  const masterKey = keys.masterKey;
+  // itemsMasterKey is generated once then uploaded to server in encrypted form.
 });
 ```
 
 #### Key descriptions:
-`pw`: sent to the server for authentication.
+`serverPassword`: sent to the server for authentication.
 
-`mk`: encrypts and decrypts items. Never sent to the server.
+`masterKey`: encrypts and decrypts keys. Not sent to server plainly.
 
-`ak`: authenticates the encryption and decryption of items. Never sent to the server.
+`itemsMasterKey`: encrypts and decrypts items. Not sent to server plainly.
 
 ### Encrypting and decrypting items
 
@@ -67,7 +67,7 @@ Use `protocolManager` to encrypt and decrypt items. Use the `SFItemParams` as a 
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.encryptItem(item, keys, authParams).then(() => {
+protocolManager.encryptItem({item, keys, authParams}).then(() => {
  // item.content is now encrypted
 })
 ```
@@ -76,7 +76,7 @@ protocolManager.encryptItem(item, keys, authParams).then(() => {
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.decryptItem(item, keys).then(() => {
+protocolManager.decryptItem({item, keys}).then(() => {
  // item.content is now decrypted
 })
 ```

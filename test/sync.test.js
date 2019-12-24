@@ -305,7 +305,7 @@ describe('online syncing', () => {
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await protocolManager.decryptItem(itemParams, keys);
+    await protocolManager.decryptItem({item: itemParams, keys: keys});
     items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
