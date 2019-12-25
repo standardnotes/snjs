@@ -299,7 +299,14 @@ describe('online syncing', () => {
 
     let keys = await authManager.keys();
     let authParams = await authManager.getAuthParams();
-    var itemParams = await new SFItemParams(item, keys, authParams).paramsForSync();
+
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: keys,
+      authParams: authParams,
+      exportType: SNProtocolOperator.ExportTypeSync
+    })
+
     itemParams.errorDecrypting = true;
     let items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     let mappedItem = items[0];
@@ -1003,7 +1010,14 @@ describe('sync params', () => {
 
   it("returns valid encrypted params for syncing", async () => {
     var item = Factory.createItem();
-    var itemParams = await new SFItemParams(item, _keys, _authParams).paramsForSync();
+
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: _keys,
+      authParams: _authParams,
+      exportType: SNProtocolOperator.ExportTypeSync
+    })
+
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
     expect(itemParams.auth_hash).to.be.null;
@@ -1016,7 +1030,13 @@ describe('sync params', () => {
 
   it("returns unencrypted params with no keys", async () => {
     var item = Factory.createItem();
-    var itemParams = await new SFItemParams(item, null).paramsForSync();
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: null,
+      authParams: null,
+      exportType: SNProtocolOperator.ExportTypeSync
+    })
+
     expect(itemParams.enc_item_key).to.be.null;
     expect(itemParams.auth_hash).to.be.null;
     expect(itemParams.uuid).to.not.be.null;
@@ -1029,7 +1049,14 @@ describe('sync params', () => {
 
   it("returns additional fields for local storage", async () => {
     var item = Factory.createItem();
-    var itemParams = await new SFItemParams(item, _keys, _authParams).paramsForLocalStorage();
+
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: _keys,
+      authParams: _authParams,
+      exportType: SNProtocolOperator.ExportTypeLocalStorage
+    })
+
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.auth_hash).to.be.null;
     expect(itemParams.uuid).to.not.be.null;
@@ -1045,7 +1072,12 @@ describe('sync params', () => {
 
   it("omits deleted for export file", async () => {
     var item = Factory.createItem();
-    var itemParams = await new SFItemParams(item, _keys, _authParams).paramsForExportFile();
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: _keys,
+      authParams: _authParams,
+      exportType: SNProtocolOperator.ExportTypeFile
+    })
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
     expect(itemParams.content_type).to.not.be.null;
@@ -1059,7 +1091,12 @@ describe('sync params', () => {
   it("items with error decrypting should remain as is", async () => {
     var item = Factory.createItem();
     item.errorDecrypting = true;
-    var itemParams = await new SFItemParams(item, _keys, _authParams).paramsForSync();
+    const itemParams = await protocolManager.generateExportParameters({
+      item: item,
+      keys: _keys,
+      authParams: _authParams,
+      exportType: SNProtocolOperator.ExportTypeSync
+    })
     expect(itemParams.content).to.eql(item.content);
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
