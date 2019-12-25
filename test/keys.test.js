@@ -8,7 +8,7 @@ const expect = chai.expect;
 describe.only('keys', () => {
   let _identifier = "hello@test.com";
   let _password = "password";
-  let _keys;
+  let _key;
 
   const protocolManager = new SNProtocolManager(new SNWebCrypto());
   const modelManager = Factory.createModelManager();
@@ -17,14 +17,14 @@ describe.only('keys', () => {
   before(async (done) => {
     // Runs before all tests in this block
     const result = await protocolManager.createRootKey({identifier: _identifier, password: _password});
-    _keys = result.keys;
+    _key = result.key;
     done();
   });
 
   it('saves and retrieves root keys', async () => {
-    await keysManager.saveRootKeys(_keys);
+    await keysManager.setRootKey(_key);
     const rootKeys = await keysManager.getRootKeys();
-    expect(rootKeys).to.equal(_keys);
+    expect(rootKeys).to.equal(_key);
     expect(rootKeys.constructor.name).to.equal("SNItemKey");
   });
 

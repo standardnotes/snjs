@@ -113,8 +113,8 @@ describe('offline syncing', () => {
 });
 
 describe('online syncing', () => {
-  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
-  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
   var totalItemCount = 0;
 
   const syncOptions = {
@@ -997,13 +997,13 @@ describe('sync params', () => {
 
   var _identifier = "hello@test.com";
   var _password = "password";
-  var _keyParams, _keys;
+  var _keyParams, _key;
 
   before((done) => {
     // runs once before all tests in this block
-    Factory.globalCryptoManager().createRootKey({identifier: _identifier, password: _password}).then((result) => {
+    Factory.globalProtocolManager().createRootKey({identifier: _identifier, password: _password}).then((result) => {
       _keyParams = result.keyParams;
-      _keys = result.keys;
+      _key = result.key;
       done();
     })
   });
@@ -1013,7 +1013,7 @@ describe('sync params', () => {
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _keys,
+      keys: _key,
       keyParams: _keyParams,
       intent: EncryptionIntentSync
     })
@@ -1024,7 +1024,7 @@ describe('sync params', () => {
     expect(itemParams.content_type).to.not.be.null;
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalCryptoManager().version());
+      return string.startsWith(Factory.globalProtocolManager().version());
     });
   });
 
@@ -1052,7 +1052,7 @@ describe('sync params', () => {
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _keys,
+      keys: _key,
       keyParams: _keyParams,
       intent: EncryptionIntentLocalStorage
     })
@@ -1066,7 +1066,7 @@ describe('sync params', () => {
     expect(itemParams.deleted).to.not.be.null;
     expect(itemParams.errorDecrypting).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalCryptoManager().version());
+      return string.startsWith(Factory.globalProtocolManager().version());
     });
   });
 
@@ -1074,7 +1074,7 @@ describe('sync params', () => {
     var item = Factory.createItem();
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _keys,
+      keys: _key,
       keyParams: _keyParams,
       intent: EncryptionIntentFile
     })
@@ -1084,7 +1084,7 @@ describe('sync params', () => {
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.deleted).to.not.be.ok;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalCryptoManager().version());
+      return string.startsWith(Factory.globalProtocolManager().version());
     });
   });
 
@@ -1093,7 +1093,7 @@ describe('sync params', () => {
     item.errorDecrypting = true;
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _keys,
+      keys: _key,
       keyParams: _keyParams,
       intent: EncryptionIntentSync
     })
@@ -1106,12 +1106,16 @@ describe('sync params', () => {
 });
 
 describe('sync discordance', () => {
-  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
-  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
   var totalItemCount = 0;
 
   let localStorageManager = new MemoryStorageManager();
-  let localAuthManager = new SFAuthManager(localStorageManager, Factory.globalHttpManager());
+  let localAuthManager = new SFAuthManager({
+    storageManager: localStorageManager,
+    httpManager: Factory.globalHttpManager(),
+    keyManager: Factory.globalKeyManager()
+  });
   let localHttpManager = new SFHttpManager();
   localHttpManager.setJWTRequestHandler(async () => {
     return localStorageManager.getItem("jwt");;

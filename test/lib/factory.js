@@ -11,15 +11,17 @@ var _globalStorageManager = null;
 var _globalHttpManager = null;
 var _globalAuthManager = null;
 var _globalModelManager = null;
-var _globalCryptoManager = null;
+var _globalProtocolManager = null;
+var _globalKeyManager = null;
 
 export default class Factory {
 
   static initialize() {
     this.globalStorageManager();
     this.globalHttpManager();
-    this.globalAuthManager();
     this.globalModelManager();
+    this.globalKeyManager();
+    this.globalAuthManager();
   }
 
   static globalStorageManager() {
@@ -38,7 +40,13 @@ export default class Factory {
   }
 
   static globalAuthManager() {
-    if(_globalAuthManager == null) { _globalAuthManager = new SFAuthManager(_globalStorageManager, _globalHttpManager); }
+    if(_globalAuthManager == null) {
+       _globalAuthManager = new SFAuthManager({
+        storageManager: _globalStorageManager,
+        httpManager: _globalHttpManager,
+        keyManager: _globalKeyManager
+      });
+    }
     return _globalAuthManager;
   }
 
@@ -47,9 +55,32 @@ export default class Factory {
     return _globalModelManager;
   }
 
-  static globalCryptoManager() {
-    if(_globalCryptoManager == null) { _globalCryptoManager = new SNProtocolManager(); }
-    return _globalCryptoManager;
+  static globalKeyManager() {
+    if(_globalKeyManager == null) {
+      _globalKeyManager = new SNKeyManager({
+        modelManager: _globalModelManager,
+        storageManager: _globalStorageManager
+      });
+
+      let keychainValue = null;
+      _globalKeyManager.setKeychainDelegate({
+         setKeyChainValue: async (value) => {
+           keychainValue = value;
+         },
+         getKeyChainValue: async () => {
+           return keychainValue;
+         },
+         deleteKeyChainValue: async () => {
+           keychainValue = null;
+         }
+      });
+    }
+    return _globalKeyManager;
+  }
+
+  static globalProtocolManager() {
+    if(_globalProtocolManager == null) { _globalProtocolManager = new SNProtocolManager(); }
+    return _globalProtocolManager;
   }
 
   static createModelManager() {

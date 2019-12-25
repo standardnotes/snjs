@@ -441,8 +441,8 @@ describe("syncing", () => {
   var totalItemCount = 0;
 
   beforeEach((done) => {
-    var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
-    var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
+    var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
+    var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
     Factory.globalStorageManager().clearAllData().then(() => {
       Factory.newRegisteredUser(email, password).then((user) => {
         done();

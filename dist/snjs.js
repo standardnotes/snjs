@@ -1190,7 +1190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNProtocolManager, protocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorage, EncryptionIntentFile, EncryptionIntentSync, SFItem, SNItemKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager */
+/*! exports provided: SNProtocolManager, protocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorage, EncryptionIntentFile, EncryptionIntentSync, SFItem, SNItemKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager, SNKeyManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1212,12 +1212,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions/004/operator_004 */ "./lib/protocol/versions/004/operator_004.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator004"]; });
 
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorage", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_36__["EncryptionIntentLocalStorage"]; });
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorage", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStorage"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFile", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_36__["EncryptionIntentFile"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFile", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentFile"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentSync", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_36__["EncryptionIntentSync"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentSync", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentSync"]; });
 
 /* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_6__["SFItem"]; });
@@ -1313,6 +1313,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _services_singletonManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/singletonManager */ "./lib/services/singletonManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return _services_singletonManager__WEBPACK_IMPORTED_MODULE_35__["SFSingletonManager"]; });
+
+/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_36__["SNKeyManager"]; });
+
 
 
 
@@ -3361,9 +3365,9 @@ function (_SNPureKey) {
       return this.keyContent.itemsKey;
     }
   }, {
-    key: "encryptionAuthenticationKey",
+    key: "dataAuthenticationKey",
     get: function get() {
-      return this.keyContent.encryptionAuthenticationKey;
+      return this.keyContent.dataAuthenticationKey;
     }
   }, {
     key: "isDefault",
@@ -3506,6 +3510,95 @@ function (_SFItem) {
 
   return SNPureKey;
 }(_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+
+/***/ }),
+
+/***/ "./lib/models/keys/rootKey.js":
+/*!************************************!*\
+  !*** ./lib/models/keys/rootKey.js ***!
+  \************************************/
+/*! exports provided: SNRootKey */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return SNRootKey; });
+/* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+var SNRootKey =
+/*#__PURE__*/
+function (_SNPureKey) {
+  _inherits(SNRootKey, _SNPureKey);
+
+  function SNRootKey() {
+    _classCallCheck(this, SNRootKey);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNRootKey).apply(this, arguments));
+  }
+
+  _createClass(SNRootKey, [{
+    key: "rootValues",
+
+    /**
+     * @returns Object containg key/values that should be extracted from key for local saving.
+     */
+    value: function rootValues() {
+      return this.keyContent.rootValues();
+    }
+  }, {
+    key: "content_type",
+    get: function get() {
+      return this.constructor.contentType();
+    }
+  }, {
+    key: "masterKey",
+    get: function get() {
+      return this.keyContent.masterKey;
+    }
+  }, {
+    key: "serverAuthenticationValue",
+    get: function get() {
+      return this.keyContent.serverAuthenticationValue;
+    }
+  }], [{
+    key: "FromRaw",
+
+    /**
+     * Because this is a traditional SFItem, the constructor expects an object with a .content
+     * property. FromRaw allows you to send in an unwrapped raw key hash instead.
+    */
+    value: function FromRaw(key) {
+      return new SNRootKey({
+        content: key
+      });
+    }
+  }, {
+    key: "contentType",
+    value: function contentType() {
+      return 'SN|RootKey|NoSync';
+    }
+  }]);
+
+  return SNRootKey;
+}(_Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
 
 /***/ }),
 
@@ -4838,6 +4931,24 @@ var protocolManager = new SNProtocolManager();
 
 /***/ }),
 
+/***/ "./lib/protocol/storageKeys.js":
+/*!*************************************!*\
+  !*** ./lib/protocol/storageKeys.js ***!
+  \*************************************/
+/*! exports provided: ROOT_KEY_KEY_PARAMS, WRAPPED_ROOT_KEY, WRAPPED_ROOT_KEY_KEY_PARAMS */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_KEY_PARAMS", function() { return ROOT_KEY_KEY_PARAMS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY", function() { return WRAPPED_ROOT_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY_KEY_PARAMS", function() { return WRAPPED_ROOT_KEY_KEY_PARAMS; });
+var ROOT_KEY_KEY_PARAMS = "ROOT_KEY_KEY_PARAMS";
+var WRAPPED_ROOT_KEY = "WRAPPED_ROOT_KEY";
+var WRAPPED_ROOT_KEY_KEY_PARAMS = "WRAPPED_ROOT_KEY_KEY_PARAMS";
+
+/***/ }),
+
 /***/ "./lib/protocol/versions/001/key_content_001.js":
 /*!******************************************************!*\
   !*** ./lib/protocol/versions/001/key_content_001.js ***!
@@ -4861,6 +4972,8 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -4871,13 +4984,10 @@ var SNKeyContent001 =
 function (_SNKeyContent) {
   _inherits(SNKeyContent001, _SNKeyContent);
 
-  function SNKeyContent001(content) {
-    var _this;
-
+  function SNKeyContent001() {
     _classCallCheck(this, SNKeyContent001);
 
-    _this.content = content;
-    return _possibleConstructorReturn(_this);
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNKeyContent001).apply(this, arguments));
   }
 
   _createClass(SNKeyContent001, [{
@@ -4903,7 +5013,7 @@ function (_SNKeyContent) {
       return this.content.pw;
     }
   }, {
-    key: "encryptionAuthenticationKey",
+    key: "dataAuthenticationKey",
     get: function get() {
       throw "Should not attempt to access this value using this protocol version.";
       return null;
@@ -4976,6 +5086,11 @@ function (_SNRootKeyParams) {
     get: function get() {
       return this.content.email;
     }
+  }, {
+    key: "salt",
+    get: function get() {
+      return this.content.pw_salt;
+    }
   }]);
 
   return SNRootKeyParams001;
@@ -4995,11 +5110,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator001", function() { return SNProtocolOperator001; });
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/001/key_params_001 */ "./lib/protocol/versions/001/key_params_001.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/omit */ "./node_modules/lodash/omit.js");
-/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/omit */ "./node_modules/lodash/omit.js");
+/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_5__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
@@ -5019,6 +5135,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -5091,26 +5208,33 @@ function (_SNProtocolOperator) {
   }, {
     key: "computeRootKey",
     value: function computeRootKey(_ref2) {
-      var password, keyParams, pw_salt, key;
+      var password, keyParams, key;
       return regeneratorRuntime.async(function computeRootKey$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               password = _ref2.password, keyParams = _ref2.keyParams;
-              // Salt is returned from server
-              pw_salt = keyParams.pw_salt;
-              _context2.next = 4;
+
+              if (keyParams.isKeyParamsObject) {
+                _context2.next = 3;
+                break;
+              }
+
+              throw 'Attempting to compute root key with non params object.';
+
+            case 3:
+              _context2.next = 5;
               return regeneratorRuntime.awrap(this.deriveKey({
                 password: password,
-                pw_salt: pw_salt,
-                pw_cost: keyParams.pw_cost
+                pw_salt: keyParams.salt,
+                pw_cost: keyParams.kdfIterations
               }));
 
-            case 4:
+            case 5:
               key = _context2.sent;
               return _context2.abrupt("return", key);
 
-            case 6:
+            case 7:
             case "end":
               return _context2.stop();
           }
@@ -5128,7 +5252,6 @@ function (_SNProtocolOperator) {
           authHash,
           authKey,
           requiresAuth,
-          localAuthHash,
           keyData,
           ivData,
           _args3 = arguments;
@@ -5139,45 +5262,15 @@ function (_SNProtocolOperator) {
             case 0:
               _ref3 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, ciphertextToAuth = _ref3.ciphertextToAuth, contentCiphertext = _ref3.contentCiphertext, encryptionKey = _ref3.encryptionKey, iv = _ref3.iv, authHash = _ref3.authHash, authKey = _ref3.authKey;
               requiresAuth = _args3.length > 1 ? _args3[1] : undefined;
-
-              if (!(requiresAuth && !authHash)) {
-                _context3.next = 5;
-                break;
-              }
-
-              console.error("Auth hash is required.");
-              return _context3.abrupt("return");
-
-            case 5:
-              if (!authHash) {
-                _context3.next = 12;
-                break;
-              }
-
-              _context3.next = 8;
-              return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertextToAuth, authKey));
-
-            case 8:
-              localAuthHash = _context3.sent;
-
-              if (!(this.crypto.timingSafeEqual(authHash, localAuthHash) === false)) {
-                _context3.next = 12;
-                break;
-              }
-
-              console.error("Auth hash does not match, returning null.");
-              return _context3.abrupt("return", null);
-
-            case 12:
-              _context3.next = 14;
+              _context3.next = 4;
               return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(encryptionKey));
 
-            case 14:
+            case 4:
               keyData = _context3.sent;
-              _context3.next = 17;
+              _context3.next = 7;
               return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv || ""));
 
-            case 17:
+            case 7:
               ivData = _context3.sent;
 
               if (!ivData) {
@@ -5187,7 +5280,7 @@ function (_SNProtocolOperator) {
 
               return _context3.abrupt("return", this.crypto.aes256CbcDecrypt(contentCiphertext, keyData, ivData));
 
-            case 20:
+            case 10:
             case "end":
               return _context3.stop();
           }
@@ -5196,14 +5289,14 @@ function (_SNProtocolOperator) {
     }
   }, {
     key: "encryptText",
-    value: function encryptText(text, key, iv) {
+    value: function encryptText(text, rawKey, iv) {
       var keyData, ivData;
       return regeneratorRuntime.async(function encryptText$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
 
             case 2:
               keyData = _context4.sent;
@@ -5230,12 +5323,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "encryptItem",
     value: function encryptItem(_ref4) {
-      var item, keys, keyParams, EncryptionKeyLength, params, item_key, ek, ak, ciphertext, authHash;
+      var item, key, keyParams, EncryptionKeyLength, params, item_key, ek, ak, ciphertext, authHash;
       return regeneratorRuntime.async(function encryptItem$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              item = _ref4.item, keys = _ref4.keys, keyParams = _ref4.keyParams;
+              item = _ref4.item, key = _ref4.key, keyParams = _ref4.keyParams;
               EncryptionKeyLength = 512;
               params = {}; // encrypt item key
 
@@ -5245,7 +5338,7 @@ function (_SNProtocolOperator) {
             case 5:
               item_key = _context5.sent;
               _context5.next = 8;
-              return regeneratorRuntime.awrap(this.encryptText(item_key, keys.mk, null));
+              return regeneratorRuntime.awrap(this.encryptText(item_key, key.masterKey, null));
 
             case 8:
               params.enc_item_key = _context5.sent;
@@ -5283,12 +5376,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "decryptItem",
     value: function decryptItem(_ref5) {
-      var item, keys, encryptedItemKey, requiresAuth, keyParams, item_key, ek, ak, itemParams, content;
+      var item, key, encryptedItemKey, requiresAuth, keyParams, item_key, ek, ak, itemParams, content;
       return regeneratorRuntime.async(function decryptItem$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              item = _ref5.item, keys = _ref5.keys;
+              item = _ref5.item, key = _ref5.key;
 
               if (!(typeof item.content != "string")) {
                 _context6.next = 3;
@@ -5337,7 +5430,7 @@ function (_SNProtocolOperator) {
               requiresAuth = true;
               encryptedItemKey = "001" + encryptedItemKey;
               requiresAuth = false;
-              keyParams = this.encryptionComponentsFromString(encryptedItemKey, keys.itemsKey, keys.encryptionAuthenticationKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
+              keyParams = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey, key.dataAuthenticationKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
               if (!(keyParams.uuid && keyParams.uuid !== item.uuid)) {
                 _context6.next = 28;
@@ -5459,19 +5552,19 @@ function (_SNProtocolOperator) {
     value: function generateExportParameters(_ref6) {
       var _this = this;
 
-      var item, keys, keyParams, includeDeleted, intent, computeParams, additionalFields, omitFields, params;
+      var item, key, keyParams, includeDeleted, intent, computeParams, additionalFields, omitFields, params;
       return regeneratorRuntime.async(function generateExportParameters$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              item = _ref6.item, keys = _ref6.keys, keyParams = _ref6.keyParams, includeDeleted = _ref6.includeDeleted, intent = _ref6.intent;
+              item = _ref6.item, key = _ref6.key, keyParams = _ref6.keyParams, includeDeleted = _ref6.includeDeleted, intent = _ref6.intent;
 
-              if (!(keys && !keyParams)) {
+              if (!(key && !keyParams)) {
                 _context8.next = 3;
                 break;
               }
 
-              throw "keyParams must be supplied if supplying keys.";
+              throw "keyParams must be supplied if supplying key.";
 
             case 3:
               if (!(keyParams && !keyParams.version)) {
@@ -5507,16 +5600,16 @@ function (_SNProtocolOperator) {
                         params.auth_hash = item.auth_hash;
 
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_4___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
                         }
 
                         return _context7.abrupt("return");
 
                       case 7:
-                        isForRemoteSync = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentSync"]; // Items should always be encrypted for export files. Only respect item.doNotEncrypt for remote sync params.
+                        isForRemoteSync = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentSync"]; // Items should always be encrypted for export files. Only respect item.doNotEncrypt for remote sync params.
 
                         doNotEncrypt = item.doNotEncrypt() && isForRemoteSync;
-                        encrypt = keys && !doNotEncrypt;
+                        encrypt = key && !doNotEncrypt;
 
                         if (!encrypt) {
                           _context7.next = 17;
@@ -5526,13 +5619,13 @@ function (_SNProtocolOperator) {
                         _context7.next = 13;
                         return regeneratorRuntime.awrap(_this.encryptItem({
                           item: item,
-                          keys: keys,
+                          key: key,
                           keyParams: keyParams
                         }));
 
                       case 13:
                         encryptedParams = _context7.sent;
-                        lodash_merge__WEBPACK_IMPORTED_MODULE_4___default()(params, encryptedParams);
+                        lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, encryptedParams);
                         _context7.next = 26;
                         break;
 
@@ -5562,11 +5655,11 @@ function (_SNProtocolOperator) {
 
                       case 26:
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_4___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
                         }
 
                         if (omitFields) {
-                          params = (_readOnlyError("params"), lodash_omit__WEBPACK_IMPORTED_MODULE_3___default()(params, omitFields));
+                          params = (_readOnlyError("params"), lodash_omit__WEBPACK_IMPORTED_MODULE_4___default()(params, omitFields));
                         }
 
                         return _context7.abrupt("return", params);
@@ -5579,8 +5672,8 @@ function (_SNProtocolOperator) {
                 });
               };
 
-              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
-              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
+              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
+              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
               _context8.next = 10;
               return regeneratorRuntime.awrap(computeParams(additionalFields, omitFields));
 
@@ -5623,7 +5716,7 @@ function (_SNProtocolOperator) {
           PBKDF2OutputKeyLength,
           derivedKey,
           partitions,
-          keys,
+          key,
           _args9 = arguments;
 
       return regeneratorRuntime.async(function deriveKey$(_context9) {
@@ -5650,12 +5743,12 @@ function (_SNProtocolOperator) {
 
             case 7:
               partitions = _context9.sent;
-              keys = SNItemKey.FromRaw({
+              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 version: this.constructor.versionString()
               });
-              return _context9.abrupt("return", keys);
+              return _context9.abrupt("return", key);
 
             case 10:
             case "end":
@@ -5727,6 +5820,8 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -5737,13 +5832,10 @@ var SNKeyContent002 =
 function (_SNKeyContent) {
   _inherits(SNKeyContent002, _SNKeyContent);
 
-  function SNKeyContent002(content) {
-    var _this;
-
+  function SNKeyContent002() {
     _classCallCheck(this, SNKeyContent002);
 
-    _this.content = content;
-    return _possibleConstructorReturn(_this);
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNKeyContent002).apply(this, arguments));
   }
 
   _createClass(SNKeyContent002, [{
@@ -5751,7 +5843,7 @@ function (_SNKeyContent) {
     value: function rootValues() {
       return {
         masterKey: this.masterKey,
-        encryptionAuthenticationKey: this.encryptionAuthenticationKey
+        dataAuthenticationKey: this.dataAuthenticationKey
       };
     }
   }, {
@@ -5770,7 +5862,7 @@ function (_SNKeyContent) {
       return this.content.pw;
     }
   }, {
-    key: "encryptionAuthenticationKey",
+    key: "dataAuthenticationKey",
     get: function get() {
       return this.content.ak;
     }
@@ -5842,6 +5934,11 @@ function (_SNRootKeyParams) {
     get: function get() {
       return this.content.email;
     }
+  }, {
+    key: "salt",
+    get: function get() {
+      return this.content.pw_salt;
+    }
   }]);
 
   return SNRootKeyParams002;
@@ -5862,11 +5959,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/002/key_params_002 */ "./lib/protocol/versions/002/key_params_002.js");
 /* harmony import */ var _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/001/operator_001 */ "./lib/protocol/versions/001/operator_001.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/omit */ "./node_modules/lodash/omit.js");
-/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/omit */ "./node_modules/lodash/omit.js");
+/* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_6__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
@@ -5893,6 +5991,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var SNProtocolOperator002 =
 /*#__PURE__*/
 function (_SNProtocolOperator) {
@@ -5911,7 +6010,7 @@ function (_SNProtocolOperator) {
      * @public
      */
     value: function createRootKey(_ref) {
-      var identifier, password, version, pw_cost, pw_nonce, pw_salt, keys, keyParams;
+      var identifier, password, version, pw_cost, pw_nonce, pw_salt, key, keyParams;
       return regeneratorRuntime.async(function createRootKey$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -5937,7 +6036,7 @@ function (_SNProtocolOperator) {
               }));
 
             case 11:
-              keys = _context.sent;
+              key = _context.sent;
               keyParams = new _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_1__["SNRootKeyParams002"]({
                 pw_nonce: pw_nonce,
                 pw_cost: pw_cost,
@@ -5945,7 +6044,7 @@ function (_SNProtocolOperator) {
                 email: identifier
               });
               return _context.abrupt("return", {
-                keys: keys,
+                key: key,
                 keyParams: keyParams
               });
 
@@ -5959,26 +6058,33 @@ function (_SNProtocolOperator) {
   }, {
     key: "computeRootKey",
     value: function computeRootKey(_ref2) {
-      var password, keyParams, pw_salt, keys;
+      var password, keyParams, key;
       return regeneratorRuntime.async(function computeRootKey$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               password = _ref2.password, keyParams = _ref2.keyParams;
-              // Salt is returned from server
-              pw_salt = keyParams.pw_salt;
-              _context2.next = 4;
+
+              if (keyParams.isKeyParamsObject) {
+                _context2.next = 3;
+                break;
+              }
+
+              throw 'Attempting to compute root key with non params object.';
+
+            case 3:
+              _context2.next = 5;
               return regeneratorRuntime.awrap(this.deriveKey({
                 password: password,
-                pw_salt: pw_salt,
-                pw_cost: keyParams.pw_cost
+                pw_salt: keyParams.salt,
+                pw_cost: keyParams.kdfIterations
               }));
 
-            case 4:
-              keys = _context2.sent;
-              return _context2.abrupt("return", keys);
+            case 5:
+              key = _context2.sent;
+              return _context2.abrupt("return", key);
 
-            case 6:
+            case 7:
             case "end":
               return _context2.stop();
           }
@@ -6058,14 +6164,14 @@ function (_SNProtocolOperator) {
     }
   }, {
     key: "encryptText",
-    value: function encryptText(text, key, iv) {
+    value: function encryptText(text, rawKey, iv) {
       var keyData, ivData;
       return regeneratorRuntime.async(function encryptText$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
 
             case 2:
               keyData = _context4.sent;
@@ -6086,12 +6192,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "encryptItem",
     value: function encryptItem(_ref4) {
-      var item, keys, keyParams, EncryptionKeyLength, params, item_key, ek, ak, ciphertext;
+      var item, key, keyParams, EncryptionKeyLength, params, item_key, ek, ak, ciphertext;
       return regeneratorRuntime.async(function encryptItem$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              item = _ref4.item, keys = _ref4.keys, keyParams = _ref4.keyParams;
+              item = _ref4.item, key = _ref4.key, keyParams = _ref4.keyParams;
               EncryptionKeyLength = 512;
               params = {}; // encrypt item key
 
@@ -6101,7 +6207,7 @@ function (_SNProtocolOperator) {
             case 5:
               item_key = _context5.sent;
               _context5.next = 8;
-              return regeneratorRuntime.awrap(this._private_encryptString(item_key, keys.mk, keys.ak, item.uuid, keyParams));
+              return regeneratorRuntime.awrap(this._private_encryptString(item_key, key.masterKey, key.dataAuthenticationKey, item.uuid, keyParams));
 
             case 8:
               params.enc_item_key = _context5.sent;
@@ -6133,12 +6239,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "decryptItem",
     value: function decryptItem(_ref5) {
-      var item, keys, encryptedItemKey, requiresAuth, keyParams, item_key, ek, ak, itemParams, content;
+      var item, key, encryptedItemKey, requiresAuth, keyParams, item_key, ek, ak, itemParams, content;
       return regeneratorRuntime.async(function decryptItem$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              item = _ref5.item, keys = _ref5.keys;
+              item = _ref5.item, key = _ref5.key;
 
               if (!(typeof item.content != "string")) {
                 _context6.next = 3;
@@ -6185,7 +6291,7 @@ function (_SNProtocolOperator) {
               // decrypt encrypted key
               encryptedItemKey = item.enc_item_key;
               requiresAuth = true;
-              keyParams = this.encryptionComponentsFromString(encryptedItemKey, keys.mk, keys.ak); // return if uuid in auth hash does not match item uuid. Signs of tampering.
+              keyParams = this.encryptionComponentsFromString(encryptedItemKey, key.masterKey, key.dataAuthenticationKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
               if (!(keyParams.uuid && keyParams.uuid !== item.uuid)) {
                 _context6.next = 26;
@@ -6303,19 +6409,19 @@ function (_SNProtocolOperator) {
     value: function generateExportParameters(_ref6) {
       var _this = this;
 
-      var item, keys, keyParams, includeDeleted, intent, computeParams, additionalFields, omitFields, params;
+      var item, key, keyParams, includeDeleted, intent, computeParams, additionalFields, omitFields, params;
       return regeneratorRuntime.async(function generateExportParameters$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              item = _ref6.item, keys = _ref6.keys, keyParams = _ref6.keyParams, includeDeleted = _ref6.includeDeleted, intent = _ref6.intent;
+              item = _ref6.item, key = _ref6.key, keyParams = _ref6.keyParams, includeDeleted = _ref6.includeDeleted, intent = _ref6.intent;
 
-              if (!(keys && !keyParams)) {
+              if (!(key && !keyParams)) {
                 _context8.next = 3;
                 break;
               }
 
-              throw "keyParams must be supplied if supplying keys.";
+              throw "keyParams must be supplied if supplying key.";
 
             case 3:
               if (!(keyParams && !keyParams.version)) {
@@ -6350,16 +6456,16 @@ function (_SNProtocolOperator) {
                         params.enc_item_key = item.enc_item_key;
 
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, pick(item, additionalFields));
                         }
 
                         return _context7.abrupt("return");
 
                       case 6:
-                        isForRemoteSync = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntentSync"]; // Items should always be encrypted for export files. Only respect item.doNotEncrypt for remote sync params.
+                        isForRemoteSync = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentSync"]; // Items should always be encrypted for export files. Only respect item.doNotEncrypt for remote sync params.
 
                         doNotEncrypt = item.doNotEncrypt() && isForRemoteSync;
-                        encrypt = keys && !doNotEncrypt;
+                        encrypt = key && !doNotEncrypt;
 
                         if (!encrypt) {
                           _context7.next = 16;
@@ -6369,13 +6475,13 @@ function (_SNProtocolOperator) {
                         _context7.next = 12;
                         return regeneratorRuntime.awrap(_this.encryptItem({
                           item: item,
-                          keys: keys,
+                          key: key,
                           keyParams: keyParams
                         }));
 
                       case 12:
                         encryptedParams = _context7.sent;
-                        lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, encryptedParams);
+                        lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, encryptedParams);
                         _context7.next = 25;
                         break;
 
@@ -6404,11 +6510,11 @@ function (_SNProtocolOperator) {
 
                       case 25:
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, pick(item, additionalFields));
                         }
 
                         if (omitFields) {
-                          params = (_readOnlyError("params"), lodash_omit__WEBPACK_IMPORTED_MODULE_4___default()(params, omitFields));
+                          params = (_readOnlyError("params"), lodash_omit__WEBPACK_IMPORTED_MODULE_5___default()(params, omitFields));
                         }
 
                         return _context7.abrupt("return", params);
@@ -6421,8 +6527,8 @@ function (_SNProtocolOperator) {
                 });
               };
 
-              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
-              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
+              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
+              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
               _context8.next = 10;
               return regeneratorRuntime.awrap(computeParams(additionalFields, omitFields));
 
@@ -6451,7 +6557,7 @@ function (_SNProtocolOperator) {
           PBKDF2OutputKeyLength,
           derivedKey,
           partitions,
-          keys,
+          key,
           _args9 = arguments;
 
       return regeneratorRuntime.async(function deriveKey$(_context9) {
@@ -6478,13 +6584,13 @@ function (_SNProtocolOperator) {
 
             case 7:
               partitions = _context9.sent;
-              keys = SNItemKey.FromRaw({
+              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 ak: partitions[2],
                 version: this.constructor.versionString()
               });
-              return _context9.abrupt("return", keys);
+              return _context9.abrupt("return", key);
 
             case 10:
             case "end":
@@ -6589,6 +6695,8 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -6599,13 +6707,10 @@ var SNKeyContent003 =
 function (_SNKeyContent) {
   _inherits(SNKeyContent003, _SNKeyContent);
 
-  function SNKeyContent003(content) {
-    var _this;
-
+  function SNKeyContent003() {
     _classCallCheck(this, SNKeyContent003);
 
-    _this.content = content;
-    return _possibleConstructorReturn(_this);
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNKeyContent003).apply(this, arguments));
   }
 
   _createClass(SNKeyContent003, [{
@@ -6613,7 +6718,7 @@ function (_SNKeyContent) {
     value: function rootValues() {
       return {
         masterKey: this.masterKey,
-        encryptionAuthenticationKey: this.encryptionAuthenticationKey
+        dataAuthenticationKey: this.dataAuthenticationKey
       };
     }
   }, {
@@ -6632,7 +6737,7 @@ function (_SNKeyContent) {
       return this.content.pw;
     }
   }, {
-    key: "encryptionAuthenticationKey",
+    key: "dataAuthenticationKey",
     get: function get() {
       return this.content.ak;
     }
@@ -6724,6 +6829,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
 /* harmony import */ var _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/002/operator_002 */ "./lib/protocol/versions/002/operator_002.js");
+/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6741,6 +6847,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -6763,29 +6870,38 @@ function (_SNProtocolOperator) {
      * @public
      */
     value: function computeRootKey(_ref) {
-      var password, keyParams, pw_salt, keys;
+      var password, keyParams, salt, key;
       return regeneratorRuntime.async(function computeRootKey$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               password = _ref.password, keyParams = _ref.keyParams;
-              _context.next = 3;
-              return regeneratorRuntime.awrap(this.generateSalt(keyParams.identifier, keyParams.version, keyParams.pw_cost, keyParams.pw_nonce));
+
+              if (keyParams.isKeyParamsObject) {
+                _context.next = 3;
+                break;
+              }
+
+              throw 'Attempting to compute root key with non params object.';
 
             case 3:
-              pw_salt = _context.sent;
-              _context.next = 6;
+              _context.next = 5;
+              return regeneratorRuntime.awrap(this.generateSalt(keyParams.identifier, keyParams.version, keyParams.kdfIterations, keyParams.seed));
+
+            case 5:
+              salt = _context.sent;
+              _context.next = 8;
               return regeneratorRuntime.awrap(this.deriveKey({
                 password: password,
-                pw_salt: pw_salt,
-                pw_cost: keyParams.pw_cost
+                pw_salt: salt,
+                pw_cost: keyParams.kdfIterations
               }));
 
-            case 6:
-              keys = _context.sent;
-              return _context.abrupt("return", keys);
-
             case 8:
+              key = _context.sent;
+              return _context.abrupt("return", key);
+
+            case 10:
             case "end":
               return _context.stop();
           }
@@ -6795,7 +6911,7 @@ function (_SNProtocolOperator) {
   }, {
     key: "createRootKey",
     value: function createRootKey(_ref2) {
-      var identifier, password, version, pw_cost, pw_nonce, pw_salt, keys, keyParams;
+      var identifier, password, version, pw_cost, pw_nonce, pw_salt, key, keyParams;
       return regeneratorRuntime.async(function createRootKey$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -6821,7 +6937,7 @@ function (_SNProtocolOperator) {
               }));
 
             case 11:
-              keys = _context2.sent;
+              key = _context2.sent;
               keyParams = new _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_1__["SNRootKeyParams003"]({
                 pw_nonce: pw_nonce,
                 pw_cost: pw_cost,
@@ -6829,7 +6945,7 @@ function (_SNProtocolOperator) {
                 version: version
               });
               return _context2.abrupt("return", {
-                keys: keys,
+                key: key,
                 keyParams: keyParams
               });
 
@@ -6906,6 +7022,8 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -6916,13 +7034,10 @@ var SNKeyContent004 =
 function (_SNKeyContent) {
   _inherits(SNKeyContent004, _SNKeyContent);
 
-  function SNKeyContent004(content) {
-    var _this;
-
+  function SNKeyContent004() {
     _classCallCheck(this, SNKeyContent004);
 
-    _this.content = content;
-    return _possibleConstructorReturn(_this);
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNKeyContent004).apply(this, arguments));
   }
 
   _createClass(SNKeyContent004, [{
@@ -6948,7 +7063,7 @@ function (_SNKeyContent) {
       return this.content.serverPassword;
     }
   }, {
-    key: "encryptionAuthenticationKey",
+    key: "dataAuthenticationKey",
     get: function get() {
       throw "Should not attempt to access this value using this protocol version.";
       return null;
@@ -7042,6 +7157,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemKey */ "./lib/models/keys/itemKey.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
 /* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
+/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7059,6 +7175,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -7113,32 +7230,41 @@ function (_SNProtocolOperator) {
   }, {
     key: "computeRootKey",
     value: function computeRootKey(_ref2) {
-      var password, keyParams, salt, keys;
+      var password, keyParams, salt, key;
       return regeneratorRuntime.async(function computeRootKey$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               password = _ref2.password, keyParams = _ref2.keyParams;
-              _context2.next = 3;
+
+              if (keyParams.isKeyParamsObject) {
+                _context2.next = 3;
+                break;
+              }
+
+              throw 'Attempting to compute root key with non params object.';
+
+            case 3:
+              _context2.next = 5;
               return regeneratorRuntime.awrap(this.generateSalt({
                 identifier: keyParams.identifier,
                 seed: keyParams.seed
               }));
 
-            case 3:
+            case 5:
               salt = _context2.sent;
-              _context2.next = 6;
+              _context2.next = 8;
               return regeneratorRuntime.awrap(this.deriveKey({
                 password: password,
                 salt: salt,
-                iterations: keyParams.iterations
+                iterations: keyParams.kdfIterations
               }));
 
-            case 6:
-              keys = _context2.sent;
-              return _context2.abrupt("return", keys);
-
             case 8:
+              key = _context2.sent;
+              return _context2.abrupt("return", key);
+
+            case 10:
             case "end":
               return _context2.stop();
           }
@@ -7148,7 +7274,7 @@ function (_SNProtocolOperator) {
   }, {
     key: "createRootKey",
     value: function createRootKey(_ref3) {
-      var identifier, password, version, iterations, seed, salt, keys, keyParams;
+      var identifier, password, version, iterations, seed, salt, key, keyParams;
       return regeneratorRuntime.async(function createRootKey$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
@@ -7173,12 +7299,11 @@ function (_SNProtocolOperator) {
               return regeneratorRuntime.awrap(this.deriveKey({
                 password: password,
                 salt: salt,
-                iterations: iterations,
-                generateItemsKey: true
+                iterations: iterations
               }));
 
             case 11:
-              keys = _context3.sent;
+              key = _context3.sent;
               keyParams = new _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_2__["SNRootKeyParams004"]({
                 version: version,
                 identifier: identifier,
@@ -7186,7 +7311,7 @@ function (_SNProtocolOperator) {
                 seed: seed
               });
               return _context3.abrupt("return", {
-                keys: keys,
+                key: key,
                 keyParams: keyParams
               });
 
@@ -7199,7 +7324,7 @@ function (_SNProtocolOperator) {
     }
     /**
      * @param plaintext  The plaintext to encrypt.
-     * @param key  The key to use to encrypt the plaintext.
+     * @param rawKey  The key to use to encrypt the plaintext.
      * @param iv  The initialization vector for encryption.
      * @param aad  JavaScript object (will be stringified) representing
                   'Additional authenticated data' — data you want to be included in authentication.
@@ -7208,14 +7333,14 @@ function (_SNProtocolOperator) {
   }, {
     key: "encryptText",
     value: function encryptText(_ref4) {
-      var plaintext, key, iv, aad, keyData, ivData, aadData;
+      var plaintext, rawKey, iv, aad, keyData, ivData, aadData;
       return regeneratorRuntime.async(function encryptText$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              plaintext = _ref4.plaintext, key = _ref4.key, iv = _ref4.iv, aad = _ref4.aad;
+              plaintext = _ref4.plaintext, rawKey = _ref4.rawKey, iv = _ref4.iv, aad = _ref4.aad;
               _context4.next = 3;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
 
             case 3:
               keyData = _context4.sent;
@@ -7254,7 +7379,7 @@ function (_SNProtocolOperator) {
     }
     /**
      * @param ciphertext  The encrypred text to decrypt.
-     * @param key  The key to use to decrypt the ciphertext.
+     * @param rawKey  The key to use to decrypt the ciphertext.
      * @param iv  The initialization vector for decryption.
      * @param aad  JavaScript object (will be stringified) representing
                   'Additional authenticated data' — data you want to be included in authentication.
@@ -7263,14 +7388,14 @@ function (_SNProtocolOperator) {
   }, {
     key: "decryptText",
     value: function decryptText(_ref5) {
-      var ciphertext, key, iv, aad, keyData, ivData, aadData;
+      var ciphertext, rawKey, iv, aad, keyData, ivData, aadData;
       return regeneratorRuntime.async(function decryptText$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              ciphertext = _ref5.ciphertext, key = _ref5.key, iv = _ref5.iv, aad = _ref5.aad;
+              ciphertext = _ref5.ciphertext, rawKey = _ref5.rawKey, iv = _ref5.iv, aad = _ref5.aad;
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
 
             case 3:
               keyData = _context5.sent;
@@ -7310,12 +7435,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "encryptItem",
     value: function encryptItem(_ref6) {
-      var item, keys, EncryptionKeyLength, item_key, contentPlaintext, encryptedPayloadString, encryptedItemKey;
+      var item, key, EncryptionKeyLength, item_key, contentPlaintext, encryptedPayloadString, encryptedItemKey;
       return regeneratorRuntime.async(function encryptItem$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              item = _ref6.item, keys = _ref6.keys;
+              item = _ref6.item, key = _ref6.key;
               EncryptionKeyLength = 256;
               _context6.next = 4;
               return regeneratorRuntime.awrap(this.crypto.generateRandomKey(EncryptionKeyLength));
@@ -7336,7 +7461,7 @@ function (_SNProtocolOperator) {
               _context6.next = 11;
               return regeneratorRuntime.awrap(this.generateEncryptedPayloadString({
                 plaintext: item_key,
-                key: keys.itemsKey,
+                key: key.itemsKey,
                 itemUuid: item.uuid
               }));
 
@@ -7362,12 +7487,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "decryptItem",
     value: function decryptItem(_ref7) {
-      var item, keys, itemKeyParams, item_key, itemParams, content;
+      var item, key, itemKeyParams, item_key, itemParams, content;
       return regeneratorRuntime.async(function decryptItem$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              item = _ref7.item, keys = _ref7.keys;
+              item = _ref7.item, key = _ref7.key;
 
               if (!(typeof item.content != "string")) {
                 _context7.next = 3;
@@ -7422,7 +7547,7 @@ function (_SNProtocolOperator) {
               _context7.next = 23;
               return regeneratorRuntime.awrap(this.decryptText({
                 ciphertext: itemKeyParams.ciphertext,
-                key: keys.itemsKey,
+                key: key.itemsKey,
                 iv: itemKeyParams.iv,
                 aad: {
                   u: item.uuid,
@@ -7562,21 +7687,20 @@ function (_SNProtocolOperator) {
           password,
           salt,
           iterations,
-          generateItemsKey,
           PBKDF2OutputKeyLength,
           derivedKey,
           partitions,
           masterKey,
           serverPassword,
           params,
-          keys,
+          key,
           _args9 = arguments;
 
       return regeneratorRuntime.async(function deriveKey$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              _ref9 = _args9.length > 0 && _args9[0] !== undefined ? _args9[0] : {}, password = _ref9.password, salt = _ref9.salt, iterations = _ref9.iterations, generateItemsKey = _ref9.generateItemsKey;
+              _ref9 = _args9.length > 0 && _args9[0] !== undefined ? _args9[0] : {}, password = _ref9.password, salt = _ref9.salt, iterations = _ref9.iterations;
               PBKDF2OutputKeyLength = 512;
               _context9.next = 4;
               return regeneratorRuntime.awrap(this.crypto.pbkdf2({
@@ -7602,25 +7726,12 @@ function (_SNProtocolOperator) {
                 masterKey: masterKey,
                 serverPassword: serverPassword,
                 version: this.constructor.versionString()
-              };
+              }; // TODO: HKDF each key to domain-seperate.
 
-              if (!generateItemsKey) {
-                _context9.next = 15;
-                break;
-              }
+              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].FromRaw(params);
+              return _context9.abrupt("return", key);
 
-              _context9.next = 14;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(256));
-
-            case 14:
-              params.itemsKey = _context9.sent;
-
-            case 15:
-              // TODO: HKDF each key to domain-seperate.
-              keys = _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_1__["SNItemKey"].FromRaw(params);
-              return _context9.abrupt("return", keys);
-
-            case 17:
+            case 13:
             case "end":
               return _context9.stop();
           }
@@ -7690,8 +7801,7 @@ function () {
   _createClass(SNKeyContent, [{
     key: "compare",
     value: function compare(otherContents) {
-      return;
-      this.masterKey === otherContents.masterKey && this.itemsKey === otherContents.itemsKey && this.serverAuthenticationValue === otherContents.serverAuthenticationValue;
+      return this.masterKey === otherContents.masterKey && this.itemsKey === otherContents.itemsKey && this.serverAuthenticationValue === otherContents.serverAuthenticationValue;
     }
   }]);
 
@@ -7712,12 +7822,32 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKeyParams", function() { return SNRootKeyParams; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SNRootKeyParams = function SNRootKeyParams(content) {
-  _classCallCheck(this, SNRootKeyParams);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.content = content;
-  Object.assign(this, content);
-};
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var SNRootKeyParams =
+/*#__PURE__*/
+function () {
+  function SNRootKeyParams(content) {
+    _classCallCheck(this, SNRootKeyParams);
+
+    this.content = content;
+  }
+  /**
+   * For consumers to determine whether the object they are working with is a proper RootKeyParams object.
+   */
+
+
+  _createClass(SNRootKeyParams, [{
+    key: "isKeyParamsObject",
+    get: function get() {
+      return true;
+    }
+  }]);
+
+  return SNRootKeyParams;
+}();
 
 /***/ }),
 
@@ -7916,12 +8046,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var SFAuthManager =
 /*#__PURE__*/
 function () {
-  function SFAuthManager(storageManager, httpManager, alertManager, timeout) {
+  function SFAuthManager(_ref) {
+    var storageManager = _ref.storageManager,
+        httpManager = _ref.httpManager,
+        alertManager = _ref.alertManager,
+        keyManager = _ref.keyManager,
+        timeout = _ref.timeout;
+
     _classCallCheck(this, SFAuthManager);
+
+    if (!storageManager || !httpManager || !keyManager) {
+      throw 'Invalid Auth Manager construction';
+    }
 
     SFAuthManager.DidSignOutEvent = "DidSignOutEvent";
     SFAuthManager.WillSignInEvent = "WillSignInEvent";
     SFAuthManager.DidSignInEvent = "DidSignInEvent";
+    this.keyManager = keyManager;
     this.httpManager = httpManager;
     this.storageManager = storageManager;
     this.alertManager = alertManager || new _Services_alertManager__WEBPACK_IMPORTED_MODULE_3__["SFAlertManager"]();
@@ -7968,206 +8109,29 @@ function () {
       }
     }
   }, {
-    key: "saveKeys",
-    value: function saveKeys(keys) {
-      return regeneratorRuntime.async(function saveKeys$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              this._keys = keys;
-              _context.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setItem("mk", keys.mk));
-
-            case 3:
-              _context.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.setItem("ak", keys.ak));
-
-            case 5:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
     key: "signout",
     value: function signout(clearAllData) {
       var _this = this;
 
-      return regeneratorRuntime.async(function signout$(_context2) {
+      return regeneratorRuntime.async(function signout$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
-              this._keys = null;
-              this._keyParams = null;
-
               if (!clearAllData) {
-                _context2.next = 6;
+                _context.next = 4;
                 break;
               }
 
-              return _context2.abrupt("return", this.storageManager.clearAllData().then(function () {
+              return _context.abrupt("return", this.storageManager.clearAllData().then(function () {
                 _this.notifyEvent(SFAuthManager.DidSignOutEvent);
               }));
 
-            case 6:
+            case 4:
               this.notifyEvent(SFAuthManager.DidSignOutEvent);
 
-            case 7:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "keys",
-    value: function keys() {
-      var mk;
-      return regeneratorRuntime.async(function keys$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              if (this._keys) {
-                _context3.next = 11;
-                break;
-              }
-
-              _context3.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("mk"));
-
-            case 3:
-              mk = _context3.sent;
-
-              if (mk) {
-                _context3.next = 6;
-                break;
-              }
-
-              return _context3.abrupt("return", null);
-
-            case 6:
-              _context3.t0 = mk;
-              _context3.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("ak"));
-
-            case 9:
-              _context3.t1 = _context3.sent;
-              this._keys = {
-                mk: _context3.t0,
-                ak: _context3.t1
-              };
-
-            case 11:
-              return _context3.abrupt("return", this._keys);
-
-            case 12:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "getKeyParams",
-    value: function getKeyParams() {
-      var data;
-      return regeneratorRuntime.async(function getKeyParams$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              if (this._keyParams) {
-                _context4.next = 5;
-                break;
-              }
-
-              _context4.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("keyParams"));
-
-            case 3:
-              data = _context4.sent;
-              this._keyParams = JSON.parse(data);
-
             case 5:
-              if (!(this._keyParams && !this._keyParams.version)) {
-                _context4.next = 9;
-                break;
-              }
-
-              _context4.next = 8;
-              return regeneratorRuntime.awrap(this.defaultProtocolVersion());
-
-            case 8:
-              this._keyParams.version = _context4.sent;
-
-            case 9:
-              return _context4.abrupt("return", this._keyParams);
-
-            case 10:
             case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "defaultProtocolVersion",
-    value: function defaultProtocolVersion() {
-      var keys;
-      return regeneratorRuntime.async(function defaultProtocolVersion$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              _context5.next = 2;
-              return regeneratorRuntime.awrap(this.keys());
-
-            case 2:
-              keys = _context5.sent;
-
-              if (!(keys && keys.ak)) {
-                _context5.next = 7;
-                break;
-              }
-
-              return _context5.abrupt("return", "002");
-
-            case 7:
-              return _context5.abrupt("return", "001");
-
-            case 8:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "protocolVersion",
-    value: function protocolVersion() {
-      var keyParams;
-      return regeneratorRuntime.async(function protocolVersion$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              _context6.next = 2;
-              return regeneratorRuntime.awrap(this.getKeyParams());
-
-            case 2:
-              keyParams = _context6.sent;
-
-              if (!(keyParams && keyParams.version)) {
-                _context6.next = 5;
-                break;
-              }
-
-              return _context6.abrupt("return", keyParams.version);
-
-            case 5:
-              return _context6.abrupt("return", this.defaultProtocolVersion());
-
-            case 6:
-            case "end":
-              return _context6.stop();
+              return _context.stop();
           }
         }
       }, null, this);
@@ -8178,15 +8142,15 @@ function () {
       var _this2 = this;
 
       var params;
-      return regeneratorRuntime.async(function getKeyParamsForEmail$(_context7) {
+      return regeneratorRuntime.async(function getKeyParamsForEmail$(_context2) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
               params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
                 email: email
               }, extraParams);
               params['api'] = _Services_httpManager__WEBPACK_IMPORTED_MODULE_4__["SFHttpManager"].getApiVersion();
-              return _context7.abrupt("return", new Promise(function (resolve, reject) {
+              return _context2.abrupt("return", new Promise(function (resolve, reject) {
                 var requestUrl = url + "/auth/params";
 
                 _this2.httpManager.getAbsolute(requestUrl, params, function (response) {
@@ -8209,7 +8173,7 @@ function () {
 
             case 3:
             case "end":
-              return _context7.stop();
+              return _context2.stop();
           }
         }
       });
@@ -8240,25 +8204,25 @@ function () {
     value: function login(url, email, password, strictSignin, extraParams) {
       var _this3 = this;
 
-      return regeneratorRuntime.async(function login$(_context10) {
+      return regeneratorRuntime.async(function login$(_context5) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              return _context10.abrupt("return", new Promise(function _callee2(resolve, reject) {
+              return _context5.abrupt("return", new Promise(function _callee2(resolve, reject) {
                 var existingKeys, keyParams, message, _message, abort, _message2, minimum, _message3, latestVersion, _message4, keys, requestUrl, params;
 
-                return regeneratorRuntime.async(function _callee2$(_context9) {
+                return regeneratorRuntime.async(function _callee2$(_context4) {
                   while (1) {
-                    switch (_context9.prev = _context9.next) {
+                    switch (_context4.prev = _context4.next) {
                       case 0:
-                        _context9.next = 2;
+                        _context4.next = 2;
                         return regeneratorRuntime.awrap(_this3.keys());
 
                       case 2:
-                        existingKeys = _context9.sent;
+                        existingKeys = _context4.sent;
 
                         if (!(existingKeys != null)) {
-                          _context9.next = 6;
+                          _context4.next = 6;
                           break;
                         }
 
@@ -8267,11 +8231,11 @@ function () {
                             message: "Cannot log in because already signed in."
                           }
                         });
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 6:
                         if (!_this3.isLocked()) {
-                          _context9.next = 9;
+                          _context4.next = 9;
                           break;
                         }
 
@@ -8280,31 +8244,31 @@ function () {
                             message: "Login already in progress."
                           }
                         });
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 9:
                         _this3.lock();
 
                         _this3.notifyEvent(SFAuthManager.WillSignInEvent);
 
-                        _context9.next = 13;
+                        _context4.next = 13;
                         return regeneratorRuntime.awrap(_this3.getKeyParamsForEmail(url, email, extraParams));
 
                       case 13:
-                        keyParams = _context9.sent;
+                        keyParams = _context4.sent;
 
                         if (!keyParams.error) {
-                          _context9.next = 17;
+                          _context4.next = 17;
                           break;
                         }
 
                         _this3.unlockAndResolve(resolve, keyParams);
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 17:
                         if (!(!keyParams || !keyParams.kdfIterations)) {
-                          _context9.next = 20;
+                          _context4.next = 20;
                           break;
                         }
 
@@ -8314,11 +8278,11 @@ function () {
                           }
                         });
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 20:
                         if (_Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].supportedVersions().includes(keyParams.version)) {
-                          _context9.next = 24;
+                          _context4.next = 24;
                           break;
                         }
 
@@ -8336,17 +8300,17 @@ function () {
                           }
                         });
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 24:
                         if (!_Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].isProtocolVersionOutdated(keyParams.version)) {
-                          _context9.next = 31;
+                          _context4.next = 31;
                           break;
                         }
 
                         _message = "The encryption version for your account, ".concat(keyParams.version, ", is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.");
                         abort = false;
-                        _context9.next = 29;
+                        _context4.next = 29;
                         return regeneratorRuntime.awrap(_this3.alertManager.confirm({
                           title: "Update Needed",
                           text: _message,
@@ -8361,15 +8325,15 @@ function () {
 
                       case 29:
                         if (!abort) {
-                          _context9.next = 31;
+                          _context4.next = 31;
                           break;
                         }
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 31:
                         if (_Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].supportsPasswordDerivationCost(keyParams.kdfIterations)) {
-                          _context9.next = 35;
+                          _context4.next = 35;
                           break;
                         }
 
@@ -8381,13 +8345,13 @@ function () {
                           }
                         });
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 35:
                         minimum = _Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].costMinimumForVersion(keyParams.version);
 
                         if (!(keyParams.kdfIterations < minimum)) {
-                          _context9.next = 40;
+                          _context4.next = 40;
                           break;
                         }
 
@@ -8399,11 +8363,11 @@ function () {
                           }
                         });
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 40:
                         if (!strictSignin) {
-                          _context9.next = 46;
+                          _context4.next = 46;
                           break;
                         }
 
@@ -8411,7 +8375,7 @@ function () {
                         latestVersion = _Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].version();
 
                         if (!(keyParams.version !== latestVersion)) {
-                          _context9.next = 46;
+                          _context4.next = 46;
                           break;
                         }
 
@@ -8423,17 +8387,17 @@ function () {
                           }
                         });
 
-                        return _context9.abrupt("return");
+                        return _context4.abrupt("return");
 
                       case 46:
-                        _context9.next = 48;
+                        _context4.next = 48;
                         return regeneratorRuntime.awrap(_Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].computeRootKey({
                           password: password,
                           keyParams: keyParams
                         }));
 
                       case 48:
-                        keys = _context9.sent;
+                        keys = _context4.sent;
                         requestUrl = url + "/auth/sign_in";
                         params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
                           password: keys.serverAuthenticationValue,
@@ -8442,11 +8406,11 @@ function () {
                         params['api'] = _Services_httpManager__WEBPACK_IMPORTED_MODULE_4__["SFHttpManager"].getApiVersion();
 
                         _this3.httpManager.postAbsolute(requestUrl, params, function _callee(response) {
-                          return regeneratorRuntime.async(function _callee$(_context8) {
+                          return regeneratorRuntime.async(function _callee$(_context3) {
                             while (1) {
-                              switch (_context8.prev = _context8.next) {
+                              switch (_context3.prev = _context3.next) {
                                 case 0:
-                                  _context8.next = 2;
+                                  _context3.next = 2;
                                   return regeneratorRuntime.awrap(_this3.handleAuthResponse(response, email, url, keyParams, keys));
 
                                 case 2:
@@ -8458,7 +8422,7 @@ function () {
 
                                 case 4:
                                 case "end":
-                                  return _context8.stop();
+                                  return _context3.stop();
                               }
                             }
                           });
@@ -8480,7 +8444,7 @@ function () {
 
                       case 53:
                       case "end":
-                        return _context9.stop();
+                        return _context4.stop();
                     }
                   }
                 });
@@ -8488,7 +8452,7 @@ function () {
 
             case 1:
             case "end":
-              return _context10.stop();
+              return _context5.stop();
           }
         }
       });
@@ -8499,13 +8463,13 @@ function () {
       var _this4 = this;
 
       return new Promise(function _callee4(resolve, reject) {
-        var MinPasswordLength, message, results, keys, keyParams, requestUrl, params;
-        return regeneratorRuntime.async(function _callee4$(_context12) {
+        var MinPasswordLength, message, results, rootKey, keyParams, requestUrl, params;
+        return regeneratorRuntime.async(function _callee4$(_context7) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 if (!_this4.isLocked()) {
-                  _context12.next = 3;
+                  _context7.next = 3;
                   break;
                 }
 
@@ -8514,13 +8478,13 @@ function () {
                     message: "Register already in progress."
                   }
                 });
-                return _context12.abrupt("return");
+                return _context7.abrupt("return");
 
               case 3:
                 MinPasswordLength = 8;
 
                 if (!(password.length < MinPasswordLength)) {
-                  _context12.next = 8;
+                  _context7.next = 8;
                   break;
                 }
 
@@ -8530,42 +8494,42 @@ function () {
                     message: message
                   }
                 });
-                return _context12.abrupt("return");
+                return _context7.abrupt("return");
 
               case 8:
                 _this4.lock();
 
-                _context12.next = 11;
+                _context7.next = 11;
                 return regeneratorRuntime.awrap(_Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].createRootKey({
                   identifier: email,
                   password: password
                 }));
 
               case 11:
-                results = _context12.sent;
-                keys = results.keys;
+                results = _context7.sent;
+                rootKey = results.key;
                 keyParams = results.keyParams;
                 requestUrl = url + "/auth";
                 params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
-                  password: keys.serverAuthenticationValue,
+                  password: rootKey.serverAuthenticationValue,
                   email: email
                 }, keyParams);
                 params['api'] = _Services_httpManager__WEBPACK_IMPORTED_MODULE_4__["SFHttpManager"].getApiVersion();
 
                 _this4.httpManager.postAbsolute(requestUrl, params, function _callee3(response) {
-                  return regeneratorRuntime.async(function _callee3$(_context11) {
+                  return regeneratorRuntime.async(function _callee3$(_context6) {
                     while (1) {
-                      switch (_context11.prev = _context11.next) {
+                      switch (_context6.prev = _context6.next) {
                         case 0:
-                          _context11.next = 2;
-                          return regeneratorRuntime.awrap(_this4.handleAuthResponse(response, email, url, keyParams, keys));
+                          _context6.next = 2;
+                          return regeneratorRuntime.awrap(_this4.handleAuthResponse(response, email, url, keyParams, rootKey));
 
                         case 2:
                           _this4.unlockAndResolve(resolve, response);
 
                         case 3:
                         case "end":
-                          return _context11.stop();
+                          return _context6.stop();
                       }
                     }
                   });
@@ -8585,7 +8549,7 @@ function () {
 
               case 18:
               case "end":
-                return _context12.stop();
+                return _context7.stop();
             }
           }
         });
@@ -8596,18 +8560,18 @@ function () {
     value: function changePassword(url, email, current_server_pw, newKeys, newKeyParams) {
       var _this5 = this;
 
-      return regeneratorRuntime.async(function changePassword$(_context15) {
+      return regeneratorRuntime.async(function changePassword$(_context10) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
-              return _context15.abrupt("return", new Promise(function _callee6(resolve, reject) {
+              return _context10.abrupt("return", new Promise(function _callee6(resolve, reject) {
                 var newServerPw, requestUrl, params;
-                return regeneratorRuntime.async(function _callee6$(_context14) {
+                return regeneratorRuntime.async(function _callee6$(_context9) {
                   while (1) {
-                    switch (_context14.prev = _context14.next) {
+                    switch (_context9.prev = _context9.next) {
                       case 0:
                         if (!_this5.isLocked()) {
-                          _context14.next = 3;
+                          _context9.next = 3;
                           break;
                         }
 
@@ -8616,7 +8580,7 @@ function () {
                             message: "Change password already in progress."
                           }
                         });
-                        return _context14.abrupt("return");
+                        return _context9.abrupt("return");
 
                       case 3:
                         _this5.lock();
@@ -8630,11 +8594,11 @@ function () {
                         params['api'] = _Services_httpManager__WEBPACK_IMPORTED_MODULE_4__["SFHttpManager"].getApiVersion();
 
                         _this5.httpManager.postAuthenticatedAbsolute(requestUrl, params, function _callee5(response) {
-                          return regeneratorRuntime.async(function _callee5$(_context13) {
+                          return regeneratorRuntime.async(function _callee5$(_context8) {
                             while (1) {
-                              switch (_context13.prev = _context13.next) {
+                              switch (_context8.prev = _context8.next) {
                                 case 0:
-                                  _context13.next = 2;
+                                  _context8.next = 2;
                                   return regeneratorRuntime.awrap(_this5.handleAuthResponse(response, email, null, newKeyParams, newKeys));
 
                                 case 2:
@@ -8642,7 +8606,7 @@ function () {
 
                                 case 3:
                                 case "end":
-                                  return _context13.stop();
+                                  return _context8.stop();
                               }
                             }
                           });
@@ -8660,7 +8624,7 @@ function () {
 
                       case 9:
                       case "end":
-                        return _context14.stop();
+                        return _context9.stop();
                     }
                   }
                 });
@@ -8668,41 +8632,40 @@ function () {
 
             case 1:
             case "end":
-              return _context15.stop();
+              return _context10.stop();
           }
         }
       });
     }
   }, {
     key: "handleAuthResponse",
-    value: function handleAuthResponse(response, email, url, keyParams, keys) {
-      return regeneratorRuntime.async(function handleAuthResponse$(_context16) {
+    value: function handleAuthResponse(response, email, url, keyParams, rootKey) {
+      return regeneratorRuntime.async(function handleAuthResponse$(_context11) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               if (!url) {
-                _context16.next = 3;
+                _context11.next = 3;
                 break;
               }
 
-              _context16.next = 3;
+              _context11.next = 3;
               return regeneratorRuntime.awrap(this.storageManager.setItem("server", url));
 
             case 3:
-              this._keyParams = keyParams;
-              _context16.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.setItem("keyParams", JSON.stringify(keyParams)));
-
-            case 6:
-              _context16.next = 8;
+              _context11.next = 5;
               return regeneratorRuntime.awrap(this.storageManager.setItem("jwt", response.token));
 
-            case 8:
-              return _context16.abrupt("return", this.saveKeys(keys));
+            case 5:
+              _context11.next = 7;
+              return regeneratorRuntime.awrap(this.keyManager.setRootKey({
+                key: rootKey,
+                keyParams: keyParams
+              }));
 
-            case 9:
+            case 7:
             case "end":
-              return _context16.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -11159,7 +11122,7 @@ function () {
     value: function getApiVersion() {
       // Applicable only to Standard Notes requests. Requests to external acitons should not use this.
       // syncManager and authManager must include this API version as part of its request params.
-      return "20190520";
+      return "20191225";
     }
   }]);
 
@@ -11363,6 +11326,646 @@ function () {
   }]);
 
   return SFHttpManager;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/keyManager.js":
+/*!************************************!*\
+  !*** ./lib/services/keyManager.js ***!
+  \************************************/
+/*! exports provided: ITEM_KEY_CONTENT_TYPE, ROOT_KEY_CONTENT_TYPE, SNKeyManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ITEM_KEY_CONTENT_TYPE", function() { return ITEM_KEY_CONTENT_TYPE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_CONTENT_TYPE", function() { return ROOT_KEY_CONTENT_TYPE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return SNKeyManager; });
+/* harmony import */ var _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/itemKey */ "./lib/models/keys/itemKey.js");
+/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Protocol_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/manager */ "./lib/protocol/manager.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/uniq */ "./node_modules/lodash/uniq.js");
+/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+
+var ITEM_KEY_CONTENT_TYPE = 'SN|ItemKey';
+var ROOT_KEY_CONTENT_TYPE = 'SN|RootKey|NoSync';
+var SNKeyManager =
+/*#__PURE__*/
+function () {
+  function SNKeyManager(_ref) {
+    var _this = this;
+
+    var modelManager = _ref.modelManager,
+        storageManager = _ref.storageManager;
+
+    _classCallCheck(this, SNKeyManager);
+
+    this.modelManager = modelManager;
+    this.storageManager = storageManager;
+    this.itemKeys = [];
+    this.modelManager.addItemSyncObserver('key-manager', [ITEM_KEY_CONTENT_TYPE], function (allItems) {
+      _this.itemKeys = lodash_uniq__WEBPACK_IMPORTED_MODULE_4___default()(_this.itemKeys.concat(allItems));
+    }); // Hide rootKey enumeration
+
+    Object.defineProperty(this, 'rootKey', {
+      enumerable: false,
+      writable: true
+    });
+    this.setLocalDatabaseEncryptionPolicy({
+      encrypted: true
+    });
+  }
+  /**
+   * @returns All SN|ItemKey objects synced to the account.
+   */
+
+
+  _createClass(SNKeyManager, [{
+    key: "setKeychainDelegate",
+
+    /**
+     * Dynamically set an item which conforms to the KeyChain protocol.
+     * A delegate must implement the following methods:
+     * async setKeyChainValue(value)
+     * async getKeyChainValue()
+     * async deleteKeyChainValue()
+     */
+    value: function setKeychainDelegate(delegate) {
+      this.keychainDelegate = delegate;
+    }
+  }, {
+    key: "getRootKeyFromKeychain",
+    value: function getRootKeyFromKeychain() {
+      var rawKey;
+      return regeneratorRuntime.async(function getRootKeyFromKeychain$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return regeneratorRuntime.awrap(this.keychainDelegate.getKeyChainValue());
+
+            case 2:
+              rawKey = _context.sent;
+
+              if (!(rawKey === null)) {
+                _context.next = 5;
+                break;
+              }
+
+              throw 'Attempting to load non-existent root key from keychain.';
+
+            case 5:
+              return _context.abrupt("return", new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"]({
+                content: rawKey
+              }));
+
+            case 6:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "saveRootKeyToKeychain",
+    value: function saveRootKeyToKeychain() {
+      var rawKey;
+      return regeneratorRuntime.async(function saveRootKeyToKeychain$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!(this.rootKey === null)) {
+                _context2.next = 2;
+                break;
+              }
+
+              throw 'Attempting to non-existent root key to the keychain.';
+
+            case 2:
+              rawKey = this.rootKey.rootValues();
+              _context2.next = 5;
+              return regeneratorRuntime.awrap(this.keychainDelegate.setKeyChainValue(rawKey));
+
+            case 5:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @returns  Plain object containing persisted wrapped (encrypted) root key
+    */
+
+  }, {
+    key: "getWrappedKeyFromStorage",
+    value: function getWrappedKeyFromStorage() {
+      return regeneratorRuntime.async(function getWrappedKeyFromStorage$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              return _context3.abrupt("return", this.storage.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
+
+            case 1:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * The root key requires unwrapping if a wrapper key exists in storage.
+    */
+
+  }, {
+    key: "rootKeyRequiresUnwrapping",
+    value: function rootKeyRequiresUnwrapping() {
+      var wrappedKey;
+      return regeneratorRuntime.async(function rootKeyRequiresUnwrapping$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return regeneratorRuntime.awrap(this.getWrappedKeyFromStorage());
+
+            case 2:
+              wrappedKey = _context4.sent;
+              return _context4.abrupt("return", wrappedKey !== null);
+
+            case 4:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Application interfaces must check to see if the root key requires unwrapping on load.
+     * If so, they must generate the unwrapping key by getting our saved wrapping key keyParams.
+     * After unwrapping, the root key is automatically loaded.
+    */
+
+  }, {
+    key: "unwrapRootKey",
+    value: function unwrapRootKey(_ref2) {
+      var wrappingKey, wrappedKey;
+      return regeneratorRuntime.async(function unwrapRootKey$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              wrappingKey = _ref2.wrappingKey;
+              _context5.next = 3;
+              return regeneratorRuntime.awrap(this.getWrappedKeyFromStorage());
+
+            case 3:
+              wrappedKey = _context5.sent;
+              _context5.next = 6;
+              return regeneratorRuntime.awrap(this.protocolManager.decryptItem(wrappedKey, wrappingKey));
+
+            case 6:
+              this.rootKey = new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"](wrappedKey);
+
+            case 7:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Interfaces should only call this method if they have checked that the key does not require unwrapping.
+     */
+
+  }, {
+    key: "loadRootKey",
+    value: function loadRootKey() {
+      return regeneratorRuntime.async(function loadRootKey$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.rootKeyRequiresUnwrapping());
+
+            case 2:
+              if (!_context6.sent) {
+                _context6.next = 4;
+                break;
+              }
+
+              throw 'Attempting to load root key without first unwrapping.';
+
+            case 4:
+              if (!(this.rootKey !== null)) {
+                _context6.next = 6;
+                break;
+              }
+
+              return _context6.abrupt("return");
+
+            case 6:
+              _context6.next = 8;
+              return regeneratorRuntime.awrap(this.getRootKeyFromKeychain());
+
+            case 8:
+              this.rootKey = _context6.sent;
+
+            case 9:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Encrypts rootKey and saves it in storage instead of keychain, and then clears keychain.
+     * This is because we don't want to store large encrypted payloads in the keychain.
+     * If the root key is not wrapped, it is stored in plain form in the user's secure keychain.
+    */
+
+  }, {
+    key: "setRootKeyWrapper",
+    value: function setRootKeyWrapper(_ref3) {
+      var wrappingKey, keyParams, rootKey, wrappedKey;
+      return regeneratorRuntime.async(function setRootKeyWrapper$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              wrappingKey = _ref3.wrappingKey, keyParams = _ref3.keyParams;
+
+              if (!(this.rootKey === null)) {
+                _context7.next = 3;
+                break;
+              }
+
+              throw 'Attempting to set a root key wrapper on an unloaded root key.';
+
+            case 3:
+              _context7.next = 5;
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_KEY_PARAMS"], keyParams));
+
+            case 5:
+              rootKey = this.rootKey;
+              _context7.next = 8;
+              return regeneratorRuntime.awrap(this.protocolManager.generateExportParameters({
+                item: rootKey,
+                key: wrappingKey,
+                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentLocalStorage"]
+              }));
+
+            case 8:
+              wrappedKey = _context7.sent;
+              _context7.next = 11;
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey));
+
+            case 11:
+              _context7.next = 13;
+              return regeneratorRuntime.awrap(this.keychainDelegate.clearKeyChainValue());
+
+            case 13:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Removes root key wrapper from local storage and stores root keys bare in secure keychain.
+     */
+
+  }, {
+    key: "removeRootKeyWrapper",
+    value: function removeRootKeyWrapper() {
+      return regeneratorRuntime.async(function removeRootKeyWrapper$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              if (!(this.rootKey === null)) {
+                _context8.next = 2;
+                break;
+              }
+
+              throw 'Attempting to remove root key wrapper on an unloaded root key.';
+
+            case 2:
+              _context8.next = 4;
+              return regeneratorRuntime.awrap(this.rootKeyRequiresUnwrapping());
+
+            case 4:
+              _context8.t0 = _context8.sent;
+
+              if (!(_context8.t0 === false)) {
+                _context8.next = 7;
+                break;
+              }
+
+              throw 'Attempting to unwrap already unwrapped key.';
+
+            case 7:
+              _context8.next = 9;
+              return regeneratorRuntime.awrap(StorageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
+
+            case 9:
+              _context8.next = 11;
+              return regeneratorRuntime.awrap(StorageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_KEY_PARAMS"]));
+
+            case 11:
+              _context8.next = 13;
+              return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
+
+            case 13:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * The root key is distinct from regular keys and are only saved locally in the keychain,
+     * in non-item form.
+     * @param key  A SNRootKey object.
+     */
+
+  }, {
+    key: "setRootKey",
+    value: function setRootKey(_ref4) {
+      var key, keyParams;
+      return regeneratorRuntime.async(function setRootKey$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              key = _ref4.key, keyParams = _ref4.keyParams;
+
+              if (!(key.content_type !== ROOT_KEY_CONTENT_TYPE)) {
+                _context9.next = 3;
+                break;
+              }
+
+              throw "Root key must be a ".concat(ROOT_KEY_CONTENT_TYPE, " object.");
+
+            case 3:
+              this.rootKey = key;
+              _context9.next = 6;
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_KEY_PARAMS"], keyParams.content));
+
+            case 6:
+              _context9.next = 8;
+              return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
+
+            case 8:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @returns  SNRootKey object
+     */
+
+  }, {
+    key: "getRootKey",
+    value: function getRootKey() {
+      var rootValue;
+      return regeneratorRuntime.async(function getRootKey$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              _context10.next = 2;
+              return regeneratorRuntime.awrap(this.delegate.getKeyChainValue());
+
+            case 2:
+              rootValue = _context10.sent;
+              return _context10.abrupt("return", new SNRootKeys(rootValue));
+
+            case 4:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Adds keys and syncs them to account.
+     * @param keys  SNItemKey object
+     */
+
+  }, {
+    key: "addNewItemKey",
+    value: function addNewItemKey(key) {
+      return regeneratorRuntime.async(function addNewItemKey$(_context11) {
+        while (1) {
+          switch (_context11.prev = _context11.next) {
+            case 0:
+              this.modelManager.addItem(key);
+              key.setDirty(true);
+
+            case 2:
+            case "end":
+              return _context11.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @returns The SNItemKey object to use to encrypt new or updated items.
+     */
+
+  }, {
+    key: "getDefaultItemKey",
+    value: function getDefaultItemKey() {
+      return regeneratorRuntime.async(function getDefaultItemKey$(_context12) {
+        while (1) {
+          switch (_context12.prev = _context12.next) {
+            case 0:
+              return _context12.abrupt("return", this.itemKeys.find(function (key) {
+                return key.isDefault === true;
+              }));
+
+            case 1:
+            case "end":
+              return _context12.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * When migrating from non-SNItemKey architecture, many items will not have a relationship with any key object.
+     * For those items, we can be sure that only 1 key object will correspond to that protocol version.
+     * @returns The SNItemKey object to decrypt items encrypted with previous protocol version.
+     */
+
+  }, {
+    key: "defaultItemKeyForProtocolVersion",
+    value: function defaultItemKeyForProtocolVersion(version) {
+      return regeneratorRuntime.async(function defaultItemKeyForProtocolVersion$(_context13) {
+        while (1) {
+          switch (_context13.prev = _context13.next) {
+            case 0:
+              return _context13.abrupt("return", this.itemKeys.find(function (key) {
+                return key.version === version;
+              }));
+
+            case 1:
+            case "end":
+              return _context13.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @param uuid  The uuid of the SNItemKey object to return
+    */
+
+  }, {
+    key: "getItemKeyForId",
+    value: function getItemKeyForId(uuid) {
+      return regeneratorRuntime.async(function getItemKeyForId$(_context14) {
+        while (1) {
+          switch (_context14.prev = _context14.next) {
+            case 0:
+              return _context14.abrupt("return", this.modelManager.findItem(uuid));
+
+            case 1:
+            case "end":
+              return _context14.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @returns  The SNItemKey object to use for encrypting this item.
+                 For regular items, should be equal too this.getDefaultItemKey.
+                 For SNItemKey items, should be equal to root keys.
+    */
+
+  }, {
+    key: "keyToUseForEncryptionOfItem",
+    value: function keyToUseForEncryptionOfItem(_ref5) {
+      var item, intent;
+      return regeneratorRuntime.async(function keyToUseForEncryptionOfItem$(_context15) {
+        while (1) {
+          switch (_context15.prev = _context15.next) {
+            case 0:
+              item = _ref5.item, intent = _ref5.intent;
+
+              if (!(item.content_type === ITEM_KEY_CONTENT_TYPE)) {
+                _context15.next = 5;
+                break;
+              }
+
+              return _context15.abrupt("return", this.getRootKey());
+
+            case 5:
+              if (!(this.localDatabaseEncryptionDisabled && intent === SNProtocolManager.IntentLocalStorage)) {
+                _context15.next = 7;
+                break;
+              }
+
+              return _context15.abrupt("return", null);
+
+            case 7:
+              return _context15.abrupt("return", this.getDefaultItemKey());
+
+            case 8:
+            case "end":
+              return _context15.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Items could have been previously encrypted with any arbitrary SNItemKey object.
+     * If the item is a key object, it is always encrypted with the root key, and so return that.
+     * Otherwise, we check to see if the item has a relationship with any given key.
+     * If it doesn't, this means the item was encrypted with legacy behavior. We return then
+     * the key object corresponding to the protocol version of this item.
+     * @returns  The SNItemKey object to use for decrypting this item.
+    */
+
+  }, {
+    key: "keyToUseForDecryptionOfItem",
+    value: function keyToUseForDecryptionOfItem(_ref6) {
+      var item, matchingReference, itemProtocolVersion;
+      return regeneratorRuntime.async(function keyToUseForDecryptionOfItem$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              item = _ref6.item;
+
+              if (!(item.content_type === ITEM_KEY_CONTENT_TYPE)) {
+                _context16.next = 3;
+                break;
+              }
+
+              return _context16.abrupt("return", this.getRootKey());
+
+            case 3:
+              matchingReference = item.content.references.find(function (ref) {
+                return ref.content_type === ITEM_KEY_CONTENT_TYPE;
+              });
+
+              if (!matchingReference) {
+                _context16.next = 6;
+                break;
+              }
+
+              return _context16.abrupt("return", this.modelManager.findItem(matchingReference.uuid));
+
+            case 6:
+              itemProtocolVersion = _Protocol_manager__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].versionForItem(item);
+              return _context16.abrupt("return", this.defaultItemKeyForProtocolVersion(itemProtocolVersion));
+
+            case 8:
+            case "end":
+              return _context16.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Allows interfaces to disable local database encryption for performance reasons (mobile).
+     */
+
+  }, {
+    key: "setLocalDatabaseEncryptionPolicy",
+    value: function setLocalDatabaseEncryptionPolicy(_ref7) {
+      var encrypted;
+      return regeneratorRuntime.async(function setLocalDatabaseEncryptionPolicy$(_context17) {
+        while (1) {
+          switch (_context17.prev = _context17.next) {
+            case 0:
+              encrypted = _ref7.encrypted;
+              this.localDatabaseEncryptionDisabled = !encrypted;
+
+            case 2:
+            case "end":
+              return _context17.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "allItemKeys",
+    get: function get() {
+      return this.itemKeys;
+    }
+  }]);
+
+  return SNKeyManager;
 }();
 
 /***/ }),
@@ -15172,7 +15775,7 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return SFStorageManager; });
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -15189,8 +15792,9 @@ function () {
 
     this.keyManager = keyManager;
     this.protocolManager = protocolManager;
-    this.setLocalStorageEncryptionPolicy({
-      encrypt: true
+    this.setLocalStoragePolicy({
+      encrypt: true,
+      ephemeral: false
     });
   }
   /**
@@ -15314,7 +15918,7 @@ function () {
               _context4.next = 8;
               return regeneratorRuntime.awrap(this.keyManager.keyToUseForEncryptionOfItem({
                 item: item,
-                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntentLocalStorage"]
+                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["EncryptionIntentLocalStorage"]
               }));
 
             case 8:
@@ -15336,17 +15940,18 @@ function () {
       }, null, this);
     }
   }, {
-    key: "setLocalStorageEncryptionPolicy",
-    value: function setLocalStorageEncryptionPolicy(_ref) {
-      var encrypt;
-      return regeneratorRuntime.async(function setLocalStorageEncryptionPolicy$(_context5) {
+    key: "setLocalStoragePolicy",
+    value: function setLocalStoragePolicy(_ref) {
+      var encrypt, ephemeral;
+      return regeneratorRuntime.async(function setLocalStoragePolicy$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              encrypt = _ref.encrypt;
+              encrypt = _ref.encrypt, ephemeral = _ref.ephemeral;
               this.localStorageEncryptionDisabled = !encrypt;
+              this.localStorageEphemeral = ephemeral;
 
-            case 2:
+            case 3:
             case "end":
               return _context5.stop();
           }
@@ -15361,14 +15966,22 @@ function () {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              _context6.next = 2;
-              return regeneratorRuntime.awrap(this.generatePayload());
+              if (!(this.localStorageEphemeral === true)) {
+                _context6.next = 2;
+                break;
+              }
+
+              return _context6.abrupt("return");
 
             case 2:
+              _context6.next = 4;
+              return regeneratorRuntime.awrap(this.generatePayload());
+
+            case 4:
               payload = _context6.sent;
               this.persistAsPayloadToDisk(payload);
 
-            case 4:
+            case 6:
             case "end":
               return _context6.stop();
           }

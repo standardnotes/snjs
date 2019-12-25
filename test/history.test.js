@@ -14,8 +14,8 @@ SFItemHistory.LargeEntryDeltaThreshold = 15;
 let largeCharacterChange = SFItemHistory.LargeEntryDeltaThreshold;
 
 describe('session history', () => {
-  var email = Factory.globalCryptoManager().crypto.generateUUIDSync();
-  var password = Factory.globalCryptoManager().crypto.generateUUIDSync();
+  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
   var totalItemCount = 0;
 
   let authManager = Factory.globalAuthManager();

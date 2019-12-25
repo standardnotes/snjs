@@ -7,28 +7,28 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
-describe("basic auth", () => {
+describe.only("basic auth", () => {
   let url = "http://localhost:3000";
-  let email = Factory.globalCryptoManager().crypto.generateUUIDSync();
-  let password = Factory.globalCryptoManager().crypto.generateUUIDSync();
-  var _keys;
+  let email = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  let password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var _key;
 
   before(async () => {
     await Factory.globalStorageManager().clearAllData();
   })
 
-  it("successfully register new account", (done) => {
+  it.only("successfully register new account", (done) => {
      Factory.globalAuthManager().register(url, email, password, false).then((response) => {
       expect(response.error).to.not.be.ok;
       done();
     })
   }).timeout(20000);
 
-  it("successfully logins to registered account", async () => {
+  it.only("successfully logins to registered account", async () => {
     await Factory.globalAuthManager().signout(true);
     var strict = false;
     var response = await Factory.globalAuthManager().login(url, email, password, strict, null);
-    _keys = await Factory.globalAuthManager().keys();
+    _key = await Factory.globalAuthManager().keys();
     expect(response.error).to.not.be.ok;
   }).timeout(20000);
 
@@ -66,11 +66,11 @@ describe("basic auth", () => {
 
     var strict = false;
 
-    var result = await Factory.globalCryptoManager().createRootKey({identifier: email, password: password});
-    var newKeys = result.keys;
+    var result = await Factory.globalProtocolManager().createRootKey({identifier: email, password: password});
+    var newKeys = result.key;
     var newKeyParams = result.keyParams;
 
-    var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newKeyParams);
+    var response = await Factory.globalAuthManager().changePassword(url, email, _key.serverAuthenticationValue, newKeys, newKeyParams);
     expect(response.error).to.not.be.ok;
 
     expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -134,11 +134,11 @@ describe("basic auth", () => {
     var strict = false;
 
     for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalCryptoManager().createRootKey({identifier: email, password});
-      var newKeys = result.keys;
+      var result = await Factory.globalProtocolManager().createRootKey({identifier: email, password});
+      var newKeys = result.key;
       var newKeyParams = result.keyParams;
 
-      var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newKeyParams);
+      var response = await Factory.globalAuthManager().changePassword(url, email, _key.serverAuthenticationValue, newKeys, newKeyParams);
       expect(response.error).to.not.be.ok;
 
       expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -164,7 +164,7 @@ describe("basic auth", () => {
       var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
       expect(loginResponse.error).to.not.be.ok;
 
-      _keys = await Factory.globalAuthManager().keys();
+      _key = await Factory.globalAuthManager().keys();
     }
   }).timeout(30000);
 
