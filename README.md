@@ -31,24 +31,24 @@ import { protocolManager } from 'snjs';
 #### New user (registration):
 
 ```javascript
-protocolManager.createKeysAndAuthParams({identifier: email, password: password}).then((results) => {
+protocolManager.createRootKey({identifier: email, password: password}).then((results) => {
   const keys = results.keys;
-  const authParams = results.authParams;
+  const keyParams = results.keyParams;
 
   const serverPassword = keys.serverAuthenticationValue;
   const masterKey = keys.masterKey;
-  const itemsMasterKey = keys.itemsMasterKey;
+  const itemsKey = keys.itemsKey;
 });
 ```
 
 #### Existing user (sign in):
 
 ```javascript
-let authParams = getPreviouslyCreatedAuthParams();
-protocolManager.computeEncryptionKeys({password, authParams}).then((keys) => {
+let keyParams = getPreviouslyCreatedKeyParams();
+protocolManager.computeRootKey({password, keyParams}).then((keys) => {
   const serverPassword = keys.serverAuthenticationValue;
   const masterKey = keys.masterKey;
-  // itemsMasterKey is generated once then uploaded to server in encrypted form.
+  // itemsKey is generated once then uploaded to server in encrypted form.
 });
 ```
 
@@ -57,7 +57,7 @@ protocolManager.computeEncryptionKeys({password, authParams}).then((keys) => {
 
 `masterKey`: encrypts and decrypts keys. Not sent to server plainly.
 
-`itemsMasterKey`: encrypts and decrypts items. Not sent to server plainly.
+`itemsKey`: encrypts and decrypts items. Not sent to server plainly.
 
 ### Encrypting and decrypting items
 
@@ -67,7 +67,7 @@ Use `protocolManager` to encrypt and decrypt items. Use the `SFItemParams` as a 
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.encryptItem({item, keys, authParams}).then(() => {
+protocolManager.encryptItem({item, keys, keyParams}).then(() => {
  // item.content is now encrypted
 })
 ```

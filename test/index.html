@@ -101,7 +101,7 @@
       alert("Enter the account password used to encrypt these files.");
       return;
     }
-    var auth_params, keys;
+    var keyParams, keys;
 
     var index = 0;
     var processedData = [];
@@ -132,7 +132,7 @@
               console.error("Error decrypting item:", item, error);
               continue;
             }
-            delete item.auth_params;
+            delete item.keyParams;
             processedData.push(item);
           }
 
@@ -153,14 +153,14 @@
 
         }
 
-        if(!auth_params) {
-          auth_params = data.auth_params;
-          if(!auth_params || !auth_params.pw_cost) {
+        if(!keyParams) {
+          keyParams = data.keyParams;
+          if(!keyParams || !keyParams.pw_cost) {
             alert("Invalid file selected. Ensure you have selected the right file and try again.");
             return;
           }
 
-          protocolManager.computeEncryptionKeys(password, auth_params).then(function(result){
+          protocolManager.computeRootKey(password, keyParams).then(function(result){
             keys = result;
             if(result) {
               onKeyReady();

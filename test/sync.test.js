@@ -146,7 +146,7 @@ describe('online syncing', () => {
   let keyRequestHandler = async () => {
     return {
       keys: await authManager.keys(),
-      auth_params: await authManager.getAuthParams(),
+      keyParams: await authManager.getKeyParams(),
       offline: false
     };
   };
@@ -298,13 +298,13 @@ describe('online syncing', () => {
     totalItemCount++;
 
     let keys = await authManager.keys();
-    let authParams = await authManager.getAuthParams();
+    let keyParams = await authManager.getKeyParams();
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: keys,
-      authParams: authParams,
-      exportType: SNProtocolOperator.ExportTypeSync
+      keyParams: keyParams,
+      intent: EncryptionIntentSync
     })
 
     itemParams.errorDecrypting = true;
@@ -997,12 +997,12 @@ describe('sync params', () => {
 
   var _identifier = "hello@test.com";
   var _password = "password";
-  var _authParams, _keys;
+  var _keyParams, _keys;
 
   before((done) => {
     // runs once before all tests in this block
-    Factory.globalCryptoManager().createKeysAndAuthParams({identifier: _identifier, password: _password}).then((result) => {
-      _authParams = result.authParams;
+    Factory.globalCryptoManager().createRootKey({identifier: _identifier, password: _password}).then((result) => {
+      _keyParams = result.keyParams;
       _keys = result.keys;
       done();
     })
@@ -1014,8 +1014,8 @@ describe('sync params', () => {
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: _keys,
-      authParams: _authParams,
-      exportType: SNProtocolOperator.ExportTypeSync
+      keyParams: _keyParams,
+      intent: EncryptionIntentSync
     })
 
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1033,8 +1033,8 @@ describe('sync params', () => {
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: null,
-      authParams: null,
-      exportType: SNProtocolOperator.ExportTypeSync
+      keyParams: null,
+      intent: EncryptionIntentSync
     })
 
     expect(itemParams.enc_item_key).to.be.null;
@@ -1053,8 +1053,8 @@ describe('sync params', () => {
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: _keys,
-      authParams: _authParams,
-      exportType: SNProtocolOperator.ExportTypeLocalStorage
+      keyParams: _keyParams,
+      intent: EncryptionIntentLocalStorage
     })
 
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1075,8 +1075,8 @@ describe('sync params', () => {
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: _keys,
-      authParams: _authParams,
-      exportType: SNProtocolOperator.ExportTypeFile
+      keyParams: _keyParams,
+      intent: EncryptionIntentFile
     })
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
@@ -1094,8 +1094,8 @@ describe('sync params', () => {
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
       keys: _keys,
-      authParams: _authParams,
-      exportType: SNProtocolOperator.ExportTypeSync
+      keyParams: _keyParams,
+      intent: EncryptionIntentSync
     })
     expect(itemParams.content).to.eql(item.content);
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1136,7 +1136,7 @@ describe('sync discordance', () => {
   localSyncManager.setKeyRequestHandler(async () => {
     return {
       keys: await localAuthManager.keys(),
-      auth_params: await localAuthManager.getAuthParams(),
+      keyParams: await localAuthManager.getKeyParams(),
       offline: false
     };
   })

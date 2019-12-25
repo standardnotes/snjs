@@ -24,7 +24,7 @@ describe('session history', () => {
   var keyRequestHandler = async () => {
     return {
       keys: await authManager.keys(),
-      auth_params: await authManager.getAuthParams(),
+      keyParams: await authManager.getKeyParams(),
       offline: false
     };
   };

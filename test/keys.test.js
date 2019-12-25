@@ -12,11 +12,11 @@ describe.only('keys', () => {
 
   const protocolManager = new SNProtocolManager(new SNWebCrypto());
   const modelManager = Factory.createModelManager();
-  const keysManager = new SNKeysManager(modelManager);
+  const keysManager = new SNKeyManager(modelManager);
 
   before(async (done) => {
     // Runs before all tests in this block
-    const result = await protocolManager.createKeysAndAuthParams({identifier: _identifier, password: _password});
+    const result = await protocolManager.createRootKey({identifier: _identifier, password: _password});
     _keys = result.keys;
     done();
   });
@@ -25,22 +25,22 @@ describe.only('keys', () => {
     await keysManager.saveRootKeys(_keys);
     const rootKeys = await keysManager.getRootKeys();
     expect(rootKeys).to.equal(_keys);
-    expect(rootKeys.constructor.name).to.equal("SNKeys");
+    expect(rootKeys.constructor.name).to.equal("SNItemKey");
   });
 
   it('generating new keys should persist keys to account', async () => {
-     const newKeys = await protocolManager.createKeysAndAuthParams({identifier: _identifier, password: "foobar"});
-     await keysManager.addNewKeys(newKeys);
+     const newKeys = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
+     await keysManager.addNewItemKey(newKeys);
      expect(keysManager.allKeys.length).to.equal(1);
-     expect(modelManager.validItemsForContentType("SNKeys")).length.to.equal(1);
+     expect(modelManager.validItemsForContentType("SNItemKey")).length.to.equal(1);
   });
 
   it('key items should be encrypted with root keys', async () => {
     /** Keys should be encrypted with root keys, because if only 1 key object,
      * the items key would be contained within, and we couldn't access it.
      */
-     const newKeys = await protocolManager.createKeysAndAuthParams({identifier: _identifier, password: "foobar"});
-     await keysManager.addNewKeys(newKeys);
+     const newKeys = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
+     await keysManager.addNewItemKey(newKeys);
 
      expect(newKeys)
   });

@@ -13,12 +13,12 @@ describe.only('003 protocol operations', () => {
 
   var _identifier = "hello@test.com";
   var _password = "password";
-  var _authParams, _keys;
+  var _keyParams, _keys;
 
   before((done) => {
     // runs before all tests in this block
-    protocol_003.createKeysAndAuthParams({identifier: _identifier, password: _password}).then((result) => {
-      _authParams = result.authParams;
+    protocol_003.createRootKey({identifier: _identifier, password: _password}).then((result) => {
+      _keyParams = result.keyParams;
       _keys = result.keys;
       done();
     })
@@ -36,18 +36,18 @@ describe.only('003 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol_003.createKeysAndAuthParams({identifier: _identifier, password: _password});
+    const result = await protocol_003.createRootKey({identifier: _identifier, password: _password});
     expect(result).to.have.property("keys");
-    expect(result).to.have.property("authParams");
+    expect(result).to.have.property("keyParams");
 
     expect(result.keys).to.have.property("pw");
     expect(result.keys).to.have.property("ak");
     expect(result.keys).to.have.property("mk");
 
-    expect(result.authParams).to.have.property("pw_nonce");
-    expect(result.authParams).to.have.property("pw_cost");
-    expect(result.authParams).to.have.property("identifier");
-    expect(result.authParams).to.have.property("version");
+    expect(result.keyParams).to.have.property("pw_nonce");
+    expect(result.keyParams).to.have.property("pw_cost");
+    expect(result.keyParams).to.have.property("identifier");
+    expect(result.keyParams).to.have.property("version");
   });
 
   it('properly encrypts and decrypts', async () => {
@@ -60,7 +60,7 @@ describe.only('003 protocol operations', () => {
   });
 
   it('generates existing keys for auth params', async () => {
-    const result = await protocol_003.computeEncryptionKeys({password: _password, authParams: _authParams});
+    const result = await protocol_003.computeRootKey({password: _password, keyParams: _keyParams});
     expect(result).to.have.property("pw");
     expect(result).to.have.property("ak");
     expect(result).to.have.property("mk");

@@ -49,7 +49,7 @@ describe("basic auth", () => {
       return {
         offline: false,
         keys: await Factory.globalAuthManager().keys(),
-        auth_params: await Factory.globalAuthManager().getAuthParams(),
+        KeyParams: await Factory.globalAuthManager().getKeyParams(),
       };
     })
 
@@ -66,11 +66,11 @@ describe("basic auth", () => {
 
     var strict = false;
 
-    var result = await Factory.globalCryptoManager().createKeysAndAuthParams({identifier: email, password: password});
+    var result = await Factory.globalCryptoManager().createRootKey({identifier: email, password: password});
     var newKeys = result.keys;
-    var newAuthParams = result.authParams;
+    var newKeyParams = result.keyParams;
 
-    var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newAuthParams);
+    var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newKeyParams);
     expect(response.error).to.not.be.ok;
 
     expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -118,7 +118,7 @@ describe("basic auth", () => {
       return {
         offline: false,
         keys: await Factory.globalAuthManager().keys(),
-        auth_params: await Factory.globalAuthManager().getAuthParams(),
+        KeyParams: await Factory.globalAuthManager().getKeyParams(),
       };
     })
 
@@ -134,11 +134,11 @@ describe("basic auth", () => {
     var strict = false;
 
     for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalCryptoManager().createKeysAndAuthParams({identifier: email, password});
+      var result = await Factory.globalCryptoManager().createRootKey({identifier: email, password});
       var newKeys = result.keys;
-      var newAuthParams = result.authParams;
+      var newKeyParams = result.keyParams;
 
-      var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newAuthParams);
+      var response = await Factory.globalAuthManager().changePassword(url, email, _keys.serverAuthenticationValue, newKeys, newKeyParams);
       expect(response.error).to.not.be.ok;
 
       expect(modelManager.allItems.length).to.equal(totalItemCount);
