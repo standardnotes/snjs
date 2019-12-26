@@ -452,7 +452,13 @@ describe("syncing", () => {
 
   let modelManager = Factory.createModelManager();
   let authManager = Factory.globalAuthManager();
-  let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+  const syncManager = new SFSyncManager({
+    modelManager,
+    authManager: Factory.globalAuthManager(),
+    storageManager: Factory.globalStorageManager(),
+    protocolManager: Factory.globalProtocolManager(),
+    httpManager: Factory.globalHttpManager()
+  });
 
   const wait = (secs) => {
     return new Promise((resolve, reject) => {
@@ -498,7 +504,13 @@ describe("syncing", () => {
 
   it("handles signing in and merging data", async () => {
 
-    let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const syncManager = new SFSyncManager({
+      modelManager,
+      authManager: Factory.globalAuthManager(),
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     modelManager.handleSignout();
     let pair = createRelatedNoteTagPair();

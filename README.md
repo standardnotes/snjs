@@ -35,7 +35,7 @@ protocolManager.createRootKey({identifier: email, password: password}).then((res
   const keys = results.keys;
   const keyParams = results.keyParams;
 
-  const serverPassword = keys.serverAuthenticationValue;
+  const serverPassword = keys.serverPassword;
   const masterKey = keys.masterKey;
   const itemsKey = keys.itemsKey;
 });
@@ -46,9 +46,9 @@ protocolManager.createRootKey({identifier: email, password: password}).then((res
 ```javascript
 let keyParams = getPreviouslyCreatedKeyParams();
 protocolManager.computeRootKey({password, keyParams}).then((keys) => {
-  const serverPassword = keys.serverAuthenticationValue;
+  const serverPassword = keys.serverPassword;
   const masterKey = keys.masterKey;
-  // itemsKey is generated once then uploaded to server in encrypted form.
+  // itemKey is generated once then uploaded to server in encrypted form.
 });
 ```
 
@@ -57,7 +57,7 @@ protocolManager.computeRootKey({password, keyParams}).then((keys) => {
 
 `masterKey`: encrypts and decrypts keys. Not sent to server plainly.
 
-`itemsKey`: encrypts and decrypts items. Not sent to server plainly.
+`itemKey`: encrypts and decrypts items. Not sent to server plainly.
 
 ### Encrypting and decrypting items
 

@@ -42,7 +42,7 @@ describe('003 protocol operations', () => {
     expect(result).to.have.property("keyParams");
 
     expect(result.key.dataAuthenticationKey).to.not.be.null;
-    expect(result.key.serverAuthenticationValue).to.not.be.null;
+    expect(result.key.serverPassword).to.not.be.null;
     expect(result.key.masterKey).to.not.be.null;
 
     expect(result.keyParams.seed).to.not.be.null;

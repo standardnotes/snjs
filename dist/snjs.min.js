@@ -1186,11 +1186,27 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 
+/***/ "./lib/constants.js":
+/*!**************************!*\
+  !*** ./lib/constants.js ***!
+  \**************************/
+/*! exports provided: SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SN_ROOT_KEY_CONTENT_TYPE", function() { return SN_ROOT_KEY_CONTENT_TYPE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SN_ITEMS_KEY_CONTENT_TYPE", function() { return SN_ITEMS_KEY_CONTENT_TYPE; });
+var SN_ROOT_KEY_CONTENT_TYPE = 'SN|RootKey|NoSync';
+var SN_ITEMS_KEY_CONTENT_TYPE = 'SN|ItemsKey';
+
+/***/ }),
+
 /***/ "./lib/main.js":
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorage, EncryptionIntentFile, EncryptionIntentSync, SFItem, SNItemKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SNDatabaseManager, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager, SNKeyManager */
+/*! exports provided: SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileDecrypted, EncryptionIntentFileEncrypted, EncryptionIntentSync, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SNDatabaseManager, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager, SNKeyManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1211,112 +1227,124 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator004"]; });
 
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorage", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStorage"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorageDecrypted", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStorageDecrypted"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFile", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentFile"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorageEncrypted", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStorageEncrypted"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStoragePreferEncrypted", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentLocalStoragePreferEncrypted"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFileDecrypted", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentFileDecrypted"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFileEncrypted", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentFileEncrypted"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentSync", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["EncryptionIntentSync"]; });
 
-/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_6__["SFItem"]; });
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SN_ROOT_KEY_CONTENT_TYPE", function() { return _Lib_constants__WEBPACK_IMPORTED_MODULE_6__["SN_ROOT_KEY_CONTENT_TYPE"]; });
 
-/* harmony import */ var _models_keys_itemKey__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models/keys/itemKey */ "./lib/models/keys/itemKey.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemKey", function() { return _models_keys_itemKey__WEBPACK_IMPORTED_MODULE_7__["SNItemKey"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SN_ITEMS_KEY_CONTENT_TYPE", function() { return _Lib_constants__WEBPACK_IMPORTED_MODULE_6__["SN_ITEMS_KEY_CONTENT_TYPE"]; });
 
-/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SFPredicate"]; });
+/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"]; });
 
-/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./models/app/note */ "./lib/models/app/note.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _models_app_note__WEBPACK_IMPORTED_MODULE_9__["SNNote"]; });
+/* harmony import */ var _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__["SNItemsKey"]; });
 
-/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./models/app/tag */ "./lib/models/app/tag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _models_app_tag__WEBPACK_IMPORTED_MODULE_10__["SNTag"]; });
+/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models_core_predicate__WEBPACK_IMPORTED_MODULE_9__["SFPredicate"]; });
 
-/* harmony import */ var _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_11__["SNSmartTag"]; });
+/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./models/app/note */ "./lib/models/app/note.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _models_app_note__WEBPACK_IMPORTED_MODULE_10__["SNNote"]; });
 
-/* harmony import */ var _models_server_mfa__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/server/mfa */ "./lib/models/server/mfa.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMfa", function() { return _models_server_mfa__WEBPACK_IMPORTED_MODULE_12__["SNMfa"]; });
+/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/app/tag */ "./lib/models/app/tag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _models_app_tag__WEBPACK_IMPORTED_MODULE_11__["SNTag"]; });
 
-/* harmony import */ var _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./models/server/serverExtension */ "./lib/models/server/serverExtension.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_13__["SNServerExtension"]; });
+/* harmony import */ var _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__["SNSmartTag"]; });
 
-/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./models/app/component */ "./lib/models/app/component.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models_app_component__WEBPACK_IMPORTED_MODULE_14__["SNComponent"]; });
+/* harmony import */ var _models_server_mfa__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./models/server/mfa */ "./lib/models/server/mfa.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMfa", function() { return _models_server_mfa__WEBPACK_IMPORTED_MODULE_13__["SNMfa"]; });
 
-/* harmony import */ var _models_app_editor__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./models/app/editor */ "./lib/models/app/editor.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models_app_editor__WEBPACK_IMPORTED_MODULE_15__["SNEditor"]; });
+/* harmony import */ var _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./models/server/serverExtension */ "./lib/models/server/serverExtension.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__["SNServerExtension"]; });
 
-/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./models/app/extension */ "./lib/models/app/extension.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNExtension", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_16__["SNExtension"]; });
+/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./models/app/component */ "./lib/models/app/component.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models_app_component__WEBPACK_IMPORTED_MODULE_15__["SNComponent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_16__["Action"]; });
+/* harmony import */ var _models_app_editor__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./models/app/editor */ "./lib/models/app/editor.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models_app_editor__WEBPACK_IMPORTED_MODULE_16__["SNEditor"]; });
 
-/* harmony import */ var _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./models/subclasses/theme */ "./lib/models/subclasses/theme.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_17__["SNTheme"]; });
+/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./models/app/extension */ "./lib/models/app/extension.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNExtension", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_17__["SNExtension"]; });
 
-/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_18__["SNEncryptedStorage"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_17__["Action"]; });
 
-/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_19__["SNComponentManager"]; });
+/* harmony import */ var _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./models/subclasses/theme */ "./lib/models/subclasses/theme.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_18__["SNTheme"]; });
 
-/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_20__["SFHistorySession"]; });
+/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_19__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_21__["SFItemHistory"]; });
+/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_20__["SNComponentManager"]; });
 
-/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_22__["SFItemHistoryEntry"]; });
+/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_21__["SFHistorySession"]; });
 
-/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_23__["SFPrivileges"]; });
+/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__["SFItemHistory"]; });
 
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_24___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_24__);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_24__["SNWebCrypto"]; });
+/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__["SFItemHistoryEntry"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_24__["SNReactNativeCrypto"]; });
+/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__["SFPrivileges"]; });
 
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_25__["findInArray"]; });
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_25___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_25__);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_25__["SNWebCrypto"]; });
 
-/* harmony import */ var _services_databaseManager__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/databaseManager */ "./lib/services/databaseManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_databaseManager__WEBPACK_IMPORTED_MODULE_26__["SNDatabaseManager"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_25__["SNReactNativeCrypto"]; });
 
-/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_27__["SFModelManager"]; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_26__["findInArray"]; });
 
-/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_28__["SFHttpManager"]; });
+/* harmony import */ var _services_databaseManager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/databaseManager */ "./lib/services/databaseManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_databaseManager__WEBPACK_IMPORTED_MODULE_27__["SNDatabaseManager"]; });
 
-/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_29__["SFStorageManager"]; });
+/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_28__["SFModelManager"]; });
 
-/* harmony import */ var _services_syncManager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/syncManager */ "./lib/services/syncManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSyncManager", function() { return _services_syncManager__WEBPACK_IMPORTED_MODULE_30__["SFSyncManager"]; });
+/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_29__["SFHttpManager"]; });
 
-/* harmony import */ var _services_authManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/authManager */ "./lib/services/authManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAuthManager", function() { return _services_authManager__WEBPACK_IMPORTED_MODULE_31__["SFAuthManager"]; });
+/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_30__["SFStorageManager"]; });
 
-/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_32__["SFMigrationManager"]; });
+/* harmony import */ var _services_syncManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/syncManager */ "./lib/services/syncManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSyncManager", function() { return _services_syncManager__WEBPACK_IMPORTED_MODULE_31__["SFSyncManager"]; });
 
-/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_33__["SFAlertManager"]; });
+/* harmony import */ var _services_authManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/authManager */ "./lib/services/authManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAuthManager", function() { return _services_authManager__WEBPACK_IMPORTED_MODULE_32__["SFAuthManager"]; });
 
-/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_34__["SFSessionHistoryManager"]; });
+/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_33__["SFMigrationManager"]; });
 
-/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_35__["SFPrivilegesManager"]; });
+/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_34__["SFAlertManager"]; });
 
-/* harmony import */ var _services_singletonManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/singletonManager */ "./lib/services/singletonManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return _services_singletonManager__WEBPACK_IMPORTED_MODULE_36__["SFSingletonManager"]; });
+/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_35__["SFSessionHistoryManager"]; });
 
-/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_37__["SNKeyManager"]; });
+/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_36__["SFPrivilegesManager"]; });
+
+/* harmony import */ var _services_singletonManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/singletonManager */ "./lib/services/singletonManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return _services_singletonManager__WEBPACK_IMPORTED_MODULE_37__["SFSingletonManager"]; });
+
+/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_38__["SNKeyManager"]; });
+
 
 
 
@@ -2511,13 +2539,19 @@ function () {
       this.deleted = json.deleted;
       this.uuid = json.uuid;
       this.enc_item_key = json.enc_item_key;
-      this.auth_hash = json.auth_hash;
       /**
         Legacy behavior. Only 003 and 002 supported this.
        */
 
-      this.auth_params = json.auth_params; // When updating from server response (as opposed to local json response), these keys will be missing.
+      if (json.auth_hash) {
+        this.auth_hash = json.auth_hash;
+      }
+
+      if (json.auth_params) {
+        this.auth_params = json.auth_params;
+      } // When updating from server response (as opposed to local json response), these keys will be missing.
       // So we only want to update these values if they are explicitly present.
+
 
       var clientKeys = ["errorDecrypting", "dirty", "dirtyCount", "dirtiedDate", "dummy"];
 
@@ -3368,17 +3402,18 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/models/keys/itemKey.js":
-/*!************************************!*\
-  !*** ./lib/models/keys/itemKey.js ***!
-  \************************************/
-/*! exports provided: SNItemKey */
+/***/ "./lib/models/keys/itemsKey.js":
+/*!*************************************!*\
+  !*** ./lib/models/keys/itemsKey.js ***!
+  \*************************************/
+/*! exports provided: SNItemsKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemKey", function() { return SNItemKey; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
 /* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3398,21 +3433,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
-var SNItemKey =
+
+var SNItemsKey =
 /*#__PURE__*/
 function (_SNPureKey) {
-  _inherits(SNItemKey, _SNPureKey);
+  _inherits(SNItemsKey, _SNPureKey);
 
-  function SNItemKey() {
-    _classCallCheck(this, SNItemKey);
+  function SNItemsKey() {
+    _classCallCheck(this, SNItemsKey);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNItemKey).apply(this, arguments));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNItemsKey).apply(this, arguments));
   }
 
-  _createClass(SNItemKey, [{
+  _createClass(SNItemsKey, [{
     key: "content_type",
     get: function get() {
-      return "SN|ItemKey";
+      return _Lib_constants__WEBPACK_IMPORTED_MODULE_1__["SN_ITEMS_KEY_CONTENT_TYPE"];
     }
   }, {
     key: "itemsKey",
@@ -3441,13 +3477,13 @@ function (_SNPureKey) {
      * property. FromRaw allows you to send in an unwrapped raw key hash instead.
     */
     value: function FromRaw(key) {
-      return new SNItemKey({
+      return new SNItemsKey({
         content: key
       });
     }
   }]);
 
-  return SNItemKey;
+  return SNItemsKey;
 }(_Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
 
 /***/ }),
@@ -3526,19 +3562,19 @@ function (_SFItem) {
 
       switch (this.content.version) {
         case '001':
-          this.keyContent = new _Protocol_versions_001_key_content_001__WEBPACK_IMPORTED_MODULE_4__["SNKeyContent001"](json_obj.content);
+          this.keyContent = new _Protocol_versions_001_key_content_001__WEBPACK_IMPORTED_MODULE_4__["SNKeyContent001"](this.content);
           break;
 
         case '002':
-          this.keyContent = new _Protocol_versions_002_key_content_002__WEBPACK_IMPORTED_MODULE_3__["SNKeyContent002"](json_obj.content);
+          this.keyContent = new _Protocol_versions_002_key_content_002__WEBPACK_IMPORTED_MODULE_3__["SNKeyContent002"](this.content);
           break;
 
         case '003':
-          this.keyContent = new _Protocol_versions_003_key_content_003__WEBPACK_IMPORTED_MODULE_2__["SNKeyContent003"](json_obj.content);
+          this.keyContent = new _Protocol_versions_003_key_content_003__WEBPACK_IMPORTED_MODULE_2__["SNKeyContent003"](this.content);
           break;
 
         case '004':
-          this.keyContent = new _Protocol_versions_004_key_content_004__WEBPACK_IMPORTED_MODULE_1__["SNKeyContent004"](json_obj.content);
+          this.keyContent = new _Protocol_versions_004_key_content_004__WEBPACK_IMPORTED_MODULE_1__["SNKeyContent004"](this.content);
           break;
 
         default:
@@ -3587,6 +3623,7 @@ function (_SFItem) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return SNRootKey; });
 /* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3604,6 +3641,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 var SNRootKey =
@@ -3642,9 +3680,9 @@ function (_SNPureKey) {
       return this.keyContent.masterKey;
     }
   }, {
-    key: "serverAuthenticationValue",
+    key: "serverPassword",
     get: function get() {
-      return this.keyContent.serverAuthenticationValue;
+      return this.keyContent.serverPassword;
     }
   }], [{
     key: "FromRaw",
@@ -3661,7 +3699,7 @@ function (_SNPureKey) {
   }, {
     key: "contentType",
     value: function contentType() {
-      return 'SN|RootKey|NoSync';
+      return _Lib_constants__WEBPACK_IMPORTED_MODULE_1__["SN_ROOT_KEY_CONTENT_TYPE"];
     }
   }]);
 
@@ -4546,19 +4584,49 @@ function (_SNComponent) {
 /*!*********************************!*\
   !*** ./lib/protocol/intents.js ***!
   \*********************************/
-/*! exports provided: EncryptionIntentSync, EncryptionIntentLocalStorage, EncryptionIntentFile, EncryptionIntentFileDecrypted */
+/*! exports provided: EncryptionIntentSync, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileEncrypted, EncryptionIntentFileDecrypted, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentSync", function() { return EncryptionIntentSync; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorage", function() { return EncryptionIntentLocalStorage; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFile", function() { return EncryptionIntentFile; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorageEncrypted", function() { return EncryptionIntentLocalStorageEncrypted; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStorageDecrypted", function() { return EncryptionIntentLocalStorageDecrypted; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentLocalStoragePreferEncrypted", function() { return EncryptionIntentLocalStoragePreferEncrypted; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFileEncrypted", function() { return EncryptionIntentFileEncrypted; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntentFileDecrypted", function() { return EncryptionIntentFileDecrypted; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return isLocalStorageIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return isFileIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return isDecryptedIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return intentRequiresEncryption; });
 var EncryptionIntentSync = 0;
-var EncryptionIntentLocalStorage = 1;
-var EncryptionIntentFile = 2;
-var EncryptionIntentFileDecrypted = 3;
+/** Store encrypted */
+
+var EncryptionIntentLocalStorageEncrypted = 1;
+/** Store decrypted */
+
+var EncryptionIntentLocalStorageDecrypted = 2;
+/** Store encrypted if possible, but decrypted if not */
+
+var EncryptionIntentLocalStoragePreferEncrypted = 3;
+var EncryptionIntentFileEncrypted = 4;
+var EncryptionIntentFileDecrypted = 5;
+function isLocalStorageIntent(intent) {
+  return intent === EncryptionIntentLocalStorageEncrypted || intent === EncryptionIntentLocalStorageDecrypted || intent === EncryptionIntentLocalStoragePreferEncrypted;
+}
+function isFileIntent(intent) {
+  return intent === EncryptionIntentFileEncrypted || intent === EncryptionIntentFileDecrypted;
+}
+function isDecryptedIntent(intent) {
+  return intent === EncryptionIntentLocalStorageDecrypted || intent === EncryptionIntentFileDecrypted;
+}
+/**
+ * @returns {boolean}  True if the intent requires encryption.
+ */
+
+function intentRequiresEncryption(intent) {
+  return intent === EncryptionIntentSync || intent === EncryptionIntentLocalStorageEncrypted || intent === EncryptionIntentFileEncrypted;
+}
 
 /***/ }),
 
@@ -4583,12 +4651,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions/002/key_params_002 */ "./lib/protocol/versions/002/key_params_002.js");
 /* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -4631,9 +4701,9 @@ function () {
       var _this = this;
 
       this.keyManager = keyManager;
-      this.keyManager.addItemKeyChangeObserver({
+      this.keyManager.addItemsKeyChangeObserver({
         name: 'protocol-manager',
-        callback: function callback(itemKeys) {
+        callback: function callback(itemsKeys) {
           _this.decryptItemsWaitingForKeys();
         }
       });
@@ -4641,7 +4711,7 @@ function () {
   }, {
     key: "loadCryptoInstance",
     value: function loadCryptoInstance(crypto) {
-      if (!crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_10__["isWebEnvironment"])()) {
+      if (!crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_11__["isWebEnvironment"])()) {
         // IE and Edge do not support pbkdf2 in WebCrypto.
         if (Object(sncrypto__WEBPACK_IMPORTED_MODULE_0__["isWebCryptoAvailable"])()) {
           this.crypto = new sncrypto__WEBPACK_IMPORTED_MODULE_0__["SNWebCrypto"]();
@@ -5080,7 +5150,7 @@ function () {
             case 0:
               item = _ref6.item, key = _ref6.key, includeDeleted = _ref6.includeDeleted, intent = _ref6.intent;
 
-              if (key) {
+              if (!(!key && !Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_10__["isDecryptedIntent"])(intent))) {
                 _context7.next = 5;
                 break;
               }
@@ -5095,7 +5165,15 @@ function () {
               key = _context7.sent;
 
             case 5:
-              version = key.version;
+              if (!(!key && Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_10__["intentRequiresEncryption"])(intent))) {
+                _context7.next = 7;
+                break;
+              }
+
+              throw 'Attempting to generate encrypted export params with no key.';
+
+            case 7:
+              version = key ? key.version : this.version();
               operator = this.operatorForVersion(version);
               return _context7.abrupt("return", operator.generateExportParameters({
                 item: item,
@@ -5104,7 +5182,7 @@ function () {
                 intent: intent
               }));
 
-            case 8:
+            case 10:
             case "end":
               return _context7.stop();
           }
@@ -5310,7 +5388,7 @@ function (_SNKeyContent) {
       return this.content.mk;
     }
   }, {
-    key: "serverAuthenticationValue",
+    key: "serverPassword",
     get: function get() {
       return this.content.pw;
     }
@@ -5413,6 +5491,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash/pick */ "./node_modules/lodash/pick.js");
+/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash_pick__WEBPACK_IMPORTED_MODULE_6__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
@@ -5432,6 +5512,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -5846,7 +5927,7 @@ function (_SNProtocolOperator) {
                         params.auth_hash = item.auth_hash;
 
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, lodash_pick__WEBPACK_IMPORTED_MODULE_6___default()(item, additionalFields));
                         }
 
                         return _context7.abrupt("return");
@@ -5900,7 +5981,7 @@ function (_SNProtocolOperator) {
 
                       case 26:
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_5___default()(params, lodash_pick__WEBPACK_IMPORTED_MODULE_6___default()(item, additionalFields));
                         }
 
                         if (omitFields) {
@@ -5917,8 +5998,8 @@ function (_SNProtocolOperator) {
                 });
               };
 
-              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
-              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
+              additionalFields = Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["isLocalStorageIntent"])(intent) ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
+              omitFields = Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["isFileIntent"])(intent) && !includeDeleted ? ["deleted"] : null;
               _context8.next = 6;
               return regeneratorRuntime.awrap(computeParams(additionalFields, omitFields));
 
@@ -6099,7 +6180,7 @@ function (_SNKeyContent) {
       return this.content.mk;
     }
   }, {
-    key: "serverAuthenticationValue",
+    key: "serverPassword",
     get: function get() {
       return this.content.pw;
     }
@@ -6202,6 +6283,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash/pick */ "./node_modules/lodash/pick.js");
+/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash_pick__WEBPACK_IMPORTED_MODULE_7__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
@@ -6221,6 +6304,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -6677,7 +6761,7 @@ function (_SNProtocolOperator) {
                         params.enc_item_key = item.enc_item_key;
 
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, lodash_pick__WEBPACK_IMPORTED_MODULE_7___default()(item, additionalFields));
                         }
 
                         return _context7.abrupt("return");
@@ -6730,7 +6814,7 @@ function (_SNProtocolOperator) {
 
                       case 25:
                         if (additionalFields) {
-                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, pick(item, additionalFields));
+                          lodash_merge__WEBPACK_IMPORTED_MODULE_6___default()(params, lodash_pick__WEBPACK_IMPORTED_MODULE_7___default()(item, additionalFields));
                         }
 
                         if (omitFields) {
@@ -6747,8 +6831,8 @@ function (_SNProtocolOperator) {
                 });
               };
 
-              additionalFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentLocalStorage"] ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
-              omitFields = intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentFile"] && !includeDeleted ? ["deleted"] : null;
+              additionalFields = Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["isLocalStorageIntent"])(intent) ? ["dirty", "dirtiedDate", "errorDecrypting"] : null;
+              omitFields = Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["isFileIntent"])(intent) && !includeDeleted ? ["deleted"] : null;
               _context8.next = 6;
               return regeneratorRuntime.awrap(computeParams(additionalFields, omitFields));
 
@@ -6946,7 +7030,7 @@ function (_SNKeyContent) {
       return this.content.mk;
     }
   }, {
-    key: "serverAuthenticationValue",
+    key: "serverPassword",
     get: function get() {
       return this.content.pw;
     }
@@ -7262,7 +7346,7 @@ function (_SNKeyContent) {
       return this.content.masterKey;
     }
   }, {
-    key: "serverAuthenticationValue",
+    key: "serverPassword",
     get: function get() {
       return this.content.serverPassword;
     }
@@ -7348,10 +7432,11 @@ function (_SNRootKeyParams) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return SNProtocolOperator004; });
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
-/* harmony import */ var _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemKey */ "./lib/models/keys/itemKey.js");
+/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
 /* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
 /* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7369,6 +7454,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -7521,15 +7607,15 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
     /**
-     * Creates a new random SNItemKey to use for item encryption. The consumer must save/sync this item.
-     * @returns  A new SNItemKey
+     * Creates a new random SNItemsKey to use for item encryption. The consumer must save/sync this item.
+     * @returns  A new SNItemsKey
      */
 
   }, {
-    key: "createItemKey",
-    value: function createItemKey() {
-      var rawKey, version, content, itemKey;
-      return regeneratorRuntime.async(function createItemKey$(_context4) {
+    key: "createItemsKey",
+    value: function createItemsKey() {
+      var rawKey, version, content, itemsKey;
+      return regeneratorRuntime.async(function createItemsKey$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
@@ -7543,14 +7629,14 @@ function (_SNProtocolOperator) {
                 itemsKey: rawKey,
                 version: version
               };
-              itemKey = new _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_1__["SNItemKey"]({
+              itemsKey = new _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]({
                 content: content
               });
               _context4.next = 8;
-              return regeneratorRuntime.awrap(itemKey.initUUID());
+              return regeneratorRuntime.awrap(itemsKey.initUUID());
 
             case 8:
-              return _context4.abrupt("return", itemKey);
+              return _context4.abrupt("return", itemsKey);
 
             case 9:
             case "end":
@@ -7678,38 +7764,47 @@ function (_SNProtocolOperator) {
           switch (_context7.prev = _context7.next) {
             case 0:
               item = _ref6.item, key = _ref6.key;
+
+              if (!(key.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_5__["SN_ROOT_KEY_CONTENT_TYPE"])) {
+                _context7.next = 3;
+                break;
+              }
+
+              throw 'Attempting to encrypt item with root key instead of items key.';
+
+            case 3:
               EncryptionKeyLength = 256;
-              _context7.next = 4;
+              _context7.next = 6;
               return regeneratorRuntime.awrap(this.crypto.generateRandomKey(EncryptionKeyLength));
 
-            case 4:
+            case 6:
               item_key = _context7.sent;
               // Encrypt content with item_key
               contentPlaintext = JSON.stringify(item.createContentJSONFromProperties());
-              _context7.next = 8;
+              _context7.next = 10;
               return regeneratorRuntime.awrap(this.generateEncryptedPayloadString({
                 plaintext: contentPlaintext,
-                key: item_key,
+                rawKey: item_key,
                 itemUuid: item.uuid
               }));
 
-            case 8:
+            case 10:
               encryptedPayloadString = _context7.sent;
-              _context7.next = 11;
+              _context7.next = 13;
               return regeneratorRuntime.awrap(this.generateEncryptedPayloadString({
                 plaintext: item_key,
-                key: key.itemsKey,
+                rawKey: key.itemsKey,
                 itemUuid: item.uuid
               }));
 
-            case 11:
+            case 13:
               encryptedItemKey = _context7.sent;
               return _context7.abrupt("return", {
                 content: encryptedPayloadString,
                 enc_item_key: encryptedItemKey
               });
 
-            case 13:
+            case 15:
             case "end":
               return _context7.stop();
           }
@@ -7724,7 +7819,7 @@ function (_SNProtocolOperator) {
   }, {
     key: "decryptItem",
     value: function decryptItem(_ref7) {
-      var item, key, itemKeyParams, item_key, itemParams, content;
+      var item, key, itemKeyComponents, item_key, itemParams, content;
       return regeneratorRuntime.async(function decryptItem$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
@@ -7764,9 +7859,9 @@ function (_SNProtocolOperator) {
 
             case 15:
               // Decrypt item_key payload.
-              itemKeyParams = this.deconstructEncryptedPayloadString(item.enc_item_key); // return if uuid in auth hash does not match item uuid. Signs of tampering.
+              itemKeyComponents = this.deconstructEncryptedPayloadString(item.enc_item_key); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
-              if (!(itemKeyParams.uuid && itemKeyParams.uuid !== item.uuid)) {
+              if (!(itemKeyComponents.uuid && itemKeyComponents.uuid !== item.uuid)) {
                 _context8.next = 21;
                 break;
               }
@@ -7783,12 +7878,12 @@ function (_SNProtocolOperator) {
             case 21:
               _context8.next = 23;
               return regeneratorRuntime.awrap(this.decryptText({
-                ciphertext: itemKeyParams.ciphertext,
+                ciphertext: itemKeyComponents.ciphertext,
                 key: key.itemsKey,
-                iv: itemKeyParams.iv,
+                iv: itemKeyComponents.iv,
                 aad: {
                   u: item.uuid,
-                  v: itemKeyParams.version
+                  v: itemKeyComponents.version
                 }
               }));
 
@@ -7882,12 +7977,12 @@ function (_SNProtocolOperator) {
   }, {
     key: "generateEncryptedPayloadString",
     value: function generateEncryptedPayloadString(_ref8) {
-      var plaintext, key, itemUuid, version, iv, ciphertext, payload;
+      var plaintext, rawKey, itemUuid, version, iv, ciphertext, payload;
       return regeneratorRuntime.async(function generateEncryptedPayloadString$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              plaintext = _ref8.plaintext, key = _ref8.key, itemUuid = _ref8.itemUuid;
+              plaintext = _ref8.plaintext, rawKey = _ref8.rawKey, itemUuid = _ref8.itemUuid;
               version = this.constructor.versionString();
               _context9.next = 4;
               return regeneratorRuntime.awrap(this.crypto.generateRandomKey(96));
@@ -7897,7 +7992,7 @@ function (_SNProtocolOperator) {
               _context9.next = 7;
               return regeneratorRuntime.awrap(this.encryptText({
                 plaintext: plaintext,
-                key: key,
+                rawKey: rawKey,
                 iv: iv,
                 aad: {
                   u: itemUuid,
@@ -7963,7 +8058,8 @@ function (_SNProtocolOperator) {
                 masterKey: masterKey,
                 serverPassword: serverPassword,
                 version: this.constructor.versionString()
-              }; // TODO: HKDF each key to domain-seperate.
+              };
+              /** @todo: HKDF each key to domain-seperate. */
 
               key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].FromRaw(params);
               return _context10.abrupt("return", key);
@@ -8038,7 +8134,7 @@ function () {
   _createClass(SNKeyContent, [{
     key: "compare",
     value: function compare(otherContents) {
-      return this.masterKey === otherContents.masterKey && this.itemsKey === otherContents.itemsKey && this.serverAuthenticationValue === otherContents.serverAuthenticationValue;
+      return this.masterKey === otherContents.masterKey && this.itemsKey === otherContents.itemsKey && this.serverPassword === otherContents.serverPassword;
     }
   }]);
 
@@ -8540,7 +8636,7 @@ function () {
     value: function register(_ref2) {
       var _this4 = this;
 
-      var url, email, password, ephemeral, MinPasswordLength, message, results, rootKey, keyParams, requestUrl, params;
+      var url, email, password, ephemeral, MinPasswordLength, message, result, rootKey, keyParams, requestUrl, params;
       return regeneratorRuntime.async(function register$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
@@ -8582,12 +8678,12 @@ function () {
               }));
 
             case 10:
-              results = _context8.sent;
-              rootKey = results.key;
-              keyParams = results.keyParams;
+              result = _context8.sent;
+              rootKey = result.key;
+              keyParams = result.keyParams;
               requestUrl = url + '/auth';
               params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
-                password: rootKey.serverAuthenticationValue,
+                password: rootKey.serverPassword,
                 email: email,
                 api: _Services_httpManager__WEBPACK_IMPORTED_MODULE_3__["SFHttpManager"].getApiVersion()
               }, keyParams);
@@ -8607,7 +8703,7 @@ function () {
 
                       case 2:
                         _context7.next = 4;
-                        return regeneratorRuntime.awrap(_this4.keyManager.createNewItemKey());
+                        return regeneratorRuntime.awrap(_this4.keyManager.createNewItemsKey());
 
                       case 4:
                         _context7.next = 6;
@@ -8661,7 +8757,7 @@ function () {
     value: function login(_ref3) {
       var _this5 = this;
 
-      var url, email, password, strict, ephemeral, extraParams, keyParamsResponse, keyParams, message, _message, abort, _message2, minimum, _message3, latestVersion, _message4, key, requestUrl, params;
+      var url, email, password, strict, ephemeral, extraParams, keyParamsResponse, keyParams, message, _message, abort, _message2, minimum, _message3, latestVersion, _message4, rootKey, requestUrl, params;
 
       return regeneratorRuntime.async(function login$(_context10) {
         while (1) {
@@ -8833,10 +8929,10 @@ function () {
               }));
 
             case 46:
-              key = _context10.sent;
+              rootKey = _context10.sent;
               requestUrl = url + '/auth/sign_in';
               params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
-                password: key.serverAuthenticationValue,
+                password: rootKey.serverPassword,
                 email: email,
                 api: _Services_httpManager__WEBPACK_IMPORTED_MODULE_3__["SFHttpManager"].getApiVersion()
               }, extraParams);
@@ -8851,7 +8947,7 @@ function () {
                           email: email,
                           url: url,
                           keyParams: keyParams,
-                          rootKey: key
+                          rootKey: rootKey
                         }));
 
                       case 2:
@@ -8908,12 +9004,12 @@ function () {
     value: function changePassword(_ref4) {
       var _this6 = this;
 
-      var url, email, current_server_pw, newKey, newKeyParams, newServerPw, requestUrl, params;
+      var url, email, serverPassword, newRootKey, newRootKeyParams, currentServerPassword, newServerPassword, requestUrl, params;
       return regeneratorRuntime.async(function changePassword$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
-              url = _ref4.url, email = _ref4.email, current_server_pw = _ref4.current_server_pw, newKey = _ref4.newKey, newKeyParams = _ref4.newKeyParams;
+              url = _ref4.url, email = _ref4.email, serverPassword = _ref4.serverPassword, newRootKey = _ref4.newRootKey, newRootKeyParams = _ref4.newRootKeyParams;
 
               if (!this.isLocked()) {
                 _context13.next = 3;
@@ -8928,13 +9024,14 @@ function () {
 
             case 3:
               this.lock();
-              newServerPw = newKey.serverAuthenticationValue;
+              currentServerPassword = serverPassword;
+              newServerPassword = newRootKey.serverPassword;
               requestUrl = url + '/auth/change_pw';
               params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()({
-                new_password: newServerPw,
-                current_password: current_server_pw,
+                new_password: newServerPassword,
+                current_password: serverPassword,
                 api: _Services_httpManager__WEBPACK_IMPORTED_MODULE_3__["SFHttpManager"].getApiVersion()
-              }, newKeyParams);
+              }, newRootKeyParams);
               return _context13.abrupt("return", this.httpManager.postAuthenticatedAbsolute(requestUrl, params).then(function _callee5(response) {
                 return regeneratorRuntime.async(function _callee5$(_context11) {
                   while (1) {
@@ -8944,16 +9041,20 @@ function () {
                         return regeneratorRuntime.awrap(_this6.handleAuthResponse({
                           response: response,
                           email: email,
-                          keyParams: newKeyParams,
-                          rootKey: newKey
+                          keyParams: newRootKeyParams,
+                          rootKey: newRootKey
                         }));
 
                       case 2:
+                        _context11.next = 4;
+                        return regeneratorRuntime.awrap(_this6.keyManager.createNewItemsKey());
+
+                      case 4:
                         _this6.unlock();
 
                         return _context11.abrupt("return", _this6.returnAfterTimeout(response));
 
-                      case 4:
+                      case 6:
                       case "end":
                         return _context11.stop();
                     }
@@ -8984,7 +9085,7 @@ function () {
                 });
               }));
 
-            case 8:
+            case 9:
             case "end":
               return _context13.stop();
           }
@@ -11805,20 +11906,19 @@ function () {
 /*!************************************!*\
   !*** ./lib/services/keyManager.js ***!
   \************************************/
-/*! exports provided: ITEM_KEY_CONTENT_TYPE, ROOT_KEY_CONTENT_TYPE, SNKeyManager */
+/*! exports provided: SNKeyManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ITEM_KEY_CONTENT_TYPE", function() { return ITEM_KEY_CONTENT_TYPE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_CONTENT_TYPE", function() { return ROOT_KEY_CONTENT_TYPE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return SNKeyManager; });
-/* harmony import */ var _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/itemKey */ "./lib/models/keys/itemKey.js");
+/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
 /* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/uniq */ "./node_modules/lodash/uniq.js");
 /* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -11830,8 +11930,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var ITEM_KEY_CONTENT_TYPE = 'SN|ItemKey';
-var ROOT_KEY_CONTENT_TYPE = 'SN|RootKey|NoSync';
+
 var SNKeyManager =
 /*#__PURE__*/
 function () {
@@ -11851,12 +11950,12 @@ function () {
     this.protocolManager = protocolManager;
     this.modelManager = modelManager;
     this.storageManager = storageManager;
-    this.itemKeys = [];
-    this.itemKeyObservers = [];
-    this.modelManager.addItemSyncObserver('key-manager', [ITEM_KEY_CONTENT_TYPE], function (allItems) {
-      _this.itemKeys = lodash_uniq__WEBPACK_IMPORTED_MODULE_3___default()(_this.itemKeys.concat(allItems));
+    this.itemsKeys = [];
+    this.itemsKeyObservers = [];
+    this.modelManager.addItemSyncObserver('key-manager', [_Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ITEMS_KEY_CONTENT_TYPE"]], function (allItems) {
+      _this.itemsKeys = lodash_uniq__WEBPACK_IMPORTED_MODULE_3___default()(_this.itemsKeys.concat(allItems));
 
-      _this.notifyItemKeyObserversOfItemKeys(_this.itemKeys);
+      _this.notifyItemsKeyObserversOfItemsKeys(_this.itemsKeys);
     }); // Hide rootKey enumeration
 
     Object.defineProperty(this, 'rootKey', {
@@ -11877,26 +11976,26 @@ function () {
 
 
   _createClass(SNKeyManager, [{
-    key: "addItemKeyChangeObserver",
-    value: function addItemKeyChangeObserver(_ref2) {
+    key: "addItemsKeyChangeObserver",
+    value: function addItemsKeyChangeObserver(_ref2) {
       var name = _ref2.name,
           callback = _ref2.callback;
-      this.itemKeyObservers.push({
+      this.itemsKeyObservers.push({
         name: name,
         callback: callback
       });
     }
   }, {
-    key: "notifyItemKeyObserversOfItemKeys",
-    value: function notifyItemKeyObserversOfItemKeys(itemKeys) {
+    key: "notifyItemsKeyObserversOfItemsKeys",
+    value: function notifyItemsKeyObserversOfItemsKeys(itemsKeys) {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = this.itemKeyObservers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = this.itemsKeyObservers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var observer = _step.value;
-          observer.callback(itemKeys);
+          observer.callback(itemsKeys);
         }
       } catch (err) {
         _didIteratorError = true;
@@ -11914,7 +12013,7 @@ function () {
       }
     }
     /**
-     * @returns All SN|ItemKey objects synced to the account.
+     * @returns All SN|ItemsKey objects synced to the account.
      */
 
   }, {
@@ -11931,10 +12030,10 @@ function () {
       this.keychainDelegate = delegate;
     }
   }, {
-    key: "getRootKeyFromKeychain",
-    value: function getRootKeyFromKeychain() {
+    key: "loadRootKeyFromKeychain",
+    value: function loadRootKeyFromKeychain() {
       var rawKey;
-      return regeneratorRuntime.async(function getRootKeyFromKeychain$(_context) {
+      return regeneratorRuntime.async(function loadRootKeyFromKeychain$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
@@ -11952,9 +12051,7 @@ function () {
               throw 'Attempting to load non-existent root key from keychain.';
 
             case 5:
-              return _context.abrupt("return", new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"]({
-                content: rawKey
-              }));
+              return _context.abrupt("return", new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].FromRaw(rawKey));
 
             case 6:
             case "end":
@@ -12001,7 +12098,7 @@ function () {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              return _context3.abrupt("return", this.storage.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY"]));
+              return _context3.abrupt("return", this.storage.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 1:
             case "end":
@@ -12104,7 +12201,7 @@ function () {
 
             case 6:
               _context6.next = 8;
-              return regeneratorRuntime.awrap(this.getRootKeyFromKeychain());
+              return regeneratorRuntime.awrap(this.loadRootKeyFromKeychain());
 
             case 8:
               this.rootKey = _context6.sent;
@@ -12141,7 +12238,7 @@ function () {
 
             case 3:
               _context7.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY_KEY_PARAMS"], keyParams));
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_KEY_PARAMS"], keyParams));
 
             case 5:
               rootKey = this.rootKey;
@@ -12149,13 +12246,13 @@ function () {
               return regeneratorRuntime.awrap(this.protocolManager.generateExportParameters({
                 item: rootKey,
                 key: wrappingKey,
-                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentLocalStorage"]
+                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntentLocalStorageEncrypted"]
               }));
 
             case 8:
               wrappedKey = _context7.sent;
               _context7.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY"], wrappedKey));
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey));
 
             case 11:
               _context7.next = 13;
@@ -12202,11 +12299,11 @@ function () {
 
             case 7:
               _context8.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 9:
               _context8.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_KEY_PARAMS"]));
 
             case 11:
               _context8.next = 13;
@@ -12235,12 +12332,12 @@ function () {
             case 0:
               key = _ref5.key, keyParams = _ref5.keyParams;
 
-              if (!(key.content_type !== ROOT_KEY_CONTENT_TYPE)) {
+              if (!(key.content_type !== _Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ROOT_KEY_CONTENT_TYPE"])) {
                 _context9.next = 3;
                 break;
               }
 
-              throw "Root key must be a ".concat(ROOT_KEY_CONTENT_TYPE, " object.");
+              throw "Root key must be a ".concat(_Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ROOT_KEY_CONTENT_TYPE"], " object.");
 
             case 3:
               if (keyParams) {
@@ -12253,7 +12350,7 @@ function () {
             case 5:
               this.rootKey = key;
               _context9.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["ROOT_KEY_KEY_PARAMS"], keyParams.content));
+              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_KEY_PARAMS"], keyParams));
 
             case 8:
               _context9.next = 10;
@@ -12273,19 +12370,21 @@ function () {
   }, {
     key: "getRootKey",
     value: function getRootKey() {
-      var rootValue;
       return regeneratorRuntime.async(function getRootKey$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
-              _context10.next = 2;
-              return regeneratorRuntime.awrap(this.delegate.getKeyChainValue());
+              if (this.rootKey) {
+                _context10.next = 2;
+                break;
+              }
+
+              throw 'Attempting to access non-existing root key';
 
             case 2:
-              rootValue = _context10.sent;
-              return _context10.abrupt("return", new SNRootKeys(rootValue));
+              return _context10.abrupt("return", this.rootKey);
 
-            case 4:
+            case 3:
             case "end":
               return _context10.stop();
           }
@@ -12308,15 +12407,15 @@ function () {
 
             case 2:
               _context11.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 4:
               _context11.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["WRAPPED_ROOT_KEY_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_KEY_PARAMS"]));
 
             case 6:
               _context11.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["ROOT_KEY_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_KEY_PARAMS"]));
 
             case 8:
             case "end":
@@ -12336,7 +12435,7 @@ function () {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              return _context12.abrupt("return", this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["ROOT_KEY_KEY_PARAMS"]));
+              return _context12.abrupt("return", this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_KEY_PARAMS"]));
 
             case 1:
             case "end":
@@ -12386,25 +12485,25 @@ function () {
       }, null, this);
     }
     /**
-     * Creates a new random SNItemKey to use for item encryption, and adds it to model management.
+     * Creates a new random SNItemsKey to use for item encryption, and adds it to model management.
      * Consumer must call sync.
      */
 
   }, {
-    key: "createNewItemKey",
-    value: function createNewItemKey() {
-      var itemKey;
-      return regeneratorRuntime.async(function createNewItemKey$(_context14) {
+    key: "createNewItemsKey",
+    value: function createNewItemsKey() {
+      var itemsKey;
+      return regeneratorRuntime.async(function createNewItemsKey$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
               _context14.next = 2;
-              return regeneratorRuntime.awrap(this.protocolManager.defaultOperator().createItemKey());
+              return regeneratorRuntime.awrap(this.protocolManager.defaultOperator().createItemsKey());
 
             case 2:
-              itemKey = _context14.sent;
-              itemKey.setDirty(true);
-              this.modelManager.addItem(itemKey);
+              itemsKey = _context14.sent;
+              itemsKey.setDirty(true);
+              this.modelManager.addItem(itemsKey);
 
             case 5:
             case "end":
@@ -12414,17 +12513,17 @@ function () {
       }, null, this);
     }
     /**
-     * @returns The SNItemKey object to use to encrypt new or updated items.
+     * @returns The SNItemsKey object to use to encrypt new or updated items.
      */
 
   }, {
-    key: "getDefaultItemKey",
-    value: function getDefaultItemKey() {
-      return regeneratorRuntime.async(function getDefaultItemKey$(_context15) {
+    key: "getDefaultItemsKey",
+    value: function getDefaultItemsKey() {
+      return regeneratorRuntime.async(function getDefaultItemsKey$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
-              return _context15.abrupt("return", this.itemKeys.find(function (key) {
+              return _context15.abrupt("return", this.itemsKeys.find(function (key) {
                 return key.isDefault === true;
               }));
 
@@ -12436,19 +12535,19 @@ function () {
       }, null, this);
     }
     /**
-     * When migrating from non-SNItemKey architecture, many items will not have a relationship with any key object.
+     * When migrating from non-SNItemsKey architecture, many items will not have a relationship with any key object.
      * For those items, we can be sure that only 1 key object will correspond to that protocol version.
-     * @returns The SNItemKey object to decrypt items encrypted with previous protocol version.
+     * @returns The SNItemsKey object to decrypt items encrypted with previous protocol version.
      */
 
   }, {
-    key: "defaultItemKeyForProtocolVersion",
-    value: function defaultItemKeyForProtocolVersion(version) {
-      return regeneratorRuntime.async(function defaultItemKeyForProtocolVersion$(_context16) {
+    key: "defaultItemsKeyForProtocolVersion",
+    value: function defaultItemsKeyForProtocolVersion(version) {
+      return regeneratorRuntime.async(function defaultItemsKeyForProtocolVersion$(_context16) {
         while (1) {
           switch (_context16.prev = _context16.next) {
             case 0:
-              return _context16.abrupt("return", this.itemKeys.find(function (key) {
+              return _context16.abrupt("return", this.itemsKeys.find(function (key) {
                 return key.version === version;
               }));
 
@@ -12460,13 +12559,13 @@ function () {
       }, null, this);
     }
     /**
-     * @param uuid  The uuid of the SNItemKey object to return
+     * @param uuid  The uuid of the SNItemsKey object to return
     */
 
   }, {
-    key: "getItemKeyForId",
-    value: function getItemKeyForId(uuid) {
-      return regeneratorRuntime.async(function getItemKeyForId$(_context17) {
+    key: "getItemsKeyForId",
+    value: function getItemsKeyForId(uuid) {
+      return regeneratorRuntime.async(function getItemsKeyForId$(_context17) {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
@@ -12480,9 +12579,9 @@ function () {
       }, null, this);
     }
     /**
-     * @returns  The SNItemKey object to use for encrypting this item.
-                 For regular items, should be equal too this.getDefaultItemKey.
-                 For SNItemKey items, should be equal to root keys.
+     * @returns  The SNItemsKey object to use for encrypting this item.
+                 For regular items, should be equal too this.getDefaultItemsKey.
+                 For SNItemsKey items, should be equal to root keys.
     */
 
   }, {
@@ -12503,7 +12602,7 @@ function () {
               throw 'Intent must be supplied when looking up key for encryption of item.';
 
             case 3:
-              if (!(item.content_type === ITEM_KEY_CONTENT_TYPE)) {
+              if (!(item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ITEMS_KEY_CONTENT_TYPE"])) {
                 _context18.next = 7;
                 break;
               }
@@ -12519,7 +12618,7 @@ function () {
               return _context18.abrupt("return", null);
 
             case 9:
-              return _context18.abrupt("return", this.getDefaultItemKey());
+              return _context18.abrupt("return", this.getDefaultItemsKey());
 
             case 10:
             case "end":
@@ -12529,12 +12628,12 @@ function () {
       }, null, this);
     }
     /**
-     * Items could have been previously encrypted with any arbitrary SNItemKey object.
+     * Items could have been previously encrypted with any arbitrary SNItemsKey object.
      * If the item is a key object, it is always encrypted with the root key, and so return that.
      * Otherwise, we check to see if the item has a relationship with any given key.
      * If it doesn't, this means the item was encrypted with legacy behavior. We return then
      * the key object corresponding to the protocol version of this item.
-     * @returns  The SNItemKey object to use for decrypting this item.
+     * @returns  The SNItemsKey object to use for decrypting this item.
     */
 
   }, {
@@ -12547,7 +12646,7 @@ function () {
             case 0:
               item = _ref7.item;
 
-              if (!(item.content_type === ITEM_KEY_CONTENT_TYPE)) {
+              if (!(item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ITEMS_KEY_CONTENT_TYPE"])) {
                 _context19.next = 3;
                 break;
               }
@@ -12556,7 +12655,7 @@ function () {
 
             case 3:
               matchingReference = item.content.references.find(function (ref) {
-                return ref.content_type === ITEM_KEY_CONTENT_TYPE;
+                return ref.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_4__["SN_ITEMS_KEY_CONTENT_TYPE"];
               });
 
               if (!matchingReference) {
@@ -12568,7 +12667,7 @@ function () {
 
             case 6:
               itemProtocolVersion = protocolManager.versionForItem(item);
-              return _context19.abrupt("return", this.defaultItemKeyForProtocolVersion(itemProtocolVersion));
+              return _context19.abrupt("return", this.defaultItemsKeyForProtocolVersion(itemProtocolVersion));
 
             case 8:
             case "end":
@@ -12600,9 +12699,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "allItemKeys",
+    key: "allItemsKeys",
     get: function get() {
-      return this.itemKeys;
+      return this.itemsKeys;
     }
   }]);
 
@@ -13352,20 +13451,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash_includes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/includes */ "./node_modules/lodash/includes.js");
 /* harmony import */ var lodash_includes__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_includes__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/keys/itemKey */ "./lib/models/keys/itemKey.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
-/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.js");
-/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.js");
-/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.js");
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
-/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony import */ var _Models_server_mfa__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/server/mfa */ "./lib/models/server/mfa.js");
-/* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
-/* harmony import */ var _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.js");
+/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.js");
+/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.js");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony import */ var _Models_server_mfa__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/server/mfa */ "./lib/models/server/mfa.js");
+/* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
+/* harmony import */ var _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
+/* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -13379,6 +13479,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -13416,17 +13517,17 @@ function () {
 
     SFModelManager.MappingSourceFileImport = "MappingSourceFileImport";
     SFModelManager.ContentTypeClassMapping = {
-      "Note": _Models_app_note__WEBPACK_IMPORTED_MODULE_10__["SNNote"],
-      "Tag": _Models_app_tag__WEBPACK_IMPORTED_MODULE_11__["SNTag"],
-      "SNItemKey": _Models_keys_itemKey__WEBPACK_IMPORTED_MODULE_5__["SNItemKey"],
-      "SN|SmartTag": _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_15__["SNSmartTag"],
-      "Extension": _Models_app_extension__WEBPACK_IMPORTED_MODULE_9__["SNExtension"],
-      "SN|Editor": _Models_app_editor__WEBPACK_IMPORTED_MODULE_8__["SNEditor"],
-      "SN|Theme": _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_16__["SNTheme"],
-      "SN|Component": _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["SNComponent"],
-      "SF|Extension": _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__["SNServerExtension"],
-      "SF|MFA": _Models_server_mfa__WEBPACK_IMPORTED_MODULE_13__["SNMfa"],
-      "SN|Privileges": _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_12__["SFPrivileges"]
+      "Note": _Models_app_note__WEBPACK_IMPORTED_MODULE_11__["SNNote"],
+      "Tag": _Models_app_tag__WEBPACK_IMPORTED_MODULE_12__["SNTag"],
+      SN_ITEMS_KEY_CONTENT_TYPE: _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_6__["SNItemsKey"],
+      "SN|SmartTag": _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_16__["SNSmartTag"],
+      "Extension": _Models_app_extension__WEBPACK_IMPORTED_MODULE_10__["SNExtension"],
+      "SN|Editor": _Models_app_editor__WEBPACK_IMPORTED_MODULE_9__["SNEditor"],
+      "SN|Theme": _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_17__["SNTheme"],
+      "SN|Component": _Models_app_component__WEBPACK_IMPORTED_MODULE_8__["SNComponent"],
+      "SF|Extension": _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_15__["SNServerExtension"],
+      "SF|MFA": _Models_server_mfa__WEBPACK_IMPORTED_MODULE_14__["SNMfa"],
+      "SN|Privileges": _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_13__["SFPrivileges"]
     };
 
     SFModelManager.isMappingSourceRetrieved = function (source) {
@@ -13500,7 +13601,7 @@ function () {
               // We need to clone this item and give it a new uuid, then delete item with old uuid from db (you can't modify uuid's in our indexeddb setup)
               newItem = this.createItem(item);
               _context.next = 3;
-              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SFItem"].GenerateUuid());
+              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_5__["SFItem"].GenerateUuid());
 
             case 3:
               newItem.uuid = _context.sent;
@@ -14339,7 +14440,7 @@ function () {
       var itemClass = SFModelManager.ContentTypeClassMapping && SFModelManager.ContentTypeClassMapping[json_obj.content_type];
 
       if (!itemClass) {
-        itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SFItem"];
+        itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["SFItem"];
       }
 
       var item = new itemClass(json_obj);
@@ -14375,7 +14476,7 @@ function () {
               itemResponseCopy = JSON.parse(JSON.stringify(itemResponse));
               _context8.t0 = regeneratorRuntime;
               _context8.next = 7;
-              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SFItem"].GenerateUuid());
+              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_5__["SFItem"].GenerateUuid());
 
             case 7:
               _context8.t1 = _context8.sent;
@@ -15061,7 +15162,7 @@ function () {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentFile"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentFileDecrypted"];
+              intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_4__["EncryptionIntentFileEncrypted"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_4__["EncryptionIntentFileDecrypted"];
               return _context12.abrupt("return", Promise.all(items.map(function (item) {
                 return protocolManager.generateExportParameters({
                   item: item,
@@ -16440,35 +16541,27 @@ function () {
   }, {
     key: "generatePayload",
     value: function generatePayload() {
-      var rawPayload, item;
+      var rawPayload, intent, item;
       return regeneratorRuntime.async(function generatePayload$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
               rawPayload = Object.assign({}, this.localStorageValues);
-
-              if (!(this.localStorageEncryptionDisabled === true)) {
-                _context4.next = 5;
-                break;
-              }
-
-              return _context4.abrupt("return", rawPayload);
-
-            case 5:
+              intent = this.localStorageEncryptionDisabled ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["EncryptionIntentLocalStorageDecrypted"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["EncryptionIntentLocalStorageEncrypted"];
               item = new SFItem({
                 content: rawPayload,
                 content_type: STORAGE_CONTENT_TYPE
               });
-              _context4.next = 8;
+              _context4.next = 5;
               return regeneratorRuntime.awrap(this.protocolManager.encryptItem({
                 item: item,
-                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["EncryptionIntentLocalStorage"]
+                intent: intent
               }));
 
-            case 8:
+            case 5:
               return _context4.abrupt("return", item);
 
-            case 9:
+            case 6:
             case "end":
               return _context4.stop();
           }
@@ -16794,6 +16887,7 @@ function () {
         storageManager = _ref.storageManager,
         protocolManager = _ref.protocolManager,
         httpManager = _ref.httpManager,
+        authManager = _ref.authManager,
         timeout = _ref.timeout,
         interval = _ref.interval;
 
@@ -16802,10 +16896,16 @@ function () {
     SFSyncManager.KeyRequestLoadLocal = "KeyRequestLoadLocal";
     SFSyncManager.KeyRequestSaveLocal = "KeyRequestSaveLocal";
     SFSyncManager.KeyRequestLoadSaveAccount = "KeyRequestLoadSaveAccount";
+
+    if (!storageManager || !protocolManager || !modelManager || !httpManager || !authManager) {
+      throw 'Invalid SyncManager construction.';
+    }
+
     this.protocolManager = protocolManager;
     this.httpManager = httpManager;
     this.modelManager = modelManager;
-    this.storageManager = storageManager; // Allows you to set your own interval/timeout function (i.e if you're using angular and want to use $timeout)
+    this.storageManager = storageManager;
+    this.authManager = authManager; // Allows you to set your own interval/timeout function (i.e if you're using angular and want to use $timeout)
 
     this.$interval = interval || setInterval.bind(window);
     this.$timeout = timeout || setTimeout.bind(window);
@@ -17198,7 +17298,7 @@ function () {
 
             case 2:
               return _context9.abrupt("return", new Promise(function _callee3(resolve, reject) {
-                var nonDeletedItems, deletedItems, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, info, params;
+                var nonDeletedItems, deletedItems, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, params;
 
                 return regeneratorRuntime.async(function _callee3$(_context8) {
                   while (1) {
@@ -17277,18 +17377,12 @@ function () {
                         })));
 
                       case 23:
-                        _context8.next = 25;
-                        return regeneratorRuntime.awrap(_this4.getActiveKeyInfo(SFSyncManager.KeyRequestSaveLocal));
-
-                      case 25:
-                        info = _context8.sent;
-
                         if (!(nonDeletedItems.length > 0)) {
-                          _context8.next = 33;
+                          _context8.next = 30;
                           break;
                         }
 
-                        _context8.next = 29;
+                        _context8.next = 26;
                         return regeneratorRuntime.awrap(Promise.all(nonDeletedItems.map(function _callee2(item) {
                           var itemParams;
                           return regeneratorRuntime.async(function _callee2$(_context7) {
@@ -17298,7 +17392,7 @@ function () {
                                   _context7.next = 2;
                                   return regeneratorRuntime.awrap(_this4.protocolManager.generateExportParameters({
                                     item: item,
-                                    intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentLocalStorage"]
+                                    intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["EncryptionIntentLocalStoragePreferEncrypted"]
                                   }));
 
                                 case 2:
@@ -17317,12 +17411,13 @@ function () {
                             }
                           });
                         })).catch(function (e) {
-                          return reject(e);
+                          console.error("Error generating export parameters:", e);
+                          reject(e);
                         }));
 
-                      case 29:
+                      case 26:
                         params = _context8.sent;
-                        _context8.next = 32;
+                        _context8.next = 29;
                         return regeneratorRuntime.awrap(_this4.storageManager.saveModels(params).catch(function (error) {
                           console.error("Error writing items", error);
                           _this4.syncStatus.localError = error;
@@ -17332,7 +17427,7 @@ function () {
                           reject();
                         }));
 
-                      case 32:
+                      case 29:
                         // on success
                         if (_this4.syncStatus.localError) {
                           _this4.syncStatus.localError = null;
@@ -17340,10 +17435,10 @@ function () {
                           _this4.syncStatusDidChange();
                         }
 
-                      case 33:
+                      case 30:
                         resolve();
 
-                      case 34:
+                      case 31:
                       case "end":
                         return _context8.stop();
                     }
@@ -17805,7 +17900,7 @@ function () {
 
             case 4:
               return _context18.abrupt("return", new Promise(function _callee5(resolve, reject) {
-                var allDirtyItems, dirtyItemsNotYetSaved, info, isSyncInProgress, initialDataLoaded, isContinuationSync, submitLimit, subItems, params, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, item;
+                var allDirtyItems, dirtyItemsNotYetSaved, isSyncInProgress, initialDataLoaded, isContinuationSync, submitLimit, subItems, params, itemParams, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, item;
 
                 return regeneratorRuntime.async(function _callee5$(_context17) {
                   while (1) {
@@ -17816,25 +17911,20 @@ function () {
                         dirtyItemsNotYetSaved = allDirtyItems.filter(function (candidate) {
                           return !_this6.lastDirtyItemsSave || candidate.dirtiedDate > _this6.lastDirtyItemsSave;
                         });
-                        _context17.next = 5;
-                        return regeneratorRuntime.awrap(_this6.getActiveKeyInfo(SFSyncManager.KeyRequestLoadSaveAccount));
-
-                      case 5:
-                        info = _context17.sent;
                         isSyncInProgress = _this6.syncStatus.syncOpInProgress;
                         initialDataLoaded = _this6.initialDataLoaded();
 
                         if (!(isSyncInProgress || !initialDataLoaded)) {
-                          _context17.next = 16;
+                          _context17.next = 13;
                           break;
                         }
 
                         _this6.performSyncAgainOnCompletion = true;
                         _this6.lastDirtyItemsSave = new Date();
-                        _context17.next = 13;
+                        _context17.next = 10;
                         return regeneratorRuntime.awrap(_this6.writeItemsToLocalStorage(dirtyItemsNotYetSaved, false));
 
-                      case 13:
+                      case 10:
                         if (isSyncInProgress) {
                           _this6.queuedCallbacks.push(resolve);
 
@@ -17854,12 +17944,12 @@ function () {
 
                         return _context17.abrupt("return");
 
-                      case 16:
+                      case 13:
                         // Set this value immediately after checking it above, to avoid race conditions.
                         _this6.syncStatus.syncOpInProgress = true;
 
-                        if (!info.offline) {
-                          _context17.next = 19;
+                        if (!_this6.authManager.offline()) {
+                          _context17.next = 16;
                           break;
                         }
 
@@ -17870,16 +17960,16 @@ function () {
                           _this6.notifyEvent("sync-exception", e);
                         }));
 
-                      case 19:
+                      case 16:
                         if (_this6.initialDataLoaded()) {
-                          _context17.next = 22;
+                          _context17.next = 19;
                           break;
                         }
 
                         console.error("Attempting to perform online sync before local data has loaded");
                         return _context17.abrupt("return");
 
-                      case 22:
+                      case 19:
                         if (_this6.loggingEnabled) {
                           console.log("Syncing online user.");
                         }
@@ -17915,10 +18005,10 @@ function () {
                         // This way, if they close the browser before the sync request completes, local changes will not be lost
 
 
-                        _context17.next = 34;
+                        _context17.next = 31;
                         return regeneratorRuntime.awrap(_this6.writeItemsToLocalStorage(dirtyItemsNotYetSaved, false));
 
-                      case 34:
+                      case 31:
                         _this6.lastDirtyItemsSave = new Date();
 
                         if (options.onPreSyncSave) {
@@ -17946,8 +18036,8 @@ function () {
                           params.compute_integrity = true;
                         }
 
-                        _context17.prev = 41;
-                        _context17.next = 44;
+                        _context17.prev = 38;
+                        _context17.next = 41;
                         return regeneratorRuntime.awrap(Promise.all(subItems.map(function _callee4(item) {
                           var itemParams;
                           return regeneratorRuntime.async(function _callee4$(_context16) {
@@ -17970,17 +18060,18 @@ function () {
                               }
                             }
                           });
-                        })).then(function (itemsParams) {
-                          params.items = itemsParams;
-                        }));
+                        })));
 
-                      case 44:
+                      case 41:
+                        itemParams = _context17.sent;
+                        params.items = itemParams;
                         _context17.next = 49;
                         break;
 
-                      case 46:
-                        _context17.prev = 46;
-                        _context17.t0 = _context17["catch"](41);
+                      case 45:
+                        _context17.prev = 45;
+                        _context17.t0 = _context17["catch"](38);
+                        console.error("Error generating sync item params", _context17.t0);
 
                         _this6.notifyEvent("sync-exception", _context17.t0);
 
@@ -18091,7 +18182,7 @@ function () {
                         return _context17.stop();
                     }
                   }
-                }, null, null, [[41, 46], [52, 56, 60, 68], [61,, 63, 67], [76, 87]]);
+                }, null, null, [[38, 45], [52, 56, 60, 68], [61,, 63, 67], [76, 87]]);
               }));
 
             case 5:
@@ -21564,6 +21655,78 @@ module.exports = baseMergeDeep;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_basePick.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_basePick.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var basePickBy = __webpack_require__(/*! ./_basePickBy */ "./node_modules/lodash/_basePickBy.js"),
+    hasIn = __webpack_require__(/*! ./hasIn */ "./node_modules/lodash/hasIn.js");
+/**
+ * The base implementation of `_.pick` without support for individual
+ * property identifiers.
+ *
+ * @private
+ * @param {Object} object The source object.
+ * @param {string[]} paths The property paths to pick.
+ * @returns {Object} Returns the new object.
+ */
+
+
+function basePick(object, paths) {
+  return basePickBy(object, paths, function (value, path) {
+    return hasIn(object, path);
+  });
+}
+
+module.exports = basePick;
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_basePickBy.js":
+/*!********************************************!*\
+  !*** ./node_modules/lodash/_basePickBy.js ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/lodash/_baseGet.js"),
+    baseSet = __webpack_require__(/*! ./_baseSet */ "./node_modules/lodash/_baseSet.js"),
+    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js");
+/**
+ * The base implementation of  `_.pickBy` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Object} object The source object.
+ * @param {string[]} paths The property paths to pick.
+ * @param {Function} predicate The function invoked per property.
+ * @returns {Object} Returns the new object.
+ */
+
+
+function basePickBy(object, paths, predicate) {
+  var index = -1,
+      length = paths.length,
+      result = {};
+
+  while (++index < length) {
+    var path = paths[index],
+        value = baseGet(object, path);
+
+    if (predicate(value, path)) {
+      baseSet(result, castPath(path, object), value);
+    }
+  }
+
+  return result;
+}
+
+module.exports = basePickBy;
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseProperty.js":
 /*!**********************************************!*\
   !*** ./node_modules/lodash/_baseProperty.js ***!
@@ -21757,6 +21920,65 @@ function baseRest(func, start) {
 }
 
 module.exports = baseRest;
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseSet.js":
+/*!*****************************************!*\
+  !*** ./node_modules/lodash/_baseSet.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/lodash/_assignValue.js"),
+    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @param {Function} [customizer] The function to customize path creation.
+ * @returns {Object} Returns `object`.
+ */
+
+
+function baseSet(object, path, value, customizer) {
+  if (!isObject(object)) {
+    return object;
+  }
+
+  path = castPath(path, object);
+  var index = -1,
+      length = path.length,
+      lastIndex = length - 1,
+      nested = object;
+
+  while (nested != null && ++index < length) {
+    var key = toKey(path[index]),
+        newValue = value;
+
+    if (index != lastIndex) {
+      var objValue = nested[key];
+      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+
+      if (newValue === undefined) {
+        newValue = isObject(objValue) ? objValue : isIndex(path[index + 1]) ? [] : {};
+      }
+    }
+
+    assignValue(nested, key, newValue);
+    nested = nested[key];
+  }
+
+  return object;
+}
+
+module.exports = baseSet;
 
 /***/ }),
 
@@ -26825,6 +27047,41 @@ var omit = flatRest(function (object, paths) {
   return result;
 });
 module.exports = omit;
+
+/***/ }),
+
+/***/ "./node_modules/lodash/pick.js":
+/*!*************************************!*\
+  !*** ./node_modules/lodash/pick.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var basePick = __webpack_require__(/*! ./_basePick */ "./node_modules/lodash/_basePick.js"),
+    flatRest = __webpack_require__(/*! ./_flatRest */ "./node_modules/lodash/_flatRest.js");
+/**
+ * Creates an object composed of the picked `object` properties.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The source object.
+ * @param {...(string|string[])} [paths] The property paths to pick.
+ * @returns {Object} Returns the new object.
+ * @example
+ *
+ * var object = { 'a': 1, 'b': '2', 'c': 3 };
+ *
+ * _.pick(object, ['a', 'c']);
+ * // => { 'a': 1, 'c': 3 }
+ */
+
+
+var pick = flatRest(function (object, paths) {
+  return object == null ? {} : basePick(object, paths);
+});
+module.exports = pick;
 
 /***/ }),
 

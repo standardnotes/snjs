@@ -23,7 +23,13 @@ describe('migrations', () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
-    let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const syncManager = new SFSyncManager({
+      modelManager,
+      authManager,
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
@@ -70,7 +76,13 @@ describe('migrations', () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
-    let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const syncManager = new SFSyncManager({
+      modelManager,
+      authManager,
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     await syncManager.loadLocalItems();
 
@@ -125,7 +137,13 @@ describe('migrations', () => {
     await Factory.globalStorageManager().clearAllData();
     await Factory.globalStorageManager().setItem("server", Factory.serverURL());
     let modelManager = Factory.createModelManager();
-    let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const syncManager = new SFSyncManager({
+      modelManager,
+      authManager,
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 

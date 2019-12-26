@@ -12,7 +12,13 @@ var expect = chai.expect;
 
 const storageManager = Factory.createMemoryStorageManager();
 const modelManager = new SFModelManager();
-const syncManager = new SFSyncManager(modelManager, storageManager, Factory.globalHttpManager());
+const syncManager = new SFSyncManager({
+  modelManager,
+  authManager: Factory.globalAuthManager(),
+  storageManager: storageManager,
+  protocolManager: Factory.globalProtocolManager(),
+  httpManager: Factory.globalHttpManager()
+});
 const singletonManager = new SFSingletonManager(modelManager, syncManager);
 
 let privilegesManager = new SFPrivilegesManager(modelManager, syncManager, singletonManager);

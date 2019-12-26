@@ -20,7 +20,13 @@ describe('session history', () => {
 
   let authManager = Factory.globalAuthManager();
   let modelManager = Factory.createModelManager();
-  let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+  const syncManager = new SFSyncManager({
+    modelManager,
+    authManager,
+    storageManager: Factory.globalStorageManager(),
+    protocolManager: Factory.globalProtocolManager(),
+    httpManager: Factory.globalHttpManager()
+  });
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {

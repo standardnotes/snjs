@@ -40,7 +40,13 @@ describe("local storage manager", () => {
 
 describe('offline syncing', () => {
   let modelManager = Factory.createModelManager();
-  let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+  const syncManager = new SFSyncManager({
+    modelManager,
+    authManager: Factory.globalAuthManager(),
+    storageManager: Factory.globalStorageManager(),
+    protocolManager: Factory.globalProtocolManager(),
+    httpManager: Factory.globalHttpManager()
+  });
 
 
   beforeEach(async () => {
@@ -69,7 +75,13 @@ describe('offline syncing', () => {
 
   it("should allow local saving before offline data has loaded, and should not overwrite present values when finished loading", async () => {
     let localModelManager = Factory.createModelManager();
-    let localSyncManager = new SFSyncManager(localModelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const syncManager = new SFSyncManager({
+      modelManager,
+      authManager: Factory.globalAuthManager(),
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     var item = Factory.createItem();
     localModelManager.addItem(item);
@@ -127,7 +139,13 @@ describe('online syncing', () => {
   let authManager = Factory.globalAuthManager();
   let modelManager = Factory.createModelManager();
   let storageManager = Factory.globalStorageManager();
-  let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+  const syncManager = new SFSyncManager({
+    modelManager,
+    authManager,
+    storageManager: Factory.globalStorageManager(),
+    protocolManager: Factory.globalProtocolManager(),
+    httpManager: Factory.globalHttpManager()
+  });
   syncManager.MaxDiscordanceBeforeOutOfSync = 1;
 
   afterEach(async () => {
@@ -769,7 +787,13 @@ describe('online syncing', () => {
 
   it("load local items", async () => {
     let localModelManager = Factory.createModelManager();
-    let localSyncManager = new SFSyncManager(localModelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
+    const localSyncManager = new SFSyncManager({
+      modelManager: localModelManager,
+      authManager: Factory.globalAuthManager(),
+      storageManager: Factory.globalStorageManager(),
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
     expect(localModelManager.allItems.length).to.equal(0);
 
     await localSyncManager.loadLocalItems();
@@ -824,7 +848,13 @@ describe('online syncing', () => {
   it("load local items should respect sort priority", async () => {
     let localModelManager = Factory.createModelManager();
     let localStorageManager = Factory.createMemoryStorageManager();
-    let localSyncManager = new SFSyncManager(localModelManager, localStorageManager, Factory.globalHttpManager());
+    const localSyncManager = new SFSyncManager({
+      modelManager: localModelManager,
+      authManager: Factory.globalAuthManager(),
+      storageManager: localStorageManager,
+      protocolManager: Factory.globalProtocolManager(),
+      httpManager: Factory.globalHttpManager()
+    });
 
     let contentTypes = ["A", "B", "C"];
     let itemCount = 6;
@@ -1012,7 +1042,7 @@ describe('sync params', () => {
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      intent: EncryptionIntentLocalStorage
+      intent: EncryptionIntentLocalStorageEncrypted
     })
 
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1032,7 +1062,7 @@ describe('sync params', () => {
     var item = Factory.createItem();
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      intent: EncryptionIntentFile
+      intent: EncryptionIntentFileEncrypted
     })
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
@@ -1076,7 +1106,13 @@ describe('sync discordance', () => {
     return localStorageManager.getItem("jwt");;
   })
   let localModelManager = Factory.createModelManager();
-  let localSyncManager = new SFSyncManager(localModelManager, localStorageManager, localHttpManager);
+  const localSyncManager = new SFSyncManager({
+    modelManager: localModelManager,
+    authManager: Factory.globalAuthManager(),
+    storageManager: localStorageManager,
+    protocolManager: Factory.globalProtocolManager(),
+    httpManager: localHttpManager
+  });
 
   before((done) => {
     localStorageManager.clearAllData().then(() => {
