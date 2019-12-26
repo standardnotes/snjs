@@ -14,22 +14,13 @@ SFItemHistory.LargeEntryDeltaThreshold = 15;
 let largeCharacterChange = SFItemHistory.LargeEntryDeltaThreshold;
 
 describe('session history', () => {
-  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var email = SFItem.GenerateUuidSynchronously();
+  var password = SFItem.GenerateUuidSynchronously();
   var totalItemCount = 0;
 
   let authManager = Factory.globalAuthManager();
   let modelManager = Factory.createModelManager();
   let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-  var keyRequestHandler = async () => {
-    return {
-      keys: await authManager.keys(),
-      keyParams: await authManager.getKeyParams(),
-      offline: false
-    };
-  };
-
-  syncManager.setKeyRequestHandler(keyRequestHandler)
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
@@ -41,7 +32,7 @@ describe('session history', () => {
     })
   })
 
-  let historyManager = new SFSessionHistoryManager(modelManager, Factory.globalStorageManager(), keyRequestHandler, "*");
+  let historyManager = new SFSessionHistoryManager(modelManager, Factory.globalStorageManager(), "*");
   beforeEach((done) => {
     historyManager.clearAllHistory().then(done);
   })

@@ -9,7 +9,7 @@ var expect = chai.expect;
 
 const getNoteParams = () => {
   var params = {
-    uuid: protocolManager.crypto.generateUUIDSync(),
+    uuid: SFItem.GenerateUuidSynchronously(),
     content_type: "Note",
     content: {
       title: "hello",
@@ -22,7 +22,7 @@ const getNoteParams = () => {
 const createRelatedNoteTagPair = () => {
   let noteParams = getNoteParams();
   let tagParams = {
-    uuid: protocolManager.crypto.generateUUIDSync(),
+    uuid: SFItem.GenerateUuidSynchronously(),
     content_type: "Tag",
     content: {
       title: "thoughts",
@@ -441,8 +441,8 @@ describe("syncing", () => {
   var totalItemCount = 0;
 
   beforeEach((done) => {
-    var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-    var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+    var email = SFItem.GenerateUuidSynchronously();
+    var password = SFItem.GenerateUuidSynchronously();
     Factory.globalStorageManager().clearAllData().then(() => {
       Factory.newRegisteredUser(email, password).then((user) => {
         done();
@@ -453,14 +453,6 @@ describe("syncing", () => {
   let modelManager = Factory.createModelManager();
   let authManager = Factory.globalAuthManager();
   let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-
-  syncManager.setKeyRequestHandler(async () => {
-    return {
-      keys: await authManager.keys(),
-      keyParams: await authManager.getKeyParams(),
-      offline: false
-    };
-  })
 
   const wait = (secs) => {
     return new Promise((resolve, reject) => {
@@ -508,13 +500,6 @@ describe("syncing", () => {
 
     let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
 
-    // be offline
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: true
-      };
-    })
-
     modelManager.handleSignout();
     let pair = createRelatedNoteTagPair();
     let noteParams = pair[0];
@@ -531,15 +516,6 @@ describe("syncing", () => {
     expect(originalTag.content.references.length).to.equal(1);
     expect(originalTag.notes.length).to.equal(1);
     expect(originalNote.tags.length).to.equal(1);
-
-    // go online
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        keys: await authManager.keys(),
-        keyParams: await authManager.getKeyParams(),
-        offline: false
-      };
-    })
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.

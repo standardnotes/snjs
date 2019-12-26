@@ -8,8 +8,8 @@ chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 describe('migrations', () => {
-  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var email = SFItem.GenerateUuidSynchronously();
+  var password = SFItem.GenerateUuidSynchronously();
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
@@ -24,14 +24,6 @@ describe('migrations', () => {
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
     let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        keys: await authManager.keys(),
-        keyParams: await authManager.getKeyParams(),
-        offline: false
-      };
-    })
 
     var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
@@ -79,14 +71,6 @@ describe('migrations', () => {
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
     let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        keys: await authManager.keys(),
-        keyParams: await authManager.getKeyParams(),
-        offline: false
-      };
-    })
 
     await syncManager.loadLocalItems();
 
@@ -163,12 +147,6 @@ describe('migrations', () => {
       ]
     }
 
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: true
-      };
-    })
-
     migrationManager.loadMigrations();
 
     await syncManager.sync();
@@ -196,18 +174,10 @@ describe('migrations', () => {
     expect(item.content.foo).to.not.equal(randValue);
 
     // sign in, migrations should run again
-    var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-    var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+    var email = SFItem.GenerateUuidSynchronously();
+    var password = SFItem.GenerateUuidSynchronously();
     await Factory.newRegisteredUser(email, password);
     authManager.notifyEvent(SFAuthManager.DidSignInEvent);
-
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        keys: await authManager.keys(),
-        keyParams: await authManager.getKeyParams(),
-        offline: false
-      };
-    })
 
     await syncManager.sync();
     // migrations run asyncronously

@@ -338,7 +338,7 @@ describe("mapping performance", () => {
     var tags = [], notes = [];
     for(var i = 0; i < tagCount; i++) {
       var tag = {
-        uuid: protocolManager.crypto.generateUUIDSync(),
+        uuid: SFItem.GenerateUuidSynchronously(),
         content_type: "Tag",
         content: {
           title: `${Math.random()}`,
@@ -350,7 +350,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: protocolManager.crypto.generateUUIDSync(),
+        uuid: SFItem.GenerateUuidSynchronously(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,
@@ -404,7 +404,7 @@ describe("mapping performance", () => {
     var notes = [];
 
     var tag = {
-      uuid: protocolManager.crypto.generateUUIDSync(),
+      uuid: SFItem.GenerateUuidSynchronously(),
       content_type: "Tag",
       content: {
         title: `${Math.random()}`,
@@ -414,7 +414,7 @@ describe("mapping performance", () => {
 
     for(var i = 0; i < noteCount; i++) {
       var note = {
-        uuid: protocolManager.crypto.generateUUIDSync(),
+        uuid: SFItem.GenerateUuidSynchronously(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,

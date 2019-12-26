@@ -7,10 +7,10 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
-describe.only("basic auth", () => {
+describe("basic auth", () => {
   let url = "http://localhost:3000";
-  let email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-  let password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  let email = SFItem.GenerateUuidSynchronously();
+  let password = SFItem.GenerateUuidSynchronously();
   var _key;
 
   before(async () => {
@@ -18,23 +18,20 @@ describe.only("basic auth", () => {
   })
 
   it.only("successfully register new account", (done) => {
-     Factory.globalAuthManager().register(url, email, password, false).then((response) => {
+     Factory.globalAuthManager().register({url, email, password, ephemeral: false}).then((response) => {
       expect(response.error).to.not.be.ok;
       done();
     })
   }).timeout(20000);
 
   it.only("successfully logins to registered account", async () => {
-    await Factory.globalAuthManager().signout(true);
-    var strict = false;
-    var response = await Factory.globalAuthManager().login(url, email, password, strict, null);
-    _key = await Factory.globalAuthManager().keys();
+    await Factory.globalAuthManager().signOut(true);
+    const response = await Factory.globalAuthManager().login({url, email, password});
     expect(response.error).to.not.be.ok;
   }).timeout(20000);
 
-  it("fails login to registered account", (done) => {
-    var strict = false;
-    Factory.globalAuthManager().login(url, email, "wrong-password", strict, null).then((response) => {
+  it.only("fails login to registered account", (done) => {
+    Factory.globalAuthManager().login({url, email, password: "wrong-password"}).then((response) => {
       expect(response.error).to.be.ok;
       done();
     })
@@ -44,14 +41,6 @@ describe.only("basic auth", () => {
     let modelManager = Factory.createModelManager();
     let storageManager = Factory.globalStorageManager();
     let syncManager = new SFSyncManager(modelManager, storageManager, Factory.globalHttpManager());
-
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: false,
-        keys: await Factory.globalAuthManager().keys(),
-        KeyParams: await Factory.globalAuthManager().getKeyParams(),
-      };
-    })
 
     var totalItemCount = 105;
     for(var i = 0; i < totalItemCount; i++) {
@@ -70,7 +59,13 @@ describe.only("basic auth", () => {
     var newKeys = result.key;
     var newKeyParams = result.keyParams;
 
-    var response = await Factory.globalAuthManager().changePassword(url, email, _key.serverAuthenticationValue, newKeys, newKeyParams);
+    var response = await Factory.globalAuthManager().changePassword(
+      url,
+      email,
+      _key.serverAuthenticationValue,
+      newKeys,
+      newKeyParams
+    );
     expect(response.error).to.not.be.ok;
 
     expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -104,7 +99,7 @@ describe.only("basic auth", () => {
     expect(modelManager.allItems.length).to.equal(totalItemCount);
     expect(modelManager.invalidItems().length).to.equal(0);
 
-    await Factory.globalAuthManager().signout(true);
+    await Factory.globalAuthManager().signOut(true);
     var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
     expect(loginResponse.error).to.not.be.ok;
   }).timeout(20000);
@@ -113,14 +108,6 @@ describe.only("basic auth", () => {
     let modelManager = Factory.createModelManager();
     let storageManager = Factory.globalStorageManager();
     let syncManager = new SFSyncManager(modelManager, storageManager, Factory.globalHttpManager());
-
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: false,
-        keys: await Factory.globalAuthManager().keys(),
-        KeyParams: await Factory.globalAuthManager().getKeyParams(),
-      };
-    })
 
     var totalItemCount = 400;
     for(var i = 0; i < totalItemCount; i++) {
@@ -138,7 +125,13 @@ describe.only("basic auth", () => {
       var newKeys = result.key;
       var newKeyParams = result.keyParams;
 
-      var response = await Factory.globalAuthManager().changePassword(url, email, _key.serverAuthenticationValue, newKeys, newKeyParams);
+      var response = await Factory.globalAuthManager().changePassword(
+        url,
+        email,
+        _key.serverAuthenticationValue,
+        newKeys,
+        newKeyParams
+      );
       expect(response.error).to.not.be.ok;
 
       expect(modelManager.allItems.length).to.equal(totalItemCount);
@@ -163,8 +156,6 @@ describe.only("basic auth", () => {
 
       var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
       expect(loginResponse.error).to.not.be.ok;
-
-      _key = await Factory.globalAuthManager().keys();
     }
   }).timeout(30000);
 

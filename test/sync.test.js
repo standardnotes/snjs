@@ -42,11 +42,6 @@ describe('offline syncing', () => {
   let modelManager = Factory.createModelManager();
   let syncManager = new SFSyncManager(modelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
 
-  syncManager.setKeyRequestHandler(async () => {
-    return {
-      offline: true
-    };
-  })
 
   beforeEach(async () => {
     await Factory.globalStorageManager().clearAllData();
@@ -75,7 +70,6 @@ describe('offline syncing', () => {
   it("should allow local saving before offline data has loaded, and should not overwrite present values when finished loading", async () => {
     let localModelManager = Factory.createModelManager();
     let localSyncManager = new SFSyncManager(localModelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-    localSyncManager.setKeyRequestHandler(syncManager.keyRequestHandler);
 
     var item = Factory.createItem();
     localModelManager.addItem(item);
@@ -113,8 +107,8 @@ describe('offline syncing', () => {
 });
 
 describe('online syncing', () => {
-  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var email = SFItem.GenerateUuidSynchronously();
+  var password = SFItem.GenerateUuidSynchronously();
   var totalItemCount = 0;
 
   const syncOptions = {
@@ -143,31 +137,15 @@ describe('online syncing', () => {
     expect(storageModels.length).to.equal(totalItemCount);
   })
 
-  let keyRequestHandler = async () => {
-    return {
-      keys: await authManager.keys(),
-      keyParams: await authManager.getKeyParams(),
-      offline: false
-    };
-  };
-
-  syncManager.setKeyRequestHandler(keyRequestHandler);
-
   const signout = async () => {
-    await Factory.globalAuthManager().signout();
+    await Factory.globalAuthManager().signOut();
     await Factory.globalStorageManager().clearAllData();
     await syncManager.handleSignout();
     await modelManager.handleSignout();
-    syncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: true
-      };
-    })
   }
 
   const signin = async () => {
     await Factory.globalAuthManager().login(Factory.serverURL(), email, password, true, null);
-    syncManager.setKeyRequestHandler(keyRequestHandler);
   }
 
   it("should register and sync basic model online", async () => {
@@ -192,7 +170,7 @@ describe('online syncing', () => {
 
   it("should login and retrieve synced item", async () => {
     // logout
-    await Factory.globalAuthManager().signout();
+    await Factory.globalAuthManager().signOut();
     syncManager.clearSyncToken();
     await Factory.globalStorageManager().clearAllData();
     await Factory.globalAuthManager().login(Factory.serverURL(), email, password, true, null);
@@ -236,8 +214,6 @@ describe('online syncing', () => {
   }).timeout(60000);
 
   it("allows me to save data after I've signed out", async () => {
-    let originalHandler = syncManager.keyRequestHandler;
-
     // useful if you run this test in isolation
     await syncManager.loadLocalItems();
 
@@ -297,13 +273,8 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     totalItemCount++;
 
-    let keys = await authManager.keys();
-    let keyParams = await authManager.getKeyParams();
-
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: keys,
-      keyParams: keyParams,
       intent: EncryptionIntentSync
     })
 
@@ -312,7 +283,7 @@ describe('online syncing', () => {
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await protocolManager.decryptItem({item: itemParams, keys: keys});
+    await protocolManager.decryptItem({item: itemParams});
     items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
@@ -799,7 +770,6 @@ describe('online syncing', () => {
   it("load local items", async () => {
     let localModelManager = Factory.createModelManager();
     let localSyncManager = new SFSyncManager(localModelManager, Factory.globalStorageManager(), Factory.globalHttpManager());
-    localSyncManager.setKeyRequestHandler(syncManager.keyRequestHandler);
     expect(localModelManager.allItems.length).to.equal(0);
 
     await localSyncManager.loadLocalItems();
@@ -812,7 +782,6 @@ describe('online syncing', () => {
     localSyncManager.__setLocalDataNotLoaded();
     localModelManager.handleSignout();
     localSyncManager.handleSignout();
-    // localSyncManager.setKeyRequestHandler(syncManager.keyRequestHandler);
     expect(localModelManager.allItems.length).to.equal(0);
 
     expect(localModelManager.getDirtyItems().length).to.equal(0);
@@ -854,13 +823,8 @@ describe('online syncing', () => {
 
   it("load local items should respect sort priority", async () => {
     let localModelManager = Factory.createModelManager();
-    let localStorageManager = new MemoryStorageManager();
+    let localStorageManager = Factory.createMemoryStorageManager();
     let localSyncManager = new SFSyncManager(localModelManager, localStorageManager, Factory.globalHttpManager());
-    localSyncManager.setKeyRequestHandler(async () => {
-      return {
-        offline: true
-      };
-    })
 
     let contentTypes = ["A", "B", "C"];
     let itemCount = 6;
@@ -933,7 +897,7 @@ describe('online syncing', () => {
 
   it("should sign in and retrieve large number of items", async () => {
     // logout
-    await Factory.globalAuthManager().signout();
+    await Factory.globalAuthManager().signOut();
     syncManager.handleSignout();
     modelManager.handleSignout();
 
@@ -1013,8 +977,6 @@ describe('sync params', () => {
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _key,
-      keyParams: _keyParams,
       intent: EncryptionIntentSync
     })
 
@@ -1032,8 +994,6 @@ describe('sync params', () => {
     var item = Factory.createItem();
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: null,
-      keyParams: null,
       intent: EncryptionIntentSync
     })
 
@@ -1052,8 +1012,6 @@ describe('sync params', () => {
 
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _key,
-      keyParams: _keyParams,
       intent: EncryptionIntentLocalStorage
     })
 
@@ -1074,8 +1032,6 @@ describe('sync params', () => {
     var item = Factory.createItem();
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _key,
-      keyParams: _keyParams,
       intent: EncryptionIntentFile
     })
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1093,8 +1049,6 @@ describe('sync params', () => {
     item.errorDecrypting = true;
     const itemParams = await protocolManager.generateExportParameters({
       item: item,
-      keys: _key,
-      keyParams: _keyParams,
       intent: EncryptionIntentSync
     })
     expect(itemParams.content).to.eql(item.content);
@@ -1106,15 +1060,16 @@ describe('sync params', () => {
 });
 
 describe('sync discordance', () => {
-  var email = Factory.globalProtocolManager().crypto.generateUUIDSync();
-  var password = Factory.globalProtocolManager().crypto.generateUUIDSync();
+  var email = SFItem.GenerateUuidSynchronously();
+  var password = SFItem.GenerateUuidSynchronously();
   var totalItemCount = 0;
 
-  let localStorageManager = new MemoryStorageManager();
+  let localStorageManager = Factory.createMemoryStorageManager();
   let localAuthManager = new SFAuthManager({
     storageManager: localStorageManager,
     httpManager: Factory.globalHttpManager(),
-    keyManager: Factory.globalKeyManager()
+    keyManager: Factory.globalKeyManager(),
+    protocolManager: Factory.globalProtocolManager()
   });
   let localHttpManager = new SFHttpManager();
   localHttpManager.setJWTRequestHandler(async () => {
@@ -1136,14 +1091,6 @@ describe('sync discordance', () => {
   });
 
   let itemCount = 0;
-
-  localSyncManager.setKeyRequestHandler(async () => {
-    return {
-      keys: await localAuthManager.keys(),
-      keyParams: await localAuthManager.getKeyParams(),
-      offline: false
-    };
-  })
 
   it("should begin discordance upon instructions", async () => {
     let response = await localSyncManager.sync({performIntegrityCheck: false});

@@ -2,8 +2,9 @@ import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
+import Factory from './lib/factory.js';
 
-const sn_webprotocolManager = new SNProtocolManager(new SNWebCrypto());
+const sn_webprotocolManager = Factory.globalProtocolManager();
 const protocol_001 = new SNProtocolOperator001(new SNWebCrypto());
 
 chai.use(chaiAsPromised);

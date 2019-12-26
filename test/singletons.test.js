@@ -10,16 +10,10 @@ SFItem.AppDomain = "org.standardnotes.sn";
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
-const storageManager = new MemoryStorageManager();
+const storageManager = Factory.createMemoryStorageManager();
 const modelManager = new SFModelManager();
 const syncManager = new SFSyncManager(modelManager, storageManager, Factory.globalHttpManager());
 const singletonManager = new SFSingletonManager(modelManager, syncManager);
-
-syncManager.setKeyRequestHandler(async () => {
-  return {
-    offline: true
-  };
-})
 
 describe("singletons", () => {
 

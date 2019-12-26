@@ -15,7 +15,7 @@ const createModelManager = () => {
 
 const createItemParams = () => {
   var params = {
-    uuid: protocolManager.crypto.generateUUIDSync(),
+    uuid: SFItem.GenerateUuidSynchronously(),
     content_type: "Item",
     content: {
       title: "Hello",

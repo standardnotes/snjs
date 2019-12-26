@@ -5,14 +5,14 @@ import './vendor/chai-as-promised-built.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('keys', () => {
+describe('keys', () => {
   let _identifier = "hello@test.com";
   let _password = "password";
   let _key;
 
-  const protocolManager = new SNProtocolManager(new SNWebCrypto());
+  const protocolManager = Factory.globalProtocolManager();
   const modelManager = Factory.createModelManager();
-  const keysManager = new SNKeyManager(modelManager);
+  const keysManager = Factory.globalKeyManager();
 
   before(async (done) => {
     // Runs before all tests in this block
@@ -23,14 +23,14 @@ describe.only('keys', () => {
 
   it('saves and retrieves root keys', async () => {
     await keysManager.setRootKey(_key);
-    const rootKeys = await keysManager.getRootKeys();
-    expect(rootKeys).to.equal(_key);
-    expect(rootKeys.constructor.name).to.equal("SNItemKey");
+    const rootKey = await keysManager.getRootKey();
+    expect(rootKey).to.equal(_key);
+    expect(rootKey.constructor.name).to.equal("SNItemKey");
   });
 
   it('generating new keys should persist keys to account', async () => {
-     const newKeys = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
-     await keysManager.addNewItemKey(newKeys);
+     const rootKey = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
+     await keysManager.setRootKey(rootKey);
      expect(keysManager.allKeys.length).to.equal(1);
      expect(modelManager.validItemsForContentType("SNItemKey")).length.to.equal(1);
   });
@@ -39,9 +39,8 @@ describe.only('keys', () => {
     /** Keys should be encrypted with root keys, because if only 1 key object,
      * the items key would be contained within, and we couldn't access it.
      */
-     const newKeys = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
-     await keysManager.addNewItemKey(newKeys);
-
+     const rootKey = await protocolManager.createRootKey({identifier: _identifier, password: "foobar"});
+     await keysManager.setRootKey(rootKey);
      expect(newKeys)
   });
 

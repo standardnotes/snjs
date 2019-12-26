@@ -4,10 +4,12 @@ import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 
 import LocalStorageManager from './localStorageManager.js';
-const sf_default = new SNProtocolManager();
+import LocalDatabaseManager from './databaseManager.js';
+import MemoryStorageManager from './memoryStorageManager.js';
 SFItem.AppDomain = "org.standardnotes.sn";
 
 var _globalStorageManager = null;
+var _globalDatabaseManager = null;
 var _globalHttpManager = null;
 var _globalAuthManager = null;
 var _globalModelManager = null;
@@ -17,16 +19,32 @@ var _globalKeyManager = null;
 export default class Factory {
 
   static initialize() {
+    this.globalModelManager();
+    this.globalProtocolManager();
     this.globalStorageManager();
     this.globalHttpManager();
-    this.globalModelManager();
     this.globalKeyManager();
     this.globalAuthManager();
   }
 
   static globalStorageManager() {
-    if(_globalStorageManager == null) { _globalStorageManager = new LocalStorageManager(); }
+    if(_globalStorageManager == null) {
+      _globalStorageManager = new LocalStorageManager({
+        protocolManager: _globalProtocolManager,
+        databaseManager: new LocalDatabaseManager()
+      });
+      _globalStorageManager.initializeFromDisk();
+    }
     return _globalStorageManager;
+  }
+
+  static createMemoryStorageManager() {
+    const storageManager = new MemoryStorageManager({
+      protocolManager: _globalProtocolManager,
+      databaseManager: new LocalDatabaseManager()
+    });
+    storageManager.initializeFromDisk();
+    return storageManager;
   }
 
   static globalHttpManager() {
@@ -42,6 +60,7 @@ export default class Factory {
   static globalAuthManager() {
     if(_globalAuthManager == null) {
        _globalAuthManager = new SFAuthManager({
+        protocolManager: _globalProtocolManager,
         storageManager: _globalStorageManager,
         httpManager: _globalHttpManager,
         keyManager: _globalKeyManager
@@ -58,28 +77,38 @@ export default class Factory {
   static globalKeyManager() {
     if(_globalKeyManager == null) {
       _globalKeyManager = new SNKeyManager({
+        protocolManager: _globalProtocolManager,
         modelManager: _globalModelManager,
-        storageManager: _globalStorageManager
+        storageManager: this.globalStorageManager()
       });
 
       let keychainValue = null;
       _globalKeyManager.setKeychainDelegate({
-         setKeyChainValue: async (value) => {
-           keychainValue = value;
-         },
-         getKeyChainValue: async () => {
-           return keychainValue;
-         },
-         deleteKeyChainValue: async () => {
-           keychainValue = null;
-         }
+        setKeyChainValue: async (value) => {
+          keychainValue = value;
+        },
+        getKeyChainValue: async () => {
+          return keychainValue;
+        },
+        clearKeyChainValue: async () => {
+          keychainValue = null;
+        }
       });
+
     }
     return _globalKeyManager;
   }
 
   static globalProtocolManager() {
-    if(_globalProtocolManager == null) { _globalProtocolManager = new SNProtocolManager(); }
+    if(_globalProtocolManager == null) {
+      _globalProtocolManager = new SNProtocolManager({
+        modelManager: _globalModelManager,
+        keyManager: _globalKeyManager
+      });
+
+      _globalKeyManager = this.globalKeyManager();
+      _globalProtocolManager.setKeyManager(_globalKeyManager);
+    }
     return _globalProtocolManager;
   }
 
@@ -87,13 +116,9 @@ export default class Factory {
     return new SFModelManager();
   }
 
-  static createStorageManager() {
-    return new LocalStorageManager();
-  }
-
   static createItemParams(contentType) {
     var params = {
-      uuid: protocolManager.crypto.generateUUIDSync(),
+      uuid: SFItem.GenerateUuidSynchronously(),
       content_type: contentType || "Note",
       content: {
         title: "hello",
@@ -129,8 +154,8 @@ export default class Factory {
 
   static async newRegisteredUser(email, password, authManager) {
     let url = this.serverURL();
-    if(!email) email = sf_default.crypto.generateUUIDSync();
-    if(!password) password = sf_default.crypto.generateUUIDSync();
+    if(!email) email = SFItem.GenerateUuidSynchronously();
+    if(!password) password = SFItem.GenerateUuidSynchronously();
     return (authManager ? authManager : this.globalAuthManager()).register(url, email, password, false);
   }
 

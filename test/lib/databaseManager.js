@@ -1,22 +1,16 @@
 // A test StorageManager class using LocalStorage
 
-export default class LocalStorageManager extends SFStorageManager {
-
-  async initializeFromDisk() {
-    this.setPayload({});
-  }
-
-  /* Simple Key/Value Storage */
+export default class LocalDatabaseManager extends SNDatabaseManager {
 
   async setItem(key, value, vaultKey) {
     localStorage.setItem(key, value);
   }
 
-  async getItem(key) {
+  async getItem(key, vault) {
     return localStorage.getItem(key)
   }
 
-  async removeItem(key) {
+  async removeItem(key, vault) {
     localStorage.removeItem(key);
   }
 
