@@ -16,6 +16,13 @@ describe.only('keys', () => {
     sharedApplication = await Factory.createInitAppWithRandNamespace();
   })
 
+  beforeEach(async function() {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    const email = SFItem.GenerateUuidSynchronously();
+    const password = SFItem.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({application: this.application, email, password});
+  })
+
   it('validate isLocalStorageIntent', async () => {
     expect(isLocalStorageIntent(EncryptionIntentSync)).to.equal(false);
     expect(isLocalStorageIntent(EncryptionIntentLocalStorageEncrypted)).to.equal(true);
@@ -96,15 +103,33 @@ describe.only('keys', () => {
     expect(keyToUse).to.equal(await localApplication.keyManager.getRootKey());
   })
 
-  it('should use items key for encryption of note', async () => {
-    const localApplication = await Factory.createInitAppWithRandNamespace();
-    await Factory.registerUserToApplication({application: localApplication});
+  it('should use items key for encryption of note', async function() {
     const note = Factory.createItem();
-    const keyToUse = await localApplication.keyManager.keyToUseForEncryptionOfItem({
+    const keyToUse = await this.application.keyManager.keyToUseForEncryptionOfItem({
       item: note,
       intent: EncryptionIntentSync
     })
     expect(keyToUse.content_type).to.equal(SN_ITEMS_KEY_CONTENT_TYPE);
+  })
+
+  it.only('encrypting an item should associate an items key to it', async function() {
+    const note = Factory.createItem();
+    const payload = await this.application.protocolManager.generateExportParameters({
+      item: note,
+      intent: EncryptionIntentSync
+    });
+    expect(note.encryptingKey).to.be.ok;
+  })
+
+  it.only('decrypt encrypted item with associated key', async function() {
+    const note = Factory.createItem();
+    const payload = await this.application.protocolManager.generateExportParameters({
+      item: note,
+      intent: EncryptionIntentSync
+    });
+
+    
+    expect(note.encryptingKey).to.be.ok;
   })
 
   it('generating export params with logged in account should produce encrypted payload', async () => {
@@ -116,7 +141,7 @@ describe.only('keys', () => {
       intent: EncryptionIntentSync
     })
     expect(typeof payload.content).to.equal('string');
-    expect(payload.content.substring(0, 3)).to.equal(localApplication.protocolManager.version());
+    expect(payload.content.substring(0, 3)).to.equal(localApplication.protocolManager.latestVersion());
   })
 
   // const protocolManager = Factory.globalProtocolManager();

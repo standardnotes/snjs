@@ -11,7 +11,7 @@ var expect = chai.expect;
 
 describe('protocol', () => {
   it('checks version to make sure its 004', () => {
-    expect(sn_webprotocolManager.version()).to.equal("004");
+    expect(sn_webprotocolManager.latestVersion()).to.equal("004");
   });
 
   it('checks supported versions to make sure it includes 001, 002, 003, 004', () => {
@@ -31,12 +31,12 @@ describe('protocol', () => {
   });
 
   it('library version should not be outdated', () => {
-    var currentVersion = sn_webprotocolManager.version();
+    var currentVersion = sn_webprotocolManager.latestVersion();
     expect(sn_webprotocolManager.isProtocolVersionOutdated(currentVersion)).to.equal(false);
   });
 
   it('cost minimum for 003 to be 110,000', () => {
-    var currentVersion = sn_webprotocolManager.version();
+    var currentVersion = sn_webprotocolManager.latestVersion();
     expect(sn_webprotocolManager.costMinimumForVersion("003")).to.equal(110000);
   });
 });

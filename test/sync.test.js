@@ -301,7 +301,7 @@ describe('online syncing', () => {
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await protocolManager.decryptItem({item: itemParams});
+    await protocolManager.decryptItemPayload({item: itemParams});
     items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
@@ -1016,7 +1016,7 @@ describe('sync params', () => {
     expect(itemParams.content_type).to.not.be.null;
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().version());
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
     });
   });
 
@@ -1054,7 +1054,7 @@ describe('sync params', () => {
     expect(itemParams.deleted).to.not.be.null;
     expect(itemParams.errorDecrypting).to.not.be.null;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().version());
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
     });
   });
 
@@ -1070,7 +1070,7 @@ describe('sync params', () => {
     expect(itemParams.created_at).to.not.be.null;
     expect(itemParams.deleted).to.not.be.ok;
     expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().version());
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
     });
   });
 

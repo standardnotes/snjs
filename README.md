@@ -67,7 +67,7 @@ Use `protocolManager` to encrypt and decrypt items. Use the `SFItemParams` as a 
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.encryptItem({item, keys, keyParams}).then(() => {
+protocolManager.generateEncryptedItemPayload({item, keys, keyParams}).then(() => {
  // item.content is now encrypted
 })
 ```
@@ -76,7 +76,7 @@ protocolManager.encryptItem({item, keys, keyParams}).then(() => {
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.decryptItem({item, keys}).then(() => {
+protocolManager.decryptItemPayload({item, keys}).then(() => {
  // item.content is now decrypted
 })
 ```

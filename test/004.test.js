@@ -24,7 +24,7 @@ describe('004 protocol operations', () => {
   });
 
   it('cost minimum for 004 to be 500,000', () => {
-    var currentVersion = application.protocolManager.version();
+    var currentVersion = application.protocolManager.latestVersion();
     expect(application.protocolManager.costMinimumForVersion("004")).to.equal(500000);
   });
 

@@ -24,7 +24,7 @@ describe('003 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    var currentVersion = application.protocolManager.version();
+    var currentVersion = application.protocolManager.latestVersion();
     expect(application.protocolManager.costMinimumForVersion("003")).to.equal(110000);
   });
 
