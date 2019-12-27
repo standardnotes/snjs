@@ -8,9 +8,9 @@ SFItem.AppDomain = "org.standardnotes.sn";
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
-const globalModelManager = new SFModelManager();
+const globalModelManager = new SNModelManager();
 const createModelManager = () => {
-  return new SFModelManager();
+  return new SNModelManager();
 }
 
 const createItemParams = () => {

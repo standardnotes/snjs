@@ -40,7 +40,7 @@ describe("local storage manager", () => {
 
 describe('offline syncing', () => {
   let modelManager = Factory.createModelManager();
-  const syncManager = new SFSyncManager({
+  const syncManager = new SNSyncManager({
     modelManager,
     authManager: Factory.globalAuthManager(),
     storageManager: Factory.globalStorageManager(),
@@ -75,7 +75,7 @@ describe('offline syncing', () => {
 
   it("should allow local saving before offline data has loaded, and should not overwrite present values when finished loading", async () => {
     let localModelManager = Factory.createModelManager();
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       authManager: Factory.globalAuthManager(),
       storageManager: Factory.globalStorageManager(),
@@ -129,7 +129,7 @@ describe('online syncing', () => {
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
-      Factory.newRegisteredUser(email, password).then((user) => {
+      Factory.registerUserToApplication({email, password, application}).then((user) => {
         done();
       })
     })
@@ -139,7 +139,7 @@ describe('online syncing', () => {
   let authManager = Factory.globalAuthManager();
   let modelManager = Factory.createModelManager();
   let storageManager = Factory.globalStorageManager();
-  const syncManager = new SFSyncManager({
+  const syncManager = new SNSyncManager({
     modelManager,
     authManager,
     storageManager: Factory.globalStorageManager(),
@@ -787,7 +787,7 @@ describe('online syncing', () => {
 
   it("load local items", async () => {
     let localModelManager = Factory.createModelManager();
-    const localSyncManager = new SFSyncManager({
+    const localSyncManager = new SNSyncManager({
       modelManager: localModelManager,
       authManager: Factory.globalAuthManager(),
       storageManager: Factory.globalStorageManager(),
@@ -848,7 +848,7 @@ describe('online syncing', () => {
   it("load local items should respect sort priority", async () => {
     let localModelManager = Factory.createModelManager();
     let localStorageManager = Factory.createMemoryStorageManager();
-    const localSyncManager = new SFSyncManager({
+    const localSyncManager = new SNSyncManager({
       modelManager: localModelManager,
       authManager: Factory.globalAuthManager(),
       storageManager: localStorageManager,
@@ -1095,18 +1095,18 @@ describe('sync discordance', () => {
   var totalItemCount = 0;
 
   let localStorageManager = Factory.createMemoryStorageManager();
-  let localAuthManager = new SFAuthManager({
+  let localAuthManager = new SNAuthManager({
     storageManager: localStorageManager,
     httpManager: Factory.globalHttpManager(),
     keyManager: Factory.globalKeyManager(),
     protocolManager: Factory.globalProtocolManager()
   });
-  let localHttpManager = new SFHttpManager();
+  let localHttpManager = new SNHttpManager();
   localHttpManager.setJWTRequestHandler(async () => {
     return localStorageManager.getItem("jwt");;
   })
   let localModelManager = Factory.createModelManager();
-  const localSyncManager = new SFSyncManager({
+  const localSyncManager = new SNSyncManager({
     modelManager: localModelManager,
     authManager: Factory.globalAuthManager(),
     storageManager: localStorageManager,
@@ -1116,7 +1116,7 @@ describe('sync discordance', () => {
 
   before((done) => {
     localStorageManager.clearAllData().then(() => {
-      Factory.newRegisteredUser(email, password, localAuthManager).then((user) => {
+      Factory.registerUserToApplication({email, password, application}).then((user) => {
         done();
       })
     })

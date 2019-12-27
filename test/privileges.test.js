@@ -11,15 +11,15 @@ chai.use(chaiAsPromised);
 var expect = chai.expect;
 
 const storageManager = Factory.createMemoryStorageManager();
-const modelManager = new SFModelManager();
-const syncManager = new SFSyncManager({
+const modelManager = new SNModelManager();
+const syncManager = new SNSyncManager({
   modelManager,
   authManager: Factory.globalAuthManager(),
   storageManager: storageManager,
   protocolManager: Factory.globalProtocolManager(),
   httpManager: Factory.globalHttpManager()
 });
-const singletonManager = new SFSingletonManager(modelManager, syncManager);
+const singletonManager = new SNSingletonManager(modelManager, syncManager);
 
 let privilegesManager = new SFPrivilegesManager(modelManager, syncManager, singletonManager);
 privilegesManager.setDelegate({

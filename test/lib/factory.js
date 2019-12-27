@@ -3,9 +3,11 @@ import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 
-import LocalStorageManager from './localStorageManager.js';
-import LocalDatabaseManager from './databaseManager.js';
-import MemoryStorageManager from './memoryStorageManager.js';
+import LocalStorageManager from './persist/storage/localStorageManager.js';
+import MemoryStorageManager from './persist/storage/memoryStorageManager.js';
+
+import LocalStorageDatabaseManager from './persist/database/localStorageDatabaseManager.js';
+import MemoryDatabaseManager from './persist/database/memoryDatabaseManager.js';
 
 var _globalStorageManager = null;
 var _globalDatabaseManager = null;
@@ -17,7 +19,23 @@ var _globalKeyManager = null;
 
 export default class Factory {
 
-  static async createApplication() {
+  static async createInitAppWithRandNamespace() {
+    const namespace = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    return this.createAndInitializeApplication(namespace);
+  }
+
+  static createApplication(namespace) {
+    return new SNApplication({namespace});
+  }
+
+  static async createAndInitializeApplication(namespace) {
+    const application = new SNApplication({namespace});
+    await this.initializeApplication(application);
+    return application;
+  }
+
+  static async initializeApplication(application) {
+    let keychainValue;
     const keychainDelegate = new SNKeychainDelegate({
       setKeyChainValue: async (value) => {
         keychainValue = value;
@@ -30,8 +48,7 @@ export default class Factory {
       }
     });
 
-    const application = new SNApplication();
-    application.initialize({
+    await application.initialize({
       keychainDelegate,
       swapClasses: [
         {
@@ -40,16 +57,19 @@ export default class Factory {
         },
         {
           swap: SNDatabaseManager,
-          with: LocalDatabaseManager
+          with: LocalStorageDatabaseManager
         }
+      ],
+      skipClasses: [
+        SNComponentManager
       ],
       callbacks: {
         onRequiresAuthentication: (sources, handleResponses) => {
 
         }
       },
-      timeout: this.timeout,
-      interval: this.setInterval
+      timeout: setTimeout.bind(window),
+      interval: setInterval.bind(window)
     });
   }
 
@@ -73,6 +93,33 @@ export default class Factory {
     }
   }
 
+  static createNoteParams() {
+    const params = {
+      uuid: SFItem.GenerateUuidSynchronously(),
+      content_type: "Note",
+      content: {
+        title: "hello",
+        text: "world"
+      }
+    };
+    return params;
+  }
+
+  static createRelatedNoteTagPairParams() {
+    let noteParams = this.createNoteParams();
+    let tagParams = {
+      uuid: SFItem.GenerateUuidSynchronously(),
+      content_type: "Tag",
+      content: { title: "thoughts" }
+    };
+    tagParams.content.references = [{
+        uuid: noteParams.uuid,
+        content_type: noteParams.content_type
+    }]
+    noteParams.content.references = []
+    return [noteParams, tagParams];
+  }
+
   static serverURL() {
     return "http://localhost:3000";
   }
@@ -89,11 +136,11 @@ export default class Factory {
     })
   }
 
-  static async newRegisteredUser(email, password, authManager) {
-    let url = this.serverURL();
+  static async registerUserToApplication({application, email, password}) {
+    const url = this.serverURL();
     if(!email) email = SFItem.GenerateUuidSynchronously();
     if(!password) password = SFItem.GenerateUuidSynchronously();
-    return (authManager ? authManager : this.globalAuthManager()).register(url, email, password, false);
+    return application.authManager.register({url, email, password});
   }
 
   static shuffleArray(a) {

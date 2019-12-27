@@ -13,7 +13,7 @@ describe('migrations', () => {
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
-      Factory.newRegisteredUser(email, password).then((user) => {
+      Factory.registerUserToApplication({email, password, application}).then((user) => {
         done();
       })
     })
@@ -23,7 +23,7 @@ describe('migrations', () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       authManager,
       storageManager: Factory.globalStorageManager(),
@@ -31,7 +31,7 @@ describe('migrations', () => {
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
     migrationManager.registeredMigrations = () => {
       return [
@@ -76,7 +76,7 @@ describe('migrations', () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createItem());
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       authManager,
       storageManager: Factory.globalStorageManager(),
@@ -86,7 +86,7 @@ describe('migrations', () => {
 
     await syncManager.loadLocalItems();
 
-    var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
     let randValue1 = Math.random();
     let randValue2 = Math.random();
@@ -137,7 +137,7 @@ describe('migrations', () => {
     await Factory.globalStorageManager().clearAllData();
     await Factory.globalStorageManager().setItem("server", Factory.serverURL());
     let modelManager = Factory.createModelManager();
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       authManager,
       storageManager: Factory.globalStorageManager(),
@@ -145,7 +145,7 @@ describe('migrations', () => {
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SFMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
     var params1 = Factory.createItem();
     modelManager.addItem(params1);
@@ -194,8 +194,8 @@ describe('migrations', () => {
     // sign in, migrations should run again
     var email = SFItem.GenerateUuidSynchronously();
     var password = SFItem.GenerateUuidSynchronously();
-    await Factory.newRegisteredUser(email, password);
-    authManager.notifyEvent(SFAuthManager.DidSignInEvent);
+    await Factory.registerUserToApplication({email, password, application});
+    authManager.notifyEvent(SNAuthManager.DidSignInEvent);
 
     await syncManager.sync();
     // migrations run asyncronously

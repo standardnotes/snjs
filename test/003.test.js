@@ -3,10 +3,6 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
-
-const sn_webprotocolManager = Factory.globalProtocolManager();
-const protocol_003 = new SNProtocolOperator003(new SNWebCrypto());
-
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
@@ -16,18 +12,20 @@ describe('003 protocol operations', () => {
   var _password = "password";
   var _keyParams, _key;
 
-  before((done) => {
-    // runs before all tests in this block
-    protocol_003.createRootKey({identifier: _identifier, password: _password}).then((result) => {
-      _keyParams = result.keyParams;
-      _key = result.key;
-      done();
-    })
+  const application = Factory.createApplication();
+  const protocol_003 = new SNProtocolOperator003(new SNWebCrypto());
+
+  // runs once before all tests in this block
+  before(async () => {
+    await Factory.initializeApplication(application);
+    const result = await protocol_003.createRootKey({identifier: _identifier, password: _password});
+    _keyParams = result.keyParams;
+    _key = result.key;
   });
 
   it('cost minimum', () => {
-    var currentVersion = sn_webprotocolManager.version();
-    expect(sn_webprotocolManager.costMinimumForVersion("003")).to.equal(110000);
+    var currentVersion = application.protocolManager.version();
+    expect(application.protocolManager.costMinimumForVersion("003")).to.equal(110000);
   });
 
   it('generates random key', async () => {

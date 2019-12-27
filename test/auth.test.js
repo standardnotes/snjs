@@ -17,7 +17,7 @@ describe("basic auth", () => {
     await Factory.globalStorageManager().clearAllData();
   })
 
-  it.only("successfully register new account", (done) => {
+  it("successfully register new account", (done) => {
      Factory.globalAuthManager().register({
        url,
        email,
@@ -42,10 +42,10 @@ describe("basic auth", () => {
     })
   }).timeout(20000);
 
-  it.only("successfully changes password", async () => {
+  it("successfully changes password", async () => {
     let modelManager = Factory.globalModelManager();
     let storageManager = Factory.globalStorageManager();
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       storageManager,
       authManager: Factory.globalAuthManager(),
@@ -120,7 +120,7 @@ describe("basic auth", () => {
   it.skip("changes password many times", async () => {
     let modelManager = Factory.createModelManager();
     let storageManager = Factory.globalStorageManager();
-    const syncManager = new SFSyncManager({
+    const syncManager = new SNSyncManager({
       modelManager,
       storageManager,
       authManager: Factory.globalAuthManager(),

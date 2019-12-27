@@ -20,7 +20,7 @@ describe('session history', () => {
 
   let authManager = Factory.globalAuthManager();
   let modelManager = Factory.createModelManager();
-  const syncManager = new SFSyncManager({
+  const syncManager = new SNSyncManager({
     modelManager,
     authManager,
     storageManager: Factory.globalStorageManager(),
@@ -30,7 +30,7 @@ describe('session history', () => {
 
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
-      Factory.newRegisteredUser(email, password).then((user) => {
+      Factory.registerUserToApplication({email, password, application}).then((user) => {
         syncManager.loadLocalItems().then(() => {
           done();
         })
