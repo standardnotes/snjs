@@ -6,7 +6,6 @@ import '../vendor/chai-as-promised-built.js';
 import LocalStorageManager from './localStorageManager.js';
 import LocalDatabaseManager from './databaseManager.js';
 import MemoryStorageManager from './memoryStorageManager.js';
-SFItem.AppDomain = "org.standardnotes.sn";
 
 var _globalStorageManager = null;
 var _globalDatabaseManager = null;
@@ -18,102 +17,40 @@ var _globalKeyManager = null;
 
 export default class Factory {
 
-  static initialize() {
-    this.globalModelManager();
-    this.globalProtocolManager();
-    this.globalStorageManager();
-    this.globalHttpManager();
-    this.globalKeyManager();
-    this.globalAuthManager();
-  }
-
-  static globalStorageManager() {
-    if(_globalStorageManager == null) {
-      _globalStorageManager = new LocalStorageManager({
-        protocolManager: _globalProtocolManager,
-        databaseManager: new LocalDatabaseManager()
-      });
-      _globalStorageManager.initializeFromDisk();
-    }
-    return _globalStorageManager;
-  }
-
-  static createMemoryStorageManager() {
-    const storageManager = new MemoryStorageManager({
-      protocolManager: _globalProtocolManager,
-      databaseManager: new LocalDatabaseManager()
+  static async createApplication() {
+    const keychainDelegate = new SNKeychainDelegate({
+      setKeyChainValue: async (value) => {
+        keychainValue = value;
+      },
+      getKeyChainValue: async () => {
+        return keychainValue;
+      },
+      clearKeyChainValue: async () => {
+        keychainValue = null;
+      }
     });
-    storageManager.initializeFromDisk();
-    return storageManager;
-  }
 
-  static globalHttpManager() {
-    if(_globalHttpManager == null) {
-      _globalHttpManager = new SFHttpManager();
-      _globalHttpManager.setJWTRequestHandler(async () => {
-        return this.globalStorageManager().getItem("jwt");;
-      })
-    }
-    return _globalHttpManager;
-  }
-
-  static globalAuthManager() {
-    if(_globalAuthManager == null) {
-       _globalAuthManager = new SFAuthManager({
-        protocolManager: _globalProtocolManager,
-        storageManager: _globalStorageManager,
-        httpManager: _globalHttpManager,
-        keyManager: _globalKeyManager
-      });
-    }
-    return _globalAuthManager;
-  }
-
-  static globalModelManager() {
-    if(_globalModelManager == null) { _globalModelManager = new SFModelManager(); }
-    return _globalModelManager;
-  }
-
-  static globalKeyManager() {
-    if(_globalKeyManager == null) {
-      _globalKeyManager = new SNKeyManager({
-        protocolManager: _globalProtocolManager,
-        modelManager: _globalModelManager,
-        storageManager: this.globalStorageManager()
-      });
-
-      let keychainValue = null;
-      _globalKeyManager.setKeychainDelegate({
-        setKeyChainValue: async (value) => {
-          keychainValue = value;
+    const application = new SNApplication();
+    application.initialize({
+      keychainDelegate,
+      swapClasses: [
+        {
+          swap: SNStorageManager,
+          with: LocalStorageManager
         },
-        getKeyChainValue: async () => {
-          return keychainValue;
-        },
-        clearKeyChainValue: async () => {
-          keychainValue = null;
+        {
+          swap: SNDatabaseManager,
+          with: LocalDatabaseManager
         }
-      });
+      ],
+      callbacks: {
+        onRequiresAuthentication: (sources, handleResponses) => {
 
-    }
-    return _globalKeyManager;
-  }
-
-  static globalProtocolManager() {
-    if(_globalProtocolManager == null) {
-      _globalProtocolManager = new SNProtocolManager({
-        modelManager: _globalModelManager,
-        keyManager: _globalKeyManager
-      });
-
-      _globalKeyManager = this.globalKeyManager();
-      _globalProtocolManager.setKeyManager(_globalKeyManager);
-    }
-    return _globalProtocolManager;
-  }
-
-  static createModelManager() {
-    return new SFModelManager();
+        }
+      },
+      timeout: this.timeout,
+      interval: this.setInterval
+    });
   }
 
   static createItemParams(contentType) {
@@ -171,5 +108,3 @@ export default class Factory {
     return array[Math.floor(Math.random() * array.length)];
   }
 }
-
-Factory.initialize();

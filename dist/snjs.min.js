@@ -1202,11 +1202,37 @@ var SN_ITEMS_KEY_CONTENT_TYPE = 'SN|ItemsKey';
 
 /***/ }),
 
+/***/ "./lib/keychain.js":
+/*!*************************!*\
+  !*** ./lib/keychain.js ***!
+  \*************************/
+/*! exports provided: SNKeychainDelegate */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeychainDelegate", function() { return SNKeychainDelegate; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
+  var setKeyChainValue = _ref.setKeyChainValue,
+      getKeyChainValue = _ref.getKeyChainValue,
+      clearKeyChainValue = _ref.clearKeyChainValue;
+
+  _classCallCheck(this, SNKeychainDelegate);
+
+  this.setKeyChainValue = setKeyChainValue;
+  this.getKeyChainValue = getKeyChainValue;
+  this.clearKeyChainValue = clearKeyChainValue;
+};
+
+/***/ }),
+
 /***/ "./lib/main.js":
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileDecrypted, EncryptionIntentFileEncrypted, EncryptionIntentSync, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SNDatabaseManager, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager, SNKeyManager */
+/*! exports provided: SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileDecrypted, EncryptionIntentFileEncrypted, EncryptionIntentSync, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, SNDatabaseManager, SFModelManager, SFHttpManager, SFStorageManager, SFSyncManager, SFAuthManager, SFMigrationManager, SFAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SFSingletonManager, SNKeyManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1244,106 +1270,110 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SN_ITEMS_KEY_CONTENT_TYPE", function() { return _Lib_constants__WEBPACK_IMPORTED_MODULE_6__["SN_ITEMS_KEY_CONTENT_TYPE"]; });
 
-/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"]; });
+/* harmony import */ var _Lib_keychain__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/keychain */ "./lib/keychain.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeychainDelegate", function() { return _Lib_keychain__WEBPACK_IMPORTED_MODULE_7__["SNKeychainDelegate"]; });
 
-/* harmony import */ var _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__["SNItemsKey"]; });
+/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_8__["SFItem"]; });
 
-/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models_core_predicate__WEBPACK_IMPORTED_MODULE_9__["SFPredicate"]; });
+/* harmony import */ var _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_9__["SNItemsKey"]; });
 
-/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./models/app/note */ "./lib/models/app/note.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _models_app_note__WEBPACK_IMPORTED_MODULE_10__["SNNote"]; });
+/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models_core_predicate__WEBPACK_IMPORTED_MODULE_10__["SFPredicate"]; });
 
-/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/app/tag */ "./lib/models/app/tag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _models_app_tag__WEBPACK_IMPORTED_MODULE_11__["SNTag"]; });
+/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/app/note */ "./lib/models/app/note.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _models_app_note__WEBPACK_IMPORTED_MODULE_11__["SNNote"]; });
 
-/* harmony import */ var _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__["SNSmartTag"]; });
+/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/app/tag */ "./lib/models/app/tag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _models_app_tag__WEBPACK_IMPORTED_MODULE_12__["SNTag"]; });
 
-/* harmony import */ var _models_server_mfa__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./models/server/mfa */ "./lib/models/server/mfa.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMfa", function() { return _models_server_mfa__WEBPACK_IMPORTED_MODULE_13__["SNMfa"]; });
+/* harmony import */ var _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_13__["SNSmartTag"]; });
 
-/* harmony import */ var _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./models/server/serverExtension */ "./lib/models/server/serverExtension.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_14__["SNServerExtension"]; });
+/* harmony import */ var _models_server_mfa__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./models/server/mfa */ "./lib/models/server/mfa.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMfa", function() { return _models_server_mfa__WEBPACK_IMPORTED_MODULE_14__["SNMfa"]; });
 
-/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./models/app/component */ "./lib/models/app/component.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models_app_component__WEBPACK_IMPORTED_MODULE_15__["SNComponent"]; });
+/* harmony import */ var _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./models/server/serverExtension */ "./lib/models/server/serverExtension.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _models_server_serverExtension__WEBPACK_IMPORTED_MODULE_15__["SNServerExtension"]; });
 
-/* harmony import */ var _models_app_editor__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./models/app/editor */ "./lib/models/app/editor.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models_app_editor__WEBPACK_IMPORTED_MODULE_16__["SNEditor"]; });
+/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./models/app/component */ "./lib/models/app/component.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models_app_component__WEBPACK_IMPORTED_MODULE_16__["SNComponent"]; });
 
-/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./models/app/extension */ "./lib/models/app/extension.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNExtension", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_17__["SNExtension"]; });
+/* harmony import */ var _models_app_editor__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./models/app/editor */ "./lib/models/app/editor.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models_app_editor__WEBPACK_IMPORTED_MODULE_17__["SNEditor"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_17__["Action"]; });
+/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./models/app/extension */ "./lib/models/app/extension.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNExtension", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_18__["SNExtension"]; });
 
-/* harmony import */ var _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./models/subclasses/theme */ "./lib/models/subclasses/theme.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_18__["SNTheme"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_18__["Action"]; });
 
-/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_19__["SNEncryptedStorage"]; });
+/* harmony import */ var _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./models/subclasses/theme */ "./lib/models/subclasses/theme.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_19__["SNTheme"]; });
 
-/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_20__["SNComponentManager"]; });
+/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_20__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_21__["SFHistorySession"]; });
+/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_21__["SNComponentManager"]; });
 
-/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__["SFItemHistory"]; });
+/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_22__["SFHistorySession"]; });
 
-/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__["SFItemHistoryEntry"]; });
+/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_23__["SFItemHistory"]; });
 
-/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__["SFPrivileges"]; });
+/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_24__["SFItemHistoryEntry"]; });
 
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_25___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_25__);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_25__["SNWebCrypto"]; });
+/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_25__["SFPrivileges"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_25__["SNReactNativeCrypto"]; });
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_26___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_26__);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_26__["SNWebCrypto"]; });
 
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_26__["findInArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_26__["SNReactNativeCrypto"]; });
 
-/* harmony import */ var _services_databaseManager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/databaseManager */ "./lib/services/databaseManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_databaseManager__WEBPACK_IMPORTED_MODULE_27__["SNDatabaseManager"]; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_27__["findInArray"]; });
 
-/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_28__["SFModelManager"]; });
+/* harmony import */ var _services_databaseManager__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/databaseManager */ "./lib/services/databaseManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_databaseManager__WEBPACK_IMPORTED_MODULE_28__["SNDatabaseManager"]; });
 
-/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_29__["SFHttpManager"]; });
+/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_29__["SFModelManager"]; });
 
-/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_30__["SFStorageManager"]; });
+/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_30__["SFHttpManager"]; });
 
-/* harmony import */ var _services_syncManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/syncManager */ "./lib/services/syncManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSyncManager", function() { return _services_syncManager__WEBPACK_IMPORTED_MODULE_31__["SFSyncManager"]; });
+/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_31__["SFStorageManager"]; });
 
-/* harmony import */ var _services_authManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/authManager */ "./lib/services/authManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAuthManager", function() { return _services_authManager__WEBPACK_IMPORTED_MODULE_32__["SFAuthManager"]; });
+/* harmony import */ var _services_syncManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/syncManager */ "./lib/services/syncManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSyncManager", function() { return _services_syncManager__WEBPACK_IMPORTED_MODULE_32__["SFSyncManager"]; });
 
-/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_33__["SFMigrationManager"]; });
+/* harmony import */ var _services_authManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/authManager */ "./lib/services/authManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAuthManager", function() { return _services_authManager__WEBPACK_IMPORTED_MODULE_33__["SFAuthManager"]; });
 
-/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_34__["SFAlertManager"]; });
+/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_34__["SFMigrationManager"]; });
 
-/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_35__["SFSessionHistoryManager"]; });
+/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_35__["SFAlertManager"]; });
 
-/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_36__["SFPrivilegesManager"]; });
+/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_36__["SFSessionHistoryManager"]; });
 
-/* harmony import */ var _services_singletonManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/singletonManager */ "./lib/services/singletonManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return _services_singletonManager__WEBPACK_IMPORTED_MODULE_37__["SFSingletonManager"]; });
+/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_37__["SFPrivilegesManager"]; });
 
-/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_38__["SNKeyManager"]; });
+/* harmony import */ var _services_singletonManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/singletonManager */ "./lib/services/singletonManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return _services_singletonManager__WEBPACK_IMPORTED_MODULE_38__["SFSingletonManager"]; });
+
+/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_39__["SNKeyManager"]; });
+
 
 
 
@@ -11577,8 +11607,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var SNDatabaseManager =
 /*#__PURE__*/
 function () {
-  function SNDatabaseManager() {
+  function SNDatabaseManager(_ref) {
+    var namespace = _ref.namespace;
+
     _classCallCheck(this, SNDatabaseManager);
+
+    this.namespace = namespace;
   }
 
   _createClass(SNDatabaseManager, [{
@@ -11672,12 +11706,12 @@ function () {
 /*!*************************************!*\
   !*** ./lib/services/httpManager.js ***!
   \*************************************/
-/*! exports provided: SFHttpManager */
+/*! exports provided: SNHttpManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFHttpManager", function() { return SFHttpManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return SNHttpManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11686,10 +11720,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-var SFHttpManager =
+var SNHttpManager =
 /*#__PURE__*/
 function () {
-  _createClass(SFHttpManager, null, [{
+  _createClass(SNHttpManager, null, [{
     key: "getApiVersion",
     value: function getApiVersion() {
       // Applicable only to Standard Notes requests. Requests to external acitons should not use this.
@@ -11698,14 +11732,14 @@ function () {
     }
   }]);
 
-  function SFHttpManager(timeout, apiVersion) {
-    _classCallCheck(this, SFHttpManager);
+  function SNHttpManager(timeout) {
+    _classCallCheck(this, SNHttpManager);
 
     // calling callbacks in a $timeout allows UI to update
     this.$timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
   }
 
-  _createClass(SFHttpManager, [{
+  _createClass(SNHttpManager, [{
     key: "setJWTRequestHandler",
     value: function setJWTRequestHandler(handler) {
       this.jwtRequestHandler = handler;
@@ -11897,7 +11931,7 @@ function () {
     }
   }]);
 
-  return SFHttpManager;
+  return SNHttpManager;
 }();
 
 /***/ }),
@@ -12020,11 +12054,7 @@ function () {
     key: "setKeychainDelegate",
 
     /**
-     * Dynamically set an item which conforms to the KeyChain protocol.
-     * A delegate must implement the following methods:
-     * async setKeyChainValue(value)
-     * async getKeyChainValue()
-     * async clearKeyChainValue()
+     * Dynamically set an SNKeychainDelegate object
      */
     value: function setKeychainDelegate(delegate) {
       this.keychainDelegate = delegate;
@@ -12714,12 +12744,12 @@ function () {
 /*!******************************************!*\
   !*** ./lib/services/migrationManager.js ***!
   \******************************************/
-/*! exports provided: SFMigrationManager */
+/*! exports provided: SNMigrationManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFMigrationManager", function() { return SFMigrationManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationManager", function() { return SNMigrationManager; });
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Services_authManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/authManager */ "./lib/services/authManager.js");
@@ -12731,13 +12761,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var SFMigrationManager =
+var SNMigrationManager =
 /*#__PURE__*/
 function () {
-  function SFMigrationManager(modelManager, syncManager, storageManager, authManager) {
+  function SNMigrationManager(modelManager, syncManager, storageManager, authManager) {
     var _this = this;
 
-    _classCallCheck(this, SFMigrationManager);
+    _classCallCheck(this, SNMigrationManager);
 
     this.modelManager = modelManager;
     this.syncManager = syncManager;
@@ -12872,7 +12902,7 @@ function () {
     });
   }
 
-  _createClass(SFMigrationManager, [{
+  _createClass(SNMigrationManager, [{
     key: "addCompletionHandler",
     value: function addCompletionHandler(handler) {
       this.completionHandlers.push(handler);
@@ -13430,7 +13460,7 @@ function () {
     }
   }]);
 
-  return SFMigrationManager;
+  return SNMigrationManager;
 }();
 
 /***/ }),
@@ -16171,12 +16201,12 @@ function () {
 /*!******************************************!*\
   !*** ./lib/services/singletonManager.js ***!
   \******************************************/
-/*! exports provided: SFSingletonManager */
+/*! exports provided: SNSingletonManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFSingletonManager", function() { return SFSingletonManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return SNSingletonManager; });
 /* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16192,13 +16222,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  */
 
 
-var SFSingletonManager =
+var SNSingletonManager =
 /*#__PURE__*/
 function () {
-  function SFSingletonManager(modelManager, syncManager) {
+  function SNSingletonManager(_ref) {
     var _this = this;
 
-    _classCallCheck(this, SFSingletonManager);
+    var modelManager = _ref.modelManager,
+        syncManager = _ref.syncManager;
+
+    _classCallCheck(this, SNSingletonManager);
 
     this.syncManager = syncManager;
     this.modelManager = modelManager;
@@ -16274,7 +16307,7 @@ function () {
    */
 
 
-  _createClass(SFSingletonManager, [{
+  _createClass(SNSingletonManager, [{
     key: "registerSingleton",
     value: function registerSingleton(predicates, resolveCallback, createBlock) {
       this.singletonHandlers.push({
@@ -16407,7 +16440,7 @@ function () {
     }
   }]);
 
-  return SFSingletonManager;
+  return SNSingletonManager;
 }();
 
 /***/ }),
@@ -16416,12 +16449,12 @@ function () {
 /*!****************************************!*\
   !*** ./lib/services/storageManager.js ***!
   \****************************************/
-/*! exports provided: SFStorageManager */
+/*! exports provided: SNStorageManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFStorageManager", function() { return SFStorageManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return SNStorageManager; });
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -16431,14 +16464,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var STORAGE_CONTENT_TYPE = 'SN|Storage';
-var SFStorageManager =
+var SNStorageManager =
 /*#__PURE__*/
 function () {
-  function SFStorageManager(_ref) {
+  function SNStorageManager(_ref) {
     var protocolManager = _ref.protocolManager,
         databaseManager = _ref.databaseManager;
 
-    _classCallCheck(this, SFStorageManager);
+    _classCallCheck(this, SNStorageManager);
 
     this.protocolManager = protocolManager;
     this.databaseManager = databaseManager;
@@ -16457,7 +16490,7 @@ function () {
   */
 
 
-  _createClass(SFStorageManager, [{
+  _createClass(SNStorageManager, [{
     key: "initializeFromDisk",
     value: function initializeFromDisk() {
       return regeneratorRuntime.async(function initializeFromDisk$(_context) {
@@ -16638,7 +16671,7 @@ function () {
               throw 'Attempting to set local storage item without first loading local storage.';
 
             case 2:
-              this.localStorageValues[key] = value;
+              this.localStorageValues[this.namespacedKeyForKey(key)] = value;
               this.repersistToDisk();
 
             case 4:
@@ -16655,7 +16688,7 @@ function () {
         throw 'Attempting to access local storage item without first loading local storage.';
       }
 
-      return this.localStorageValues[key];
+      return this.localStorageValues[this.namespacedKeyForKey(key)];
     }
   }, {
     key: "getItem",
@@ -16672,7 +16705,7 @@ function () {
               throw 'Attempting to access local storage item without first loading local storage.';
 
             case 2:
-              return _context8.abrupt("return", this.localStorageValues[key]);
+              return _context8.abrupt("return", this.localStorageValues[this.namespacedKeyForKey(key)]);
 
             case 3:
             case "end":
@@ -16696,7 +16729,7 @@ function () {
               throw 'Attempting to access local storage item without first loading local storage.';
 
             case 2:
-              delete this.localStorageValues[key];
+              delete this.localStorageValues[this.namespacedKeyForKey(key)];
               this.repersistToDisk();
 
             case 4:
@@ -16705,6 +16738,15 @@ function () {
           }
         }
       }, null, this);
+    }
+  }, {
+    key: "namespacedKeyForKey",
+    value: function namespacedKeyForKey(key) {
+      if (this.namespace && this.namespace.length > 0) {
+        return "".concat(this.namespace, "-").concat(key);
+      } else {
+        return key;
+      }
     }
     /**
      *  Clears simple key/value items from storage only. Does not affect models.
@@ -16849,7 +16891,7 @@ function () {
     }
   }]);
 
-  return SFStorageManager;
+  return SNStorageManager;
 }();
 
 /***/ }),
