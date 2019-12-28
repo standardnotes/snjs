@@ -57,7 +57,7 @@ describe("basic auth", () => {
 
     var totalItemCount = 105;
     for(var i = 0; i < totalItemCount; i++) {
-      var item = Factory.createItem();
+      var item = Factory.createStorageItemNotePayload();
       modelManager.addItem(item);
       modelManager.setItemDirty(item, true);
     }
@@ -130,7 +130,7 @@ describe("basic auth", () => {
 
     var totalItemCount = 400;
     for(var i = 0; i < totalItemCount; i++) {
-      var item = Factory.createItem();
+      var item = Factory.createStorageItemNotePayload();
       modelManager.addItem(item);
       modelManager.setItemDirty(item, true);
     }

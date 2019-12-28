@@ -12,24 +12,10 @@ describe("items", () => {
     return isolatedApplication.modelManager;
   }
 
-  it('item content should equal item contentObject', async () => {
-    let modelManager = await createModelManager();
-    var item1 = Factory.createItem();
-    var item2 = Factory.createItem();
-    item1.addItemAsRelationship(item2);
-    item2.addItemAsRelationship(item1);
-
-    expect(item1.content).to.equal(item1.contentObject);
-
-    item1.content.foo = "bar";
-
-    expect(item1.content).to.equal(item1.contentObject);
-  });
-
   it('setting an item as dirty should update its client updated at', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createItemParams();
-    await modelManager.mapResponseItemsToLocalModels([params]);
+    var params = Factory.createStorageItemNotePayload();
+    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
@@ -40,8 +26,8 @@ describe("items", () => {
 
   it('setting an item as dirty with option to skip client updated at', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createItemParams();
-    await modelManager.mapResponseItemsToLocalModels([params]);
+    var params = Factory.createStorageItemNotePayload();
+    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
@@ -52,8 +38,8 @@ describe("items", () => {
 
   it('properly pins, archives, and locks', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createItemParams();
-    await modelManager.mapResponseItemsToLocalModels([params]);
+    var params = Factory.createStorageItemNotePayload();
+    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
 
     let item = modelManager.items[0];
     expect(item.pinned).to.not.be.ok;
@@ -70,9 +56,9 @@ describe("items", () => {
 
   it('properly compares item equality', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createItemParams();
-    var params2 = Factory.createItemParams();
-    await modelManager.mapResponseItemsToLocalModels([params1, params2]);
+    var params1 = Factory.createStorageItemNotePayload();
+    var params2 = Factory.createStorageItemNotePayload();
+    await modelManager.mapPayloadsToLocalModels({payloads: [params1, params2]});
 
     let item1 = modelManager.items[0];
     let item2 = modelManager.items[1];
@@ -112,9 +98,9 @@ describe("items", () => {
 
   it('content equality should not have side effects', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createItemParams();
-    var params2 = Factory.createItemParams();
-    await modelManager.mapResponseItemsToLocalModels([params1, params2]);
+    var params1 = Factory.createStorageItemNotePayload();
+    var params2 = Factory.createStorageItemNotePayload();
+    await modelManager.mapPayloadsToLocalModels({payloads: [params1, params2]});
 
     let item1 = modelManager.items[0];
     let item2 = modelManager.items[1];

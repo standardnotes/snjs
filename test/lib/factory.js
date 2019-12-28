@@ -73,24 +73,47 @@ export default class Factory {
     });
   }
 
+  static createStorageItemPayload(contentType) {
+    return new SNStorageItemPayload(this.createItemParams(contentType));
+  }
+
+  static createStorageItemNotePayload() {
+    return new SNStorageItemPayload(this.createNoteParams());
+  }
+
+  static createStorageItemTagPayload() {
+    return new SNStorageItemPayload(this.createTagParams());
+  }
+
+  static async mapPayloadToItem(payload, modelManager) {
+    const items = await modelManager.mapPayloadsToLocalModels({payloads: [payload]})
+    return items[0];
+  }
+
+  static itemToStoragePayload(item) {
+    return CreateMaxPayloadFromItem({item});
+  }
+
+  static createMappedNote(modelManager) {
+    const payload = this.createStorageItemNotePayload();
+    return this.mapPayloadToItem(payload, modelManager);
+  }
+
+  static createMappedTag(modelManager) {
+    const payload = this.createStorageItemTagPayload();
+    return this.mapPayloadToItem(payload, modelManager);
+  }
+
   static createItemParams(contentType) {
-    var params = {
+    const params = {
       uuid: SFItem.GenerateUuidSynchronously(),
-      content_type: contentType || "Note",
+      content_type: contentType,
       content: {
         title: "hello",
         text: "world"
       }
     };
     return params;
-  }
-
-  static createItem(contentType) {
-    if(!contentType) {
-      return new SNNote(this.createItemParams());
-    } else {
-      return new SFItem(this.createItemParams(contentType));
-    }
   }
 
   static createNoteParams() {
@@ -100,6 +123,17 @@ export default class Factory {
       content: {
         title: "hello",
         text: "world"
+      }
+    };
+    return params;
+  }
+
+  static createTagParams() {
+    const params = {
+      uuid: SFItem.GenerateUuidSynchronously(),
+      content_type: "Tag",
+      content: {
+        title: "thoughts",
       }
     };
     return params;

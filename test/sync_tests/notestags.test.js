@@ -27,7 +27,7 @@ describe.only("notes + tags syncing", async function() {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    this.application.modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    this.application.modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
@@ -53,7 +53,7 @@ describe.only("notes + tags syncing", async function() {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    this.application.modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    this.application.modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let originalNote = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     let originalTag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
     originalNote.setDirty(true);
@@ -93,7 +93,7 @@ describe.only("notes + tags syncing", async function() {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    this.application.modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    this.application.modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
 

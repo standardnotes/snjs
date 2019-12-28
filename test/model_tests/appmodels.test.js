@@ -33,7 +33,7 @@ describe('app models', () => {
     }
 
     // merging a with b should replace total content
-    SFItem.deepMerge(a, b);
+    deepMerge(a, b);
     expect(a.content.references).to.eql([]);
   });
 
@@ -46,13 +46,13 @@ describe('app models', () => {
   });
 
   it('item content should be assigned', () => {
-    var params = Factory.createItemParams();
+    var params = Factory.createStorageItemNotePayload();
     var item = new SFItem(params);
     expect(item.content.title).to.equal(params.content.title);
   });
 
   it('should default updated_at to 1970 and created_at to the present', () => {
-    var params = Factory.createItemParams();
+    var params = Factory.createStorageItemNotePayload();
     var item = new SFItem(params);
     let epoch = new Date(0);
     expect(item.updated_at - epoch).to.equal(0);
@@ -60,8 +60,8 @@ describe('app models', () => {
     expect(new Date() - item.created_at).to.be.below(5); // < 5ms
   });
 
-  it('adding item to modelmanager should add it to its items', () => {
-    sharedCreatedItem = Factory.createItem();
+  it('adding item to modelmanager should add it to its items', async () => {
+    sharedCreatedItem = await Factory.createMappedNote(application.modelManager);
     application.modelManager.addItem(sharedCreatedItem);
     expect(application.modelManager.items.length).to.equal(1);
     expect(application.modelManager.allItems.length).to.equal(1);
@@ -81,19 +81,22 @@ describe('app models', () => {
 
   it('handles delayed mapping', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createItem();
-    var params2 = Factory.createItem();
+    var params1 = Factory.createStorageItemNotePayload();
+    var params2 = Factory.createStorageItemNotePayload();
 
-    params1.content.references = [{uuid: params2.uuid, content_type: params2.content_type}];
+    params1.content.references = [{
+      uuid: params2.uuid,
+      content_type: params2.content_type
+    }];
 
-    expect(params1.content.references.length).to.equal(1);
-    expect(params2.content.references.length).to.equal(0);
-
-    await modelManager.mapResponseItemsToLocalModels([params1]);
-    await modelManager.mapResponseItemsToLocalModels([params2]);
+    await modelManager.mapPayloadsToLocalModels({payloads: [params1]});
+    await modelManager.mapPayloadsToLocalModels({payloads: [params2]});
 
     var item1 = modelManager.findItem(params1.uuid);
     var item2 = modelManager.findItem(params2.uuid);
+
+    expect(item1.content.references.length).to.equal(1);
+    expect(item2.content.references.length).to.equal(0);
 
     expect(item1.referencingObjects.length).to.equal(0);
     expect(item2.referencingObjects.length).to.equal(1);
@@ -101,32 +104,49 @@ describe('app models', () => {
 
   it('mapping item without uuid should not map it', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createItem();
+    var params1 = Factory.createStorageItemNotePayload();
     params1.uuid = null;
 
-    await modelManager.mapResponseItemsToLocalModels([params1]);
+    await modelManager.mapPayloadsToLocalModels({payloads: [params1]});
     expect(modelManager.allItems.length).to.equal(0);
   });
 
   it('mapping an item twice shouldnt cause problems', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createItem();
-    params1.content.foo = "bar";
+    var payload = Factory.createStorageItemNotePayload();
+    payload.content.foo = "bar";
 
-    let items = await modelManager.mapResponseItemsToLocalModels([params1]);
+    let items = await modelManager.mapPayloadsToLocalModels({payloads: [payload]});
     let item = items[0];
     expect(item).to.not.be.null;
 
-    items = await modelManager.mapResponseItemsToLocalModels([item]);
+    items = await modelManager.mapPayloadsToLocalModels({payloads: [payload]});
     item = items[0];
 
     expect(item.content.foo).to.equal("bar");
+    expect(modelManager.notes.length).to.equal(1);
+  });
+
+  it('mapping item twice should preserve references', async () => {
+    let modelManager = await createModelManager();
+    var item1 = await Factory.createMappedNote(modelManager);
+    var item2 = await Factory.createMappedNote(modelManager);
+
+    item1.addItemAsRelationship(item2);
+    item2.addItemAsRelationship(item1);
+
+    expect(item1.content.references.length).to.equal(1);
+
+    const updatedPayload = Factory.itemToStoragePayload(item1);
+    await modelManager.mapPayloadsToLocalModels({payloads: [updatedPayload]});
+
+    expect(item1.content.references.length).to.equal(1);
   });
 
   it('fixes relationship integrity', async () => {
     let modelManager = await createModelManager();
-    var item1 = Factory.createItem();
-    var item2 = Factory.createItem();
+    var item1 = await Factory.createMappedNote(modelManager);
+    var item2 = await Factory.createMappedNote(modelManager);
 
     item1.addItemAsRelationship(item2);
     item2.addItemAsRelationship(item1);
@@ -136,7 +156,8 @@ describe('app models', () => {
 
     // damage references of one object
     item1.content.references = [];
-    await modelManager.mapResponseItemsToLocalModels([item1]);
+    const updatedPayload = Factory.itemToStoragePayload(item1);
+    await modelManager.mapPayloadsToLocalModels({payloads: [updatedPayload]});
 
     expect(item1.content.references.length).to.equal(0);
     expect(item2.content.references.length).to.equal(1);
@@ -144,8 +165,8 @@ describe('app models', () => {
 
   it('creating and removing relationships between two items should have valid references', async () => {
     let modelManager = await createModelManager();
-    var item1 = Factory.createItem();
-    var item2 = Factory.createItem();
+    var item1 = await Factory.createMappedNote(modelManager);
+    var item2 = await Factory.createMappedNote(modelManager);
     item1.addItemAsRelationship(item2);
     item2.addItemAsRelationship(item1);
 
@@ -167,7 +188,7 @@ describe('app models', () => {
 
   it('notifies observers of item uuid alternation', async () => {
     let modelManager = await createModelManager();
-    var originalItem1 = Factory.createItem();
+    var item1 = await Factory.createMappedNote(modelManager);
 
     return new Promise((resolve, reject) => {
       modelManager.addModelUuidChangeObserver("test", (oldItem, newItem) => {
@@ -175,82 +196,97 @@ describe('app models', () => {
         resolve();
       })
 
-      modelManager.alternateUUIDForItem(originalItem1);
+      modelManager.alternateUUIDForItem(item1);
     })
   });
 
-  it('properly duplicates item', async () => {
-    let modelManager = await createModelManager();
-    var originalItem1 = Factory.createItem();
-    originalItem1.setAppDataItem("locked", true);
-    var originalItem2 = Factory.createItem();
-    originalItem1.addItemAsRelationship(originalItem2);
+  it('properly duplicates item with no relationships', async () => {
+    const modelManager = await createModelManager();
+    const item = await Factory.createMappedNote(modelManager);
+    const duplicate = modelManager.duplicateItemAndAdd(item);
+    expect(duplicate.uuid).to.not.equal(item.uuid);
+    expect(item.isItemContentEqualWith(duplicate)).to.equal(true);
+    expect(item.created_at).to.equal(duplicate.created_at);
+    expect(item.content_type).to.equal(duplicate.content_type);
+  });
 
-    expect(originalItem2.referencingObjects.length).to.equal(1);
+  it('properly duplicates item with relationships', async () => {
+    const modelManager = await createModelManager();
 
-    let duplicate = modelManager.duplicateItemAndAdd(originalItem1);
+    const item1 = await Factory.createMappedNote(modelManager);
+    const item2 = await Factory.createMappedNote(modelManager);
 
-    expect(originalItem1.isItemContentEqualWith(duplicate)).to.equal(true);
-    expect(originalItem1.created_at).to.equal(duplicate.created_at);
-    expect(originalItem1.content_type).to.equal(duplicate.content_type);
+    item1.addItemAsRelationship(item2);
+
+    expect(item1.referencedObjects.length).to.equal(1);
+    expect(item2.referencingObjects.length).to.equal(1);
+
+    const duplicate = modelManager.duplicateItemAndAdd(item1);
+    expect(duplicate.uuid).to.not.equal(item1.uuid);
+    expect(item1.referencedObjects.length).to.equal(1);
+    expect(duplicate.referencingObjects.length).to.equal(item1.referencingObjects.length);
+    expect(duplicate.referencedObjects.length).to.equal(item1.referencedObjects.length);
+
+    expect(item1.isItemContentEqualWith(duplicate)).to.equal(true);
+    expect(item1.created_at).to.equal(duplicate.created_at);
+    expect(item1.content_type).to.equal(duplicate.content_type);
+
     expect(duplicate.content.references.length).to.equal(1);
-    expect(originalItem2.referencingObjects.length).to.equal(1);
+
+    expect(item2.referencingObjects.length).to.equal(2);
+    expect(item2.referencedObjects.length).to.equal(0);
   });
 
   it('properly handles single item uuid alternation', async () => {
-    let modelManager = await createModelManager();
-    var originalItem1 = Factory.createItem();
-    var originalItem2 = Factory.createItem();
-    modelManager.addItem(originalItem1);
-    modelManager.addItem(originalItem2);
+    const modelManager = await createModelManager();
+    const item1 = await Factory.createMappedNote(modelManager);
+    const item2 = await Factory.createMappedNote(modelManager);
 
-    originalItem1.addItemAsRelationship(originalItem2);
-    originalItem2.addItemAsRelationship(originalItem1);
+    item1.addItemAsRelationship(item2);
 
-    expect(originalItem1.referencingObjects.length).to.equal(1);
-    expect(originalItem2.referencingObjects.length).to.equal(1);
+    expect(item1.content.references.length).to.equal(1);
+    expect(item1.referencedObjects.length).to.equal(1);
+    expect(item2.referencingObjects.length).to.equal(1);
 
-    let alternatedItem1 = await modelManager.alternateUUIDForItem(originalItem1);
+    const alternatedItem = await modelManager.alternateUUIDForItem(item1);
+    // they should not be same reference
+    expect(item1.content === alternatedItem.content).to.equal(false);
+    expect(item1.content.references === alternatedItem.content.references).to.equal(false);
+    expect(item1.uuid).to.not.equal(alternatedItem.uuid);
 
-    expect(modelManager.allItems.length).to.equal(2);
+    expect(modelManager.notes.length).to.equal(2);
 
-    expect(originalItem1.uuid).to.not.equal(alternatedItem1.uuid);
-    expect(alternatedItem1.uuid).to.equal(alternatedItem1.uuid);
+    // item1 references should be discarded
+    expect(item1.content.references.length).to.equal(0);
 
-    expect(alternatedItem1.content.references.length).to.equal(1);
-    expect(originalItem2.content.references.length).to.equal(1);
-    expect(alternatedItem1.content.references.length).to.equal(1);
+    expect(alternatedItem.content.references.length).to.equal(1);
+    expect(alternatedItem.referencingObjects.length).to.equal(0);
+    expect(alternatedItem.referencedObjects.length).to.equal(1);
 
-    expect(alternatedItem1.referencingObjects.length).to.equal(1);
-    expect(originalItem2.referencingObjects.length).to.equal(1);
+    expect(item2.referencingObjects.length).to.equal(1);
 
-    expect(alternatedItem1.hasRelationshipWithItem(originalItem2)).to.equal(true);
-    expect(originalItem2.hasRelationshipWithItem(alternatedItem1)).to.equal(true);
-
-    expect(originalItem2.hasRelationshipWithItem(alternatedItem1)).to.equal(true);
-    expect(alternatedItem1.hasRelationshipWithItem(originalItem2)).to.equal(true);
-
-    expect(alternatedItem1.dirty).to.equal(true);
+    expect(alternatedItem.hasRelationshipWithItem(item2)).to.equal(true);
+    expect(alternatedItem.dirty).to.equal(true);
   });
 
   it('properly handles mutli item uuid alternation', async () => {
-    let modelManager = await createModelManager();
-    var originalItem1 = Factory.createItem();
-    var originalItem2 = Factory.createItem();
-    modelManager.addItem(originalItem1);
-    modelManager.addItem(originalItem2);
+    const modelManager = await createModelManager();
+    const item1 = await Factory.createMappedNote(modelManager);
+    const item2 = await Factory.createMappedNote(modelManager);
+    modelManager.addItem(item1);
+    modelManager.addItem(item2);
 
-    originalItem1.addItemAsRelationship(originalItem2);
+    item1.addItemAsRelationship(item2);
 
-    expect(originalItem2.referencingObjects.length).to.equal(1);
+    expect(item2.referencingObjects.length).to.equal(1);
 
-    var alternatedItem1 = await modelManager.alternateUUIDForItem(originalItem1);
-    var alternatedItem2 = await modelManager.alternateUUIDForItem(originalItem2);
+    const alternatedItem1 = await modelManager.alternateUUIDForItem(item1);
+    const alternatedItem2 = await modelManager.alternateUUIDForItem(item2);
 
     expect(modelManager.allItems.length).to.equal(2);
 
-    expect(originalItem1.uuid).to.not.equal(alternatedItem1.uuid);
-    expect(originalItem2.uuid).to.not.equal(alternatedItem2.uuid);
+    expect(item1.uuid).to.not.equal(alternatedItem1.uuid);
+    expect(item2.uuid).to.not.equal(alternatedItem2.uuid);
 
     expect(alternatedItem1.content.references.length).to.equal(1);
     expect(alternatedItem1.content.references[0].uuid).to.equal(alternatedItem2.uuid);
@@ -264,20 +300,18 @@ describe('app models', () => {
   });
 
   it('maintains referencing relationships when duplicating', async () => {
-    let modelManager = await createModelManager();
-    var tag = Factory.createItem();
-    var note = Factory.createItem();
-    modelManager.addItem(tag);
-    modelManager.addItem(note);
-
+    const modelManager = await createModelManager();
+    const tag = await Factory.createMappedTag(modelManager);
+    const note = await Factory.createMappedNote(modelManager);
     tag.addItemAsRelationship(note);
 
     expect(tag.content.references.length).to.equal(1);
 
-    var noteCopy = modelManager.duplicateItemAndAdd(note);
-
-    expect(modelManager.allItems.length).to.equal(3);
+    const noteCopy = modelManager.duplicateItemAndAdd(note);
     expect(note.uuid).to.not.equal(noteCopy.uuid);
+
+    expect(modelManager.notes.length).to.equal(2);
+    expect(modelManager.tags.length).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
     expect(noteCopy.content.references.length).to.equal(0);
@@ -293,22 +327,26 @@ describe('app models', () => {
       then when the incoming tag is being processed, it will also think it has changed, since our local value now doesn't match
       what's coming in. The solution is to get all values ahead of time before any changes are made.
     */
-    let modelManager = await createModelManager();
-    var tag = Factory.createItem();
-    var note = Factory.createItem();
-    modelManager.addItem(tag);
-    modelManager.addItem(note);
+    const modelManager = await createModelManager();
+    const tag = await Factory.createMappedTag(modelManager);
+    const note = await Factory.createMappedNote(modelManager);
 
     tag.addItemAsRelationship(note);
 
-    let externalNote = Object.assign({}, {content: note.getContentCopy(), content_type: note.content_type});
+    const externalNote = Object.assign(
+      {},
+      {content: note.getContentCopy(), content_type: note.content_type}
+    );
     externalNote.uuid = note.uuid;
     externalNote.content.text = `${Math.random()}`;
 
-    let externalTag = Object.assign({}, {content: tag.getContentCopy(), content_type: tag.content_type});
+    const externalTag = Object.assign(
+      {},
+      {content: tag.getContentCopy(), content_type: tag.content_type}
+    );
     externalTag.uuid = tag.uuid;
 
-    await modelManager.importItems([externalNote, externalTag]);
+    await modelManager.importItemsFromRaw([externalNote, externalTag]);
 
     // We expect now that the total item count is 3, not 4.
     expect(modelManager.allItems.length).to.equal(3);

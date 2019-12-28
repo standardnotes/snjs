@@ -24,9 +24,9 @@ const singletonManager = new SNSingletonManager(modelManager, syncManager);
 describe("singletons", () => {
 
   it("only resolves to 1 item", async () => {
-    let item1 = Factory.createItem();
-    let item2 = Factory.createItem();
-    let item3 = Factory.createItem();
+    let item1 = Factory.createStorageItemNotePayload();
+    let item2 = Factory.createStorageItemNotePayload();
+    let item3 = Factory.createStorageItemNotePayload();
     let contentTypePredicate = new SFPredicate("content_type", "=", item1.content_type);
     singletonManager.registerSingleton([contentTypePredicate]);
 
@@ -57,7 +57,7 @@ describe("singletons", () => {
     await modelManager.handleSignout();
     await syncManager.loadLocalItems();
 
-    let item1 = Factory.createItem();
+    let item1 = Factory.createStorageItemNotePayload();
     modelManager.addItem(item1);
     modelManager.setItemDirty(item1, true);
     await syncManager.sync();
@@ -71,7 +71,7 @@ describe("singletons", () => {
     singletonManager.registerSingleton([contentTypePredicate], (resolvedSingleton) => {
       resolvedItem = resolvedSingleton;
     }, async (valueCallback) => {
-      let newItem = Factory.createItem();
+      let newItem = Factory.createStorageItemNotePayload();
       modelManager.addItem(newItem);
       modelManager.setItemDirty(newItem, true);
       valueCallback(newItem);

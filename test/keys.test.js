@@ -72,9 +72,9 @@ describe.only('keys', () => {
   })
 
   it('generating export params with no key should produce decrypted payload', async () => {
-    const item = Factory.createItem();
+    const item = Factory.createStorageItemNotePayload();
     const title = item.content.title;
-    const payload = await sharedApplication.protocolManager.generateExportParameters({
+    const payload = await sharedApplication.protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentLocalStoragePreferEncrypted
     })
@@ -104,7 +104,7 @@ describe.only('keys', () => {
   })
 
   it('should use items key for encryption of note', async function() {
-    const note = Factory.createItem();
+    const note = Factory.createStorageItemNotePayload();
     const keyToUse = await this.application.keyManager.keyToUseForEncryptionOfItem({
       item: note,
       intent: EncryptionIntentSync
@@ -113,30 +113,30 @@ describe.only('keys', () => {
   })
 
   it.only('encrypting an item should associate an items key to it', async function() {
-    const note = Factory.createItem();
-    const payload = await this.application.protocolManager.generateExportParameters({
+    const note = Factory.createStorageItemNotePayload();
+    const payload = await this.application.protocolManager.generateItemPayload({
       item: note,
       intent: EncryptionIntentSync
     });
-    expect(note.encryptingKey).to.be.ok;
+    // expect(note.encryptingKey).to.be.ok;
   })
 
   it.only('decrypt encrypted item with associated key', async function() {
-    const note = Factory.createItem();
-    const payload = await this.application.protocolManager.generateExportParameters({
+    const note = Factory.createStorageItemNotePayload();
+    const payload = await this.application.protocolManager.generateItemPayload({
       item: note,
       intent: EncryptionIntentSync
     });
 
-    
-    expect(note.encryptingKey).to.be.ok;
+
+    // expect(note.encryptingKey).to.be.ok;
   })
 
   it('generating export params with logged in account should produce encrypted payload', async () => {
     const localApplication = await Factory.createInitAppWithRandNamespace();
     await Factory.registerUserToApplication({application: localApplication});
-    const item = Factory.createItem();
-    const payload = await localApplication.protocolManager.generateExportParameters({
+    const item = Factory.createStorageItemNotePayload();
+    const payload = await localApplication.protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })

@@ -22,7 +22,7 @@ describe('migrations', () => {
   it("should not run migrations until local data loading and sync is complete", async () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
-    modelManager.addItem(Factory.createItem());
+    modelManager.addItem(Factory.createStorageItemNotePayload);
     const syncManager = new SNSyncManager({
       modelManager,
       authManager,
@@ -75,7 +75,7 @@ describe('migrations', () => {
   it("should handle running multiple migrations", async () => {
     let authManager = Factory.globalAuthManager();
     let modelManager = Factory.createModelManager();
-    modelManager.addItem(Factory.createItem());
+    modelManager.addItem(Factory.createStorageItemNotePayload);
     const syncManager = new SNSyncManager({
       modelManager,
       authManager,
@@ -147,7 +147,7 @@ describe('migrations', () => {
 
     var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
 
-    var params1 = Factory.createItem();
+    var params1 = Factory.createStorageItemNotePayload();
     modelManager.addItem(params1);
 
     let randValue = Math.random();
@@ -186,7 +186,7 @@ describe('migrations', () => {
     var item1 = modelManager.findItem(params1.uuid);
     expect(item1.content.foo).to.equal(randValue);
 
-    var params = Factory.createItem();
+    var params = Factory.createStorageItemNotePayload();
     modelManager.addItem(params);
     var item = modelManager.findItem(params.uuid);
     expect(item.content.foo).to.not.equal(randValue);

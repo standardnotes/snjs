@@ -16,7 +16,7 @@ describe("notes and tags", () => {
   it('uses proper class for note', async function() {
     let modelManager = await createModelManager();
     let noteParams = Factory.createNoteParams();
-    modelManager.mapResponseItemsToLocalModels([noteParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
@@ -27,14 +27,14 @@ describe("notes and tags", () => {
     note.title = title;
     note.text = text;
 
-    let content = note.createContentJSONFromProperties();
+    let content = note.collapseContentAndGetJson();
     expect(content.title).to.equal(title);
     expect(content.text).to.equal(text);
 
     let tag = new SNTag();
     tag.title = title;
 
-    expect(tag.createContentJSONFromProperties().title).to.equal(title);
+    expect(tag.collapseContentAndGetJson().title).to.equal(title);
 
     expect(tag.structureParams().title).to.equal(tag.getContentCopy().title);
   })
@@ -53,7 +53,7 @@ describe("notes and tags", () => {
       }
     ];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -71,7 +71,7 @@ describe("notes and tags", () => {
     expect(noteParams.content.references.length).to.equal(0);
     expect(tagParams.content.references.length).to.equal(1);
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -104,7 +104,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -112,7 +112,7 @@ describe("notes and tags", () => {
     expect(tag.content.references.length).to.equal(1);
 
     tagParams.content.references = [];
-    modelManager.mapResponseItemsToLocalModels([tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
 
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
@@ -130,14 +130,14 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
     tagParams.deleted = true;
-    modelManager.mapResponseItemsToLocalModels([tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -153,14 +153,14 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
     tagParams.content.references = [];
-    modelManager.mapResponseItemsToLocalModels([tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -176,7 +176,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -188,7 +188,10 @@ describe("notes and tags", () => {
     tag.title = title;
     tagParams.content.title = title;
     // simulate a save, which omits `content`
-    modelManager.mapResponseItemsToLocalModelsOmittingFields([tagParams], ['content']);
+    modelManager.mapPayloadsToLocalModels({
+      payloads: [tagParams],
+      omitFields: ['content']
+    })
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -202,7 +205,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -210,7 +213,7 @@ describe("notes and tags", () => {
     expect(tag.content.references.length).to.equal(1);
 
     tag.removeItemAsRelationship(note);
-    modelManager.mapResponseItemsToLocalModels([tag]);
+    modelManager.mapPayloadsToLocalModels({payloads: [tag]});
 
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
@@ -223,7 +226,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -255,7 +258,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -272,7 +275,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -283,7 +286,7 @@ describe("notes and tags", () => {
     expect(note.tags.length).to.equal(1);
 
     modelManager.setItemToBeDeleted(tag);
-    modelManager.mapResponseItemsToLocalModels([tag]);
+    modelManager.mapPayloadsToLocalModels({payloads: [tag]});
     expect(tag.content.references.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
   });
@@ -295,7 +298,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -305,7 +308,7 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(1);
 
-    modelManager.importItems([noteParams, tagParams]);
+    modelManager.importItemsFromRaw([noteParams, tagParams]);
 
     expect(modelManager.allItems.length).to.equal(2);
 
@@ -324,13 +327,13 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     noteParams.content.title = Math.random();
     tagParams.content.title = Math.random();
-    await modelManager.importItems([noteParams, tagParams]);
+    await modelManager.importItemsFromRaw([noteParams, tagParams]);
 
     expect(modelManager.allItems.length).to.equal(4);
 
@@ -371,7 +374,7 @@ describe("notes and tags", () => {
       uuid: tagParams.uuid
     }]
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -398,7 +401,7 @@ describe("notes and tags", () => {
     let noteParams = pair[0];
     let tagParams = pair[1];
 
-    modelManager.mapResponseItemsToLocalModels([noteParams, tagParams]);
+    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 

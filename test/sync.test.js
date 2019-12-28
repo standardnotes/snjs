@@ -21,7 +21,7 @@ describe("local storage manager", () => {
   })
 
   it("should set and retrieve items", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     await Factory.globalStorageManager().saveModel(item);
 
     return Factory.globalStorageManager().getAllModels().then((models) => {
@@ -58,7 +58,7 @@ describe('offline syncing', () => {
   })
 
   it("should sync basic model offline", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
 
@@ -83,7 +83,7 @@ describe('offline syncing', () => {
       httpManager: Factory.globalHttpManager()
     });
 
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     localModelManager.addItem(item);
     localModelManager.setItemDirty(item);
     // Beginning this sync will begin data load, and this latency will be applied to the data load.
@@ -169,7 +169,7 @@ describe('online syncing', () => {
   it("should register and sync basic model online", async () => {
     await syncManager.loadLocalItems();
 
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
 
@@ -238,7 +238,7 @@ describe('online syncing', () => {
     // logout
     await signout();
 
-    let item = Factory.createItem();
+    let item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item, true);
     totalItemCount++;
@@ -283,7 +283,7 @@ describe('online syncing', () => {
   }).timeout(60000);
 
   it("mapping should not mutate items with error decrypting state", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     let originalTitle = item.content.title;
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
@@ -291,18 +291,18 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     totalItemCount++;
 
-    const itemParams = await protocolManager.generateExportParameters({
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
 
     itemParams.errorDecrypting = true;
-    let items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
+    let items = await modelManager.mapPayloadsToLocalModels({payloads: [itemParams]});
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
     await protocolManager.decryptItemPayload({item: itemParams});
-    items = await modelManager.mapResponseItemsToLocalModels([itemParams]);
+    items = await modelManager.mapPayloadsToLocalModels({payloads: [itemParams]});
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
     expect(mappedItem.content.title).to.equal(originalTitle);
@@ -312,7 +312,7 @@ describe('online syncing', () => {
     // See sync-log.md 1.10.
     await syncManager.loadLocalItems();
     // create an item and sync it
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
     await syncManager.sync(syncOptions);
@@ -355,7 +355,7 @@ describe('online syncing', () => {
   it("should handle sync conflicts by duplicating differing data", async () => {
     await syncManager.loadLocalItems();
     // create an item and sync it
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
     await syncManager.sync(syncOptions);
@@ -385,7 +385,7 @@ describe('online syncing', () => {
 
   it("should duplicate item if saving a modified item and clearing our sync token", async () => {
     await syncManager.loadLocalItems();
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     await syncManager.sync(syncOptions);
@@ -420,7 +420,7 @@ describe('online syncing', () => {
   it("should handle sync conflicts by not duplicating same data", async () => {
     await syncManager.loadLocalItems();
     // create an item and sync it
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     totalItemCount++;
     modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
@@ -442,7 +442,7 @@ describe('online syncing', () => {
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     totalItemCount += 1;
@@ -469,7 +469,7 @@ describe('online syncing', () => {
 
   it('removes item from storage upon deletion', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     await syncManager.sync(syncOptions);
@@ -490,7 +490,7 @@ describe('online syncing', () => {
 
   it('handle case where server says item is deleted but client says its not deleted', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     await syncManager.sync(syncOptions);
@@ -526,7 +526,7 @@ describe('online syncing', () => {
 
   it('handle case where server says item is not deleted but client says it is deleted', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     totalItemCount += 1;
@@ -565,7 +565,7 @@ describe('online syncing', () => {
 
     await syncManager.loadLocalItems();
 
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     totalItemCount++;
     modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
@@ -592,7 +592,7 @@ describe('online syncing', () => {
 
   it('creating conflict with exactly equal content should keep us in sync', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
     totalItemCount += 1;
@@ -610,7 +610,7 @@ describe('online syncing', () => {
 
   it('should keep an item dirty thats been modified after low latency sync request began', async () => {
     await syncManager.loadLocalItems();
-    let note = Factory.createItem();
+    let note = Factory.createStorageItemNotePayload();
     note.text = "Initial value";
     modelManager.addItem(note);
     modelManager.setItemDirty(note, true);
@@ -655,7 +655,7 @@ describe('online syncing', () => {
 
   it("should sync an item twice if it's marked dirty while a sync is ongoing", async () => {
     // create an item and sync it
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     modelManager.setItemDirty(item, true);
     totalItemCount++;
@@ -679,7 +679,7 @@ describe('online syncing', () => {
   it.skip("marking an item dirty then saving to disk should retain that dirty state when restored", async () => {
     // This test is currently broken, but seems to have to do more with how the test was written than  an issue with the code.
     // create an item and sync it
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     totalItemCount++;
     await syncManager.markAllItemsDirtyAndSaveOffline(false);
@@ -700,11 +700,11 @@ describe('online syncing', () => {
 
   it('duplicating an item should maintian its relationships', async () => {
     await syncManager.loadLocalItems();
-    var originalItem1 = Factory.createItem("Foo");
-    var originalItem2 = Factory.createItem("Bar");
+    var originalItem1 = Factory.createStorageItemPayload("Foo");
+    var originalItem2 = Factory.createStorageItemPayload("Bar");
 
     originalItem1.addItemAsRelationship(originalItem2);
-    await modelManager.mapResponseItemsToLocalModels([originalItem1, originalItem2]);
+    await modelManager.mapPayloadsToLocalModels({payloads: [originalItem1, originalItem2]});
 
     totalItemCount += 2;
 
@@ -763,7 +763,7 @@ describe('online syncing', () => {
 
   it("should handle syncing pagination", async () => {
     for(var i = 0; i < largeItemCount; i++) {
-      var item = Factory.createItem();
+      var item = Factory.createStorageItemNotePayload();
       modelManager.setItemDirty(item, true);
       modelManager.addItem(item);
     }
@@ -810,7 +810,7 @@ describe('online syncing', () => {
 
     expect(localModelManager.getDirtyItems().length).to.equal(0);
 
-    let item = Factory.createItem();
+    let item = Factory.createStorageItemNotePayload();
     item.text = `${Math.random()}`;
     localModelManager.addItem(item);
     localModelManager.setItemDirty(item);
@@ -859,7 +859,7 @@ describe('online syncing', () => {
     let contentTypes = ["A", "B", "C"];
     let itemCount = 6;
     for(var i = 0; i < itemCount; i++) {
-      var item = Factory.createItem(contentTypes[Math.floor(i/2)]);
+      var item = Factory.createStorageItemPayload(contentTypes[Math.floor(i/2)]);
       modelManager.setItemDirty(item, true);
       localModelManager.addItem(item);
     }
@@ -954,9 +954,9 @@ describe('online syncing', () => {
       then when the incoming tag is being processed, it will also think it has changed, since our local value now doesn't match
       what's coming in. The solution is to get all values ahead of time before any changes are made.
     */
-    var tag = Factory.createItem("Tag");
+    var tag = Factory.createStorageItemPayload("Tag");
 
-    var note = Factory.createItem();
+    var note = Factory.createStorageItemNotePayload();
     modelManager.addItem(note);
     modelManager.addItem(tag);
     tag.addItemAsRelationship(note);
@@ -1003,9 +1003,9 @@ describe('sync params', () => {
   });
 
   it("returns valid encrypted params for syncing", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateExportParameters({
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1021,8 +1021,8 @@ describe('sync params', () => {
   });
 
   it("returns unencrypted params with no keys", async () => {
-    var item = Factory.createItem();
-    const itemParams = await protocolManager.generateExportParameters({
+    var item = Factory.createStorageItemNotePayload();
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1038,9 +1038,9 @@ describe('sync params', () => {
   });
 
   it("returns additional fields for local storage", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateExportParameters({
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentLocalStorageEncrypted
     })
@@ -1059,8 +1059,8 @@ describe('sync params', () => {
   });
 
   it("omits deleted for export file", async () => {
-    var item = Factory.createItem();
-    const itemParams = await protocolManager.generateExportParameters({
+    var item = Factory.createStorageItemNotePayload();
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentFileEncrypted
     })
@@ -1075,9 +1075,9 @@ describe('sync params', () => {
   });
 
   it("items with error decrypting should remain as is", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     item.errorDecrypting = true;
-    const itemParams = await protocolManager.generateExportParameters({
+    const itemParams = await protocolManager.generateItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1153,7 +1153,7 @@ describe('sync discordance', () => {
   it("should increase discordance as client server mismatches", async () => {
     let response = await localSyncManager.sync();
 
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     localModelManager.setItemDirty(item, true);
     localModelManager.addItem(item);
     itemCount++;
@@ -1197,7 +1197,7 @@ describe('sync discordance', () => {
   }).timeout(10000);
 
   it("should perform sync resolution in which differing items are duplicated instead of merged", async () => {
-    var item = Factory.createItem();
+    var item = Factory.createStorageItemNotePayload();
     localModelManager.addItem(item);
     localModelManager.setItemDirty(item, true);
     itemCount++;
