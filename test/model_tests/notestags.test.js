@@ -26,14 +26,14 @@ describe("notes and tags", () => {
     note.title = title;
     note.text = text;
 
-    let content = note.collapseContentAndGetJson();
+    let content = note.collapseContent();
     expect(content.title).to.equal(title);
     expect(content.text).to.equal(text);
 
     let tag = new SNTag();
     tag.title = title;
 
-    expect(tag.collapseContentAndGetJson().title).to.equal(title);
+    expect(tag.collapseContent().title).to.equal(title);
 
     expect(tag.structureParams().title).to.equal(tag.getContentCopy().title);
   })
@@ -52,7 +52,7 @@ describe("notes and tags", () => {
       }
     ];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -70,7 +70,7 @@ describe("notes and tags", () => {
     expect(notePayload.content.references.length).to.equal(0);
     expect(tagPayload.content.references.length).to.equal(1);
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -103,7 +103,7 @@ describe("notes and tags", () => {
     let notePayload = pair[0];
     let tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -111,7 +111,7 @@ describe("notes and tags", () => {
     expect(tag.content.references.length).to.equal(1);
 
     tagPayload.content.references = [];
-    modelManager.mapPayloadsToLocalModels({payloads: [tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [tagPayload]});
 
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
@@ -129,7 +129,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -141,7 +141,7 @@ describe("notes and tags", () => {
         deleted: true
       }
     })
-    modelManager.mapPayloadsToLocalModels({payloads: [changedTagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [changedTagPayload]});
 
     expect(modelManager.tags.length).to.equal(0);
 
@@ -162,14 +162,14 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
     tagPayload.content.references = [];
-    modelManager.mapPayloadsToLocalModels({payloads: [tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [tagPayload]});
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -185,7 +185,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -204,7 +204,7 @@ describe("notes and tags", () => {
     })
 
     // simulate a save, which omits `content`
-    modelManager.mapPayloadsToLocalModels({
+    modelManager.mapPayloadsToLocalItems({
       payloads: [changedTagPayload]
     })
 
@@ -220,7 +220,7 @@ describe("notes and tags", () => {
     let notePayload = pair[0];
     let tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -229,9 +229,9 @@ describe("notes and tags", () => {
 
     tag.removeItemAsRelationship(note);
 
-    const newTagPayload = CreateMaxPayloadFromItem({item: tag});
+    const newTagPayload = CreatePayloadFromAnyObject({object: tag});
 
-    modelManager.mapPayloadsToLocalModels({payloads: [newTagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
 
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
@@ -244,7 +244,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -276,7 +276,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -293,7 +293,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -304,8 +304,8 @@ describe("notes and tags", () => {
     expect(note.tags.length).to.equal(1);
 
     modelManager.setItemToBeDeleted(tag);
-    const newTagPayload = CreateMaxPayloadFromItem({item: tag});
-    modelManager.mapPayloadsToLocalModels({payloads: [newTagPayload]});
+    const newTagPayload = CreatePayloadFromAnyObject({object: tag});
+    modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
     expect(tag.content.references.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
   });
@@ -317,7 +317,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -342,7 +342,7 @@ describe("notes and tags", () => {
   it('modifying payload content should not modify item content', async () => {
     const modelManager = await createModelManager();
     const notePayload = Factory.createNotePayload();
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.content === notePayload.content).to.equal(false);
     expect(note.content.references === notePayload.content.references).to.equal(false);
@@ -357,7 +357,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -406,7 +406,7 @@ describe("notes and tags", () => {
       uuid: tagPayload.uuid
     }]
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -433,7 +433,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 

@@ -291,18 +291,18 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     totalItemCount++;
 
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentSync
+      intent: ENCRYPTION_INTENT_SYNC
     })
 
     itemParams.errorDecrypting = true;
-    let items = await modelManager.mapPayloadsToLocalModels({payloads: [itemParams]});
+    let items = await modelManager.mapPayloadsToLocalItems({payloads: [itemParams]});
     let mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    await protocolManager.decryptItemPayload({item: itemParams});
-    items = await modelManager.mapPayloadsToLocalModels({payloads: [itemParams]});
+    const decryptedPayload = await protocolManager.payloadByDecryptingPayload({item: itemParams});
+    items = await modelManager.mapPayloadsToLocalItems({payloads: [decryptedPayload]});
     mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("object");
     expect(mappedItem.content.title).to.equal(originalTitle);
@@ -704,7 +704,7 @@ describe('online syncing', () => {
     var originalItem2 = Factory.createStorageItemPayload("Bar");
 
     originalItem1.addItemAsRelationship(originalItem2);
-    await modelManager.mapPayloadsToLocalModels({payloads: [originalItem1, originalItem2]});
+    await modelManager.mapPayloadsToLocalItems({payloads: [originalItem1, originalItem2]});
 
     totalItemCount += 2;
 
@@ -1005,9 +1005,9 @@ describe('sync params', () => {
   it("returns valid encrypted params for syncing", async () => {
     var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentSync
+      intent: ENCRYPTION_INTENT_SYNC
     })
 
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1022,9 +1022,9 @@ describe('sync params', () => {
 
   it("returns unencrypted params with no keys", async () => {
     var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentSync
+      intent: ENCRYPTION_INTENT_SYNC
     })
 
     expect(itemParams.enc_item_key).to.be.null;
@@ -1040,9 +1040,9 @@ describe('sync params', () => {
   it("returns additional fields for local storage", async () => {
     var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentLocalStorageEncrypted
+      intent: ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED
     })
 
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1060,9 +1060,9 @@ describe('sync params', () => {
 
   it("omits deleted for export file", async () => {
     var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentFileEncrypted
+      intent: ENCRYPTION_INTENT_FILE_ENCRYPTED
     })
     expect(itemParams.enc_item_key).to.not.be.null;
     expect(itemParams.uuid).to.not.be.null;
@@ -1077,9 +1077,9 @@ describe('sync params', () => {
   it("items with error decrypting should remain as is", async () => {
     var item = Factory.createStorageItemNotePayload();
     item.errorDecrypting = true;
-    const itemParams = await protocolManager.generateEncryptedItemPayload({
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
       item: item,
-      intent: EncryptionIntentSync
+      intent: ENCRYPTION_INTENT_SYNC
     })
     expect(itemParams.content).to.eql(item.content);
     expect(itemParams.enc_item_key).to.not.be.null;
@@ -1229,7 +1229,7 @@ describe('sync discordance', () => {
     // now lets change the local content without syncing it.
     item.text = "discordance";
     // typically this is done by setDirty, but because we don't want to sync it, we'll apply this directly.
-    item.collapseCustomPropertiesIntoContent();
+    item.collapseContent();
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)
     // we expect that the remote content coming in doesn't wipe out our pending change. A conflict should be created

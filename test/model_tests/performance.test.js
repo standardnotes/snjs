@@ -57,7 +57,9 @@ describe("mapping performance", () => {
       notes.push(note);
     }
 
-    const payloads = Factory.shuffleArray(tags.concat(notes)).map((item) => CreatePayloadFromAnyObject({object: item}));
+    const payloads = Factory.shuffleArray(tags.concat(notes)).map((item) => {
+      return CreatePayloadFromAnyObject({object: item})
+    });
 
     const t0 = performance.now();
     // process items in separate batches, so as to trigger missed references
@@ -65,7 +67,7 @@ describe("mapping performance", () => {
     const batchSize = 100;
     for(let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalModels({payloads: subArray});
+      await modelManager.mapPayloadsToLocalItems({payloads: subArray});
       currentIndex += batchSize;
     }
 
@@ -125,7 +127,7 @@ describe("mapping performance", () => {
     const batchSize = 100;
     for(let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalModels({payloads: subArray});
+      await modelManager.mapPayloadsToLocalItems({payloads: subArray});
       currentIndex += batchSize;
     }
 

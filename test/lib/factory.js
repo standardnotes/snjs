@@ -86,12 +86,12 @@ export default class Factory {
   }
 
   static async mapPayloadToItem(payload, modelManager) {
-    const items = await modelManager.mapPayloadsToLocalModels({payloads: [payload]})
+    const items = await modelManager.mapPayloadsToLocalItems({payloads: [payload]})
     return items[0];
   }
 
   static itemToStoragePayload(item) {
-    return CreateMaxPayloadFromItem({item});
+    return CreatePayloadFromAnyObject({object: item});
   }
 
   static createMappedNote(modelManager) {

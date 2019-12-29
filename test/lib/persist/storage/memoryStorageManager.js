@@ -3,7 +3,7 @@
 export default class MemoryStorageManager extends SNStorageManager {
 
   async initializeFromDisk() {
-    this.setPayload({});
+    this.setInitialContent({});
   }
 
 }
