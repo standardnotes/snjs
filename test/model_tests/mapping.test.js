@@ -19,18 +19,6 @@ describe("model manager mapping", () => {
     expect(modelManager.items.length).to.equal(1);
   });
 
-  it('mapping string content correctly parses it', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
-    let originalTitle = params.content.title;
-    params.content = JSON.stringify(params.content);
-    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
-    var item = modelManager.items[0];
-    expect(params.content.title).to.not.be.a('string');
-    expect(item.content.title).to.be.a('string');
-    expect(item.content.title).to.equal(originalTitle);
-  });
-
   it('mapping nonexistent deleted item doesnt create it', async () => {
     let modelManager = await createModelManager();
     var params = Factory.createStorageItemNotePayload();
@@ -51,14 +39,15 @@ describe("model manager mapping", () => {
   });
 
   it('mapping deleted but dirty item should not delete it', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
+    const modelManager = await createModelManager();
+    const params = Factory.createStorageItemNotePayload();
     await modelManager.mapPayloadsToLocalModels({payloads: [params]});
 
-    let item = modelManager.items[0];
+    const item = modelManager.items[0];
     item.deleted = true;
     modelManager.setItemDirty(item, true);
-    await modelManager.mapPayloadsToLocalModels({payloads: [item]});
+    const payload = CreateMaxPayloadFromItem({item});
+    await modelManager.mapPayloadsToLocalModels({payloads: [payload]});
     expect(modelManager.items.length).to.equal(1);
   });
 
@@ -99,16 +88,16 @@ describe("model manager mapping", () => {
   });
 
   it('set all items dirty', async () => {
-    let modelManager = await createModelManager();
-    let count = 10;
-    var items = [];
-    for(var i = 0; i < count; i++) {
-      items.push(Factory.createStorageItemNotePayload);
+    const modelManager = await createModelManager();
+    const count = 10;
+    const payloads = [];
+    for(let i = 0; i < count; i++) {
+      payloads.push(Factory.createStorageItemNotePayload());
     }
-    await modelManager.mapPayloadsToLocalModels({payloads: [items]});
+    await modelManager.mapPayloadsToLocalModels({payloads: payloads});
     modelManager.setAllItemsDirty();
 
-    let dirtyItems = modelManager.getDirtyItems();
+    const dirtyItems = modelManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(10);
   });
 

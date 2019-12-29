@@ -1525,7 +1525,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, CreateMaxPayloadFromItem, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, isNullOrUndefined, deepMerge, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNAuthManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileDecrypted, EncryptionIntentFileEncrypted, EncryptionIntentSync, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, MAPPING_SOURCE_REMOTE_RETRIEVED, MAPPING_SOURCE_REMOTE_SAVED, MAPPING_SOURCE_LOCAL_SAVED, MAPPING_SOURCE_LOCAL_RETRIEVED, MAPPING_SOURCE_LOCAL_DIRTIED, MAPPING_SOURCE_COMPONENT_RETRIEVED, MAPPING_SOURCE_DESKTOP_INSTALLED, MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED, MAPPING_SOURCE_FILE_IMPORT */
+/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, CreateMaxPayloadFromItem, CreatePayloadFromAnyObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, findInArray, isNullOrUndefined, deepMerge, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNAuthManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, EncryptionIntentLocalStorageDecrypted, EncryptionIntentLocalStorageEncrypted, EncryptionIntentLocalStoragePreferEncrypted, EncryptionIntentFileDecrypted, EncryptionIntentFileEncrypted, EncryptionIntentSync, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, MAPPING_SOURCE_REMOTE_RETRIEVED, MAPPING_SOURCE_REMOTE_SAVED, MAPPING_SOURCE_LOCAL_SAVED, MAPPING_SOURCE_LOCAL_RETRIEVED, MAPPING_SOURCE_LOCAL_DIRTIED, MAPPING_SOURCE_COMPONENT_RETRIEVED, MAPPING_SOURCE_DESKTOP_INSTALLED, MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED, MAPPING_SOURCE_FILE_IMPORT */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1556,6 +1556,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromItem", function() { return _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_8__["CreateMaxPayloadFromItem"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_8__["CreatePayloadFromAnyObject"]; });
 
 /* harmony import */ var _Lib_keychain__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/keychain */ "./lib/keychain.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeychainDelegate", function() { return _Lib_keychain__WEBPACK_IMPORTED_MODULE_9__["SNKeychainDelegate"]; });
@@ -2422,7 +2424,7 @@ function (_SFItem) {
       Now, only tags contain references to notes. For old notes that may have references to tags,
       we want to transfer them over to the tag.
        */
-      if (item.content_type == "Tag") {
+      if (item.content_type === 'Tag') {
         item.addItemAsRelationship(this);
       }
 
@@ -2438,7 +2440,13 @@ function (_SFItem) {
   }, {
     key: "setIsNoLongerBeingReferencedBy",
     value: function setIsNoLongerBeingReferencedBy(item) {
-      _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item);
+      _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item); // Legacy two-way note-tag relationships need to be handled explicitly.
+
+
+      if (this.hasRelationshipWithItem(item)) {
+        this.removeReferenceWithUuid(item.uuid);
+        this.setDirty(true);
+      }
 
       this.clearSavedTagsString();
     }
@@ -2850,17 +2858,20 @@ function () {
   function SFItem(payload) {
     _classCallCheck(this, SFItem);
 
-    if (!payload.isPayload) {
-      throw 'Attempting to construct SFItem from non-payload object.';
-    }
-
     this.content = {
       references: [],
       appData: {}
     };
-    this.referencingObjects = [];
-    this.referencedObjects = [];
-    this.updateFromPayload(payload);
+    this.resetLocalReferencePointers();
+
+    if (payload) {
+      if (!payload.isPayload) {
+        throw 'Attempting to construct SFItem from non-payload object.';
+      }
+
+      this.updateFromPayload(payload);
+    }
+
     this.populateDefaultContentValues();
 
     if (!this.uuid) {
@@ -2933,8 +2944,30 @@ function () {
       if (!this.content_type) {
         this.content_type = payload.content_type;
       }
+      /**
+       * this.content = payload.content will copy it by reference rather than value.
+       * So we need to do a deep merge instead.
+       * payload.content can still be a string here if errorDecrypting.
+       */
 
-      var fieldsToMerge = [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UUID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_CREATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UPDATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DELETED"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ENC_ITEM_KEY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_CONTENT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ITEMS_KEY_ID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_HASH"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_PARAMS"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTIED_DATE"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ERROR_DECRYPTING"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DUMMY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY_COUNT"]];
+
+      if (payload.errorDecrypting) {
+        this.content = payload.content;
+      } else {
+        try {
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(this.content, payload.content);
+        } catch (e) {
+          console.log("Error while updating item from payload", e);
+        }
+      }
+
+      if (this.content) {
+        this.mapContentToLocalProperties(this.content);
+      } else if (payload.deleted === true) {
+        this.handleDeletedContent();
+      }
+
+      var fieldsToMerge = [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UUID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_CREATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UPDATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DELETED"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ENC_ITEM_KEY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ITEMS_KEY_ID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_HASH"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_PARAMS"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTIED_DATE"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ERROR_DECRYPTING"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DUMMY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY_COUNT"]];
 
       for (var _i = 0, _fieldsToMerge = fieldsToMerge; _i < _fieldsToMerge.length; _i++) {
         var field = _fieldsToMerge[_i];
@@ -2967,28 +3000,6 @@ function () {
 
 
       this._client_updated_at = null;
-      /**
-       * this.content = payload.content will copy it by reference rather than value.
-       * So we need to do a deep merge instead.
-       * payload.content can still be a string here if errorDecrypting.
-       * [stale]We copy it to this.content, then do a deep merge to transfer over all values.[/stale]
-       */
-
-      if (payload.errorDecrypting) {
-        this.content = payload.content;
-      } else {
-        try {
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(this.content, payload.content);
-        } catch (e) {
-          console.log("Error while updating item from payload", e);
-        }
-      }
-
-      if (this.content) {
-        this.mapContentToLocalProperties(this.content);
-      } else if (payload.deleted === true) {
-        this.handleDeletedContent();
-      }
     }
   }, {
     key: "mapContentToLocalProperties",
@@ -3071,30 +3082,28 @@ function () {
   }, {
     key: "updateLocalRelationships",
     value: function updateLocalRelationships() {
-      var _this = this;
-
       var references = this.content.references;
       var newUuids = references.map(function (ref) {
         return ref.uuid;
       });
-      this.referencedObjects.slice().forEach(function (currentReferencedItem) {
+
+      for (var _i2 = 0, _Object$keys = Object.keys(this._referencedItems); _i2 < _Object$keys.length; _i2++) {
+        var uuid = _Object$keys[_i2];
+        var currentReferencedItem = this._referencedItems[uuid];
+
         if (!newUuids.includes(currentReferencedItem.uuid)) {
-          lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(_this.referencedObjects, {
-            uuid: currentReferencedItem.uuid
-          });
-          currentReferencedItem.setIsNoLongerBeingReferencedBy(_this);
+          delete this._referencedItems[uuid];
+          currentReferencedItem.setIsNoLongerBeingReferencedBy(this);
         }
-      });
+      }
     }
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
       item.setIsBeingReferencedBy(this);
 
-      if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(this.referencedObjects, {
-        uuid: item.uuid
-      })) {
-        this.referencedObjects.push(item);
+      if (!this._referencedItems[item.uuid]) {
+        this._referencedItems[item.uuid] = item;
       }
 
       if (this.hasRelationshipWithItem(item)) {
@@ -3113,27 +3122,21 @@ function () {
     value: function removeItemAsRelationship(item) {
       item.setIsNoLongerBeingReferencedBy(this);
       this.removeReferenceWithUuid(item.uuid);
-      lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.referencedObjects, {
-        uuid: item.uuid
-      });
+      delete this._referencedItems[item.uuid];
     } // When another object has a relationship with us, we push that object into memory here.
     // We use this so that when `this` is deleted, we're able to update the references of those other objects.
 
   }, {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
-      if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(this.referencingObjects, {
-        uuid: item.uuid
-      })) {
-        this.referencingObjects.push(item);
+      if (!this._referencingItems[item.uuid]) {
+        this._referencingItems[item.uuid] = item;
       }
     }
   }, {
     key: "setIsNoLongerBeingReferencedBy",
     value: function setIsNoLongerBeingReferencedBy(item) {
-      lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.referencingObjects, {
-        uuid: item.uuid
-      });
+      delete this._referencingItems[item.uuid];
     }
   }, {
     key: "removeReferenceWithUuid",
@@ -3143,9 +3146,7 @@ function () {
         return r.uuid != uuid;
       });
       this.content.references = references;
-      lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.referencedObjects, {
-        uuid: uuid
-      });
+      delete this._referencedItems[uuid];
     }
   }, {
     key: "hasRelationshipWithItem",
@@ -3158,11 +3159,19 @@ function () {
   }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      var _this2 = this;
+      for (var _i3 = 0, _Object$keys2 = Object.keys(this._referencedItems); _i3 < _Object$keys2.length; _i3++) {
+        var uuid = _Object$keys2[_i3];
+        var item = this._referencedItems[uuid];
+        item.setIsNoLongerBeingReferencedBy(this);
+      }
+    }
+    /** The number of items this item currently references */
 
-      this.referencedObjects.forEach(function (item) {
-        item.setIsNoLongerBeingReferencedBy(_this2);
-      });
+  }, {
+    key: "resetLocalReferencePointers",
+    value: function resetLocalReferencePointers() {
+      this._referencingItems = {};
+      this._referencedItems = {};
     }
   }, {
     key: "didFinishSyncing",
@@ -3188,10 +3197,8 @@ function () {
 
           if (currentReference.uuid === oldUUID) {
             currentReference.uuid = newUUID;
-            lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.referencedObjects, {
-              uuid: oldUUID
-            });
-            this.referencedObjects.push(newItem);
+            delete this._referencedItems[oldUUID];
+            this._referencedItems[newItem.uuid] = newItem;
             this.setDirty(true);
           }
         }
@@ -3386,6 +3393,27 @@ function () {
     key: "isItem",
     get: function get() {
       return true;
+    }
+  }, {
+    key: "referencedItemsCount",
+    get: function get() {
+      return Object.keys(this._referencedItems).length;
+    }
+    /** The number of items that currently reference this item */
+
+  }, {
+    key: "referencingItemsCount",
+    get: function get() {
+      return Object.keys(this._referencingItems).length;
+    }
+  }, {
+    key: "allReferencingItems",
+    get: function get() {
+      var _this = this;
+
+      return Object.keys(this._referencingItems).map(function (uuid) {
+        return _this._referencingItems[uuid];
+      });
     }
   }, {
     key: "pinned",
@@ -3789,6 +3817,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
 /* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
 /* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3806,6 +3835,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -3852,9 +3882,12 @@ function (_SNPureKey) {
      * property. FromRaw allows you to send in an unwrapped raw key hash instead.
     */
     value: function FromRaw(key) {
-      return new SNItemsKey({
-        content: key
+      var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreatePayloadFromAnyObject"])({
+        object: {
+          content: key
+        }
       });
+      return new SNItemsKey(payload);
     }
   }]);
 
@@ -3912,10 +3945,10 @@ var SNPureKey =
 function (_SFItem) {
   _inherits(SNPureKey, _SFItem);
 
-  function SNPureKey(json_obj) {
+  function SNPureKey() {
     _classCallCheck(this, SNPureKey);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNPureKey).call(this, json_obj));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNPureKey).apply(this, arguments));
   }
 
   _createClass(SNPureKey, [{
@@ -4011,6 +4044,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return SNRootKey; });
 /* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
 /* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4028,6 +4062,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -4088,9 +4123,12 @@ function (_SNPureKey) {
      * property. FromRaw allows you to send in an unwrapped raw key hash instead.
     */
     value: function FromRaw(key) {
-      return new SNRootKey({
-        content: key
+      var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreatePayloadFromAnyObject"])({
+        object: {
+          content: key
+        }
       });
+      return new SNRootKey(payload);
     }
   }, {
     key: "contentType",
@@ -5224,24 +5262,28 @@ function CreatePayloadFromItem(_ref) {
 
   var payloadClass = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(intent) ? itemPayloadClassForIntent(intent) : itemPayloadClassForMappingSource(source);
   var rawPayload = Object.assign(lodash_pick__WEBPACK_IMPORTED_MODULE_7___default()(item, payloadClass.fields()), encryptionPayload);
-  return new payloadClass(rawPayload);
+  return Object.freeze(new payloadClass(rawPayload));
 }
 function CreatePayloadFromAnyObject(_ref2) {
   var object = _ref2.object,
-      source = _ref2.source;
-  var payloadClass = itemPayloadClassForMappingSource(source);
+      source = _ref2.source,
+      override = _ref2.override;
+  var payloadClass = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(source) ? itemPayloadClassForMappingSource(source) : _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__["SNMaxItemPayload"];
   var rawPayload = lodash_pick__WEBPACK_IMPORTED_MODULE_7___default()(object, payloadClass.fields());
-  return new payloadClass(rawPayload);
+  Object.assign(rawPayload, override);
+  return Object.freeze(new payloadClass(rawPayload));
 }
 function CreateMaxPayloadFromItem(_ref3) {
-  var item = _ref3.item;
+  var item = _ref3.item,
+      override = _ref3.override;
 
   if (!item.isItem) {
     throw 'Attempting to create max payload from non-item object.';
   }
 
   var rawPayload = lodash_pick__WEBPACK_IMPORTED_MODULE_7___default()(item, _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__["SNMaxItemPayload"].fields());
-  return new _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__["SNMaxItemPayload"](rawPayload);
+  Object.assign(rawPayload, override);
+  return Object.freeze(new _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__["SNMaxItemPayload"](rawPayload));
 }
 
 function itemPayloadClassForIntent(intent) {
@@ -14493,19 +14535,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
-/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.js");
-/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.js");
-/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.js");
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
-/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony import */ var _Models_server_mfa__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Models/server/mfa */ "./lib/models/server/mfa.js");
-/* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
-/* harmony import */ var _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.js");
+/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.js");
+/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.js");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony import */ var _Models_server_mfa__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/server/mfa */ "./lib/models/server/mfa.js");
+/* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
+/* harmony import */ var _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
+/* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -14540,6 +14583,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var SNModelManager =
 /*#__PURE__*/
 function () {
@@ -14547,17 +14591,17 @@ function () {
     _classCallCheck(this, SNModelManager);
 
     SNModelManager.ContentTypeClassMapping = {
-      "Note": _Models_app_note__WEBPACK_IMPORTED_MODULE_13__["SNNote"],
-      "Tag": _Models_app_tag__WEBPACK_IMPORTED_MODULE_14__["SNTag"],
-      SN_ITEMS_KEY_CONTENT_TYPE: _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_8__["SNItemsKey"],
-      "SN|SmartTag": _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_18__["SNSmartTag"],
-      "Extension": _Models_app_extension__WEBPACK_IMPORTED_MODULE_12__["SNExtension"],
-      "SN|Editor": _Models_app_editor__WEBPACK_IMPORTED_MODULE_11__["SNEditor"],
-      "SN|Theme": _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_19__["SNTheme"],
-      "SN|Component": _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["SNComponent"],
-      "SF|Extension": _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_17__["SNServerExtension"],
-      "SF|MFA": _Models_server_mfa__WEBPACK_IMPORTED_MODULE_16__["SNMfa"],
-      "SN|Privileges": _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_15__["SFPrivileges"]
+      "Note": _Models_app_note__WEBPACK_IMPORTED_MODULE_14__["SNNote"],
+      "Tag": _Models_app_tag__WEBPACK_IMPORTED_MODULE_15__["SNTag"],
+      SN_ITEMS_KEY_CONTENT_TYPE: _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_9__["SNItemsKey"],
+      "SN|SmartTag": _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_19__["SNSmartTag"],
+      "Extension": _Models_app_extension__WEBPACK_IMPORTED_MODULE_13__["SNExtension"],
+      "SN|Editor": _Models_app_editor__WEBPACK_IMPORTED_MODULE_12__["SNEditor"],
+      "SN|Theme": _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_20__["SNTheme"],
+      "SN|Component": _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["SNComponent"],
+      "SF|Extension": _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_18__["SNServerExtension"],
+      "SF|MFA": _Models_server_mfa__WEBPACK_IMPORTED_MODULE_17__["SNMfa"],
+      "SN|Privileges": _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_16__["SFPrivileges"]
     };
 
     SNModelManager.isMappingSourceRetrieved = function (source) {
@@ -14572,7 +14616,7 @@ function () {
     this.tags = [];
     this.components = [];
     this.itemsHash = {};
-    this.missedReferences = {};
+    this.resolveQueue = {};
     this.uuidChangeObservers = [];
   }
 
@@ -14585,7 +14629,7 @@ function () {
       this.tags.length = 0;
       this.components.length = 0;
       this.itemsHash = {};
-      this.missedReferences = {};
+      this.resolveQueue = {};
     }
   }, {
     key: "didSyncModelsOffline",
@@ -14595,110 +14639,123 @@ function () {
   }, {
     key: "mapPayloadsToLocalModels",
     value: function mapPayloadsToLocalModels(_ref) {
-      var payloads, omitFields, source, sourceKey, options, models, processedObjects, modelsToNotifyObserversOf, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, isMissingContent, isCorrupt, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, key, item, contentType, unknownContentType, isDirtyItemPendingDelete, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _step2$value, index, _payload, model, missedRefs, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _loop, _iterator3, _step3;
+      var payloads, omitFields, source, sourceKey, options, itemsToNotifyObserversOf, processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, inputPayload, payload, isMissingContent, isCorrupt, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, key, item, contentType, unknownContentType, isDirtyItemPendingDelete, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, interestedItem;
 
       return regeneratorRuntime.async(function mapPayloadsToLocalModels$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               payloads = _ref.payloads, omitFields = _ref.omitFields, source = _ref.source, sourceKey = _ref.sourceKey, options = _ref.options;
-              models = [], processedObjects = [], modelsToNotifyObserversOf = [];
-              /** first loop should add and process items */
+              itemsToNotifyObserversOf = [];
+              processed = {
+                /**
+                 * key: uuid
+                 *     value:
+                 *          key: payload
+                 *          key: item
+                 */
+              };
+              /** First loop should process payloads and add items only; no relationship handling. */
 
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context.prev = 5;
+              _context.prev = 6;
               _iterator = payloads[Symbol.iterator]();
 
-            case 7:
+            case 8:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context.next = 62;
+                _context.next = 63;
                 break;
               }
 
-              payload = _step.value;
+              inputPayload = _step.value;
 
-              if (payload) {
-                _context.next = 12;
+              if (inputPayload) {
+                _context.next = 13;
                 break;
               }
 
               console.error("Payload is null");
-              return _context.abrupt("continue", 59);
+              return _context.abrupt("continue", 60);
 
-            case 12:
+            case 13:
+              /** Create copy as not to modify input payload, especially when omitting fields below. */
+              // const payload = CreatePayloadFromAnyObject({object: inputPayload});
+              // console.log(payload, inputPayload);
+              payload = inputPayload;
+
               if (payload.isPayload) {
-                _context.next = 14;
+                _context.next = 16;
                 break;
               }
 
               throw 'Attempting to map non-payload object into local model.';
 
-            case 14:
+            case 16:
               // content is missing if it has been sucessfullly decrypted but no content
               isMissingContent = !payload.content && !payload.errorDecrypting;
               isCorrupt = !payload.content_type || !payload.uuid;
 
               if (!((isCorrupt || isMissingContent) && !payload.deleted)) {
-                _context.next = 19;
+                _context.next = 21;
                 break;
               }
 
               // An item that is not deleted should never have empty content
               console.error("Payload is corrupt:", payload);
-              return _context.abrupt("continue", 59);
+              return _context.abrupt("continue", 60);
 
-            case 19:
+            case 21:
               if (!Array.isArray(omitFields)) {
+                _context.next = 41;
+                break;
+              }
+
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context.prev = 25;
+
+              for (_iterator2 = omitFields[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                key = _step2.value;
+                delete payload[key];
+              }
+
+              _context.next = 33;
+              break;
+
+            case 29:
+              _context.prev = 29;
+              _context.t0 = _context["catch"](25);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context.t0;
+
+            case 33:
+              _context.prev = 33;
+              _context.prev = 34;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 36:
+              _context.prev = 36;
+
+              if (!_didIteratorError2) {
                 _context.next = 39;
                 break;
               }
 
-              _iteratorNormalCompletion4 = true;
-              _didIteratorError4 = false;
-              _iteratorError4 = undefined;
-              _context.prev = 23;
-
-              for (_iterator4 = omitFields[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                key = _step4.value;
-                delete payload[key];
-              }
-
-              _context.next = 31;
-              break;
-
-            case 27:
-              _context.prev = 27;
-              _context.t0 = _context["catch"](23);
-              _didIteratorError4 = true;
-              _iteratorError4 = _context.t0;
-
-            case 31:
-              _context.prev = 31;
-              _context.prev = 32;
-
-              if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                _iterator4.return();
-              }
-
-            case 34:
-              _context.prev = 34;
-
-              if (!_didIteratorError4) {
-                _context.next = 37;
-                break;
-              }
-
-              throw _iteratorError4;
-
-            case 37:
-              return _context.finish(34);
-
-            case 38:
-              return _context.finish(31);
+              throw _iteratorError2;
 
             case 39:
+              return _context.finish(36);
+
+            case 40:
+              return _context.finish(33);
+
+            case 41:
               item = this.findItem(payload.uuid);
 
               if (item) {
@@ -14712,23 +14769,23 @@ function () {
               unknownContentType = this.acceptableContentTypes && !this.acceptableContentTypes.includes(contentType);
 
               if (!unknownContentType) {
-                _context.next = 46;
+                _context.next = 48;
                 break;
               }
 
               console.error("Unknown content_type: ".concat(contentType));
-              return _context.abrupt("continue", 59);
+              return _context.abrupt("continue", 60);
 
-            case 46:
+            case 48:
               isDirtyItemPendingDelete = false;
 
-              if (!(payload.deleted == true)) {
-                _context.next = 54;
+              if (!(payload.deleted === true)) {
+                _context.next = 56;
                 break;
               }
 
               if (!payload.dirty) {
-                _context.next = 52;
+                _context.next = 54;
                 break;
               }
 
@@ -14736,236 +14793,182 @@ function () {
               // We need to create this item as usual, but just not add it to individual arrays
               // i.e add to this.items but not this.notes (so that it can be retrieved with getDirtyItems)
               isDirtyItemPendingDelete = true;
-              _context.next = 54;
+              _context.next = 56;
               break;
 
-            case 52:
+            case 54:
               if (item) {
-                // We still want to return this item to the caller so they know it was handled.
-                models.push(item);
-                modelsToNotifyObserversOf.push(item);
+                /** We still want to return this item to the caller so they know it was handled. */
+                processed[item.uuid] = {
+                  item: item,
+                  payload: payload
+                };
+                itemsToNotifyObserversOf.push(item);
                 this.removeItemLocally(item);
               }
 
-              return _context.abrupt("continue", 59);
+              return _context.abrupt("continue", 60);
 
-            case 54:
+            case 56:
               if (!item) {
                 item = this.createItemFromPayload(payload);
               }
 
-              this.addItem(item, isDirtyItemPendingDelete); // Observers do not need to handle items that errored while decrypting.
+              this.addItem(item, isDirtyItemPendingDelete);
+              /** Observers do not need to handle items that errored while decrypting. */
 
               if (!item.errorDecrypting) {
-                modelsToNotifyObserversOf.push(item);
+                itemsToNotifyObserversOf.push(item);
               }
 
-              models.push(item);
-              processedObjects.push(payload);
+              processed[item.uuid] = {
+                item: item,
+                payload: payload
+              };
 
-            case 59:
+            case 60:
               _iteratorNormalCompletion = true;
-              _context.next = 7;
+              _context.next = 8;
               break;
 
-            case 62:
-              _context.next = 68;
+            case 63:
+              _context.next = 69;
               break;
 
-            case 64:
-              _context.prev = 64;
-              _context.t1 = _context["catch"](5);
+            case 65:
+              _context.prev = 65;
+              _context.t1 = _context["catch"](6);
               _didIteratorError = true;
               _iteratorError = _context.t1;
 
-            case 68:
-              _context.prev = 68;
+            case 69:
               _context.prev = 69;
+              _context.prev = 70;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
-            case 71:
-              _context.prev = 71;
+            case 72:
+              _context.prev = 72;
 
               if (!_didIteratorError) {
-                _context.next = 74;
+                _context.next = 75;
                 break;
               }
 
               throw _iteratorError;
 
-            case 74:
-              return _context.finish(71);
-
             case 75:
-              return _context.finish(68);
+              return _context.finish(72);
 
             case 76:
-              // second loop should process references
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context.prev = 79;
+              return _context.finish(69);
 
-              for (_iterator2 = processedObjects.entries()[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                _step2$value = _slicedToArray(_step2.value, 2), index = _step2$value[0], _payload = _step2$value[1];
-                model = models[index];
+            case 77:
+              /** Second loop should process references */
+              allPayloads = [], allItems = [];
+              _i = 0, _Object$keys = Object.keys(processed);
 
-                if (_payload.content) {
-                  this.resolveReferencesForItem(model);
-                }
-
-                model.didFinishSyncing();
-              }
-
-              _context.next = 87;
-              break;
-
-            case 83:
-              _context.prev = 83;
-              _context.t2 = _context["catch"](79);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context.t2;
-
-            case 87:
-              _context.prev = 87;
-              _context.prev = 88;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 90:
-              _context.prev = 90;
-
-              if (!_didIteratorError2) {
-                _context.next = 93;
+            case 79:
+              if (!(_i < _Object$keys.length)) {
+                _context.next = 109;
                 break;
               }
 
-              throw _iteratorError2;
+              uuid = _Object$keys[_i];
+              _processed$uuid = processed[uuid], _item = _processed$uuid.item, _payload = _processed$uuid.payload;
+              allPayloads.push(_payload);
+              allItems.push(_item);
 
-            case 93:
-              return _context.finish(90);
+              if (_payload.content && !_item.deleted) {
+                this.resolveReferencesForItem(_item);
+              }
 
-            case 94:
-              return _context.finish(87);
-
-            case 95:
-              missedRefs = this.popMissedReferenceStructsForObjects(processedObjects);
+              interestedItems = this.popItemsInterestedInPreviouslyMissingItem({
+                item: _item
+              });
               _iteratorNormalCompletion3 = true;
               _didIteratorError3 = false;
               _iteratorError3 = undefined;
-              _context.prev = 99;
+              _context.prev = 89;
 
-              _loop = function _loop() {
-                var ref = _step3.value;
-                var model = models.find(function (candidate) {
-                  return candidate.uuid == ref.reference_uuid;
-                }); // Model should 100% be defined here, but let's not be too overconfident
-
-                if (model) {
-                  var itemWaitingForTheValueInThisCurrentLoop = ref.for_item;
-                  itemWaitingForTheValueInThisCurrentLoop.addItemAsRelationship(model);
-                }
-              };
-
-              for (_iterator3 = missedRefs[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                _loop();
+              for (_iterator3 = interestedItems[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                interestedItem = _step3.value;
+                interestedItem.addItemAsRelationship(_item);
               }
 
-              _context.next = 108;
+              _context.next = 97;
               break;
 
-            case 104:
-              _context.prev = 104;
-              _context.t3 = _context["catch"](99);
+            case 93:
+              _context.prev = 93;
+              _context.t2 = _context["catch"](89);
               _didIteratorError3 = true;
-              _iteratorError3 = _context.t3;
+              _iteratorError3 = _context.t2;
 
-            case 108:
-              _context.prev = 108;
-              _context.prev = 109;
+            case 97:
+              _context.prev = 97;
+              _context.prev = 98;
 
               if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                 _iterator3.return();
               }
 
-            case 111:
-              _context.prev = 111;
+            case 100:
+              _context.prev = 100;
 
               if (!_didIteratorError3) {
-                _context.next = 114;
+                _context.next = 103;
                 break;
               }
 
               throw _iteratorError3;
 
-            case 114:
-              return _context.finish(111);
+            case 103:
+              return _context.finish(100);
 
-            case 115:
-              return _context.finish(108);
+            case 104:
+              return _context.finish(97);
 
-            case 116:
-              _context.next = 118;
-              return regeneratorRuntime.awrap(this.notifySyncObserversOfModels(modelsToNotifyObserversOf, source, sourceKey));
+            case 105:
+              _item.didFinishSyncing();
 
-            case 118:
-              return _context.abrupt("return", models);
+            case 106:
+              _i++;
+              _context.next = 79;
+              break;
 
-            case 119:
+            case 109:
+              _context.next = 111;
+              return regeneratorRuntime.awrap(this.notifySyncObserversOfModels(itemsToNotifyObserversOf, source, sourceKey));
+
+            case 111:
+              return _context.abrupt("return", allItems);
+
+            case 112:
             case "end":
               return _context.stop();
           }
         }
-      }, null, this, [[5, 64, 68, 76], [23, 27, 31, 39], [32,, 34, 38], [69,, 71, 75], [79, 83, 87, 95], [88,, 90, 94], [99, 104, 108, 116], [109,, 111, 115]]);
+      }, null, this, [[6, 65, 69, 77], [25, 29, 33, 41], [34,, 36, 40], [70,, 72, 76], [89, 93, 97, 105], [98,, 100, 104]]);
     }
   }, {
-    key: "missedReferenceBuildKey",
-    value: function missedReferenceBuildKey(referenceId, objectId) {
-      return "".concat(referenceId, ":").concat(objectId);
+    key: "resolveRelationshipWhenItemAvailable",
+    value: function resolveRelationshipWhenItemAvailable(_ref2) {
+      var interestedItem = _ref2.interestedItem,
+          missingItemId = _ref2.missingItemId;
+      var interestedItems = this.resolveQueue[missingItemId] || [];
+      interestedItems.push(interestedItem);
+      this.resolveQueue[missingItemId] = interestedItems;
     }
   }, {
-    key: "popMissedReferenceStructsForObjects",
-    value: function popMissedReferenceStructsForObjects(objects) {
-      if (!objects || objects.length == 0) {
-        return [];
-      }
-
-      var results = [];
-      var toDelete = [];
-      var uuids = objects.map(function (item) {
-        return item.uuid;
-      });
-      var genericUuidLength = uuids[0].length;
-      var keys = Object.keys(this.missedReferences);
-
-      for (var _i2 = 0, _keys = keys; _i2 < _keys.length; _i2++) {
-        var candidateKey = _keys[_i2];
-
-        /*
-        We used to do string.split to get at the UUID, but surprisingly,
-        the performance of this was about 20x worse then just getting the substring.
-         let matches = candidateKey.split(":")[0] == object.uuid;
-        */
-        var matches = uuids.includes(candidateKey.substring(0, genericUuidLength));
-
-        if (matches) {
-          results.push(this.missedReferences[candidateKey]);
-          toDelete.push(candidateKey);
-        }
-      } // remove from hash
-
-
-      for (var _i3 = 0, _toDelete = toDelete; _i3 < _toDelete.length; _i3++) {
-        var key = _toDelete[_i3];
-        delete this.missedReferences[key];
-      }
-
-      return results;
+    key: "popItemsInterestedInPreviouslyMissingItem",
+    value: function popItemsInterestedInPreviouslyMissingItem(_ref3) {
+      var item = _ref3.item;
+      var interestedItems = this.resolveQueue[item.uuid];
+      delete this.resolveQueue[item.uuid];
+      return interestedItems || [];
     }
   }, {
     key: "resolveReferencesForItem",
@@ -14991,16 +14994,16 @@ function () {
         return ref.uuid;
       });
       var includeBlanks = true;
-      var referencesObjectResults = this.findItems(referencesIds, includeBlanks);
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
+      var items = this.findItems(referencesIds, includeBlanks);
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator5 = referencesObjectResults.entries()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var _step5$value = _slicedToArray(_step5.value, 2),
-              index = _step5$value[0],
-              referencedItem = _step5$value[1];
+        for (var _iterator4 = items.entries()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var _step4$value = _slicedToArray(_step4.value, 2),
+              index = _step4$value[0],
+              referencedItem = _step4$value[1];
 
           if (referencedItem) {
             item.addItemAsRelationship(referencedItem);
@@ -15009,31 +15012,24 @@ function () {
               this.setItemDirty(referencedItem, true);
             }
           } else {
-            var missingRefId = referencesIds[index]; // Allows mapper to check when missing reference makes it through the loop,
-            // and then runs resolveReferencesForItem again for the original item.
-
-            var mappingKey = this.missedReferenceBuildKey(missingRefId, item.uuid);
-
-            if (!this.missedReferences[mappingKey]) {
-              var missedRef = {
-                reference_uuid: missingRefId,
-                for_item: item
-              };
-              this.missedReferences[mappingKey] = missedRef;
-            }
+            var referenceId = referencesIds[index];
+            this.resolveRelationshipWhenItemAvailable({
+              interestedItem: item,
+              missingItemId: referenceId
+            });
           }
         }
       } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-            _iterator5.return();
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
           }
         } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -15045,7 +15041,7 @@ function () {
     value: function notifySyncObserversOfModels(models, source, sourceKey) {
       var _this = this;
 
-      var observers, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _loop2, _iterator6, _step6;
+      var observers, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _loop, _iterator5, _step5;
 
       return regeneratorRuntime.async(function notifySyncObserversOfModels$(_context3) {
         while (1) {
@@ -15056,30 +15052,30 @@ function () {
                 // sort by priority
                 return a.priority < b.priority ? -1 : 1;
               });
-              _iteratorNormalCompletion6 = true;
-              _didIteratorError6 = false;
-              _iteratorError6 = undefined;
+              _iteratorNormalCompletion5 = true;
+              _didIteratorError5 = false;
+              _iteratorError5 = undefined;
               _context3.prev = 4;
 
-              _loop2 = function _loop2() {
-                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, item;
+              _loop = function _loop() {
+                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, item;
 
-                return regeneratorRuntime.async(function _loop2$(_context2) {
+                return regeneratorRuntime.async(function _loop$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
                       case 0:
-                        observer = _step6.value;
+                        observer = _step5.value;
                         allRelevantItems = observer.types.includes("*") ? models : models.filter(function (item) {
                           return observer.types.includes(item.content_type);
                         });
                         validItems = [], deletedItems = [];
-                        _iteratorNormalCompletion7 = true;
-                        _didIteratorError7 = false;
-                        _iteratorError7 = undefined;
+                        _iteratorNormalCompletion6 = true;
+                        _didIteratorError6 = false;
+                        _iteratorError6 = undefined;
                         _context2.prev = 6;
 
-                        for (_iterator7 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                          item = _step7.value;
+                        for (_iterator6 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                          item = _step6.value;
 
                           if (item.deleted) {
                             deletedItems.push(item);
@@ -15094,26 +15090,26 @@ function () {
                       case 10:
                         _context2.prev = 10;
                         _context2.t0 = _context2["catch"](6);
-                        _didIteratorError7 = true;
-                        _iteratorError7 = _context2.t0;
+                        _didIteratorError6 = true;
+                        _iteratorError6 = _context2.t0;
 
                       case 14:
                         _context2.prev = 14;
                         _context2.prev = 15;
 
-                        if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                          _iterator7.return();
+                        if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                          _iterator6.return();
                         }
 
                       case 17:
                         _context2.prev = 17;
 
-                        if (!_didIteratorError7) {
+                        if (!_didIteratorError6) {
                           _context2.next = 20;
                           break;
                         }
 
-                        throw _iteratorError7;
+                        throw _iteratorError6;
 
                       case 20:
                         return _context2.finish(17);
@@ -15138,19 +15134,19 @@ function () {
                 }, null, null, [[6, 10, 14, 22], [15,, 17, 21]]);
               };
 
-              _iterator6 = observers[Symbol.iterator]();
+              _iterator5 = observers[Symbol.iterator]();
 
             case 7:
-              if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+              if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
                 _context3.next = 13;
                 break;
               }
 
               _context3.next = 10;
-              return regeneratorRuntime.awrap(_loop2());
+              return regeneratorRuntime.awrap(_loop());
 
             case 10:
-              _iteratorNormalCompletion6 = true;
+              _iteratorNormalCompletion5 = true;
               _context3.next = 7;
               break;
 
@@ -15161,26 +15157,26 @@ function () {
             case 15:
               _context3.prev = 15;
               _context3.t0 = _context3["catch"](4);
-              _didIteratorError6 = true;
-              _iteratorError6 = _context3.t0;
+              _didIteratorError5 = true;
+              _iteratorError5 = _context3.t0;
 
             case 19:
               _context3.prev = 19;
               _context3.prev = 20;
 
-              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                _iterator6.return();
+              if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                _iterator5.return();
               }
 
             case 22:
               _context3.prev = 22;
 
-              if (!_didIteratorError6) {
+              if (!_didIteratorError5) {
                 _context3.next = 25;
                 break;
               }
 
-              throw _iteratorError6;
+              throw _iteratorError5;
 
             case 25:
               return _context3.finish(22);
@@ -15247,26 +15243,26 @@ function () {
       var updateClientDate = arguments.length > 2 ? arguments[2] : undefined;
       var source = arguments.length > 3 ? arguments[3] : undefined;
       var sourceKey = arguments.length > 4 ? arguments[4] : undefined;
-      var _iteratorNormalCompletion8 = true;
-      var _didIteratorError8 = false;
-      var _iteratorError8 = undefined;
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
 
       try {
-        for (var _iterator8 = items[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-          var item = _step8.value;
+        for (var _iterator7 = items[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var item = _step7.value;
           item.setDirty(dirty, updateClientDate);
         }
       } catch (err) {
-        _didIteratorError8 = true;
-        _iteratorError8 = err;
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-            _iterator8.return();
+          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+            _iterator7.return();
           }
         } finally {
-          if (_didIteratorError8) {
-            throw _iteratorError8;
+          if (_didIteratorError7) {
+            throw _iteratorError7;
           }
         }
       }
@@ -15283,7 +15279,7 @@ function () {
       var itemClass = SNModelManager.ContentTypeClassMapping && SNModelManager.ContentTypeClassMapping[payload.content_type];
 
       if (!itemClass) {
-        itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"];
+        itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_8__["SFItem"];
       }
 
       var item = new itemClass(payload);
@@ -15299,13 +15295,13 @@ function () {
 
   }, {
     key: "createDuplicateItemFromPayload",
-    value: function createDuplicateItemFromPayload(payload) {
-      var duplicate;
+    value: function createDuplicateItemFromPayload(inPayload) {
+      var payload, duplicate;
       return regeneratorRuntime.async(function createDuplicateItemFromPayload$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              if (payload.isPayload) {
+              if (inPayload.isPayload) {
                 _context5.next = 2;
                 break;
               }
@@ -15313,15 +15309,25 @@ function () {
               throw 'Attempting to createDuplicateItemFromPayload with non payload object';
 
             case 2:
-              _context5.next = 4;
-              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"].GenerateUuid());
+              _context5.t0 = _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"];
+              _context5.t1 = inPayload;
+              _context5.next = 6;
+              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_8__["SFItem"].GenerateUuid());
 
-            case 4:
-              payload.uuid = _context5.sent;
+            case 6:
+              _context5.t2 = _context5.sent;
+              _context5.t3 = {
+                uuid: _context5.t2
+              };
+              _context5.t4 = {
+                object: _context5.t1,
+                override: _context5.t3
+              };
+              payload = (0, _context5.t0)(_context5.t4);
               duplicate = this.createItemFromPayload(payload);
               return _context5.abrupt("return", duplicate);
 
-            case 7:
+            case 12:
             case "end":
               return _context5.stop();
           }
@@ -15338,9 +15344,9 @@ function () {
     }
   }, {
     key: "duplicateItemWithCustomContentAndAddAsConflict",
-    value: function duplicateItemWithCustomContentAndAddAsConflict(_ref2) {
-      var content = _ref2.content,
-          duplicateOf = _ref2.duplicateOf;
+    value: function duplicateItemWithCustomContentAndAddAsConflict(_ref4) {
+      var content = _ref4.content,
+          duplicateOf = _ref4.duplicateOf;
       var copy = this.duplicateItemWithCustomContent({
         content: content,
         duplicateOf: duplicateOf
@@ -15353,20 +15359,30 @@ function () {
     }
   }, {
     key: "addDuplicatedItemAsConflict",
-    value: function addDuplicatedItemAsConflict(_ref3) {
-      var duplicate = _ref3.duplicate,
-          duplicateOf = _ref3.duplicateOf;
+    value: function addDuplicatedItemAsConflict(_ref5) {
+      var duplicate = _ref5.duplicate,
+          duplicateOf = _ref5.duplicateOf;
       this.addDuplicatedItem(duplicate, duplicateOf);
       duplicate.content.conflict_of = duplicateOf.uuid;
     }
   }, {
     key: "duplicateItemWithCustomContent",
-    value: function duplicateItemWithCustomContent(_ref4) {
-      var content = _ref4.content,
-          duplicateOf = _ref4.duplicateOf;
-      var copy = new duplicateOf.constructor({
-        content: content
+    value: function duplicateItemWithCustomContent(_ref6) {
+      var content = _ref6.content,
+          duplicateOf = _ref6.duplicateOf;
+
+      if (!duplicateOf.isItem) {
+        throw 'Attempting to duplicate non-item object.';
+      }
+
+      var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromItem"])({
+        item: duplicateOf,
+        override: {
+          uuid: null,
+          content: null
+        }
       });
+      var copy = new duplicateOf.constructor(payload);
       copy.created_at = duplicateOf.created_at;
 
       if (!copy.content_type) {
@@ -15385,21 +15401,10 @@ function () {
   }, {
     key: "duplicateItemWithoutAdding",
     value: function duplicateItemWithoutAdding(item) {
-      if (!item.isItem) {
-        throw 'Attempting to duplicate non-item object.';
-      }
-
-      var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromItem"])({
-        item: item
+      var copy = this.duplicateItemWithCustomContent({
+        content: item.content,
+        duplicateOf: item
       });
-      payload.uuid = null;
-      var copy = new item.constructor(payload);
-      copy.created_at = item.created_at;
-
-      if (!copy.content_type) {
-        copy.content_type = item.content_type;
-      }
-
       return copy;
     }
   }, {
@@ -15408,15 +15413,88 @@ function () {
       this.addItem(duplicate);
       /** the duplicate should inherit the original's relationships */
 
+      var referencingItems = original.allReferencingItems;
+      var _iteratorNormalCompletion8 = true;
+      var _didIteratorError8 = false;
+      var _iteratorError8 = undefined;
+
+      try {
+        for (var _iterator8 = referencingItems[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+          var referencingObject = _step8.value;
+          referencingObject.addItemAsRelationship(duplicate);
+          this.setItemDirty(referencingObject, true);
+        }
+      } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+            _iterator8.return();
+          }
+        } finally {
+          if (_didIteratorError8) {
+            throw _iteratorError8;
+          }
+        }
+      }
+
+      this.resolveReferencesForItem(duplicate);
+      this.setItemDirty(duplicate, true);
+    }
+    /**
+     * Adds items to model management.
+     * @param globalOnly  Whether the item should only be added to main .items array, and not individual
+     *                    item arrays like .notes, .tags, .components, etc.
+     */
+
+  }, {
+    key: "addItem",
+    value: function addItem(item) {
+      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      this.addItems([item], globalOnly);
+    }
+  }, {
+    key: "addItems",
+    value: function addItems(items) {
+      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var _iteratorNormalCompletion9 = true;
       var _didIteratorError9 = false;
       var _iteratorError9 = undefined;
 
       try {
-        for (var _iterator9 = original.referencingObjects[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-          var referencingObject = _step9.value;
-          referencingObject.addItemAsRelationship(duplicate);
-          this.setItemDirty(referencingObject, true);
+        for (var _iterator9 = items[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+          var item = _step9.value;
+
+          if (!this.itemsHash[item.uuid]) {
+            this.itemsHash[item.uuid] = item;
+            this.items.push(item);
+            /**
+            * In some cases, you just want to add the item to this.items, and not to the individual arrays
+            * This applies when you want to keep an item syncable, but not display it via the individual arrays
+            */
+
+            if (globalOnly) {
+              continue;
+            }
+
+            if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_5__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
+              this.itemsKeys.unshift(item);
+            } else if (item.content_type === 'Tag') {
+              var index = lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3___default()(this.tags, item, function (item) {
+                if (item.title) {
+                  return item.title.toLowerCase();
+                } else {
+                  return '';
+                }
+              });
+              this.tags.splice(index, 0, item);
+            } else if (item.content_type === 'Note') {
+              this.notes.unshift(item);
+            } else if (item.content_type == 'SN|Component') {
+              this.components.unshift(item);
+            }
+          }
         }
       } catch (err) {
         _didIteratorError9 = true;
@@ -15432,61 +15510,6 @@ function () {
           }
         }
       }
-
-      this.resolveReferencesForItem(duplicate);
-      this.setItemDirty(duplicate, true);
-    }
-  }, {
-    key: "addItem",
-    value: function addItem(item) {
-      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      this.addItems([item], globalOnly);
-    }
-  }, {
-    key: "addItems",
-    value: function addItems(items) {
-      var _this3 = this;
-
-      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      items.forEach(function (item) {
-        if (!_this3.itemsHash[item.uuid]) {
-          _this3.itemsHash[item.uuid] = item;
-
-          _this3.items.push(item);
-        } // In some cases, you just want to add the item to this.items, and not to the individual arrays
-        // This applies when you want to keep an item syncable, but not display it via the individual arrays
-
-
-        if (!globalOnly) {
-          if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_5__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
-            if (!lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(_this3.itemsKeys, {
-              uuid: item.uuid
-            })) {
-              _this3.itemsKeys.unshift(item);
-            }
-          } else if (item.content_type == "Tag") {
-            if (!lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(_this3.tags, {
-              uuid: item.uuid
-            })) {
-              _this3.tags.splice(lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3___default()(_this3.tags, item, function (item) {
-                if (item.title) return item.title.toLowerCase();else return '';
-              }), 0, item);
-            }
-          } else if (item.content_type == "Note") {
-            if (!lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(_this3.notes, {
-              uuid: item.uuid
-            })) {
-              _this3.notes.unshift(item);
-            }
-          } else if (item.content_type == "SN|Component") {
-            if (!lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(_this3.components, {
-              uuid: item.uuid
-            })) {
-              _this3.components.unshift(item);
-            }
-          }
-        }
-      });
     }
     /* Notifies observers when an item has been synced or mapped from a remote response */
 
@@ -15502,11 +15525,11 @@ function () {
     }
   }, {
     key: "addItemSyncObserverWithPriority",
-    value: function addItemSyncObserverWithPriority(_ref5) {
-      var id = _ref5.id,
-          priority = _ref5.priority,
-          types = _ref5.types,
-          callback = _ref5.callback;
+    value: function addItemSyncObserverWithPriority(_ref7) {
+      var id = _ref7.id,
+          priority = _ref7.priority,
+          types = _ref7.types,
+          callback = _ref7.callback;
 
       if (!Array.isArray(types)) {
         types = [types];
@@ -15604,12 +15627,13 @@ function () {
       /** Handle indirect relationships */
 
 
+      var referencingItems = item.allReferencingItems;
       var _iteratorNormalCompletion12 = true;
       var _didIteratorError12 = false;
       var _iteratorError12 = undefined;
 
       try {
-        for (var _iterator12 = item.referencingObjects[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+        for (var _iterator12 = referencingItems[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
           var object = _step12.value;
           object.removeItemAsRelationship(item);
           this.setItemDirty(object, true);
@@ -15629,8 +15653,7 @@ function () {
         }
       }
 
-      item.referencingObjects = [];
-      item.referencedObjects = [];
+      item.resetLocalReferencePointers();
     }
     /* Used when changing encryption key */
 
@@ -15741,7 +15764,7 @@ function () {
   }, {
     key: "alternateUUIDForItem",
     value: function alternateUUIDForItem(item) {
-      var inPayload, newItem, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, referencingObject, payload;
+      var inPayload, newItem, referencingItems, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, referencingObject, payload;
 
       return regeneratorRuntime.async(function alternateUUIDForItem$(_context7) {
         while (1) {
@@ -15764,7 +15787,7 @@ function () {
               */
 
               _context7.next = 5;
-              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"].GenerateUuid());
+              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_8__["SFItem"].GenerateUuid());
 
             case 5:
               inPayload.uuid = _context7.sent;
@@ -15775,53 +15798,54 @@ function () {
               this.informModelsOfUUIDChangeForItem(newItem, item.uuid, newItem.uuid);
               /** The new item should inherit the original's relationships */
 
+              referencingItems = item.allReferencingItems;
               _iteratorNormalCompletion14 = true;
               _didIteratorError14 = false;
               _iteratorError14 = undefined;
-              _context7.prev = 12;
+              _context7.prev = 13;
 
-              for (_iterator14 = item.referencingObjects[Symbol.iterator](); !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+              for (_iterator14 = referencingItems[Symbol.iterator](); !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
                 referencingObject = _step14.value;
                 referencingObject.setIsNoLongerBeingReferencedBy(item);
                 item.setIsNoLongerBeingReferencedBy(referencingObject);
                 referencingObject.addItemAsRelationship(newItem);
               }
 
-              _context7.next = 20;
+              _context7.next = 21;
               break;
 
-            case 16:
-              _context7.prev = 16;
-              _context7.t0 = _context7["catch"](12);
+            case 17:
+              _context7.prev = 17;
+              _context7.t0 = _context7["catch"](13);
               _didIteratorError14 = true;
               _iteratorError14 = _context7.t0;
 
-            case 20:
-              _context7.prev = 20;
+            case 21:
               _context7.prev = 21;
+              _context7.prev = 22;
 
               if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
                 _iterator14.return();
               }
 
-            case 23:
-              _context7.prev = 23;
+            case 24:
+              _context7.prev = 24;
 
               if (!_didIteratorError14) {
-                _context7.next = 26;
+                _context7.next = 27;
                 break;
               }
 
               throw _iteratorError14;
 
-            case 26:
-              return _context7.finish(23);
-
             case 27:
-              return _context7.finish(20);
+              return _context7.finish(24);
 
             case 28:
-              this.setItemsDirty(item.referencingObjects, true);
+              return _context7.finish(21);
+
+            case 29:
+              this.setItemsDirty(referencingItems, true);
               this.resolveReferencesForItem(newItem);
 
               if (this.loggingEnabled) {
@@ -15846,24 +15870,24 @@ function () {
                 object: item,
                 source: MAPPING_SOURCE_LOCAL_SAVED
               });
-              _context7.next = 37;
+              _context7.next = 38;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalModels({
                 payloads: [payload],
                 source: MAPPING_SOURCE_LOCAL_SAVED
               }));
 
-            case 37:
+            case 38:
               this.addItem(newItem);
               this.setItemDirty(newItem, true, true, MAPPING_SOURCE_LOCAL_SAVED);
               this.notifyObserversOfUuidChange(item, newItem);
               return _context7.abrupt("return", newItem);
 
-            case 41:
+            case 42:
             case "end":
               return _context7.stop();
           }
         }
-      }, null, this, [[12, 16, 20, 28], [21,, 23, 27]]);
+      }, null, this, [[13, 17, 21, 29], [22,, 24, 28]]);
     }
   }, {
     key: "informModelsOfUUIDChangeForItem",
@@ -16009,8 +16033,8 @@ function () {
 
   }, {
     key: "importItemsFromRaw",
-    value: function importItemsFromRaw(externalItems) {
-      var payloadsToMap, localValues, _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, itemData, localItem, frozenValue, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, _itemData, payload, _localValues$_itemDat, _frozenValue, itemRef, duplicate, duplicatePayload, items, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, item;
+    value: function importItemsFromRaw(rawPayloads) {
+      var payloadsToMap, localValues, _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, rawPayloadData, localItem, frozenItem, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, _rawPayloadData, payload, _localValues$_rawPayl, _frozenItem, item, contentDiffers, duplicate, duplicatePayload, items, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, _item2;
 
       return regeneratorRuntime.async(function importItemsFromRaw$(_context8) {
         while (1) {
@@ -16028,7 +16052,7 @@ function () {
               _didIteratorError18 = false;
               _iteratorError18 = undefined;
               _context8.prev = 5;
-              _iterator18 = externalItems[Symbol.iterator]();
+              _iterator18 = rawPayloads[Symbol.iterator]();
 
             case 7:
               if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
@@ -16036,22 +16060,22 @@ function () {
                 break;
               }
 
-              itemData = _step18.value;
-              localItem = this.findItem(itemData.uuid);
+              rawPayloadData = _step18.value;
+              localItem = this.findItem(rawPayloadData.uuid);
 
               if (localItem) {
                 _context8.next = 13;
                 break;
               }
 
-              localValues[itemData.uuid] = {};
+              localValues[rawPayloadData.uuid] = {};
               return _context8.abrupt("continue", 15);
 
             case 13:
-              frozenValue = this.duplicateItemWithoutAdding(localItem);
-              localValues[itemData.uuid] = {
-                frozenValue: frozenValue,
-                itemRef: localItem
+              frozenItem = this.duplicateItemWithoutAdding(localItem);
+              localValues[rawPayloadData.uuid] = {
+                frozenItem: frozenItem,
+                item: localItem
               };
 
             case 15:
@@ -16098,156 +16122,162 @@ function () {
               _didIteratorError19 = false;
               _iteratorError19 = undefined;
               _context8.prev = 35;
-              _iterator19 = externalItems[Symbol.iterator]();
+              _iterator19 = rawPayloads[Symbol.iterator]();
 
             case 37:
               if (_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done) {
-                _context8.next = 53;
+                _context8.next = 57;
                 break;
               }
 
-              _itemData = _step19.value;
+              _rawPayloadData = _step19.value;
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                object: _itemData,
+                object: _rawPayloadData,
                 source: MAPPING_SOURCE_FILE_IMPORT
               });
-              _localValues$_itemDat = localValues[_itemData.uuid], _frozenValue = _localValues$_itemDat.frozenValue, itemRef = _localValues$_itemDat.itemRef;
+              _localValues$_rawPayl = localValues[_rawPayloadData.uuid], _frozenItem = _localValues$_rawPayl.frozenItem, item = _localValues$_rawPayl.item;
 
-              if (!(_frozenValue && !itemRef.errorDecrypting)) {
-                _context8.next = 48;
+              if (!(_frozenItem && !item.errorDecrypting)) {
+                _context8.next = 52;
                 break;
               }
 
-              _context8.next = 44;
-              return regeneratorRuntime.awrap(this.createDuplicateItemFromPayload(payload));
+              // if the item already exists, check to see if it's different from the import data.
+              // If it's the same, do nothing, otherwise, create a copy.
+              contentDiffers = !_frozenItem.isContentEqualWithNonItemContent(payload.content);
 
-            case 44:
-              duplicate = _context8.sent;
-
-              if (!_itemData.deleted && !_frozenValue.isItemContentEqualWith(duplicate)) {
-                // Data differs
-                this.addDuplicatedItemAsConflict({
-                  duplicate: duplicate,
-                  duplicateOf: itemRef
-                });
-                duplicatePayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromItem"])({
-                  item: duplicate
-                });
-                payloadsToMap.push(duplicatePayload);
+              if (!(!_rawPayloadData.deleted && contentDiffers)) {
+                _context8.next = 50;
+                break;
               }
 
-              _context8.next = 50;
+              _context8.next = 46;
+              return regeneratorRuntime.awrap(this.createDuplicateItemFromPayload(payload));
+
+            case 46:
+              duplicate = _context8.sent;
+              this.addDuplicatedItemAsConflict({
+                duplicate: duplicate,
+                duplicateOf: item
+              });
+              duplicatePayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromItem"])({
+                item: duplicate
+              });
+              payloadsToMap.push(duplicatePayload);
+
+            case 50:
+              _context8.next = 54;
               break;
 
-            case 48:
+            case 52:
               // it doesn't exist, push it into items to be mapped
               payloadsToMap.push(payload);
 
-              if (itemRef && itemRef.errorDecrypting) {
-                itemRef.errorDecrypting = false;
+              if (item && item.errorDecrypting) {
+                item.errorDecrypting = false;
               }
 
-            case 50:
+            case 54:
               _iteratorNormalCompletion19 = true;
               _context8.next = 37;
               break;
 
-            case 53:
-              _context8.next = 59;
+            case 57:
+              _context8.next = 63;
               break;
 
-            case 55:
-              _context8.prev = 55;
+            case 59:
+              _context8.prev = 59;
               _context8.t1 = _context8["catch"](35);
               _didIteratorError19 = true;
               _iteratorError19 = _context8.t1;
 
-            case 59:
-              _context8.prev = 59;
-              _context8.prev = 60;
+            case 63:
+              _context8.prev = 63;
+              _context8.prev = 64;
 
               if (!_iteratorNormalCompletion19 && _iterator19.return != null) {
                 _iterator19.return();
               }
 
-            case 62:
-              _context8.prev = 62;
+            case 66:
+              _context8.prev = 66;
 
               if (!_didIteratorError19) {
-                _context8.next = 65;
+                _context8.next = 69;
                 break;
               }
 
               throw _iteratorError19;
 
-            case 65:
-              return _context8.finish(62);
+            case 69:
+              return _context8.finish(66);
 
-            case 66:
-              return _context8.finish(59);
+            case 70:
+              return _context8.finish(63);
 
-            case 67:
-              _context8.next = 69;
+            case 71:
+              _context8.next = 73;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalModels({
                 payloads: payloadsToMap,
                 source: MAPPING_SOURCE_FILE_IMPORT
               }));
 
-            case 69:
+            case 73:
               items = _context8.sent;
               _iteratorNormalCompletion20 = true;
               _didIteratorError20 = false;
               _iteratorError20 = undefined;
-              _context8.prev = 73;
+              _context8.prev = 77;
 
               for (_iterator20 = items[Symbol.iterator](); !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
-                item = _step20.value;
-                this.setItemDirty(item, true, false);
-                item.deleted = false;
+                _item2 = _step20.value;
+                this.setItemDirty(_item2, true, false);
+                _item2.deleted = false;
               }
 
-              _context8.next = 81;
+              _context8.next = 85;
               break;
-
-            case 77:
-              _context8.prev = 77;
-              _context8.t2 = _context8["catch"](73);
-              _didIteratorError20 = true;
-              _iteratorError20 = _context8.t2;
 
             case 81:
               _context8.prev = 81;
-              _context8.prev = 82;
+              _context8.t2 = _context8["catch"](77);
+              _didIteratorError20 = true;
+              _iteratorError20 = _context8.t2;
+
+            case 85:
+              _context8.prev = 85;
+              _context8.prev = 86;
 
               if (!_iteratorNormalCompletion20 && _iterator20.return != null) {
                 _iterator20.return();
               }
 
-            case 84:
-              _context8.prev = 84;
+            case 88:
+              _context8.prev = 88;
 
               if (!_didIteratorError20) {
-                _context8.next = 87;
+                _context8.next = 91;
                 break;
               }
 
               throw _iteratorError20;
 
-            case 87:
-              return _context8.finish(84);
+            case 91:
+              return _context8.finish(88);
 
-            case 88:
-              return _context8.finish(81);
+            case 92:
+              return _context8.finish(85);
 
-            case 89:
+            case 93:
               return _context8.abrupt("return", items);
 
-            case 90:
+            case 94:
             case "end":
               return _context8.stop();
           }
         }
-      }, null, this, [[5, 20, 24, 32], [25,, 27, 31], [35, 55, 59, 67], [60,, 62, 66], [73, 77, 81, 89], [82,, 84, 88]]);
+      }, null, this, [[5, 20, 24, 32], [25,, 27, 31], [35, 59, 63, 71], [64,, 66, 70], [77, 81, 85, 93], [86,, 88, 92]]);
     }
   }, {
     key: "getAllItemsJSONData",

@@ -98,8 +98,8 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1);
     expect(item2.content.references.length).to.equal(0);
 
-    expect(item1.referencingObjects.length).to.equal(0);
-    expect(item2.referencingObjects.length).to.equal(1);
+    expect(item1.referencingItemsCount).to.equal(0);
+    expect(item2.referencingItemsCount).to.equal(1);
   });
 
   it('mapping item without uuid should not map it', async () => {
@@ -173,8 +173,8 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1);
     expect(item2.content.references.length).to.equal(1);
 
-    expect(item1.referencingObjects).to.include(item2);
-    expect(item2.referencingObjects).to.include(item1);
+    expect(item1.allReferencingItems).to.include(item2);
+    expect(item2.allReferencingItems).to.include(item1);
 
     item1.removeItemAsRelationship(item2);
     item2.removeItemAsRelationship(item1);
@@ -182,8 +182,8 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(0);
     expect(item2.content.references.length).to.equal(0);
 
-    expect(item1.referencingObjects.length).to.equal(0);
-    expect(item2.referencingObjects.length).to.equal(0);
+    expect(item1.referencingItemsCount).to.equal(0);
+    expect(item2.referencingItemsCount).to.equal(0);
   });
 
   it('notifies observers of item uuid alternation', async () => {
@@ -218,14 +218,14 @@ describe('app models', () => {
 
     item1.addItemAsRelationship(item2);
 
-    expect(item1.referencedObjects.length).to.equal(1);
-    expect(item2.referencingObjects.length).to.equal(1);
+    expect(item1.referencedItemsCount).to.equal(1);
+    expect(item2.referencingItemsCount).to.equal(1);
 
     const duplicate = modelManager.duplicateItemAndAdd(item1);
     expect(duplicate.uuid).to.not.equal(item1.uuid);
-    expect(item1.referencedObjects.length).to.equal(1);
-    expect(duplicate.referencingObjects.length).to.equal(item1.referencingObjects.length);
-    expect(duplicate.referencedObjects.length).to.equal(item1.referencedObjects.length);
+    expect(item1.referencedItemsCount).to.equal(1);
+    expect(duplicate.referencingItemsCount).to.equal(item1.referencingItemsCount);
+    expect(duplicate.referencedItemsCount).to.equal(item1.referencedItemsCount);
 
     expect(item1.isItemContentEqualWith(duplicate)).to.equal(true);
     expect(item1.created_at).to.equal(duplicate.created_at);
@@ -233,8 +233,8 @@ describe('app models', () => {
 
     expect(duplicate.content.references.length).to.equal(1);
 
-    expect(item2.referencingObjects.length).to.equal(2);
-    expect(item2.referencedObjects.length).to.equal(0);
+    expect(item2.referencingItemsCount).to.equal(2);
+    expect(item2.referencedItemsCount).to.equal(0);
   });
 
   it('properly handles single item uuid alternation', async () => {
@@ -245,8 +245,8 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
 
     expect(item1.content.references.length).to.equal(1);
-    expect(item1.referencedObjects.length).to.equal(1);
-    expect(item2.referencingObjects.length).to.equal(1);
+    expect(item1.referencedItemsCount).to.equal(1);
+    expect(item2.referencingItemsCount).to.equal(1);
 
     const alternatedItem = await modelManager.alternateUUIDForItem(item1);
     // they should not be same reference
@@ -260,10 +260,10 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(0);
 
     expect(alternatedItem.content.references.length).to.equal(1);
-    expect(alternatedItem.referencingObjects.length).to.equal(0);
-    expect(alternatedItem.referencedObjects.length).to.equal(1);
+    expect(alternatedItem.referencingItemsCount).to.equal(0);
+    expect(alternatedItem.referencedItemsCount).to.equal(1);
 
-    expect(item2.referencingObjects.length).to.equal(1);
+    expect(item2.referencingItemsCount).to.equal(1);
 
     expect(alternatedItem.hasRelationshipWithItem(item2)).to.equal(true);
     expect(alternatedItem.dirty).to.equal(true);
@@ -278,7 +278,7 @@ describe('app models', () => {
 
     item1.addItemAsRelationship(item2);
 
-    expect(item2.referencingObjects.length).to.equal(1);
+    expect(item2.referencingItemsCount).to.equal(1);
 
     const alternatedItem1 = await modelManager.alternateUUIDForItem(item1);
     const alternatedItem2 = await modelManager.alternateUUIDForItem(item2);
@@ -292,7 +292,7 @@ describe('app models', () => {
     expect(alternatedItem1.content.references[0].uuid).to.equal(alternatedItem2.uuid);
     expect(alternatedItem2.content.references.length).to.equal(0);
 
-    expect(alternatedItem2.referencingObjects.length).to.equal(1);
+    expect(alternatedItem2.referencingItemsCount).to.equal(1);
 
     expect(alternatedItem1.hasRelationshipWithItem(alternatedItem2)).to.equal(true);
     expect(alternatedItem2.hasRelationshipWithItem(alternatedItem1)).to.equal(false);

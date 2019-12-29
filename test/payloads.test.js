@@ -28,4 +28,37 @@ describe('payload', () => {
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
   });
 
+  it('creating payload with override properties', async () => {
+    const payload = Factory.createNotePayload();
+    const uuid = payload.uuid;
+    const changedUuid = 'foo';
+    const changedPayload = CreatePayloadFromAnyObject({
+      object: payload,
+      override: {
+        uuid: changedUuid
+      }
+    })
+
+    expect(payload.uuid).to.equal(uuid);
+    expect(changedPayload.uuid).to.equal(changedUuid);
+  });
+
+  it('creating payload with deep override properties', async () => {
+    const payload = Factory.createNotePayload();
+    const text = payload.content.text;
+    const changedText = `${Math.random()}`;
+    const changedPayload = CreatePayloadFromAnyObject({
+      object: payload,
+      override: {
+        content: {
+          text: changedText
+        }
+      }
+    })
+
+    expect(payload.content === changedPayload.content).to.equal(false);
+    expect(payload.content.text).to.equal(text);
+    expect(changedPayload.content.text).to.equal(changedText);
+  });
+
 })

@@ -14,10 +14,9 @@ describe("notes and tags", () => {
   }
 
   it('uses proper class for note', async function() {
-    let modelManager = await createModelManager();
-    let noteParams = Factory.createNoteParams();
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const modelManager = await createModelManager();
+    const item = await Factory.createMappedNote(modelManager);
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
 
@@ -41,21 +40,21 @@ describe("notes and tags", () => {
 
   it('properly handles legacy relationships', async () => {
     // legacy relationships are when a note has a reference to a tag
-    let modelManager = await createModelManager();
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
-    tagParams.content.references = null;
-    noteParams.content.references = [
+    const modelManager = await createModelManager();
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
+    tagPayload.content.references = null;
+    notePayload.content.references = [
       {
-        uuid: tagParams.uuid,
-        content_type: tagParams.content_type
+        uuid: tagPayload.uuid,
+        content_type: tagPayload.content_type
       }
     ];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tags.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -64,14 +63,14 @@ describe("notes and tags", () => {
   it('creates two-way relationship between note and tag', async () => {
     let modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    let pair = Factory.createRelatedNoteTagPairPayload();
+    let notePayload = pair[0];
+    let tagPayload = pair[1];
 
-    expect(noteParams.content.references.length).to.equal(0);
-    expect(tagParams.content.references.length).to.equal(1);
+    expect(notePayload.content.references.length).to.equal(0);
+    expect(tagPayload.content.references.length).to.equal(1);
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -100,19 +99,19 @@ describe("notes and tags", () => {
   it('handles remote deletion of relationship', async () => {
     let modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    let pair = Factory.createRelatedNoteTagPairPayload();
+    let notePayload = pair[0];
+    let tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    tagParams.content.references = [];
-    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
+    tagPayload.content.references = [];
+    modelManager.mapPayloadsToLocalModels({payloads: [tagPayload]});
 
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
@@ -124,43 +123,53 @@ describe("notes and tags", () => {
   });
 
   it('resets cached note tags string when tag is deleted from remote source', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    tagParams.deleted = true;
-    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
+    const changedTagPayload = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {
+        deleted: true
+      }
+    })
+    modelManager.mapPayloadsToLocalModels({payloads: [changedTagPayload]});
 
-    // should be null
+    expect(modelManager.tags.length).to.equal(0);
+
+    // Should be null
     expect(note.savedTagsString).to.not.be.ok;
+
+    expect(note.referencedItemsCount).to.equal(0);
+    expect(note.referencingItemsCount).to.equal(0);
 
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
   });
 
   it('resets cached note tags string when tag reference is removed from remote source', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    tagParams.content.references = [];
-    modelManager.mapPayloadsToLocalModels({payloads: [tagParams]});
+    tagPayload.content.references = [];
+    modelManager.mapPayloadsToLocalModels({payloads: [tagPayload]});
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -169,31 +178,41 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(0);
   });
 
-  it('resets cached note tags string when tag is renamed', async () => {
-    let modelManager = await createModelManager();
+  it.only('resets cached note tags string when tag is renamed', async () => {
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    expect(note.tagsString()).to.equal(`#${tagParams.content.title}`);
+    expect(note.tagsString()).to.equal(`#${tagPayload.content.title}`);
 
-    var title = Math.random();
+    const title = `${Math.random()}`;
 
     // Saving involves modifying local state first, then syncing with omitting content.
     tag.title = title;
-    tagParams.content.title = title;
+    tag.setDirty(true);
+
+    const changedTagPayload = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {
+        content: {
+          title: title
+        }
+      }
+    })
+    
     // simulate a save, which omits `content`
     modelManager.mapPayloadsToLocalModels({
-      payloads: [tagParams],
+      payloads: [tagPayload],
       omitFields: ['content']
     })
 
-    // should be null
+    expect(tag.content.title).to.equal(tagPayload.content.title);
     expect(note.savedTagsString).to.not.be.ok;
     expect(note.tagsString()).to.equal(`#${title}`);
   });
@@ -201,11 +220,11 @@ describe("notes and tags", () => {
   it('handles removing relationship between note and tag', async () => {
     let modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    let pair = Factory.createRelatedNoteTagPairPayload();
+    let notePayload = pair[0];
+    let tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
     let note = modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -220,17 +239,17 @@ describe("notes and tags", () => {
   });
 
   it('properly handles tag duplication', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    var duplicateTag = await modelManager.duplicateItemAndAddAsConflict(tag);
+    const duplicateTag = await modelManager.duplicateItemAndAddAsConflict(tag);
 
     expect(tag.uuid).to.not.equal(duplicateTag.uuid);
 
@@ -242,8 +261,8 @@ describe("notes and tags", () => {
 
     expect(note.tags.length).to.equal(2);
 
-    var noteTag1 = note.tags[0];
-    var noteTag2 = note.tags[1];
+    const noteTag1 = note.tags[0];
+    const noteTag2 = note.tags[1];
     expect(noteTag1.uuid).to.not.equal(noteTag2.uuid);
 
     // expect to be false
@@ -252,32 +271,32 @@ describe("notes and tags", () => {
   });
 
   it('duplicating a note should maintain its tag references', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    var duplicateNote = await modelManager.duplicateItemAndAddAsConflict(note);
+    const duplicateNote = await modelManager.duplicateItemAndAddAsConflict(note);
 
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
     expect(duplicateNote.tags.length).to.equal(note.tags.length);
   });
 
   it('deleting a note should update tag references', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(tag.content.references.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -286,21 +305,22 @@ describe("notes and tags", () => {
     expect(note.tags.length).to.equal(1);
 
     modelManager.setItemToBeDeleted(tag);
-    modelManager.mapPayloadsToLocalModels({payloads: [tag]});
+    const newTagPayload = CreateMaxPayloadFromItem({item: tag});
+    modelManager.mapPayloadsToLocalModels({payloads: [newTagPayload]});
     expect(tag.content.references.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
   });
 
   it('importing existing data should keep relationships valid', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(tag.content.references.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -308,7 +328,7 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(1);
 
-    modelManager.importItemsFromRaw([noteParams, tagParams]);
+    modelManager.importItemsFromRaw([notePayload, tagPayload]);
 
     expect(modelManager.allItems.length).to.equal(2);
 
@@ -316,29 +336,42 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(note.referencingObjects.length).to.equal(1);
+    expect(note.referencingItemsCount).to.equal(1);
     expect(note.tags.length).to.equal(1);
   });
 
+  it('modifying payload content should not modify item content', async () => {
+    const modelManager = await createModelManager();
+    const notePayload = Factory.createNotePayload();
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    expect(note.content === notePayload.content).to.equal(false);
+    expect(note.content.references === notePayload.content.references).to.equal(false);
+    notePayload.content.title = Math.random();
+    expect(note.content.title).to.not.equal(notePayload.content.title);
+  });
+
   it('importing data with differing content should create duplicates', async () => {
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    noteParams.content.title = Math.random();
-    tagParams.content.title = Math.random();
-    await modelManager.importItemsFromRaw([noteParams, tagParams]);
+    notePayload.content.title = `${Math.random()}`;
+    tagPayload.content.title = `${Math.random()}`;
+    expect(note.content.title).to.not.equal(notePayload.content.title);
+
+    const imported = await modelManager.importItemsFromRaw([notePayload, tagPayload]);
 
     expect(modelManager.allItems.length).to.equal(4);
 
-    var newNote = modelManager.allItemsMatchingTypes(["Note"])[1];
-    var newTag = modelManager.allItemsMatchingTypes(["Tag"])[1];
+    const newNote = imported[0];
+    const newTag = imported[1];
 
     expect(newNote.uuid).to.not.equal(note.uuid);
     expect(newTag.uuid).to.not.equal(tag.uuid);
@@ -347,15 +380,15 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(2);
 
     expect(note.content.references.length).to.equal(0);
-    expect(note.referencingObjects.length).to.equal(2);
+    expect(note.referencingItemsCount).to.equal(2);
     expect(note.tags.length).to.equal(2);
 
-    expect(newTag.content.references.length).to.equal(1);
-    expect(newTag.notes.length).to.equal(1);
+    expect(newTag.content.references.length).to.equal(2);
+    expect(newTag.notes.length).to.equal(2);
 
     expect(newNote.content.references.length).to.equal(0);
-    expect(newNote.referencingObjects.length).to.equal(1);
-    expect(newNote.tags.length).to.equal(1);
+    expect(newNote.referencingItemsCount).to.equal(2);
+    expect(newNote.tags.length).to.equal(2);
   });
 
   it('deleting a tag from a note with bi-directional relationship', async () => {
@@ -363,20 +396,20 @@ describe("notes and tags", () => {
     // After the change, there was an issue where removing an old tag relationship from a note would only
     // remove one way, and thus keep it intact on the visual level.
 
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    noteParams.content.references = [{
-      content_type: tagParams.content_type,
-      uuid: tagParams.uuid
+    notePayload.content.references = [{
+      content_type: tagPayload.content_type,
+      uuid: tagPayload.uuid
     }]
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     expect(tag.notes.length).to.equal(1);
     expect(note.tags.length).to.equal(1);
@@ -395,15 +428,15 @@ describe("notes and tags", () => {
     // After the change, there was an issue where removing an old tag relationship from a note would only
     // remove one way, and thus keep it intact on the visual level.
 
-    let modelManager = await createModelManager();
+    const modelManager = await createModelManager();
 
-    let pair = Factory.createRelatedNoteTagPairParams();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalModels({payloads: [noteParams, tagParams]});
-    let note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalModels({payloads: [notePayload, tagPayload]});
+    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
     modelManager.setItemToBeDeleted(tag);
 
@@ -411,7 +444,7 @@ describe("notes and tags", () => {
     expect(note.dirty).to.not.be.ok;
   })
 
-  it('syncing a note should collapse its properties into the content object after setting it dirty', async () => {
+  it('setting a note dirty should collapse its properties into content', async () => {
     let note = new SNNote();
     note.title = "Foo";
     expect(note.content.title).to.not.be.ok;

@@ -104,6 +104,10 @@ export default class Factory {
     return this.mapPayloadToItem(payload, modelManager);
   }
 
+  static createNotePayload() {
+    return CreatePayloadFromAnyObject({object: this.createNoteParams()});
+  }
+
   static createItemParams(contentType) {
     const params = {
       uuid: SFItem.GenerateUuidSynchronously(),
@@ -139,7 +143,7 @@ export default class Factory {
     return params;
   }
 
-  static createRelatedNoteTagPairParams() {
+  static createRelatedNoteTagPairPayload() {
     let noteParams = this.createNoteParams();
     let tagParams = {
       uuid: SFItem.GenerateUuidSynchronously(),
@@ -147,11 +151,14 @@ export default class Factory {
       content: { title: "thoughts" }
     };
     tagParams.content.references = [{
-        uuid: noteParams.uuid,
-        content_type: noteParams.content_type
+      uuid: noteParams.uuid,
+      content_type: noteParams.content_type
     }]
     noteParams.content.references = []
-    return [noteParams, tagParams];
+    return [
+      CreatePayloadFromAnyObject({object: noteParams}),
+      CreatePayloadFromAnyObject({object: tagParams})
+    ];
   }
 
   static serverURL() {

@@ -23,7 +23,7 @@ describe.only("notes + tags syncing", async function() {
   })
 
   it('syncing a note many times does not cause duplication', async function() {
-    let pair = Factory.createRelatedNoteTagPairParams();
+    let pair = Factory.createRelatedNoteTagPairPayload();
     let noteParams = pair[0];
     let tagParams = pair[1];
 
@@ -49,7 +49,7 @@ describe.only("notes + tags syncing", async function() {
   }).timeout(20000);
 
   it("handles signing in and merging data", async function() {
-    let pair = Factory.createRelatedNoteTagPairParams();
+    let pair = Factory.createRelatedNoteTagPairPayload();
     let noteParams = pair[0];
     let tagParams = pair[1];
 
@@ -82,14 +82,14 @@ describe.only("notes + tags syncing", async function() {
     expect(tag.content.references.length).to.equal(1);
     expect(note.content.references.length).to.equal(0);
 
-    expect(note.referencingObjects.length).to.equal(1);
+    expect(note.referencingItemsCount).to.equal(1);
     expect(tag.notes.length).to.equal(1);
     expect(note.tags.length).to.equal(1);
   })
 
   it.only('duplicating a tag should maintian its relationships', async function() {
     await this.application.syncManager.loadLocalItems();
-    let pair = Factory.createRelatedNoteTagPairParams();
+    let pair = Factory.createRelatedNoteTagPairPayload();
     let noteParams = pair[0];
     let tagParams = pair[1];
 
@@ -110,7 +110,7 @@ describe.only("notes + tags syncing", async function() {
     // tag.updated_at = Factory.yesterday();
     // tag.setDirty(true);
     //
-    // expect(note.referencingObjects.length).to.equal(1);
+    // expect(note.referencingItemsCount).to.equal(1);
     //
     // // wait about 1s, which is the value the dev server will ignore conflicting changes
     // await Factory.sleep(1.1);
@@ -129,11 +129,11 @@ describe.only("notes + tags syncing", async function() {
     // expect(tag1.uuid).to.equal(tag.uuid);
     // expect(tag2.content.conflict_of).to.equal(tag1.uuid);
     // expect(tag1.notes.length).to.equal(tag2.notes.length);
-    // expect(tag1.referencingObjects.length).to.equal(0);
-    // expect(tag2.referencingObjects.length).to.equal(0);
+    // expect(tag1.referencingItemsCount).to.equal(0);
+    // expect(tag2.referencingItemsCount).to.equal(0);
     //
     // // Two tags now link to this note
-    // expect(note.referencingObjects.length).to.equal(2);
-    // expect(note.referencingObjects[0]).to.not.equal(note.referencingObjects[1]);
+    // expect(note.referencingItemsCount).to.equal(2);
+    // expect(note.allReferencingItems[0]).to.not.equal(note.allReferencingItems[1]);
   }).timeout(10000);
 })

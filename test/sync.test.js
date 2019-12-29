@@ -714,8 +714,8 @@ describe('online syncing', () => {
     expect(originalItem1).to.be.ok;
     expect(originalItem2).to.be.ok;
 
-    expect(originalItem2.referencingObjects.length).to.equal(1);
-    expect(originalItem2.referencingObjects).to.include(originalItem1);
+    expect(originalItem2.referencingItemsCount).to.equal(1);
+    expect(originalItem2.allReferencingItems).to.include(originalItem1);
 
     modelManager.setItemsDirty([originalItem1, originalItem2], true);
 
@@ -741,12 +741,12 @@ describe('online syncing', () => {
 
     expect(item2.content.conflict_of).to.equal(item1.uuid);
     // Two items now link to this original object
-    expect(originalItem2.referencingObjects.length).to.equal(2);
-    expect(originalItem2.referencingObjects[0]).to.not.equal(originalItem2.referencingObjects[1]);
+    expect(originalItem2.referencingItemsCount).to.equal(2);
+    expect(originalItem2.allReferencingItems[0]).to.not.equal(originalItem2.allReferencingItems[1]);
 
-    expect(originalItem1.referencingObjects.length).to.equal(0);
-    expect(item1.referencingObjects.length).to.equal(0);
-    expect(item2.referencingObjects.length).to.equal(0);
+    expect(originalItem1.referencingItemsCount).to.equal(0);
+    expect(item1.referencingItemsCount).to.equal(0);
+    expect(item2.referencingItemsCount).to.equal(0);
 
     expect(item1.content.references.length).to.equal(1);
     expect(item2.content.references.length).to.equal(1);
