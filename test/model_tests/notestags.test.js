@@ -60,7 +60,7 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(1);
   })
 
-  it('creates two-way relationship between note and tag', async () => {
+  it('creates relationship between note and tag', async () => {
     let modelManager = await createModelManager();
 
     let pair = Factory.createRelatedNoteTagPairPayload();
@@ -178,7 +178,7 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(0);
   });
 
-  it.only('resets cached note tags string when tag is renamed', async () => {
+  it('resets cached note tags string when tag is renamed', async () => {
     const modelManager = await createModelManager();
 
     const pair = Factory.createRelatedNoteTagPairPayload();
@@ -191,30 +191,26 @@ describe("notes and tags", () => {
 
     expect(note.tagsString()).to.equal(`#${tagPayload.content.title}`);
 
-    const title = `${Math.random()}`;
-
+    const newTitle = `${Math.random()}`;
     // Saving involves modifying local state first, then syncing with omitting content.
-    tag.title = title;
+    tag.title = newTitle;
     tag.setDirty(true);
+
+    expect(tag.content.title).to.equal(newTitle);
 
     const changedTagPayload = CreatePayloadFromAnyObject({
       object: tagPayload,
-      override: {
-        content: {
-          title: title
-        }
-      }
-    })
-    
-    // simulate a save, which omits `content`
-    modelManager.mapPayloadsToLocalModels({
-      payloads: [tagPayload],
-      omitFields: ['content']
+      omit: ['content']
     })
 
-    expect(tag.content.title).to.equal(tagPayload.content.title);
+    // simulate a save, which omits `content`
+    modelManager.mapPayloadsToLocalModels({
+      payloads: [changedTagPayload]
+    })
+
+    expect(tag.content.title).to.equal(newTitle);
     expect(note.savedTagsString).to.not.be.ok;
-    expect(note.tagsString()).to.equal(`#${title}`);
+    expect(note.tagsString()).to.equal(`#${newTitle}`);
   });
 
   it('handles removing relationship between note and tag', async () => {
@@ -232,7 +228,10 @@ describe("notes and tags", () => {
     expect(tag.content.references.length).to.equal(1);
 
     tag.removeItemAsRelationship(note);
-    modelManager.mapPayloadsToLocalModels({payloads: [tag]});
+
+    const newTagPayload = CreateMaxPayloadFromItem({item: tag});
+
+    modelManager.mapPayloadsToLocalModels({payloads: [newTagPayload]});
 
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);

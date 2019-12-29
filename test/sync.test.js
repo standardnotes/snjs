@@ -291,7 +291,7 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     totalItemCount++;
 
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1005,7 +1005,7 @@ describe('sync params', () => {
   it("returns valid encrypted params for syncing", async () => {
     var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1022,7 +1022,7 @@ describe('sync params', () => {
 
   it("returns unencrypted params with no keys", async () => {
     var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })
@@ -1040,7 +1040,7 @@ describe('sync params', () => {
   it("returns additional fields for local storage", async () => {
     var item = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentLocalStorageEncrypted
     })
@@ -1060,7 +1060,7 @@ describe('sync params', () => {
 
   it("omits deleted for export file", async () => {
     var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentFileEncrypted
     })
@@ -1077,7 +1077,7 @@ describe('sync params', () => {
   it("items with error decrypting should remain as is", async () => {
     var item = Factory.createStorageItemNotePayload();
     item.errorDecrypting = true;
-    const itemParams = await protocolManager.generateItemPayload({
+    const itemParams = await protocolManager.generateEncryptedItemPayload({
       item: item,
       intent: EncryptionIntentSync
     })

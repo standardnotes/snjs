@@ -61,4 +61,17 @@ describe('payload', () => {
     expect(changedPayload.content.text).to.equal(changedText);
   });
 
+  it('creating payload with omit fields', async () => {
+    const payload = Factory.createNotePayload();
+    const uuid = payload.uuid;
+    const changedUuid = 'foo';
+    const changedPayload = CreatePayloadFromAnyObject({
+      object: payload,
+      omit: ['uuid']
+    })
+
+    expect(payload.uuid).to.equal(uuid);
+    expect(changedPayload.uuid).to.not.be.ok;
+  });
+
 })

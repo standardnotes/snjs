@@ -21,20 +21,29 @@ describe("model manager mapping", () => {
 
   it('mapping nonexistent deleted item doesnt create it', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
-    params.deleted = true;
+    const params = CreatePayloadFromAnyObject({
+      object: Factory.createNoteParams(),
+      override: {
+        deleted: true
+      }
+    });
     await modelManager.mapPayloadsToLocalModels({payloads: [params]});
     expect(modelManager.items.length).to.equal(0);
   });
 
   it('mapping and deleting nonexistent item creates and deletes it', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
+    const modelManager = await createModelManager();
+    const params = Factory.createStorageItemNotePayload();
     await modelManager.mapPayloadsToLocalModels({payloads: [params]});
     expect(modelManager.items.length).to.equal(1);
 
-    params.deleted = true;
-    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
+    const changedParams = CreatePayloadFromAnyObject({
+      object: params,
+      override: {
+        deleted: true
+      }
+    });
+    await modelManager.mapPayloadsToLocalModels({payloads: [changedParams]});
     expect(modelManager.items.length).to.equal(0);
   });
 

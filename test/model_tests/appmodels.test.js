@@ -19,24 +19,6 @@ describe('app models', () => {
     await Factory.initializeApplication(application);
   });
 
-  it('lodash merge should behave as expected', () => {
-    var a = {
-      content: {
-        references: [{a: "a"}]
-      }
-    }
-
-    var b = {
-      content: {
-        references: [ ]
-      }
-    }
-
-    // merging a with b should replace total content
-    deepMerge(a, b);
-    expect(a.content.references).to.eql([]);
-  });
-
   it('modelManager should be defined', () => {
     expect(application.modelManager).to.not.be.null;
   });
@@ -80,9 +62,9 @@ describe('app models', () => {
   });
 
   it('handles delayed mapping', async () => {
-    let modelManager = await createModelManager();
-    var params1 = Factory.createStorageItemNotePayload();
-    var params2 = Factory.createStorageItemNotePayload();
+    const modelManager = await createModelManager();
+    const params1 = Factory.createStorageItemNotePayload();
+    const params2 = Factory.createStorageItemNotePayload();
 
     params1.content.references = [{
       uuid: params2.uuid,
@@ -92,8 +74,8 @@ describe('app models', () => {
     await modelManager.mapPayloadsToLocalModels({payloads: [params1]});
     await modelManager.mapPayloadsToLocalModels({payloads: [params2]});
 
-    var item1 = modelManager.findItem(params1.uuid);
-    var item2 = modelManager.findItem(params2.uuid);
+    const item1 = modelManager.findItem(params1.uuid);
+    const item2 = modelManager.findItem(params2.uuid);
 
     expect(item1.content.references.length).to.equal(1);
     expect(item2.content.references.length).to.equal(0);
@@ -103,11 +85,13 @@ describe('app models', () => {
   });
 
   it('mapping item without uuid should not map it', async () => {
-    let modelManager = await createModelManager();
-    var params1 = Factory.createStorageItemNotePayload();
-    params1.uuid = null;
+    const modelManager = await createModelManager();
+    const params = CreatePayloadFromAnyObject({
+      object: Factory.createNoteParams(),
+      omit: ['uuid']
+    });
 
-    await modelManager.mapPayloadsToLocalModels({payloads: [params1]});
+    await modelManager.mapPayloadsToLocalModels({payloads: [params]});
     expect(modelManager.allItems.length).to.equal(0);
   });
 
@@ -187,8 +171,8 @@ describe('app models', () => {
   });
 
   it('notifies observers of item uuid alternation', async () => {
-    let modelManager = await createModelManager();
-    var item1 = await Factory.createMappedNote(modelManager);
+    const modelManager = await createModelManager();
+    const item = await Factory.createMappedNote(modelManager);
 
     return new Promise((resolve, reject) => {
       modelManager.addModelUuidChangeObserver("test", (oldItem, newItem) => {
@@ -196,7 +180,7 @@ describe('app models', () => {
         resolve();
       })
 
-      modelManager.alternateUUIDForItem(item1);
+      modelManager.alternateUUIDForItem(item);
     })
   });
 

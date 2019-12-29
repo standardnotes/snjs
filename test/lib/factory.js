@@ -74,15 +74,15 @@ export default class Factory {
   }
 
   static createStorageItemPayload(contentType) {
-    return new SNStorageItemPayload(this.createItemParams(contentType));
+    return CreatePayloadFromAnyObject({object: this.createItemParams(contentType)});
   }
 
   static createStorageItemNotePayload() {
-    return new SNStorageItemPayload(this.createNoteParams());
+    return CreatePayloadFromAnyObject({object: this.createNoteParams()});
   }
 
   static createStorageItemTagPayload() {
-    return new SNStorageItemPayload(this.createTagParams());
+    return CreatePayloadFromAnyObject({object: this.createTagParams()});
   }
 
   static async mapPayloadToItem(payload, modelManager) {

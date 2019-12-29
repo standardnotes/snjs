@@ -24,4 +24,22 @@ describe('utils', () => {
     expect(isNullOrUndefined({})).to.equal(false);
     expect(isNullOrUndefined([null])).to.equal(false);
   })
+
+  it('lodash merge should behave as expected', () => {
+    const a = {
+      content: {
+        references: [{a: "a"}]
+      }
+    }
+
+    const b = {
+      content: {
+        references: [ ]
+      }
+    }
+
+    // merging a with b should replace total content
+    deepMerge(a, b);
+    expect(a.content.references).to.eql([]);
+  });
 });
