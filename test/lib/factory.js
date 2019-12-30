@@ -99,6 +99,22 @@ export default class Factory {
     return this.mapPayloadToItem(payload, modelManager);
   }
 
+  static async createSyncedNote(application) {
+    const payload = this.createStorageItemNotePayload();
+    const note = await this.mapPayloadToItem(payload, application.modelManager);
+    note.setDirty(true);
+    await application.syncManager.sync();
+    return note;
+  }
+
+  static async loginToApplication({application, email, password}) {
+    return application.signIn({
+      url: Factory.serverURL(),
+      email: email,
+      password: password
+    });
+  }
+
   static createMappedTag(modelManager) {
     const payload = this.createStorageItemTagPayload();
     return this.mapPayloadToItem(payload, modelManager);
@@ -181,7 +197,7 @@ export default class Factory {
     const url = this.serverURL();
     if(!email) email = SFItem.GenerateUuidSynchronously();
     if(!password) password = SFItem.GenerateUuidSynchronously();
-    return application.authManager.register({url, email, password});
+    return application.register({url, email, password});
   }
 
   static shuffleArray(a) {

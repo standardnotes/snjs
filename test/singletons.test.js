@@ -54,7 +54,7 @@ describe("singletons", () => {
 
   it("if only result is errorDecrypting, create new item", async () => {
     await storageManager.clearAllData();
-    await modelManager.handleSignout();
+    await modelManager.handleSignOut();
     await syncManager.loadLocalItems();
 
     let item1 = Factory.createStorageItemNotePayload();

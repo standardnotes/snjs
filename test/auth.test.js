@@ -30,7 +30,7 @@ describe("basic auth", () => {
   }).timeout(20000);
 
   it("successfully logins to registered account", async () => {
-    await Factory.globalAuthManager().signOut(true);
+    await Factory.globalAuthManager().signOut({clearAllData: true});
     const response = await Factory.globalAuthManager().login({url, email, password});
     expect(response.error).to.not.be.ok;
   }).timeout(20000);
@@ -101,9 +101,9 @@ describe("basic auth", () => {
     // await syncManager.sync();
     //
     // // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-    // await syncManager.handleSignout();
+    // await syncManager.handleSignOut();
     // await storageManager.clearAllModels();
-    // await modelManager.handleSignout();
+    // await modelManager.handleSignOut();
     //
     // expect(modelManager.allItems.length).to.equal(0);
     //
@@ -112,7 +112,7 @@ describe("basic auth", () => {
     // expect(modelManager.allItems.length).to.equal(totalItemCount);
     // expect(modelManager.invalidItems().length).to.equal(0);
     //
-    // await Factory.globalAuthManager().signOut(true);
+    // await Factory.globalAuthManager().signOut({clearAllData: true});
     // var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
     // expect(loginResponse.error).to.not.be.ok;
   }).timeout(20000);
@@ -164,7 +164,7 @@ describe("basic auth", () => {
       await syncManager.sync();
       await syncManager.clearSyncToken();
       await storageManager.clearAllModels();
-      modelManager.handleSignout();
+      modelManager.handleSignOut();
 
       expect(modelManager.allItems.length).to.equal(0);
 

@@ -7,8 +7,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('keys', () => {
-  let _identifier = "hello@test.com";
-  let _password = "password";
   let _key, _keyParams;
   let sharedApplication;
 
@@ -143,6 +141,47 @@ describe('keys', () => {
     });
 
     expect(decryptedPayload.content.title).to.equal(title);
+  })
+
+  it('decrypts items waiting for keys', async function() {
+    const notePayload = Factory.createStorageItemNotePayload();
+    const title = notePayload.content.title;
+    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+      payload: notePayload,
+      intent: ENCRYPTION_INTENT_SYNC
+    });
+
+    const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
+    await this.application.modelManager.removeItemLocally(itemsKey);
+
+    const decryptedPayload = await this.application.protocolManager.payloadByDecryptingPayload({
+      payload: encryptedPayload
+    })
+    await this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [decryptedPayload]
+    })
+
+    const note = this.application.modelManager.notes[0];
+    expect(note.uuid).to.equal(notePayload.uuid);
+    expect(note.errorDecrypting).to.equal(true);
+    expect(note.waitingForKey).to.equal(true);
+
+    const keyPayload = CreatePayloadFromAnyObject({
+      object: itemsKey
+    })
+    await this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [keyPayload]
+    })
+
+    /**
+     * Sleeping is required to trigger asyncronous protocolManager.decryptItemsWaitingForKeys,
+     * which occurs after keys are mapped above.
+     */
+    await Factory.sleep(0.2);
+
+    expect(note.errorDecrypting).to.equal(false);
+    expect(note.waitingForKey).to.equal(false);
+    expect(note.content.title).to.equal(title);
   })
 
   it('generating export params with logged in account should produce encrypted payload', async () => {

@@ -195,7 +195,7 @@ describe('migrations', () => {
     var email = SFItem.GenerateUuidSynchronously();
     var password = SFItem.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({email, password, application});
-    authManager.notifyEvent(SNAuthManager.DidSignInEvent);
+    authManager.notifyEvent(APPLICATION_EVENT_DID_SIGN_IN);
 
     await syncManager.sync();
     // migrations run asyncronously

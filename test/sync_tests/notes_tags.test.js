@@ -25,7 +25,7 @@ describe("notes + tags syncing", async function() {
     const note = await Factory.createMappedNote(this.application.modelManager);
     note.setDirty(true);
     await this.application.syncManager.sync();
-    await this.application.modelManager.handleSignout();
+    await this.application.modelManager.handleSignOut();
     await this.application.syncManager.clearSyncToken();
     await this.application.syncManager.sync();
     const downloadedNote = this.application.modelManager.notes[0];

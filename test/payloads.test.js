@@ -6,7 +6,10 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
-describe('payload', () => {
+describe('payloads', () => {
+  const _identifier = "hello@test.com";
+  const _password = "password";
+  let _keyParams, _key;
 
   const application = Factory.createApplication();
 
@@ -72,6 +75,92 @@ describe('payload', () => {
 
     expect(payload.uuid).to.equal(uuid);
     expect(changedPayload.uuid).to.not.be.ok;
+  });
+
+  it("returns valid encrypted params for syncing", async () => {
+    var item = Factory.createStorageItemNotePayload();
+
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
+      item: item,
+      intent: ENCRYPTION_INTENT_SYNC
+    })
+
+    expect(itemParams.enc_item_key).to.not.be.null;
+    expect(itemParams.uuid).to.not.be.null;
+    expect(itemParams.auth_hash).to.be.null;
+    expect(itemParams.content_type).to.not.be.null;
+    expect(itemParams.created_at).to.not.be.null;
+    expect(itemParams.content).to.satisfy((string) => {
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
+    });
+  });
+
+  it("returns unencrypted params with no keys", async () => {
+    var item = Factory.createStorageItemNotePayload();
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
+      item: item,
+      intent: ENCRYPTION_INTENT_SYNC
+    })
+
+    expect(itemParams.enc_item_key).to.be.null;
+    expect(itemParams.auth_hash).to.be.null;
+    expect(itemParams.uuid).to.not.be.null;
+    expect(itemParams.content_type).to.not.be.null;
+    expect(itemParams.created_at).to.not.be.null;
+    expect(itemParams.content).to.satisfy((string) => {
+      return string.startsWith("000");
+    });
+  });
+
+  it("returns additional fields for local storage", async () => {
+    var item = Factory.createStorageItemNotePayload();
+
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
+      item: item,
+      intent: ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED
+    })
+
+    expect(itemParams.enc_item_key).to.not.be.null;
+    expect(itemParams.auth_hash).to.be.null;
+    expect(itemParams.uuid).to.not.be.null;
+    expect(itemParams.content_type).to.not.be.null;
+    expect(itemParams.created_at).to.not.be.null;
+    expect(itemParams.updated_at).to.not.be.null;
+    expect(itemParams.deleted).to.not.be.null;
+    expect(itemParams.errorDecrypting).to.not.be.null;
+    expect(itemParams.content).to.satisfy((string) => {
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
+    });
+  });
+
+  it("omits deleted for export file", async () => {
+    var item = Factory.createStorageItemNotePayload();
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
+      item: item,
+      intent: ENCRYPTION_INTENT_FILE_ENCRYPTED
+    })
+    expect(itemParams.enc_item_key).to.not.be.null;
+    expect(itemParams.uuid).to.not.be.null;
+    expect(itemParams.content_type).to.not.be.null;
+    expect(itemParams.created_at).to.not.be.null;
+    expect(itemParams.deleted).to.not.be.ok;
+    expect(itemParams.content).to.satisfy((string) => {
+      return string.startsWith(Factory.globalProtocolManager().latestVersion());
+    });
+  });
+
+  it("items with error decrypting should remain as is", async () => {
+    var item = Factory.createStorageItemNotePayload();
+    item.errorDecrypting = true;
+    const itemParams = await protocolManager.payloadByEncryptingPayload({
+      item: item,
+      intent: ENCRYPTION_INTENT_SYNC
+    })
+    expect(itemParams.content).to.eql(item.content);
+    expect(itemParams.enc_item_key).to.not.be.null;
+    expect(itemParams.uuid).to.not.be.null;
+    expect(itemParams.content_type).to.not.be.null;
+    expect(itemParams.created_at).to.not.be.null;
   });
 
 })
