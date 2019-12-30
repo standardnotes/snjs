@@ -2,16 +2,10 @@ import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
-
-SFItem.AppDomain = "org.standardnotes.sn";
-
+import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
-const globalModelManager = new SNModelManager();
-const createModelManager = () => {
-  return new SNModelManager();
-}
 
 const createItemParams = () => {
   var params = {
@@ -41,10 +35,22 @@ const createItemParams = () => {
 }
 
 const createItem = () => {
-  return new SFItem(createItemParams());
+  const payload = CreatePayloadFromAnyObject({
+    object: createItemParams()
+  })
+  return new SFItem(payload);
 }
 
 describe("predicates", () => {
+  const application = Factory.createApplication();
+  before(async function () {
+    await Factory.initializeApplication(application);
+  });
+
+  beforeEach(async function() {
+    this.application = await Factory.createInitAppWithRandNamespace();
+  })
+
   it('test and operator', () => {
     let item = createItem();
     expect(item.satisfiesPredicate(new SFPredicate( "this_field_ignored", "and", [
@@ -167,8 +173,8 @@ describe("predicates", () => {
     expect(item.satisfiesPredicate(JSON.parse('["archived", "=", false]'))).to.equal(false);
   })
 
-  it('model manager predicate matching', () => {
-    let modelManager = createModelManager();
+  it('model manager predicate matching', function () {
+    let modelManager = this.application.modelManager;
     let item1 = createItem();
     item1.updated_at = new Date();
 
@@ -230,22 +236,25 @@ describe("predicates", () => {
 
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.title", "startsWith", "H")).length).to.equal(1);
 
-    let item2 = new SFItem({
-      content_type: "Item",
-      content: {
-        tags: [
-          {
-            title: "sobar",
-            id: Math.random()
-          },
-          {
-            title: "foobart",
-            id: Math.random()
-          }
-        ]
-      },
+    const payload = CreatePayloadFromAnyObject({
+      object: {
+        content_type: "Item",
+        content: {
+          tags: [
+            {
+              title: "sobar",
+              id: Math.random()
+            },
+            {
+              title: "foobart",
+              id: Math.random()
+            }
+          ]
+        }
+      }
     })
 
+    const item2 = new SFItem(payload);
     modelManager.addItem(item2);
 
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "includes", "bar"])).length).to.equal(2);
@@ -265,17 +274,17 @@ describe("predicates", () => {
     expect(item.satisfiesPredicate(new SFPredicate("content.foobar.length", "=", 0))).to.equal(false);
   })
 
-  it("false should compare true with undefined", () => {
+  it("false should compare true with undefined", function () {
     var item = createItem();
-    let modelManager = createModelManager();
+    let modelManager = this.application.modelManager;
     modelManager.addItem(item);
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("pinned", "=", false)).length).to.equal(1);
   })
 
-  it("regex", () => {
+  it("regex", function () {
     var item = createItem();
     item.content.title = "123";
-    let modelManager = createModelManager();
+    let modelManager = this.application.modelManager;
     item.setDirty(true);
     modelManager.addItem(item);
     // match only letters

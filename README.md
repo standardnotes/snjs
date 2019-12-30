@@ -76,7 +76,7 @@ protocolManager.generateEncryptionParameters({item, keys, keyParams}).then(() =>
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.payloadByDecryptingPayload({item, keys}).then(() => {
+protocolManager.payloadByDecryptingPayload({payload: item, keys}).then(() => {
  // item.content is now decrypted
 })
 ```

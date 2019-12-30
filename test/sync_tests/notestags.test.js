@@ -4,10 +4,9 @@ import '../../node_modules/chai/chai.js';
 import './../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
-
-describe.only("notes + tags syncing", async function() {
+describe("notes + tags syncing", async function() {
   const sharedApplication = Factory.createApplication();
   before(async function() {
     await Factory.initializeApplication(sharedApplication);
@@ -22,14 +21,25 @@ describe.only("notes + tags syncing", async function() {
     await Factory.registerUserToApplication({application: this.application, email, password});
   })
 
-  it('syncing a note many times does not cause duplication', async function() {
-    let pair = Factory.createRelatedNoteTagPairPayload();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+  it('syncing an item then downloading it should include items_key_id', async function() {
+    const note = await Factory.createMappedNote(this.application.modelManager);
+    note.setDirty(true);
+    await this.application.syncManager.sync();
+    await this.application.modelManager.handleSignout();
+    await this.application.syncManager.clearSyncToken();
+    await this.application.syncManager.sync();
+    const downloadedNote = this.application.modelManager.notes[0];
+    expect(downloadedNote.items_key_id).to.be.ok;
+  });
 
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [noteParams, tagParams]});
-    let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
+  it('syncing a note many times does not cause duplication', async function() {
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
+
+    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    const note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
+    const tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 
@@ -50,10 +60,10 @@ describe.only("notes + tags syncing", async function() {
 
   it("handles signing in and merging data", async function() {
     let pair = Factory.createRelatedNoteTagPairPayload();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    let notePayload = pair[0];
+    let tagPayload = pair[1];
 
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [noteParams, tagParams]});
+    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     let originalNote = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     let originalTag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
     originalNote.setDirty(true);
@@ -87,13 +97,13 @@ describe.only("notes + tags syncing", async function() {
     expect(note.tags.length).to.equal(1);
   })
 
-  it.only('duplicating a tag should maintian its relationships', async function() {
+  it('duplicating a tag should maintian its relationships', async function() {
     await this.application.syncManager.loadLocalItems();
     let pair = Factory.createRelatedNoteTagPairPayload();
-    let noteParams = pair[0];
-    let tagParams = pair[1];
+    let notePayload = pair[0];
+    let tagPayload = pair[1];
 
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [noteParams, tagParams]});
+    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -101,39 +111,38 @@ describe.only("notes + tags syncing", async function() {
     tag.setDirty(true);
 
     await this.application.syncManager.sync();
-    // await this.application.syncManager.clearSyncToken();
-    //
-    // expect(this.application.modelManager.notes.length).to.equal(1);
-    // expect(this.application.modelManager.tags.length).to.equal(1);
+    await this.application.syncManager.clearSyncToken();
 
-    // tag.title = `${Math.random()}`
-    // tag.updated_at = Factory.yesterday();
-    // tag.setDirty(true);
-    //
-    // expect(note.referencingItemsCount).to.equal(1);
-    //
-    // // wait about 1s, which is the value the dev server will ignore conflicting changes
-    // await Factory.sleep(1.1);
-    //
-    // await this.application.syncManager.sync();
-    //
-    // // tag should now be conflicted and a copy created
-    // expect(this.application.modelManager.notes.length).to.equal(1);
-    // expect(this.application.modelManager.tags.length).to.equal(2);
-    // var tags = this.application.modelManager.allItemsMatchingTypes(["Tag"]);
-    // var tag1 = tags[0];
-    // var tag2 = tags[1];
-    //
-    // expect(tag1.uuid).to.not.equal(tag2.uuid);
-    //
-    // expect(tag1.uuid).to.equal(tag.uuid);
-    // expect(tag2.content.conflict_of).to.equal(tag1.uuid);
-    // expect(tag1.notes.length).to.equal(tag2.notes.length);
-    // expect(tag1.referencingItemsCount).to.equal(0);
-    // expect(tag2.referencingItemsCount).to.equal(0);
-    //
-    // // Two tags now link to this note
-    // expect(note.referencingItemsCount).to.equal(2);
-    // expect(note.allReferencingItems[0]).to.not.equal(note.allReferencingItems[1]);
+    expect(this.application.modelManager.notes.length).to.equal(1);
+    expect(this.application.modelManager.tags.length).to.equal(1);
+
+    tag.title = `${Math.random()}`
+    tag.updated_at = Factory.yesterday();
+    tag.setDirty(true);
+
+    expect(note.referencingItemsCount).to.equal(1);
+
+    // wait about 1s, which is the value the dev server will ignore conflicting changes
+    await Factory.sleep(1.1);
+    await this.application.syncManager.sync();
+
+    // tag should now be conflicted and a copy created
+    expect(this.application.modelManager.notes.length).to.equal(1);
+    expect(this.application.modelManager.tags.length).to.equal(2);
+    var tags = this.application.modelManager.allItemsMatchingTypes(["Tag"]);
+    var tag1 = tags[0];
+    var tag2 = tags[1];
+
+    expect(tag1.uuid).to.not.equal(tag2.uuid);
+
+    expect(tag1.uuid).to.equal(tag.uuid);
+    expect(tag2.content.conflict_of).to.equal(tag1.uuid);
+    expect(tag1.notes.length).to.equal(tag2.notes.length);
+    expect(tag1.referencingItemsCount).to.equal(0);
+    expect(tag2.referencingItemsCount).to.equal(0);
+
+    // Two tags now link to this note
+    expect(note.referencingItemsCount).to.equal(2);
+    expect(note.allReferencingItems[0]).to.not.equal(note.allReferencingItems[1]);
   }).timeout(10000);
 })
