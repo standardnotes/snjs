@@ -11808,8 +11808,7 @@ function () {
               object: responseItem,
               source: MAPPING_SOURCE_REMOTE_RETRIEVED
             });
-
-            var item = _this10.modelManager.createItemFromPayload(payload);
+            var item = Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_5__["CreateItemFromPayload"])(payload);
 
             if (responseItem.clientData) {
               item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
@@ -14799,12 +14798,13 @@ function () {
 /*!**************************************!*\
   !*** ./lib/services/modelManager.js ***!
   \**************************************/
-/*! exports provided: SNModelManager */
+/*! exports provided: SNModelManager, CreateItemFromPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return SNModelManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return CreateItemFromPayload; });
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
@@ -15008,7 +15008,7 @@ function () {
 
             case 29:
               if (!item) {
-                item = this.createItemFromPayload(payload);
+                item = CreateItemFromPayload(payload);
                 this.addItem(item, isDirtyItemPendingDelete);
               }
               /** Observers do not need to handle items that errored while decrypting. */
@@ -15466,22 +15466,6 @@ function () {
 
       this.notifySyncObserversOfModels(items, source || MAPPING_SOURCE_LOCAL_DIRTIED, sourceKey);
     }
-  }, {
-    key: "createItemFromPayload",
-    value: function createItemFromPayload(payload) {
-      if (!payload.isPayload) {
-        throw 'Attempting to create item from non-payload object.';
-      }
-
-      var itemClass = SNModelManager.ContentTypeClassMapping && SNModelManager.ContentTypeClassMapping[payload.content_type];
-
-      if (!itemClass) {
-        itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["SFItem"];
-      }
-
-      var item = new itemClass(payload);
-      return item;
-    }
     /*
       Be sure itemResponse is a generic Javascript object, and not an Item.
       An Item needs to collapse its properties into its content object before it can be duplicated.
@@ -15521,7 +15505,7 @@ function () {
                 override: _context5.t3
               };
               payload = (0, _context5.t0)(_context5.t4);
-              duplicate = this.createItemFromPayload(payload);
+              duplicate = CreateItemFromPayload(payload);
               return _context5.abrupt("return", duplicate);
 
             case 12:
@@ -15529,7 +15513,7 @@ function () {
               return _context5.stop();
           }
         }
-      }, null, this);
+      });
     }
   }, {
     key: "duplicateItemAndAddAsConflict",
@@ -15990,7 +15974,7 @@ function () {
                 override: _context7.t3
               };
               inPayload = (0, _context7.t0)(_context7.t4);
-              newItem = this.createItemFromPayload(inPayload);
+              newItem = CreateItemFromPayload(inPayload);
               /** Update uuids of relationships */
 
               newItem.informReferencesOfUUIDChange(item.uuid, newItem.uuid);
@@ -16559,6 +16543,20 @@ function () {
 
   return SNModelManager;
 }();
+function CreateItemFromPayload(payload) {
+  if (!payload.isPayload) {
+    throw 'Attempting to create item from non-payload object.';
+  }
+
+  var itemClass = SNModelManager.ContentTypeClassMapping && SNModelManager.ContentTypeClassMapping[payload.content_type];
+
+  if (!itemClass) {
+    itemClass = _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["SFItem"];
+  }
+
+  var item = new itemClass(payload);
+  return item;
+}
 
 /***/ }),
 
@@ -18339,12 +18337,12 @@ function () {
       });
     }
   }, {
-    key: "timingStrategyPiggybackOnCurrentOperation",
-    value: function timingStrategyPiggybackOnCurrentOperation() {
+    key: "timingStrategyResolveOnNext",
+    value: function timingStrategyResolveOnNext() {
       var _this2 = this;
 
       return new Promise(function (resolve, reject) {
-        _this2.callbackQueue.push(resolve);
+        _this2.resolveQueue.push(resolve);
       });
     }
   }, {
@@ -18386,13 +18384,13 @@ function () {
         }
       }
 
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["emptyArray"])(this.queuedCallbacks);
+      this.queuedCallbacks = [];
     }
   }, {
     key: "popSpawnQueue",
     value: function popSpawnQueue() {
       if (this.spawnQueue.length === 0) {
-        return;
+        return null;
       }
 
       var promise = this.spawnQueue[0];
@@ -18404,16 +18402,19 @@ function () {
       });
     }
     /**
-     * @param timingStrategy  TIMING_STRATEGY_PIGGYBACK_CALLBACK
-     *                        Promise will be resolved whenever the currently running sync operation completes.
+     * @param timingStrategy  TIMING_STRATEGY_RESOLVE_ON_NEXT - default
+     *                        Promise will be resolved on the next sync requests after the current one completes.
+     *                        If there is no scheduled sync request, one will be scheduled.
      *                        TIMING_STRATEGY_FORCE_SPAWN_NEW
-     *                        Promise will be resolved whenever your sync request is processed in the serial queue.
+     *                        A new sync request is guarenteed to be generated for your request, no matter how long it takes.
+     *                        Promise will be resolved whenever this sync request is processed in the serial queue.
      */
 
   }, {
     key: "sync",
     value: function sync(_ref) {
-      var timingStrategy, items, decryptedPayloads, needsSaveEncrypted, strategy, encryptedPayloads, operation;
+      var timingStrategy, items, decryptedPayloads, needsSaveEncrypted, inTimeResolveQueue, useStrategy, encryptedPayloads, operation, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, callback;
+
       return regeneratorRuntime.async(function sync$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -18435,34 +18436,36 @@ function () {
               }));
 
             case 6:
-              strategy = isNullOrUndefined(timingStrategy) ? TIMING_STRATEGY_PIGGYBACK_CALLBACK : TIMING_STRATEGY_FORCE_SPAWN_NEW;
+              /** The resolve queue before we add any new elements to it below */
+              inTimeResolveQueue = this.resolveQueue.slice();
+              useStrategy = isNullOrUndefined(timingStrategy) ? TIMING_STRATEGY_RESOLVE_ON_NEXT : TIMING_STRATEGY_FORCE_SPAWN_NEW;
 
               if (!(this.currentOperation && this.currentOperation.running)) {
-                _context4.next = 18;
+                _context4.next = 19;
                 break;
               }
 
-              log('Attempting to sync while existing sync in progress.');
+              this.log('Attempting to sync while existing sync in progress.');
 
-              if (!(timingStrategy === TIMING_STRATEGY_PIGGYBACK_CALLBACK)) {
-                _context4.next = 13;
+              if (!(useStrategy === TIMING_STRATEGY_RESOLVE_ON_NEXT)) {
+                _context4.next = 14;
                 break;
               }
 
               return _context4.abrupt("return", this.timingStrategyPiggybackOnCurrentOperation());
 
-            case 13:
-              if (!(timingStrategy === TIMING_STRATEGY_FORCE_SPAWN_NEW)) {
-                _context4.next = 17;
+            case 14:
+              if (!(useStrategy === TIMING_STRATEGY_FORCE_SPAWN_NEW)) {
+                _context4.next = 18;
                 break;
               }
 
               return _context4.abrupt("return", this.timingStrategyForceSpawnNew());
 
-            case 17:
+            case 18:
               throw "Unhandled timing strategy ".concat(strategy);
 
-            case 18:
+            case 19:
               encryptedPayloads = this.protocolManager.payloadsByEncryptingPayloads({
                 payloads: decryptedPayloads,
                 intent: ENCRYPTION_INTENT_SYNC
@@ -18475,19 +18478,66 @@ function () {
               }
 
               this.currentOperation = operation;
-              _context4.next = 23;
+              _context4.next = 24;
               return regeneratorRuntime.awrap(operation.run());
 
-            case 23:
-              this.resolveQueuedCallbacks();
-              this.popSpawnQueue();
+            case 24:
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context4.prev = 27;
 
-            case 25:
+              for (_iterator2 = inTimeResolveQueue[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                callback = _step2.value;
+                callback.resolve();
+              }
+
+              _context4.next = 35;
+              break;
+
+            case 31:
+              _context4.prev = 31;
+              _context4.t0 = _context4["catch"](27);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context4.t0;
+
+            case 35:
+              _context4.prev = 35;
+              _context4.prev = 36;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 38:
+              _context4.prev = 38;
+
+              if (!_didIteratorError2) {
+                _context4.next = 41;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 41:
+              return _context4.finish(38);
+
+            case 42:
+              return _context4.finish(35);
+
+            case 43:
+              subtractFromArray(this.resolveQueue, inTimeResolveQueue);
+
+              if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
+                this.sync();
+              }
+
+            case 45:
             case "end":
               return _context4.stop();
           }
         }
-      }, null, this);
+      }, null, this, [[27, 31, 35, 43], [36,, 38, 42]]);
     }
     /**
      * @private
@@ -18610,13 +18660,18 @@ function () {
     value: function handleServerResponse(response) {
       var _this6 = this;
 
-      var idsOfInterest, itemsOfInterest, decryptedPayloads, resolver, payloads, saveTask;
+      var idsOfInterest, itemsOfInterest, currentItemPayloads, decryptedPayloads, resolver, payloads, saveTask;
       return regeneratorRuntime.async(function handleServerResponse$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
               idsOfInterest = response.idsOfInterest();
               itemsOfInterest = this.modelManager.findItems(idsOfInterest);
+              currentItemPayloads = itemsOfInterest.map(function (item) {
+                return CreatePayloadFromAnyObject({
+                  object: item
+                });
+              });
               decryptedPayloads = response.allProcessedPayloads.map(function (payload) {
                 return _this6.protocolManager.payloadByDecryptingPayload({
                   payload: payload
@@ -18625,32 +18680,32 @@ function () {
               resolver = new AccountSyncResponseResolver({
                 request: request,
                 response: response,
-                decryptedPayloads: decryptedPayloads,
-                itemsOfInterest: itemsOfInterest
+                decryptedResponsePayloads: decryptedPayloads,
+                currentItemPayloads: currentItemPayloads
               });
-              _context10.next = 6;
+              _context10.next = 7;
               return regeneratorRuntime.awrap(resolver.run());
 
-            case 6:
+            case 7:
               payloads = _context10.sent;
-              _context10.next = 9;
+              _context10.next = 10;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: payloads
               }));
 
-            case 9:
+            case 10:
               saveTask = new SyncTaskPersistLocally({
                 payloads: payloads
               });
-              _context10.next = 12;
+              _context10.next = 13;
               return regeneratorRuntime.awrap(saveTask.run());
 
-            case 12:
+            case 13:
               if (response.needsMoreSync()) {
                 this.sync();
               }
 
-            case 13:
+            case 14:
             case "end":
               return _context10.stop();
           }
