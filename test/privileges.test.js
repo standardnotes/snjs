@@ -30,10 +30,10 @@ privilegesManager.setDelegate({
     return true;
   },
   saveToStorage: async (key, value) => {
-    return storageManager.setItem(key, value);
+    return storageManager.setValue(key, value);
   },
   getFromStorage: async (key) => {
-    return storageManager.getItem(key)
+    return storageManager.getValue(key)
   },
   verifyAccountPassword: async () => {
     return true;

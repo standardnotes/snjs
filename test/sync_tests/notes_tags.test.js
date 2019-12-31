@@ -77,7 +77,7 @@ describe("notes + tags syncing", async function() {
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
-    await this.application.storageManager.clearAllModels();
+    await this.application.storageManager.clearAllPayloads();
     await this.application.syncManager.markAllItemsDirtyAndSaveOffline(true)
 
     let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];

@@ -1206,7 +1206,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
 /* harmony import */ var _Services_singletonManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/singletonManager */ "./lib/services/singletonManager.js");
 /* harmony import */ var _Services_storageManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/storageManager */ "./lib/services/storageManager.js");
-/* harmony import */ var _Services_syncManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/syncManager */ "./lib/services/syncManager.js");
+/* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1315,7 +1315,7 @@ function () {
                   while (1) {
                     switch (_context.prev = _context.next) {
                       case 0:
-                        return _context.abrupt("return", _this.storageManager.getItem("jwt"));
+                        return _context.abrupt("return", _this.storageManager.getValue("jwt"));
 
                       case 2:
                       case "end":
@@ -1700,7 +1700,7 @@ function () {
   }, {
     key: "createSyncManager",
     value: function createSyncManager() {
-      this.syncManager = new (this.getClass(_Services_syncManager__WEBPACK_IMPORTED_MODULE_10__["SNSyncManager"]))({
+      this.syncManager = new (this.getClass(_Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_10__["SNSyncManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         authManager: this.authManager,
@@ -1922,8 +1922,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_32__["SNStorageManager"]; });
 
-/* harmony import */ var _services_syncManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/syncManager */ "./lib/services/syncManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_syncManager__WEBPACK_IMPORTED_MODULE_33__["SNSyncManager"]; });
+/* harmony import */ var _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__["SNSyncManager"]; });
 
 /* harmony import */ var _services_authManager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/authManager */ "./lib/services/authManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAuthManager", function() { return _services_authManager__WEBPACK_IMPORTED_MODULE_34__["SNAuthManager"]; });
@@ -9756,7 +9756,7 @@ function () {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["USER_STORAGE_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["USER_STORAGE_KEY"]));
 
             case 2:
               userData = _context.sent;
@@ -9772,7 +9772,7 @@ function () {
 
             case 7:
               _context.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["LEGACY_UUID_STORAGE_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["LEGACY_UUID_STORAGE_KEY"]));
 
             case 9:
               uuid = _context.sent;
@@ -10373,11 +10373,11 @@ function () {
               response = _ref5.response, email = _ref5.email, url = _ref5.url;
               this.user = response.user;
               _context14.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["JWT_STORAGE_KEY"], response.token));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["JWT_STORAGE_KEY"], response.token));
 
             case 4:
               _context14.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["USER_STORAGE_KEY"], JSON.stringify(response.user)));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["USER_STORAGE_KEY"], JSON.stringify(response.user)));
 
             case 6:
               if (!url) {
@@ -10386,7 +10386,7 @@ function () {
               }
 
               _context14.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SERVER_STORAGE_KEY"], url));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SERVER_STORAGE_KEY"], url));
 
             case 9:
             case "end":
@@ -12864,9 +12864,9 @@ function () {
   }
 
   _createClass(SNDatabaseManager, [{
-    key: "getAllModels",
-    value: function getAllModels() {
-      return regeneratorRuntime.async(function getAllModels$(_context) {
+    key: "getAllPayloads",
+    value: function getAllPayloads() {
+      return regeneratorRuntime.async(function getAllPayloads$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
@@ -12880,13 +12880,13 @@ function () {
       });
     }
   }, {
-    key: "saveModel",
-    value: function saveModel(item) {
-      return regeneratorRuntime.async(function saveModel$(_context2) {
+    key: "savePayload",
+    value: function savePayload(item) {
+      return regeneratorRuntime.async(function savePayload$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              return _context2.abrupt("return", this.saveModels([item]));
+              return _context2.abrupt("return", this.savePayloads([item]));
 
             case 1:
             case "end":
@@ -12896,9 +12896,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "saveModels",
-    value: function saveModels(items) {
-      return regeneratorRuntime.async(function saveModels$(_context3) {
+    key: "savePayloads",
+    value: function savePayloads(items) {
+      return regeneratorRuntime.async(function savePayloads$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
@@ -12912,9 +12912,9 @@ function () {
       });
     }
   }, {
-    key: "deleteModel",
-    value: function deleteModel(item) {
-      return regeneratorRuntime.async(function deleteModel$(_context4) {
+    key: "deletePayloadWithId",
+    value: function deletePayloadWithId(id) {
+      return regeneratorRuntime.async(function deletePayloadWithId$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
@@ -12928,9 +12928,9 @@ function () {
       });
     }
   }, {
-    key: "clearAllModels",
-    value: function clearAllModels() {
-      return regeneratorRuntime.async(function clearAllModels$(_context5) {
+    key: "clearAllPayloads",
+    value: function clearAllPayloads() {
+      return regeneratorRuntime.async(function clearAllPayloads$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
@@ -13375,7 +13375,7 @@ function () {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              return _context3.abrupt("return", this.storage.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
+              return _context3.abrupt("return", this.storage.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
 
             case 1:
             case "end":
@@ -13518,7 +13518,7 @@ function () {
 
             case 3:
               _context7.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"], keyParams));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"], keyParams));
 
             case 5:
               payload = CreatePayloadFromAnyObject({
@@ -13534,7 +13534,7 @@ function () {
             case 8:
               wrappedKey = _context7.sent;
               _context7.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"], wrappedKey));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"], wrappedKey));
 
             case 11:
               _context7.next = 13;
@@ -13581,11 +13581,11 @@ function () {
 
             case 7:
               _context8.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
 
             case 9:
               _context8.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"]));
 
             case 11:
               _context8.next = 13;
@@ -13632,7 +13632,7 @@ function () {
             case 5:
               this.rootKey = key;
               _context9.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"], keyParams));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"], keyParams));
 
             case 8:
               _context9.next = 10;
@@ -13698,15 +13698,15 @@ function () {
 
             case 2:
               _context11.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY"]));
 
             case 4:
               _context11.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["WRAPPED_ROOT_KEY_PARAMS"]));
 
             case 6:
               _context11.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"]));
 
             case 8:
             case "end":
@@ -13726,7 +13726,7 @@ function () {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              return _context12.abrupt("return", this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"]));
+              return _context12.abrupt("return", this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_6__["ROOT_KEY_PARAMS"]));
 
             case 1:
             case "end":
@@ -14601,7 +14601,7 @@ function () {
               }
 
               _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("migrations"));
+              return regeneratorRuntime.awrap(this.storageManager.getValue("migrations"));
 
             case 3:
               rawCompleted = _context6.sent;
@@ -14737,7 +14737,7 @@ function () {
 
               _context8.t0.push.call(_context8.t0, _context8.t1);
 
-              this.storageManager.setItem("migrations", JSON.stringify(completed));
+              this.storageManager.setValue("migrations", JSON.stringify(completed));
               migration.running = false;
 
             case 10:
@@ -17373,7 +17373,7 @@ function () {
           switch (_context2.prev = _context2.next) {
             case 0:
               this.historySession.clearAllHistory();
-              return _context2.abrupt("return", this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return _context2.abrupt("return", this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 2:
             case "end":
@@ -17396,14 +17396,14 @@ function () {
                 break;
               }
 
-              this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
+              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
               this.saveToDisk();
               _context3.next = 8;
               break;
 
             case 6:
-              this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
-              return _context3.abrupt("return", this.storageManager.removeItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
+              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
+              return _context3.abrupt("return", this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 8:
             case "end":
@@ -17427,7 +17427,7 @@ function () {
               return _context4.abrupt("return");
 
             case 2:
-              this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
+              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
 
             case 3:
             case "end":
@@ -17445,7 +17445,7 @@ function () {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_PERSIST_KEY"]));
 
             case 2:
               diskValue = _context5.sent;
@@ -17455,7 +17455,7 @@ function () {
               }
 
               _context5.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 6:
               historyValue = _context5.sent;
@@ -17469,7 +17469,7 @@ function () {
               }
 
               _context5.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"]));
 
             case 10:
               autoOptimizeValue = _context5.sent;
@@ -17498,9 +17498,9 @@ function () {
               this.autoOptimize = !this.autoOptimize;
 
               if (this.autoOptimize) {
-                this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
+                this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
               } else {
-                this.storageManager.setItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
+                this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
               }
 
             case 2:
@@ -18022,9 +18022,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "setItem",
-    value: function setItem(key, value) {
-      return regeneratorRuntime.async(function setItem$(_context8) {
+    key: "setValue",
+    value: function setValue(key, value) {
+      return regeneratorRuntime.async(function setValue$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
@@ -18033,7 +18033,7 @@ function () {
                 break;
               }
 
-              throw 'Attempting to set local storage item without first loading local storage.';
+              throw 'Attempting to set local storage value without first loading local storage.';
 
             case 2:
               this.localStorageValues[this.namespacedKeyForKey(key)] = value;
@@ -18047,18 +18047,18 @@ function () {
       }, null, this);
     }
   }, {
-    key: "getItemSync",
-    value: function getItemSync(key) {
+    key: "getValueSync",
+    value: function getValueSync(key) {
       if (!this.localStorageValues) {
-        throw 'Attempting to access local storage item without first loading local storage.';
+        throw 'Attempting to access local storage value without first loading local storage.';
       }
 
       return this.localStorageValues[this.namespacedKeyForKey(key)];
     }
   }, {
-    key: "getItem",
-    value: function getItem(key) {
-      return regeneratorRuntime.async(function getItem$(_context9) {
+    key: "getValue",
+    value: function getValue(key) {
+      return regeneratorRuntime.async(function getValue$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
@@ -18067,7 +18067,7 @@ function () {
                 break;
               }
 
-              throw 'Attempting to access local storage item without first loading local storage.';
+              throw 'Attempting to access local storage value without first loading local storage.';
 
             case 2:
               return _context9.abrupt("return", this.localStorageValues[this.namespacedKeyForKey(key)]);
@@ -18080,9 +18080,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "removeItem",
-    value: function removeItem(key) {
-      return regeneratorRuntime.async(function removeItem$(_context10) {
+    key: "removeValue",
+    value: function removeValue(key) {
+      return regeneratorRuntime.async(function removeValue$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
@@ -18091,7 +18091,7 @@ function () {
                 break;
               }
 
-              throw 'Attempting to access local storage item without first loading local storage.';
+              throw 'Attempting to access local storage value without first loading local storage.';
 
             case 2:
               delete this.localStorageValues[this.namespacedKeyForKey(key)];
@@ -18114,7 +18114,7 @@ function () {
       }
     }
     /**
-     *  Clears simple key/value items from storage only. Does not affect models.
+     *  Clears simple values from storage only. Does not affect items.
      */
 
   }, {
@@ -18135,17 +18135,17 @@ function () {
       }, null, this);
     }
     /**
-     * Model Storage
+     * Payload Storage
      */
 
   }, {
-    key: "getAllModels",
-    value: function getAllModels() {
-      return regeneratorRuntime.async(function getAllModels$(_context12) {
+    key: "getAllPayloads",
+    value: function getAllPayloads() {
+      return regeneratorRuntime.async(function getAllPayloads$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              return _context12.abrupt("return", this.databaseManager.getAllModels());
+              return _context12.abrupt("return", this.databaseManager.getAllPayloads());
 
             case 1:
             case "end":
@@ -18155,9 +18155,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "saveModel",
-    value: function saveModel(item) {
-      return regeneratorRuntime.async(function saveModel$(_context13) {
+    key: "savePayload",
+    value: function savePayload(item) {
+      return regeneratorRuntime.async(function savePayload$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
@@ -18169,7 +18169,7 @@ function () {
               return _context13.abrupt("return");
 
             case 2:
-              return _context13.abrupt("return", this.saveModels([item]));
+              return _context13.abrupt("return", this.savePayloads([item]));
 
             case 3:
             case "end":
@@ -18179,9 +18179,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "saveModels",
-    value: function saveModels(items) {
-      return regeneratorRuntime.async(function saveModels$(_context14) {
+    key: "savePayloads",
+    value: function savePayloads(items) {
+      return regeneratorRuntime.async(function savePayloads$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
@@ -18193,7 +18193,7 @@ function () {
               return _context14.abrupt("return");
 
             case 2:
-              return _context14.abrupt("return", this.databaseManager.saveModels(items));
+              return _context14.abrupt("return", this.databaseManager.savePayloads(items));
 
             case 3:
             case "end":
@@ -18203,13 +18203,13 @@ function () {
       }, null, this);
     }
   }, {
-    key: "deleteModel",
-    value: function deleteModel(item) {
-      return regeneratorRuntime.async(function deleteModel$(_context15) {
+    key: "deletePayloadWithId",
+    value: function deletePayloadWithId(id) {
+      return regeneratorRuntime.async(function deletePayloadWithId$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
-              return _context15.abrupt("return", this.databaseManager.deleteModel(item));
+              return _context15.abrupt("return", this.databaseManager.deletePayloadWithId(id));
 
             case 1:
             case "end":
@@ -18219,13 +18219,13 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clearAllModels",
-    value: function clearAllModels() {
-      return regeneratorRuntime.async(function clearAllModels$(_context16) {
+    key: "clearAllPayloads",
+    value: function clearAllPayloads() {
+      return regeneratorRuntime.async(function clearAllPayloads$(_context16) {
         while (1) {
           switch (_context16.prev = _context16.next) {
             case 0:
-              return _context16.abrupt("return", this.databaseManager.clearAllModels());
+              return _context16.abrupt("return", this.databaseManager.clearAllPayloads());
 
             case 1:
             case "end":
@@ -18245,7 +18245,7 @@ function () {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
-              return _context17.abrupt("return", Promise.all([this.clear(), this.clearAllModels()]));
+              return _context17.abrupt("return", Promise.all([this.clear(), this.clearAllPayloads()]));
 
             case 1:
             case "end":
@@ -18261,25 +18261,17 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/syncManager.js":
-/*!*************************************!*\
-  !*** ./lib/services/syncManager.js ***!
-  \*************************************/
-/*! exports provided: SNSyncManager */
+/***/ "./lib/services/sync/sync_manager.js":
+/*!*******************************************!*\
+  !*** ./lib/services/sync/sync_manager.js ***!
+  \*******************************************/
+/*! exports provided: SyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return SNSyncManager; });
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
-/* harmony import */ var _Services_httpManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/httpManager */ "./lib/services/httpManager.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
-/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
-/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncManager", function() { return SyncManager; });
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -18287,119 +18279,23 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-
-
-
-
-
-
-
-var SNSyncManager =
+var SyncManager =
 /*#__PURE__*/
 function () {
-  function SNSyncManager(_ref) {
-    var modelManager = _ref.modelManager,
-        storageManager = _ref.storageManager,
-        protocolManager = _ref.protocolManager,
-        httpManager = _ref.httpManager,
-        authManager = _ref.authManager,
-        timeout = _ref.timeout,
-        interval = _ref.interval;
-
-    _classCallCheck(this, SNSyncManager);
-
-    SNSyncManager.KeyRequestLoadLocal = "KeyRequestLoadLocal";
-    SNSyncManager.KeyRequestSaveLocal = "KeyRequestSaveLocal";
-    SNSyncManager.KeyRequestLoadSaveAccount = "KeyRequestLoadSaveAccount";
-
-    if (!storageManager || !protocolManager || !modelManager || !httpManager || !authManager) {
-      throw 'Invalid SyncManager construction.';
-    }
-
-    this.protocolManager = protocolManager;
-    this.httpManager = httpManager;
-    this.modelManager = modelManager;
-    this.storageManager = storageManager;
-    this.authManager = authManager; // Allows you to set your own interval/timeout function (i.e if you're using angular and want to use $timeout)
-
-    this.$interval = interval || setInterval.bind(window);
-    this.$timeout = timeout || setTimeout.bind(window);
-    this.syncStatus = {};
-    this.syncStatusObservers = [];
-    this.eventHandlers = []; // this.loggingEnabled = true;
-
-    this.PerSyncItemUploadLimit = 150;
-    this.ServerItemDownloadLimit = 150; // The number of changed items that constitute a major change
-    // This is used by the desktop app to create backups
-
-    this.MajorDataChangeThreshold = 15; // Sync integrity checking
-    // If X consective sync requests return mismatching hashes, then we officially enter out-of-sync.
-
-    this.MaxDiscordanceBeforeOutOfSync = 5; // How many consective sync results have had mismatching hashes. This value can never exceed this.MaxDiscordanceBeforeOutOfSync.
-
-    this.syncDiscordance = 0;
-    this.outOfSync = false; // Content types appearing first are always mapped first
-
-    this.contentTypeLoadPriority = ["SN|UserPreferences", "SN|Privileges", "SN|Component", "SN|Theme"];
+  function SyncManager() {
+    _classCallCheck(this, SyncManager);
   }
 
-  _createClass(SNSyncManager, [{
-    key: "handleServerIntegrityHash",
-    value: function handleServerIntegrityHash(serverHash) {
-      var localHash;
-      return regeneratorRuntime.async(function handleServerIntegrityHash$(_context) {
+  _createClass(SyncManager, [{
+    key: "itemsNeedingSync",
+    value: function itemsNeedingSync() {
+      return regeneratorRuntime.async(function itemsNeedingSync$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (!(!serverHash || serverHash.length == 0)) {
-                _context.next = 2;
-                break;
-              }
+              return _context.abrupt("return", this.modelManager.getDirtyItems());
 
-              return _context.abrupt("return", true);
-
-            case 2:
-              _context.next = 4;
-              return regeneratorRuntime.awrap(this.protocolManager.computeDataIntegrityHash());
-
-            case 4:
-              localHash = _context.sent;
-
-              if (localHash) {
-                _context.next = 7;
-                break;
-              }
-
-              return _context.abrupt("return", true);
-
-            case 7:
-              if (!(localHash !== serverHash)) {
-                _context.next = 13;
-                break;
-              }
-
-              this.syncDiscordance++;
-
-              if (this.syncDiscordance >= this.MaxDiscordanceBeforeOutOfSync) {
-                if (!this.outOfSync) {
-                  this.outOfSync = true;
-                  this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_7__["SYNC_EVENT_ENTER_OUT_OF_SYNC"]);
-                }
-              }
-
-              return _context.abrupt("return", false);
-
-            case 13:
-              // Integrity matches
-              if (this.outOfSync) {
-                this.outOfSync = false;
-                this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_7__["SYNC_EVENT_EXIT_OUT_OF_SYNC"]);
-              }
-
-              this.syncDiscordance = 0;
-              return _context.abrupt("return", true);
-
-            case 16:
+            case 1:
             case "end":
               return _context.stop();
           }
@@ -18407,36 +18303,15 @@ function () {
       }, null, this);
     }
   }, {
-    key: "isOutOfSync",
-    value: function isOutOfSync() {
-      // Once we are outOfSync, it's up to the client to display UI to the user to instruct them
-      // to take action. The client should present a reconciliation wizard.
-      return this.outOfSync;
-    }
-  }, {
-    key: "getServerURL",
-    value: function getServerURL() {
-      return regeneratorRuntime.async(function getServerURL$(_context2) {
+    key: "markItemsSynced",
+    value: function markItemsSynced(items) {
+      return regeneratorRuntime.async(function markItemsSynced$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              _context2.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getItem(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_3__["SERVER_STORAGE_KEY"]));
+              this.modelManager.clearDirtyItems(items);
 
-            case 2:
-              _context2.t0 = _context2.sent;
-
-              if (_context2.t0) {
-                _context2.next = 5;
-                break;
-              }
-
-              _context2.t0 = window._default_sf_server;
-
-            case 5:
-              return _context2.abrupt("return", _context2.t0);
-
-            case 6:
+            case 1:
             case "end":
               return _context2.stop();
           }
@@ -18444,84 +18319,57 @@ function () {
       }, null, this);
     }
   }, {
-    key: "getSyncURL",
-    value: function getSyncURL() {
-      return regeneratorRuntime.async(function getSyncURL$(_context3) {
+    key: "payloadsNeedingPreSyncSave",
+    value: function payloadsNeedingPreSyncSave(from) {
+      var _this = this;
+
+      return regeneratorRuntime.async(function payloadsNeedingPreSyncSave$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              _context3.next = 2;
-              return regeneratorRuntime.awrap(this.getServerURL());
+              return _context3.abrupt("return", from.filter(function (candidate) {
+                return !_this.lastPreSyncSave || candidate.dirtiedDate > _this.lastPreSyncSave;
+              }));
 
-            case 2:
-              _context3.t0 = _context3.sent;
-              return _context3.abrupt("return", _context3.t0 + '/items/sync');
-
-            case 4:
+            case 1:
             case "end":
               return _context3.stop();
           }
         }
-      }, null, this);
-    }
-  }, {
-    key: "registerSyncStatusObserver",
-    value: function registerSyncStatusObserver(callback) {
-      var observer = {
-        key: new Date(),
-        callback: callback
-      };
-      this.syncStatusObservers.push(observer);
-      return observer;
-    }
-  }, {
-    key: "removeSyncStatusObserver",
-    value: function removeSyncStatusObserver(observer) {
-      lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(this.syncStatusObservers, observer);
-    }
-  }, {
-    key: "syncStatusDidChange",
-    value: function syncStatusDidChange() {
-      var _this = this;
-
-      this.syncStatusObservers.forEach(function (observer) {
-        observer.callback(_this.syncStatus);
       });
     }
-    /**
-     * Events include:
-     *  sync:completed
-     *  sync:taking-too-long
-     *  sync:updated_token
-     *  sync:error
-     *  major-data-change
-     *  local-data-loaded
-     *  sync-session-invalid
-     *  sync-exception
-     */
+  }, {
+    key: "timingStrategyPiggybackOnCurrentOperation",
+    value: function timingStrategyPiggybackOnCurrentOperation() {
+      var _this2 = this;
 
-  }, {
-    key: "addEventHandler",
-    value: function addEventHandler(handler) {
-      this.eventHandlers.push(handler);
-      return handler;
+      return new Promise(function (resolve, reject) {
+        _this2.callbackQueue.push(resolve);
+      });
     }
   }, {
-    key: "removeEventHandler",
-    value: function removeEventHandler(handler) {
-      lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(this.eventHandlers, handler);
+    key: "timingStrategyForceSpawnNew",
+    value: function timingStrategyForceSpawnNew() {
+      var _this3 = this;
+
+      return new Promise(function (resolve, reject) {
+        _this3.spawnQueue.push({
+          resolve: resolve,
+          reject: reject
+        });
+      });
     }
   }, {
-    key: "notifyEvent",
-    value: function notifyEvent(syncEvent, data) {
+    key: "resolveQueuedCallbacks",
+    value: function resolveQueuedCallbacks() {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = this.eventHandlers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var handler = _step.value;
-          handler(syncEvent, data || {});
+        for (var _iterator = this.queuedCallbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var callback = _step.value;
+          callback.resolve();
         }
       } catch (err) {
         _didIteratorError = true;
@@ -18537,158 +18385,138 @@ function () {
           }
         }
       }
+
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["emptyArray"])(this.queuedCallbacks);
     }
   }, {
-    key: "initialDataLoaded",
-    value: function initialDataLoaded() {
-      return this._initialDataLoaded === true;
-    }
-  }, {
-    key: "_sortLocalItems",
-    value: function _sortLocalItems(items) {
-      var _this2 = this;
+    key: "popSpawnQueue",
+    value: function popSpawnQueue() {
+      if (this.spawnQueue.length === 0) {
+        return;
+      }
 
-      return items.sort(function (a, b) {
-        var dateResult = new Date(b.updated_at) - new Date(a.updated_at);
-        var priorityList = _this2.contentTypeLoadPriority;
-        var aPriority = 0,
-            bPriority = 0;
-
-        if (priorityList) {
-          aPriority = priorityList.indexOf(a.content_type);
-          bPriority = priorityList.indexOf(b.content_type);
-
-          if (aPriority == -1) {
-            // Not found in list, not prioritized. Set it to max value
-            aPriority = priorityList.length;
-          }
-
-          if (bPriority == -1) {
-            // Not found in list, not prioritized. Set it to max value
-            bPriority = priorityList.length;
-          }
-        }
-
-        if (aPriority == bPriority) {
-          return dateResult;
-        }
-
-        if (aPriority < bPriority) {
-          return -1;
-        } else {
-          return 1;
-        } // aPriority < bPriority means a should come first
-
-
-        return aPriority < bPriority ? -1 : 1;
+      var promise = this.spawnQueue[0];
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromIndex"])(this.spawnQueue, 0);
+      return this.sync().then(function () {
+        promise.resolve();
+      }).catch(function () {
+        promise.reject();
       });
     }
+    /**
+     * @param timingStrategy  TIMING_STRATEGY_PIGGYBACK_CALLBACK
+     *                        Promise will be resolved whenever the currently running sync operation completes.
+     *                        TIMING_STRATEGY_FORCE_SPAWN_NEW
+     *                        Promise will be resolved whenever your sync request is processed in the serial queue.
+     */
+
   }, {
-    key: "loadLocalItems",
-    value: function loadLocalItems() {
-      var _this3 = this;
+    key: "sync",
+    value: function sync(_ref) {
+      var timingStrategy, items, decryptedPayloads, needsSaveEncrypted, strategy, encryptedPayloads, operation;
+      return regeneratorRuntime.async(function sync$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              timingStrategy = _ref.timingStrategy;
+              items = this.itemsNeedingSync();
+              decryptedPayloads = items.map(function (item) {
+                CreatePayloadFromAnyObject({
+                  object: item
+                });
+              });
+              needsSaveEncrypted = this.protocolManager.payloadsByEncryptingPayloads({
+                payloads: this.payloadsNeedingPreSyncSave(decryptedPayloads),
+                intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
+              });
+              _context4.next = 6;
+              return regeneratorRuntime.awrap(this.storageManager.savePayloads({
+                payloads: needsSaveEncrypted
+              }));
 
-      var _ref2,
-          incrementalCallback,
-          batchSize,
-          options,
-          latency,
-          _args5 = arguments;
+            case 6:
+              strategy = isNullOrUndefined(timingStrategy) ? TIMING_STRATEGY_PIGGYBACK_CALLBACK : TIMING_STRATEGY_FORCE_SPAWN_NEW;
 
-      return regeneratorRuntime.async(function loadLocalItems$(_context5) {
+              if (!(this.currentOperation && this.currentOperation.running)) {
+                _context4.next = 18;
+                break;
+              }
+
+              log('Attempting to sync while existing sync in progress.');
+
+              if (!(timingStrategy === TIMING_STRATEGY_PIGGYBACK_CALLBACK)) {
+                _context4.next = 13;
+                break;
+              }
+
+              return _context4.abrupt("return", this.timingStrategyPiggybackOnCurrentOperation());
+
+            case 13:
+              if (!(timingStrategy === TIMING_STRATEGY_FORCE_SPAWN_NEW)) {
+                _context4.next = 17;
+                break;
+              }
+
+              return _context4.abrupt("return", this.timingStrategyForceSpawnNew());
+
+            case 17:
+              throw "Unhandled timing strategy ".concat(strategy);
+
+            case 18:
+              encryptedPayloads = this.protocolManager.payloadsByEncryptingPayloads({
+                payloads: decryptedPayloads,
+                intent: ENCRYPTION_INTENT_SYNC
+              });
+
+              if (this.authManager.online()) {
+                operation = this.syncOnlineOperation(encryptedPayloads);
+              } else {
+                operation = this.syncOffline(encryptedPayloads);
+              }
+
+              this.currentOperation = operation;
+              _context4.next = 23;
+              return regeneratorRuntime.awrap(operation.run());
+
+            case 23:
+              this.resolveQueuedCallbacks();
+              this.popSpawnQueue();
+
+            case 25:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @private
+     */
+
+  }, {
+    key: "syncOnlineOperation",
+    value: function syncOnlineOperation(encryptedPayloads) {
+      var _this4 = this;
+
+      var operation;
+      return regeneratorRuntime.async(function syncOnlineOperation$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              _ref2 = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : {}, incrementalCallback = _ref2.incrementalCallback, batchSize = _ref2.batchSize, options = _ref2.options;
-
-              if (!(options && options.simulateHighLatency)) {
-                _context5.next = 5;
-                break;
-              }
-
-              latency = options.simulatedLatency || 1000;
-              _context5.next = 5;
-              return regeneratorRuntime.awrap(this._awaitSleep(latency));
-
-            case 5:
-              if (!this.loadLocalDataPromise) {
-                _context5.next = 7;
-                break;
-              }
-
-              return _context5.abrupt("return", this.loadLocalDataPromise);
-
-            case 7:
-              if (!batchSize) {
-                batchSize = 100;
-              }
-
-              this.loadLocalDataPromise = this.storageManager.getAllModels().then(function (items) {
-                // put most recently updated at beginning, sorted by priority
-                items = _this3._sortLocalItems(items); // Filter out any items that exist in the local model mapping and have a lower dirtied date than the local dirtiedDate.
-
-                items = items.filter(function (nonDecryptedItem) {
-                  var localItem = _this3.modelManager.findItem(nonDecryptedItem.uuid);
-
-                  if (!localItem) {
-                    return true;
+              operation = new AccountSyncOperation({
+                url: this.authManager.getServerUrl(),
+                payloads: encryptedPayloads,
+                receiver: function receiver(signal, type) {
+                  if (type === SIGNAL_TYPE_SERVER_RESPONSE) {
+                    _this4.handleServerResponse(signal);
+                  } else if (type === SIGNAL_TYPE_STATUS_CHANGED) {
+                    _this4.handleStatusChange(operation);
                   }
-
-                  return new Date(nonDecryptedItem.dirtiedDate) > localItem.dirtiedDate;
-                }); // break it up into chunks to make interface more responsive for large item counts
-
-                var total = items.length;
-                var current = 0;
-                var processed = [];
-
-                var decryptNext = function decryptNext() {
-                  var subitems, processedSubitems;
-                  return regeneratorRuntime.async(function decryptNext$(_context4) {
-                    while (1) {
-                      switch (_context4.prev = _context4.next) {
-                        case 0:
-                          subitems = items.slice(current, current + batchSize);
-                          _context4.next = 3;
-                          return regeneratorRuntime.awrap(_this3.handleItemsResponse(subitems, null, _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_LOCAL_RETRIEVED"], SNSyncManager.KeyRequestLoadLocal));
-
-                        case 3:
-                          processedSubitems = _context4.sent;
-                          processed.push(processedSubitems);
-                          current += subitems.length;
-
-                          if (!(current < total)) {
-                            _context4.next = 10;
-                            break;
-                          }
-
-                          return _context4.abrupt("return", new Promise(function (innerResolve, innerReject) {
-                            _this3.$timeout(function () {
-                              _this3.notifyEvent("local-data-incremental-load");
-
-                              incrementalCallback && incrementalCallback(current, total);
-                              decryptNext().then(innerResolve);
-                            });
-                          }));
-
-                        case 10:
-                          // Completed
-                          _this3._initialDataLoaded = true;
-
-                          _this3.notifyEvent("local-data-loaded");
-
-                        case 12:
-                        case "end":
-                          return _context4.stop();
-                      }
-                    }
-                  });
-                };
-
-                return decryptNext();
+                }
               });
-              return _context5.abrupt("return", this.loadLocalDataPromise);
+              return _context5.abrupt("return", operation);
 
-            case 10:
+            case 2:
             case "end":
               return _context5.stop();
           }
@@ -18696,170 +18524,81 @@ function () {
       }, null, this);
     }
   }, {
-    key: "writeItemsToLocalStorage",
-    value: function writeItemsToLocalStorage(items, offlineOnly) {
-      var _this4 = this;
+    key: "syncOfflineOperation",
+    value: function syncOfflineOperation(encryptedPayloads) {
+      var _this5 = this;
 
-      return regeneratorRuntime.async(function writeItemsToLocalStorage$(_context9) {
+      var operation;
+      return regeneratorRuntime.async(function syncOfflineOperation$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              operation = new OfflineSyncOperation({
+                payloads: encryptedPayloads,
+                receiver: function receiver(signal, type) {
+                  if (type === SIGNAL_TYPE_OFFLINE_RESPONSE) {
+                    _this5.handleOfflineResponse(signal);
+                  } else if (type === SIGNAL_TYPE_STATUS_CHANGED) {
+                    _this5.handleStatusChange(operation);
+                  }
+                }
+              });
+              return _context6.abrupt("return", operation);
+
+            case 2:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "handleStatusChange",
+    value: function handleStatusChange(operation) {
+      var savedCount, downloadedCount, pendingUploadCount, totalUploadCount, completedUploadCount;
+      return regeneratorRuntime.async(function handleStatusChange$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              savedCount = operation.savedCount();
+              downloadedCount = operation.downloadedCount();
+              pendingUploadCount = operaiton.pendingUploadCount();
+              totalUploadCount = operation.totalUploadCount();
+              completedUploadCount = totalUploadCount - pendingUploadCount;
+              this.setStatus({
+                string: "".concat(completedUploadCount, "/").concat(totalUploadCount)
+              });
+
+            case 6:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "setStatus",
+    value: function setStatus(status) {
+      return regeneratorRuntime.async(function setStatus$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              this.status = status;
+
+            case 1:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "handleOfflineResponse",
+    value: function handleOfflineResponse(response) {
+      return regeneratorRuntime.async(function handleOfflineResponse$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              if (!(items.length == 0)) {
-                _context9.next = 2;
-                break;
-              }
-
-              return _context9.abrupt("return");
-
-            case 2:
-              return _context9.abrupt("return", new Promise(function _callee3(resolve, reject) {
-                var nonDeletedItems, deletedItems, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, params;
-
-                return regeneratorRuntime.async(function _callee3$(_context8) {
-                  while (1) {
-                    switch (_context8.prev = _context8.next) {
-                      case 0:
-                        nonDeletedItems = [], deletedItems = [];
-                        _iteratorNormalCompletion2 = true;
-                        _didIteratorError2 = false;
-                        _iteratorError2 = undefined;
-                        _context8.prev = 4;
-
-                        for (_iterator2 = items[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                          item = _step2.value;
-
-                          // if the item is deleted and dirty it means we still need to sync it.
-                          if (item.deleted === true && !item.dirty) {
-                            deletedItems.push(item);
-                          } else {
-                            nonDeletedItems.push(item);
-                          }
-                        }
-
-                        _context8.next = 12;
-                        break;
-
-                      case 8:
-                        _context8.prev = 8;
-                        _context8.t0 = _context8["catch"](4);
-                        _didIteratorError2 = true;
-                        _iteratorError2 = _context8.t0;
-
-                      case 12:
-                        _context8.prev = 12;
-                        _context8.prev = 13;
-
-                        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                          _iterator2.return();
-                        }
-
-                      case 15:
-                        _context8.prev = 15;
-
-                        if (!_didIteratorError2) {
-                          _context8.next = 18;
-                          break;
-                        }
-
-                        throw _iteratorError2;
-
-                      case 18:
-                        return _context8.finish(15);
-
-                      case 19:
-                        return _context8.finish(12);
-
-                      case 20:
-                        if (!(deletedItems.length > 0)) {
-                          _context8.next = 23;
-                          break;
-                        }
-
-                        _context8.next = 23;
-                        return regeneratorRuntime.awrap(Promise.all(deletedItems.map(function _callee(deletedItem) {
-                          return regeneratorRuntime.async(function _callee$(_context6) {
-                            while (1) {
-                              switch (_context6.prev = _context6.next) {
-                                case 0:
-                                  return _context6.abrupt("return", _this4.storageManager.deleteModel(deletedItem));
-
-                                case 1:
-                                case "end":
-                                  return _context6.stop();
-                              }
-                            }
-                          });
-                        })));
-
-                      case 23:
-                        if (!(nonDeletedItems.length > 0)) {
-                          _context8.next = 30;
-                          break;
-                        }
-
-                        _context8.next = 26;
-                        return regeneratorRuntime.awrap(Promise.all(nonDeletedItems.map(function _callee2(item) {
-                          var payload, encryptedPayload;
-                          return regeneratorRuntime.async(function _callee2$(_context7) {
-                            while (1) {
-                              switch (_context7.prev = _context7.next) {
-                                case 0:
-                                  payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                                    object: item
-                                  });
-                                  _context7.next = 3;
-                                  return regeneratorRuntime.awrap(_this4.protocolManager.payloadByEncryptingPayload({
-                                    payload: payload,
-                                    intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]
-                                  }));
-
-                                case 3:
-                                  encryptedPayload = _context7.sent;
-                                  return _context7.abrupt("return", encryptedPayload);
-
-                                case 5:
-                                case "end":
-                                  return _context7.stop();
-                              }
-                            }
-                          });
-                        })).catch(function (e) {
-                          console.error("Error generating export parameters:", e);
-                          reject(e);
-                        }));
-
-                      case 26:
-                        params = _context8.sent;
-                        _context8.next = 29;
-                        return regeneratorRuntime.awrap(_this4.storageManager.saveModels(params).catch(function (error) {
-                          console.error("Error writing items", error);
-                          _this4.syncStatus.localError = error;
-
-                          _this4.syncStatusDidChange();
-
-                          reject();
-                        }));
-
-                      case 29:
-                        // on success
-                        if (_this4.syncStatus.localError) {
-                          _this4.syncStatus.localError = null;
-
-                          _this4.syncStatusDidChange();
-                        }
-
-                      case 30:
-                        resolve();
-
-                      case 31:
-                      case "end":
-                        return _context8.stop();
-                    }
-                  }
-                }, null, null, [[4, 8, 12, 20], [13,, 15, 19]]);
-              }));
-
-            case 3:
             case "end":
               return _context9.stop();
           }
@@ -18867,2035 +18606,67 @@ function () {
       });
     }
   }, {
-    key: "syncOffline",
-    value: function syncOffline(items) {
-      var _this5 = this;
+    key: "handleServerResponse",
+    value: function handleServerResponse(response) {
+      var _this6 = this;
 
-      var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, item;
-
-      return regeneratorRuntime.async(function syncOffline$(_context10) {
+      var idsOfInterest, itemsOfInterest, decryptedPayloads, resolver, payloads, saveTask;
+      return regeneratorRuntime.async(function handleServerResponse$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
-              _iteratorNormalCompletion3 = true;
-              _didIteratorError3 = false;
-              _iteratorError3 = undefined;
-              _context10.prev = 3;
-
-              for (_iterator3 = items[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                item = _step3.value;
-                item.updated_at = new Date();
-              }
-
-              _context10.next = 11;
-              break;
-
-            case 7:
-              _context10.prev = 7;
-              _context10.t0 = _context10["catch"](3);
-              _didIteratorError3 = true;
-              _iteratorError3 = _context10.t0;
-
-            case 11:
-              _context10.prev = 11;
-              _context10.prev = 12;
-
-              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                _iterator3.return();
-              }
-
-            case 14:
-              _context10.prev = 14;
-
-              if (!_didIteratorError3) {
-                _context10.next = 17;
-                break;
-              }
-
-              throw _iteratorError3;
-
-            case 17:
-              return _context10.finish(14);
-
-            case 18:
-              return _context10.finish(11);
-
-            case 19:
-              return _context10.abrupt("return", this.writeItemsToLocalStorage(items, true).then(function (responseItems) {
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
-
-                try {
-                  for (var _iterator4 = items[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var item = _step4.value;
-
-                    if (item.deleted) {
-                      _this5.modelManager.removeItemLocally(item);
-                    }
-                  }
-                } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                      _iterator4.return();
-                    }
-                  } finally {
-                    if (_didIteratorError4) {
-                      throw _iteratorError4;
-                    }
-                  }
-                }
-
-                _this5.modelManager.clearDirtyItems(items); // Required in order for modelManager to notify sync observers
-
-
-                _this5.modelManager.didSyncModelsOffline(items);
-
-                _this5.notifyEvent("sync:completed", {
-                  savedItems: items
+              idsOfInterest = response.idsOfInterest();
+              itemsOfInterest = this.modelManager.findItems(idsOfInterest);
+              decryptedPayloads = response.allProcessedPayloads.map(function (payload) {
+                return _this6.protocolManager.payloadByDecryptingPayload({
+                  payload: payload
                 });
+              });
+              resolver = new AccountSyncResponseResolver({
+                request: request,
+                response: response,
+                decryptedPayloads: decryptedPayloads,
+                itemsOfInterest: itemsOfInterest
+              });
+              _context10.next = 6;
+              return regeneratorRuntime.awrap(resolver.run());
 
-                return {
-                  saved_items: items
-                };
+            case 6:
+              payloads = _context10.sent;
+              _context10.next = 9;
+              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
+                payloads: payloads
               }));
 
-            case 20:
+            case 9:
+              saveTask = new SyncTaskPersistLocally({
+                payloads: payloads
+              });
+              _context10.next = 12;
+              return regeneratorRuntime.awrap(saveTask.run());
+
+            case 12:
+              if (response.needsMoreSync()) {
+                this.sync();
+              }
+
+            case 13:
             case "end":
               return _context10.stop();
           }
         }
-      }, null, this, [[3, 7, 11, 19], [12,, 14, 18]]);
-    }
-    /*
-      In the case of signing in and merging local data, we alternative UUIDs
-      to avoid overwriting data a user may retrieve that has the same UUID.
-      Alternating here forces us to to create duplicates of the items instead.
-     */
-
-  }, {
-    key: "markAllItemsDirtyAndSaveOffline",
-    value: function markAllItemsDirtyAndSaveOffline(alternateUUIDs) {
-      var originalItems, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, item, allItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _item;
-
-      return regeneratorRuntime.async(function markAllItemsDirtyAndSaveOffline$(_context11) {
-        while (1) {
-          switch (_context11.prev = _context11.next) {
-            case 0:
-              if (!alternateUUIDs) {
-                _context11.next = 28;
-                break;
-              }
-
-              // use a copy, as alternating uuid will affect array
-              originalItems = this.modelManager.allNondummyItems.filter(function (item) {
-                return !item.errorDecrypting;
-              }).slice();
-              _iteratorNormalCompletion5 = true;
-              _didIteratorError5 = false;
-              _iteratorError5 = undefined;
-              _context11.prev = 5;
-              _iterator5 = originalItems[Symbol.iterator]();
-
-            case 7:
-              if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context11.next = 14;
-                break;
-              }
-
-              item = _step5.value;
-              _context11.next = 11;
-              return regeneratorRuntime.awrap(this.modelManager.alternateUUIDForItem(item));
-
-            case 11:
-              _iteratorNormalCompletion5 = true;
-              _context11.next = 7;
-              break;
-
-            case 14:
-              _context11.next = 20;
-              break;
-
-            case 16:
-              _context11.prev = 16;
-              _context11.t0 = _context11["catch"](5);
-              _didIteratorError5 = true;
-              _iteratorError5 = _context11.t0;
-
-            case 20:
-              _context11.prev = 20;
-              _context11.prev = 21;
-
-              if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                _iterator5.return();
-              }
-
-            case 23:
-              _context11.prev = 23;
-
-              if (!_didIteratorError5) {
-                _context11.next = 26;
-                break;
-              }
-
-              throw _iteratorError5;
-
-            case 26:
-              return _context11.finish(23);
-
-            case 27:
-              return _context11.finish(20);
-
-            case 28:
-              allItems = this.modelManager.allNondummyItems;
-              _iteratorNormalCompletion6 = true;
-              _didIteratorError6 = false;
-              _iteratorError6 = undefined;
-              _context11.prev = 32;
-
-              for (_iterator6 = allItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                _item = _step6.value;
-
-                _item.setDirty(true);
-              }
-
-              _context11.next = 40;
-              break;
-
-            case 36:
-              _context11.prev = 36;
-              _context11.t1 = _context11["catch"](32);
-              _didIteratorError6 = true;
-              _iteratorError6 = _context11.t1;
-
-            case 40:
-              _context11.prev = 40;
-              _context11.prev = 41;
-
-              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                _iterator6.return();
-              }
-
-            case 43:
-              _context11.prev = 43;
-
-              if (!_didIteratorError6) {
-                _context11.next = 46;
-                break;
-              }
-
-              throw _iteratorError6;
-
-            case 46:
-              return _context11.finish(43);
-
-            case 47:
-              return _context11.finish(40);
-
-            case 48:
-              return _context11.abrupt("return", this.writeItemsToLocalStorage(allItems, false));
-
-            case 49:
-            case "end":
-              return _context11.stop();
-          }
-        }
-      }, null, this, [[5, 16, 20, 28], [21,, 23, 27], [32, 36, 40, 48], [41,, 43, 47]]);
-    }
-  }, {
-    key: "setSyncToken",
-    value: function setSyncToken(token) {
-      return regeneratorRuntime.async(function setSyncToken$(_context12) {
-        while (1) {
-          switch (_context12.prev = _context12.next) {
-            case 0:
-              this._syncToken = token;
-              _context12.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setItem("syncToken", token));
-
-            case 3:
-            case "end":
-              return _context12.stop();
-          }
-        }
       }, null, this);
     }
   }, {
-    key: "getSyncToken",
-    value: function getSyncToken() {
-      return regeneratorRuntime.async(function getSyncToken$(_context13) {
-        while (1) {
-          switch (_context13.prev = _context13.next) {
-            case 0:
-              if (this._syncToken) {
-                _context13.next = 4;
-                break;
-              }
-
-              _context13.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("syncToken"));
-
-            case 3:
-              this._syncToken = _context13.sent;
-
-            case 4:
-              return _context13.abrupt("return", this._syncToken);
-
-            case 5:
-            case "end":
-              return _context13.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "setCursorToken",
-    value: function setCursorToken(token) {
-      return regeneratorRuntime.async(function setCursorToken$(_context14) {
-        while (1) {
-          switch (_context14.prev = _context14.next) {
-            case 0:
-              this._cursorToken = token;
-
-              if (!token) {
-                _context14.next = 6;
-                break;
-              }
-
-              _context14.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setItem("cursorToken", token));
-
-            case 4:
-              _context14.next = 8;
-              break;
-
-            case 6:
-              _context14.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeItem("cursorToken"));
-
-            case 8:
-            case "end":
-              return _context14.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "getCursorToken",
-    value: function getCursorToken() {
-      return regeneratorRuntime.async(function getCursorToken$(_context15) {
-        while (1) {
-          switch (_context15.prev = _context15.next) {
-            case 0:
-              if (this._cursorToken) {
-                _context15.next = 4;
-                break;
-              }
-
-              _context15.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getItem("cursorToken"));
-
-            case 3:
-              this._cursorToken = _context15.sent;
-
-            case 4:
-              return _context15.abrupt("return", this._cursorToken);
-
-            case 5:
-            case "end":
-              return _context15.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clearQueuedCallbacks",
-    value: function clearQueuedCallbacks() {
-      this._queuedCallbacks = [];
-    }
-  }, {
-    key: "callQueuedCallbacks",
-    value: function callQueuedCallbacks(response) {
-      var allCallbacks = this.queuedCallbacks;
-
-      if (allCallbacks.length) {
-        var _iteratorNormalCompletion7 = true;
-        var _didIteratorError7 = false;
-        var _iteratorError7 = undefined;
-
-        try {
-          for (var _iterator7 = allCallbacks[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-            var eachCallback = _step7.value;
-            eachCallback(response);
-          }
-        } catch (err) {
-          _didIteratorError7 = true;
-          _iteratorError7 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-              _iterator7.return();
-            }
-          } finally {
-            if (_didIteratorError7) {
-              throw _iteratorError7;
-            }
-          }
-        }
-
-        this.clearQueuedCallbacks();
+    key: "log",
+    value: function log(message) {
+      if (this.loggingEnabled) {
+        console.log(message);
       }
-    }
-  }, {
-    key: "beginCheckingIfSyncIsTakingTooLong",
-    value: function beginCheckingIfSyncIsTakingTooLong() {
-      if (this.syncStatus.checker) {
-        this.stopCheckingIfSyncIsTakingTooLong();
-      }
-
-      this.syncStatus.checker = this.$interval(function () {
-        // check to see if the ongoing sync is taking too long, alert the user
-        var secondsPassed = (new Date() - this.syncStatus.syncStart) / 1000;
-        var warningThreshold = 5.0; // seconds
-
-        if (secondsPassed > warningThreshold) {
-          this.notifyEvent("sync:taking-too-long");
-          this.stopCheckingIfSyncIsTakingTooLong();
-        }
-      }.bind(this), 500);
-    }
-  }, {
-    key: "stopCheckingIfSyncIsTakingTooLong",
-    value: function stopCheckingIfSyncIsTakingTooLong() {
-      if (this.$interval.hasOwnProperty("cancel")) {
-        this.$interval.cancel(this.syncStatus.checker);
-      } else {
-        clearInterval(this.syncStatus.checker);
-      }
-
-      this.syncStatus.checker = null;
-    }
-  }, {
-    key: "lockSyncing",
-    value: function lockSyncing() {
-      this.syncLocked = true;
-    }
-  }, {
-    key: "unlockSyncing",
-    value: function unlockSyncing() {
-      this.syncLocked = false;
-    }
-  }, {
-    key: "sync",
-    value: function sync() {
-      var _this6 = this;
-
-      var options,
-          _args17 = arguments;
-      return regeneratorRuntime.async(function sync$(_context17) {
-        while (1) {
-          switch (_context17.prev = _context17.next) {
-            case 0:
-              options = _args17.length > 0 && _args17[0] !== undefined ? _args17[0] : {};
-
-              if (!this.syncLocked) {
-                _context17.next = 4;
-                break;
-              }
-
-              console.log("Sync Locked, Returning;");
-              return _context17.abrupt("return");
-
-            case 4:
-              return _context17.abrupt("return", new Promise(function _callee4(resolve, reject) {
-                var allDirtyItems, dirtyItemsNotYetSaved, isSyncInProgress, initialDataLoaded, isContinuationSync, submitLimit, subItems, params, payloads, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, item, payload, encryptedPayload, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _item2;
-
-                return regeneratorRuntime.async(function _callee4$(_context16) {
-                  while (1) {
-                    switch (_context16.prev = _context16.next) {
-                      case 0:
-                        if (!options) options = {};
-                        allDirtyItems = _this6.modelManager.getDirtyItems();
-                        dirtyItemsNotYetSaved = allDirtyItems.filter(function (candidate) {
-                          return !_this6.lastDirtyItemsSave || candidate.dirtiedDate > _this6.lastDirtyItemsSave;
-                        });
-                        isSyncInProgress = _this6.syncStatus.syncOpInProgress;
-                        initialDataLoaded = _this6.initialDataLoaded();
-
-                        if (!(isSyncInProgress || !initialDataLoaded)) {
-                          _context16.next = 13;
-                          break;
-                        }
-
-                        _this6.performSyncAgainOnCompletion = true;
-                        _this6.lastDirtyItemsSave = new Date();
-                        _context16.next = 10;
-                        return regeneratorRuntime.awrap(_this6.writeItemsToLocalStorage(dirtyItemsNotYetSaved, false));
-
-                      case 10:
-                        if (isSyncInProgress) {
-                          _this6.queuedCallbacks.push(resolve);
-
-                          if (_this6.loggingEnabled) {
-                            console.warn("Attempting to sync while existing sync is in progress.");
-                          }
-                        }
-
-                        if (!initialDataLoaded) {
-                          if (_this6.loggingEnabled) {
-                            console.warn("(1) Attempting to perform online sync before local data has loaded");
-                          } // Resolve right away, as we can't be sure when local data will be called by consumer.
-
-
-                          resolve();
-                        }
-
-                        return _context16.abrupt("return");
-
-                      case 13:
-                        // Set this value immediately after checking it above, to avoid race conditions.
-                        _this6.syncStatus.syncOpInProgress = true;
-
-                        if (!_this6.authManager.offline()) {
-                          _context16.next = 16;
-                          break;
-                        }
-
-                        return _context16.abrupt("return", _this6.syncOffline(allDirtyItems).then(function (response) {
-                          _this6.syncStatus.syncOpInProgress = false;
-                          resolve(response);
-                        }).catch(function (e) {
-                          _this6.notifyEvent("sync-exception", e);
-                        }));
-
-                      case 16:
-                        if (_this6.initialDataLoaded()) {
-                          _context16.next = 19;
-                          break;
-                        }
-
-                        console.error("Attempting to perform online sync before local data has loaded");
-                        return _context16.abrupt("return");
-
-                      case 19:
-                        if (_this6.loggingEnabled) {
-                          console.log("Syncing online user.");
-                        }
-
-                        isContinuationSync = _this6.syncStatus.needsMoreSync;
-                        _this6.syncStatus.syncStart = new Date();
-
-                        _this6.beginCheckingIfSyncIsTakingTooLong();
-
-                        submitLimit = _this6.PerSyncItemUploadLimit;
-                        subItems = allDirtyItems.slice(0, submitLimit);
-
-                        if (subItems.length < allDirtyItems.length) {
-                          // more items left to be synced, repeat
-                          _this6.syncStatus.needsMoreSync = true;
-                        } else {
-                          _this6.syncStatus.needsMoreSync = false;
-                        }
-
-                        if (!isContinuationSync) {
-                          _this6.syncStatus.total = allDirtyItems.length;
-                          _this6.syncStatus.current = 0;
-                        } // If items are marked as dirty during a long running sync request, total isn't updated
-                        // This happens mostly in the case of large imports and sync conflicts where duplicated items are created
-
-
-                        if (_this6.syncStatus.current > _this6.syncStatus.total) {
-                          _this6.syncStatus.total = _this6.syncStatus.current;
-                        }
-
-                        _this6.syncStatusDidChange(); // Perform save after you've updated all status signals above. Presync save can take several seconds in some cases.
-                        // Write to local storage before beginning sync.
-                        // This way, if they close the browser before the sync request completes, local changes will not be lost
-
-
-                        _context16.next = 31;
-                        return regeneratorRuntime.awrap(_this6.writeItemsToLocalStorage(dirtyItemsNotYetSaved, false));
-
-                      case 31:
-                        _this6.lastDirtyItemsSave = new Date();
-
-                        if (options.onPreSyncSave) {
-                          options.onPreSyncSave();
-                        } // when doing a sync request that returns items greater than the limit, and thus subsequent syncs are required,
-                        // we want to keep track of all retreived items, then save to local storage only once all items have been retrieved,
-                        // so that relationships remain intact
-                        // Update 12/18: I don't think we need to do this anymore, since relationships will now retroactively resolve their relationships,
-                        // if an item they were looking for hasn't been pulled in yet.
-
-
-                        if (!_this6.allRetreivedItems) {
-                          _this6.allRetreivedItems = [];
-                        } // We also want to do this for savedItems
-
-
-                        if (!_this6.allSavedItems) {
-                          _this6.allSavedItems = [];
-                        }
-
-                        params = {};
-                        params.limit = _this6.ServerItemDownloadLimit;
-
-                        if (options.performIntegrityCheck) {
-                          params.compute_integrity = true;
-                        }
-
-                        _context16.prev = 38;
-                        payloads = [];
-                        _iteratorNormalCompletion8 = true;
-                        _didIteratorError8 = false;
-                        _iteratorError8 = undefined;
-                        _context16.prev = 43;
-                        _iterator8 = subItems[Symbol.iterator]();
-
-                      case 45:
-                        if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
-                          _context16.next = 55;
-                          break;
-                        }
-
-                        item = _step8.value;
-                        payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                          object: item
-                        });
-                        _context16.next = 50;
-                        return regeneratorRuntime.awrap(_this6.protocolManager.payloadByEncryptingPayload({
-                          payload: payload,
-                          intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_5__["ENCRYPTION_INTENT_SYNC"]
-                        }));
-
-                      case 50:
-                        encryptedPayload = _context16.sent;
-                        payloads.push(encryptedPayload);
-
-                      case 52:
-                        _iteratorNormalCompletion8 = true;
-                        _context16.next = 45;
-                        break;
-
-                      case 55:
-                        _context16.next = 61;
-                        break;
-
-                      case 57:
-                        _context16.prev = 57;
-                        _context16.t0 = _context16["catch"](43);
-                        _didIteratorError8 = true;
-                        _iteratorError8 = _context16.t0;
-
-                      case 61:
-                        _context16.prev = 61;
-                        _context16.prev = 62;
-
-                        if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-                          _iterator8.return();
-                        }
-
-                      case 64:
-                        _context16.prev = 64;
-
-                        if (!_didIteratorError8) {
-                          _context16.next = 67;
-                          break;
-                        }
-
-                        throw _iteratorError8;
-
-                      case 67:
-                        return _context16.finish(64);
-
-                      case 68:
-                        return _context16.finish(61);
-
-                      case 69:
-                        params.items = payloads;
-                        _context16.next = 76;
-                        break;
-
-                      case 72:
-                        _context16.prev = 72;
-                        _context16.t1 = _context16["catch"](38);
-                        console.error("Error generating sync item params", _context16.t1);
-
-                        _this6.notifyEvent("sync-exception", _context16.t1);
-
-                      case 76:
-                        _iteratorNormalCompletion9 = true;
-                        _didIteratorError9 = false;
-                        _iteratorError9 = undefined;
-                        _context16.prev = 79;
-
-                        for (_iterator9 = subItems[Symbol.iterator](); !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                          _item2 = _step9.value;
-                          // Reset dirty counter to 0, since we're about to sync it.
-                          // This means anyone marking the item as dirty after this will cause it so sync again and not be cleared on sync completion.
-                          _item2.dirtyCount = 0;
-                        }
-
-                        _context16.next = 87;
-                        break;
-
-                      case 83:
-                        _context16.prev = 83;
-                        _context16.t2 = _context16["catch"](79);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context16.t2;
-
-                      case 87:
-                        _context16.prev = 87;
-                        _context16.prev = 88;
-
-                        if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
-                          _iterator9.return();
-                        }
-
-                      case 90:
-                        _context16.prev = 90;
-
-                        if (!_didIteratorError9) {
-                          _context16.next = 93;
-                          break;
-                        }
-
-                        throw _iteratorError9;
-
-                      case 93:
-                        return _context16.finish(90);
-
-                      case 94:
-                        return _context16.finish(87);
-
-                      case 95:
-                        _context16.next = 97;
-                        return regeneratorRuntime.awrap(_this6.getSyncToken());
-
-                      case 97:
-                        params.sync_token = _context16.sent;
-                        _context16.next = 100;
-                        return regeneratorRuntime.awrap(_this6.getCursorToken());
-
-                      case 100:
-                        params.cursor_token = _context16.sent;
-                        params['api'] = _Services_httpManager__WEBPACK_IMPORTED_MODULE_2__["SNHttpManager"].getApiVersion();
-
-                        if (_this6.loggingEnabled) {
-                          console.log("Syncing with params", params);
-                        }
-
-                        _context16.prev = 103;
-                        _context16.t3 = _this6.httpManager;
-                        _context16.next = 107;
-                        return regeneratorRuntime.awrap(_this6.getSyncURL());
-
-                      case 107:
-                        _context16.t4 = _context16.sent;
-                        _context16.t5 = params;
-
-                        _context16.t6 = function (response) {
-                          _this6.handleSyncSuccess(subItems, response, options).then(function () {
-                            resolve(response);
-                          }).catch(function (e) {
-                            console.error("Caught sync success exception:", e);
-
-                            _this6.handleSyncError(e, null, allDirtyItems).then(function (errorResponse) {
-                              _this6.notifyEvent("sync-exception", e);
-
-                              resolve(errorResponse);
-                            });
-                          });
-                        };
-
-                        _context16.t7 = function (response, statusCode) {
-                          _this6.handleSyncError(response, statusCode, allDirtyItems).then(function (errorResponse) {
-                            resolve(errorResponse);
-                          });
-                        };
-
-                        _context16.t3.postAuthenticatedAbsolute.call(_context16.t3, _context16.t4, _context16.t5, _context16.t6, _context16.t7);
-
-                        _context16.next = 117;
-                        break;
-
-                      case 114:
-                        _context16.prev = 114;
-                        _context16.t8 = _context16["catch"](103);
-                        console.log("Sync exception caught:", _context16.t8);
-
-                      case 117:
-                      case "end":
-                        return _context16.stop();
-                    }
-                  }
-                }, null, null, [[38, 72], [43, 57, 61, 69], [62,, 64, 68], [79, 83, 87, 95], [88,, 90, 94], [103, 114]]);
-              }));
-
-            case 5:
-            case "end":
-              return _context17.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "_awaitSleep",
-    value: function _awaitSleep(durationInMs) {
-      return regeneratorRuntime.async(function _awaitSleep$(_context18) {
-        while (1) {
-          switch (_context18.prev = _context18.next) {
-            case 0:
-              console.warn("Simulating high latency sync request", durationInMs);
-              return _context18.abrupt("return", new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                  resolve();
-                }, durationInMs);
-              }));
-
-            case 2:
-            case "end":
-              return _context18.stop();
-          }
-        }
-      });
-    }
-  }, {
-    key: "handleSyncSuccess",
-    value: function handleSyncSuccess(syncedItems, response, options) {
-      var _this7 = this;
-
-      var latency, allSavedUUIDs, currentRequestSavedUUIDs, potentialRetrievedConflicts, itemsToClearAsDirty, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, item, conflictsNeedingSave, payloads, decryptedPayloads, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, payload, localItem, remoteContent, tempServerItem, retrieved, omitFields, saved, deprecated_unsaved, handledConflicts, matches, cursorToken;
-
-      return regeneratorRuntime.async(function handleSyncSuccess$(_context19) {
-        while (1) {
-          switch (_context19.prev = _context19.next) {
-            case 0:
-              if (!options.simulateHighLatency) {
-                _context19.next = 4;
-                break;
-              }
-
-              latency = options.simulatedLatency || 1000;
-              _context19.next = 4;
-              return regeneratorRuntime.awrap(this._awaitSleep(latency));
-
-            case 4:
-              this.syncStatus.error = null;
-
-              if (this.loggingEnabled) {
-                console.log("Sync response", response);
-              }
-
-              allSavedUUIDs = this.allSavedItems.map(function (item) {
-                return item.uuid;
-              });
-              currentRequestSavedUUIDs = response.saved_items.map(function (savedResponse) {
-                return savedResponse.uuid;
-              });
-              potentialRetrievedConflicts = []; // If we have retrieved an item that has or is being saved, or if the item is locally dirty,
-              // filter it out of retrieved_items, and add to potential conflicts.
-
-              response.retrieved_items = response.retrieved_items.filter(function (retrievedItem) {
-                var isInPreviousSaved = allSavedUUIDs.includes(retrievedItem.uuid);
-                var isInCurrentSaved = currentRequestSavedUUIDs.includes(retrievedItem.uuid);
-
-                if (isInPreviousSaved || isInCurrentSaved) {
-                  potentialRetrievedConflicts.push(retrievedItem);
-                  return false;
-                }
-
-                var localItem = _this7.modelManager.findItem(retrievedItem.uuid);
-
-                if (localItem && localItem.dirty) {
-                  potentialRetrievedConflicts.push(retrievedItem);
-                  return false;
-                }
-
-                return true;
-              }); // Clear dirty items after we've finish filtering retrieved_items above, since that depends on dirty items.
-              // Check to make sure any subItem hasn't been marked as dirty again while a sync was ongoing
-
-              itemsToClearAsDirty = [];
-              _iteratorNormalCompletion10 = true;
-              _didIteratorError10 = false;
-              _iteratorError10 = undefined;
-              _context19.prev = 14;
-
-              for (_iterator10 = syncedItems[Symbol.iterator](); !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-                item = _step10.value;
-
-                if (item.dirtyCount == 0) {
-                  // Safe to clear as dirty
-                  itemsToClearAsDirty.push(item);
-                }
-              }
-
-              _context19.next = 22;
-              break;
-
-            case 18:
-              _context19.prev = 18;
-              _context19.t0 = _context19["catch"](14);
-              _didIteratorError10 = true;
-              _iteratorError10 = _context19.t0;
-
-            case 22:
-              _context19.prev = 22;
-              _context19.prev = 23;
-
-              if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
-                _iterator10.return();
-              }
-
-            case 25:
-              _context19.prev = 25;
-
-              if (!_didIteratorError10) {
-                _context19.next = 28;
-                break;
-              }
-
-              throw _iteratorError10;
-
-            case 28:
-              return _context19.finish(25);
-
-            case 29:
-              return _context19.finish(22);
-
-            case 30:
-              this.modelManager.clearDirtyItems(itemsToClearAsDirty);
-              conflictsNeedingSave = []; // Any retrieved_items that were filtered from the above retrieved_items.filter should now be
-              // looped on to make sure we create conflicts for any retrieved content that differs from local values.
-
-              if (!(potentialRetrievedConflicts.length > 0)) {
-                _context19.next = 71;
-                break;
-              }
-
-              payloads = potentialRetrievedConflicts.map(function (conflictCandidate) {
-                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                  object: conflictCandidate
-                });
-              });
-              _context19.next = 36;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
-                payloads: payloads
-              }));
-
-            case 36:
-              decryptedPayloads = _context19.sent;
-              _iteratorNormalCompletion11 = true;
-              _didIteratorError11 = false;
-              _iteratorError11 = undefined;
-              _context19.prev = 40;
-              _iterator11 = decryptedPayloads[Symbol.iterator]();
-
-            case 42:
-              if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
-                _context19.next = 57;
-                break;
-              }
-
-              payload = _step11.value;
-              localItem = this.modelManager.findItem(payload.uuid);
-              remoteContent = payload.content;
-
-              if (!(!localItem || !remoteContent)) {
-                _context19.next = 48;
-                break;
-              }
-
-              return _context19.abrupt("continue", 54);
-
-            case 48:
-              if (!(localItem && !localItem.isContentEqualWithNonItemContent(remoteContent))) {
-                _context19.next = 54;
-                break;
-              }
-
-              _context19.next = 51;
-              return regeneratorRuntime.awrap(this.modelManager.createDuplicateItemFromPayload(payload));
-
-            case 51:
-              tempServerItem = _context19.sent;
-              this.modelManager.addDuplicatedItemAsConflict({
-                duplicate: tempServerItem,
-                duplicateOf: localItem
-              });
-              conflictsNeedingSave.push(tempServerItem);
-
-            case 54:
-              _iteratorNormalCompletion11 = true;
-              _context19.next = 42;
-              break;
-
-            case 57:
-              _context19.next = 63;
-              break;
-
-            case 59:
-              _context19.prev = 59;
-              _context19.t1 = _context19["catch"](40);
-              _didIteratorError11 = true;
-              _iteratorError11 = _context19.t1;
-
-            case 63:
-              _context19.prev = 63;
-              _context19.prev = 64;
-
-              if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
-                _iterator11.return();
-              }
-
-            case 66:
-              _context19.prev = 66;
-
-              if (!_didIteratorError11) {
-                _context19.next = 69;
-                break;
-              }
-
-              throw _iteratorError11;
-
-            case 69:
-              return _context19.finish(66);
-
-            case 70:
-              return _context19.finish(63);
-
-            case 71:
-              _context19.next = 73;
-              return regeneratorRuntime.awrap(this.handleItemsResponse(response.retrieved_items, null, _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_RETRIEVED"], SNSyncManager.KeyRequestLoadSaveAccount));
-
-            case 73:
-              retrieved = _context19.sent;
-              // Append items to master list of retrieved items for this ongoing sync operation
-              this.allRetreivedItems = this.allRetreivedItems.concat(retrieved);
-              this.syncStatus.retrievedCount = this.allRetreivedItems.length; // Merge only metadata for saved items
-              // we write saved items to disk now because it clears their dirty status then saves
-              // if we saved items before completion, we had have to save them as dirty and save them again on success as clean
-
-              omitFields = ["content", "auth_hash"]; // Map saved items to local data
-
-              _context19.next = 79;
-              return regeneratorRuntime.awrap(this.handleItemsResponse(response.saved_items, omitFields, _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_SAVED"], SNSyncManager.KeyRequestLoadSaveAccount));
-
-            case 79:
-              saved = _context19.sent;
-              // Append items to master list of saved items for this ongoing sync operation
-              this.allSavedItems = this.allSavedItems.concat(saved); // 'unsaved' is deprecated and replaced with 'conflicts' in newer version.
-
-              deprecated_unsaved = response.unsaved;
-              _context19.next = 84;
-              return regeneratorRuntime.awrap(this.deprecated_handleUnsavedItemsResponse(deprecated_unsaved));
-
-            case 84:
-              _context19.next = 86;
-              return regeneratorRuntime.awrap(this.handleConflictsResponse(response.conflicts));
-
-            case 86:
-              _context19.t2 = _context19.sent;
-
-              if (_context19.t2) {
-                _context19.next = 89;
-                break;
-              }
-
-              _context19.t2 = [];
-
-            case 89:
-              handledConflicts = _context19.t2;
-              conflictsNeedingSave = conflictsNeedingSave.concat(handledConflicts);
-
-              if (!(conflictsNeedingSave.length > 0)) {
-                _context19.next = 94;
-                break;
-              }
-
-              _context19.next = 94;
-              return regeneratorRuntime.awrap(this.writeItemsToLocalStorage(conflictsNeedingSave, false));
-
-            case 94:
-              _context19.next = 96;
-              return regeneratorRuntime.awrap(this.writeItemsToLocalStorage(saved, false));
-
-            case 96:
-              _context19.next = 98;
-              return regeneratorRuntime.awrap(this.writeItemsToLocalStorage(retrieved, false));
-
-            case 98:
-              if (!(response.integrity_hash && !response.cursor_token)) {
-                _context19.next = 103;
-                break;
-              }
-
-              _context19.next = 101;
-              return regeneratorRuntime.awrap(this.handleServerIntegrityHash(response.integrity_hash));
-
-            case 101:
-              matches = _context19.sent;
-
-              if (!matches) {
-                // If the server hash doesn't match our local hash, we want to continue syncing until we reach
-                // the max discordance threshold
-                if (this.syncDiscordance < this.MaxDiscordanceBeforeOutOfSync) {
-                  this.performSyncAgainOnCompletion = true;
-                }
-              }
-
-            case 103:
-              this.syncStatus.syncOpInProgress = false;
-              this.syncStatus.current += syncedItems.length;
-              this.syncStatusDidChange(); // set the sync token at the end, so that if any errors happen above, you can resync
-
-              this.setSyncToken(response.sync_token);
-              this.setCursorToken(response.cursor_token);
-              this.stopCheckingIfSyncIsTakingTooLong();
-              _context19.next = 111;
-              return regeneratorRuntime.awrap(this.getCursorToken());
-
-            case 111:
-              cursorToken = _context19.sent;
-
-              if (!(cursorToken || this.syncStatus.needsMoreSync)) {
-                _context19.next = 116;
-                break;
-              }
-
-              return _context19.abrupt("return", new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                  this.sync(options).then(resolve);
-                }.bind(_this7), 10); // wait 10ms to allow UI to update
-              }));
-
-            case 116:
-              if (!(conflictsNeedingSave.length > 0)) {
-                _context19.next = 121;
-                break;
-              }
-
-              // We'll use the conflict sync as the next sync, so performSyncAgainOnCompletion can be turned off.
-              this.performSyncAgainOnCompletion = false; // Include as part of await/resolve chain
-
-              return _context19.abrupt("return", new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                  _this7.sync(options).then(resolve);
-                }, 10); // wait 10ms to allow UI to update
-              }));
-
-            case 121:
-              this.syncStatus.retrievedCount = 0; // current and total represent what's going up, not what's come down or saved.
-
-              this.syncStatus.current = 0;
-              this.syncStatus.total = 0;
-              this.syncStatusDidChange();
-
-              if (this.allRetreivedItems.length >= this.majorDataChangeThreshold || saved.length >= this.majorDataChangeThreshold || deprecated_unsaved && deprecated_unsaved.length >= this.majorDataChangeThreshold || conflictsNeedingSave && conflictsNeedingSave.length >= this.majorDataChangeThreshold) {
-                this.notifyEvent("major-data-change");
-              }
-
-              this.callQueuedCallbacks(response);
-              this.notifyEvent("sync:completed", {
-                retrievedItems: this.allRetreivedItems,
-                savedItems: this.allSavedItems
-              });
-              this.allRetreivedItems = [];
-              this.allSavedItems = [];
-
-              if (this.performSyncAgainOnCompletion) {
-                this.performSyncAgainOnCompletion = false;
-                setTimeout(function () {
-                  _this7.sync(options);
-                }, 10); // wait 10ms to allow UI to update
-              }
-
-              return _context19.abrupt("return", response);
-
-            case 132:
-            case "end":
-              return _context19.stop();
-          }
-        }
-      }, null, this, [[14, 18, 22, 30], [23,, 25, 29], [40, 59, 63, 71], [64,, 66, 70]]);
-    }
-  }, {
-    key: "handleSyncError",
-    value: function handleSyncError(response, statusCode, allDirtyItems) {
-      return regeneratorRuntime.async(function handleSyncError$(_context20) {
-        while (1) {
-          switch (_context20.prev = _context20.next) {
-            case 0:
-              console.error("Sync error: ", response);
-
-              if (statusCode == 401) {
-                this.notifyEvent("sync-session-invalid");
-              }
-
-              if (!response) {
-                response = {
-                  error: {
-                    message: "Could not connect to server."
-                  }
-                };
-              } else if (typeof response == 'string') {
-                response = {
-                  error: {
-                    message: response
-                  }
-                };
-              }
-
-              this.syncStatus.syncOpInProgress = false;
-              this.syncStatus.error = response.error;
-              this.syncStatusDidChange();
-              this.writeItemsToLocalStorage(allDirtyItems, false);
-              this.modelManager.didSyncModelsOffline(allDirtyItems);
-              this.stopCheckingIfSyncIsTakingTooLong();
-              this.notifyEvent("sync:error", response.error);
-              this.callQueuedCallbacks({
-                error: "Sync error"
-              });
-              return _context20.abrupt("return", response);
-
-            case 12:
-            case "end":
-              return _context20.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "handleItemsResponse",
-    value: function handleItemsResponse(responseItems, omitFields, source, keyRequest) {
-      var payloads, decryptedPayloads, items, itemsWithErrorStatusChange;
-      return regeneratorRuntime.async(function handleItemsResponse$(_context21) {
-        while (1) {
-          switch (_context21.prev = _context21.next) {
-            case 0:
-              payloads = responseItems.map(function (responsePayload) {
-                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                  object: responsePayload,
-                  source: source,
-                  omit: omitFields
-                });
-              });
-              _context21.next = 3;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
-                payloads: payloads
-              }));
-
-            case 3:
-              decryptedPayloads = _context21.sent;
-              _context21.next = 6;
-              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: decryptedPayloads,
-                source: source
-              }));
-
-            case 6:
-              items = _context21.sent;
-              // During the decryption process, items may be marked as "errorDecrypting". If so, we want to be sure
-              // to persist this new state by writing these items back to local storage. When an item's "errorDecrypting"
-              // flag is changed, its "errorDecryptingValueChanged" flag will be set, so we can find these items by filtering (then unsetting) below:
-              itemsWithErrorStatusChange = items.filter(function (item) {
-                var valueChanged = item.errorDecryptingValueChanged; // unset after consuming value
-
-                item.errorDecryptingValueChanged = false;
-                return valueChanged;
-              });
-
-              if (itemsWithErrorStatusChange.length > 0) {
-                this.writeItemsToLocalStorage(itemsWithErrorStatusChange, false);
-              }
-
-              return _context21.abrupt("return", items);
-
-            case 10:
-            case "end":
-              return _context21.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "refreshErroredItems",
-    value: function refreshErroredItems() {
-      var erroredItems;
-      return regeneratorRuntime.async(function refreshErroredItems$(_context22) {
-        while (1) {
-          switch (_context22.prev = _context22.next) {
-            case 0:
-              erroredItems = this.modelManager.allNondummyItems.filter(function (item) {
-                return item.errorDecrypting == true;
-              });
-
-              if (!(erroredItems.length > 0)) {
-                _context22.next = 3;
-                break;
-              }
-
-              return _context22.abrupt("return", this.handleItemsResponse(erroredItems, null, _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_LOCAL_RETRIEVED"], SNSyncManager.KeyRequestLoadSaveAccount));
-
-            case 3:
-            case "end":
-              return _context22.stop();
-          }
-        }
-      }, null, this);
-    }
-    /*
-    The difference between 'unsaved' (deprecated_handleUnsavedItemsResponse) and 'conflicts' (handleConflictsResponse) is that
-    with unsaved items, the local copy is triumphant on the server, and we check the server copy to see if we should
-    create it as a duplicate. This is for the legacy API where it would save what you sent the server no matter its value,
-    and the client would decide what to do with the previous server value.
-     handleConflictsResponse on the other hand handles where the local copy save was not triumphant on the server.
-    Instead the conflict includes the server item. Here we immediately map the server value onto our local value,
-    but before that, we give our local value a chance to duplicate itself if it differs from the server value.
-    */
-
-  }, {
-    key: "handleConflictsResponse",
-    value: function handleConflictsResponse(conflicts) {
-      var localValues, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, conflict, serverItemResponse, localItem, frozenCurrentContent, itemsNeedingLocalSave, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, _conflict, _serverItemResponse, encryptedServerPayload, decryptedServerPayload, _localValues$_serverI, _frozenCurrentContent, itemRef, newItem, tempServerItem, tempCurrentItemWithFrozenValues, frozenContentDiffers, currentContentDiffers, duplicateLocal, duplicateServer, keepLocal, keepServer, IsActiveItemSecondsThreshold, isActivelyBeingEdited, contentExcludingReferencesDiffers, isOnlyReferenceChange, localDuplicate, serverPayload;
-
-      return regeneratorRuntime.async(function handleConflictsResponse$(_context23) {
-        while (1) {
-          switch (_context23.prev = _context23.next) {
-            case 0:
-              if (!(!conflicts || conflicts.length == 0)) {
-                _context23.next = 2;
-                break;
-              }
-
-              return _context23.abrupt("return");
-
-            case 2:
-              if (this.loggingEnabled) {
-                console.log("Handle Conflicted Items:", conflicts);
-              } // Get local values before doing any processing. This way, if a note change below modifies a tag,
-              // and the tag is going to be iterated on in the same loop, then we don't want this change to be compared
-              // to the local value.
-
-
-              localValues = {};
-              _iteratorNormalCompletion12 = true;
-              _didIteratorError12 = false;
-              _iteratorError12 = undefined;
-              _context23.prev = 7;
-              _iterator12 = conflicts[Symbol.iterator]();
-
-            case 9:
-              if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
-                _context23.next = 21;
-                break;
-              }
-
-              conflict = _step12.value;
-              serverItemResponse = conflict.server_item || conflict.unsaved_item;
-              localItem = this.modelManager.findItem(serverItemResponse.uuid);
-
-              if (localItem) {
-                _context23.next = 16;
-                break;
-              }
-
-              localValues[serverItemResponse.uuid] = {};
-              return _context23.abrupt("continue", 18);
-
-            case 16:
-              frozenCurrentContent = localItem.getContentCopy();
-              localValues[serverItemResponse.uuid] = {
-                frozenCurrentContent: frozenCurrentContent,
-                itemRef: localItem
-              };
-
-            case 18:
-              _iteratorNormalCompletion12 = true;
-              _context23.next = 9;
-              break;
-
-            case 21:
-              _context23.next = 27;
-              break;
-
-            case 23:
-              _context23.prev = 23;
-              _context23.t0 = _context23["catch"](7);
-              _didIteratorError12 = true;
-              _iteratorError12 = _context23.t0;
-
-            case 27:
-              _context23.prev = 27;
-              _context23.prev = 28;
-
-              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
-                _iterator12.return();
-              }
-
-            case 30:
-              _context23.prev = 30;
-
-              if (!_didIteratorError12) {
-                _context23.next = 33;
-                break;
-              }
-
-              throw _iteratorError12;
-
-            case 33:
-              return _context23.finish(30);
-
-            case 34:
-              return _context23.finish(27);
-
-            case 35:
-              // Any item that's newly created here or updated will need to be persisted
-              itemsNeedingLocalSave = [];
-              _iteratorNormalCompletion13 = true;
-              _didIteratorError13 = false;
-              _iteratorError13 = undefined;
-              _context23.prev = 39;
-              _iterator13 = conflicts[Symbol.iterator]();
-
-            case 41:
-              if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                _context23.next = 89;
-                break;
-              }
-
-              _conflict = _step13.value;
-              // if sync_conflict, we receive conflict.server_item.
-              // If uuid_conflict, we receive the value we attempted to save.
-              _serverItemResponse = _conflict.server_item || _conflict.unsaved_item;
-              encryptedServerPayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                object: _serverItemResponse
-              });
-              _context23.next = 47;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
-                payload: encryptedServerPayload
-              }));
-
-            case 47:
-              decryptedServerPayload = _context23.sent;
-              _localValues$_serverI = localValues[_serverItemResponse.uuid], _frozenCurrentContent = _localValues$_serverI.frozenCurrentContent, itemRef = _localValues$_serverI.itemRef; // Could be deleted
-
-              if (itemRef) {
-                _context23.next = 51;
-                break;
-              }
-
-              return _context23.abrupt("continue", 86);
-
-            case 51:
-              // Item ref is always added, since it's value will have changed below, either by mapping, being set to dirty,
-              // or being set undirty by the caller but the caller not saving because they're waiting on us.
-              itemsNeedingLocalSave.push(itemRef);
-
-              if (!(_conflict.type === "uuid_conflict")) {
-                _context23.next = 59;
-                break;
-              }
-
-              _context23.next = 55;
-              return regeneratorRuntime.awrap(this.modelManager.alternateUUIDForItem(itemRef));
-
-            case 55:
-              newItem = _context23.sent;
-              itemsNeedingLocalSave.push(newItem);
-              _context23.next = 86;
-              break;
-
-            case 59:
-              if (!(_conflict.type === "sync_conflict")) {
-                _context23.next = 84;
-                break;
-              }
-
-              _context23.next = 62;
-              return regeneratorRuntime.awrap(this.modelManager.createDuplicateItemFromPayload(decryptedServerPayload));
-
-            case 62:
-              tempServerItem = _context23.sent;
-              // Convert to an object simply so we can have access to the `isItemContentEqualWith` function.
-              tempCurrentItemWithFrozenValues = this.modelManager.duplicateItemWithCustomContent({
-                content: _frozenCurrentContent,
-                duplicateOf: itemRef
-              }); // if !frozenContentDiffers && currentContentDiffers, it means values have changed as we were looping through conflicts here.
-
-              frozenContentDiffers = !tempCurrentItemWithFrozenValues.isItemContentEqualWith(tempServerItem);
-              currentContentDiffers = !itemRef.isItemContentEqualWith(tempServerItem);
-              duplicateLocal = false;
-              duplicateServer = false;
-              keepLocal = false;
-              keepServer = false;
-
-              if (_serverItemResponse.deleted || itemRef.deleted) {
-                keepServer = true;
-              } else if (frozenContentDiffers) {
-                IsActiveItemSecondsThreshold = 20;
-                isActivelyBeingEdited = (new Date() - itemRef.client_updated_at) / 1000 < IsActiveItemSecondsThreshold;
-
-                if (isActivelyBeingEdited) {
-                  keepLocal = true;
-                  duplicateServer = true;
-                } else {
-                  duplicateLocal = true;
-                  keepServer = true;
-                }
-              } else if (currentContentDiffers) {
-                contentExcludingReferencesDiffers = !SFItem.AreItemContentsEqual({
-                  leftContent: itemRef.content,
-                  rightContent: tempServerItem.content,
-                  keysToIgnore: itemRef.keysToIgnoreWhenCheckingContentEquality().concat(["references"]),
-                  appDataKeysToIgnore: itemRef.appDataKeysToIgnoreWhenCheckingContentEquality()
-                });
-                isOnlyReferenceChange = !contentExcludingReferencesDiffers;
-
-                if (isOnlyReferenceChange) {
-                  keepLocal = true;
-                } else {
-                  duplicateLocal = true;
-                  keepServer = true;
-                }
-              } else {
-                // items are exactly equal
-                keepServer = true;
-              }
-
-              if (!duplicateLocal) {
-                _context23.next = 76;
-                break;
-              }
-
-              _context23.next = 74;
-              return regeneratorRuntime.awrap(this.modelManager.duplicateItemWithCustomContentAndAddAsConflict({
-                content: _frozenCurrentContent,
-                duplicateOf: itemRef
-              }));
-
-            case 74:
-              localDuplicate = _context23.sent;
-              itemsNeedingLocalSave.push(localDuplicate);
-
-            case 76:
-              if (duplicateServer) {
-                this.modelManager.addDuplicatedItemAsConflict({
-                  duplicate: tempServerItem,
-                  duplicateOf: itemRef
-                });
-                itemsNeedingLocalSave.push(tempServerItem);
-              }
-
-              if (!keepServer) {
-                _context23.next = 81;
-                break;
-              }
-
-              serverPayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                object: decryptedServerPayload
-              });
-              _context23.next = 81;
-              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: [serverPayload],
-                source: _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_RETRIEVED"]
-              }));
-
-            case 81:
-              if (keepLocal) {
-                itemRef.updated_at = tempServerItem.updated_at;
-                itemRef.setDirty(true);
-              }
-
-              _context23.next = 86;
-              break;
-
-            case 84:
-              console.error("Unsupported conflict type", _conflict.type);
-              return _context23.abrupt("continue", 86);
-
-            case 86:
-              _iteratorNormalCompletion13 = true;
-              _context23.next = 41;
-              break;
-
-            case 89:
-              _context23.next = 95;
-              break;
-
-            case 91:
-              _context23.prev = 91;
-              _context23.t1 = _context23["catch"](39);
-              _didIteratorError13 = true;
-              _iteratorError13 = _context23.t1;
-
-            case 95:
-              _context23.prev = 95;
-              _context23.prev = 96;
-
-              if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
-                _iterator13.return();
-              }
-
-            case 98:
-              _context23.prev = 98;
-
-              if (!_didIteratorError13) {
-                _context23.next = 101;
-                break;
-              }
-
-              throw _iteratorError13;
-
-            case 101:
-              return _context23.finish(98);
-
-            case 102:
-              return _context23.finish(95);
-
-            case 103:
-              return _context23.abrupt("return", itemsNeedingLocalSave);
-
-            case 104:
-            case "end":
-              return _context23.stop();
-          }
-        }
-      }, null, this, [[7, 23, 27, 35], [28,, 30, 34], [39, 91, 95, 103], [96,, 98, 102]]);
-    } // Legacy API
-
-  }, {
-    key: "deprecated_handleUnsavedItemsResponse",
-    value: function deprecated_handleUnsavedItemsResponse(unsaved) {
-      var _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, mapping, itemResponse, payload, decryptedPayload, item, error, dup;
-
-      return regeneratorRuntime.async(function deprecated_handleUnsavedItemsResponse$(_context24) {
-        while (1) {
-          switch (_context24.prev = _context24.next) {
-            case 0:
-              if (!(!unsaved || unsaved.length == 0)) {
-                _context24.next = 2;
-                break;
-              }
-
-              return _context24.abrupt("return");
-
-            case 2:
-              if (this.loggingEnabled) {
-                console.log("Handle Unsaved Items:", unsaved);
-              }
-
-              _iteratorNormalCompletion14 = true;
-              _didIteratorError14 = false;
-              _iteratorError14 = undefined;
-              _context24.prev = 6;
-              _iterator14 = unsaved[Symbol.iterator]();
-
-            case 8:
-              if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
-                _context24.next = 32;
-                break;
-              }
-
-              mapping = _step14.value;
-              itemResponse = mapping.item;
-              payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                object: itemResponse
-              });
-              _context24.next = 14;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
-                payload: payload
-              }));
-
-            case 14:
-              decryptedPayload = _context24.sent;
-              item = this.modelManager.findItem(itemResponse.uuid); // Could be deleted
-
-              if (item) {
-                _context24.next = 18;
-                break;
-              }
-
-              return _context24.abrupt("continue", 29);
-
-            case 18:
-              error = mapping.error;
-
-              if (!(error.tag === "uuid_conflict")) {
-                _context24.next = 24;
-                break;
-              }
-
-              _context24.next = 22;
-              return regeneratorRuntime.awrap(this.modelManager.alternateUUIDForItem(item));
-
-            case 22:
-              _context24.next = 29;
-              break;
-
-            case 24:
-              if (!(error.tag === "sync_conflict")) {
-                _context24.next = 29;
-                break;
-              }
-
-              _context24.next = 27;
-              return regeneratorRuntime.awrap(this.modelManager.createDuplicateItemFromPayload(decryptedPayload));
-
-            case 27:
-              dup = _context24.sent;
-
-              if (!itemResponse.deleted && !item.isItemContentEqualWith(dup)) {
-                this.modelManager.addDuplicatedItemAsConflict({
-                  duplicate: dup,
-                  duplicateOf: item
-                });
-              }
-
-            case 29:
-              _iteratorNormalCompletion14 = true;
-              _context24.next = 8;
-              break;
-
-            case 32:
-              _context24.next = 38;
-              break;
-
-            case 34:
-              _context24.prev = 34;
-              _context24.t0 = _context24["catch"](6);
-              _didIteratorError14 = true;
-              _iteratorError14 = _context24.t0;
-
-            case 38:
-              _context24.prev = 38;
-              _context24.prev = 39;
-
-              if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
-                _iterator14.return();
-              }
-
-            case 41:
-              _context24.prev = 41;
-
-              if (!_didIteratorError14) {
-                _context24.next = 44;
-                break;
-              }
-
-              throw _iteratorError14;
-
-            case 44:
-              return _context24.finish(41);
-
-            case 45:
-              return _context24.finish(38);
-
-            case 46:
-            case "end":
-              return _context24.stop();
-          }
-        }
-      }, null, this, [[6, 34, 38, 46], [39,, 41, 45]]);
-    }
-    /*
-      Executes a sync request with a blank sync token and high download limit. It will download all items,
-      but won't do anything with them other than decrypting, creating respective objects, and returning them to caller. (it does not map them nor establish their relationships)
-      The use case came primarly for clients who had ignored a certain content_type in sync, but later issued an update
-      indicated they actually did want to start handling that content type. In that case, they would need to download all items
-      freshly from the server.
-    */
-
-  }, {
-    key: "stateless_downloadAllItems",
-    value: function stateless_downloadAllItems() {
-      var _this8 = this;
-
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      return new Promise(function _callee6(resolve, reject) {
-        var params;
-        return regeneratorRuntime.async(function _callee6$(_context26) {
-          while (1) {
-            switch (_context26.prev = _context26.next) {
-              case 0:
-                params = {
-                  limit: options.limit || 500,
-                  sync_token: options.syncToken,
-                  cursor_token: options.cursorToken,
-                  content_type: options.contentType,
-                  event: options.event,
-                  api: _Services_httpManager__WEBPACK_IMPORTED_MODULE_2__["SNHttpManager"].getApiVersion()
-                };
-                _context26.prev = 1;
-                _context26.t0 = _this8.httpManager;
-                _context26.next = 5;
-                return regeneratorRuntime.awrap(_this8.getSyncURL());
-
-              case 5:
-                _context26.t1 = _context26.sent;
-                _context26.t2 = params;
-
-                _context26.t3 = function _callee5(response) {
-                  var encryptedPayloads, decryptedPayloads, items;
-                  return regeneratorRuntime.async(function _callee5$(_context25) {
-                    while (1) {
-                      switch (_context25.prev = _context25.next) {
-                        case 0:
-                          if (!options.retrievedItems) {
-                            options.retrievedItems = [];
-                          }
-
-                          encryptedPayloads = response.retrieved_items.map(function (retrievedPayload) {
-                            return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                              object: retrievedPayload,
-                              ource: _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_RETRIEVED"]
-                            });
-                          });
-                          _context25.next = 4;
-                          return regeneratorRuntime.awrap(_this8.protocolManager.payloadsByDecryptingPayloads({
-                            payloads: encryptedPayloads
-                          }));
-
-                        case 4:
-                          decryptedPayloads = _context25.sent;
-                          items = decryptedPayloads.map(function (payload) {
-                            return _this8.modelManager.createItemFromPayload(payload);
-                          });
-                          options.retrievedItems = options.retrievedItems.concat(items);
-                          options.syncToken = response.sync_token;
-                          options.cursorToken = response.cursor_token;
-
-                          if (options.cursorToken) {
-                            _this8.stateless_downloadAllItems(options).then(resolve);
-                          } else {
-                            resolve(options.retrievedItems);
-                          }
-
-                        case 10:
-                        case "end":
-                          return _context25.stop();
-                      }
-                    }
-                  });
-                };
-
-                _context26.t4 = function (response, statusCode) {
-                  reject(response);
-                };
-
-                _context26.t0.postAuthenticatedAbsolute.call(_context26.t0, _context26.t1, _context26.t2, _context26.t3, _context26.t4);
-
-                _context26.next = 16;
-                break;
-
-              case 12:
-                _context26.prev = 12;
-                _context26.t5 = _context26["catch"](1);
-                console.log("Download all items exception caught:", _context26.t5);
-                reject(_context26.t5);
-
-              case 16:
-              case "end":
-                return _context26.stop();
-            }
-          }
-        }, null, null, [[1, 12]]);
-      });
-    }
-  }, {
-    key: "resolveOutOfSync",
-    value: function resolveOutOfSync() {
-      var _this9 = this;
-
-      return regeneratorRuntime.async(function resolveOutOfSync$(_context28) {
-        while (1) {
-          switch (_context28.prev = _context28.next) {
-            case 0:
-              return _context28.abrupt("return", this.stateless_downloadAllItems({
-                event: "resolve-out-of-sync"
-              }).then(function _callee7(downloadedItems) {
-                var payloadsToMap, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, downloadedItem, existingItem, contentDoesntMatch, payload;
-
-                return regeneratorRuntime.async(function _callee7$(_context27) {
-                  while (1) {
-                    switch (_context27.prev = _context27.next) {
-                      case 0:
-                        payloadsToMap = [];
-                        _iteratorNormalCompletion15 = true;
-                        _didIteratorError15 = false;
-                        _iteratorError15 = undefined;
-                        _context27.prev = 4;
-                        _iterator15 = downloadedItems[Symbol.iterator]();
-
-                      case 6:
-                        if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
-                          _context27.next = 19;
-                          break;
-                        }
-
-                        downloadedItem = _step15.value;
-                        // Note that deleted items will not be sent back by the server.
-                        existingItem = _this9.modelManager.findItem(downloadedItem.uuid);
-
-                        if (!existingItem) {
-                          _context27.next = 14;
-                          break;
-                        }
-
-                        // Check if the content differs. If it does, create a new item, and do not map downloadedItem.
-                        contentDoesntMatch = !downloadedItem.isItemContentEqualWith(existingItem);
-
-                        if (!contentDoesntMatch) {
-                          _context27.next = 14;
-                          break;
-                        }
-
-                        _context27.next = 14;
-                        return regeneratorRuntime.awrap(_this9.modelManager.duplicateItemAndAddAsConflict(existingItem));
-
-                      case 14:
-                        payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreatePayloadFromAnyObject"])({
-                          object: downloadedItem,
-                          source: _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_RETRIEVED"]
-                        }); // Map the downloadedItem as authoritive content. If client copy at all differed, we would have created a duplicate of it above and synced it.
-                        // This is also neccessary to map the updated_at value from the server
-
-                        payloadsToMap.push(payload);
-
-                      case 16:
-                        _iteratorNormalCompletion15 = true;
-                        _context27.next = 6;
-                        break;
-
-                      case 19:
-                        _context27.next = 25;
-                        break;
-
-                      case 21:
-                        _context27.prev = 21;
-                        _context27.t0 = _context27["catch"](4);
-                        _didIteratorError15 = true;
-                        _iteratorError15 = _context27.t0;
-
-                      case 25:
-                        _context27.prev = 25;
-                        _context27.prev = 26;
-
-                        if (!_iteratorNormalCompletion15 && _iterator15.return != null) {
-                          _iterator15.return();
-                        }
-
-                      case 28:
-                        _context27.prev = 28;
-
-                        if (!_didIteratorError15) {
-                          _context27.next = 31;
-                          break;
-                        }
-
-                        throw _iteratorError15;
-
-                      case 31:
-                        return _context27.finish(28);
-
-                      case 32:
-                        return _context27.finish(25);
-
-                      case 33:
-                        _context27.next = 35;
-                        return regeneratorRuntime.awrap(_this9.modelManager.mapPayloadsToLocalItems({
-                          payloads: payloadsToMap,
-                          source: _Lib_sources__WEBPACK_IMPORTED_MODULE_6__["MAPPING_SOURCE_REMOTE_RETRIEVED"]
-                        }));
-
-                      case 35:
-                        _context27.next = 37;
-                        return regeneratorRuntime.awrap(_this9.writeItemsToLocalStorage(_this9.modelManager.allNondummyItems));
-
-                      case 37:
-                        return _context27.abrupt("return", _this9.sync({
-                          performIntegrityCheck: true
-                        }));
-
-                      case 38:
-                      case "end":
-                        return _context27.stop();
-                    }
-                  }
-                }, null, null, [[4, 21, 25, 33], [26,, 28, 32]]);
-              }));
-
-            case 1:
-            case "end":
-              return _context28.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "handleSignOut",
-    value: function handleSignOut() {
-      return regeneratorRuntime.async(function handleSignOut$(_context29) {
-        while (1) {
-          switch (_context29.prev = _context29.next) {
-            case 0:
-              this.outOfSync = false;
-              this.loadLocalDataPromise = null;
-              this.performSyncAgainOnCompletion = false;
-              this.syncStatus.syncOpInProgress = false;
-              this._queuedCallbacks = [];
-              this.syncStatus = {};
-              return _context29.abrupt("return", this.clearSyncToken());
-
-            case 7:
-            case "end":
-              return _context29.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clearSyncToken",
-    value: function clearSyncToken() {
-      return regeneratorRuntime.async(function clearSyncToken$(_context30) {
-        while (1) {
-          switch (_context30.prev = _context30.next) {
-            case 0:
-              this._syncToken = null;
-              this._cursorToken = null;
-              return _context30.abrupt("return", this.storageManager.removeItem("syncToken"));
-
-            case 3:
-            case "end":
-              return _context30.stop();
-          }
-        }
-      }, null, this);
-    } // Only used by unit test
-
-  }, {
-    key: "__setLocalDataNotLoaded",
-    value: function __setLocalDataNotLoaded() {
-      this.loadLocalDataPromise = null;
-      this._initialDataLoaded = false;
-    }
-  }, {
-    key: "queuedCallbacks",
-    get: function get() {
-      if (!this._queuedCallbacks) {
-        this._queuedCallbacks = [];
-      }
-
-      return this._queuedCallbacks;
     }
   }]);
 
-  return SNSyncManager;
+  return SyncManager;
 }();
 
 /***/ }),

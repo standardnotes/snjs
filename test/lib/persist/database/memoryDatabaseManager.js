@@ -2,7 +2,7 @@ export default class MemoryDatabaseManager extends SNDatabaseManager {
 
   constructor({namespace}) {
     super({namespace});
-    this.models = [];
+    this.payloads = [];
   }
 
   getKeyPrefix() {
@@ -13,23 +13,24 @@ export default class MemoryDatabaseManager extends SNDatabaseManager {
     }
   }
 
-  async getAllModels() {
-    return this.models;
+  async getAllPayloads() {
+    return this.payloads;
   }
 
-  async saveModels(items) {
+  async savePayloads(items) {
     for(const item of items) {
-      if(!this.models.includes(item)) {
-        this.models.push(item);
+      if(!this.payloads.includes(item)) {
+        this.payloads.push(item);
       }
     }
   }
 
-  async deleteModel(item) {
-    this.models.splice(this.models.indexOf(item), 1);
+  async deletePayloadWithId(id) {
+    const index = this.payloads.indexOf((payload) => payload.uuid === id);
+    this.payloads.splice(index, 1);
   }
 
-  async clearAllModels() {
-    this.models = [];
+  async clearAllPayloads() {
+    this.payloads = [];
   }
 }

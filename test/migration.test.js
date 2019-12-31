@@ -135,7 +135,7 @@ describe('migrations', () => {
     // go offline
     let authManager = Factory.globalAuthManager();
     await Factory.globalStorageManager().clearAllData();
-    await Factory.globalStorageManager().setItem("server", Factory.serverURL());
+    await Factory.globalStorageManager().setValue("server", Factory.serverURL());
     let modelManager = Factory.createModelManager();
     const syncManager = new SNSyncManager({
       modelManager,

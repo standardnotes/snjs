@@ -102,7 +102,7 @@ describe("basic auth", () => {
     //
     // // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
     // await syncManager.handleSignOut();
-    // await storageManager.clearAllModels();
+    // await storageManager.clearAllPayloads();
     // await modelManager.handleSignOut();
     //
     // expect(modelManager.allItems.length).to.equal(0);
@@ -163,7 +163,7 @@ describe("basic auth", () => {
       await syncManager.clearSyncToken();
       await syncManager.sync();
       await syncManager.clearSyncToken();
-      await storageManager.clearAllModels();
+      await storageManager.clearAllPayloads();
       modelManager.handleSignOut();
 
       expect(modelManager.allItems.length).to.equal(0);

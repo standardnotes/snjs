@@ -14,15 +14,15 @@ describe("local storage manager", () => {
   it("should set and retrieve values", async () => {
     var key = "foo";
     var value = "bar";
-    await Factory.globalStorageManager().setItem(key, value);
-    expect(await Factory.globalStorageManager().getItem(key)).to.eql(value);
+    await Factory.globalStorageManager().setValue(key, value);
+    expect(await Factory.globalStorageManager().getValue(key)).to.eql(value);
   })
 
   it("should set and retrieve items", async () => {
     var item = Factory.createStorageItemNotePayload();
-    await Factory.globalStorageManager().saveModel(item);
+    await Factory.globalStorageManager().savePayload(item);
 
-    return Factory.globalStorageManager().getAllModels().then((models) => {
+    return Factory.globalStorageManager().getAllPayloads().then((models) => {
       expect(models.length).to.equal(1);
     })
   })
@@ -30,8 +30,8 @@ describe("local storage manager", () => {
   it("should clear values", async () => {
     var key = "foo";
     var value = "bar";
-    await Factory.globalStorageManager().setItem(key, value);
+    await Factory.globalStorageManager().setValue(key, value);
     await Factory.globalStorageManager().clearAllData();
-    expect(await Factory.globalStorageManager().getItem(key)).to.not.be.ok;
+    expect(await Factory.globalStorageManager().getValue(key)).to.not.be.ok;
   })
 })

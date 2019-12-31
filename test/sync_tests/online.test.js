@@ -47,7 +47,7 @@ describe('online syncing', () => {
   afterEach(async function() {
     expect(sharedApplication.syncManager.isOutOfSync()).to.equal(false);
     expect(sharedApplication.modelManager.notes.length).to.equal(sharedNoteCount);
-    const storageModels = await sharedApplication.storageManager.getAllModels();
+    const storageModels = await sharedApplication.storageManager.getAllPayloads();
     const storageNotes = notesFromItems(storageModels);
     expect(storageNotes.length).to.equal(sharedNoteCount);
   })
@@ -67,7 +67,7 @@ describe('online syncing', () => {
     expect(response).to.be.ok;
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
 
-    const items = await this.application.storageManager.getAllModels();
+    const items = await this.application.storageManager.getAllPayloads();
     const notes = notesFromItems(items);
     expect(notes.length).to.equal(1);
 
@@ -128,7 +128,7 @@ describe('online syncing', () => {
     const note = await Factory.createMappedNote(this.application.modelManager);
     this.application.modelManager.setItemDirty(note, true);
     await this.application.syncManager.sync(syncOptions);
-    const models = await this.application.storageManager.getAllModels();
+    const models = await this.application.storageManager.getAllPayloads();
     const notes = notesFromItems(models);
     expect(notes.length).to.equal(1);
     expect(this.application.modelManager.notes.length).to.equal(1);
@@ -158,7 +158,7 @@ describe('online syncing', () => {
       expect(item.content.title).to.be.ok;
     }
 
-    models = await this.application.storageManager.getAllModels();
+    models = await this.application.storageManager.getAllPayloads();
     for(let model of models) {
       // if an item comes back from the server, it is saved to disk immediately without a dirty value.
       expect(model.dirty).to.not.be.ok;
@@ -201,7 +201,7 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     sharedNoteCount++;
 
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
 
     let originalValue = item.title;
@@ -231,7 +231,7 @@ describe('online syncing', () => {
     expect(duplicateItem.title).to.equal(originalValue);
     expect(originalItem.title).to.not.equal(duplicateItem.title);
 
-    let storedModels = await Factory.globalStorageManager().getAllModels();
+    let storedModels = await Factory.globalStorageManager().getAllPayloads();
     expect(storedModels.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -244,7 +244,7 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
     sharedNoteCount++;
 
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
 
     // modify this item to have stale values
@@ -262,7 +262,7 @@ describe('online syncing', () => {
     let memModels = modelManager.allItems;
     expect(memModels.length).to.equal(sharedNoteCount);
 
-    let storedModels = await Factory.globalStorageManager().getAllModels();
+    let storedModels = await Factory.globalStorageManager().getAllPayloads();
     expect(storedModels.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -295,7 +295,7 @@ describe('online syncing', () => {
     let memModels = modelManager.allItems;
     expect(memModels.length).to.equal(sharedNoteCount);
 
-    let storedModels = await Factory.globalStorageManager().getAllModels();
+    let storedModels = await Factory.globalStorageManager().getAllPayloads();
     expect(storedModels.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -319,7 +319,7 @@ describe('online syncing', () => {
     await Factory.sleep(1.1);
     let response = await syncManager.sync(syncOptions);
     expect(response).to.be.ok;
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -367,7 +367,7 @@ describe('online syncing', () => {
     // We expect that this item is now gone for good, and a duplicate has not been created.
     expect(modelManager.allItems.length).to.equal(sharedNoteCount);
 
-    let storageModels = await storageManager.getAllModels();
+    let storageModels = await storageManager.getAllPayloads();
     expect(storageModels.length).to.equal(sharedNoteCount)
   }).timeout(60000);
 
@@ -403,7 +403,7 @@ describe('online syncing', () => {
     // We expect that this item is now gone for good, and a duplicate has not been created.
     expect(modelManager.allItems.length).to.equal(sharedNoteCount);
 
-    let storageModels = await storageManager.getAllModels();
+    let storageModels = await storageManager.getAllPayloads();
     expect(storageModels.length).to.equal(sharedNoteCount)
   }).timeout(60000);
 
@@ -463,7 +463,7 @@ describe('online syncing', () => {
     // We expect now that the item was conflicted
     sharedNoteCount++;
 
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
     for(let model of models) {
       if(model.dirty) {
@@ -619,7 +619,7 @@ describe('online syncing', () => {
     var item1 = models[0];
     var item2 = models[1];
 
-    let storageModels = await storageManager.getAllModels();
+    let storageModels = await storageManager.getAllPayloads();
     expect(storageModels.length).to.equal(sharedNoteCount);
 
     expect(item2.content.conflict_of).to.equal(item1.uuid);
@@ -655,7 +655,7 @@ describe('online syncing', () => {
 
     let response = await syncManager.sync(syncOptions);
     expect(response).to.be.ok;
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -703,7 +703,7 @@ describe('online syncing', () => {
 
     await localSyncManager.sync(syncOptions);
 
-    let storageModels = await storageManager.getAllModels();
+    let storageModels = await storageManager.getAllPayloads();
     expect(storageModels.length).to.equal(sharedNoteCount);
     let savedModel = storageModels.find((m) => m.uuid == item.uuid);
 
@@ -719,7 +719,7 @@ describe('online syncing', () => {
 
     await localSyncManager.sync(syncOptions);
 
-    storageModels = await storageManager.getAllModels();
+    storageModels = await storageManager.getAllPayloads();
     expect(storageModels.length).to.equal(sharedNoteCount);
 
     let currentItem = localModelManager.findItem(item.uuid);
@@ -749,7 +749,7 @@ describe('online syncing', () => {
 
     await localSyncManager.loadLocalItems();
     await localSyncManager.sync(syncOptions);
-    let models = await localStorageManager.getAllModels();
+    let models = await localStorageManager.getAllPayloads();
 
     expect(models.length).to.equal(itemCount);
 
@@ -804,7 +804,7 @@ describe('online syncing', () => {
     items = modelManager.allItems;
     expect(items.length).to.equal(sharedNoteCount);
 
-    let storage = await Factory.globalStorageManager().getAllModels();
+    let storage = await Factory.globalStorageManager().getAllPayloads();
     expect(storage.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 
@@ -817,13 +817,13 @@ describe('online syncing', () => {
     await Factory.globalStorageManager().clearAllData();
     await Factory.globalAuthManager().login(Factory.serverURL(), email, password, true, null);
 
-    let models = await Factory.globalStorageManager().getAllModels();
+    let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(0);
 
     await syncManager.loadLocalItems();
     await syncManager.sync(syncOptions);
 
-    models = await Factory.globalStorageManager().getAllModels();
+    models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(sharedNoteCount);
   }).timeout(60000);
 

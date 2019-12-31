@@ -36,15 +36,15 @@ describe('application instances', () => {
     app1.modelManager.addItem(app1Item);
     await app1.syncManager.sync();
 
-    expect((await app1.storageManager.getAllModels()).length).length.to.equal(1);
-    expect((await app2.storageManager.getAllModels()).length).length.to.equal(0);
+    expect((await app1.storageManager.getAllPayloads()).length).length.to.equal(1);
+    expect((await app2.storageManager.getAllPayloads()).length).length.to.equal(0);
 
     const app2Item = await Factory.createMappedNote(app2.modelManager);
     app2Item.setDirty(true);
     app2.modelManager.addItem(app2Item);
     await app2.syncManager.sync();
 
-    expect((await app1.storageManager.getAllModels()).length).length.to.equal(1);
-    expect((await app2.storageManager.getAllModels()).length).length.to.equal(1);
+    expect((await app1.storageManager.getAllPayloads()).length).length.to.equal(1);
+    expect((await app2.storageManager.getAllPayloads()).length).length.to.equal(1);
   });
 })

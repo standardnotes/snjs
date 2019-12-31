@@ -19,7 +19,7 @@ describe('sync discordance', () => {
   });
   let localHttpManager = new SNHttpManager();
   localHttpManager.setJWTRequestHandler(async () => {
-    return localStorageManager.getItem("jwt");;
+    return localStorageManager.getValue("jwt");;
   })
   let localModelManager = Factory.createModelManager();
   const localSyncManager = new SNSyncManager({
