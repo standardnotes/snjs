@@ -160,9 +160,9 @@ describe("basic auth", () => {
       await syncManager.sync();
 
       // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-      await syncManager.clearSyncToken();
+      await syncManager.clearSyncPositionTokens();
       await syncManager.sync();
-      await syncManager.clearSyncToken();
+      await syncManager.clearSyncPositionTokens();
       await storageManager.clearAllPayloads();
       modelManager.handleSignOut();
 

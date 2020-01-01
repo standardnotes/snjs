@@ -215,7 +215,7 @@ describe('online syncing', () => {
     modelManager.setItemDirty(item);
 
     // Download all items from the server, which will include this item.
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
     await syncManager.sync(syncOptions)
 
     // We expect this item to be duplicated
@@ -286,7 +286,7 @@ describe('online syncing', () => {
     // We expect this item to be duplicated
     sharedNoteCount++;
 
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
     await syncManager.sync(syncOptions)
 
     // We expect the item title to be the new title, and not rolled back to original value
@@ -313,7 +313,7 @@ describe('online syncing', () => {
     modelManager.setItemDirty(item, true);
 
     // clear sync token so that all items are retrieved on next sync
-    syncManager.clearSyncToken();
+    syncManager.clearSyncPositionTokens();
 
     // wait about 1s, which is the value the dev server will ignore conflicting changes
     await Factory.sleep(1.1);
@@ -336,7 +336,7 @@ describe('online syncing', () => {
     await syncManager.sync(syncOptions);
 
     // client B
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
     note.content.conflict_of = "bar";
     note.updated_at = Factory.yesterday();
     modelManager.setItemDirty(note, true);
@@ -389,7 +389,7 @@ describe('online syncing', () => {
     expect(modelManager.allItems.length).to.equal(sharedNoteCount);
 
     // client B
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
 
     // Add the item back and say it's not deleted
     modelManager.addItem(note);
@@ -419,7 +419,7 @@ describe('online syncing', () => {
     expect(modelManager.allItems.length).to.equal(sharedNoteCount);
 
     // client B
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
 
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
@@ -527,7 +527,7 @@ describe('online syncing', () => {
     await Factory.sleep(0.5);
 
     // client B
-    await syncManager.clearSyncToken();
+    await syncManager.clearSyncPositionTokens();
     await syncManager.sync(syncOptions);
 
     // Expect that the server value and client value match, and no conflicts are created.

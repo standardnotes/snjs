@@ -26,7 +26,7 @@ describe("notes + tags syncing", async function() {
     note.setDirty(true);
     await this.application.syncManager.sync();
     await this.application.modelManager.handleSignOut();
-    await this.application.syncManager.clearSyncToken();
+    await this.application.syncManager.clearSyncPositionTokens();
     await this.application.syncManager.sync();
     const downloadedNote = this.application.modelManager.notes[0];
     expect(downloadedNote.items_key_id).to.be.ok;
@@ -47,7 +47,7 @@ describe("notes + tags syncing", async function() {
       note.setDirty(true);
       tag.setDirty(true);
       await this.application.syncManager.sync();
-      this.application.syncManager.clearSyncToken();
+      this.application.syncManager.clearSyncPositionTokens();
       expect(tag.content.references.length).to.equal(1);
       expect(note.tags.length).to.equal(1);
       expect(tag.notes.length).to.equal(1);
@@ -111,7 +111,7 @@ describe("notes + tags syncing", async function() {
     tag.setDirty(true);
 
     await this.application.syncManager.sync();
-    await this.application.syncManager.clearSyncToken();
+    await this.application.syncManager.clearSyncPositionTokens();
 
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
