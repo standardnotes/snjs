@@ -20,18 +20,18 @@ describe('migrations', () => {
   })
 
   it("should not run migrations until local data loading and sync is complete", async () => {
-    let authManager = Factory.globalAuthManager();
+    let sessionManager = Factory.globalSessionManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createStorageItemNotePayload);
     const syncManager = new SNSyncManager({
       modelManager,
-      authManager,
+      sessionManager,
       storageManager: Factory.globalStorageManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
     migrationManager.registeredMigrations = () => {
       return [
@@ -73,12 +73,12 @@ describe('migrations', () => {
   })
 
   it("should handle running multiple migrations", async () => {
-    let authManager = Factory.globalAuthManager();
+    let sessionManager = Factory.globalSessionManager();
     let modelManager = Factory.createModelManager();
     modelManager.addItem(Factory.createStorageItemNotePayload);
     const syncManager = new SNSyncManager({
       modelManager,
-      authManager,
+      sessionManager,
       storageManager: Factory.globalStorageManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
@@ -86,7 +86,7 @@ describe('migrations', () => {
 
     await syncManager.loadLocalItems();
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
     let randValue1 = Math.random();
     let randValue2 = Math.random();
@@ -133,19 +133,19 @@ describe('migrations', () => {
 
   it("should run migrations while offline, then again after signing in", async () => {
     // go offline
-    let authManager = Factory.globalAuthManager();
+    let sessionManager = Factory.globalSessionManager();
     await Factory.globalStorageManager().clearAllData();
     await Factory.globalStorageManager().setValue("server", Factory.serverURL());
     let modelManager = Factory.createModelManager();
     const syncManager = new SNSyncManager({
       modelManager,
-      authManager,
+      sessionManager,
       storageManager: Factory.globalStorageManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), authManager);
+    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
     var params1 = Factory.createStorageItemNotePayload();
     modelManager.addItem(params1);
@@ -195,7 +195,7 @@ describe('migrations', () => {
     var email = SFItem.GenerateUuidSynchronously();
     var password = SFItem.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({email, password, application});
-    authManager.notifyEvent(APPLICATION_EVENT_DID_SIGN_IN);
+    sessionManager.notifyEvent(APPLICATION_EVENT_DID_SIGN_IN);
 
     await syncManager.sync();
     // migrations run asyncronously

@@ -11,7 +11,7 @@ describe('online syncing', () => {
   let sharedNoteCount = 0;
 
   const syncOptions = {
-    performIntegrityCheck: true
+    checkIntegrity: true
   }
   let _key, _keyParams;
   let sharedApplication;
@@ -57,7 +57,7 @@ describe('online syncing', () => {
   }
 
   const signin = async function() {
-    await Factory.globalAuthManager().login(Factory.serverURL(), email, password, true, null);
+    await Factory.globalSessionManager().login(Factory.serverURL(), email, password, true, null);
   }
 
   it("should register and sync basic model online", async function() {
@@ -501,7 +501,7 @@ describe('online syncing', () => {
 
     // client A. Don't await, we want to do other stuff.
     let slowSync = syncManager.sync({
-      performIntegrityCheck: true,
+      checkIntegrity: true,
       simulateHighLatency: true,
       simulatedLatency: 400
     });
@@ -546,7 +546,7 @@ describe('online syncing', () => {
     await syncManager.loadLocalItems();
 
     let syncRequest = syncManager.sync({
-      performIntegrityCheck: true,
+      checkIntegrity: true,
       simulateHighLatency: true,
       simulatedLatency: 500
     });
@@ -672,7 +672,7 @@ describe('online syncing', () => {
     let localModelManager = Factory.createModelManager();
     const localSyncManager = new SNSyncManager({
       modelManager: localModelManager,
-      authManager: Factory.globalAuthManager(),
+      sessionManager: Factory.globalSessionManager(),
       storageManager: Factory.globalStorageManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
@@ -733,7 +733,7 @@ describe('online syncing', () => {
     let localStorageManager = Factory.createMemoryStorageManager();
     const localSyncManager = new SNSyncManager({
       modelManager: localModelManager,
-      authManager: Factory.globalAuthManager(),
+      sessionManager: Factory.globalSessionManager(),
       storageManager: localStorageManager,
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
@@ -810,12 +810,12 @@ describe('online syncing', () => {
 
   it("should sign in and retrieve large number of items", async function() {
     // logout
-    await Factory.globalAuthManager().signOut();
+    await Factory.globalSessionManager().signOut();
     syncManager.handleSignOut();
     modelManager.handleSignOut();
 
     await Factory.globalStorageManager().clearAllData();
-    await Factory.globalAuthManager().login(Factory.serverURL(), email, password, true, null);
+    await Factory.globalSessionManager().login(Factory.serverURL(), email, password, true, null);
 
     let models = await Factory.globalStorageManager().getAllPayloads();
     expect(models.length).to.equal(0);

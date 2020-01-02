@@ -12,7 +12,7 @@ import MemoryDatabaseManager from './persist/database/memoryDatabaseManager.js';
 var _globalStorageManager = null;
 var _globalDatabaseManager = null;
 var _globalHttpManager = null;
-var _globalAuthManager = null;
+var _globalSessionManager = null;
 var _globalModelManager = null;
 var _globalProtocolManager = null;
 var _globalKeyManager = null;

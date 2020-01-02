@@ -18,7 +18,7 @@ describe("basic auth", () => {
   })
 
   it("successfully register new account", (done) => {
-     Factory.globalAuthManager().register({
+     Factory.globalSessionManager().register({
        url,
        email,
        password
@@ -30,13 +30,13 @@ describe("basic auth", () => {
   }).timeout(20000);
 
   it("successfully logins to registered account", async () => {
-    await Factory.globalAuthManager().signOut({clearAllData: true});
-    const response = await Factory.globalAuthManager().login({url, email, password});
+    await Factory.globalSessionManager().signOut({clearAllData: true});
+    const response = await Factory.globalSessionManager().login({url, email, password});
     expect(response.error).to.not.be.ok;
   }).timeout(20000);
 
   it("fails login to registered account", (done) => {
-    Factory.globalAuthManager().login({url, email, password: "wrong-password"}).then((response) => {
+    Factory.globalSessionManager().login({url, email, password: "wrong-password"}).then((response) => {
       expect(response.error).to.be.ok;
       done();
     })
@@ -48,7 +48,7 @@ describe("basic auth", () => {
     const syncManager = new SNSyncManager({
       modelManager,
       storageManager,
-      authManager: Factory.globalAuthManager(),
+      sessionManager: Factory.globalSessionManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
     });
@@ -72,7 +72,7 @@ describe("basic auth", () => {
     // const newKey = result.key;
     // const newKeyParams = result.keyParams;
     //
-    // var response = await Factory.globalAuthManager().changePassword({
+    // var response = await Factory.globalSessionManager().changePassword({
     //   url,
     //   email,
     //   serverPassword: _key.serverPassword,
@@ -112,8 +112,8 @@ describe("basic auth", () => {
     // expect(modelManager.allItems.length).to.equal(totalItemCount);
     // expect(modelManager.invalidItems().length).to.equal(0);
     //
-    // await Factory.globalAuthManager().signOut({clearAllData: true});
-    // var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
+    // await Factory.globalSessionManager().signOut({clearAllData: true});
+    // var loginResponse = await Factory.globalSessionManager().login(url, email, password, strict, null);
     // expect(loginResponse.error).to.not.be.ok;
   }).timeout(20000);
 
@@ -123,7 +123,7 @@ describe("basic auth", () => {
     const syncManager = new SNSyncManager({
       modelManager,
       storageManager,
-      authManager: Factory.globalAuthManager(),
+      sessionManager: Factory.globalSessionManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()
     });
@@ -144,7 +144,7 @@ describe("basic auth", () => {
       var newKeys = result.key;
       var newKeyParams = result.keyParams;
 
-      var response = await Factory.globalAuthManager().changePassword(
+      var response = await Factory.globalSessionManager().changePassword(
         url,
         email,
         _key.serverPassword,
@@ -173,7 +173,7 @@ describe("basic auth", () => {
       expect(modelManager.allItems.length).to.equal(totalItemCount);
       expect(modelManager.invalidItems().length).to.equal(0);
 
-      var loginResponse = await Factory.globalAuthManager().login(url, email, password, strict, null);
+      var loginResponse = await Factory.globalSessionManager().login(url, email, password, strict, null);
       expect(loginResponse.error).to.not.be.ok;
     }
   }).timeout(30000);

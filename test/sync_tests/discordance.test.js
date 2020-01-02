@@ -11,7 +11,7 @@ describe('sync discordance', () => {
   var totalItemCount = 0;
 
   let localStorageManager = Factory.createMemoryStorageManager();
-  let localAuthManager = new SNAuthManager({
+  let localSessionManager = new SNSessionManager({
     storageManager: localStorageManager,
     httpManager: Factory.globalHttpManager(),
     keyManager: Factory.globalKeyManager(),
@@ -24,7 +24,7 @@ describe('sync discordance', () => {
   let localModelManager = Factory.createModelManager();
   const localSyncManager = new SNSyncManager({
     modelManager: localModelManager,
-    authManager: Factory.globalAuthManager(),
+    sessionManager: Factory.globalSessionManager(),
     storageManager: localStorageManager,
     protocolManager: Factory.globalProtocolManager(),
     httpManager: localHttpManager
@@ -45,21 +45,21 @@ describe('sync discordance', () => {
   let itemCount = 0;
 
   it("should begin discordance upon instructions", async () => {
-    let response = await localSyncManager.sync({performIntegrityCheck: false});
+    let response = await localSyncManager.sync({checkIntegrity: false});
     expect(response.integrity_hash).to.not.be.ok;
 
-    response = await localSyncManager.sync({performIntegrityCheck: true});
+    response = await localSyncManager.sync({checkIntegrity: true});
     expect(response.integrity_hash).to.not.be.null;
 
     // integrity should be valid
     expect(localSyncManager.syncDiscordance).to.equal(0);
 
     // sync should no longer request integrity hash from server
-    response = await localSyncManager.sync({performIntegrityCheck: false});
+    response = await localSyncManager.sync({checkIntegrity: false});
     expect(response.integrity_hash).to.not.be.ok;
 
     // we expect another integrity check here
-    response = await localSyncManager.sync({performIntegrityCheck: true});
+    response = await localSyncManager.sync({checkIntegrity: true});
     expect(response.integrity_hash).to.not.be.null;
 
     // integrity should be valid
@@ -74,7 +74,7 @@ describe('sync discordance', () => {
     localModelManager.addItem(item);
     itemCount++;
 
-    await localSyncManager.sync({performIntegrityCheck: true});
+    await localSyncManager.sync({checkIntegrity: true});
 
     // Expect no discordance
     expect(localSyncManager.syncDiscordance).to.equal(0);
@@ -83,7 +83,7 @@ describe('sync discordance', () => {
     await localModelManager.removeItemLocally(item);
 
     // wait for integrity check interval
-    await localSyncManager.sync({performIntegrityCheck: true});
+    await localSyncManager.sync({checkIntegrity: true});
 
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
@@ -106,7 +106,7 @@ describe('sync discordance', () => {
     // We will now reinstate the item and sync, which should repair everything
     localModelManager.addItem(item);
     localModelManager.setItemDirty(item, true);
-    await localSyncManager.sync({performIntegrityCheck: true});
+    await localSyncManager.sync({checkIntegrity: true});
 
     expect(localSyncManager.isOutOfSync()).to.equal(false);
     expect(localSyncManager.syncDiscordance).to.equal(0);
@@ -128,7 +128,7 @@ describe('sync discordance', () => {
     localModelManager.items = localModelManager.items.filter((candidate) => candidate.uuid != item.uuid);
     delete localModelManager.itemsHash[item.uuid]
 
-    await localSyncManager.sync({performIntegrityCheck: true});
+    await localSyncManager.sync({checkIntegrity: true});
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
     expect(localSyncManager.isOutOfSync()).to.equal(true);
@@ -159,7 +159,7 @@ describe('sync discordance', () => {
 
     // now lets sync the item, just to make sure it doesn't cause any problems
     localModelManager.setItemDirty(item, true);
-    await localSyncManager.sync({performIntegrityCheck: true});
+    await localSyncManager.sync({checkIntegrity: true});
     expect(localSyncManager.isOutOfSync()).to.equal(false);
     expect(localModelManager.allItems.length).to.equal(itemCount + 1);
   });

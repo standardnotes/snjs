@@ -14,7 +14,7 @@ const storageManager = Factory.createMemoryStorageManager();
 const modelManager = new SNModelManager();
 const syncManager = new SNSyncManager({
   modelManager,
-  authManager: Factory.globalAuthManager(),
+  sessionManager: Factory.globalSessionManager(),
   storageManager: storageManager,
   protocolManager: Factory.globalProtocolManager(),
   httpManager: Factory.globalHttpManager()

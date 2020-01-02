@@ -11,7 +11,7 @@ describe('offline syncing', () => {
   let modelManager = Factory.createModelManager();
   const syncManager = new SNSyncManager({
     modelManager,
-    authManager: Factory.globalAuthManager(),
+    sessionManager: Factory.globalSessionManager(),
     storageManager: Factory.globalStorageManager(),
     protocolManager: Factory.globalProtocolManager(),
     httpManager: Factory.globalHttpManager()
@@ -46,7 +46,7 @@ describe('offline syncing', () => {
     let localModelManager = Factory.createModelManager();
     const syncManager = new SNSyncManager({
       modelManager,
-      authManager: Factory.globalAuthManager(),
+      sessionManager: Factory.globalSessionManager(),
       storageManager: Factory.globalStorageManager(),
       protocolManager: Factory.globalProtocolManager(),
       httpManager: Factory.globalHttpManager()

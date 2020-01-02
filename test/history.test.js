@@ -18,11 +18,11 @@ describe('session history', () => {
   var password = SFItem.GenerateUuidSynchronously();
   var totalItemCount = 0;
 
-  let authManager = Factory.globalAuthManager();
+  let sessionManager = Factory.globalSessionManager();
   let modelManager = Factory.createModelManager();
   const syncManager = new SNSyncManager({
     modelManager,
-    authManager,
+    sessionManager,
     storageManager: Factory.globalStorageManager(),
     protocolManager: Factory.globalProtocolManager(),
     httpManager: Factory.globalHttpManager()
