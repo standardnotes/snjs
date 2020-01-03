@@ -50,7 +50,7 @@ describe("privileges", () => {
   });
 
   it('successfully loads privileges', async () => {
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
     // Singleton handler doesn't run on initial data load, only after first sync
     await syncManager.sync();
 

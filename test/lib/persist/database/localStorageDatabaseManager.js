@@ -1,5 +1,9 @@
 export default class LocalStorageDatabaseManager extends SNDatabaseManager {
 
+  async openDatabase() {
+
+  }
+
   getKeyPrefix() {
     if(this.namespace) {
       return `${this.namespace}-item-`;
@@ -8,7 +12,7 @@ export default class LocalStorageDatabaseManager extends SNDatabaseManager {
     }
   }
 
-  async getAllPayloads() {
+  async getAllRawPayloads() {
     const models = [];
     for(var key in localStorage) {
       if(key.startsWith(this.getKeyPrefix())) {
@@ -24,12 +28,12 @@ export default class LocalStorageDatabaseManager extends SNDatabaseManager {
 
   async savePayloads(items) {
     for(const item of items) {
-      localStorage.setValue(`${this.getKeyPrefix()}${item.uuid}`, JSON.stringify(item));
+      localStorage.setItem(`${this.getKeyPrefix()}${item.uuid}`, JSON.stringify(item));
     }
   }
 
   async deletePayloadWithId(id) {
-    return localStorage.removeValue(`${this.getKeyPrefix()}${id}`);
+    return localStorage.removeItem(`${this.getKeyPrefix()}${id}`);
   }
 
   async clearAllPayloads() {

@@ -22,7 +22,7 @@ describe("local storage manager", () => {
     var item = Factory.createStorageItemNotePayload();
     await Factory.globalStorageManager().savePayload(item);
 
-    return Factory.globalStorageManager().getAllPayloads().then((models) => {
+    return Factory.globalStorageManager().getAllRawPayloads().then((models) => {
       expect(models.length).to.equal(1);
     })
   })

@@ -31,14 +31,14 @@ describe('offline syncing', () => {
     modelManager.addItem(item);
     modelManager.setItemDirty(item);
 
-    let models = await Factory.globalStorageManager().getAllPayloads();
+    let models = await Factory.globalStorageManager().getAllRawPayloads();
     expect(models.length).to.equal(0);
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
     await syncManager.sync()
 
     expect(modelManager.getDirtyItems().length).to.equal(0);
-    models = await Factory.globalStorageManager().getAllPayloads();
+    models = await Factory.globalStorageManager().getAllRawPayloads();
     expect(models.length).to.equal(1);
   });
 
@@ -67,7 +67,7 @@ describe('offline syncing', () => {
     });
 
     // This item should be saved to disk at this point.
-    let models = await Factory.globalStorageManager().getAllPayloads()
+    let models = await Factory.globalStorageManager().getAllRawPayloads()
     expect(models.length).to.equal(1);
 
     let text = `${Math.random()}`;
@@ -81,7 +81,7 @@ describe('offline syncing', () => {
     expect(localModelManager.findItem(item.uuid).text).to.equal(text);
     expect(localModelManager.findItem(item.uuid).content.text).to.equal(text);
 
-    models = await Factory.globalStorageManager().getAllPayloads()
+    models = await Factory.globalStorageManager().getAllRawPayloads()
     expect(models.length).to.equal(1);
     expect(localModelManager.allItems.length).to.equal(1);
   }).timeout(5000);

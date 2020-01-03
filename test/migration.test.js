@@ -58,7 +58,7 @@ describe('migrations', () => {
     expect(pending.length).to.equal(1);
     expect(completed.length).to.equal(0);
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
     await syncManager.sync();
     // should be completed now
     // migrationManager works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
@@ -84,7 +84,7 @@ describe('migrations', () => {
       httpManager: Factory.globalHttpManager()
     });
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
 
     var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
@@ -126,7 +126,7 @@ describe('migrations', () => {
       expect(item.content.bar).to.not.equal(randValue1);
       expect(item.content.foo).to.not.equal(randValue2);
 
-      await syncManager.loadLocalItems();
+      await syncManager.loadDataFromDatabase();
       await syncManager.sync();
     })
   })
@@ -173,7 +173,7 @@ describe('migrations', () => {
     expect(pending.length).to.equal(1);
     expect(completed.length).to.equal(0);
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
     await syncManager.sync();
     // should be completed now
     // migrationManager works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here

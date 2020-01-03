@@ -7,9 +7,8 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('keys', () => {
-  let _key, _keyParams;
   let sharedApplication;
-
+  
   before(async () => {
     sharedApplication = await Factory.createInitAppWithRandNamespace();
   })
@@ -72,7 +71,8 @@ describe('keys', () => {
   it('generating export params with no key should produce decrypted payload', async () => {
     const payload = Factory.createStorageItemNotePayload();
     const title = payload.content.title;
-    const encryptedPayload = await sharedApplication.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
     })
@@ -99,7 +99,8 @@ describe('keys', () => {
         content_type: ENCRYPTED_STORAGE_CONTENT_TYPE
       }
     });
-    const keyToUse = await localApplication.keyManager.keyToUseForEncryptionOfPayload({
+    const keyToUse = await localApplication.keyManager.
+    keyToUseForEncryptionOfPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
     })
@@ -108,7 +109,8 @@ describe('keys', () => {
 
   it('should use items key for encryption of note', async function() {
     const note = Factory.createStorageItemNotePayload();
-    const keyToUse = await this.application.keyManager.keyToUseForEncryptionOfPayload({
+    const keyToUse = await this.application.keyManager.
+    keyToUseForEncryptionOfPayload({
       payload: note,
       intent: ENCRYPTION_INTENT_SYNC
     })
@@ -117,7 +119,8 @@ describe('keys', () => {
 
   it('encrypting an item should associate an items key to it', async function() {
     const note = Factory.createStorageItemNotePayload();
-    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await this.application.protocolManager
+    .payloadByEncryptingPayload({
       payload: note,
       intent: ENCRYPTION_INTENT_SYNC
     });
@@ -128,7 +131,8 @@ describe('keys', () => {
   it('decrypt encrypted item with associated key', async function() {
     const note = Factory.createStorageItemNotePayload();
     const title = note.content.title;
-    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await this.application.protocolManager
+    .payloadByEncryptingPayload({
       payload: note,
       intent: ENCRYPTION_INTENT_SYNC
     });
@@ -136,7 +140,8 @@ describe('keys', () => {
     const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
 
-    const decryptedPayload = await this.application.protocolManager.payloadByDecryptingPayload({
+    const decryptedPayload = await this.application.protocolManager
+    .payloadByDecryptingPayload({
       payload: encryptedPayload
     });
 
@@ -146,7 +151,8 @@ describe('keys', () => {
   it('decrypts items waiting for keys', async function() {
     const notePayload = Factory.createStorageItemNotePayload();
     const title = notePayload.content.title;
-    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await this.application.protocolManager
+    .payloadByEncryptingPayload({
       payload: notePayload,
       intent: ENCRYPTION_INTENT_SYNC
     });
@@ -154,7 +160,8 @@ describe('keys', () => {
     const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
     await this.application.modelManager.removeItemLocally(itemsKey);
 
-    const decryptedPayload = await this.application.protocolManager.payloadByDecryptingPayload({
+    const decryptedPayload = await this.application.protocolManager
+    .payloadByDecryptingPayload({
       payload: encryptedPayload
     })
     await this.application.modelManager.mapPayloadsToLocalItems({
@@ -188,12 +195,15 @@ describe('keys', () => {
     const localApplication = await Factory.createInitAppWithRandNamespace();
     await Factory.registerUserToApplication({application: localApplication});
     const payload = Factory.createStorageItemNotePayload();
-    const encryptedPayload = await localApplication.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await localApplication.protocolManager
+    .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_SYNC
     })
     expect(typeof encryptedPayload.content).to.equal('string');
-    expect(encryptedPayload.content.substring(0, 3)).to.equal(localApplication.protocolManager.latestVersion());
+    expect(encryptedPayload.content.substring(0, 3)).to.equal(
+      localApplication.protocolManager.latestVersion()
+    );
   })
 
   //

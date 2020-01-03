@@ -30,7 +30,7 @@ describe("singletons", () => {
     let contentTypePredicate = new SFPredicate("content_type", "=", item1.content_type);
     singletonManager.registerSingleton([contentTypePredicate]);
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
 
     modelManager.addItems([item1, item2, item3]);
     modelManager.setItemsDirty([item1, item2, item3], true);
@@ -55,7 +55,7 @@ describe("singletons", () => {
   it("if only result is errorDecrypting, create new item", async () => {
     await storageManager.clearAllData();
     await modelManager.handleSignOut();
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
 
     let item1 = Factory.createStorageItemNotePayload();
     modelManager.addItem(item1);

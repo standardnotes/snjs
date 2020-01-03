@@ -18,18 +18,18 @@ var _globalProtocolManager = null;
 var _globalKeyManager = null;
 
 export default class Factory {
+  static createApplication(namespace) {
+    const url = this.serverURL();
+    return new SNApplication({namespace, host: url});
+  }
 
   static async createInitAppWithRandNamespace() {
     const namespace = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     return this.createAndInitializeApplication(namespace);
   }
 
-  static createApplication(namespace) {
-    return new SNApplication({namespace});
-  }
-
   static async createAndInitializeApplication(namespace) {
-    const application = new SNApplication({namespace});
+    const application = this.createApplication(namespace);
     await this.initializeApplication(application);
     return application;
   }
@@ -71,6 +71,12 @@ export default class Factory {
       timeout: setTimeout.bind(window),
       interval: setInterval.bind(window)
     });
+  }
+
+  static async registerUserToApplication({application, email, password}) {
+    if(!email) email = SFItem.GenerateUuidSynchronously();
+    if(!password) password = SFItem.GenerateUuidSynchronously();
+    return application.register({email, password});
   }
 
   static createStorageItemPayload(contentType) {
@@ -142,7 +148,8 @@ export default class Factory {
       content_type: "Note",
       content: {
         title: "hello",
-        text: "world"
+        text: "world",
+        references: []
       }
     };
     return params;
@@ -154,6 +161,7 @@ export default class Factory {
       content_type: "Tag",
       content: {
         title: "thoughts",
+        references: []
       }
     };
     return params;
@@ -191,13 +199,6 @@ export default class Factory {
         resolve();
       }, seconds * 1000);
     })
-  }
-
-  static async registerUserToApplication({application, email, password}) {
-    const url = this.serverURL();
-    if(!email) email = SFItem.GenerateUuidSynchronously();
-    if(!password) password = SFItem.GenerateUuidSynchronously();
-    return application.register({url, email, password});
   }
 
   static shuffleArray(a) {

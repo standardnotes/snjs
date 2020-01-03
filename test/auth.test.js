@@ -62,7 +62,7 @@ describe("basic auth", () => {
       modelManager.setItemDirty(item, true);
     }
 
-    await syncManager.loadLocalItems();
+    await syncManager.loadDataFromDatabase();
     await syncManager.sync();
 
     // const result = await Factory.globalProtocolManager().createRootKey({

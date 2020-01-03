@@ -31,7 +31,7 @@ describe('session history', () => {
   before((done) => {
     Factory.globalStorageManager().clearAllData().then(() => {
       Factory.registerUserToApplication({email, password, application}).then((user) => {
-        syncManager.loadLocalItems().then(() => {
+        syncManager.loadDataFromDatabase().then(() => {
           done();
         })
       })

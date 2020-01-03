@@ -244,11 +244,15 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalItems({payloads: pair});
+    const note = modelManager.notes[0];
+    const tag = modelManager.tags[0];
 
-    const duplicateTag = await modelManager.duplicateItemAndAddAsConflict(tag);
+    const duplicateTag = await modelManager.duplicateItem({
+      item: tag,
+      isConflict: true
+    });
+    console.log(duplicateTag);
 
     expect(tag.uuid).to.not.equal(duplicateTag.uuid);
 
@@ -280,7 +284,7 @@ describe("notes and tags", () => {
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    const duplicateNote = await modelManager.duplicateItemAndAddAsConflict(note);
+    const duplicateNote = await modelManager.duplicateItem({item: note, isConflict: true});
 
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
     expect(duplicateNote.tags.length).to.equal(note.tags.length);
@@ -345,7 +349,8 @@ describe("notes and tags", () => {
     modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.content === notePayload.content).to.equal(false);
-    expect(note.content.references === notePayload.content.references).to.equal(false);
+    /** Items transfer payload values on update, so these should be equal */
+    expect(note.content.references === notePayload.content.references).to.equal(true);
     notePayload.content.title = Math.random();
     expect(note.content.title).to.not.equal(notePayload.content.title);
   });
@@ -357,15 +362,29 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    modelManager.mapPayloadsToLocalItems({payloads: pair});
+    const note = modelManager.notes[0];
+    const tag = modelManager.tags[0];
 
-    notePayload.content.title = `${Math.random()}`;
-    tagPayload.content.title = `${Math.random()}`;
-    expect(note.content.title).to.not.equal(notePayload.content.title);
+    const mutatedNote = CreatePayloadFromAnyObject({
+      object: notePayload,
+      override: {
+        content: {
+          title: `${Math.random()}`
+        }
+      }
+    });
 
-    const imported = await modelManager.importItemsFromRaw([notePayload, tagPayload]);
+    const mutatedTag = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {
+        content: {
+          title: `${Math.random()}`
+        }
+      }
+    });
+
+    const imported = await modelManager.importItemsFromRaw([mutatedNote, mutatedTag]);
 
     expect(modelManager.allItems.length).to.equal(4);
 

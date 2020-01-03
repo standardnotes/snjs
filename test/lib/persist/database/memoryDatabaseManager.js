@@ -5,6 +5,10 @@ export default class MemoryDatabaseManager extends SNDatabaseManager {
     this.payloads = [];
   }
 
+  async openDatabase() {
+
+  }
+
   getKeyPrefix() {
     if(this.namespace) {
       return `${this.namespace}-item-`;
@@ -13,7 +17,7 @@ export default class MemoryDatabaseManager extends SNDatabaseManager {
     }
   }
 
-  async getAllPayloads() {
+  async getAllRawPayloads() {
     return this.payloads;
   }
 

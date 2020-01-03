@@ -4,28 +4,30 @@ import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe('payloads', () => {
-  const _identifier = "hello@test.com";
-  const _password = "password";
-  let _keyParams, _key;
-
-  const application = Factory.createApplication();
+  const sharedApplication = Factory.createApplication();
 
   before(async () => {
-    await Factory.initializeApplication(application);
+    localStorage.clear();
+    await Factory.initializeApplication(sharedApplication);
+    await Factory.registerUserToApplication({application: sharedApplication});
   });
 
+  after(async () => {
+    localStorage.clear();
+  })
+
   it('creating payload from item should create copy not by reference', async () => {
-    const item = await Factory.createMappedNote(application.modelManager);
+    const item = await Factory.createMappedNote(sharedApplication.modelManager);
     const payload = CreatePayloadFromAnyObject({object: item});
     expect(item.content === payload.content).to.equal(false);
     expect(item.content.references === payload.content.references).to.equal(false);
   });
 
   it('creating payload from item should preserve appData', async () => {
-    const item = await Factory.createMappedNote(application.modelManager);
+    const item = await Factory.createMappedNote(sharedApplication.modelManager);
     const payload = CreatePayloadFromAnyObject({object: item});
     expect(item.content.appData).to.be.ok;
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
@@ -64,6 +66,20 @@ describe('payloads', () => {
     expect(changedPayload.content.text).to.equal(changedText);
   });
 
+  it('copying payload with override should override selected fields only', async () => {
+    const item = await Factory.createMappedNote(sharedApplication.modelManager);
+    const payload = CreatePayloadFromAnyObject({object: item});
+    const mutated = CreatePayloadFromAnyObject({
+      object: payload,
+      override: {
+        content: {
+          foo: 'bar'
+        }
+      }
+    })
+    expect(mutated.content.text).to.equal(payload.content.text);
+  });
+
   it('creating payload with omit fields', async () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
@@ -78,89 +94,96 @@ describe('payloads', () => {
   });
 
   it("returns valid encrypted params for syncing", async () => {
-    var item = Factory.createStorageItemNotePayload();
-
-    const itemParams = await protocolManager.payloadByEncryptingPayload({
-      item: item,
+    const payload = Factory.createStorageItemNotePayload();
+    const encryptedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
+      payload: payload,
       intent: ENCRYPTION_INTENT_SYNC
-    })
-
-    expect(itemParams.enc_item_key).to.not.be.null;
-    expect(itemParams.uuid).to.not.be.null;
-    expect(itemParams.auth_hash).to.be.null;
-    expect(itemParams.content_type).to.not.be.null;
-    expect(itemParams.created_at).to.not.be.null;
-    expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().latestVersion());
     });
-  });
+    expect(encryptedPayload.enc_item_key).to.not.be.null;
+    expect(encryptedPayload.uuid).to.not.be.null;
+    expect(encryptedPayload.auth_hash).to.not.be.ok;
+    expect(encryptedPayload.content_type).to.not.be.null;
+    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.content).to.satisfy((string) => {
+      return string.startsWith(sharedApplication.protocolManager.latestVersion());
+    });
+  }).timeout(5000);
 
   it("returns unencrypted params with no keys", async () => {
-    var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.payloadByEncryptingPayload({
-      item: item,
-      intent: ENCRYPTION_INTENT_SYNC
+    var payload = Factory.createStorageItemNotePayload();
+    const encodedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
+      payload: payload,
+      intent: ENCRYPTION_INTENT_FILE_DECRYPTED
     })
 
-    expect(itemParams.enc_item_key).to.be.null;
-    expect(itemParams.auth_hash).to.be.null;
-    expect(itemParams.uuid).to.not.be.null;
-    expect(itemParams.content_type).to.not.be.null;
-    expect(itemParams.created_at).to.not.be.null;
-    expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith("000");
-    });
+    expect(encodedPayload.enc_item_key).to.not.be.ok;
+    expect(encodedPayload.auth_hash).to.not.be.ok;
+    expect(encodedPayload.uuid).to.not.be.null;
+    expect(encodedPayload.content_type).to.not.be.null;
+    expect(encodedPayload.created_at).to.not.be.null;
+    /** File decrypted will result in bare object */
+    expect(encodedPayload.content.title).to.equal(payload.content.title);
   });
 
   it("returns additional fields for local storage", async () => {
-    var item = Factory.createStorageItemNotePayload();
+    const payload = Factory.createStorageItemNotePayload();
 
-    const itemParams = await protocolManager.payloadByEncryptingPayload({
-      item: item,
+    const encryptedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
+      payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED
     })
 
-    expect(itemParams.enc_item_key).to.not.be.null;
-    expect(itemParams.auth_hash).to.be.null;
-    expect(itemParams.uuid).to.not.be.null;
-    expect(itemParams.content_type).to.not.be.null;
-    expect(itemParams.created_at).to.not.be.null;
-    expect(itemParams.updated_at).to.not.be.null;
-    expect(itemParams.deleted).to.not.be.null;
-    expect(itemParams.errorDecrypting).to.not.be.null;
-    expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().latestVersion());
+    expect(encryptedPayload.enc_item_key).to.not.be.null;
+    expect(encryptedPayload.auth_hash).to.not.be.ok;
+    expect(encryptedPayload.uuid).to.not.be.null;
+    expect(encryptedPayload.content_type).to.not.be.null;
+    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.updated_at).to.not.be.null;
+    expect(encryptedPayload.deleted).to.not.be.null;
+    expect(encryptedPayload.errorDecrypting).to.not.be.null;
+    expect(encryptedPayload.content).to.satisfy((string) => {
+      return string.startsWith(sharedApplication.protocolManager.latestVersion());
     });
   });
 
   it("omits deleted for export file", async () => {
-    var item = Factory.createStorageItemNotePayload();
-    const itemParams = await protocolManager.payloadByEncryptingPayload({
-      item: item,
+    const payload = Factory.createStorageItemNotePayload();
+    const encryptedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
+      payload: payload,
       intent: ENCRYPTION_INTENT_FILE_ENCRYPTED
     })
-    expect(itemParams.enc_item_key).to.not.be.null;
-    expect(itemParams.uuid).to.not.be.null;
-    expect(itemParams.content_type).to.not.be.null;
-    expect(itemParams.created_at).to.not.be.null;
-    expect(itemParams.deleted).to.not.be.ok;
-    expect(itemParams.content).to.satisfy((string) => {
-      return string.startsWith(Factory.globalProtocolManager().latestVersion());
+    expect(encryptedPayload.enc_item_key).to.not.be.null;
+    expect(encryptedPayload.uuid).to.not.be.null;
+    expect(encryptedPayload.content_type).to.not.be.null;
+    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.deleted).to.not.be.ok;
+    expect(encryptedPayload.content).to.satisfy((string) => {
+      return string.startsWith(sharedApplication.protocolManager.latestVersion());
     });
   });
 
   it("items with error decrypting should remain as is", async () => {
-    var item = Factory.createStorageItemNotePayload();
-    item.errorDecrypting = true;
-    const itemParams = await protocolManager.payloadByEncryptingPayload({
-      item: item,
+    const payload = Factory.createStorageItemNotePayload();
+    const mutatedPayload = CreatePayloadFromAnyObject({
+      object: payload,
+      override: {
+        errorDecrypting: true
+      }
+    })
+    const encryptedPayload = await sharedApplication.protocolManager
+    .payloadByEncryptingPayload({
+      payload: mutatedPayload,
       intent: ENCRYPTION_INTENT_SYNC
     })
-    expect(itemParams.content).to.eql(item.content);
-    expect(itemParams.enc_item_key).to.not.be.null;
-    expect(itemParams.uuid).to.not.be.null;
-    expect(itemParams.content_type).to.not.be.null;
-    expect(itemParams.created_at).to.not.be.null;
+    expect(encryptedPayload.content).to.eql(payload.content);
+    expect(encryptedPayload.enc_item_key).to.not.be.null;
+    expect(encryptedPayload.uuid).to.not.be.null;
+    expect(encryptedPayload.content_type).to.not.be.null;
+    expect(encryptedPayload.created_at).to.not.be.null;
   });
 
 })

@@ -18,9 +18,6 @@ describe('sync discordance', () => {
     protocolManager: Factory.globalProtocolManager()
   });
   let localHttpManager = new SNHttpManager();
-  localHttpManager.setJWTRequestHandler(async () => {
-    return localStorageManager.getValue("jwt");;
-  })
   let localModelManager = Factory.createModelManager();
   const localSyncManager = new SNSyncManager({
     modelManager: localModelManager,
@@ -39,7 +36,7 @@ describe('sync discordance', () => {
   })
 
   beforeEach(async () => {
-    await localSyncManager.loadLocalItems();
+    await localSyncManager.loadDataFromDatabase();
   });
 
   let itemCount = 0;

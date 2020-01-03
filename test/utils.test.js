@@ -25,6 +25,33 @@ describe('utils', () => {
     expect(isNullOrUndefined([null])).to.equal(false);
   })
 
+  it('extendArray', () => {
+    const array = [1, 2, 3];
+    const original = array.slice();
+    const extended = [4, 5, 6];
+    extendArray(array, extended);
+    expect(array).to.eql(original.concat(extended));
+  })
+
+  it('subtractFromArray', () => {
+    const array = [1, 2, 3, 4, 5];
+    subtractFromArray(array, [1, 3, 5]);
+    expect(array).to.eql([2, 4]);
+  })
+
+  it('removeFromIndex', () => {
+    const array = [1, 2, 3];
+    removeFromIndex(array, 1);
+    expect(array).to.eql([1, 3]);
+  })
+
+  it('arrayByDifference', () => {
+    const array = [1, 2, 3, 4];
+    const array2 = [2, 3];
+    const result = arrayByDifference(array, array2);
+    expect(result).to.eql([1, 4]);
+  })
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {

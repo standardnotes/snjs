@@ -120,9 +120,9 @@ The interface allows users to create new notes while their data is loading, and 
 
 - What if a user makes a change to a note, then gets it saved locally, before local data load has even started. Then, upon local data load, this item appears 5,000 items later, by which time, you modified the in memory copy several times. This would then overwrite the changes you've made. To handle this, we'll persist dirtiedDate to local storage. Upon local data load, we check if the saved value's dirtiedDate is less than the current item (if it exists in modelManager) dirtiedDate. If it is, we'll ignore this local value.
 
-- Clients **must** call syncManager.loadLocalItems and wait for that to complete before calling syncManager.sync. Ideally these two would be combined into one, but for now, they remain separate and up to the consumer to ensure proper order. Calling syncManager.sync before loadLocalItems has completed will save dirty items to disk, but will not proceed with online sync.
+- Clients **must** call syncManager.loadDataFromDatabase and wait for that to complete before calling syncManager.sync. Ideally these two would be combined into one, but for now, they remain separate and up to the consumer to ensure proper order. Calling syncManager.sync before loadDataFromDatabase has completed will save dirty items to disk, but will not proceed with online sync.
 
-- When a user signs out, assuming we don't reload the interface (we do reload on web but not mobile), then we will keep the flag that indicates that local data has loaded. The client is not required to call loadLocalItems after a sign out.
+- When a user signs out, assuming we don't reload the interface (we do reload on web but not mobile), then we will keep the flag that indicates that local data has loaded. The client is not required to call loadDataFromDatabase after a sign out.
 
 ### 1.7 Dirty
 

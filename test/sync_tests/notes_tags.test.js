@@ -98,7 +98,7 @@ describe("notes + tags syncing", async function() {
   })
 
   it('duplicating a tag should maintian its relationships', async function() {
-    await this.application.syncManager.loadLocalItems();
+    await this.application.syncManager.loadDataFromDatabase();
     let pair = Factory.createRelatedNoteTagPairPayload();
     let notePayload = pair[0];
     let tagPayload = pair[1];
