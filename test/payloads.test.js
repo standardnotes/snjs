@@ -80,13 +80,29 @@ describe('payloads', () => {
     expect(mutated.content.text).to.equal(payload.content.text);
   });
 
+  it('copying payload with override should copy empty arrays', async () => {
+    const pair = await Factory.createRelatedNoteTagPairPayload(sharedApplication.modelManager);
+    const tagPayload = pair[1];
+    expect(tagPayload.content.references.length).to.equal(1);
+
+    const mutated = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {
+        content: {
+          references: []
+        }
+      }
+    })
+    expect(mutated.content.references.length).to.equal(0);
+  });
+
   it('creating payload with omit fields', async () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
     const changedUuid = 'foo';
     const changedPayload = CreatePayloadFromAnyObject({
       object: payload,
-      omit: ['uuid']
+      override: {uuid: null}
     })
 
     expect(payload.uuid).to.equal(uuid);

@@ -1388,15 +1388,28 @@ function () {
       }
     }
   }, {
-    key: "setHost",
-    value: function setHost(host) {
-      return regeneratorRuntime.async(function setHost$(_context2) {
+    key: "saveItem",
+    value: function saveItem(_ref3) {
+      var item, payload;
+      return regeneratorRuntime.async(function saveItem$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              this.apiService.setHost(host);
+              item = _ref3.item;
+              this.modelManager.setItemDirty(item, true);
+              payload = CreatePayloadFromAnyObject({
+                object: item
+              });
+              _context2.next = 5;
+              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
+                payloads: [payload]
+              }));
 
-            case 1:
+            case 5:
+              _context2.next = 7;
+              return regeneratorRuntime.awrap(this.syncManager.sync());
+
+            case 7:
             case "end":
               return _context2.stop();
           }
@@ -1404,59 +1417,15 @@ function () {
       }, null, this);
     }
   }, {
-    key: "register",
-    value: function register(_ref3) {
-      var email, password, ephemeral, result;
-      return regeneratorRuntime.async(function register$(_context3) {
+    key: "setHost",
+    value: function setHost(host) {
+      return regeneratorRuntime.async(function setHost$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              email = _ref3.email, password = _ref3.password, ephemeral = _ref3.ephemeral;
-              _context3.next = 3;
-              return regeneratorRuntime.awrap(this.sessionManager.register({
-                email: email,
-                password: password
-              }));
+              this.apiService.setHost(host);
 
-            case 3:
-              result = _context3.sent;
-
-              if (result.response.error) {
-                _context3.next = 15;
-                break;
-              }
-
-              _context3.next = 7;
-              return regeneratorRuntime.awrap(this.keyManager.setRootKey({
-                key: result.rootKey,
-                keyParams: result.keyParams
-              }));
-
-            case 7:
-              _context3.next = 9;
-              return regeneratorRuntime.awrap(this.keyManager.createNewItemsKey());
-
-            case 9:
-              _context3.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.setLocalStoragePolicy({
-                encrypt: true,
-                ephemeral: ephemeral
-              }));
-
-            case 11:
-              _context3.next = 13;
-              return regeneratorRuntime.awrap(this.storageManager.setLocalDatabaseStoragePolicy({
-                ephemeral: ephemeral
-              }));
-
-            case 13:
-              _context3.next = 15;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
-
-            case 15:
-              return _context3.abrupt("return", result.response);
-
-            case 16:
+            case 1:
             case "end":
               return _context3.stop();
           }
@@ -1464,16 +1433,76 @@ function () {
       }, null, this);
     }
   }, {
-    key: "signIn",
-    value: function signIn(_ref4) {
-      var email, password, strict, ephemeral, mfaKeyPath, mfaCode, result;
-      return regeneratorRuntime.async(function signIn$(_context4) {
+    key: "register",
+    value: function register(_ref4) {
+      var email, password, ephemeral, result;
+      return regeneratorRuntime.async(function register$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              email = _ref4.email, password = _ref4.password, strict = _ref4.strict, ephemeral = _ref4.ephemeral, mfaKeyPath = _ref4.mfaKeyPath, mfaCode = _ref4.mfaCode;
+              email = _ref4.email, password = _ref4.password, ephemeral = _ref4.ephemeral;
+              _context4.next = 3;
+              return regeneratorRuntime.awrap(this.sessionManager.register({
+                email: email,
+                password: password
+              }));
+
+            case 3:
+              result = _context4.sent;
+
+              if (result.response.error) {
+                _context4.next = 15;
+                break;
+              }
+
+              _context4.next = 7;
+              return regeneratorRuntime.awrap(this.keyManager.setRootKey({
+                key: result.rootKey,
+                keyParams: result.keyParams
+              }));
+
+            case 7:
+              _context4.next = 9;
+              return regeneratorRuntime.awrap(this.keyManager.createNewItemsKey());
+
+            case 9:
+              _context4.next = 11;
+              return regeneratorRuntime.awrap(this.storageManager.setLocalStoragePolicy({
+                encrypt: true,
+                ephemeral: ephemeral
+              }));
+
+            case 11:
+              _context4.next = 13;
+              return regeneratorRuntime.awrap(this.storageManager.setLocalDatabaseStoragePolicy({
+                ephemeral: ephemeral
+              }));
+
+            case 13:
+              _context4.next = 15;
+              return regeneratorRuntime.awrap(this.syncManager.sync());
+
+            case 15:
+              return _context4.abrupt("return", result.response);
+
+            case 16:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "signIn",
+    value: function signIn(_ref5) {
+      var email, password, strict, ephemeral, mfaKeyPath, mfaCode, result;
+      return regeneratorRuntime.async(function signIn$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              email = _ref5.email, password = _ref5.password, strict = _ref5.strict, ephemeral = _ref5.ephemeral, mfaKeyPath = _ref5.mfaKeyPath, mfaCode = _ref5.mfaCode;
               this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_12__["APPLICATION_EVENT_WILL_SIGN_IN"]);
-              _context4.next = 4;
+              _context5.next = 4;
               return regeneratorRuntime.awrap(this.sessionManager.signIn({
                 email: email,
                 password: password,
@@ -1483,14 +1512,14 @@ function () {
               }));
 
             case 4:
-              result = _context4.sent;
+              result = _context5.sent;
 
               if (result.response.error) {
-                _context4.next = 9;
+                _context5.next = 9;
                 break;
               }
 
-              _context4.next = 8;
+              _context5.next = 8;
               return regeneratorRuntime.awrap(this.keyManager.setRootKey({
                 key: result.rootKey,
                 keyParams: result.keyParams
@@ -1500,72 +1529,9 @@ function () {
               this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_12__["APPLICATION_EVENT_DID_SIGN_IN"]);
 
             case 9:
-              return _context4.abrupt("return", result.response);
-
-            case 10:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "changePassword",
-    value: function changePassword(_ref5) {
-      var email, currentPassword, currentKeyParams, newPassword, result;
-      return regeneratorRuntime.async(function changePassword$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              email = _ref5.email, currentPassword = _ref5.currentPassword, currentKeyParams = _ref5.currentKeyParams, newPassword = _ref5.newPassword;
-              _context5.t0 = regeneratorRuntime;
-              _context5.t1 = this.sessionManager;
-              _context5.next = 5;
-              return regeneratorRuntime.awrap(this.sessionManager.getServerUrl());
-
-            case 5:
-              _context5.t2 = _context5.sent;
-              _context5.t3 = email;
-              _context5.t4 = currentPassword;
-              _context5.t5 = currentKeyParams;
-              _context5.t6 = newPassword;
-              _context5.t7 = {
-                url: _context5.t2,
-                email: _context5.t3,
-                currentPassword: _context5.t4,
-                currentKeyParams: _context5.t5,
-                newPassword: _context5.t6
-              };
-              _context5.t8 = _context5.t1.changePassword.call(_context5.t1, _context5.t7);
-              _context5.next = 14;
-              return _context5.t0.awrap.call(_context5.t0, _context5.t8);
-
-            case 14:
-              result = _context5.sent;
-
-              if (result.response.error) {
-                _context5.next = 22;
-                break;
-              }
-
-              _context5.next = 18;
-              return regeneratorRuntime.awrap(this.keyManager.setRootKey({
-                key: result.rootKey,
-                keyParams: result.keyParams
-              }));
-
-            case 18:
-              _context5.next = 20;
-              return regeneratorRuntime.awrap(this.keyManager.createNewItemsKey());
-
-            case 20:
-              _context5.next = 22;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
-
-            case 22:
               return _context5.abrupt("return", result.response);
 
-            case 23:
+            case 10:
             case "end":
               return _context5.stop();
           }
@@ -1573,39 +1539,102 @@ function () {
       }, null, this);
     }
   }, {
-    key: "signOut",
-    value: function signOut() {
-      var _ref6,
-          dontClearData,
-          _args6 = arguments;
-
-      return regeneratorRuntime.async(function signOut$(_context6) {
+    key: "changePassword",
+    value: function changePassword(_ref6) {
+      var email, currentPassword, currentKeyParams, newPassword, result;
+      return regeneratorRuntime.async(function changePassword$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              _ref6 = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : {}, dontClearData = _ref6.dontClearData;
-              _context6.next = 3;
+              email = _ref6.email, currentPassword = _ref6.currentPassword, currentKeyParams = _ref6.currentKeyParams, newPassword = _ref6.newPassword;
+              _context6.t0 = regeneratorRuntime;
+              _context6.t1 = this.sessionManager;
+              _context6.next = 5;
+              return regeneratorRuntime.awrap(this.sessionManager.getServerUrl());
+
+            case 5:
+              _context6.t2 = _context6.sent;
+              _context6.t3 = email;
+              _context6.t4 = currentPassword;
+              _context6.t5 = currentKeyParams;
+              _context6.t6 = newPassword;
+              _context6.t7 = {
+                url: _context6.t2,
+                email: _context6.t3,
+                currentPassword: _context6.t4,
+                currentKeyParams: _context6.t5,
+                newPassword: _context6.t6
+              };
+              _context6.t8 = _context6.t1.changePassword.call(_context6.t1, _context6.t7);
+              _context6.next = 14;
+              return _context6.t0.awrap.call(_context6.t0, _context6.t8);
+
+            case 14:
+              result = _context6.sent;
+
+              if (result.response.error) {
+                _context6.next = 22;
+                break;
+              }
+
+              _context6.next = 18;
+              return regeneratorRuntime.awrap(this.keyManager.setRootKey({
+                key: result.rootKey,
+                keyParams: result.keyParams
+              }));
+
+            case 18:
+              _context6.next = 20;
+              return regeneratorRuntime.awrap(this.keyManager.createNewItemsKey());
+
+            case 20:
+              _context6.next = 22;
+              return regeneratorRuntime.awrap(this.syncManager.sync());
+
+            case 22:
+              return _context6.abrupt("return", result.response);
+
+            case 23:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "signOut",
+    value: function signOut() {
+      var _ref7,
+          dontClearData,
+          _args7 = arguments;
+
+      return regeneratorRuntime.async(function signOut$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _ref7 = _args7.length > 0 && _args7[0] !== undefined ? _args7[0] : {}, dontClearData = _ref7.dontClearData;
+              _context7.next = 3;
               return regeneratorRuntime.awrap(this.syncManager.handleSignOut());
 
             case 3:
-              _context6.next = 5;
+              _context7.next = 5;
               return regeneratorRuntime.awrap(this.modelManager.handleSignOut());
 
             case 5:
-              _context6.next = 7;
+              _context7.next = 7;
               return regeneratorRuntime.awrap(this.sessionManager.signOut());
 
             case 7:
-              _context6.next = 9;
+              _context7.next = 9;
               return regeneratorRuntime.awrap(this.keyManager.deleteRootKey());
 
             case 9:
               if (dontClearData) {
-                _context6.next = 12;
+                _context7.next = 12;
                 break;
               }
 
-              _context6.next = 12;
+              _context7.next = 12;
               return regeneratorRuntime.awrap(this.storageManager.clearAllData());
 
             case 12:
@@ -1613,7 +1642,7 @@ function () {
 
             case 13:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -2279,9 +2308,9 @@ function (_SFItem) {
       return this.hosted_url || this.legacy_url;
     }
   }, {
-    key: "keysToIgnoreWhenCheckingContentEquality",
-    value: function keysToIgnoreWhenCheckingContentEquality() {
-      return ["active", "disassociatedItemIds", "associatedItemIds"].concat(_get(_getPrototypeOf(SNComponent.prototype), "keysToIgnoreWhenCheckingContentEquality", this).call(this));
+    key: "contentKeysToIgnoreWhenCheckingEquality",
+    value: function contentKeysToIgnoreWhenCheckingEquality() {
+      return ["active", "disassociatedItemIds", "associatedItemIds"].concat(_get(_getPrototypeOf(SNComponent.prototype), "contentKeysToIgnoreWhenCheckingEquality", this).call(this));
     }
     /*
       An associative component depends on being explicitly activated for a given item, compared to a dissaciative component,
@@ -3199,35 +3228,62 @@ function () {
         this.content_type = payload.content_type;
       }
 
-      var fieldsToMerge = [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UUID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_CREATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_UPDATED_AT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DELETED"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ENC_ITEM_KEY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ITEMS_KEY_ID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_HASH"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_LEGACY_003_AUTH_PARAMS"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTIED_DATE"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ERROR_DECRYPTING"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_WAITING_FOR_KEY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DUMMY"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_DIRTY_COUNT"]];
+      var fieldsToCopy = [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__["ITEM_PAYLOAD_CONTENT"]];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-      for (var _i = 0, _fieldsToMerge = fieldsToMerge; _i < _fieldsToMerge.length; _i++) {
-        var field = _fieldsToMerge[_i];
-        var value = payload[field];
-        this[field] = value;
-      }
-      /**
-       * this.content = payload.content will copy it by reference rather than value.
-       * So we need to do a deep merge instead.
-       * payload.content can still be a string here if errorDecrypting.
-       */
+      try {
+        for (var _iterator = payload.fields()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var field = _step.value;
 
-
-      if (payload.errorDecrypting) {
-        this.content = payload.content;
-      } else {
-        if (payload.content) {
-          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"])(payload.content)) {
-            throw 'Payload is not error decrypting, but is a string nonetheless.';
+          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hasGetter"])(this, field)) {
+            continue;
           }
 
-          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"])(this.content)) {
-            /** Previously errorDecrypting */
-            this.content = {};
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(this.content, payload.content);
-            this.populateDefaultContentValues();
+          var value = payload[field];
+
+          if (fieldsToCopy.includes(field)) {
+            var copy = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(value);
+            this[field] = copy;
           } else {
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(this.content, payload.content);
+            this[field] = value;
+          }
+        }
+        /**
+         * Payload content is deeply immutable, do not attempt to deepMerge
+         * `content` directly, as that can leave `content.references` array as immutable.
+         */
+        // if(payload.errorDecrypting) {
+        //   /** payload.content can still be a string here if errorDecrypting. */
+        //   this.content = contentCopy;
+        // } else {
+        //   if(payload.content) {
+        //     if(isString(payload.content)) {
+        //       throw 'Payload is not error decrypting, but is a string nonetheless.';
+        //     }
+        //     if(isString(this.content)) {
+        //       /** Previously errorDecrypting */
+        //       this.content = {};
+        //       deepMerge(this.content, contentCopy);
+        //       this.populateDefaultContentValues();
+        //     } else {
+        //       deepMerge(this.content, contentCopy);
+        //     }
+        //   }
+        // }
+
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
       }
@@ -3333,8 +3389,8 @@ function () {
         return ref.uuid;
       });
 
-      for (var _i2 = 0, _Object$keys = Object.keys(this._referencedItems); _i2 < _Object$keys.length; _i2++) {
-        var uuid = _Object$keys[_i2];
+      for (var _i = 0, _Object$keys = Object.keys(this._referencedItems); _i < _Object$keys.length; _i++) {
+        var uuid = _Object$keys[_i];
         var currentReferencedItem = this._referencedItems[uuid];
 
         if (!newUuids.includes(currentReferencedItem.uuid)) {
@@ -3405,8 +3461,8 @@ function () {
   }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      for (var _i3 = 0, _Object$keys2 = Object.keys(this._referencedItems); _i3 < _Object$keys2.length; _i3++) {
-        var uuid = _Object$keys2[_i3];
+      for (var _i2 = 0, _Object$keys2 = Object.keys(this._referencedItems); _i2 < _Object$keys2.length; _i2++) {
+        var uuid = _Object$keys2[_i2];
         var item = this._referencedItems[uuid];
         item.setIsNoLongerBeingReferencedBy(this);
       }
@@ -3496,21 +3552,21 @@ function () {
       return this.getAppDataItem("client_updated_at") != null;
     }
   }, {
-    key: "keysToIgnoreWhenCheckingContentEquality",
+    key: "contentKeysToIgnoreWhenCheckingEquality",
 
     /*
       During sync conflicts, when determing whether to create a duplicate for an item, we can omit keys that have no
       meaningful weight and can be ignored. For example, if one component has active = true and another component has active = false,
       it would be silly to duplicate them, so instead we ignore this.
      */
-    value: function keysToIgnoreWhenCheckingContentEquality() {
-      return [];
+    value: function contentKeysToIgnoreWhenCheckingEquality() {
+      return ['conflict_of'];
     } // Same as above, but keys inside appData[Item.AppDomain]
 
   }, {
-    key: "appDataKeysToIgnoreWhenCheckingContentEquality",
-    value: function appDataKeysToIgnoreWhenCheckingContentEquality() {
-      return ["client_updated_at"];
+    key: "appDatacontentKeysToIgnoreWhenCheckingEquality",
+    value: function appDatacontentKeysToIgnoreWhenCheckingEquality() {
+      return ['client_updated_at'];
     }
   }, {
     key: "getContentCopy",
@@ -3524,8 +3580,8 @@ function () {
       return SFItem.AreItemContentsEqual({
         leftContent: this.content,
         rightContent: otherItem.content,
-        keysToIgnore: this.keysToIgnoreWhenCheckingContentEquality(),
-        appDataKeysToIgnore: this.appDataKeysToIgnoreWhenCheckingContentEquality()
+        keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
+        appDataKeysToIgnore: this.appDatacontentKeysToIgnoreWhenCheckingEquality()
       });
     }
   }, {
@@ -3534,8 +3590,8 @@ function () {
       return SFItem.AreItemContentsEqual({
         leftContent: this.content,
         rightContent: otherContent,
-        keysToIgnore: this.keysToIgnoreWhenCheckingContentEquality(),
-        appDataKeysToIgnore: this.appDataKeysToIgnoreWhenCheckingContentEquality()
+        keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
+        appDataKeysToIgnore: this.appDatacontentKeysToIgnoreWhenCheckingEquality()
       });
     }
   }, {
@@ -3853,7 +3909,7 @@ function () {
         if (Array.isArray(valueAtKeyPath)) {
           return JSON.stringify(valueAtKeyPath) == JSON.stringify(predicateValue);
         } else {
-          return valueAtKeyPath == predicateValue;
+          return valueAtKeyPath === predicateValue;
         }
       } else if (predicate.operator == "!=") {
         // Use array comparison
@@ -5540,15 +5596,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/server_item_payload */ "./lib/protocol/payloads/server_item_payload.js");
 /* harmony import */ var _Protocol_payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/file_item_payload */ "./lib/protocol/payloads/file_item_payload.js");
 /* harmony import */ var _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/max_item_payload */ "./lib/protocol/payloads/max_item_payload.js");
-/* harmony import */ var _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Protocol_payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/saved_server_item_payload */ "./lib/protocol/payloads/saved_server_item_payload.js");
+/* harmony import */ var _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
-/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lodash/pick */ "./node_modules/lodash/pick.js");
-/* harmony import */ var lodash_pick__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(lodash_pick__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_9__);
-
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
 
@@ -5562,54 +5614,44 @@ function CreatePayloadFromAnyObject(_ref) {
   var object = _ref.object,
       source = _ref.source,
       intent = _ref.intent,
-      override = _ref.override,
-      omit = _ref.omit;
+      override = _ref.override;
   var payloadClass;
 
-  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(source)) {
+  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["isNullOrUndefined"])(source)) {
     payloadClass = itemPayloadClassForMappingSource(source);
-  } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(intent)) {
+  } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["isNullOrUndefined"])(intent)) {
     payloadClass = itemPayloadClassForIntent(intent);
   } else {
     payloadClass = _Protocol_payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_3__["SNMaxItemPayload"];
   }
 
-  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["pickByCopy"])(object, payloadClass.fields());
+  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["pickByCopy"])(object, payloadClass.fields());
 
   if (override) {
-    lodash_merge__WEBPACK_IMPORTED_MODULE_9___default()(rawPayload, override);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepMergeByCopy"])(rawPayload, override);
   }
 
-  if (omit) {
-    rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["omitByCopy"])(rawPayload, omit);
-  }
-
-  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["deepFreeze"])(new payloadClass(rawPayload, true));
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new payloadClass(rawPayload, true));
 }
 function CreateEncryptionParameters(rawParameters) {
-  var copy = JSON.parse(JSON.stringify(rawParameters));
-  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["deepFreeze"])(new _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__["SNEncryptionParameters"](copy, true));
+  var copy = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["Copy"])(rawParameters);
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__["SNEncryptionParameters"](copy, true));
 }
 function CopyEncryptionParameters(_ref2) {
   var encryptionParameters = _ref2.encryptionParameters,
-      override = _ref2.override,
-      omit = _ref2.omit;
+      override = _ref2.override;
 
   if (!encryptionParameters.isEncryptionParameters) {
     throw 'Attempting to copy encryption parameters from non-parameters object.';
   }
 
-  var rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["pickByCopy"])(encryptionParameters, _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__["SNEncryptionParameters"].fields());
+  var rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["pickByCopy"])(encryptionParameters, _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__["SNEncryptionParameters"].fields());
 
   if (override) {
-    lodash_merge__WEBPACK_IMPORTED_MODULE_9___default()(rawParameters, override);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepMergeByCopy"])(rawParameters, override);
   }
 
-  if (omit) {
-    rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["omitByCopy"])(rawParameters, omit);
-  }
-
-  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["deepFreeze"])(new _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__["SNEncryptionParameters"](rawParameters, true));
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__["SNEncryptionParameters"](rawParameters, true));
 }
 
 function itemPayloadClassForIntent(intent) {
@@ -5637,8 +5679,12 @@ function itemPayloadClassForMappingSource(source) {
     return _Protocol_payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
   }
 
-  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_RETRIEVED"] || source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_SAVED"]) {
+  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_RETRIEVED"]) {
     return _Protocol_payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_1__["SNServerItemPayload"];
+  }
+
+  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_SAVED"]) {
+    return _Protocol_payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_4__["SNSavedServerItemPayload"];
   } else {
     throw "No item payload class found for source ".concat(source);
   }
@@ -6105,6 +6151,11 @@ function () {
   }
 
   _createClass(SNPurePayload, [{
+    key: "fields",
+    value: function fields() {
+      return this.constructor.fields();
+    }
+  }, {
     key: "version",
     get: function get() {
       if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isString"])(this.content)) {
@@ -6134,6 +6185,68 @@ function () {
 
   return SNPurePayload;
 }();
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/saved_server_item_payload.js":
+/*!************************************************************!*\
+  !*** ./lib/protocol/payloads/saved_server_item_payload.js ***!
+  \************************************************************/
+/*! exports provided: SNSavedServerItemPayload */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSavedServerItemPayload", function() { return SNSavedServerItemPayload; });
+/* harmony import */ var _Protocol_payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
+/* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+/**
+ * The saved server item payload represents the payload we want to map
+ * when mapping saved_items from the server. We only want to map the
+ * updated_at value the server returns for the item, and basically
+ * nothing else.
+ */
+
+var SNSavedServerItemPayload =
+/*#__PURE__*/
+function (_SNPureItemPayload) {
+  _inherits(SNSavedServerItemPayload, _SNPureItemPayload);
+
+  function SNSavedServerItemPayload() {
+    _classCallCheck(this, SNSavedServerItemPayload);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNSavedServerItemPayload).apply(this, arguments));
+  }
+
+  _createClass(SNSavedServerItemPayload, null, [{
+    key: "fields",
+    value: function fields() {
+      return [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_1__["ITEM_PAYLOAD_UUID"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_1__["ITEM_PAYLOAD_CONTENT_TYPE"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_1__["ITEM_PAYLOAD_UPDATED_AT"]];
+    }
+  }]);
+
+  return SNSavedServerItemPayload;
+}(_Protocol_payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__["SNPureItemPayload"]);
 
 /***/ }),
 
@@ -15725,7 +15838,7 @@ function () {
             case 30:
               if (!item) {
                 item = CreateItemFromPayload(payload);
-                this.addItem(item, isDirtyItemPendingDelete);
+                this.insertItems([item], isDirtyItemPendingDelete);
               }
               /** Observers do not need to handle items that errored while decrypting. */
 
@@ -15867,6 +15980,65 @@ function () {
       }, null, this, [[6, 38, 42, 50], [43,, 45, 49], [62, 66, 70, 78], [71,, 73, 77]]);
     }
   }, {
+    key: "insertItems",
+    value: function insertItems(items) {
+      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = items[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var item = _step3.value;
+
+          if (this.itemsHash[item.uuid]) {
+            continue;
+          }
+
+          this.itemsHash[item.uuid] = item;
+          this.items.push(item);
+          /**
+          * In some cases, you just want to add the item to this.items, and not to the individual arrays
+          * This applies when you want to keep an item syncable, but not display it via the individual arrays
+          */
+
+          if (globalOnly) {
+            continue;
+          }
+
+          if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
+            this.itemsKeys.unshift(item);
+          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"]) {
+            var index = lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_1___default()(this.tags, item, function (item) {
+              if (item.title) {
+                return item.title.toLowerCase();
+              } else {
+                return '';
+              }
+            });
+            this.tags.splice(index, 0, item);
+          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"]) {
+            this.notes.unshift(item);
+          } else if (item.content_type == 'SN|Component') {
+            this.components.unshift(item);
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+    }
+  }, {
     key: "resolveRelationshipWhenItemAvailable",
     value: function resolveRelationshipWhenItemAvailable(_ref2) {
       var interestedItem = _ref2.interestedItem,
@@ -15908,15 +16080,15 @@ function () {
       });
       var includeBlanks = true;
       var items = this.findItems(referencesIds, includeBlanks);
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator3 = items.entries()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var _step3$value = _slicedToArray(_step3.value, 2),
-              index = _step3$value[0],
-              referencedItem = _step3$value[1];
+        for (var _iterator4 = items.entries()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var _step4$value = _slicedToArray(_step4.value, 2),
+              index = _step4$value[0],
+              referencedItem = _step4$value[1];
 
           if (referencedItem) {
             item.addItemAsRelationship(referencedItem);
@@ -15933,16 +16105,16 @@ function () {
           }
         }
       } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-            _iterator3.return();
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
           }
         } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -15954,7 +16126,7 @@ function () {
     value: function notifySyncObserversOfItems(models, source, sourceKey) {
       var _this = this;
 
-      var observers, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _loop, _iterator4, _step4;
+      var observers, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _loop, _iterator5, _step5;
 
       return regeneratorRuntime.async(function notifySyncObserversOfItems$(_context3) {
         while (1) {
@@ -15965,30 +16137,30 @@ function () {
                 // sort by priority
                 return a.priority < b.priority ? -1 : 1;
               });
-              _iteratorNormalCompletion4 = true;
-              _didIteratorError4 = false;
-              _iteratorError4 = undefined;
+              _iteratorNormalCompletion5 = true;
+              _didIteratorError5 = false;
+              _iteratorError5 = undefined;
               _context3.prev = 4;
 
               _loop = function _loop() {
-                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, item;
+                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, item;
 
                 return regeneratorRuntime.async(function _loop$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
                       case 0:
-                        observer = _step4.value;
+                        observer = _step5.value;
                         allRelevantItems = observer.types.includes("*") ? models : models.filter(function (item) {
                           return observer.types.includes(item.content_type);
                         });
                         validItems = [], deletedItems = [];
-                        _iteratorNormalCompletion5 = true;
-                        _didIteratorError5 = false;
-                        _iteratorError5 = undefined;
+                        _iteratorNormalCompletion6 = true;
+                        _didIteratorError6 = false;
+                        _iteratorError6 = undefined;
                         _context2.prev = 6;
 
-                        for (_iterator5 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                          item = _step5.value;
+                        for (_iterator6 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                          item = _step6.value;
 
                           if (item.deleted) {
                             deletedItems.push(item);
@@ -16003,26 +16175,26 @@ function () {
                       case 10:
                         _context2.prev = 10;
                         _context2.t0 = _context2["catch"](6);
-                        _didIteratorError5 = true;
-                        _iteratorError5 = _context2.t0;
+                        _didIteratorError6 = true;
+                        _iteratorError6 = _context2.t0;
 
                       case 14:
                         _context2.prev = 14;
                         _context2.prev = 15;
 
-                        if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                          _iterator5.return();
+                        if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                          _iterator6.return();
                         }
 
                       case 17:
                         _context2.prev = 17;
 
-                        if (!_didIteratorError5) {
+                        if (!_didIteratorError6) {
                           _context2.next = 20;
                           break;
                         }
 
-                        throw _iteratorError5;
+                        throw _iteratorError6;
 
                       case 20:
                         return _context2.finish(17);
@@ -16047,10 +16219,10 @@ function () {
                 }, null, null, [[6, 10, 14, 22], [15,, 17, 21]]);
               };
 
-              _iterator4 = observers[Symbol.iterator]();
+              _iterator5 = observers[Symbol.iterator]();
 
             case 7:
-              if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
+              if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
                 _context3.next = 13;
                 break;
               }
@@ -16059,7 +16231,7 @@ function () {
               return regeneratorRuntime.awrap(_loop());
 
             case 10:
-              _iteratorNormalCompletion4 = true;
+              _iteratorNormalCompletion5 = true;
               _context3.next = 7;
               break;
 
@@ -16070,26 +16242,26 @@ function () {
             case 15:
               _context3.prev = 15;
               _context3.t0 = _context3["catch"](4);
-              _didIteratorError4 = true;
-              _iteratorError4 = _context3.t0;
+              _didIteratorError5 = true;
+              _iteratorError5 = _context3.t0;
 
             case 19:
               _context3.prev = 19;
               _context3.prev = 20;
 
-              if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                _iterator4.return();
+              if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                _iterator5.return();
               }
 
             case 22:
               _context3.prev = 22;
 
-              if (!_didIteratorError4) {
+              if (!_didIteratorError5) {
                 _context3.next = 25;
                 break;
               }
 
-              throw _iteratorError4;
+              throw _iteratorError5;
 
             case 25:
               return _context3.finish(22);
@@ -16156,26 +16328,26 @@ function () {
       var updateClientDate = arguments.length > 2 ? arguments[2] : undefined;
       var source = arguments.length > 3 ? arguments[3] : undefined;
       var sourceKey = arguments.length > 4 ? arguments[4] : undefined;
-      var _iteratorNormalCompletion6 = true;
-      var _didIteratorError6 = false;
-      var _iteratorError6 = undefined;
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
 
       try {
-        for (var _iterator6 = items[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-          var item = _step6.value;
+        for (var _iterator7 = items[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var item = _step7.value;
           item.setDirty(dirty, updateClientDate);
         }
       } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-            _iterator6.return();
+          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+            _iterator7.return();
           }
         } finally {
-          if (_didIteratorError6) {
-            throw _iteratorError6;
+          if (_didIteratorError7) {
+            throw _iteratorError7;
           }
         }
       }
@@ -16211,20 +16383,19 @@ function () {
 
             case 6:
               payloads = _context5.sent;
-              console.log("needs map", payloads);
-              _context5.next = 10;
+              _context5.next = 9;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: payloads
               }));
 
-            case 10:
+            case 9:
               results = _context5.sent;
               copy = results.find(function (p) {
                 return p.uuid === payloads[0].uuid;
               });
               return _context5.abrupt("return", copy);
 
-            case 13:
+            case 12:
             case "end":
               return _context5.stop();
           }
@@ -16240,67 +16411,50 @@ function () {
   }, {
     key: "addItem",
     value: function addItem(item) {
-      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      this.addItems([item], globalOnly);
+      var globalOnly,
+          _args6 = arguments;
+      return regeneratorRuntime.async(function addItem$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              globalOnly = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : false;
+              return _context6.abrupt("return", this.addItems([item], globalOnly));
+
+            case 2:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "addItems",
     value: function addItems(items) {
-      var globalOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var _iteratorNormalCompletion7 = true;
-      var _didIteratorError7 = false;
-      var _iteratorError7 = undefined;
+      var globalOnly,
+          payloads,
+          _args7 = arguments;
+      return regeneratorRuntime.async(function addItems$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              globalOnly = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : false;
+              console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
+              payloads = items.map(function (item) {
+                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
+                  object: item
+                });
+              });
+              _context7.next = 5;
+              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
+                payloads: payloads
+              }));
 
-      try {
-        for (var _iterator7 = items[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-          var item = _step7.value;
-
-          if (this.itemsHash[item.uuid]) {
-            continue;
-          }
-
-          this.itemsHash[item.uuid] = item;
-          this.items.push(item);
-          /**
-          * In some cases, you just want to add the item to this.items, and not to the individual arrays
-          * This applies when you want to keep an item syncable, but not display it via the individual arrays
-          */
-
-          if (globalOnly) {
-            continue;
-          }
-
-          if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
-            this.itemsKeys.unshift(item);
-          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"]) {
-            var index = lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_1___default()(this.tags, item, function (item) {
-              if (item.title) {
-                return item.title.toLowerCase();
-              } else {
-                return '';
-              }
-            });
-            this.tags.splice(index, 0, item);
-          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"]) {
-            this.notes.unshift(item);
-          } else if (item.content_type == 'SN|Component') {
-            this.components.unshift(item);
+            case 5:
+            case "end":
+              return _context7.stop();
           }
         }
-      } catch (err) {
-        _didIteratorError7 = true;
-        _iteratorError7 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-            _iterator7.return();
-          }
-        } finally {
-          if (_didIteratorError7) {
-            throw _iteratorError7;
-          }
-        }
-      }
+      }, null, this);
     }
     /* Notifies observers when an item has been synced or mapped from a remote response */
 
@@ -16469,9 +16623,9 @@ function () {
   }, {
     key: "removeItemLocally",
     value: function removeItemLocally(item) {
-      return regeneratorRuntime.async(function removeItemLocally$(_context6) {
+      return regeneratorRuntime.async(function removeItemLocally$(_context8) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.items, {
                 uuid: item.uuid
@@ -16482,7 +16636,7 @@ function () {
 
             case 4:
             case "end":
-              return _context6.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -16512,12 +16666,12 @@ function () {
     key: "alternateUUIDForItem",
     value: function alternateUUIDForItem(item) {
       var payload, results, mapped;
-      return regeneratorRuntime.async(function alternateUUIDForItem$(_context7) {
+      return regeneratorRuntime.async(function alternateUUIDForItem$(_context9) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               if (item.isItem) {
-                _context7.next = 2;
+                _context9.next = 2;
                 break;
               }
 
@@ -16527,26 +16681,26 @@ function () {
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                 object: item
               });
-              _context7.next = 5;
+              _context9.next = 5;
               return regeneratorRuntime.awrap(payload.payloadsByAlternatingUuid({
                 masterCollection: this.getMasterCollection()
               }));
 
             case 5:
-              results = _context7.sent;
-              _context7.next = 8;
+              results = _context9.sent;
+              _context9.next = 8;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: results,
                 source: MAPPING_SOURCE_LOCAL_SAVED
               }));
 
             case 8:
-              mapped = _context7.sent;
-              return _context7.abrupt("return", mapped[0]);
+              mapped = _context9.sent;
+              return _context9.abrupt("return", mapped[0]);
 
             case 10:
             case "end":
-              return _context7.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -16666,124 +16820,166 @@ function () {
   }, {
     key: "importItemsFromRaw",
     value: function importItemsFromRaw(rawPayloads) {
-      var payloadsToMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, rawPayloadData, payload, currentPayload, contentDiffers, resultingPayloads, items, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, item;
+      var _this3 = this;
 
-      return regeneratorRuntime.async(function importItemsFromRaw$(_context8) {
+      var payloadsToMap, newCopyIds, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _loop2, _iterator13, _step13, _ret, items, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, item;
+
+      return regeneratorRuntime.async(function importItemsFromRaw$(_context11) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               payloadsToMap = [];
+              newCopyIds = [];
               _iteratorNormalCompletion13 = true;
               _didIteratorError13 = false;
               _iteratorError13 = undefined;
-              _context8.prev = 4;
+              _context11.prev = 5;
+
+              _loop2 = function _loop2() {
+                var rawPayloadData, payload, currentPayload, contentDiffers, resultingPayloads;
+                return regeneratorRuntime.async(function _loop2$(_context10) {
+                  while (1) {
+                    switch (_context10.prev = _context10.next) {
+                      case 0:
+                        rawPayloadData = _step13.value;
+
+                        if (!rawPayloadData.deleted) {
+                          _context10.next = 3;
+                          break;
+                        }
+
+                        return _context10.abrupt("return", "continue");
+
+                      case 3:
+                        payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
+                          object: rawPayloadData,
+                          source: MAPPING_SOURCE_FILE_IMPORT
+                        });
+                        /**
+                         * Check to see if we've already processed a payload for this id.
+                         * If so, that would be the latest value, and not what's in the MC.
+                         */
+
+                        currentPayload = payloadsToMap.find(function (candidate) {
+                          return candidate.uuid === payload.uuid || candidate.content.conflict_of === payload.uuid;
+                        });
+
+                        if (!currentPayload) {
+                          currentPayload = _this3.masterCollection.findPayload(payload.uuid);
+                        }
+
+                        if (!(currentPayload && !currentPayload.errorDecrypting)) {
+                          _context10.next = 16;
+                          break;
+                        }
+
+                        contentDiffers = !currentPayload.compareContentFields(payload);
+
+                        if (!contentDiffers) {
+                          _context10.next = 14;
+                          break;
+                        }
+
+                        _context10.next = 11;
+                        return regeneratorRuntime.awrap(payload.payloadsByCopying({
+                          isConflict: true,
+                          masterCollection: _this3.masterCollection
+                        }));
+
+                      case 11:
+                        resultingPayloads = _context10.sent;
+                        newCopyIds.push(resultingPayloads[0].uuid);
+                        extendArray(payloadsToMap, resultingPayloads);
+
+                      case 14:
+                        _context10.next = 18;
+                        break;
+
+                      case 16:
+                        newCopyIds.push(payload.uuid);
+                        payloadsToMap.push(payload);
+
+                      case 18:
+                      case "end":
+                        return _context10.stop();
+                    }
+                  }
+                });
+              };
+
               _iterator13 = rawPayloads[Symbol.iterator]();
 
-            case 6:
+            case 8:
               if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                _context8.next = 27;
+                _context11.next = 17;
                 break;
               }
 
-              rawPayloadData = _step13.value;
+              _context11.next = 11;
+              return regeneratorRuntime.awrap(_loop2());
 
-              if (!rawPayloadData.deleted) {
-                _context8.next = 10;
+            case 11:
+              _ret = _context11.sent;
+
+              if (!(_ret === "continue")) {
+                _context11.next = 14;
                 break;
               }
 
-              return _context8.abrupt("continue", 24);
+              return _context11.abrupt("continue", 14);
 
-            case 10:
-              payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
-                object: rawPayloadData,
-                source: MAPPING_SOURCE_FILE_IMPORT
-              });
-              currentPayload = this.masterCollection.findPayload(payload.uuid);
-              console.log("currentPayload", currentPayload);
+            case 14:
+              _iteratorNormalCompletion13 = true;
+              _context11.next = 8;
+              break;
 
-              if (!(currentPayload && !currentPayload.errorDecrypting)) {
-                _context8.next = 23;
-                break;
-              }
-
-              contentDiffers = !currentPayload.compareContentFields(payload);
-
-              if (!contentDiffers) {
-                _context8.next = 21;
-                break;
-              }
-
-              console.log("content differs");
-              _context8.next = 19;
-              return regeneratorRuntime.awrap(payload.payloadsByCopying({
-                isConflict: true,
-                masterCollection: this.masterCollection
-              }));
+            case 17:
+              _context11.next = 23;
+              break;
 
             case 19:
-              resultingPayloads = _context8.sent;
-              extendArray(payloadsToMap, resultingPayloads);
-
-            case 21:
-              _context8.next = 24;
-              break;
+              _context11.prev = 19;
+              _context11.t0 = _context11["catch"](5);
+              _didIteratorError13 = true;
+              _iteratorError13 = _context11.t0;
 
             case 23:
-              payloadsToMap.push(payload);
-
-            case 24:
-              _iteratorNormalCompletion13 = true;
-              _context8.next = 6;
-              break;
-
-            case 27:
-              _context8.next = 33;
-              break;
-
-            case 29:
-              _context8.prev = 29;
-              _context8.t0 = _context8["catch"](4);
-              _didIteratorError13 = true;
-              _iteratorError13 = _context8.t0;
-
-            case 33:
-              _context8.prev = 33;
-              _context8.prev = 34;
+              _context11.prev = 23;
+              _context11.prev = 24;
 
               if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
                 _iterator13.return();
               }
 
-            case 36:
-              _context8.prev = 36;
+            case 26:
+              _context11.prev = 26;
 
               if (!_didIteratorError13) {
-                _context8.next = 39;
+                _context11.next = 29;
                 break;
               }
 
               throw _iteratorError13;
 
-            case 39:
-              return _context8.finish(36);
+            case 29:
+              return _context11.finish(26);
 
-            case 40:
-              return _context8.finish(33);
+            case 30:
+              return _context11.finish(23);
 
-            case 41:
-              _context8.next = 43;
+            case 31:
+              _context11.next = 33;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: payloadsToMap,
                 source: MAPPING_SOURCE_FILE_IMPORT
               }));
 
-            case 43:
-              items = _context8.sent;
+            case 33:
+              items = _context11.sent;
               _iteratorNormalCompletion14 = true;
               _didIteratorError14 = false;
               _iteratorError14 = undefined;
-              _context8.prev = 47;
+              _context11.prev = 37;
 
               for (_iterator14 = items[Symbol.iterator](); !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
                 item = _step14.value;
@@ -16791,61 +16987,63 @@ function () {
                 item.deleted = false;
               }
 
-              _context8.next = 55;
+              _context11.next = 45;
               break;
 
-            case 51:
-              _context8.prev = 51;
-              _context8.t1 = _context8["catch"](47);
+            case 41:
+              _context11.prev = 41;
+              _context11.t1 = _context11["catch"](37);
               _didIteratorError14 = true;
-              _iteratorError14 = _context8.t1;
+              _iteratorError14 = _context11.t1;
 
-            case 55:
-              _context8.prev = 55;
-              _context8.prev = 56;
+            case 45:
+              _context11.prev = 45;
+              _context11.prev = 46;
 
               if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
                 _iterator14.return();
               }
 
-            case 58:
-              _context8.prev = 58;
+            case 48:
+              _context11.prev = 48;
 
               if (!_didIteratorError14) {
-                _context8.next = 61;
+                _context11.next = 51;
                 break;
               }
 
               throw _iteratorError14;
 
-            case 61:
-              return _context8.finish(58);
+            case 51:
+              return _context11.finish(48);
 
-            case 62:
-              return _context8.finish(55);
+            case 52:
+              return _context11.finish(45);
 
-            case 63:
-              return _context8.abrupt("return", items);
+            case 53:
+              return _context11.abrupt("return", items.filter(function (item) {
+                return newCopyIds.includes(item.uuid);
+              }));
 
-            case 64:
+            case 54:
             case "end":
-              return _context8.stop();
+              return _context11.stop();
           }
         }
-      }, null, this, [[4, 29, 33, 41], [34,, 36, 40], [47, 51, 55, 63], [56,, 58, 62]]);
+      }, null, this, [[5, 19, 23, 31], [24,, 26, 30], [37, 41, 45, 53], [46,, 48, 52]]);
     }
   }, {
     key: "getAllItemsJSONData",
     value: function getAllItemsJSONData(keyParams, returnNullIfEmpty) {
-      return regeneratorRuntime.async(function getAllItemsJSONData$(_context9) {
+      return regeneratorRuntime.async(function getAllItemsJSONData$(_context12) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
-              return _context9.abrupt("return", this.getJSONDataForItems(this.allItems, keyParams, returnNullIfEmpty));
+              return _context12.abrupt("return", this.getJSONDataForItems(this.allItems, keyParams, returnNullIfEmpty));
 
             case 1:
             case "end":
-              return _context9.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -16854,12 +17052,12 @@ function () {
     key: "getJSONDataForItems",
     value: function getJSONDataForItems(items, keyParams, returnNullIfEmpty) {
       var intent;
-      return regeneratorRuntime.async(function getJSONDataForItems$(_context10) {
+      return regeneratorRuntime.async(function getJSONDataForItems$(_context13) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__["ENCRYPTION_INTENT_FILE_DECRYPTED"];
-              return _context10.abrupt("return", Promise.all(items.map(function (item) {
+              return _context13.abrupt("return", Promise.all(items.map(function (item) {
                 var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                   object: item
                 });
@@ -16887,7 +17085,7 @@ function () {
 
             case 2:
             case "end":
-              return _context10.stop();
+              return _context13.stop();
           }
         }
       });
@@ -19219,12 +19417,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AccountSyncResponseResolver", function() { return AccountSyncResponseResolver; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
+/* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -19249,7 +19449,7 @@ function () {
   _createClass(AccountSyncResponseResolver, [{
     key: "run",
     value: function run() {
-      var allPayloads, processedRetrieved, processedSavedItems, processedConflicts, finalProcessed;
+      var allPayloads, processedRetrieved, processedSaved, processedConflicts;
       return regeneratorRuntime.async(function run$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -19265,8 +19465,8 @@ function () {
               return regeneratorRuntime.awrap(this.processSavedItems());
 
             case 7:
-              processedSavedItems = _context.sent;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedSavedItems);
+              processedSaved = _context.sent;
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedSaved);
               _context.next = 11;
               return regeneratorRuntime.awrap(this.processConflictedItems());
 
@@ -19274,14 +19474,9 @@ function () {
               processedConflicts = _context.sent;
               Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedConflicts);
               this.handledConflicts = processedConflicts;
-              _context.next = 16;
-              return regeneratorRuntime.awrap(this.processAllPayloadDirtyStatus(allPayloads));
+              return _context.abrupt("return", allPayloads);
 
-            case 16:
-              finalProcessed = _context.sent;
-              return _context.abrupt("return", finalProcessed);
-
-            case 18:
+            case 15:
             case "end":
               return _context.stop();
           }
@@ -19289,77 +19484,13 @@ function () {
       }, null, this);
     }
   }, {
-    key: "processAllPayloadDirtyStatus",
-    value: function processAllPayloadDirtyStatus(allPayloads) {
-      var resultPayloads, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, currentItemPayload, stillDirty, result;
+    key: "finalDirtyStateForId",
+    value: function finalDirtyStateForId(id) {
+      var currentItemPayload = this.findCurrentItemPayload(id);
+      /** currentItemPayload can be null in the case of new items that haven't yet been mapped */
 
-      return regeneratorRuntime.async(function processAllPayloadDirtyStatus$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              resultPayloads = [];
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context2.prev = 4;
-
-              for (_iterator = allPayloads[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                payload = _step.value;
-                currentItemPayload = this.findCurrentItemPayload(payload.uuid);
-                /** currentItemPayload can be null in the case of new items that haven't yet been mapped */
-
-                stillDirty = currentItemPayload ? currentItemPayload.dirtyCount > 0 : false;
-                result = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
-                  object: payload,
-                  override: {
-                    dirty: stillDirty
-                  }
-                });
-                resultPayloads.push(result);
-              }
-
-              _context2.next = 12;
-              break;
-
-            case 8:
-              _context2.prev = 8;
-              _context2.t0 = _context2["catch"](4);
-              _didIteratorError = true;
-              _iteratorError = _context2.t0;
-
-            case 12:
-              _context2.prev = 12;
-              _context2.prev = 13;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 15:
-              _context2.prev = 15;
-
-              if (!_didIteratorError) {
-                _context2.next = 18;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 18:
-              return _context2.finish(15);
-
-            case 19:
-              return _context2.finish(12);
-
-            case 20:
-              return _context2.abrupt("return", resultPayloads);
-
-            case 21:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+      var stillDirty = currentItemPayload ? currentItemPayload.dirtyCount > 0 : false;
+      return stillDirty;
     }
   }, {
     key: "processRetrievedItems",
@@ -19368,16 +19499,22 @@ function () {
 
       var conflictedRetrievedPayloads, filteredRetrieved, conflicts, _i, _conflictedRetrievedP, potentialConflict, decryptedServerPayload, currentPayloadValue, copy;
 
-      return regeneratorRuntime.async(function processRetrievedItems$(_context3) {
+      return regeneratorRuntime.async(function processRetrievedItems$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
               /**
                * If we have retrieved an item that was saved as part of this ongoing sync operation,
                * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
                */
               conflictedRetrievedPayloads = [];
-              filteredRetrieved = this.response.rawRetrievedItems.filter(function (retrievedPayload) {
+              filteredRetrieved = this.response.rawRetrievedItems.filter(function (retrievedItem) {
+                var decrypted = _this.findDecryptedPayload(retrievedItem.uuid);
+
+                var retrievedPayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
+                  object: decrypted,
+                  source: MAPPING_SOURCE_REMOTE_RETRIEVED
+                });
                 var savedOrSaving = findInArray(_this.payloadsSavedOrSaving, 'uuid', retrievedPayload.uuid);
 
                 if (savedOrSaving) {
@@ -19405,7 +19542,7 @@ function () {
 
             case 4:
               if (!(_i < _conflictedRetrievedP.length)) {
-                _context3.next = 18;
+                _context2.next = 18;
                 break;
               }
 
@@ -19414,38 +19551,38 @@ function () {
               currentPayloadValue = this.findCurrentItemPayload(potentialConflict.uuid);
 
               if (!(!currentPayloadValue || !decryptedServerPayload.content)) {
-                _context3.next = 10;
+                _context2.next = 10;
                 break;
               }
 
-              return _context3.abrupt("continue", 15);
+              return _context2.abrupt("continue", 15);
 
             case 10:
               if (currentPayloadValue.compareContentFields(decryptedServerPayload)) {
-                _context3.next = 15;
+                _context2.next = 15;
                 break;
               }
 
-              _context3.next = 13;
+              _context2.next = 13;
               return regeneratorRuntime.awrap(decryptedServerPayload.payloadsByCopying({
                 isConflict: true
               }));
 
             case 13:
-              copy = _context3.sent;
+              copy = _context2.sent;
               conflicts.push(copy);
 
             case 15:
               _i++;
-              _context3.next = 4;
+              _context2.next = 4;
               break;
 
             case 18:
-              return _context3.abrupt("return", filteredRetrieved.concat(conflicts));
+              return _context2.abrupt("return", filteredRetrieved.concat(conflicts));
 
             case 19:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
       }, null, this);
@@ -19455,13 +19592,11 @@ function () {
     value: function processSavedItems() {
       var _this2 = this;
 
-      var omitFields, saved_items, processed;
-      return regeneratorRuntime.async(function processSavedItems$(_context4) {
+      var saved_items, processed;
+      return regeneratorRuntime.async(function processSavedItems$(_context3) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              /** Merge only metadata for saved items */
-              omitFields = [_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_2__["ITEM_PAYLOAD_CONTENT"], _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_2__["ITEM_PAYLOAD_LEGACY_003_AUTH_HASH"]];
               saved_items = this.response.rawSavedItems;
               processed = saved_items.map(function (serverPayload) {
                 var decrypted = _this2.findDecryptedPayload(serverPayload.uuid);
@@ -19472,14 +19607,14 @@ function () {
 
                 return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
                   object: decrypted,
-                  omit: omitFields
+                  source: _Lib_sources__WEBPACK_IMPORTED_MODULE_2__["MAPPING_SOURCE_REMOTE_SAVED"]
                 });
               });
-              return _context4.abrupt("return", processed);
+              return _context3.abrupt("return", processed);
 
-            case 4:
+            case 3:
             case "end":
-              return _context4.stop();
+              return _context3.stop();
           }
         }
       }, null, this);
@@ -19487,84 +19622,84 @@ function () {
   }, {
     key: "processConflictedItems",
     value: function processConflictedItems() {
-      var conflicts, results, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, conflict, resolver, payloads;
+      var conflicts, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, conflict, resolver, payloads;
 
-      return regeneratorRuntime.async(function processConflictedItems$(_context5) {
+      return regeneratorRuntime.async(function processConflictedItems$(_context4) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               conflicts = this.response.rawConflictObjects;
               results = [];
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context5.prev = 5;
-              _iterator2 = conflicts[Symbol.iterator]();
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context4.prev = 5;
+              _iterator = conflicts[Symbol.iterator]();
 
             case 7:
-              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context5.next = 17;
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context4.next = 17;
                 break;
               }
 
-              conflict = _step2.value;
+              conflict = _step.value;
               resolver = new AccountSyncConflictResolver({
                 conflict: conflict,
                 decryptedResponsePayloads: this.decryptedResponsePayloads,
                 masterCollection: this.masterCollection
               });
-              _context5.next = 12;
+              _context4.next = 12;
               return regeneratorRuntime.awrap(resolve.run());
 
             case 12:
-              payloads = _context5.sent;
+              payloads = _context4.sent;
               Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(results, payloads);
 
             case 14:
-              _iteratorNormalCompletion2 = true;
-              _context5.next = 7;
+              _iteratorNormalCompletion = true;
+              _context4.next = 7;
               break;
 
             case 17:
-              _context5.next = 23;
+              _context4.next = 23;
               break;
 
             case 19:
-              _context5.prev = 19;
-              _context5.t0 = _context5["catch"](5);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context5.t0;
+              _context4.prev = 19;
+              _context4.t0 = _context4["catch"](5);
+              _didIteratorError = true;
+              _iteratorError = _context4.t0;
 
             case 23:
-              _context5.prev = 23;
-              _context5.prev = 24;
+              _context4.prev = 23;
+              _context4.prev = 24;
 
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
               }
 
             case 26:
-              _context5.prev = 26;
+              _context4.prev = 26;
 
-              if (!_didIteratorError2) {
-                _context5.next = 29;
+              if (!_didIteratorError) {
+                _context4.next = 29;
                 break;
               }
 
-              throw _iteratorError2;
+              throw _iteratorError;
 
             case 29:
-              return _context5.finish(26);
+              return _context4.finish(26);
 
             case 30:
-              return _context5.finish(23);
+              return _context4.finish(23);
 
             case 31:
-              return _context5.abrupt("return", results);
+              return _context4.abrupt("return", results);
 
             case 32:
             case "end":
-              return _context5.stop();
+              return _context4.stop();
           }
         }
       }, null, this, [[5, 19, 23, 31], [24,, 26, 30]]);
@@ -21542,7 +21677,7 @@ var MAPPING_SOURCE_FILE_IMPORT = 'MappingSourceFileImport';
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isNullOrUndefined, isString, extendArray, subtractFromArray, arrayByDifference, removeFromIndex, omitInPlace, omitByCopy, isObject, deepMerge, pickByCopy, deepFreeze, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isNullOrUndefined, isString, extendArray, subtractFromArray, arrayByDifference, removeFromIndex, omitInPlace, omitByCopy, isObject, deepMerge, Copy, deepMergeByCopy, pickByCopy, deepFreeze, hasGetter, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -21560,8 +21695,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return deepMerge; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return Copy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepMergeByCopy", function() { return deepMergeByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pickByCopy", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepFreeze", function() { return deepFreeze; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasGetter", function() { return hasGetter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sleep", function() { return sleep; });
 /* harmony import */ var lodash_isArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/isArray */ "./node_modules/lodash/isArray.js");
 /* harmony import */ var lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_isArray__WEBPACK_IMPORTED_MODULE_0__);
@@ -21687,6 +21825,8 @@ function omitInPlace(object, keys) {
 
   return object;
 }
+/** Creates a new object by omitting `fields` from `object` */
+
 function omitByCopy(object, fields) {
   var newObject = Object.assign({}, object);
   /**
@@ -21733,8 +21873,21 @@ function deepMerge(a, b) {
     throw 'Attempting to deepMerge with null values';
   }
 
-  if (!isObject(a) || !isObject(b)) {
-    throw 'Attempting to deepMerge with non-object values';
+  function mergeCopyArrays(objValue, srcValue) {
+    if (lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default()(objValue)) {
+      return srcValue;
+    }
+  }
+
+  lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default()(a, b, mergeCopyArrays);
+  return a;
+}
+function Copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+function deepMergeByCopy(a, b) {
+  if (!a || !b) {
+    throw 'Attempting to deepMergeByCopy with null values';
   }
 
   function mergeCopyArrays(objValue, srcValue) {
@@ -21743,6 +21896,7 @@ function deepMerge(a, b) {
     }
   }
 
+  b = Copy(b);
   lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default()(a, b, mergeCopyArrays);
   return a;
 }
@@ -21774,7 +21928,7 @@ function pickByCopy(object, keys) {
     }
   }
 
-  return JSON.parse(JSON.stringify(result));
+  return Copy(result);
 }
 function deepFreeze(object) {
   // Retrieve the property names defined on object
@@ -21806,6 +21960,10 @@ function deepFreeze(object) {
   }
 
   return Object.freeze(object);
+}
+function hasGetter(object, property) {
+  var descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(object), property);
+  return descriptor && !isNullOrUndefined(descriptor.get);
 }
 function sleep(milliseconds) {
   return regeneratorRuntime.async(function sleep$(_context) {
@@ -24060,78 +24218,6 @@ module.exports = baseMergeDeep;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_basePick.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_basePick.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var basePickBy = __webpack_require__(/*! ./_basePickBy */ "./node_modules/lodash/_basePickBy.js"),
-    hasIn = __webpack_require__(/*! ./hasIn */ "./node_modules/lodash/hasIn.js");
-/**
- * The base implementation of `_.pick` without support for individual
- * property identifiers.
- *
- * @private
- * @param {Object} object The source object.
- * @param {string[]} paths The property paths to pick.
- * @returns {Object} Returns the new object.
- */
-
-
-function basePick(object, paths) {
-  return basePickBy(object, paths, function (value, path) {
-    return hasIn(object, path);
-  });
-}
-
-module.exports = basePick;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_basePickBy.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_basePickBy.js ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/lodash/_baseGet.js"),
-    baseSet = __webpack_require__(/*! ./_baseSet */ "./node_modules/lodash/_baseSet.js"),
-    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js");
-/**
- * The base implementation of  `_.pickBy` without support for iteratee shorthands.
- *
- * @private
- * @param {Object} object The source object.
- * @param {string[]} paths The property paths to pick.
- * @param {Function} predicate The function invoked per property.
- * @returns {Object} Returns the new object.
- */
-
-
-function basePickBy(object, paths, predicate) {
-  var index = -1,
-      length = paths.length,
-      result = {};
-
-  while (++index < length) {
-    var path = paths[index],
-        value = baseGet(object, path);
-
-    if (predicate(value, path)) {
-      baseSet(result, castPath(path, object), value);
-    }
-  }
-
-  return result;
-}
-
-module.exports = basePickBy;
-
-/***/ }),
-
 /***/ "./node_modules/lodash/_baseProperty.js":
 /*!**********************************************!*\
   !*** ./node_modules/lodash/_baseProperty.js ***!
@@ -24325,65 +24411,6 @@ function baseRest(func, start) {
 }
 
 module.exports = baseRest;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_baseSet.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseSet.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/lodash/_assignValue.js"),
-    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js"),
-    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
-/**
- * The base implementation of `_.set`.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {Array|string} path The path of the property to set.
- * @param {*} value The value to set.
- * @param {Function} [customizer] The function to customize path creation.
- * @returns {Object} Returns `object`.
- */
-
-
-function baseSet(object, path, value, customizer) {
-  if (!isObject(object)) {
-    return object;
-  }
-
-  path = castPath(path, object);
-  var index = -1,
-      length = path.length,
-      lastIndex = length - 1,
-      nested = object;
-
-  while (nested != null && ++index < length) {
-    var key = toKey(path[index]),
-        newValue = value;
-
-    if (index != lastIndex) {
-      var objValue = nested[key];
-      newValue = customizer ? customizer(objValue, key, nested) : undefined;
-
-      if (newValue === undefined) {
-        newValue = isObject(objValue) ? objValue : isIndex(path[index + 1]) ? [] : {};
-      }
-    }
-
-    assignValue(nested, key, newValue);
-    nested = nested[key];
-  }
-
-  return object;
-}
-
-module.exports = baseSet;
 
 /***/ }),
 
@@ -29395,41 +29422,6 @@ var omit = flatRest(function (object, paths) {
   return result;
 });
 module.exports = omit;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/pick.js":
-/*!*************************************!*\
-  !*** ./node_modules/lodash/pick.js ***!
-  \*************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var basePick = __webpack_require__(/*! ./_basePick */ "./node_modules/lodash/_basePick.js"),
-    flatRest = __webpack_require__(/*! ./_flatRest */ "./node_modules/lodash/_flatRest.js");
-/**
- * Creates an object composed of the picked `object` properties.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The source object.
- * @param {...(string|string[])} [paths] The property paths to pick.
- * @returns {Object} Returns the new object.
- * @example
- *
- * var object = { 'a': 1, 'b': '2', 'c': 3 };
- *
- * _.pick(object, ['a', 'c']);
- * // => { 'a': 1, 'c': 3 }
- */
-
-
-var pick = flatRest(function (object, paths) {
-  return object == null ? {} : basePick(object, paths);
-});
-module.exports = pick;
 
 /***/ }),
 

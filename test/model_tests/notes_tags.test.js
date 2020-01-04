@@ -4,7 +4,7 @@ import '../../node_modules/chai/chai.js';
 import './../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe("notes and tags", () => {
 
@@ -44,15 +44,22 @@ describe("notes and tags", () => {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    tagPayload.content.references = null;
-    notePayload.content.references = [
-      {
-        uuid: tagPayload.uuid,
-        content_type: tagPayload.content_type
-      }
-    ];
 
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    const mutatedTag = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {content: {references: null}}
+    })
+    const mutatedNote = CreatePayloadFromAnyObject({
+      object: notePayload,
+      override: {content: {references: [
+        {
+          uuid: tagPayload.uuid,
+          content_type: tagPayload.content_type
+        }
+      ]}}
+    })
+
+    modelManager.mapPayloadsToLocalItems({payloads: [mutatedNote, mutatedTag]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
@@ -110,8 +117,11 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    tagPayload.content.references = [];
-    modelManager.mapPayloadsToLocalItems({payloads: [tagPayload]});
+    const mutatedTag = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {content: {references: []}}
+    })
+    modelManager.mapPayloadsToLocalItems({payloads: [mutatedTag]});
 
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
@@ -168,8 +178,11 @@ describe("notes and tags", () => {
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    tagPayload.content.references = [];
-    modelManager.mapPayloadsToLocalItems({payloads: [tagPayload]});
+    const mutatedTag = CreatePayloadFromAnyObject({
+      object: tagPayload,
+      override: {content: {references: []}}
+    })
+    modelManager.mapPayloadsToLocalItems({payloads: [mutatedTag]});
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -200,7 +213,7 @@ describe("notes and tags", () => {
 
     const changedTagPayload = CreatePayloadFromAnyObject({
       object: tagPayload,
-      omit: ['content']
+      source: MAPPING_SOURCE_REMOTE_SAVED
     })
 
     // simulate a save, which omits `content`
@@ -252,7 +265,6 @@ describe("notes and tags", () => {
       item: tag,
       isConflict: true
     });
-    console.log(duplicateTag);
 
     expect(tag.uuid).to.not.equal(duplicateTag.uuid);
 
@@ -314,99 +326,16 @@ describe("notes and tags", () => {
     expect(tag.notes.length).to.equal(0);
   });
 
-  it('importing existing data should keep relationships valid', async () => {
-    const modelManager = await createModelManager();
-
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    const notePayload = pair[0];
-    const tagPayload = pair[1];
-
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
-
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.notes.length).to.equal(1);
-
-    expect(note.content.references.length).to.equal(0);
-    expect(note.tags.length).to.equal(1);
-
-    modelManager.importItemsFromRaw([notePayload, tagPayload]);
-
-    expect(modelManager.allItems.length).to.equal(2);
-
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.notes.length).to.equal(1);
-
-    expect(note.content.references.length).to.equal(0);
-    expect(note.referencingItemsCount).to.equal(1);
-    expect(note.tags.length).to.equal(1);
-  });
-
-  it('modifying payload content should not modify item content', async () => {
+  it('modifying item content should not modify payload content', async () => {
     const modelManager = await createModelManager();
     const notePayload = Factory.createNotePayload();
     modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.content === notePayload.content).to.equal(false);
     /** Items transfer payload values on update, so these should be equal */
-    expect(note.content.references === notePayload.content.references).to.equal(true);
-    notePayload.content.title = Math.random();
+    expect(note.content.references === notePayload.content.references).to.equal(false);
+    note.content.title = Math.random();
     expect(note.content.title).to.not.equal(notePayload.content.title);
-  });
-
-  it('importing data with differing content should create duplicates', async () => {
-    const modelManager = await createModelManager();
-
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    const notePayload = pair[0];
-    const tagPayload = pair[1];
-
-    modelManager.mapPayloadsToLocalItems({payloads: pair});
-    const note = modelManager.notes[0];
-    const tag = modelManager.tags[0];
-
-    const mutatedNote = CreatePayloadFromAnyObject({
-      object: notePayload,
-      override: {
-        content: {
-          title: `${Math.random()}`
-        }
-      }
-    });
-
-    const mutatedTag = CreatePayloadFromAnyObject({
-      object: tagPayload,
-      override: {
-        content: {
-          title: `${Math.random()}`
-        }
-      }
-    });
-
-    const imported = await modelManager.importItemsFromRaw([mutatedNote, mutatedTag]);
-
-    expect(modelManager.allItems.length).to.equal(4);
-
-    const newNote = imported[0];
-    const newTag = imported[1];
-
-    expect(newNote.uuid).to.not.equal(note.uuid);
-    expect(newTag.uuid).to.not.equal(tag.uuid);
-
-    expect(tag.content.references.length).to.equal(2);
-    expect(tag.notes.length).to.equal(2);
-
-    expect(note.content.references.length).to.equal(0);
-    expect(note.referencingItemsCount).to.equal(2);
-    expect(note.tags.length).to.equal(2);
-
-    expect(newTag.content.references.length).to.equal(2);
-    expect(newTag.notes.length).to.equal(2);
-
-    expect(newNote.content.references.length).to.equal(0);
-    expect(newNote.referencingItemsCount).to.equal(2);
-    expect(newNote.tags.length).to.equal(2);
   });
 
   it('deleting a tag from a note with bi-directional relationship', async () => {
@@ -420,12 +349,15 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    notePayload.content.references = [{
-      content_type: tagPayload.content_type,
-      uuid: tagPayload.uuid
-    }]
+    const mutatedPayload = CreatePayloadFromAnyObject({
+      object: notePayload,
+      override: { content: { references: [{
+        content_type: tagPayload.content_type,
+        uuid: tagPayload.uuid
+      }] } }
+    })
 
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    modelManager.mapPayloadsToLocalItems({payloads: [mutatedPayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 

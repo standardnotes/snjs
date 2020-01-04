@@ -108,17 +108,17 @@ describe("items", () => {
     item1.content.foo = "bar";
     expect(item1.content.foo).to.equal("bar");
 
-    item1.keysToIgnoreWhenCheckingContentEquality = () => {
+    item1.contentKeysToIgnoreWhenCheckingEquality = () => {
       return ["foo"];
     }
 
-    item2.keysToIgnoreWhenCheckingContentEquality = () => {
+    item2.contentKeysToIgnoreWhenCheckingEquality = () => {
       return ["foo"];
     }
 
     // calling isItemContentEqualWith should not have side effects
     // There was an issue where calling that function would modify values directly to omit keys
-    // in keysToIgnoreWhenCheckingContentEquality.
+    // in contentKeysToIgnoreWhenCheckingEquality.
 
     modelManager.setItemsDirty([item1, item2], true);
 

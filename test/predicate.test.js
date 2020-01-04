@@ -173,9 +173,12 @@ describe("predicates", () => {
     expect(item.satisfiesPredicate(JSON.parse('["archived", "=", false]'))).to.equal(false);
   })
 
-  it('model manager predicate matching', function () {
-    let modelManager = this.application.modelManager;
-    let item1 = createItem();
+  it('model manager predicate matching', async function () {
+    const modelManager = this.application.modelManager;
+    const payload1 = CreatePayloadFromAnyObject({object: createItemParams()});
+    const item1 = (await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload1]
+    }))[0];
     item1.updated_at = new Date();
 
     modelManager.addItem(item1);
@@ -235,9 +238,13 @@ describe("predicates", () => {
     expect(modelManager.itemsMatchingPredicates([predicate1, predicate2]).length).to.equal(1);
 
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.title", "startsWith", "H")).length).to.equal(1);
+  });
 
+  it('model manager predicate matching 2', async function () {
+    const modelManager = this.application.modelManager;
     const payload = CreatePayloadFromAnyObject({
       object: {
+        uuid: SFItem.GenerateUuidSynchronously(),
         content_type: "Item",
         content: {
           tags: [
@@ -254,14 +261,13 @@ describe("predicates", () => {
       }
     })
 
-    const item2 = new SFItem(payload);
-    modelManager.addItem(item2);
+    const item2 = (await modelManager.mapPayloadsToLocalItems({payloads: [payload]}))[0];
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "includes", "bar"])).length).to.equal(2);
+    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "includes", "bar"])).length).to.equal(1);
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "in", ["sobar"]])).length).to.equal(1);
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "in", ["sobar", "foo"]])).length).to.equal(2);
+    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", ["title", "in", ["sobar", "foo"]])).length).to.equal(1);
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", new SFPredicate("title", "startsWith", "f"))).length).to.equal(2);
+    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", new SFPredicate("title", "startsWith", "f"))).length).to.equal(1);
 
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("archived", "=", true)).length).to.equal(0);
     var contentPred = new SFPredicate("content_type", "=", "Item");
@@ -281,8 +287,8 @@ describe("predicates", () => {
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("pinned", "=", false)).length).to.equal(1);
   })
 
-  it("regex", function () {
-    var item = createItem();
+  it("regex", async function () {
+    const item = createItem();
     item.content.title = "123";
     let modelManager = this.application.modelManager;
     item.setDirty(true);
@@ -292,6 +298,7 @@ describe("predicates", () => {
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = "abc";
+    await modelManager.mapPayloadsToLocalItems({payloads: [CreatePayloadFromAnyObject({object: item})]})
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   })
 })
