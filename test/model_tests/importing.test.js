@@ -13,6 +13,10 @@ describe("importing", () => {
     return isolatedApplication.modelManager;
   }
 
+  beforeEach(async function() {
+    this.application = await Factory.createInitAppWithRandNamespace();
+  })
+
   it('importing existing data should keep relationships valid', async () => {
     const modelManager = await createModelManager();
 
@@ -51,14 +55,14 @@ describe("importing", () => {
       object: notePayload,
       override: { content: { title: `${Math.random()}` } }
     });
-    const imported = await modelManager.importItemsFromRaw([
+    await modelManager.importItemsFromRaw([
       mutatedNote,
       mutatedNote,
       mutatedNote
     ]);
-    expect(imported.length).to.equal(1);
     expect(modelManager.notes.length).to.equal(2);
-    expect(imported[0].content.title).to.equal(mutatedNote.content.title);
+    const imported = modelManager.notes.find((n) => n.uuid !== notePayload.uuid);
+    expect(imported.content.title).to.equal(mutatedNote.content.title);
   });
 
   it('importing a tag with lesser references should create a duplicate', async () => {
@@ -74,13 +78,13 @@ describe("importing", () => {
       object: tagPayload,
       override: { content: { references: [] } }
     });
-    const imported = await modelManager.importItemsFromRaw([
+    await modelManager.importItemsFromRaw([
       mutatedTag
     ]);
-    expect(imported.length).to.equal(1);
     expect(modelManager.tags.length).to.equal(2);
+    const imported = modelManager.tags.find((t) => t.uuid !== tagPayload.uuid);
     expect(modelManager.findItem(tagPayload.uuid).content.references.length).to.equal(1);
-    expect(modelManager.findItem(imported[0].uuid).content.references.length).to.equal(0);
+    expect(modelManager.findItem(imported.uuid).content.references.length).to.equal(0);
   });
 
   it('importing data with differing content should create duplicates', async () => {
@@ -99,14 +103,15 @@ describe("importing", () => {
       object: tagPayload,
       override: { content: { title: `${Math.random()}` } }
     });
-    const imported = await modelManager.importItemsFromRaw([
+    await modelManager.importItemsFromRaw([
       mutatedNote,
       mutatedTag
     ]);
     expect(modelManager.allItems.length).to.equal(4);
 
-    const newNote = imported[0];
-    const newTag = imported[1];
+    const newNote = modelManager.notes.find((n) => n.uuid !== notePayload.uuid);
+    const newTag = modelManager.tags.find((t) => t.uuid !== tagPayload.uuid);
+
     expect(newNote.uuid).to.not.equal(note.uuid);
     expect(newTag.uuid).to.not.equal(tag.uuid);
 
@@ -145,15 +150,26 @@ describe("importing", () => {
     await this.application.saveItem({item: tag});
 
     const externalNote = Object.assign({},
-      {uuid: note.uuid, content: note.getContentCopy(), content_type: note.content_type}
+      {
+        uuid: note.uuid,
+        content: note.getContentCopy(),
+        content_type: note.content_type
+      }
     );
     externalNote.content.text = `${Math.random()}`;
 
     const externalTag = Object.assign({},
-      {uuid: tag.uuid, content: tag.getContentCopy(), content_type: tag.content_type}
+      {
+        uuid: tag.uuid,
+        content: tag.getContentCopy(),
+        content_type: tag.content_type
+      }
     );
 
-    await modelManager.importItemsFromRaw([externalNote, externalTag]);
+    await modelManager.importItemsFromRaw([
+      externalNote,
+      externalTag
+    ]);
 
     // We expect now that the total item count is 3, not 4.
     expect(modelManager.allItems.length).to.equal(3);

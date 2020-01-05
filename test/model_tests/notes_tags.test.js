@@ -213,7 +213,7 @@ describe("notes and tags", () => {
 
     const changedTagPayload = CreatePayloadFromAnyObject({
       object: tagPayload,
-      source: MAPPING_SOURCE_REMOTE_SAVED
+      source: PAYLOAD_SOURCE_REMOTE_SAVED
     })
 
     // simulate a save, which omits `content`

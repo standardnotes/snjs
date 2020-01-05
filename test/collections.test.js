@@ -19,28 +19,20 @@ describe('payload collections', () => {
   })
 
   it('find', async () => {
-    const collection = new SNPayloadCollection();
     const payload = Factory.createStorageItemNotePayload()
-    collection.setPayload(payload);
+    const collection = new PayloadCollection({
+      payloads: [payload]
+    });
     expect(collection.findPayload(payload.uuid)).to.be.ok;
   });
 
-  it('remove', async () => {
-    const collection = new SNPayloadCollection();
-    const payload = Factory.createStorageItemNotePayload()
-    collection.setPayload(payload);
-    collection.removePayload(payload);
-    expect(collection.findPayload(payload.uuid)).to.not.be.ok;
-  });
-
   it('references', async () => {
-    const collection = new SNPayloadCollection();
     const payloads = Factory.createRelatedNoteTagPairPayload();
     const notePayload = payloads[0];
     const tagPayload = payloads[1];
-    collection.setPayload(notePayload);
-    collection.setPayload(tagPayload);
-
+    const collection = new PayloadCollection({
+      payloads: [notePayload, tagPayload]
+    });
     const referencing = collection.payloadsThatReferencePayload(notePayload);
     expect(referencing.length).to.equal(1);
   });

@@ -1856,7 +1856,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, SNPayloadCollection, CreatePayloadFromAnyObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, MAPPING_SOURCE_REMOTE_RETRIEVED, MAPPING_SOURCE_REMOTE_SAVED, MAPPING_SOURCE_LOCAL_SAVED, MAPPING_SOURCE_LOCAL_RETRIEVED, MAPPING_SOURCE_LOCAL_DIRTIED, MAPPING_SOURCE_COMPONENT_RETRIEVED, MAPPING_SOURCE_DESKTOP_INSTALLED, MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED, MAPPING_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT */
+/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreatePayloadFromAnyObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1886,7 +1886,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return _Protocol_payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_7__["SNStorageItemPayload"]; });
 
 /* harmony import */ var _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPayloadCollection", function() { return _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_8__["SNPayloadCollection"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_8__["PayloadCollection"]; });
 
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreatePayloadFromAnyObject"]; });
@@ -2038,24 +2038,24 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTED_STORAGE_CONTENT_TYPE", function() { return _Lib_constants__WEBPACK_IMPORTED_MODULE_45__["ENCRYPTED_STORAGE_CONTENT_TYPE"]; });
 
-/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_RETRIEVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_REMOTE_RETRIEVED"]; });
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_SAVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_REMOTE_SAVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_SAVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_SAVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_LOCAL_SAVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_SAVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_RETRIEVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_LOCAL_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_DIRTIED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_LOCAL_DIRTIED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_DIRTIED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_COMPONENT_RETRIEVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_COMPONENT_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_COMPONENT_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_COMPONENT_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_DESKTOP_INSTALLED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_DESKTOP_INSTALLED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_DESKTOP_INSTALLED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_DESKTOP_INSTALLED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_FILE_IMPORT", function() { return _Lib_sources__WEBPACK_IMPORTED_MODULE_46__["MAPPING_SOURCE_FILE_IMPORT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_FILE_IMPORT", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_FILE_IMPORT"]; });
 
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_WILL_SIGN_IN", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_47__["APPLICATION_EVENT_WILL_SIGN_IN"]; });
@@ -5317,12 +5317,12 @@ function intentRequiresEncryption(intent) {
 /*!*********************************************!*\
   !*** ./lib/protocol/payloads/collection.js ***!
   \*********************************************/
-/*! exports provided: SNPayloadCollection */
+/*! exports provided: PayloadCollection */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPayloadCollection", function() { return SNPayloadCollection; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return PayloadCollection; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -5331,34 +5331,61 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-var SNPayloadCollection =
+var PayloadCollection =
 /*#__PURE__*/
 function () {
-  function SNPayloadCollection() {
-    _classCallCheck(this, SNPayloadCollection);
+  function PayloadCollection() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        payloads = _ref.payloads,
+        source = _ref.source;
 
+    _classCallCheck(this, PayloadCollection);
+
+    if (!payloads) {
+      payloads = [];
+    }
+
+    this.source = source;
     this.payloads = {};
+    this.allPayloads = payloads;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = payloads[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var payload = _step.value;
+        this.payloads[payload.uuid] = payload;
+      } // deepFreeze(this);
+
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
   }
 
-  _createClass(SNPayloadCollection, [{
-    key: "setPayload",
-    value: function setPayload(payload) {
-      this.payloads[payload.uuid] = payload;
-    }
-  }, {
+  _createClass(PayloadCollection, [{
     key: "findPayload",
     value: function findPayload(id) {
       return this.payloads[id];
     }
   }, {
-    key: "removePayload",
-    value: function removePayload(payload) {
-      delete this.payloads[payload.uuid];
-    }
-  }, {
-    key: "removePayloadId",
-    value: function removePayloadId(id) {
-      delete this.payloads[id];
+    key: "concat",
+    value: function concat(collection) {
+      return new PayloadCollection({
+        payloads: this.allPayloads.concat(collection.allPayloads),
+        source: this.source
+      });
     }
   }, {
     key: "payloadsThatReferencePayload",
@@ -5368,8 +5395,9 @@ function () {
       for (var _i = 0, _Object$keys = Object.keys(this.payloads); _i < _Object$keys.length; _i++) {
         var id = _Object$keys[_i];
         var payload = this.payloads[id];
+        var inReferences = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(payload.content.references, 'uuid', inPayload.uuid);
 
-        if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(payload.content.references, 'uuid', inPayload.uuid)) {
+        if (inReferences) {
           results.push(payload);
         }
       }
@@ -5378,8 +5406,1292 @@ function () {
     }
   }]);
 
-  return SNPayloadCollection;
+  return PayloadCollection;
 }();
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/collection_set.js":
+/*!*************************************************!*\
+  !*** ./lib/protocol/payloads/collection_set.js ***!
+  \*************************************************/
+/*! exports provided: PayloadCollectionSet */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadCollectionSet", function() { return PayloadCollectionSet; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var PayloadCollectionSet =
+/*#__PURE__*/
+function () {
+  /**
+   * @param collections An array of PayloadCollection objects.
+   */
+  function PayloadCollectionSet(_ref) {
+    var collections = _ref.collections;
+
+    _classCallCheck(this, PayloadCollectionSet);
+
+    this.collections = collections;
+    Object.freeze(this);
+  }
+
+  _createClass(PayloadCollectionSet, [{
+    key: "collectionForSource",
+    value: function collectionForSource(source) {
+      return this.collections.find(function (collection) {
+        return collection.source === source;
+      });
+    }
+  }]);
+
+  return PayloadCollectionSet;
+}();
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/delta.js":
+/*!***********************************************!*\
+  !*** ./lib/protocol/payloads/deltas/delta.js ***!
+  \***********************************************/
+/*! exports provided: PayloadsDelta, PayloadContentsEqual */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsDelta", function() { return PayloadsDelta; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadContentsEqual", function() { return PayloadContentsEqual; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var PayloadsDelta =
+/*#__PURE__*/
+function () {
+  /**
+   * @param baseCollection The authoratitive collection on top of which to compute changes.
+   * @param applyCollection The collection of payloads to apply, from one given source only.
+   * @param relatedCollectionSet A collection set (many collections) that contain payloads
+   *                             that may be neccessary to carry out computation.
+   */
+  function PayloadsDelta(_ref) {
+    var baseCollection = _ref.baseCollection,
+        applyCollection = _ref.applyCollection,
+        relatedCollectionSet = _ref.relatedCollectionSet;
+
+    _classCallCheck(this, PayloadsDelta);
+
+    this.baseCollection = baseCollection;
+    this.applyCollection = applyCollection;
+    this.relatedCollectionSet = relatedCollectionSet;
+  }
+
+  _createClass(PayloadsDelta, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      return regeneratorRuntime.async(function resultingCollection$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              throw 'Must override PayloadDelta.resultingCollection.';
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "findBasePayload",
+    value: function findBasePayload(_ref2) {
+      var id = _ref2.id;
+      return this.baseCollection.findPayload(id);
+    }
+  }, {
+    key: "findRelatedPayload",
+    value: function findRelatedPayload(_ref3) {
+      var id = _ref3.id,
+          source = _ref3.source;
+      var collection = this.relatedCollectionSet.collectionForSource(source);
+      return collection.findPayload(id);
+    }
+  }]);
+
+  return PayloadsDelta;
+}();
+function PayloadContentsEqual(payloadA, payloadB) {
+  var itemA = CreateItemFromPayload(payloadA);
+  var itemB = CreateItemFromPayload(payloadB);
+  return itemA.isItemContentEqualWith(itemB);
+}
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/file_import.js":
+/*!*****************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/file_import.js ***!
+  \*****************************************************/
+/*! exports provided: DeltaFileImport */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaFileImport", function() { return DeltaFileImport; });
+/* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var DeltaFileImport =
+/*#__PURE__*/
+function (_PayloadsDelta) {
+  _inherits(DeltaFileImport, _PayloadsDelta);
+
+  function DeltaFileImport() {
+    _classCallCheck(this, DeltaFileImport);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DeltaFileImport).apply(this, arguments));
+  }
+
+  _createClass(DeltaFileImport, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      var _this = this;
+
+      var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _loop, _iterator, _step;
+
+      return regeneratorRuntime.async(function resultingCollection$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              results = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context2.prev = 4;
+
+              _loop = function _loop() {
+                var payload, current, differs, resultingPayloads;
+                return regeneratorRuntime.async(function _loop$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        payload = _step.value;
+
+                        /**
+                         * Check to see if we've already processed a payload for this id.
+                         * If so, that would be the latest value, and not what's in the BC.
+                         */
+                        current = results.find(function (candidate) {
+                          return candidate.uuid === payload.uuid || candidate.content.conflict_of === payload.uuid;
+                        });
+
+                        if (!current) {
+                          current = _this.findBasePayload({
+                            id: payload.uuid
+                          });
+                        }
+
+                        if (!(current && !current.errorDecrypting)) {
+                          _context.next = 12;
+                          break;
+                        }
+
+                        differs = !current.compareContentFields(payload);
+
+                        if (!differs) {
+                          _context.next = 10;
+                          break;
+                        }
+
+                        _context.next = 8;
+                        return regeneratorRuntime.awrap(payload.payloadsByCopying({
+                          isConflict: true,
+                          masterCollection: _this.baseCollection
+                        }));
+
+                      case 8:
+                        resultingPayloads = _context.sent;
+                        extendArray(results, resultingPayloads);
+
+                      case 10:
+                        _context.next = 13;
+                        break;
+
+                      case 12:
+                        results.push(payload);
+
+                      case 13:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }
+                });
+              };
+
+              _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+
+            case 7:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context2.next = 13;
+                break;
+              }
+
+              _context2.next = 10;
+              return regeneratorRuntime.awrap(_loop());
+
+            case 10:
+              _iteratorNormalCompletion = true;
+              _context2.next = 7;
+              break;
+
+            case 13:
+              _context2.next = 19;
+              break;
+
+            case 15:
+              _context2.prev = 15;
+              _context2.t0 = _context2["catch"](4);
+              _didIteratorError = true;
+              _iteratorError = _context2.t0;
+
+            case 19:
+              _context2.prev = 19;
+              _context2.prev = 20;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 22:
+              _context2.prev = 22;
+
+              if (!_didIteratorError) {
+                _context2.next = 25;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 25:
+              return _context2.finish(22);
+
+            case 26:
+              return _context2.finish(19);
+
+            case 27:
+              return _context2.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"]({
+                payloads: results,
+                source: PAYLOAD_SOURCE_FILE_IMPORT
+              }));
+
+            case 28:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this, [[4, 15, 19, 27], [20,, 22, 26]]);
+    }
+  }]);
+
+  return DeltaFileImport;
+}(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadsDelta"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/generator.js":
+/*!***************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/generator.js ***!
+  \***************************************************/
+/*! exports provided: DeltaClassForSource */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaClassForSource", function() { return DeltaClassForSource; });
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./lib/protocol/payloads/deltas/index.js");
+
+function DeltaClassForSource(source) {
+  if (source === PAYLOAD_SOURCE_REMOTE_RETRIEVED) {
+    return _index__WEBPACK_IMPORTED_MODULE_0__["DeltaRemoteRetrieved"];
+  } else if (source === PAYLOAD_SOURCE_REMOTE_SAVED) {
+    return _index__WEBPACK_IMPORTED_MODULE_0__["DeltaRemoteSaved"];
+  }
+}
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/index.js":
+/*!***********************************************!*\
+  !*** ./lib/protocol/payloads/deltas/index.js ***!
+  \***********************************************/
+/*! exports provided: DeltaFileImport, DeltaOutOfSync, DeltaRemoteConflicts, DeltaRemoteRetrieved, DeltaRemoteSaved */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _file_import__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./file_import */ "./lib/protocol/payloads/deltas/file_import.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaFileImport", function() { return _file_import__WEBPACK_IMPORTED_MODULE_0__["DeltaFileImport"]; });
+
+/* harmony import */ var _out_of_sync__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./out_of_sync */ "./lib/protocol/payloads/deltas/out_of_sync.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaOutOfSync", function() { return _out_of_sync__WEBPACK_IMPORTED_MODULE_1__["DeltaOutOfSync"]; });
+
+/* harmony import */ var _remote_conflicts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./remote_conflicts */ "./lib/protocol/payloads/deltas/remote_conflicts.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteConflicts", function() { return _remote_conflicts__WEBPACK_IMPORTED_MODULE_2__["DeltaRemoteConflicts"]; });
+
+/* harmony import */ var _remote_retrieved__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./remote_retrieved */ "./lib/protocol/payloads/deltas/remote_retrieved.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteRetrieved", function() { return _remote_retrieved__WEBPACK_IMPORTED_MODULE_3__["DeltaRemoteRetrieved"]; });
+
+/* harmony import */ var _remote_saved__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./remote_saved */ "./lib/protocol/payloads/deltas/remote_saved.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteSaved", function() { return _remote_saved__WEBPACK_IMPORTED_MODULE_4__["DeltaRemoteSaved"]; });
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/out_of_sync.js":
+/*!*****************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/out_of_sync.js ***!
+  \*****************************************************/
+/*! exports provided: DeltaOutOfSync */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaOutOfSync", function() { return DeltaOutOfSync; });
+/* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var DeltaOutOfSync =
+/*#__PURE__*/
+function (_PayloadsDelta) {
+  _inherits(DeltaOutOfSync, _PayloadsDelta);
+
+  function DeltaOutOfSync() {
+    _classCallCheck(this, DeltaOutOfSync);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DeltaOutOfSync).apply(this, arguments));
+  }
+
+  _createClass(DeltaOutOfSync, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, current, differs, copyResults;
+
+      return regeneratorRuntime.async(function resultingCollection$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              results = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context.prev = 4;
+              _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+
+            case 6:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context.next = 20;
+                break;
+              }
+
+              payload = _step.value;
+
+              /**
+               * Map the server payload as authoritive content. If client copy at all differed,
+               * we would have created a duplicate of it above and synced it.
+               * This is also neccessary to map the updated_at value from the server
+               */
+              results.push(payload);
+              current = this.findBasePayload({
+                id: payload.uuid
+              });
+
+              if (current) {
+                _context.next = 12;
+                break;
+              }
+
+              return _context.abrupt("continue", 17);
+
+            case 12:
+              differs = !Object(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadContentsEqual"])(payload, current);
+
+              if (differs) {
+                _context.next = 15;
+                break;
+              }
+
+              return _context.abrupt("continue", 17);
+
+            case 15:
+              /**
+               * We create a copy of the local existing item and sync that up.
+               * It will be a "conflict" of itself
+               */
+              copyResults = current.payloadsByCopying({
+                masterCollection: this.baseCollection,
+                isConflict: true
+              });
+              extendArray(results, copyResults);
+
+            case 17:
+              _iteratorNormalCompletion = true;
+              _context.next = 6;
+              break;
+
+            case 20:
+              _context.next = 26;
+              break;
+
+            case 22:
+              _context.prev = 22;
+              _context.t0 = _context["catch"](4);
+              _didIteratorError = true;
+              _iteratorError = _context.t0;
+
+            case 26:
+              _context.prev = 26;
+              _context.prev = 27;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 29:
+              _context.prev = 29;
+
+              if (!_didIteratorError) {
+                _context.next = 32;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 32:
+              return _context.finish(29);
+
+            case 33:
+              return _context.finish(26);
+
+            case 34:
+              return _context.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"]({
+                payloads: results,
+                source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
+              }));
+
+            case 35:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this, [[4, 22, 26, 34], [27,, 29, 33]]);
+    }
+  }]);
+
+  return DeltaOutOfSync;
+}(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadsDelta"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/remote_conflicts.js":
+/*!**********************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/remote_conflicts.js ***!
+  \**********************************************************/
+/*! exports provided: DeltaRemoteConflicts */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteConflicts", function() { return DeltaRemoteConflicts; });
+/* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+var CONFLICT_STRATEGY_NONE = 0;
+var CONFLICT_STRATEGY_KEEP = 1;
+var CONFLICT_STRATEGY_DUPLICATE = 2;
+/**
+  * The number of seconds in between changes to constitue a
+  * subjective measure of what we think is active editing of an item
+  */
+
+var IS_ACTIVELY_EDITING_THRESHOLD = 10;
+var DeltaRemoteConflicts =
+/*#__PURE__*/
+function (_PayloadsDelta) {
+  _inherits(DeltaRemoteConflicts, _PayloadsDelta);
+
+  function DeltaRemoteConflicts() {
+    _classCallCheck(this, DeltaRemoteConflicts);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DeltaRemoteConflicts).apply(this, arguments));
+  }
+
+  _createClass(DeltaRemoteConflicts, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      return regeneratorRuntime.async(function resultingCollection$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (!(this.applyCollection.source === _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_CONFLICT_UUID"])) {
+                _context.next = 4;
+                break;
+              }
+
+              return _context.abrupt("return", this.collectionsByHandlingUuidConflicts());
+
+            case 4:
+              if (!(this.applyCollection.source === _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_CONFLICT_DATA"])) {
+                _context.next = 8;
+                break;
+              }
+
+              return _context.abrupt("return", this.collectionsByHandlingDataConflicts());
+
+            case 8:
+              throw "Unhandled conflict type ".concat(this.applyCollection.source);
+
+            case 9:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "collectionsByHandlingDataConflicts",
+    value: function collectionsByHandlingDataConflicts() {
+      var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, current, decrypted, tmpServerItem, tmpCurrentItem, contentDiffers, localStrategy, serverStrategy, isActivelyBeingEdited, contentExcludingReferencesDiffers, isOnlyReferenceChange, _payload, _payload2, _payload3;
+
+      return regeneratorRuntime.async(function collectionsByHandlingDataConflicts$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              results = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context2.prev = 4;
+              _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+
+            case 6:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context2.next = 24;
+                break;
+              }
+
+              payload = _step.value;
+              current = this.findBasePayload({
+                id: payload.uuid
+              });
+              /*** Could be deleted */
+
+              if (current) {
+                _context2.next = 11;
+                break;
+              }
+
+              return _context2.abrupt("continue", 21);
+
+            case 11:
+              /**
+               * Current value is always added, since it's value will have changed below,
+               * either by mapping, being set to dirty, or being set undirty by the caller
+               * but the caller not saving because they're waiting on us.
+               */
+              results.push(current);
+              decrypted = this.findRelatedPayload({
+                id: payload.uuid,
+                source: _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_DECRYPTED_TRANSIENT"]
+              });
+              /** Convert to an object simply so we can have access to the `isItemContentEqualWith` function. */
+
+              tmpServerItem = Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(decrypted);
+              tmpCurrentItem = Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(current);
+              contentDiffers = !tmpCurrentItem.isItemContentEqualWith(tmpServerItem);
+              localStrategy = CONFLICT_STRATEGY_NONE;
+              serverStrategy = CONFLICT_STRATEGY_NONE;
+
+              if (raw.deleted || current.deleted) {
+                serverStrategy = CONFLICT_STRATEGY_KEEP;
+              } else if (contentDiffers) {
+                isActivelyBeingEdited = this.itemIsBeingActivelyEdited(tmpCurrentItem);
+
+                if (isActivelyBeingEdited) {
+                  localStrategy = CONFLICT_STRATEGY_KEEP;
+                  serverStrategy = CONFLICT_STRATEGY_DUPLICATE;
+                } else {
+                  localStrategy = CONFLICT_STRATEGY_DUPLICATE;
+                  serverStrategy = CONFLICT_STRATEGY_KEEP;
+                }
+              } else if (currentContentDiffers) {
+                contentExcludingReferencesDiffers = !SFItem.AreItemContentsEqual({
+                  leftContent: tmpCurrentItem.content,
+                  rightContent: tmpServerItem.content,
+                  keysToIgnore: tmpCurrentItem.contentKeysToIgnoreWhenCheckingEquality().concat(['references']),
+                  appDataKeysToIgnore: tmpCurrentItem.appDatacontentKeysToIgnoreWhenCheckingEquality()
+                });
+                isOnlyReferenceChange = !contentExcludingReferencesDiffers;
+
+                if (isOnlyReferenceChange) {
+                  localStrategy = CONFLICT_STRATEGY_KEEP;
+                } else {
+                  localStrategy = CONFLICT_STRATEGY_DUPLICATE;
+                  serverStrategy = CONFLICT_STRATEGY_KEEP;
+                }
+              } else {
+                /** Items are exactly equal */
+                serverStrategy = CONFLICT_STRATEGY_KEEP;
+              }
+
+              if (localStrategy === CONFLICT_STRATEGY_DUPLICATE) {
+                _payload = CreatePayloadFromAnyObject({
+                  object: current,
+                  override: {
+                    content: {
+                      conflict_of: current.uuid
+                    }
+                  }
+                });
+                results.push(_payload);
+              } else if (localStrategy === CONFLICT_STRATEGY_KEEP) {
+                _payload2 = CreatePayloadFromAnyObject({
+                  object: current,
+                  override: {
+                    updated_at: _payload2.updated_at,
+                    dirty: true
+                  }
+                });
+                results.push(_payload2);
+              }
+
+              if (serverStrategy === CONFLICT_STRATEGY_DUPLICATE) {
+                _payload3 = CreatePayloadFromAnyObject({
+                  object: decrypted,
+                  override: {
+                    content: {
+                      conflict_of: _payload3.uuid
+                    }
+                  }
+                });
+                results.push(_payload3);
+              } else if (serverStrategy === CONFLICT_STRATEGY_KEEP) {
+                results.push(decrypted);
+              }
+
+            case 21:
+              _iteratorNormalCompletion = true;
+              _context2.next = 6;
+              break;
+
+            case 24:
+              _context2.next = 30;
+              break;
+
+            case 26:
+              _context2.prev = 26;
+              _context2.t0 = _context2["catch"](4);
+              _didIteratorError = true;
+              _iteratorError = _context2.t0;
+
+            case 30:
+              _context2.prev = 30;
+              _context2.prev = 31;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 33:
+              _context2.prev = 33;
+
+              if (!_didIteratorError) {
+                _context2.next = 36;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 36:
+              return _context2.finish(33);
+
+            case 37:
+              return _context2.finish(30);
+
+            case 38:
+              return _context2.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__["PayloadCollection"]({
+                payloads: results,
+                source: _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
+              }));
+
+            case 39:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this, [[4, 26, 30, 38], [31,, 33, 37]]);
+    }
+    /**
+     * UUID conflicts can occur if a user attmpts to import an old data
+     * backup with uuids from the old account into a new account.
+     * In uuid_conflict, we receive the value we attmpted to save.
+     */
+
+  }, {
+    key: "collectionsByHandlingUuidConflicts",
+    value: function collectionsByHandlingUuidConflicts() {
+      var results, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, payload, alternateResults;
+
+      return regeneratorRuntime.async(function collectionsByHandlingUuidConflicts$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              results = [];
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context3.prev = 4;
+
+              for (_iterator2 = this.applyCollection.allPayloads[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                payload = _step2.value;
+                alternateResults = payload.payloadsByAlternatingUuid({
+                  masterCollection: this.baseCollection
+                });
+                extendArray(results, alternateResults);
+              }
+
+              _context3.next = 12;
+              break;
+
+            case 8:
+              _context3.prev = 8;
+              _context3.t0 = _context3["catch"](4);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context3.t0;
+
+            case 12:
+              _context3.prev = 12;
+              _context3.prev = 13;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 15:
+              _context3.prev = 15;
+
+              if (!_didIteratorError2) {
+                _context3.next = 18;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 18:
+              return _context3.finish(15);
+
+            case 19:
+              return _context3.finish(12);
+
+            case 20:
+              return _context3.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__["PayloadCollection"]({
+                payloads: results,
+                source: _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
+              }));
+
+            case 21:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+    }
+  }, {
+    key: "itemIsBeingActivelyEdited",
+    value: function itemIsBeingActivelyEdited(item) {
+      return (new Date() - item.client_updated_at) / 1000 < IS_ACTIVELY_EDITING_THRESHOLD;
+    }
+  }]);
+
+  return DeltaRemoteConflicts;
+}(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadsDelta"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/remote_retrieved.js":
+/*!**********************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/remote_retrieved.js ***!
+  \**********************************************************/
+/*! exports provided: DeltaRemoteRetrieved */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteRetrieved", function() { return DeltaRemoteRetrieved; });
+/* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var DeltaRemoteRetrieved =
+/*#__PURE__*/
+function (_PayloadsDelta) {
+  _inherits(DeltaRemoteRetrieved, _PayloadsDelta);
+
+  function DeltaRemoteRetrieved() {
+    _classCallCheck(this, DeltaRemoteRetrieved);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DeltaRemoteRetrieved).apply(this, arguments));
+  }
+
+  _createClass(DeltaRemoteRetrieved, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      var filtered, conflicted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, received, savedOrSaving, base, conflicts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _conflicted, decrypted, current, differs, copy;
+
+      return regeneratorRuntime.async(function resultingCollection$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              filtered = [];
+              conflicted = [];
+              /**
+              * If we have retrieved an item that was saved as part of this ongoing sync operation,
+              * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
+              */
+
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context.prev = 5;
+              _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+
+            case 7:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context.next = 21;
+                break;
+              }
+
+              received = _step.value;
+              savedOrSaving = this.findRelatedPayload({
+                id: received.uuid,
+                source: PAYLOAD_SOURCE_SAVED_OR_SAVING
+              });
+
+              if (!savedOrSaving) {
+                _context.next = 13;
+                break;
+              }
+
+              conflicted.push(received);
+              return _context.abrupt("continue", 18);
+
+            case 13:
+              base = this.findBasePayload({
+                id: received.uuid
+              });
+
+              if (!(base && base.dirty)) {
+                _context.next = 17;
+                break;
+              }
+
+              conflicted.push(received);
+              return _context.abrupt("continue", 18);
+
+            case 17:
+              filtered.push(received);
+
+            case 18:
+              _iteratorNormalCompletion = true;
+              _context.next = 7;
+              break;
+
+            case 21:
+              _context.next = 27;
+              break;
+
+            case 23:
+              _context.prev = 23;
+              _context.t0 = _context["catch"](5);
+              _didIteratorError = true;
+              _iteratorError = _context.t0;
+
+            case 27:
+              _context.prev = 27;
+              _context.prev = 28;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 30:
+              _context.prev = 30;
+
+              if (!_didIteratorError) {
+                _context.next = 33;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 33:
+              return _context.finish(30);
+
+            case 34:
+              return _context.finish(27);
+
+            case 35:
+              /**
+               * For any potential conflict above, we compare the values with current
+               * local values, and if they differ, we create a new payload that is a copy
+               * of the server payload.
+               */
+              conflicts = [];
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context.prev = 39;
+              _iterator2 = conflicted[Symbol.iterator]();
+
+            case 41:
+              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                _context.next = 58;
+                break;
+              }
+
+              _conflicted = _step2.value;
+              decrypted = this.findRelatedPayload({
+                id: _conflicted.uuid,
+                source: PAYLOAD_SOURCE_DECRYPTED_TRANSIENT
+              });
+
+              if (decrypted) {
+                _context.next = 46;
+                break;
+              }
+
+              return _context.abrupt("continue", 55);
+
+            case 46:
+              current = this.findBasePayload({
+                id: _conflicted.uuid
+              });
+
+              if (current) {
+                _context.next = 49;
+                break;
+              }
+
+              return _context.abrupt("continue", 55);
+
+            case 49:
+              differs = !current.compareContentFields(decrypted);
+
+              if (!differs) {
+                _context.next = 55;
+                break;
+              }
+
+              _context.next = 53;
+              return regeneratorRuntime.awrap(decrypted.payloadsByCopying({
+                isConflict: true
+              }));
+
+            case 53:
+              copy = _context.sent;
+              conflicts.push(copy);
+
+            case 55:
+              _iteratorNormalCompletion2 = true;
+              _context.next = 41;
+              break;
+
+            case 58:
+              _context.next = 64;
+              break;
+
+            case 60:
+              _context.prev = 60;
+              _context.t1 = _context["catch"](39);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context.t1;
+
+            case 64:
+              _context.prev = 64;
+              _context.prev = 65;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 67:
+              _context.prev = 67;
+
+              if (!_didIteratorError2) {
+                _context.next = 70;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 70:
+              return _context.finish(67);
+
+            case 71:
+              return _context.finish(64);
+
+            case 72:
+              return _context.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"]({
+                payloads: filtered.concat(conflicts),
+                source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
+              }));
+
+            case 73:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this, [[5, 23, 27, 35], [28,, 30, 34], [39, 60, 64, 72], [65,, 67, 71]]);
+    }
+  }]);
+
+  return DeltaRemoteRetrieved;
+}(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadsDelta"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/deltas/remote_saved.js":
+/*!******************************************************!*\
+  !*** ./lib/protocol/payloads/deltas/remote_saved.js ***!
+  \******************************************************/
+/*! exports provided: DeltaRemoteSaved */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteSaved", function() { return DeltaRemoteSaved; });
+/* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var DeltaRemoteSaved =
+/*#__PURE__*/
+function (_PayloadsDelta) {
+  _inherits(DeltaRemoteSaved, _PayloadsDelta);
+
+  function DeltaRemoteSaved() {
+    _classCallCheck(this, DeltaRemoteSaved);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DeltaRemoteSaved).apply(this, arguments));
+  }
+
+  _createClass(DeltaRemoteSaved, [{
+    key: "resultingCollection",
+    value: function resultingCollection() {
+      var processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, decrypted, result;
+
+      return regeneratorRuntime.async(function resultingCollection$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              processed = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context.prev = 4;
+              _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+
+            case 6:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context.next = 16;
+                break;
+              }
+
+              payload = _step.value;
+              decrypted = this.findRelatedPayload({
+                id: payload.uuid,
+                source: PAYLOAD_SOURCE_DECRYPTED_TRANSIENT
+              });
+
+              if (decrypted) {
+                _context.next = 11;
+                break;
+              }
+
+              throw 'Unable to find decrypted counterpart for payload.';
+
+            case 11:
+              result = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
+                object: decrypted,
+                source: PAYLOAD_SOURCE_REMOTE_SAVED
+              });
+              processed.push(result);
+
+            case 13:
+              _iteratorNormalCompletion = true;
+              _context.next = 6;
+              break;
+
+            case 16:
+              _context.next = 22;
+              break;
+
+            case 18:
+              _context.prev = 18;
+              _context.t0 = _context["catch"](4);
+              _didIteratorError = true;
+              _iteratorError = _context.t0;
+
+            case 22:
+              _context.prev = 22;
+              _context.prev = 23;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 25:
+              _context.prev = 25;
+
+              if (!_didIteratorError) {
+                _context.next = 28;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 28:
+              return _context.finish(25);
+
+            case 29:
+              return _context.finish(22);
+
+            case 30:
+              return _context.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"]({
+                payloads: processed,
+                source: PAYLOAD_SOURCE_REMOTE_SAVED
+              }));
+
+            case 31:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this, [[4, 18, 22, 30], [23,, 25, 29]]);
+    }
+  }]);
+
+  return DeltaRemoteSaved;
+}(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadsDelta"]);
 
 /***/ }),
 
@@ -5421,8 +6733,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNEncryptionParameters =
 /*#__PURE__*/
-function (_SNPurePayload) {
-  _inherits(SNEncryptionParameters, _SNPurePayload);
+function (_PurePayload) {
+  _inherits(SNEncryptionParameters, _PurePayload);
 
   function SNEncryptionParameters() {
     _classCallCheck(this, SNEncryptionParameters);
@@ -5456,7 +6768,7 @@ function (_SNPurePayload) {
   }]);
 
   return SNEncryptionParameters;
-}(_Protocol_payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__["SNPurePayload"]);
+}(_Protocol_payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__["PurePayload"]);
 
 /***/ }),
 
@@ -5583,7 +6895,7 @@ var PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING = 2;
 /*!********************************************!*\
   !*** ./lib/protocol/payloads/generator.js ***!
   \********************************************/
-/*! exports provided: CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForMappingSource */
+/*! exports provided: CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5591,7 +6903,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return CreatePayloadFromAnyObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return CopyEncryptionParameters; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForMappingSource", function() { return itemPayloadClassForMappingSource; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForPayloadSource", function() { return itemPayloadClassForPayloadSource; });
 /* harmony import */ var _Protocol_payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.js");
 /* harmony import */ var _Protocol_payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/server_item_payload */ "./lib/protocol/payloads/server_item_payload.js");
 /* harmony import */ var _Protocol_payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/file_item_payload */ "./lib/protocol/payloads/file_item_payload.js");
@@ -5599,7 +6911,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/saved_server_item_payload */ "./lib/protocol/payloads/saved_server_item_payload.js");
 /* harmony import */ var _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -5618,7 +6930,7 @@ function CreatePayloadFromAnyObject(_ref) {
   var payloadClass;
 
   if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["isNullOrUndefined"])(source)) {
-    payloadClass = itemPayloadClassForMappingSource(source);
+    payloadClass = itemPayloadClassForPayloadSource(source);
   } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["isNullOrUndefined"])(intent)) {
     payloadClass = itemPayloadClassForIntent(intent);
   } else {
@@ -5670,25 +6982,55 @@ function itemPayloadClassForIntent(intent) {
   }
 }
 
-function itemPayloadClassForMappingSource(source) {
-  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_FILE_IMPORT"]) {
+function itemPayloadClassForPayloadSource(source) {
+  if (source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_FILE_IMPORT"]) {
     return _Protocol_payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_2__["SNFileItemPayload"];
   }
 
-  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_LOCAL_SAVED"] || source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_LOCAL_RETRIEVED"] || source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_LOCAL_DIRTIED"]) {
+  if (source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_LOCAL_SAVED"] || source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_LOCAL_RETRIEVED"] || source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]) {
     return _Protocol_payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
   }
 
-  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_RETRIEVED"]) {
+  if (source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]) {
     return _Protocol_payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_1__["SNServerItemPayload"];
   }
 
-  if (source === _Lib_sources__WEBPACK_IMPORTED_MODULE_7__["MAPPING_SOURCE_REMOTE_SAVED"]) {
+  if (source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_REMOTE_SAVED"]) {
     return _Protocol_payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_4__["SNSavedServerItemPayload"];
   } else {
     throw "No item payload class found for source ".concat(source);
   }
 }
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/index.js":
+/*!****************************************!*\
+  !*** ./lib/protocol/payloads/index.js ***!
+  \****************************************/
+/*! exports provided: PayloadCollection, PayloadCollectionSet, CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collection */ "./lib/protocol/payloads/collection.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _collection__WEBPACK_IMPORTED_MODULE_0__["PayloadCollection"]; });
+
+/* harmony import */ var _collection_set__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./collection_set */ "./lib/protocol/payloads/collection_set.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollectionSet", function() { return _collection_set__WEBPACK_IMPORTED_MODULE_1__["PayloadCollectionSet"]; });
+
+/* harmony import */ var _generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./generator */ "./lib/protocol/payloads/generator.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreatePayloadFromAnyObject"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreateEncryptionParameters"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CopyEncryptionParameters"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForPayloadSource", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["itemPayloadClassForPayloadSource"]; });
+
+
+
+
 
 /***/ }),
 
@@ -5790,8 +7132,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNPureItemPayload =
 /*#__PURE__*/
-function (_SNPurePayload) {
-  _inherits(SNPureItemPayload, _SNPurePayload);
+function (_PurePayload) {
+  _inherits(SNPureItemPayload, _PurePayload);
 
   function SNPureItemPayload() {
     _classCallCheck(this, SNPureItemPayload);
@@ -6066,7 +7408,7 @@ function (_SNPurePayload) {
   }]);
 
   return SNPureItemPayload;
-}(_Protocol_payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__["SNPurePayload"]);
+}(_Protocol_payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__["PurePayload"]);
 
 /***/ }),
 
@@ -6074,12 +7416,12 @@ function (_SNPurePayload) {
 /*!***********************************************!*\
   !*** ./lib/protocol/payloads/pure_payload.js ***!
   \***********************************************/
-/*! exports provided: SNPurePayload */
+/*! exports provided: PurePayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPurePayload", function() { return SNPurePayload; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return PurePayload; });
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6090,11 +7432,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var SNPurePayload =
+var PurePayload =
 /*#__PURE__*/
 function () {
-  function SNPurePayload(rawPayload, isFromGenerator) {
-    _classCallCheck(this, SNPurePayload);
+  function PurePayload(rawPayload, isFromGenerator) {
+    _classCallCheck(this, PurePayload);
 
     if (rawPayload.isItem) {
       throw 'Cannot create payload from item directly';
@@ -6150,7 +7492,7 @@ function () {
     }
   }
 
-  _createClass(SNPurePayload, [{
+  _createClass(PurePayload, [{
     key: "fields",
     value: function fields() {
       return this.constructor.fields();
@@ -6179,11 +7521,11 @@ function () {
   }], [{
     key: "fields",
     value: function fields() {
-      throw 'Must override SNPurePayload.fields';
+      throw 'Must override PurePayload.fields';
     }
   }]);
 
-  return SNPurePayload;
+  return PurePayload;
 }();
 
 /***/ }),
@@ -6302,6 +7644,64 @@ function (_SNPureItemPayload) {
 
   return SNServerItemPayload;
 }(_Protocol_payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__["SNPureItemPayload"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/payloads/sources.js":
+/*!******************************************!*\
+  !*** ./lib/protocol/payloads/sources.js ***!
+  \******************************************/
+/*! exports provided: PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, PAYLOAD_SOURCE_REMOTE_CONFLICT, PAYLOAD_SOURCE_IMPORT_CONFLICT, PAYLOAD_SOURCE_SAVED_OR_SAVING, PAYLOAD_SOURCE_DECRYPTED_TRANSIENT, PAYLOAD_SOURCE_CONFLICT_UUID, PAYLOAD_SOURCE_CONFLICT_DATA */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_RETRIEVED", function() { return PAYLOAD_SOURCE_REMOTE_RETRIEVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_SAVED", function() { return PAYLOAD_SOURCE_REMOTE_SAVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_SAVED", function() { return PAYLOAD_SOURCE_LOCAL_SAVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_RETRIEVED", function() { return PAYLOAD_SOURCE_LOCAL_RETRIEVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_DIRTIED", function() { return PAYLOAD_SOURCE_LOCAL_DIRTIED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_COMPONENT_RETRIEVED", function() { return PAYLOAD_SOURCE_COMPONENT_RETRIEVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_DESKTOP_INSTALLED", function() { return PAYLOAD_SOURCE_DESKTOP_INSTALLED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_FILE_IMPORT", function() { return PAYLOAD_SOURCE_FILE_IMPORT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_CONFLICT", function() { return PAYLOAD_SOURCE_REMOTE_CONFLICT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_IMPORT_CONFLICT", function() { return PAYLOAD_SOURCE_IMPORT_CONFLICT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_SAVED_OR_SAVING", function() { return PAYLOAD_SOURCE_SAVED_OR_SAVING; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_DECRYPTED_TRANSIENT", function() { return PAYLOAD_SOURCE_DECRYPTED_TRANSIENT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_CONFLICT_UUID", function() { return PAYLOAD_SOURCE_CONFLICT_UUID; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_CONFLICT_DATA", function() { return PAYLOAD_SOURCE_CONFLICT_DATA; });
+var PAYLOAD_SOURCE_REMOTE_RETRIEVED = 1;
+var PAYLOAD_SOURCE_REMOTE_SAVED = 2;
+var PAYLOAD_SOURCE_LOCAL_SAVED = 3;
+var PAYLOAD_SOURCE_LOCAL_RETRIEVED = 4;
+var PAYLOAD_SOURCE_LOCAL_DIRTIED = 5;
+/** Payloads retrieved from an external
+ extension/component */
+
+var PAYLOAD_SOURCE_COMPONENT_RETRIEVED = 6;
+/** When a component is installed by the desktop
+and some of its values change */
+
+var PAYLOAD_SOURCE_DESKTOP_INSTALLED = 7;
+/** aciton-based Extensions like note history */
+
+var PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED = 8;
+var PAYLOAD_SOURCE_FILE_IMPORT = 9;
+var PAYLOAD_SOURCE_REMOTE_CONFLICT = 10;
+var PAYLOAD_SOURCE_IMPORT_CONFLICT = 11;
+/** Payloads that are saved or saving in the
+current sync request */
+
+var PAYLOAD_SOURCE_SAVED_OR_SAVING = 12;
+/** Payloads that have been decrypted for the convenience
+of consumers who can only work with decrypted formats. The
+decrypted payloads exist in transient, ephemeral space, and
+are not used in anyway. */
+
+var PAYLOAD_SOURCE_DECRYPTED_TRANSIENT = 13;
+var PAYLOAD_SOURCE_CONFLICT_UUID = 14;
+var PAYLOAD_SOURCE_CONFLICT_DATA = 15;
 
 /***/ }),
 
@@ -11275,11 +12675,11 @@ function () {
         var syncedComponents = allItems.filter(function (item) {
           return item.content_type === "SN|Component" || item.content_type == "SN|Theme";
         });
-        /* We only want to sync if the item source is Retrieved, not MappingSourceRemoteSaved to avoid
+        /* We only want to sync if the item source is Retrieved, not PayloadSourceRemoteSaved to avoid
           recursion caused by the component being modified and saved after it is updated.
         */
 
-        if (syncedComponents.length > 0 && source != MAPPING_SOURCE_REMOTE_SAVED) {
+        if (syncedComponents.length > 0 && source != PAYLOAD_SOURCE_REMOTE_SAVED) {
           // Ensure any component in our data is installed by the system
           if (_this.isDesktop) {
             _this.desktopManager.syncComponentsInstallation(syncedComponents);
@@ -11683,10 +13083,10 @@ function () {
       params.content = item.collapseContent();
       params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {}; // isMetadataUpdate implies that the extension should make reference of updated metadata,
       // but not update content values as they may be stale relative to what the extension currently has
-      // Changes are always metadata updates if the mapping source is MAPPING_SOURCE_REMOTE_SAVED || source == MAPPING_SOURCE_LOCAL_SAVED.
+      // Changes are always metadata updates if the mapping source is PAYLOAD_SOURCE_REMOTE_SAVED || source == PAYLOAD_SOURCE_LOCAL_SAVED.
       //
 
-      if (source && (source == MAPPING_SOURCE_REMOTE_SAVED || source == MAPPING_SOURCE_LOCAL_SAVED)) {
+      if (source && (source == PAYLOAD_SOURCE_REMOTE_SAVED || source == PAYLOAD_SOURCE_LOCAL_SAVED)) {
         params.isMetadataUpdate = true;
       }
 
@@ -12425,7 +13825,7 @@ function () {
                         _context.next = 27;
                         return regeneratorRuntime.awrap(_this8.modelManager.mapPayloadsToLocalItems({
                           paylods: payloads,
-                          source: MAPPING_SOURCE_COMPONENT_RETRIEVED,
+                          source: PAYLOAD_SOURCE_COMPONENT_RETRIEVED,
                           sourceKey: component.uuid
                         }));
 
@@ -12466,7 +13866,7 @@ function () {
                             _item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
                           }
 
-                          _this8.modelManager.setItemDirty(_item, true, true, MAPPING_SOURCE_COMPONENT_RETRIEVED, component.uuid);
+                          _this8.modelManager.setItemDirty(_item, true, true, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, component.uuid);
                         }
 
                       case 40:
@@ -12603,7 +14003,7 @@ function () {
             var responseItem = _step21.value;
             var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_6__["CreatePayloadFromAnyObject"])({
               object: responseItem,
-              source: MAPPING_SOURCE_REMOTE_RETRIEVED
+              source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
             });
             var item = Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_5__["CreateItemFromPayload"])(payload);
 
@@ -12720,7 +14120,7 @@ function () {
                 // We manually notify observers.
 
 
-                _this11.modelManager.notifySyncObserversOfItems([model], MAPPING_SOURCE_REMOTE_SAVED);
+                _this11.modelManager.notifySyncObserversOfItems([model], PAYLOAD_SOURCE_REMOTE_SAVED);
 
               case 21:
                 _iteratorNormalCompletion22 = true;
@@ -15650,8 +17050,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Protocol/payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Protocol/payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _Lib_constants__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Lib/constants */ "./lib/constants.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -15688,6 +17089,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var SNModelManager =
 /*#__PURE__*/
 function () {
@@ -15696,10 +17098,10 @@ function () {
 
     _classCallCheck(this, SNModelManager);
 
-    SNModelManager.ContentTypeClassMapping = (_SNModelManager$Conte = {}, _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"], _Models_app_note__WEBPACK_IMPORTED_MODULE_9__["SNNote"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"], _Models_app_tag__WEBPACK_IMPORTED_MODULE_10__["SNTag"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SN_ITEMS_KEY_CONTENT_TYPE"], _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_4__["SNItemsKey"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SMART_TAG_CONTENT_TYPE"], _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_14__["SNSmartTag"]), _defineProperty(_SNModelManager$Conte, "Extension", _Models_app_extension__WEBPACK_IMPORTED_MODULE_8__["SNExtension"]), _defineProperty(_SNModelManager$Conte, "SN|Editor", _Models_app_editor__WEBPACK_IMPORTED_MODULE_7__["SNEditor"]), _defineProperty(_SNModelManager$Conte, "SN|Theme", _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_15__["SNTheme"]), _defineProperty(_SNModelManager$Conte, "SN|Component", _Models_app_component__WEBPACK_IMPORTED_MODULE_6__["SNComponent"]), _defineProperty(_SNModelManager$Conte, "SF|Extension", _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_13__["SNServerExtension"]), _defineProperty(_SNModelManager$Conte, "SF|MFA", _Models_server_mfa__WEBPACK_IMPORTED_MODULE_12__["SNMfa"]), _defineProperty(_SNModelManager$Conte, "SN|Privileges", _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_11__["SFPrivileges"]), _SNModelManager$Conte);
+    SNModelManager.ContentTypeClassMapping = (_SNModelManager$Conte = {}, _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["NOTE_CONTENT_TYPE"], _Models_app_note__WEBPACK_IMPORTED_MODULE_9__["SNNote"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["TAG_CONTENT_TYPE"], _Models_app_tag__WEBPACK_IMPORTED_MODULE_10__["SNTag"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["SN_ITEMS_KEY_CONTENT_TYPE"], _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_4__["SNItemsKey"]), _defineProperty(_SNModelManager$Conte, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["SMART_TAG_CONTENT_TYPE"], _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_14__["SNSmartTag"]), _defineProperty(_SNModelManager$Conte, "Extension", _Models_app_extension__WEBPACK_IMPORTED_MODULE_8__["SNExtension"]), _defineProperty(_SNModelManager$Conte, "SN|Editor", _Models_app_editor__WEBPACK_IMPORTED_MODULE_7__["SNEditor"]), _defineProperty(_SNModelManager$Conte, "SN|Theme", _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_15__["SNTheme"]), _defineProperty(_SNModelManager$Conte, "SN|Component", _Models_app_component__WEBPACK_IMPORTED_MODULE_6__["SNComponent"]), _defineProperty(_SNModelManager$Conte, "SF|Extension", _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_13__["SNServerExtension"]), _defineProperty(_SNModelManager$Conte, "SF|MFA", _Models_server_mfa__WEBPACK_IMPORTED_MODULE_12__["SNMfa"]), _defineProperty(_SNModelManager$Conte, "SN|Privileges", _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_11__["SFPrivileges"]), _SNModelManager$Conte);
 
-    SNModelManager.isMappingSourceRetrieved = function (source) {
-      return [MAPPING_SOURCE_REMOTE_RETRIEVED, MAPPING_SOURCE_COMPONENT_RETRIEVED, MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED].includes(source);
+    SNModelManager.isPayloadSourceRetrieved = function (source) {
+      return [PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED].includes(source);
     };
 
     this.timeout = timeout || setTimeout.bind(window);
@@ -15712,7 +17114,7 @@ function () {
     this.itemsHash = {};
     this.resolveQueue = {};
     this.uuidChangeObservers = [];
-    this.masterCollection = new _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_17__["SNPayloadCollection"]();
+    this.masterCollection = new _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_17__["PayloadCollection"]();
   }
   /**
   * Our payload collectionn keeps the latest mapped payload for every payload
@@ -15738,15 +17140,36 @@ function () {
       this.resolveQueue = {};
     }
   }, {
-    key: "mapPayloadsToLocalItems",
-    value: function mapPayloadsToLocalItems(_ref) {
-      var payloads, source, sourceKey, options, itemsToNotifyObserversOf, processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, isCorrupt, item, isDirtyItemPendingDelete, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, interestedItem;
-
-      return regeneratorRuntime.async(function mapPayloadsToLocalItems$(_context) {
+    key: "mapCollectionToLocalItems",
+    value: function mapCollectionToLocalItems(_ref) {
+      var collection, sourceKey;
+      return regeneratorRuntime.async(function mapCollectionToLocalItems$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              payloads = _ref.payloads, source = _ref.source, sourceKey = _ref.sourceKey, options = _ref.options;
+              collection = _ref.collection, sourceKey = _ref.sourceKey;
+              return _context.abrupt("return", this.mapPayloadsToLocalItems({
+                payloads: collection.allPayloads,
+                source: collection.source
+              }));
+
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "mapPayloadsToLocalItems",
+    value: function mapPayloadsToLocalItems(_ref2) {
+      var payloads, source, sourceKey, itemsToNotifyObserversOf, processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, isCorrupt, item, isDirtyItemPendingDelete, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, interestedItem, newCollection;
+
+      return regeneratorRuntime.async(function mapPayloadsToLocalItems$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              payloads = _ref2.payloads, source = _ref2.source, sourceKey = _ref2.sourceKey;
               itemsToNotifyObserversOf = [];
               processed = {};
               /** First loop should process payloads and add items only; no relationship handling. */
@@ -15754,28 +17177,28 @@ function () {
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context.prev = 6;
+              _context2.prev = 6;
               _iterator = payloads[Symbol.iterator]();
 
             case 8:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context.next = 36;
+                _context2.next = 35;
                 break;
               }
 
               payload = _step.value;
 
               if (payload) {
-                _context.next = 13;
+                _context2.next = 13;
                 break;
               }
 
               console.error("Payload is null");
-              return _context.abrupt("continue", 33);
+              return _context2.abrupt("continue", 32);
 
             case 13:
               if (payload.isPayload) {
-                _context.next = 15;
+                _context2.next = 15;
                 break;
               }
 
@@ -15785,15 +17208,14 @@ function () {
               isCorrupt = !payload.content_type || !payload.uuid;
 
               if (!(isCorrupt && !payload.deleted)) {
-                _context.next = 19;
+                _context2.next = 19;
                 break;
               }
 
               console.error("Payload is corrupt:", payload);
-              return _context.abrupt("continue", 33);
+              return _context2.abrupt("continue", 32);
 
             case 19:
-              this.masterCollection.setPayload(payload);
               item = this.findItem(payload.uuid);
 
               if (item) {
@@ -15806,12 +17228,12 @@ function () {
               isDirtyItemPendingDelete = false;
 
               if (!(payload.deleted === true)) {
-                _context.next = 30;
+                _context2.next = 29;
                 break;
               }
 
               if (!payload.dirty) {
-                _context.next = 28;
+                _context2.next = 27;
                 break;
               }
 
@@ -15819,10 +17241,10 @@ function () {
               // We need to create this item as usual, but just not add it to individual arrays
               // i.e add to this.items but not this.notes (so that it can be retrieved with getDirtyItems)
               isDirtyItemPendingDelete = true;
-              _context.next = 30;
+              _context2.next = 29;
               break;
 
-            case 28:
+            case 27:
               if (item) {
                 /** We still want to return this item to the caller so they know it was handled. */
                 processed[item.uuid] = {
@@ -15833,9 +17255,9 @@ function () {
                 this.removeItemLocally(item);
               }
 
-              return _context.abrupt("continue", 33);
+              return _context2.abrupt("continue", 32);
 
-            case 30:
+            case 29:
               if (!item) {
                 item = CreateItemFromPayload(payload);
                 this.insertItems([item], isDirtyItemPendingDelete);
@@ -15852,53 +17274,53 @@ function () {
                 payload: payload
               };
 
-            case 33:
+            case 32:
               _iteratorNormalCompletion = true;
-              _context.next = 8;
+              _context2.next = 8;
               break;
 
-            case 36:
-              _context.next = 42;
+            case 35:
+              _context2.next = 41;
               break;
 
-            case 38:
-              _context.prev = 38;
-              _context.t0 = _context["catch"](6);
+            case 37:
+              _context2.prev = 37;
+              _context2.t0 = _context2["catch"](6);
               _didIteratorError = true;
-              _iteratorError = _context.t0;
+              _iteratorError = _context2.t0;
 
-            case 42:
-              _context.prev = 42;
-              _context.prev = 43;
+            case 41:
+              _context2.prev = 41;
+              _context2.prev = 42;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
-            case 45:
-              _context.prev = 45;
+            case 44:
+              _context2.prev = 44;
 
               if (!_didIteratorError) {
-                _context.next = 48;
+                _context2.next = 47;
                 break;
               }
 
               throw _iteratorError;
 
+            case 47:
+              return _context2.finish(44);
+
             case 48:
-              return _context.finish(45);
+              return _context2.finish(41);
 
             case 49:
-              return _context.finish(42);
-
-            case 50:
               /** Second loop should process references */
               allPayloads = [], allItems = [];
               _i = 0, _Object$keys = Object.keys(processed);
 
-            case 52:
+            case 51:
               if (!(_i < _Object$keys.length)) {
-                _context.next = 82;
+                _context2.next = 81;
                 break;
               }
 
@@ -15917,67 +17339,72 @@ function () {
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context.prev = 62;
+              _context2.prev = 61;
 
               for (_iterator2 = interestedItems[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                 interestedItem = _step2.value;
                 interestedItem.addItemAsRelationship(_item);
               }
 
-              _context.next = 70;
+              _context2.next = 69;
               break;
 
-            case 66:
-              _context.prev = 66;
-              _context.t1 = _context["catch"](62);
+            case 65:
+              _context2.prev = 65;
+              _context2.t1 = _context2["catch"](61);
               _didIteratorError2 = true;
-              _iteratorError2 = _context.t1;
+              _iteratorError2 = _context2.t1;
 
-            case 70:
-              _context.prev = 70;
-              _context.prev = 71;
+            case 69:
+              _context2.prev = 69;
+              _context2.prev = 70;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
-            case 73:
-              _context.prev = 73;
+            case 72:
+              _context2.prev = 72;
 
               if (!_didIteratorError2) {
-                _context.next = 76;
+                _context2.next = 75;
                 break;
               }
 
               throw _iteratorError2;
 
+            case 75:
+              return _context2.finish(72);
+
             case 76:
-              return _context.finish(73);
+              return _context2.finish(69);
 
             case 77:
-              return _context.finish(70);
-
-            case 78:
               _item.didFinishSyncing();
 
-            case 79:
+            case 78:
               _i++;
-              _context.next = 52;
+              _context2.next = 51;
               break;
 
-            case 82:
-              _context.next = 84;
+            case 81:
+              newCollection = new _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_17__["PayloadCollection"]({
+                payloads: allPayloads,
+                source: source
+              });
+              this.masterCollection = this.masterCollection.concat(newCollection);
+              _context2.next = 85;
               return regeneratorRuntime.awrap(this.notifySyncObserversOfItems(itemsToNotifyObserversOf, source, sourceKey));
 
-            case 84:
-              return _context.abrupt("return", allItems);
-
             case 85:
+              return _context2.abrupt("return", allItems);
+
+            case 86:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
         }
-      }, null, this, [[6, 38, 42, 50], [43,, 45, 49], [62, 66, 70, 78], [71,, 73, 77]]);
+      }, null, this, [[6, 37, 41, 49], [42,, 44, 48], [61, 65, 69, 77], [70,, 72, 76]]);
     }
   }, {
     key: "insertItems",
@@ -16006,9 +17433,9 @@ function () {
             continue;
           }
 
-          if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
+          if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
             this.itemsKeys.unshift(item);
-          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"]) {
+          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["TAG_CONTENT_TYPE"]) {
             var index = lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_1___default()(this.tags, item, function (item) {
               if (item.title) {
                 return item.title.toLowerCase();
@@ -16017,7 +17444,7 @@ function () {
               }
             });
             this.tags.splice(index, 0, item);
-          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"]) {
+          } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["NOTE_CONTENT_TYPE"]) {
             this.notes.unshift(item);
           } else if (item.content_type == 'SN|Component') {
             this.components.unshift(item);
@@ -16040,17 +17467,17 @@ function () {
     }
   }, {
     key: "resolveRelationshipWhenItemAvailable",
-    value: function resolveRelationshipWhenItemAvailable(_ref2) {
-      var interestedItem = _ref2.interestedItem,
-          missingItemId = _ref2.missingItemId;
+    value: function resolveRelationshipWhenItemAvailable(_ref3) {
+      var interestedItem = _ref3.interestedItem,
+          missingItemId = _ref3.missingItemId;
       var interestedItems = this.resolveQueue[missingItemId] || [];
       interestedItems.push(interestedItem);
       this.resolveQueue[missingItemId] = interestedItems;
     }
   }, {
     key: "popItemsInterestedInPreviouslyMissingItem",
-    value: function popItemsInterestedInPreviouslyMissingItem(_ref3) {
-      var item = _ref3.item;
+    value: function popItemsInterestedInPreviouslyMissingItem(_ref4) {
+      var item = _ref4.item;
       var interestedItems = this.resolveQueue[item.uuid];
       delete this.resolveQueue[item.uuid];
       return interestedItems || [];
@@ -16128,11 +17555,10 @@ function () {
 
       var observers, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _loop, _iterator5, _step5;
 
-      return regeneratorRuntime.async(function notifySyncObserversOfItems$(_context3) {
+      return regeneratorRuntime.async(function notifySyncObserversOfItems$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              // Make sure `let` is used in the for loops instead of `var`, as we will be using a timeout below.
               observers = this.itemSyncObservers.sort(function (a, b) {
                 // sort by priority
                 return a.priority < b.priority ? -1 : 1;
@@ -16140,14 +17566,14 @@ function () {
               _iteratorNormalCompletion5 = true;
               _didIteratorError5 = false;
               _iteratorError5 = undefined;
-              _context3.prev = 4;
+              _context4.prev = 4;
 
               _loop = function _loop() {
                 var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, item;
 
-                return regeneratorRuntime.async(function _loop$(_context2) {
+                return regeneratorRuntime.async(function _loop$(_context3) {
                   while (1) {
-                    switch (_context2.prev = _context2.next) {
+                    switch (_context3.prev = _context3.next) {
                       case 0:
                         observer = _step5.value;
                         allRelevantItems = observer.types.includes("*") ? models : models.filter(function (item) {
@@ -16157,7 +17583,7 @@ function () {
                         _iteratorNormalCompletion6 = true;
                         _didIteratorError6 = false;
                         _iteratorError6 = undefined;
-                        _context2.prev = 6;
+                        _context3.prev = 6;
 
                         for (_iterator6 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                           item = _step6.value;
@@ -16169,51 +17595,51 @@ function () {
                           }
                         }
 
-                        _context2.next = 14;
+                        _context3.next = 14;
                         break;
 
                       case 10:
-                        _context2.prev = 10;
-                        _context2.t0 = _context2["catch"](6);
+                        _context3.prev = 10;
+                        _context3.t0 = _context3["catch"](6);
                         _didIteratorError6 = true;
-                        _iteratorError6 = _context2.t0;
+                        _iteratorError6 = _context3.t0;
 
                       case 14:
-                        _context2.prev = 14;
-                        _context2.prev = 15;
+                        _context3.prev = 14;
+                        _context3.prev = 15;
 
                         if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
                           _iterator6.return();
                         }
 
                       case 17:
-                        _context2.prev = 17;
+                        _context3.prev = 17;
 
                         if (!_didIteratorError6) {
-                          _context2.next = 20;
+                          _context3.next = 20;
                           break;
                         }
 
                         throw _iteratorError6;
 
                       case 20:
-                        return _context2.finish(17);
+                        return _context3.finish(17);
 
                       case 21:
-                        return _context2.finish(14);
+                        return _context3.finish(14);
 
                       case 22:
                         if (!(allRelevantItems.length > 0)) {
-                          _context2.next = 25;
+                          _context3.next = 25;
                           break;
                         }
 
-                        _context2.next = 25;
+                        _context3.next = 25;
                         return regeneratorRuntime.awrap(_this._callSyncObserverCallbackWithTimeout(observer, allRelevantItems, validItems, deletedItems, source, sourceKey));
 
                       case 25:
                       case "end":
-                        return _context2.stop();
+                        return _context3.stop();
                     }
                   }
                 }, null, null, [[6, 10, 14, 22], [15,, 17, 21]]);
@@ -16223,55 +17649,55 @@ function () {
 
             case 7:
               if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context3.next = 13;
+                _context4.next = 13;
                 break;
               }
 
-              _context3.next = 10;
+              _context4.next = 10;
               return regeneratorRuntime.awrap(_loop());
 
             case 10:
               _iteratorNormalCompletion5 = true;
-              _context3.next = 7;
+              _context4.next = 7;
               break;
 
             case 13:
-              _context3.next = 19;
+              _context4.next = 19;
               break;
 
             case 15:
-              _context3.prev = 15;
-              _context3.t0 = _context3["catch"](4);
+              _context4.prev = 15;
+              _context4.t0 = _context4["catch"](4);
               _didIteratorError5 = true;
-              _iteratorError5 = _context3.t0;
+              _iteratorError5 = _context4.t0;
 
             case 19:
-              _context3.prev = 19;
-              _context3.prev = 20;
+              _context4.prev = 19;
+              _context4.prev = 20;
 
               if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                 _iterator5.return();
               }
 
             case 22:
-              _context3.prev = 22;
+              _context4.prev = 22;
 
               if (!_didIteratorError5) {
-                _context3.next = 25;
+                _context4.next = 25;
                 break;
               }
 
               throw _iteratorError5;
 
             case 25:
-              return _context3.finish(22);
+              return _context4.finish(22);
 
             case 26:
-              return _context3.finish(19);
+              return _context4.finish(19);
 
             case 27:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this, [[4, 15, 19, 27], [20,, 22, 26]]);
@@ -16286,11 +17712,11 @@ function () {
     value: function _callSyncObserverCallbackWithTimeout(observer, allRelevantItems, validItems, deletedItems, source, sourceKey) {
       var _this2 = this;
 
-      return regeneratorRuntime.async(function _callSyncObserverCallbackWithTimeout$(_context4) {
+      return regeneratorRuntime.async(function _callSyncObserverCallbackWithTimeout$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              return _context4.abrupt("return", new Promise(function (resolve, reject) {
+              return _context5.abrupt("return", new Promise(function (resolve, reject) {
                 _this2.timeout(function () {
                   try {
                     observer.callback(allRelevantItems, validItems, deletedItems, source, sourceKey);
@@ -16304,7 +17730,7 @@ function () {
 
             case 1:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
       });
@@ -16352,20 +17778,20 @@ function () {
         }
       }
 
-      this.notifySyncObserversOfItems(items, source || MAPPING_SOURCE_LOCAL_DIRTIED, sourceKey);
+      this.notifySyncObserversOfItems(items, source || PAYLOAD_SOURCE_LOCAL_DIRTIED, sourceKey);
     }
   }, {
     key: "duplicateItem",
-    value: function duplicateItem(_ref4) {
+    value: function duplicateItem(_ref5) {
       var item, isConflict, payload, payloads, results, copy;
-      return regeneratorRuntime.async(function duplicateItem$(_context5) {
+      return regeneratorRuntime.async(function duplicateItem$(_context6) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
-              item = _ref4.item, isConflict = _ref4.isConflict;
+              item = _ref5.item, isConflict = _ref5.isConflict;
 
               if (item.isItem) {
-                _context5.next = 3;
+                _context6.next = 3;
                 break;
               }
 
@@ -16375,29 +17801,29 @@ function () {
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                 object: item
               });
-              _context5.next = 6;
+              _context6.next = 6;
               return regeneratorRuntime.awrap(payload.payloadsByCopying({
                 isConflict: isConflict,
                 masterCollection: this.getMasterCollection()
               }));
 
             case 6:
-              payloads = _context5.sent;
-              _context5.next = 9;
+              payloads = _context6.sent;
+              _context6.next = 9;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: payloads
               }));
 
             case 9:
-              results = _context5.sent;
+              results = _context6.sent;
               copy = results.find(function (p) {
                 return p.uuid === payloads[0].uuid;
               });
-              return _context5.abrupt("return", copy);
+              return _context6.abrupt("return", copy);
 
             case 12:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -16412,17 +17838,17 @@ function () {
     key: "addItem",
     value: function addItem(item) {
       var globalOnly,
-          _args6 = arguments;
-      return regeneratorRuntime.async(function addItem$(_context6) {
+          _args7 = arguments;
+      return regeneratorRuntime.async(function addItem$(_context7) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              globalOnly = _args6.length > 1 && _args6[1] !== undefined ? _args6[1] : false;
-              return _context6.abrupt("return", this.addItems([item], globalOnly));
+              globalOnly = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : false;
+              return _context7.abrupt("return", this.addItems([item], globalOnly));
 
             case 2:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -16432,26 +17858,26 @@ function () {
     value: function addItems(items) {
       var globalOnly,
           payloads,
-          _args7 = arguments;
-      return regeneratorRuntime.async(function addItems$(_context7) {
+          _args8 = arguments;
+      return regeneratorRuntime.async(function addItems$(_context8) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
-              globalOnly = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : false;
+              globalOnly = _args8.length > 1 && _args8[1] !== undefined ? _args8[1] : false;
               console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
               payloads = items.map(function (item) {
                 return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                   object: item
                 });
               });
-              _context7.next = 5;
+              _context8.next = 5;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: payloads
               }));
 
             case 5:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -16470,11 +17896,11 @@ function () {
     }
   }, {
     key: "addItemSyncObserverWithPriority",
-    value: function addItemSyncObserverWithPriority(_ref5) {
-      var id = _ref5.id,
-          priority = _ref5.priority,
-          types = _ref5.types,
-          callback = _ref5.callback;
+    value: function addItemSyncObserverWithPriority(_ref6) {
+      var id = _ref6.id,
+          priority = _ref6.priority,
+          types = _ref6.types,
+          callback = _ref6.callback;
 
       if (!Array.isArray(types)) {
         types = [types];
@@ -16623,9 +18049,9 @@ function () {
   }, {
     key: "removeItemLocally",
     value: function removeItemLocally(item) {
-      return regeneratorRuntime.async(function removeItemLocally$(_context8) {
+      return regeneratorRuntime.async(function removeItemLocally$(_context9) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.items, {
                 uuid: item.uuid
@@ -16636,7 +18062,7 @@ function () {
 
             case 4:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -16644,11 +18070,11 @@ function () {
   }, {
     key: "removeItemFromRespectiveArray",
     value: function removeItemFromRespectiveArray(item) {
-      if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"]) {
+      if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["TAG_CONTENT_TYPE"]) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.tags, {
           uuid: item.uuid
         });
-      } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"]) {
+      } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["NOTE_CONTENT_TYPE"]) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.notes, {
           uuid: item.uuid
         });
@@ -16656,7 +18082,7 @@ function () {
         lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.components, {
           uuid: item.uuid
         });
-      } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
+      } else if (item.content_type === _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["SN_ITEMS_KEY_CONTENT_TYPE"]) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.itemsKeys, {
           uuid: item.uuid
         });
@@ -16666,12 +18092,12 @@ function () {
     key: "alternateUUIDForItem",
     value: function alternateUUIDForItem(item) {
       var payload, results, mapped;
-      return regeneratorRuntime.async(function alternateUUIDForItem$(_context9) {
+      return regeneratorRuntime.async(function alternateUUIDForItem$(_context10) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               if (item.isItem) {
-                _context9.next = 2;
+                _context10.next = 2;
                 break;
               }
 
@@ -16681,26 +18107,26 @@ function () {
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                 object: item
               });
-              _context9.next = 5;
+              _context10.next = 5;
               return regeneratorRuntime.awrap(payload.payloadsByAlternatingUuid({
                 masterCollection: this.getMasterCollection()
               }));
 
             case 5:
-              results = _context9.sent;
-              _context9.next = 8;
+              results = _context10.sent;
+              _context10.next = 8;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: results,
-                source: MAPPING_SOURCE_LOCAL_SAVED
+                source: PAYLOAD_SOURCE_LOCAL_SAVED
               }));
 
             case 8:
-              mapped = _context9.sent;
-              return _context9.abrupt("return", mapped[0]);
+              mapped = _context10.sent;
+              return _context10.abrupt("return", mapped[0]);
 
             case 10:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -16813,224 +18239,90 @@ function () {
       });
       return results;
     }
-    /*
-    Archives
-    */
-
   }, {
     key: "importItemsFromRaw",
     value: function importItemsFromRaw(rawPayloads) {
-      var _this3 = this;
-
-      var payloadsToMap, newCopyIds, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _loop2, _iterator13, _step13, _ret, items, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, item;
+      var payloads, delta, collection, items, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, item;
 
       return regeneratorRuntime.async(function importItemsFromRaw$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
-              payloadsToMap = [];
-              newCopyIds = [];
+              payloads = rawPayloads.map(function (rawPayload) {
+                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
+                  object: rawPayload,
+                  source: PAYLOAD_SOURCE_FILE_IMPORT
+                });
+              });
+              delta = new _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_18__["DeltaFileImport"]({
+                baseCollection: this.getMasterCollection(),
+                applyCollection: new _Protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_17__["PayloadCollection"]({
+                  payloads: payloads,
+                  source: PAYLOAD_SOURCE_FILE_IMPORT
+                })
+              });
+              _context11.next = 4;
+              return regeneratorRuntime.awrap(delta.resultingCollection());
+
+            case 4:
+              collection = _context11.sent;
+              _context11.next = 7;
+              return regeneratorRuntime.awrap(this.mapCollectionToLocalItems({
+                collection: collection
+              }));
+
+            case 7:
+              items = _context11.sent;
               _iteratorNormalCompletion13 = true;
               _didIteratorError13 = false;
               _iteratorError13 = undefined;
-              _context11.prev = 5;
+              _context11.prev = 11;
 
-              _loop2 = function _loop2() {
-                var rawPayloadData, payload, currentPayload, contentDiffers, resultingPayloads;
-                return regeneratorRuntime.async(function _loop2$(_context10) {
-                  while (1) {
-                    switch (_context10.prev = _context10.next) {
-                      case 0:
-                        rawPayloadData = _step13.value;
-
-                        if (!rawPayloadData.deleted) {
-                          _context10.next = 3;
-                          break;
-                        }
-
-                        return _context10.abrupt("return", "continue");
-
-                      case 3:
-                        payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
-                          object: rawPayloadData,
-                          source: MAPPING_SOURCE_FILE_IMPORT
-                        });
-                        /**
-                         * Check to see if we've already processed a payload for this id.
-                         * If so, that would be the latest value, and not what's in the MC.
-                         */
-
-                        currentPayload = payloadsToMap.find(function (candidate) {
-                          return candidate.uuid === payload.uuid || candidate.content.conflict_of === payload.uuid;
-                        });
-
-                        if (!currentPayload) {
-                          currentPayload = _this3.masterCollection.findPayload(payload.uuid);
-                        }
-
-                        if (!(currentPayload && !currentPayload.errorDecrypting)) {
-                          _context10.next = 16;
-                          break;
-                        }
-
-                        contentDiffers = !currentPayload.compareContentFields(payload);
-
-                        if (!contentDiffers) {
-                          _context10.next = 14;
-                          break;
-                        }
-
-                        _context10.next = 11;
-                        return regeneratorRuntime.awrap(payload.payloadsByCopying({
-                          isConflict: true,
-                          masterCollection: _this3.masterCollection
-                        }));
-
-                      case 11:
-                        resultingPayloads = _context10.sent;
-                        newCopyIds.push(resultingPayloads[0].uuid);
-                        extendArray(payloadsToMap, resultingPayloads);
-
-                      case 14:
-                        _context10.next = 18;
-                        break;
-
-                      case 16:
-                        newCopyIds.push(payload.uuid);
-                        payloadsToMap.push(payload);
-
-                      case 18:
-                      case "end":
-                        return _context10.stop();
-                    }
-                  }
-                });
-              };
-
-              _iterator13 = rawPayloads[Symbol.iterator]();
-
-            case 8:
-              if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                _context11.next = 17;
-                break;
+              for (_iterator13 = items[Symbol.iterator](); !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                item = _step13.value;
+                this.setItemDirty(item, true, false);
+                item.deleted = false;
               }
 
-              _context11.next = 11;
-              return regeneratorRuntime.awrap(_loop2());
-
-            case 11:
-              _ret = _context11.sent;
-
-              if (!(_ret === "continue")) {
-                _context11.next = 14;
-                break;
-              }
-
-              return _context11.abrupt("continue", 14);
-
-            case 14:
-              _iteratorNormalCompletion13 = true;
-              _context11.next = 8;
+              _context11.next = 19;
               break;
 
-            case 17:
-              _context11.next = 23;
-              break;
-
-            case 19:
-              _context11.prev = 19;
-              _context11.t0 = _context11["catch"](5);
+            case 15:
+              _context11.prev = 15;
+              _context11.t0 = _context11["catch"](11);
               _didIteratorError13 = true;
               _iteratorError13 = _context11.t0;
 
-            case 23:
-              _context11.prev = 23;
-              _context11.prev = 24;
+            case 19:
+              _context11.prev = 19;
+              _context11.prev = 20;
 
               if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
                 _iterator13.return();
               }
 
-            case 26:
-              _context11.prev = 26;
+            case 22:
+              _context11.prev = 22;
 
               if (!_didIteratorError13) {
-                _context11.next = 29;
+                _context11.next = 25;
                 break;
               }
 
               throw _iteratorError13;
 
-            case 29:
-              return _context11.finish(26);
+            case 25:
+              return _context11.finish(22);
 
-            case 30:
-              return _context11.finish(23);
+            case 26:
+              return _context11.finish(19);
 
-            case 31:
-              _context11.next = 33;
-              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
-                payloads: payloadsToMap,
-                source: MAPPING_SOURCE_FILE_IMPORT
-              }));
-
-            case 33:
-              items = _context11.sent;
-              _iteratorNormalCompletion14 = true;
-              _didIteratorError14 = false;
-              _iteratorError14 = undefined;
-              _context11.prev = 37;
-
-              for (_iterator14 = items[Symbol.iterator](); !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-                item = _step14.value;
-                this.setItemDirty(item, true, false);
-                item.deleted = false;
-              }
-
-              _context11.next = 45;
-              break;
-
-            case 41:
-              _context11.prev = 41;
-              _context11.t1 = _context11["catch"](37);
-              _didIteratorError14 = true;
-              _iteratorError14 = _context11.t1;
-
-            case 45:
-              _context11.prev = 45;
-              _context11.prev = 46;
-
-              if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
-                _iterator14.return();
-              }
-
-            case 48:
-              _context11.prev = 48;
-
-              if (!_didIteratorError14) {
-                _context11.next = 51;
-                break;
-              }
-
-              throw _iteratorError14;
-
-            case 51:
-              return _context11.finish(48);
-
-            case 52:
-              return _context11.finish(45);
-
-            case 53:
-              return _context11.abrupt("return", items.filter(function (item) {
-                return newCopyIds.includes(item.uuid);
-              }));
-
-            case 54:
+            case 27:
             case "end":
               return _context11.stop();
           }
         }
-      }, null, this, [[5, 19, 23, 31], [24,, 26, 30], [37, 41, 45, 53], [46,, 48, 52]]);
+      }, null, this, [[11, 15, 19, 27], [20,, 22, 26]]);
     }
   }, {
     key: "getAllItemsJSONData",
@@ -17056,7 +18348,7 @@ function () {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
-              intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__["ENCRYPTION_INTENT_FILE_DECRYPTED"];
+              intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_20__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_20__["ENCRYPTION_INTENT_FILE_DECRYPTED"];
               return _context13.abrupt("return", Promise.all(items.map(function (item) {
                 var payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreatePayloadFromAnyObject"])({
                   object: item
@@ -17075,7 +18367,6 @@ function () {
                 };
 
                 if (keyParams) {
-                  // auth params are only needed when encrypted with a standard notes key
                   data['keyParams'] = keyParams;
                 }
 
@@ -17095,7 +18386,7 @@ function () {
     value: function humanReadableDisplayForContentType(contentType) {
       var _NOTE_CONTENT_TYPE$TA;
 
-      return (_NOTE_CONTENT_TYPE$TA = {}, _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["NOTE_CONTENT_TYPE"], "note"), _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["TAG_CONTENT_TYPE"], "tag"), _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_18__["SMART_TAG_CONTENT_TYPE"], "smart tag"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "Extension", "action-based extension"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Component", "component"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Editor", "editor"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Theme", "theme"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SF|Extension", "server extension"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SF|MFA", "two-factor authentication setting"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|Credentials", "FileSafe credential"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|FileMetadata", "FileSafe file"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|Integration", "FileSafe integration"), _NOTE_CONTENT_TYPE$TA)[contentType];
+      return (_NOTE_CONTENT_TYPE$TA = {}, _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["NOTE_CONTENT_TYPE"], "note"), _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["TAG_CONTENT_TYPE"], "tag"), _defineProperty(_NOTE_CONTENT_TYPE$TA, _Lib_constants__WEBPACK_IMPORTED_MODULE_19__["SMART_TAG_CONTENT_TYPE"], "smart tag"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "Extension", "action-based extension"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Component", "component"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Editor", "editor"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|Theme", "theme"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SF|Extension", "server extension"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SF|MFA", "two-factor authentication setting"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|Credentials", "FileSafe credential"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|FileMetadata", "FileSafe file"), _defineProperty(_NOTE_CONTENT_TYPE$TA, "SN|FileSafe|Integration", "FileSafe integration"), _NOTE_CONTENT_TYPE$TA)[contentType];
     }
   }, {
     key: "allItems",
@@ -17883,7 +19174,7 @@ function () {
     this.timeout = timeout || setTimeout.bind(window);
     this.loadFromDisk().then(function () {
       _this.modelManager.addItemSyncObserver("session-history", contentTypes, function (allItems, validItems, deletedItems, source, sourceKey) {
-        if (source === MAPPING_SOURCE_LOCAL_DIRTIED) {
+        if (source === PAYLOAD_SOURCE_LOCAL_DIRTIED) {
           return;
         }
 
@@ -18173,7 +19464,7 @@ function () {
       priority: -1,
       callback: function callback(allItems, validItems, deletedItems, source, sourceKey) {
         // Inside resolveSingletons, we are going to set items as dirty. If we don't stop here it result in infinite recursion.
-        if (source === MAPPING_SOURCE_LOCAL_DIRTIED) {
+        if (source === PAYLOAD_SOURCE_LOCAL_DIRTIED) {
           return;
         }
 
@@ -18983,7 +20274,7 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AccountDownloader", function() { return AccountDownloader; });
 /* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
-/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -19037,7 +20328,7 @@ function () {
                         encryptedPayloads = response.retrieved_items.map(function (retrievedPayload) {
                           return CreatePayloadFromAnyObject({
                             object: retrievedPayload,
-                            source: _Lib_sources__WEBPACK_IMPORTED_MODULE_1__["MAPPING_SOURCE_REMOTE_RETRIEVED"]
+                            source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
                           });
                         });
                         _context.next = 4;
@@ -19124,17 +20415,10 @@ function () {
   /**
    * A long running operation that handles multiple roundtrips from a server,
    * emitting a stream of values that should be acted upon in real time.
-   * Once an operation is created, no new values can be passed into it.
-   * However, it can be cancleled at most pointss.
-   * If an item changes that a current operation is handling, try canceling it,
-   * then starting a new one. But once it returns values, those values should be acted upon.\
-   */
-
-  /**
    * @param payloads   An array of payloads to send to the server
    * @param receiver   A function that recieves callback multiple times during the operation
    *                   and takes two parameters: (payloads, actions)
-    */
+   */
   function AccountSyncOperation(_ref) {
     var payloads = _ref.payloads,
         receiver = _ref.receiver,
@@ -19378,7 +20662,8 @@ function () {
       var conflicts = this.rawResponse.conflicted_items || [];
       var legacyConflicts = this.rawResponse.conflicts || [];
       var rawConflictItems = conflicts.map(function (conflict) {
-        /** unsaved_item for uuid conflicts, and server_item for data conflicts */
+        /** unsaved_item for uuid conflicts,
+        and server_item for data conflicts */
         return conflict.unsaved_item || conflict.server_item;
       });
       var rawLegacyConflictItems = conflicts.map(function (conflict) {
@@ -19417,8 +20702,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AccountSyncResponseResolver", function() { return AccountSyncResponseResolver; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Lib_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/sources */ "./lib/sources.js");
-/* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Protocol_payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/deltas/generator */ "./lib/protocol/payloads/deltas/generator.js");
+/* harmony import */ var _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -19429,6 +20717,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
+
+
+var SYNC_CONFLICT_TYPE_CONFLICTING_DATA = 'sync_conflict';
+var SYNC_CONFLICT_TYPE_UUID_CONFLICT = 'uuid_conflict';
 var AccountSyncResponseResolver =
 /*#__PURE__*/
 function () {
@@ -19441,146 +20734,159 @@ function () {
     _classCallCheck(this, AccountSyncResponseResolver);
 
     this.response = response;
-    this.decryptedResponsePayloads = decryptedResponsePayloads;
     this.masterCollection = masterCollection;
-    this.payloadsSavedOrSaving = payloadsSavedOrSaving;
+    this.relatedCollectionSet = new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollectionSet"]({
+      collections: [new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
+        payloads: this.decryptedResponsePayloads,
+        source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_DECRYPTED_TRANSIENT"]
+      }), new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
+        payloads: this.payloadsSavedOrSaving,
+        source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_SAVED_OR_SAVING"]
+      })]
+    });
   }
 
   _createClass(AccountSyncResponseResolver, [{
-    key: "run",
-    value: function run() {
-      var allPayloads, processedRetrieved, processedSaved, processedConflicts;
-      return regeneratorRuntime.async(function run$(_context) {
+    key: "collectionsByProcessingResponse",
+    value: function collectionsByProcessingResponse() {
+      var collections, collectionRetrieved, collectionSaved, collectionsConflicts, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, conflictCollection;
+
+      return regeneratorRuntime.async(function collectionsByProcessingResponse$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              allPayloads = [];
+              collections = [];
               _context.next = 3;
-              return regeneratorRuntime.awrap(this.processRetrievedItems());
+              return regeneratorRuntime.awrap(this.collectionByProcessingRawItems({
+                rawItems: this.response.rawRetrievedItems,
+                source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
+              }));
 
             case 3:
-              processedRetrieved = _context.sent;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedRetrieved);
+              collectionRetrieved = _context.sent;
+              collections.push(collectionRetrieved);
               _context.next = 7;
-              return regeneratorRuntime.awrap(this.processSavedItems());
+              return regeneratorRuntime.awrap(this.collectionByProcessingRawItems({
+                rawItems: this.response.rawSavedItems,
+                source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_REMOTE_SAVED"]
+              }));
 
             case 7:
-              processedSaved = _context.sent;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedSaved);
+              collectionSaved = _context.sent;
+              collections.push(collectionSaved);
               _context.next = 11;
-              return regeneratorRuntime.awrap(this.processConflictedItems());
+              return regeneratorRuntime.awrap(this.collectionsByProcessingConflicts());
 
             case 11:
-              processedConflicts = _context.sent;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(allPayloads, processedConflicts);
-              this.handledConflicts = processedConflicts;
-              return _context.abrupt("return", allPayloads);
+              collectionsConflicts = _context.sent;
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(collections, collectionsConflicts);
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context.prev = 16;
+              _iterator = collectionsConflicts[Symbol.iterator]();
 
-            case 15:
+            case 18:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context.next = 27;
+                break;
+              }
+
+              conflictCollection = _step.value;
+
+              if (!(conflictCollection.allPayloads.length > 0)) {
+                _context.next = 23;
+                break;
+              }
+
+              this.needsMoreSync = true;
+              return _context.abrupt("break", 27);
+
+            case 23:
+              this.needsMoreSync = false;
+
+            case 24:
+              _iteratorNormalCompletion = true;
+              _context.next = 18;
+              break;
+
+            case 27:
+              _context.next = 33;
+              break;
+
+            case 29:
+              _context.prev = 29;
+              _context.t0 = _context["catch"](16);
+              _didIteratorError = true;
+              _iteratorError = _context.t0;
+
+            case 33:
+              _context.prev = 33;
+              _context.prev = 34;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 36:
+              _context.prev = 36;
+
+              if (!_didIteratorError) {
+                _context.next = 39;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 39:
+              return _context.finish(36);
+
+            case 40:
+              return _context.finish(33);
+
+            case 41:
+              return _context.abrupt("return", collections);
+
+            case 42:
             case "end":
               return _context.stop();
           }
         }
-      }, null, this);
+      }, null, this, [[16, 29, 33, 41], [34,, 36, 40]]);
     }
   }, {
-    key: "finalDirtyStateForId",
-    value: function finalDirtyStateForId(id) {
-      var currentItemPayload = this.findCurrentItemPayload(id);
-      /** currentItemPayload can be null in the case of new items that haven't yet been mapped */
-
-      var stillDirty = currentItemPayload ? currentItemPayload.dirtyCount > 0 : false;
-      return stillDirty;
-    }
-  }, {
-    key: "processRetrievedItems",
-    value: function processRetrievedItems() {
+    key: "collectionByProcessingRawItems",
+    value: function collectionByProcessingRawItems(_ref2) {
       var _this = this;
 
-      var conflictedRetrievedPayloads, filteredRetrieved, conflicts, _i, _conflictedRetrievedP, potentialConflict, decryptedServerPayload, currentPayloadValue, copy;
-
-      return regeneratorRuntime.async(function processRetrievedItems$(_context2) {
+      var rawItems, source, payloads, collection, deltaClass, delta;
+      return regeneratorRuntime.async(function collectionByProcessingRawItems$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              /**
-               * If we have retrieved an item that was saved as part of this ongoing sync operation,
-               * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
-               */
-              conflictedRetrievedPayloads = [];
-              filteredRetrieved = this.response.rawRetrievedItems.filter(function (retrievedItem) {
-                var decrypted = _this.findDecryptedPayload(retrievedItem.uuid);
-
-                var retrievedPayload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
-                  object: decrypted,
-                  source: MAPPING_SOURCE_REMOTE_RETRIEVED
+              rawItems = _ref2.rawItems, source = _ref2.source;
+              payloads = rawItems.map(function (rawItem) {
+                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
+                  object: rawItem,
+                  source: source,
+                  override: {
+                    dirty: _this.finalDirtyStateForId(rawItem.uuid)
+                  }
                 });
-                var savedOrSaving = findInArray(_this.payloadsSavedOrSaving, 'uuid', retrievedPayload.uuid);
-
-                if (savedOrSaving) {
-                  conflictedRetrievedPayloads.push(retrievedPayload);
-                  return false;
-                }
-
-                var localItemPayload = _this.findCurrentItemPayload(retrievedPayload.uuid);
-
-                if (localItemPayload && localItemPayload.dirty === true) {
-                  conflictedRetrievedPayloads.push(retrievedPayload);
-                  return false;
-                }
-
-                return true;
               });
-              /**
-               * For any potential conflict above, we compare the values with current
-               * local values, and if they differ, we create a new payload that is a copy
-               * of the server payload.
-               */
+              collection = new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
+                payloads: payloads,
+                source: source
+              });
+              deltaClass = Object(_Protocol_payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_2__["DeltaClassForSource"])(source);
+              delta = new deltaClass({
+                baseCollection: this.masterCollection,
+                applyCollection: collection,
+                relatedCollectionSet: this.relatedCollectionSet
+              });
+              return _context2.abrupt("return", delta.resultingCollection());
 
-              conflicts = [];
-              _i = 0, _conflictedRetrievedP = conflictedRetrievedPayloads;
-
-            case 4:
-              if (!(_i < _conflictedRetrievedP.length)) {
-                _context2.next = 18;
-                break;
-              }
-
-              potentialConflict = _conflictedRetrievedP[_i];
-              decryptedServerPayload = this.findDecryptedPayload(potentialConflict.uuid);
-              currentPayloadValue = this.findCurrentItemPayload(potentialConflict.uuid);
-
-              if (!(!currentPayloadValue || !decryptedServerPayload.content)) {
-                _context2.next = 10;
-                break;
-              }
-
-              return _context2.abrupt("continue", 15);
-
-            case 10:
-              if (currentPayloadValue.compareContentFields(decryptedServerPayload)) {
-                _context2.next = 15;
-                break;
-              }
-
-              _context2.next = 13;
-              return regeneratorRuntime.awrap(decryptedServerPayload.payloadsByCopying({
-                isConflict: true
-              }));
-
-            case 13:
-              copy = _context2.sent;
-              conflicts.push(copy);
-
-            case 15:
-              _i++;
-              _context2.next = 4;
-              break;
-
-            case 18:
-              return _context2.abrupt("return", filteredRetrieved.concat(conflicts));
-
-            case 19:
+            case 6:
             case "end":
               return _context2.stop();
           }
@@ -19588,31 +20894,53 @@ function () {
       }, null, this);
     }
   }, {
-    key: "processSavedItems",
-    value: function processSavedItems() {
-      var _this2 = this;
-
-      var saved_items, processed;
-      return regeneratorRuntime.async(function processSavedItems$(_context3) {
+    key: "collectionsByProcessingConflicts",
+    value: function collectionsByProcessingConflicts() {
+      var conflicts, uuidConflictRawItems, dataConflictRawItems, uuidConflictDelta, dataConflictDelta, uuidResults, dataResults;
+      return regeneratorRuntime.async(function collectionsByProcessingConflicts$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              saved_items = this.response.rawSavedItems;
-              processed = saved_items.map(function (serverPayload) {
-                var decrypted = _this2.findDecryptedPayload(serverPayload.uuid);
-
-                if (!decrypted) {
-                  throw 'Unable to find decrypted counterpart for payload.';
-                }
-
-                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
-                  object: decrypted,
-                  source: _Lib_sources__WEBPACK_IMPORTED_MODULE_2__["MAPPING_SOURCE_REMOTE_SAVED"]
-                });
+              conflicts = this.response.rawConflictObjects;
+              uuidConflictRawItems = conflicts.filter(function (conflict) {
+                return conflict.type === SYNC_CONFLICT_TYPE_UUID_CONFLICT;
+              }).map(function (conflict) {
+                return conflict.unsaved_item || conflict.item;
               });
-              return _context3.abrupt("return", processed);
+              dataConflictRawItems = conflicts.filter(function (conflict) {
+                return conflict.type === SYNC_CONFLICT_TYPE_CONFLICTING_DATA;
+              }).map(function (conflict) {
+                return conflict.server_item || conflict.item;
+              });
+              uuidConflictDelta = new _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_3__["DeltaRemoteConflicts"]({
+                baseCollection: this.masterCollection,
+                applyCollection: new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
+                  payloads: uuidConflictRawItems,
+                  source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_CONFLICT_UUID"]
+                }),
+                relatedCollectionSet: this.relatedCollectionSet
+              });
+              dataConflictDelta = new _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_3__["DeltaRemoteConflicts"]({
+                baseCollection: this.masterCollection,
+                applyCollection: new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
+                  payloads: dataConflictRawItems,
+                  source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_CONFLICT_DATA"]
+                }),
+                relatedCollectionSet: this.relatedCollectionSet
+              });
+              _context3.next = 7;
+              return regeneratorRuntime.awrap(uuidConflictDelta.resultingCollection());
 
-            case 3:
+            case 7:
+              uuidResults = _context3.sent;
+              _context3.next = 10;
+              return regeneratorRuntime.awrap(dataConflictDelta.resultingCollection());
+
+            case 10:
+              dataResults = _context3.sent;
+              return _context3.abrupt("return", [uuidResults, dataResults]);
+
+            case 12:
             case "end":
               return _context3.stop();
           }
@@ -19620,106 +20948,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "processConflictedItems",
-    value: function processConflictedItems() {
-      var conflicts, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, conflict, resolver, payloads;
+    key: "finalDirtyStateForId",
+    value: function finalDirtyStateForId(id) {
+      var current = this.masterCollection.findPayload(id);
+      /**
+       * `current` can be null in the case of new
+       * items that haven't yet been mapped
+       */
 
-      return regeneratorRuntime.async(function processConflictedItems$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              conflicts = this.response.rawConflictObjects;
-              results = [];
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context4.prev = 5;
-              _iterator = conflicts[Symbol.iterator]();
-
-            case 7:
-              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context4.next = 17;
-                break;
-              }
-
-              conflict = _step.value;
-              resolver = new AccountSyncConflictResolver({
-                conflict: conflict,
-                decryptedResponsePayloads: this.decryptedResponsePayloads,
-                masterCollection: this.masterCollection
-              });
-              _context4.next = 12;
-              return regeneratorRuntime.awrap(resolve.run());
-
-            case 12:
-              payloads = _context4.sent;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["extendArray"])(results, payloads);
-
-            case 14:
-              _iteratorNormalCompletion = true;
-              _context4.next = 7;
-              break;
-
-            case 17:
-              _context4.next = 23;
-              break;
-
-            case 19:
-              _context4.prev = 19;
-              _context4.t0 = _context4["catch"](5);
-              _didIteratorError = true;
-              _iteratorError = _context4.t0;
-
-            case 23:
-              _context4.prev = 23;
-              _context4.prev = 24;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 26:
-              _context4.prev = 26;
-
-              if (!_didIteratorError) {
-                _context4.next = 29;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 29:
-              return _context4.finish(26);
-
-            case 30:
-              return _context4.finish(23);
-
-            case 31:
-              return _context4.abrupt("return", results);
-
-            case 32:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this, [[5, 19, 23, 31], [24,, 26, 30]]);
-    }
-  }, {
-    key: "findDecryptedPayload",
-    value: function findDecryptedPayload(id) {
-      return this.decryptedResponsePayloads.find(function (payload) {
-        return payload.uuid === id;
-      });
-    }
-  }, {
-    key: "findCurrentItemPayload",
-    value: function findCurrentItemPayload(id) {
-      return this.masterCollection.findPayload(id);
-    }
-  }, {
-    key: "needsMoreSync",
-    get: function get() {
-      return this.handledConflicts && this.handledConflicts.length > 0;
+      var dirty = current ? current.dirtyCount > 0 : false;
+      return dirty;
     }
   }]);
 
@@ -19951,8 +21189,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/sync/account/operation */ "./lib/services/sync/account/operation.js");
 /* harmony import */ var _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/sync/offline/operation */ "./lib/services/sync/offline/operation.js");
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.js");
-/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Protocol/payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
+/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19970,6 +21210,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
 
 
 
@@ -20182,7 +21424,7 @@ function (_SNService) {
               _context.next = 17;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: payloads,
-                source: MAPPING_SOURCE_LOCAL_RETRIEVED
+                source: PAYLOAD_SOURCE_LOCAL_RETRIEVED
               }));
 
             case 17:
@@ -20216,7 +21458,7 @@ function (_SNService) {
           switch (_context2.prev = _context2.next) {
             case 0:
               this.syncToken = token;
-              return _context2.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
+              return _context2.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
 
             case 2:
             case "end":
@@ -20239,11 +21481,11 @@ function (_SNService) {
                 break;
               }
 
-              return _context3.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_PAGINATION_TOKEN"], token));
+              return _context3.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_PAGINATION_TOKEN"], token));
 
             case 5:
               _context3.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 7:
               return _context3.abrupt("return", _context3.sent);
@@ -20268,7 +21510,7 @@ function (_SNService) {
               }
 
               _context4.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 3:
               this.syncToken = _context4.sent;
@@ -20296,7 +21538,7 @@ function (_SNService) {
               }
 
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 3:
               this.cursorToken = _context5.sent;
@@ -20321,11 +21563,11 @@ function (_SNService) {
               this.syncToken = null;
               this.cursorToken = null;
               _context6.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 4:
               _context6.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_11__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_13__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 6:
             case "end":
@@ -20337,7 +21579,7 @@ function (_SNService) {
   }, {
     key: "popItemsNeedingSync",
     value: function popItemsNeedingSync() {
-      var items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _item;
+      var items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item;
 
       return regeneratorRuntime.async(function popItemsNeedingSync$(_context7) {
         while (1) {
@@ -20355,8 +21597,8 @@ function (_SNService) {
               _context7.prev = 4;
 
               for (_iterator2 = items[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                _item = _step2.value;
-                _item.dirtyCount = 0;
+                item = _step2.value;
+                item.dirtyCount = 0;
               }
 
               _context7.next = 12;
@@ -20412,7 +21654,7 @@ function (_SNService) {
   }, {
     key: "markAllItemsAsNeedingSync",
     value: function markAllItemsAsNeedingSync(_ref2) {
-      var alternateUuids, _items, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _item2, items, payloads;
+      var alternateUuids, _items, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, item, items, payloads;
 
       return regeneratorRuntime.async(function markAllItemsAsNeedingSync$(_context8) {
         while (1) {
@@ -20441,9 +21683,9 @@ function (_SNService) {
                 break;
               }
 
-              _item2 = _step3.value;
+              item = _step3.value;
               _context8.next = 12;
-              return regeneratorRuntime.awrap(this.modelManager.alternateUUIDForItem(_item2));
+              return regeneratorRuntime.awrap(this.modelManager.alternateUUIDForItem(item));
 
             case 12:
               _iteratorNormalCompletion3 = true;
@@ -20833,7 +22075,7 @@ function (_SNService) {
               _context11.t5 = _context11.sent;
 
               _context11.t6 = function receiver(signal, type) {
-                if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_10__["SIGNAL_TYPE_RESPONSE"]) {
+                if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_12__["SIGNAL_TYPE_RESPONSE"]) {
                   var response = signal;
 
                   if (response.hasError) {
@@ -20847,7 +22089,7 @@ function (_SNService) {
                       response: response
                     });
                   }
-                } else if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_10__["SIGNAL_TYPE_STATUS_CHANGED"]) {
+                } else if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_12__["SIGNAL_TYPE_STATUS_CHANGED"]) {
                   _this7.handleStatusChange({
                     operation: operation
                   });
@@ -20886,9 +22128,9 @@ function (_SNService) {
               operation = new _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_8__["OfflineSyncOperation"]({
                 payloads: payloads,
                 receiver: function receiver(signal, type) {
-                  if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_10__["SIGNAL_TYPE_RESPONSE"]) {
+                  if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_12__["SIGNAL_TYPE_RESPONSE"]) {
                     _this8.handleOfflineResponse(signal);
-                  } else if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_10__["SIGNAL_TYPE_STATUS_CHANGED"]) {
+                  } else if (type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_12__["SIGNAL_TYPE_STATUS_CHANGED"]) {
                     _this8.handleStatusChange({
                       operation: operation
                     });
@@ -20929,31 +22171,15 @@ function (_SNService) {
       }, null, this);
     }
   }, {
-    key: "setStatus",
-    value: function setStatus(status) {
-      return regeneratorRuntime.async(function setStatus$(_context14) {
-        while (1) {
-          switch (_context14.prev = _context14.next) {
-            case 0:
-              this.status = status;
-
-            case 1:
-            case "end":
-              return _context14.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
     key: "handleOfflineResponse",
     value: function handleOfflineResponse(response) {
       var payloads;
-      return regeneratorRuntime.async(function handleOfflineResponse$(_context15) {
+      return regeneratorRuntime.async(function handleOfflineResponse$(_context14) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               payloads = response.payloads;
-              _context15.next = 3;
+              _context14.next = 3;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 encryptedPayloads: payloads
               }));
@@ -20961,13 +22187,13 @@ function (_SNService) {
             case 3:
               this.modelManager.mapPayloadsToLocalItems({
                 payloads: payloads,
-                source: MAPPING_SOURCE_LOCAL_SAVED
+                source: PAYLOAD_SOURCE_LOCAL_SAVED
               });
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_FULL_SYNC_COMPLETED"]);
 
             case 5:
             case "end":
-              return _context15.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -20976,9 +22202,9 @@ function (_SNService) {
     key: "handleErrorServerResponse",
     value: function handleErrorServerResponse(_ref7) {
       var operation, response;
-      return regeneratorRuntime.async(function handleErrorServerResponse$(_context16) {
+      return regeneratorRuntime.async(function handleErrorServerResponse$(_context15) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               operation = _ref7.operation, response = _ref7.response;
               this.log('Sync Error', response);
@@ -20992,7 +22218,7 @@ function (_SNService) {
 
             case 5:
             case "end":
-              return _context16.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -21000,20 +22226,20 @@ function (_SNService) {
   }, {
     key: "handleSuccessServerResponse",
     value: function handleSuccessServerResponse(_ref8) {
-      var operation, response, decryptedPayloads, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, payload, masterCollection, resolver, payloads, clientHash;
+      var operation, response, decryptedPayloads, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, payload, masterCollection, resolver, collections, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, collection, clientHash;
 
-      return regeneratorRuntime.async(function handleSuccessServerResponse$(_context17) {
+      return regeneratorRuntime.async(function handleSuccessServerResponse$(_context16) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
               operation = _ref8.operation, response = _ref8.response;
 
               if (!this._simulate_latency) {
-                _context17.next = 4;
+                _context16.next = 4;
                 break;
               }
 
-              _context17.next = 4;
+              _context16.next = 4;
               return regeneratorRuntime.awrap(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["sleep"])(this._simulate_latency.latency));
 
             case 4:
@@ -21025,65 +22251,65 @@ function (_SNService) {
               _iteratorNormalCompletion5 = true;
               _didIteratorError5 = false;
               _iteratorError5 = undefined;
-              _context17.prev = 12;
+              _context16.prev = 12;
               _iterator5 = response.allProcessedPayloads[Symbol.iterator]();
 
             case 14:
               if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context17.next = 24;
+                _context16.next = 24;
                 break;
               }
 
               payload = _step5.value;
-              _context17.t0 = decryptedPayloads;
-              _context17.next = 19;
+              _context16.t0 = decryptedPayloads;
+              _context16.next = 19;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
                 payload: payload
               }));
 
             case 19:
-              _context17.t1 = _context17.sent;
+              _context16.t1 = _context16.sent;
 
-              _context17.t0.push.call(_context17.t0, _context17.t1);
+              _context16.t0.push.call(_context16.t0, _context16.t1);
 
             case 21:
               _iteratorNormalCompletion5 = true;
-              _context17.next = 14;
+              _context16.next = 14;
               break;
 
             case 24:
-              _context17.next = 30;
+              _context16.next = 30;
               break;
 
             case 26:
-              _context17.prev = 26;
-              _context17.t2 = _context17["catch"](12);
+              _context16.prev = 26;
+              _context16.t2 = _context16["catch"](12);
               _didIteratorError5 = true;
-              _iteratorError5 = _context17.t2;
+              _iteratorError5 = _context16.t2;
 
             case 30:
-              _context17.prev = 30;
-              _context17.prev = 31;
+              _context16.prev = 30;
+              _context16.prev = 31;
 
               if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                 _iterator5.return();
               }
 
             case 33:
-              _context17.prev = 33;
+              _context16.prev = 33;
 
               if (!_didIteratorError5) {
-                _context17.next = 36;
+                _context16.next = 36;
                 break;
               }
 
               throw _iteratorError5;
 
             case 36:
-              return _context17.finish(33);
+              return _context16.finish(33);
 
             case 37:
-              return _context17.finish(30);
+              return _context16.finish(30);
 
             case 38:
               masterCollection = this.modelManager.getMasterCollection();
@@ -21093,60 +22319,111 @@ function (_SNService) {
                 payloadsSavedOrSaving: operation.payloadsSavedOrSaving,
                 masterCollection: masterCollection
               });
-              _context17.next = 42;
-              return regeneratorRuntime.awrap(resolver.run());
+              _context16.next = 42;
+              return regeneratorRuntime.awrap(resolver.collectionsByProcessingResponse());
 
             case 42:
-              payloads = _context17.sent;
-              _context17.next = 45;
-              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: payloads,
-                source: MAPPING_SOURCE_REMOTE_RETRIEVED
-              }));
+              collections = _context16.sent;
+              _iteratorNormalCompletion6 = true;
+              _didIteratorError6 = false;
+              _iteratorError6 = undefined;
+              _context16.prev = 46;
+              _iterator6 = collections[Symbol.iterator]();
 
-            case 45:
-              _context17.next = 47;
-              return regeneratorRuntime.awrap(this.persistPayloads({
-                decryptedPayloads: payloads
-              }));
-
-            case 47:
-              if (!response.checkIntegrity) {
-                _context17.next = 52;
+            case 48:
+              if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+                _context16.next = 57;
                 break;
               }
 
-              _context17.next = 50;
+              collection = _step6.value;
+              _context16.next = 52;
+              return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
+                collection: collection
+              }));
+
+            case 52:
+              _context16.next = 54;
+              return regeneratorRuntime.awrap(this.persistPayloads({
+                decryptedPayloads: collection.allPayloads
+              }));
+
+            case 54:
+              _iteratorNormalCompletion6 = true;
+              _context16.next = 48;
+              break;
+
+            case 57:
+              _context16.next = 63;
+              break;
+
+            case 59:
+              _context16.prev = 59;
+              _context16.t3 = _context16["catch"](46);
+              _didIteratorError6 = true;
+              _iteratorError6 = _context16.t3;
+
+            case 63:
+              _context16.prev = 63;
+              _context16.prev = 64;
+
+              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                _iterator6.return();
+              }
+
+            case 66:
+              _context16.prev = 66;
+
+              if (!_didIteratorError6) {
+                _context16.next = 69;
+                break;
+              }
+
+              throw _iteratorError6;
+
+            case 69:
+              return _context16.finish(66);
+
+            case 70:
+              return _context16.finish(63);
+
+            case 71:
+              if (!response.checkIntegrity) {
+                _context16.next = 76;
+                break;
+              }
+
+              _context16.next = 74;
               return regeneratorRuntime.awrap(this.protocolManager.computeDataIntegrityHash());
 
-            case 50:
-              clientHash = _context17.sent;
+            case 74:
+              clientHash = _context16.sent;
               this.state.setIntegrityHashes({
                 clientHash: clientHash,
                 serverHash: response.integrityHash
               });
 
-            case 52:
+            case 76:
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_SINGLE_SYNC_COMPLETED"]);
 
               if (resolver.needsMoreSync) {
                 this.sync();
               }
 
-            case 54:
+            case 78:
             case "end":
-              return _context17.stop();
+              return _context16.stop();
           }
         }
-      }, null, this, [[12, 26, 30, 38], [31,, 33, 37]]);
+      }, null, this, [[12, 26, 30, 38], [31,, 33, 37], [46, 59, 63, 71], [64,, 66, 70]]);
     }
   }, {
     key: "handleSyncOperationCompletion",
     value: function handleSyncOperationCompletion(_ref9) {
       var operation;
-      return regeneratorRuntime.async(function handleSyncOperationCompletion$(_context18) {
+      return regeneratorRuntime.async(function handleSyncOperationCompletion$(_context17) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
               operation = _ref9.operation;
 
@@ -21159,7 +22436,7 @@ function (_SNService) {
 
             case 4:
             case "end":
-              return _context18.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -21170,39 +22447,39 @@ function (_SNService) {
       var _this9 = this;
 
       var encryptedPayloads, decryptedPayloads, newlyEncrypted, allPayloads;
-      return regeneratorRuntime.async(function persistPayloads$(_context20) {
+      return regeneratorRuntime.async(function persistPayloads$(_context19) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               encryptedPayloads = _ref10.encryptedPayloads, decryptedPayloads = _ref10.decryptedPayloads;
               newlyEncrypted = (decryptedPayloads || []).map(function _callee(payload) {
-                return regeneratorRuntime.async(function _callee$(_context19) {
+                return regeneratorRuntime.async(function _callee$(_context18) {
                   while (1) {
-                    switch (_context19.prev = _context19.next) {
+                    switch (_context18.prev = _context18.next) {
                       case 0:
-                        _context19.next = 2;
+                        _context18.next = 2;
                         return regeneratorRuntime.awrap(_this9.protocolManager.payloadByEncryptingPayload({
                           payload: payload,
                           intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
                         }));
 
                       case 2:
-                        return _context19.abrupt("return", _context19.sent);
+                        return _context18.abrupt("return", _context18.sent);
 
                       case 3:
                       case "end":
-                        return _context19.stop();
+                        return _context18.stop();
                     }
                   }
                 });
               });
               allPayloads = (encryptedPayloads || []).concat(newlyEncrypted);
-              _context20.next = 5;
+              _context19.next = 5;
               return regeneratorRuntime.awrap(this.storageManager.savePayloads(allPayloads));
 
             case 5:
             case "end":
-              return _context20.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
@@ -21210,18 +22487,72 @@ function (_SNService) {
   }, {
     key: "handleSignOut",
     value: function handleSignOut() {
-      return regeneratorRuntime.async(function handleSignOut$(_context21) {
+      return regeneratorRuntime.async(function handleSignOut$(_context20) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
               this.state.reset();
               this.syncStatus.reset();
               this.resolveQueue = [];
               this.spawnQueue = [];
-              _context21.next = 6;
+              _context20.next = 6;
               return regeneratorRuntime.awrap(this.clearSyncPositionTokens());
 
             case 6:
+            case "end":
+              return _context20.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** Downloads all items and maps to lcoal items to attempt resolve out-of-sync state */
+
+  }, {
+    key: "resolveOutOfSync",
+    value: function resolveOutOfSync() {
+      var payloads, delta, collection;
+      return regeneratorRuntime.async(function resolveOutOfSync$(_context21) {
+        while (1) {
+          switch (_context21.prev = _context21.next) {
+            case 0:
+              _context21.next = 2;
+              return regeneratorRuntime.awrap(_Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
+                apiService: this.apiService,
+                protocolManager: this.protocolManager,
+                customEvent: "resolve-out-of-sync"
+              }));
+
+            case 2:
+              payloads = _context21.sent;
+              delta = new _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_11__["DeltaOutOfSync"]({
+                baseCollection: this.modelManager.getMasterCollection(),
+                applyCollection: new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_10__["PayloadCollection"]({
+                  payloads: payloads,
+                  source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
+                })
+              });
+              _context21.next = 6;
+              return regeneratorRuntime.awrap(delta.resultingCollection());
+
+            case 6:
+              collection = _context21.sent;
+              _context21.next = 9;
+              return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
+                collection: collection
+              }));
+
+            case 9:
+              _context21.next = 11;
+              return regeneratorRuntime.awrap(this.persistPayloads({
+                decryptedPayloads: collection.payloads
+              }));
+
+            case 11:
+              return _context21.abrupt("return", this.sync({
+                checkIntegrity: true
+              }));
+
+            case 12:
             case "end":
               return _context21.stop();
           }
@@ -21246,120 +22577,7 @@ function (_SNService) {
         });
       });
     }
-    /** Downloads all items and maps to lcoal items to attempt resolve out-of-sync state */
-
-  }, {
-    key: "resolveOutOfSync",
-    value: function resolveOutOfSync() {
-      var payloads, results, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, payload, existingItem, contentDiffers, existingPayload, resultingPayloads;
-
-      return regeneratorRuntime.async(function resolveOutOfSync$(_context22) {
-        while (1) {
-          switch (_context22.prev = _context22.next) {
-            case 0:
-              payloads = _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
-                apiService: this.apiService,
-                protocolManager: this.protocolManager,
-                customEvent: "resolve-out-of-sync"
-              });
-              results = [];
-              _iteratorNormalCompletion6 = true;
-              _didIteratorError6 = false;
-              _iteratorError6 = undefined;
-              _context22.prev = 5;
-
-              for (_iterator6 = payloads[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                payload = _step6.value;
-                existingItem = this.modelManager.findItem(payload.uuid);
-
-                if (existingItem) {
-                  contentDiffers = !item.isItemContentEqualWith(existingItem);
-
-                  if (contentDiffers) {
-                    existingPayload = CreatePayloadFromAnyObject({
-                      object: existingItem
-                    });
-                    /**
-                     * We create a copy of the local existing item and sync that up.
-                     * It will be a "conflict" of itself
-                     */
-
-                    resultingPayloads = existingPayload.payloadsByCopying({
-                      isConflict: true,
-                      masterCollection: this.modelManager.getMasterCollection()
-                    });
-                    extendArray(results, resultingPayloads);
-                  }
-                }
-                /**
-                 * Map the server payload as authoritive content. If client copy at all differed,
-                 * we would have created a duplicate of it above and synced it.
-                 * This is also neccessary to map the updated_at value from the server
-                 */
-
-
-                results.push(payload);
-              }
-
-              _context22.next = 13;
-              break;
-
-            case 9:
-              _context22.prev = 9;
-              _context22.t0 = _context22["catch"](5);
-              _didIteratorError6 = true;
-              _iteratorError6 = _context22.t0;
-
-            case 13:
-              _context22.prev = 13;
-              _context22.prev = 14;
-
-              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                _iterator6.return();
-              }
-
-            case 16:
-              _context22.prev = 16;
-
-              if (!_didIteratorError6) {
-                _context22.next = 19;
-                break;
-              }
-
-              throw _iteratorError6;
-
-            case 19:
-              return _context22.finish(16);
-
-            case 20:
-              return _context22.finish(13);
-
-            case 21:
-              _context22.next = 23;
-              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: results,
-                source: MAPPING_SOURCE_REMOTE_RETRIEVED
-              }));
-
-            case 23:
-              _context22.next = 25;
-              return regeneratorRuntime.awrap(this.persistPayloads({
-                decryptedPayloads: results
-              }));
-
-            case 25:
-              return _context22.abrupt("return", this.sync({
-                checkIntegrity: true
-              }));
-
-            case 26:
-            case "end":
-              return _context22.stop();
-          }
-        }
-      }, null, this, [[5, 9, 13, 21], [14,, 16, 20]]);
-    }
-    /** For testing */
+    /** @unit_testing */
 
   }, {
     key: "beginLatencySimulator",
@@ -21369,6 +22587,8 @@ function (_SNService) {
         enabled: true
       };
     }
+    /** @unit_testing */
+
   }, {
     key: "endLatencySimulator",
     value: function endLatencySimulator() {
@@ -21636,40 +22856,6 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
     return aPriority < bPriority ? -1 : 1;
   });
 }
-
-/***/ }),
-
-/***/ "./lib/sources.js":
-/*!************************!*\
-  !*** ./lib/sources.js ***!
-  \************************/
-/*! exports provided: MAPPING_SOURCE_REMOTE_RETRIEVED, MAPPING_SOURCE_REMOTE_SAVED, MAPPING_SOURCE_LOCAL_SAVED, MAPPING_SOURCE_LOCAL_RETRIEVED, MAPPING_SOURCE_LOCAL_DIRTIED, MAPPING_SOURCE_COMPONENT_RETRIEVED, MAPPING_SOURCE_DESKTOP_INSTALLED, MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED, MAPPING_SOURCE_FILE_IMPORT */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_RETRIEVED", function() { return MAPPING_SOURCE_REMOTE_RETRIEVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_SAVED", function() { return MAPPING_SOURCE_REMOTE_SAVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_SAVED", function() { return MAPPING_SOURCE_LOCAL_SAVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_RETRIEVED", function() { return MAPPING_SOURCE_LOCAL_RETRIEVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_LOCAL_DIRTIED", function() { return MAPPING_SOURCE_LOCAL_DIRTIED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_COMPONENT_RETRIEVED", function() { return MAPPING_SOURCE_COMPONENT_RETRIEVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_DESKTOP_INSTALLED", function() { return MAPPING_SOURCE_DESKTOP_INSTALLED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAPPING_SOURCE_FILE_IMPORT", function() { return MAPPING_SOURCE_FILE_IMPORT; });
-var MAPPING_SOURCE_REMOTE_RETRIEVED = 'MappingSourceRemoteRetrieved';
-var MAPPING_SOURCE_REMOTE_SAVED = 'MappingSourceRemoteSaved';
-var MAPPING_SOURCE_LOCAL_SAVED = 'MappingSourceLocalSaved';
-var MAPPING_SOURCE_LOCAL_RETRIEVED = 'MappingSourceLocalRetrieved';
-var MAPPING_SOURCE_LOCAL_DIRTIED = 'MappingSourceLocalDirtied';
-var MAPPING_SOURCE_COMPONENT_RETRIEVED = 'MappingSourceComponentRetrieved';
-var MAPPING_SOURCE_DESKTOP_INSTALLED = 'MappingSourceDesktopInstalled';
-/** When a component is installed by the desktop and some of its values change */
-
-var MAPPING_SOURCE_REMOTE_ACTION_RETRIEVED = 'MappingSourceRemoteActionRetrieved';
-/** aciton-based Extensions like note history */
-
-var MAPPING_SOURCE_FILE_IMPORT = 'MappingSourceFileImport';
 
 /***/ }),
 
