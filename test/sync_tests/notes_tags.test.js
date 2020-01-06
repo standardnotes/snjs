@@ -21,7 +21,7 @@ describe("notes + tags syncing", async function() {
     await Factory.registerUserToApplication({application: this.application, email, password});
   })
 
-  it('syncing an item then downloading it should include items_key_id', async function() {
+  it.only('syncing an item then downloading it should include items_key_id', async function() {
     const note = await Factory.createMappedNote(this.application.modelManager);
     note.setDirty(true);
     await this.application.syncManager.sync();
@@ -30,6 +30,9 @@ describe("notes + tags syncing", async function() {
     await this.application.syncManager.sync();
     const downloadedNote = this.application.modelManager.notes[0];
     expect(downloadedNote.items_key_id).to.be.ok;
+    // Allow time for waitingForKey
+    await Factory.sleep(0.1);
+    expect(downloadedNote.content.text).to.be.ok;
   });
 
   it('syncing a note many times does not cause duplication', async function() {
@@ -59,13 +62,14 @@ describe("notes + tags syncing", async function() {
   }).timeout(20000);
 
   it("handles signing in and merging data", async function() {
-    let pair = Factory.createRelatedNoteTagPairPayload();
-    let notePayload = pair[0];
-    let tagPayload = pair[1];
-
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    let originalNote = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
-    let originalTag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
+    this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload]
+    });
+    const originalNote = this.application.modelManager.notes[0];
+    const originalTag = this.application.modelManager.tags[0];
     originalNote.setDirty(true);
     originalTag.setDirty(true);
 
@@ -78,14 +82,15 @@ describe("notes + tags syncing", async function() {
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
     await this.application.storageManager.clearAllPayloads();
-    await this.application.syncManager.markAllItemsDirtyAndSaveOffline(true)
-
-    let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
+    await this.application.syncManager.markAllItemsAsNeedingSync({
+      alternateUuids: true
+    })
 
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 
+    const note = this.application.modelManager.notes[0];
+    const tag = this.application.modelManager.tags[0];
     expect(note.uuid).to.not.equal(originalNote.uuid);
     expect(tag.uuid).to.not.equal(originalTag.uuid);
 
@@ -98,14 +103,16 @@ describe("notes + tags syncing", async function() {
   })
 
   it('duplicating a tag should maintian its relationships', async function() {
-    await this.application.syncManager.loadDataFromDatabase();
-    let pair = Factory.createRelatedNoteTagPairPayload();
-    let notePayload = pair[0];
-    let tagPayload = pair[1];
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    const notePayload = pair[0];
+    const tagPayload = pair[1];
 
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    let note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
-    let tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
+    this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload]
+    });
+    const note = this.application.modelManager.notes[0];
+    const tag = this.application.modelManager.tags[0];
+    expect(note.referencingItemsCount).to.equal(1);
 
     note.setDirty(true);
     tag.setDirty(true);
@@ -113,25 +120,22 @@ describe("notes + tags syncing", async function() {
     await this.application.syncManager.sync();
     await this.application.syncManager.clearSyncPositionTokens();
 
+    expect(note.dirty).to.equal(false);
+    expect(tag.dirty).to.equal(false);
+
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 
     tag.title = `${Math.random()}`
     tag.updated_at = Factory.yesterday();
-    tag.setDirty(true);
-
-    expect(note.referencingItemsCount).to.equal(1);
-
-    // wait about 1s, which is the value the dev server will ignore conflicting changes
-    await Factory.sleep(1.1);
-    await this.application.syncManager.sync();
+    await this.application.saveItem({item: tag});
 
     // tag should now be conflicted and a copy created
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(2);
-    var tags = this.application.modelManager.allItemsMatchingTypes(["Tag"]);
-    var tag1 = tags[0];
-    var tag2 = tags[1];
+    const tags = this.application.modelManager.tags;
+    const tag1 = tags[0];
+    const tag2 = tags[1];
 
     expect(tag1.uuid).to.not.equal(tag2.uuid);
 

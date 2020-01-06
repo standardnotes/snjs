@@ -33,6 +33,32 @@ describe('payloads', () => {
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
   });
 
+  it('server payloads should not contain client values', async function() {
+    const rawPayload = Factory.createNotePayload();
+    const notePayload = CreatePayloadFromAnyObject({
+      object: rawPayload,
+      override: {
+        dirty: true,
+        dirtyCount: 3,
+        waitingForKey: false,
+        dummy: true,
+        errorDecrypting: false
+      }
+    })
+
+    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+      payload: notePayload,
+      intent: ENCRYPTION_INTENT_SYNC
+    });
+
+    expect(encryptedPayload.dirty).to.not.be.ok;
+    expect(encryptedPayload.errorDecrypting).to.not.be.ok;
+    expect(encryptedPayload.errorDecryptingValueChanged).to.not.be.ok;
+    expect(encryptedPayload.waitingForKey).to.not.be.ok;
+    expect(encryptedPayload.dirtyCount).to.not.be.ok;
+    expect(encryptedPayload.dummy).to.not.be.ok;
+  });
+
   it('creating payload with override properties', async () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;

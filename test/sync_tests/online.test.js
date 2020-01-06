@@ -565,7 +565,9 @@ describe('online syncing', () => {
     var item = Factory.createStorageItemNotePayload();
     modelManager.addItem(item);
     sharedNoteCount++;
-    await syncManager.markAllItemsDirtyAndSaveOffline(false);
+    await syncManager.markAllItemsAsNeedingSync({
+      alternateUuids: false
+    });
 
     modelManager.handleSignOut();
     await syncManager.handleSignOut();
