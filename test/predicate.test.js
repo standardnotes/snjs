@@ -35,7 +35,7 @@ const createItemParams = () => {
 }
 
 const createItem = () => {
-  const payload = CreatePayloadFromAnyObject({
+  const payload = CreateMaxPayloadFromAnyObject({
     object: createItemParams()
   })
   return new SFItem(payload);
@@ -175,7 +175,7 @@ describe("predicates", () => {
 
   it('model manager predicate matching', async function () {
     const modelManager = this.application.modelManager;
-    const payload1 = CreatePayloadFromAnyObject({object: createItemParams()});
+    const payload1 = CreateMaxPayloadFromAnyObject({object: createItemParams()});
     const item1 = (await modelManager.mapPayloadsToLocalItems({
       payloads: [payload1]
     }))[0];
@@ -242,7 +242,7 @@ describe("predicates", () => {
 
   it('model manager predicate matching 2', async function () {
     const modelManager = this.application.modelManager;
-    const payload = CreatePayloadFromAnyObject({
+    const payload = CreateMaxPayloadFromAnyObject({
       object: {
         uuid: SFItem.GenerateUuidSynchronously(),
         content_type: "Item",
@@ -291,14 +291,14 @@ describe("predicates", () => {
     const item = createItem();
     item.content.title = "123";
     let modelManager = this.application.modelManager;
-    item.setDirty(true);
+    await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     // match only letters
     var predicate = new SFPredicate("content.title", "matches", "^[a-zA-Z]+$");
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = "abc";
-    await modelManager.mapPayloadsToLocalItems({payloads: [CreatePayloadFromAnyObject({object: item})]})
+    await modelManager.mapPayloadsToLocalItems({payloads: [CreateMaxPayloadFromAnyObject({object: item})]})
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   })
 })

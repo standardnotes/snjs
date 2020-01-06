@@ -66,7 +66,7 @@ describe('app models', () => {
     const params1 = Factory.createStorageItemNotePayload();
     const params2 = Factory.createStorageItemNotePayload();
 
-    const mutated = CreatePayloadFromAnyObject({
+    const mutated = CreateMaxPayloadFromAnyObject({
       object: params1,
       override: {
         content: {
@@ -93,7 +93,7 @@ describe('app models', () => {
 
   it('mapping item without uuid should not map it', async function() {
     const modelManager = this.application.modelManager;
-    const params = CreatePayloadFromAnyObject({
+    const params = CreateMaxPayloadFromAnyObject({
       object: Factory.createNoteParams(),
       override: {uuid: null}
     });
@@ -105,7 +105,7 @@ describe('app models', () => {
   it('mapping an item twice shouldnt cause problems', async function() {
     let modelManager = this.application.modelManager;
     var payload = Factory.createStorageItemNotePayload();
-    const mutated = CreatePayloadFromAnyObject({
+    const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {foo: "bar"}}
     })
@@ -239,7 +239,7 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadsToLocalItems({
       payloads: [
-        CreatePayloadFromAnyObject({object: item1})
+        CreateMaxPayloadFromAnyObject({object: item1})
       ]
     })
 
@@ -278,7 +278,7 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadsToLocalItems({
       payloads: [
-        CreatePayloadFromAnyObject({object: item1})
+        CreateMaxPayloadFromAnyObject({object: item1})
       ]
     })
 

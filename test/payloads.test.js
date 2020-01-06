@@ -21,21 +21,21 @@ describe('payloads', () => {
 
   it('creating payload from item should create copy not by reference', async () => {
     const item = await Factory.createMappedNote(sharedApplication.modelManager);
-    const payload = CreatePayloadFromAnyObject({object: item});
+    const payload = CreateMaxPayloadFromAnyObject({object: item});
     expect(item.content === payload.content).to.equal(false);
     expect(item.content.references === payload.content.references).to.equal(false);
   });
 
   it('creating payload from item should preserve appData', async () => {
     const item = await Factory.createMappedNote(sharedApplication.modelManager);
-    const payload = CreatePayloadFromAnyObject({object: item});
+    const payload = CreateMaxPayloadFromAnyObject({object: item});
     expect(item.content.appData).to.be.ok;
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
   });
 
   it('server payloads should not contain client values', async function() {
     const rawPayload = Factory.createNotePayload();
-    const notePayload = CreatePayloadFromAnyObject({
+    const notePayload = CreateMaxPayloadFromAnyObject({
       object: rawPayload,
       override: {
         dirty: true,
@@ -63,7 +63,7 @@ describe('payloads', () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
     const changedUuid = 'foo';
-    const changedPayload = CreatePayloadFromAnyObject({
+    const changedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {
         uuid: changedUuid
@@ -78,7 +78,7 @@ describe('payloads', () => {
     const payload = Factory.createNotePayload();
     const text = payload.content.text;
     const changedText = `${Math.random()}`;
-    const changedPayload = CreatePayloadFromAnyObject({
+    const changedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {
         content: {
@@ -94,8 +94,8 @@ describe('payloads', () => {
 
   it('copying payload with override should override selected fields only', async () => {
     const item = await Factory.createMappedNote(sharedApplication.modelManager);
-    const payload = CreatePayloadFromAnyObject({object: item});
-    const mutated = CreatePayloadFromAnyObject({
+    const payload = CreateMaxPayloadFromAnyObject({object: item});
+    const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {
         content: {
@@ -111,7 +111,7 @@ describe('payloads', () => {
     const tagPayload = pair[1];
     expect(tagPayload.content.references.length).to.equal(1);
 
-    const mutated = CreatePayloadFromAnyObject({
+    const mutated = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: {
         content: {
@@ -126,7 +126,7 @@ describe('payloads', () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
     const changedUuid = 'foo';
-    const changedPayload = CreatePayloadFromAnyObject({
+    const changedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {uuid: null}
     })
@@ -210,7 +210,7 @@ describe('payloads', () => {
 
   it("items with error decrypting should remain as is", async () => {
     const payload = Factory.createStorageItemNotePayload();
-    const mutatedPayload = CreatePayloadFromAnyObject({
+    const mutatedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {
         errorDecrypting: true

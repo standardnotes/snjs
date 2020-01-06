@@ -21,7 +21,7 @@ describe("model manager mapping", () => {
 
   it('mapping nonexistent deleted item doesnt create it', async () => {
     let modelManager = await createModelManager();
-    const payload = CreatePayloadFromAnyObject({
+    const payload = CreateMaxPayloadFromAnyObject({
       object: Factory.createNoteParams(),
       override: {
         deleted: true
@@ -38,7 +38,7 @@ describe("model manager mapping", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     const originalNote = modelManager.notes[0];
     expect(originalNote.content.title).to.equal(payload.content.title);
-    const mutated = CreatePayloadFromAnyObject({
+    const mutated = CreateSourcedPayloadFromObject({
       object: payload,
       source: PAYLOAD_SOURCE_REMOTE_SAVED
     })
@@ -53,7 +53,7 @@ describe("model manager mapping", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     expect(modelManager.items.length).to.equal(1);
 
-    const changedParams = CreatePayloadFromAnyObject({
+    const changedParams = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {
         deleted: true
@@ -71,7 +71,7 @@ describe("model manager mapping", () => {
     const item = modelManager.items[0];
     item.deleted = true;
     modelManager.setItemDirty(item, true);
-    const payload2 = CreatePayloadFromAnyObject({object: item});
+    const payload2 = CreateMaxPayloadFromAnyObject({object: item});
     await modelManager.mapPayloadsToLocalItems({payloads: [payload2]});
     expect(modelManager.items.length).to.equal(1);
   });
@@ -82,7 +82,7 @@ describe("model manager mapping", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
 
     const newTitle = "updated title";
-    const mutated = CreatePayloadFromAnyObject({
+    const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {title: newTitle}}
     })

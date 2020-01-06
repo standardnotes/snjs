@@ -80,15 +80,15 @@ export default class Factory {
   }
 
   static createStorageItemPayload(contentType) {
-    return CreatePayloadFromAnyObject({object: this.createItemParams(contentType)});
+    return CreateMaxPayloadFromAnyObject({object: this.createItemParams(contentType)});
   }
 
   static createStorageItemNotePayload() {
-    return CreatePayloadFromAnyObject({object: this.createNoteParams()});
+    return CreateMaxPayloadFromAnyObject({object: this.createNoteParams()});
   }
 
   static createStorageItemTagPayload() {
-    return CreatePayloadFromAnyObject({object: this.createTagParams()});
+    return CreateMaxPayloadFromAnyObject({object: this.createTagParams()});
   }
 
   static async mapPayloadToItem(payload, modelManager) {
@@ -97,18 +97,18 @@ export default class Factory {
   }
 
   static itemToStoragePayload(item) {
-    return CreatePayloadFromAnyObject({object: item});
+    return CreateMaxPayloadFromAnyObject({object: item});
   }
 
-  static createMappedNote(modelManager) {
+  static createMappedNote(application) {
     const payload = this.createStorageItemNotePayload();
-    return this.mapPayloadToItem(payload, modelManager);
+    return this.mapPayloadToItem(payload, application.modelManager);
   }
 
   static async createSyncedNote(application) {
     const payload = this.createStorageItemNotePayload();
     const note = await this.mapPayloadToItem(payload, application.modelManager);
-    note.setDirty(true);
+    await application.modelManager.setItemDirty(note, true);
     await application.syncManager.sync();
     return note;
   }
@@ -127,7 +127,7 @@ export default class Factory {
   }
 
   static createNotePayload() {
-    return CreatePayloadFromAnyObject({object: this.createNoteParams()});
+    return CreateMaxPayloadFromAnyObject({object: this.createNoteParams()});
   }
 
   static createItemParams(contentType) {
@@ -180,8 +180,8 @@ export default class Factory {
     }]
     noteParams.content.references = []
     return [
-      CreatePayloadFromAnyObject({object: noteParams}),
-      CreatePayloadFromAnyObject({object: tagParams})
+      CreateMaxPayloadFromAnyObject({object: noteParams}),
+      CreateMaxPayloadFromAnyObject({object: tagParams})
     ];
   }
 

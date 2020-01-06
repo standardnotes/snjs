@@ -92,7 +92,7 @@ describe('keys', () => {
     const result = await localApplication.protocolManager.createRootKey({identifier: email, password});
     localApplication.keyManager.setRootKey({key: result.key, keyParams: result.keyParams});
 
-    const payload = CreatePayloadFromAnyObject({
+    const payload = CreateMaxPayloadFromAnyObject({
       object: {
         content: {foo: 'bar'},
         content_type: ENCRYPTED_STORAGE_CONTENT_TYPE
@@ -104,6 +104,11 @@ describe('keys', () => {
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
     })
     expect(keyToUse).to.equal(await localApplication.keyManager.getRootKey());
+  })
+
+  it('items key should be encrypted with root key', async function() {
+    expect(true).to.equal(false);
+    expect(itemsKey.items_key_id).to.not.be.ok;
   })
 
   it('should use items key for encryption of note', async function() {
@@ -172,7 +177,7 @@ describe('keys', () => {
     expect(note.errorDecrypting).to.equal(true);
     expect(note.waitingForKey).to.equal(true);
 
-    const keyPayload = CreatePayloadFromAnyObject({
+    const keyPayload = CreateMaxPayloadFromAnyObject({
       object: itemsKey
     })
     await this.application.modelManager.mapPayloadsToLocalItems({

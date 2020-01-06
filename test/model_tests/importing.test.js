@@ -55,7 +55,7 @@ describe("importing", () => {
     const notePayload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
     const note = modelManager.notes[0];
-    const mutatedNote = CreatePayloadFromAnyObject({
+    const mutatedNote = CreateMaxPayloadFromAnyObject({
       object: notePayload,
       override: { content: { title: `${Math.random()}` } }
     });
@@ -78,7 +78,7 @@ describe("importing", () => {
     const note = modelManager.notes[0];
     const tag = modelManager.tags[0];
 
-    const mutatedTag = CreatePayloadFromAnyObject({
+    const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: { content: { references: [] } }
     });
@@ -97,11 +97,11 @@ describe("importing", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: pair});
     const note = modelManager.notes[0];
     const tag = modelManager.tags[0];
-    const mutatedNote = CreatePayloadFromAnyObject({
+    const mutatedNote = CreateMaxPayloadFromAnyObject({
       object: notePayload,
       override: { content: { title: `${Math.random()}` } }
     });
-    const mutatedTag = CreatePayloadFromAnyObject({
+    const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: { content: { title: `${Math.random()}` } }
     });

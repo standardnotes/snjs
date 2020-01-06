@@ -22,8 +22,8 @@ describe("notes + tags syncing", async function() {
   })
 
   it('syncing an item then downloading it should include items_key_id', async function() {
-    const note = await Factory.createMappedNote(this.application.modelManager);
-    note.setDirty(true);
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(note);
     await this.application.syncManager.sync();
     await this.application.modelManager.handleSignOut();
     await this.application.syncManager.clearSyncPositionTokens();
@@ -47,8 +47,7 @@ describe("notes + tags syncing", async function() {
     expect(this.application.modelManager.tags.length).to.equal(1);
 
     for(let i = 0; i < 9; i++) {
-      note.setDirty(true);
-      tag.setDirty(true);
+      await this.application.modelManager.setItemsDirty([note, tag]);
       await this.application.syncManager.sync();
       this.application.syncManager.clearSyncPositionTokens();
       expect(tag.content.references.length).to.equal(1);
@@ -70,8 +69,7 @@ describe("notes + tags syncing", async function() {
     });
     const originalNote = this.application.modelManager.notes[0];
     const originalTag = this.application.modelManager.tags[0];
-    originalNote.setDirty(true);
-    originalTag.setDirty(true);
+    await this.application.modelManager.setItemsDirty([originalNote, originalTag]);
 
     await this.application.syncManager.sync();
 
@@ -114,9 +112,7 @@ describe("notes + tags syncing", async function() {
     const tag = this.application.modelManager.tags[0];
     expect(note.referencingItemsCount).to.equal(1);
 
-    note.setDirty(true);
-    tag.setDirty(true);
-
+    await this.application.modelManager.setItemsDirty([note, tag]);
     await this.application.syncManager.sync();
     await this.application.syncManager.clearSyncPositionTokens();
 

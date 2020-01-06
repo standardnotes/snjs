@@ -45,11 +45,11 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    const mutatedTag = CreatePayloadFromAnyObject({
+    const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: {content: {references: null}}
     })
-    const mutatedNote = CreatePayloadFromAnyObject({
+    const mutatedNote = CreateMaxPayloadFromAnyObject({
       object: notePayload,
       override: {content: {references: [
         {
@@ -117,7 +117,7 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    const mutatedTag = CreatePayloadFromAnyObject({
+    const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: {content: {references: []}}
     })
@@ -145,7 +145,7 @@ describe("notes and tags", () => {
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    const changedTagPayload = CreatePayloadFromAnyObject({
+    const changedTagPayload = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: {
         deleted: true
@@ -178,7 +178,7 @@ describe("notes and tags", () => {
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    const mutatedTag = CreatePayloadFromAnyObject({
+    const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
       override: {content: {references: []}}
     })
@@ -207,11 +207,11 @@ describe("notes and tags", () => {
     const newTitle = `${Math.random()}`;
     // Saving involves modifying local state first, then syncing with omitting content.
     tag.title = newTitle;
-    tag.setDirty(true);
+    await modelManager.setItemDirty(tag);
 
     expect(tag.content.title).to.equal(newTitle);
 
-    const changedTagPayload = CreatePayloadFromAnyObject({
+    const changedTagPayload = CreateSourcedPayloadFromObject({
       object: tagPayload,
       source: PAYLOAD_SOURCE_REMOTE_SAVED
     })
@@ -242,7 +242,7 @@ describe("notes and tags", () => {
 
     tag.removeItemAsRelationship(note);
 
-    const newTagPayload = CreatePayloadFromAnyObject({object: tag});
+    const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
 
     modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
 
@@ -320,7 +320,7 @@ describe("notes and tags", () => {
     expect(note.tags.length).to.equal(1);
 
     modelManager.setItemToBeDeleted(tag);
-    const newTagPayload = CreatePayloadFromAnyObject({object: tag});
+    const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
     modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
     expect(tag.content.references.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
@@ -349,7 +349,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    const mutatedPayload = CreatePayloadFromAnyObject({
+    const mutatedPayload = CreateMaxPayloadFromAnyObject({
       object: notePayload,
       override: { content: { references: [{
         content_type: tagPayload.content_type,
@@ -395,11 +395,11 @@ describe("notes and tags", () => {
   })
 
   it('setting a note dirty should collapse its properties into content', async () => {
+    const modelManager = await createModelManager();
     let note = new SNNote();
     note.title = "Foo";
     expect(note.content.title).to.not.be.ok;
-
-    note.setDirty(true);
+    await modelManager.setItemDirty(note);
     expect(note.content.title).to.equal("Foo");
   });
 });
