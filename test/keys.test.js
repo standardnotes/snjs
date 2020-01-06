@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 describe('keys', () => {
   let sharedApplication;
-  
+
   before(async () => {
     sharedApplication = await Factory.createInitAppWithRandNamespace();
   })
@@ -28,7 +28,6 @@ describe('keys', () => {
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_FILE_ENCRYPTED)).to.equal(false);
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_FILE_DECRYPTED)).to.equal(false);
   })
-
 
   it('validate isFileIntent', async () => {
     expect(isFileIntent(ENCRYPTION_INTENT_SYNC)).to.equal(false);

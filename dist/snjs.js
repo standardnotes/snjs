@@ -3171,18 +3171,7 @@ var dateFormatter;
 var SFItem =
 /*#__PURE__*/
 function () {
-  _createClass(SFItem, [{
-    key: "payloadRepresentation",
-    value: function payloadRepresentation() {
-      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          override = _ref.override;
-
-      return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_7__["CreatePayloadFromAnyObject"])({
-        object: this,
-        override: override
-      });
-    }
-  }], [{
+  _createClass(SFItem, null, [{
     key: "SetUuidGenerators",
 
     /**
@@ -3192,9 +3181,9 @@ function () {
      * @param syncImpl  A syncronous function that returns a UUID.
      * @param asyncImpl  An asyncronous function that returns a UUID.
      */
-    value: function SetUuidGenerators(_ref2) {
-      var syncImpl = _ref2.syncImpl,
-          asyncImpl = _ref2.asyncImpl;
+    value: function SetUuidGenerators(_ref) {
+      var syncImpl = _ref.syncImpl,
+          asyncImpl = _ref.asyncImpl;
       this.syncUuidFunc = syncImpl;
       this.asyncUuidFunc = asyncImpl;
     }
@@ -3264,13 +3253,24 @@ function () {
       }
     }
   }
-  /**
-   * If creating from external payload, it may not include values for .references and .appData
-   * Here we want to initialize these values with default values.
-   */
-
 
   _createClass(SFItem, [{
+    key: "payloadRepresentation",
+    value: function payloadRepresentation() {
+      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          override = _ref2.override;
+
+      return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_7__["CreatePayloadFromAnyObject"])({
+        object: this,
+        override: override
+      });
+    }
+    /**
+     * If creating from external payload, it may not include values for .references and .appData
+     * Here we want to initialize these values with default values.
+     */
+
+  }, {
     key: "populateDefaultContentValues",
     value: function populateDefaultContentValues() {
       if (this.errorDecrypting) {
@@ -5659,15 +5659,15 @@ function (_PayloadsDelta) {
               }
 
               updated_at = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-              leftPayload = CreatePayloadFromAnyObject({
-                object: this.basePayload,
+              leftPayload = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+                payload: this.basePayload,
                 override: {
                   updated_at: updated_at,
                   dirty: true
                 }
               });
               _context2.next = 8;
-              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByDuplicating"])({
                 payload: this.applyPayload,
                 baseCollection: this.baseCollection,
                 isConflict: true
@@ -5684,7 +5684,7 @@ function (_PayloadsDelta) {
               }
 
               _context2.next = 13;
-              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByDuplicating"])({
                 payload: this.basePayload,
                 baseCollection: this.baseCollection,
                 isConflict: true
@@ -5703,8 +5703,8 @@ function (_PayloadsDelta) {
 
               refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["uniqCombineObjArrays"])(this.basePayload.content.references, this.applyPayload.content.references, ['uuid', 'content_type']);
               _updated_at = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-              payload = CreatePayloadFromAnyObject({
-                object: this.basePayload,
+              payload = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+                payload: this.basePayload,
                 override: {
                   updated_at: _updated_at,
                   dirty: true,
@@ -6178,7 +6178,7 @@ function (_PayloadsDelta) {
 
             case 15:
               _context.next = 17;
-              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByCopying"])({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByDuplicating"])({
                 payload: current,
                 baseCollection: this.baseCollection,
                 isConflict: true
@@ -6594,7 +6594,7 @@ function (_PayloadsDelta) {
   _createClass(DeltaRemoteRetrieved, [{
     key: "resultingCollection",
     value: function resultingCollection() {
-      var filtered, conflicted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, received, savedOrSaving, decrypted, base, conflicts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _conflicted, _decrypted, current, differs, copy;
+      var filtered, conflicted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, received, savedOrSaving, decrypted, base, conflicts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _conflicted, _decrypted, current, differs, copyResults;
 
       return regeneratorRuntime.async(function resultingCollection$(_context) {
         while (1) {
@@ -6745,15 +6745,15 @@ function (_PayloadsDelta) {
               }
 
               _context.next = 54;
-              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByCopying"])({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByDuplicating"])({
                 payload: _decrypted,
                 baseCollection: this.baseCollection,
                 isConflict: true
               }));
 
             case 54:
-              copy = _context.sent;
-              conflicts.push(copy);
+              copyResults = _context.sent;
+              extendArray(conflicts, copyResults);
 
             case 56:
               _iteratorNormalCompletion2 = true;
@@ -6895,9 +6895,8 @@ function (_PayloadsDelta) {
               throw 'Unable to find decrypted counterpart for payload.';
 
             case 11:
-              result = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
-                object: decrypted,
-                source: _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PAYLOAD_SOURCE_REMOTE_SAVED"]
+              result = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["CopyPayload"])({
+                payload: decrypted
               });
               processed.push(result);
 
@@ -7180,16 +7179,18 @@ var PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING = 2;
 /*!********************************************!*\
   !*** ./lib/protocol/payloads/functions.js ***!
   \********************************************/
-/*! exports provided: PayloadsByCopying, PayloadsByAlternatingUuid */
+/*! exports provided: PayloadsByDuplicating, PayloadsByAlternatingUuid */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByCopying", function() { return PayloadsByCopying; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByDuplicating", function() { return PayloadsByDuplicating; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByAlternatingUuid", function() { return PayloadsByAlternatingUuid; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
+
 
 
 /**
@@ -7197,9 +7198,9 @@ __webpack_require__.r(__webpack_exports__);
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-function PayloadsByCopying(_ref) {
+function PayloadsByDuplicating(_ref) {
   var payload, baseCollection, isConflict, results, override, copy, referencing, updatedReferencing;
-  return regeneratorRuntime.async(function PayloadsByCopying$(_context) {
+  return regeneratorRuntime.async(function PayloadsByDuplicating$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -7221,8 +7222,8 @@ function PayloadsByCopying(_ref) {
             };
           }
 
-          copy = CreatePayloadFromAnyObject({
-            object: payload,
+          copy = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+            payload: payload,
             override: override
           });
           results.push(copy);
@@ -7272,7 +7273,7 @@ function PayloadsByAlternatingUuid(_ref2) {
           * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
           */
 
-          _context2.t0 = CreatePayloadFromAnyObject;
+          _context2.t0 = _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"];
           _context2.t1 = payload;
           _context2.next = 6;
           return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"].GenerateUuid());
@@ -7284,7 +7285,7 @@ function PayloadsByAlternatingUuid(_ref2) {
             dirty: true
           };
           _context2.t4 = {
-            object: _context2.t1,
+            payload: _context2.t1,
             override: _context2.t3
           };
           copy = (0, _context2.t0)(_context2.t4);
@@ -7308,8 +7309,8 @@ function PayloadsByAlternatingUuid(_ref2) {
         case 14:
           updatedReferencing = _context2.sent;
           extendArray(results, updatedReferencing);
-          updatedSelf = CreatePayloadFromAnyObject({
-            object: payload,
+          updatedSelf = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+            payload: payload,
             override: {
               deleted: true,
               content: {
@@ -7452,8 +7453,8 @@ function PayloadsByUpdatingReferences(_ref3) {
           return _context3.finish(42);
 
         case 50:
-          result = CreatePayloadFromAnyObject({
-            object: payload,
+          result = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+            payload: payload,
             override: {
               dirty: true,
               content: {
@@ -7519,12 +7520,13 @@ function PayloadsByUpdatingReferences(_ref3) {
 /*!********************************************!*\
   !*** ./lib/protocol/payloads/generator.js ***!
   \********************************************/
-/*! exports provided: CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
+/*! exports provided: CreatePayloadFromAnyObject, CopyPayload, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return CreatePayloadFromAnyObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return CopyPayload; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return CopyEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForPayloadSource", function() { return itemPayloadClassForPayloadSource; });
@@ -7569,13 +7571,24 @@ function CreatePayloadFromAnyObject(_ref) {
 
   return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new payloadClass(rawPayload, true));
 }
+function CopyPayload(_ref2) {
+  var payload = _ref2.payload,
+      override = _ref2.override;
+  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["pickByCopy"])(payload, payload.fields());
+
+  if (override) {
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepMergeByCopy"])(rawPayload, override);
+  }
+
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new payload.constructor(rawPayload, true));
+}
 function CreateEncryptionParameters(rawParameters) {
   var copy = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["Copy"])(rawParameters);
   return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_8__["deepFreeze"])(new _Protocol_payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__["SNEncryptionParameters"](copy, true));
 }
-function CopyEncryptionParameters(_ref2) {
-  var encryptionParameters = _ref2.encryptionParameters,
-      override = _ref2.override;
+function CopyEncryptionParameters(_ref3) {
+  var encryptionParameters = _ref3.encryptionParameters,
+      override = _ref3.override;
 
   if (!encryptionParameters.isEncryptionParameters) {
     throw 'Attempting to copy encryption parameters from non-parameters object.';
@@ -7632,7 +7645,7 @@ function itemPayloadClassForPayloadSource(source) {
 /*!****************************************!*\
   !*** ./lib/protocol/payloads/index.js ***!
   \****************************************/
-/*! exports provided: PayloadCollection, PayloadCollectionSet, CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
+/*! exports provided: PayloadCollection, PayloadCollectionSet, CreatePayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7647,6 +7660,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreatePayloadFromAnyObject", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreatePayloadFromAnyObject"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreateEncryptionParameters"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CopyEncryptionParameters"]; });
 
@@ -8163,7 +8178,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions/002/key_params_002 */ "./lib/protocol/versions/002/key_params_002.js");
 /* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
-/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
 /* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
@@ -8687,7 +8702,7 @@ function () {
             case 7:
               version = this.versionForPayload(payload);
               operator = this.operatorForVersion(version);
-              encryptionParameters = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_10__["CreateEncryptionParameters"])(payload);
+              encryptionParameters = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_10__["CreateEncryptionParameters"])(payload);
               _context7.next = 12;
               return regeneratorRuntime.awrap(operator.generateDecryptedParameters({
                 encryptedParameters: encryptionParameters,
@@ -18227,7 +18242,7 @@ function () {
                 object: item
               });
               _context7.next = 6;
-              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByDuplicating"])({
                 payload: payload,
                 baseCollection: this.getMasterCollection(),
                 isConflict: isConflict
@@ -20752,9 +20767,9 @@ function () {
                           };
                         }
 
-                        encryptedPayloads = response.retrieved_items.map(function (retrievedPayload) {
+                        encryptedPayloads = response.retrieved_items.map(function (rawRetrievedPayload) {
                           return CreatePayloadFromAnyObject({
-                            object: retrievedPayload,
+                            object: rawRetrievedPayload,
                             source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
                           });
                         });
@@ -21313,9 +21328,8 @@ function () {
             case 7:
               resultCollection = _context2.sent;
               updatedDirtyPayloads = resultCollection.allPayloads.map(function (payload) {
-                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreatePayloadFromAnyObject"])({
-                  object: payload,
-                  source: source,
+                return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CopyPayload"])({
+                  payload: payload,
                   override: {
                     dirty: _this.finalDirtyStateForId(payload.uuid)
                   }
@@ -21472,12 +21486,14 @@ var SYNC_EVENT_EXIT_OUT_OF_SYNC = 'exit-out-of-sync';
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OfflineSyncOperation", function() { return OfflineSyncOperation; });
-/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
+/* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 var OfflineSyncOperation =
@@ -21515,8 +21531,8 @@ function () {
 
               for (_iterator = this.payloads[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                 payload = _step.value;
-                outPayloads.push(CreatePayloadFromAnyObject({
-                  object: payload,
+                outPayloads.push(Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])({
+                  payload: payload,
                   override: {
                     updated_at: new Date(),
                     dirty: false
@@ -21562,7 +21578,7 @@ function () {
                 payloads: outPayloads
               };
               _context.next = 23;
-              return regeneratorRuntime.awrap(this.receiver(response, _Services_sync_signals__WEBPACK_IMPORTED_MODULE_0__["SIGNAL_TYPE_RESPONSE"]));
+              return regeneratorRuntime.awrap(this.receiver(response, _Services_sync_signals__WEBPACK_IMPORTED_MODULE_1__["SIGNAL_TYPE_RESPONSE"]));
 
             case 23:
             case "end":

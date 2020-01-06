@@ -46,7 +46,7 @@ describe('payloads', () => {
       }
     })
 
-    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await sharedApplication.protocolManager.payloadByEncryptingPayload({
       payload: notePayload,
       intent: ENCRYPTION_INTENT_SYNC
     });

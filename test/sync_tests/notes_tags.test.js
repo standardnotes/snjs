@@ -21,7 +21,7 @@ describe("notes + tags syncing", async function() {
     await Factory.registerUserToApplication({application: this.application, email, password});
   })
 
-  it.only('syncing an item then downloading it should include items_key_id', async function() {
+  it('syncing an item then downloading it should include items_key_id', async function() {
     const note = await Factory.createMappedNote(this.application.modelManager);
     note.setDirty(true);
     await this.application.syncManager.sync();
