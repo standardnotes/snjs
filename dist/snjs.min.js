@@ -1864,7 +1864,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreatePayloadFromAnyObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT */
+/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreatePayloadFromAnyObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, SNSyncManager, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, SN_ROOT_KEY_CONTENT_TYPE, SN_ITEMS_KEY_CONTENT_TYPE, ENCRYPTED_STORAGE_CONTENT_TYPE, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2017,6 +2017,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["subtractFromArray"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["arrayByDifference"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["uniqCombineObjArrays"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["greaterOfTwoDates"]; });
 
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]; });
@@ -3059,6 +3063,79 @@ function (_SFItem) {
 
 /***/ }),
 
+/***/ "./lib/models/core/functions.js":
+/*!**************************************!*\
+  !*** ./lib/models/core/functions.js ***!
+  \**************************************/
+/*! exports provided: ItemContentsEqual, ItemContentsDiffer */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemContentsEqual", function() { return ItemContentsEqual; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemContentsDiffer", function() { return ItemContentsDiffer; });
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+
+function ItemContentsEqual(_ref) {
+  var leftContent = _ref.leftContent,
+      rightContent = _ref.rightContent,
+      keysToIgnore = _ref.keysToIgnore,
+      appDataKeysToIgnore = _ref.appDataKeysToIgnore;
+  // Create copies of objects before running omit as not to modify source values directly.
+  leftContent = JSON.parse(JSON.stringify(leftContent));
+
+  if (leftContent.appData) {
+    var domainData = leftContent.appData[SFItem.AppDomain];
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(domainData, appDataKeysToIgnore);
+    /**
+     * We don't want to disqualify comparison if one object contains an empty domain object
+     * and the other doesn't contain a domain object. This can happen if you create an item
+     * without setting dirty, which means it won't be initialized with a client_updated_at
+     */
+
+    if (domainData) {
+      if (Object.keys(domainData).length === 0) {
+        delete leftContent.appData;
+      }
+    } else {
+      delete leftContent.appData;
+    }
+  }
+
+  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(leftContent, keysToIgnore);
+  rightContent = JSON.parse(JSON.stringify(rightContent));
+
+  if (rightContent.appData) {
+    var _domainData = rightContent.appData[SFItem.AppDomain];
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(_domainData, appDataKeysToIgnore);
+
+    if (_domainData) {
+      if (Object.keys(_domainData).length === 0) {
+        delete rightContent.appData;
+      }
+    } else {
+      delete rightContent.appData;
+    }
+  }
+
+  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(rightContent, keysToIgnore);
+  return JSON.stringify(leftContent) === JSON.stringify(rightContent);
+}
+function ItemContentsDiffer(item1, item2, excludeContentKeys) {
+  if (!excludeContentKeys) {
+    excludeContentKeys = [];
+  }
+
+  return !ItemContentsEqual({
+    leftContent: item1.content,
+    rightContent: item2.content,
+    keysToIgnore: item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
+    appDataKeysToIgnore: item1.appDatacontentKeysToIgnoreWhenCheckingEquality()
+  });
+}
+
+/***/ }),
+
 /***/ "./lib/models/core/item.js":
 /*!*********************************!*\
   !*** ./lib/models/core/item.js ***!
@@ -3077,11 +3154,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
 /* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
+/* harmony import */ var _Models_core_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/core/functions */ "./lib/models/core/functions.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -3196,8 +3275,9 @@ function () {
       }
     }
     /**
-     * Consumers who create items without a syncronous UUID generation function must manually call
-     * this function when creating an item. The consumer must have previously called SFItem.SetUuidGenerators
+     * Consumers who create items without a syncronous UUID generation function
+     * must manually call this function when creating an item. The consumer must
+     * have previously called SFItem.SetUuidGenerators.
      */
 
   }, {
@@ -3560,20 +3640,6 @@ function () {
       var contentCopy = JSON.parse(JSON.stringify(this.content));
       return contentCopy;
     }
-  }, {
-    key: "ItemContentsDiffer",
-    value: function ItemContentsDiffer(item1, item2, excludeContentKeys) {
-      if (!excludeContentKeys) {
-        excludeContentKeys = [];
-      }
-
-      return !SFItem.AreItemContentsEqual({
-        leftContent: item1.content,
-        rightContent: item2.content,
-        keysToIgnore: item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-        appDataKeysToIgnore: item1.appDatacontentKeysToIgnoreWhenCheckingEquality()
-      });
-    }
     /**
      * Subclasses can override this method and provide their own opinion on whether
      * they want to be duplicated. For example, if this.content.x = 12 and
@@ -3590,13 +3656,24 @@ function () {
     value: function strategyWhenConflictingWithItem(_ref2) {
       var item = _ref2.item;
 
+      if (this.errorDecrypting) {
+        return CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT;
+      }
       /**
         * The number of seconds in between changes to constitue a
         * subjective measure of what we think is active editing of an item
         */
+
+
       var IS_ACTIVELY_EDITING_THRESHOLD = 10;
 
       function ItemIsBeingActivelyEdited(item) {
+        var isEpoch = item.client_updated_at.getTime() === 0;
+
+        if (!item.client_updated_at) {
+          return false;
+        }
+
         return (new Date() - item.client_updated_at) / 1000 < IS_ACTIVELY_EDITING_THRESHOLD;
       }
 
@@ -3604,23 +3681,22 @@ function () {
         return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_RIGHT"];
       }
 
-      var contentDiffers = ItemContentsDiffer(this, item);
+      var contentDiffers = Object(_Models_core_functions__WEBPACK_IMPORTED_MODULE_6__["ItemContentsDiffer"])(this, item);
 
       if (!contentDiffers) {
         return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_RIGHT"];
       }
 
-      var differsExclRefs = ItemContentsDiffer(this, item, ['references']);
+      var differsExclRefs = Object(_Models_core_functions__WEBPACK_IMPORTED_MODULE_6__["ItemContentsDiffer"])(this, item, ['references']);
 
       if (differsExclRefs) {
+        return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT"];
         /** Has differences beyond just references */
-        var isActivelyEdited = ItemIsBeingActivelyEdited(this);
-
-        if (isActivelyEdited) {
-          return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT"];
-        } else {
-          return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_DUPLICATE_LEFT_KEEP_RIGHT"];
-        }
+        // const isActivelyEdited = ItemIsBeingActivelyEdited(this);
+        // if(isActivelyEdited) {
+        // } else {
+        //   return strategies.CONFLICT_STRATEGY_DUPLICATE_LEFT_KEEP_RIGHT;
+        // }
       } else {
         /** Is only references change */
         return _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_MERGE_REFS"];
@@ -3629,7 +3705,7 @@ function () {
   }, {
     key: "isItemContentEqualWith",
     value: function isItemContentEqualWith(otherItem) {
-      return SFItem.AreItemContentsEqual({
+      return Object(_Models_core_functions__WEBPACK_IMPORTED_MODULE_6__["ItemContentsEqual"])({
         leftContent: this.content,
         rightContent: otherItem.content,
         keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
@@ -3637,26 +3713,8 @@ function () {
       });
     }
   }, {
-    key: "isContentEqualWithNonItemContent",
-    value: function isContentEqualWithNonItemContent(otherContent) {
-      return SFItem.AreItemContentsEqual({
-        leftContent: this.content,
-        rightContent: otherContent,
-        keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
-        appDataKeysToIgnore: this.appDatacontentKeysToIgnoreWhenCheckingEquality()
-      });
-    }
-  }, {
     key: "satisfiesPredicate",
     value: function satisfiesPredicate(predicate) {
-      /*
-      Predicate is an SFPredicate having properties:
-      {
-        keypath: String,
-        operator: String,
-        value: object
-      }
-       */
       return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"].ItemSatisfiesPredicate(this, predicate);
     }
     /*
@@ -3771,53 +3829,6 @@ function () {
     set: function set(date) {
       this._client_updated_at = date;
       this.setAppDataItem("client_updated_at", date);
-    }
-  }], [{
-    key: "AreItemContentsEqual",
-    value: function AreItemContentsEqual(_ref3) {
-      var leftContent = _ref3.leftContent,
-          rightContent = _ref3.rightContent,
-          keysToIgnore = _ref3.keysToIgnore,
-          appDataKeysToIgnore = _ref3.appDataKeysToIgnore;
-      // Create copies of objects before running omit as not to modify source values directly.
-      leftContent = JSON.parse(JSON.stringify(leftContent));
-
-      if (leftContent.appData) {
-        var domainData = leftContent.appData[SFItem.AppDomain];
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["omitInPlace"])(domainData, appDataKeysToIgnore);
-        /**
-         * We don't want to disqualify comparison if one object contains an empty domain object
-         * and the other doesn't contain a domain object. This can happen if you create an item
-         * without setting dirty, which means it won't be initialized with a client_updated_at
-         */
-
-        if (domainData) {
-          if (Object.keys(domainData).length === 0) {
-            delete leftContent.appData;
-          }
-        } else {
-          delete leftContent.appData;
-        }
-      }
-
-      leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["omitInPlace"])(leftContent, keysToIgnore);
-      rightContent = JSON.parse(JSON.stringify(rightContent));
-
-      if (rightContent.appData) {
-        var _domainData = rightContent.appData[SFItem.AppDomain];
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["omitInPlace"])(_domainData, appDataKeysToIgnore);
-
-        if (_domainData) {
-          if (Object.keys(_domainData).length === 0) {
-            delete rightContent.appData;
-          }
-        } else {
-          delete rightContent.appData;
-        }
-      }
-
-      rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["omitInPlace"])(rightContent, keysToIgnore);
-      return JSON.stringify(leftContent) === JSON.stringify(rightContent);
     }
   }]);
 
@@ -5521,9 +5532,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
 /* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
 /* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
-/* harmony import */ var _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5541,6 +5553,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -5607,7 +5620,7 @@ function (_PayloadsDelta) {
   }, {
     key: "payloadsByHandlingStrategy",
     value: function payloadsByHandlingStrategy(_ref2) {
-      var strategy, _updated_at, leftPayload, rightPayloads, leftPayloads, rightPayload, refs;
+      var strategy, updated_at, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updated_at, payload;
 
       return regeneratorRuntime.async(function payloadsByHandlingStrategy$(_context2) {
         while (1) {
@@ -5615,7 +5628,7 @@ function (_PayloadsDelta) {
             case 0:
               strategy = _ref2.strategy;
 
-              if (!(strategy === CONFLICT_STRATEGY_KEEP_RIGHT)) {
+              if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_RIGHT"])) {
                 _context2.next = 3;
                 break;
               }
@@ -5623,21 +5636,21 @@ function (_PayloadsDelta) {
               return _context2.abrupt("return", [this.applyPayload]);
 
             case 3:
-              if (!(strategy === CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT)) {
+              if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT"])) {
                 _context2.next = 10;
                 break;
               }
 
-              _updated_at = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+              updated_at = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
               leftPayload = CreatePayloadFromAnyObject({
                 object: this.basePayload,
                 override: {
-                  updated_at: _updated_at,
+                  updated_at: updated_at,
                   dirty: true
                 }
               });
               _context2.next = 8;
-              return regeneratorRuntime.awrap(PayloadsByCopying({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
                 payload: this.applyPayload,
                 baseCollection: this.baseCollection,
                 isConflict: true
@@ -5648,13 +5661,13 @@ function (_PayloadsDelta) {
               return _context2.abrupt("return", [leftPayload].concat(rightPayloads));
 
             case 10:
-              if (!(strategy === CONFLICT_STRATEGY_DUPLICATE_LEFT_KEEP_RIGHT)) {
+              if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_DUPLICATE_LEFT_KEEP_RIGHT"])) {
                 _context2.next = 16;
                 break;
               }
 
               _context2.next = 13;
-              return regeneratorRuntime.awrap(PayloadsByCopying({
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
                 payload: this.basePayload,
                 baseCollection: this.baseCollection,
                 isConflict: true
@@ -5666,27 +5679,29 @@ function (_PayloadsDelta) {
               return _context2.abrupt("return", leftPayloads.concat([rightPayload]));
 
             case 16:
-              if (!(strategy === CONFLICT_STRATEGY_KEEP_LEFT_MERGE_REFS)) {
-                _context2.next = 19;
+              if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_MERGE_REFS"])) {
+                _context2.next = 21;
                 break;
               }
 
-              refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["uniqCombineArrays"])(this.basePayload.content.references, this.applyPayload.content.references);
-              return _context2.abrupt("return", CreatePayloadFromAnyObject({
+              refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["uniqCombineObjArrays"])(this.basePayload.content.references, this.applyPayload.content.references, ['uuid', 'content_type']);
+              _updated_at = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+              payload = CreatePayloadFromAnyObject({
                 object: this.basePayload,
                 override: {
-                  updated_at: updated_at,
+                  updated_at: _updated_at,
                   dirty: true,
                   content: {
                     references: refs
                   }
                 }
-              }));
+              });
+              return _context2.abrupt("return", [payload]);
 
-            case 19:
+            case 21:
               throw 'Unhandled strategy';
 
-            case 20:
+            case 22:
             case "end":
               return _context2.stop();
           }
@@ -5849,8 +5864,9 @@ function (_PayloadsDelta) {
 
               payload = _step.value;
               _context.next = 10;
-              return regeneratorRuntime.awrap(this.handlePayloadInCollection({
-                payload: payload
+              return regeneratorRuntime.awrap(this.payloadsByHandlingPayload({
+                payload: payload,
+                currentResults: results
               }));
 
             case 10:
@@ -5910,50 +5926,72 @@ function (_PayloadsDelta) {
       }, null, this, [[4, 17, 21, 29], [22,, 24, 28]]);
     }
   }, {
-    key: "handlePayloadInCollection",
-    value: function handlePayloadInCollection(_ref) {
-      var payload, current, delta, deltaCollection;
-      return regeneratorRuntime.async(function handlePayloadInCollection$(_context2) {
+    key: "payloadsByHandlingPayload",
+    value: function payloadsByHandlingPayload(_ref) {
+      var payload, currentResults, current, delta, deltaCollection;
+      return regeneratorRuntime.async(function payloadsByHandlingPayload$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              payload = _ref.payload;
+              payload = _ref.payload, currentResults = _ref.currentResults;
 
               /**
                * Check to see if we've already processed a payload for this id.
                * If so, that would be the latest value, and not what's in the BC.
                */
-              current = results.find(function (candidate) {
-                return candidate.uuid === payload.uuid || candidate.content.conflict_of === payload.uuid;
+
+              /*
+               * Find the most recently created conflict if available, as that
+               * would contain the most recent value.
+               */
+              current = currentResults.find(function (candidate) {
+                return candidate.content.conflict_of === payload.uuid;
               });
+              /**
+               * If no latest conflict, find by uuid directly.
+               */
+
+              if (!current) {
+                current = currentResults.find(function (candidate) {
+                  return candidate.uuid === payload.uuid;
+                });
+              }
+              /**
+               * If not found in current results, use the base value.
+               */
+
 
               if (!current) {
                 current = this.findBasePayload({
                   id: payload.uuid
                 });
               }
+              /**
+               * If the current doesn't exist, we're creating a new item from payload.
+               */
 
-              if (!(!current || current.errorDecrypting)) {
-                _context2.next = 5;
+
+              if (current) {
+                _context2.next = 6;
                 break;
               }
 
               return _context2.abrupt("return", [payload]);
 
-            case 5:
+            case 6:
               delta = new _Protocol_payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"]({
                 baseCollection: this.baseCollection,
                 basePayload: current,
                 applyPayload: payload
               });
-              _context2.next = 8;
+              _context2.next = 9;
               return regeneratorRuntime.awrap(delta.resultingCollection());
 
-            case 8:
+            case 9:
               deltaCollection = _context2.sent;
               return _context2.abrupt("return", deltaCollection.allPayloads);
 
-            case 10:
+            case 11:
             case "end":
               return _context2.stop();
           }
@@ -6088,7 +6126,7 @@ function (_PayloadsDelta) {
 
             case 6:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context.next = 20;
+                _context.next = 22;
                 break;
               }
 
@@ -6109,7 +6147,7 @@ function (_PayloadsDelta) {
                 break;
               }
 
-              return _context.abrupt("continue", 17);
+              return _context.abrupt("continue", 19);
 
             case 12:
               differs = !Object(_Protocol_payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadContentsEqual"])(payload, current);
@@ -6119,71 +6157,71 @@ function (_PayloadsDelta) {
                 break;
               }
 
-              return _context.abrupt("continue", 17);
+              return _context.abrupt("continue", 19);
 
             case 15:
-              /**
-               * We create a copy of the local existing item and sync that up.
-               * It will be a "conflict" of itself
-               */
-              copyResults = Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByCopying"])({
+              _context.next = 17;
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_2__["PayloadsByCopying"])({
                 payload: current,
                 baseCollection: this.baseCollection,
                 isConflict: true
-              });
-              extendArray(results, copyResults);
+              }));
 
             case 17:
+              copyResults = _context.sent;
+              extendArray(results, copyResults);
+
+            case 19:
               _iteratorNormalCompletion = true;
               _context.next = 6;
               break;
 
-            case 20:
-              _context.next = 26;
+            case 22:
+              _context.next = 28;
               break;
 
-            case 22:
-              _context.prev = 22;
+            case 24:
+              _context.prev = 24;
               _context.t0 = _context["catch"](4);
               _didIteratorError = true;
               _iteratorError = _context.t0;
 
-            case 26:
-              _context.prev = 26;
-              _context.prev = 27;
+            case 28:
+              _context.prev = 28;
+              _context.prev = 29;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
-            case 29:
-              _context.prev = 29;
+            case 31:
+              _context.prev = 31;
 
               if (!_didIteratorError) {
-                _context.next = 32;
+                _context.next = 34;
                 break;
               }
 
               throw _iteratorError;
 
-            case 32:
-              return _context.finish(29);
-
-            case 33:
-              return _context.finish(26);
-
             case 34:
+              return _context.finish(31);
+
+            case 35:
+              return _context.finish(28);
+
+            case 36:
               return _context.abrupt("return", new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"]({
                 payloads: results,
                 source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
               }));
 
-            case 35:
+            case 37:
             case "end":
               return _context.stop();
           }
         }
-      }, null, this, [[4, 22, 26, 34], [27,, 29, 33]]);
+      }, null, this, [[4, 24, 28, 36], [29,, 31, 35]]);
     }
   }]);
 
@@ -7091,6 +7129,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByCopying", function() { return PayloadsByCopying; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByAlternatingUuid", function() { return PayloadsByAlternatingUuid; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_1__);
+
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -7313,7 +7354,7 @@ function PayloadsByUpdatingReferences(_ref3) {
 
           for (_iterator3 = removeIds[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
             id = _step3.value;
-            remove(references, {
+            lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(references, {
               uuid: id
             });
           }
@@ -18085,24 +18126,28 @@ function () {
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_17__["CreatePayloadFromAnyObject"])({
                 object: item
               });
-              payloads = Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
+              _context6.next = 6;
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByCopying"])({
                 payload: payload,
                 baseCollection: this.getMasterCollection(),
                 isConflict: isConflict
-              });
-              _context6.next = 7;
+              }));
+
+            case 6:
+              payloads = _context6.sent;
+              _context6.next = 9;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: payloads
               }));
 
-            case 7:
+            case 9:
               results = _context6.sent;
               copy = results.find(function (p) {
                 return p.uuid === payloads[0].uuid;
               });
               return _context6.abrupt("return", copy);
 
-            case 10:
+            case 12:
             case "end":
               return _context6.stop();
           }
@@ -18388,21 +18433,25 @@ function () {
               payload = Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_17__["CreatePayloadFromAnyObject"])({
                 object: item
               });
-              results = Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByAlternatingUuid"])({
+              _context10.next = 5;
+              return regeneratorRuntime.awrap(Object(_Protocol_payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByAlternatingUuid"])({
                 payload: payload,
                 baseCollection: this.getMasterCollection()
-              });
-              _context10.next = 6;
+              }));
+
+            case 5:
+              results = _context10.sent;
+              _context10.next = 8;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: results,
                 source: PAYLOAD_SOURCE_LOCAL_SAVED
               }));
 
-            case 6:
+            case 8:
               mapped = _context10.sent;
               return _context10.abrupt("return", mapped[0]);
 
-            case 8:
+            case 10:
             case "end":
               return _context10.stop();
           }
@@ -23232,7 +23281,7 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineArrays, extendArray, subtractFromArray, arrayByDifference, removeFromIndex, omitInPlace, omitByCopy, isObject, deepMerge, Copy, deepMergeByCopy, pickByCopy, deepFreeze, hasGetter, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, extendArray, subtractFromArray, arrayByDifference, removeFromIndex, omitInPlace, omitByCopy, isObject, deepMerge, Copy, deepMergeByCopy, pickByCopy, deepFreeze, hasGetter, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23243,7 +23292,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return isNullOrUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return greaterOfTwoDates; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "uniqCombineArrays", function() { return uniqCombineArrays; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return uniqCombineObjArrays; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return extendArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return subtractFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return arrayByDifference; });
@@ -23262,8 +23311,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_isArray__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/mergeWith */ "./node_modules/lodash/mergeWith.js");
 /* harmony import */ var lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/uniq */ "./node_modules/lodash/uniq.js");
-/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/uniqWith */ "./node_modules/lodash/uniqWith.js");
+/* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 
@@ -23293,47 +23342,49 @@ function greaterOfTwoDates(dateA, dateB) {
     return dateB;
   }
 }
-function uniqCombineArrays(arrayA, arrayB) {
-  return lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(arrayA.concat(arrayB));
+function uniqCombineObjArrays(arrayA, arrayB, equalityKeys) {
+  return lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2___default()(arrayA.concat(arrayB), function (a, b) {
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = equalityKeys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var key = _step.value;
+
+        if (a[key] !== b[key]) {
+          return false;
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    return true;
+  });
 }
 /** Adds all items from otherArray into inArray, in-place.*/
 
 function extendArray(inArray, otherArray) {
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = otherArray[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var value = _step.value;
-      inArray.push(value);
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return != null) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
-}
-/** Removes all items appearing in toSubtract from inArray, in-place */
-
-function subtractFromArray(inArray, toSubtract) {
   var _iteratorNormalCompletion2 = true;
   var _didIteratorError2 = false;
   var _iteratorError2 = undefined;
 
   try {
-    for (var _iterator2 = toSubtract[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+    for (var _iterator2 = otherArray[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
       var value = _step2.value;
-      inArray.splice(inArray.indexOf(value), 1);
+      inArray.push(value);
     }
   } catch (err) {
     _didIteratorError2 = true;
@@ -23346,6 +23397,33 @@ function subtractFromArray(inArray, toSubtract) {
     } finally {
       if (_didIteratorError2) {
         throw _iteratorError2;
+      }
+    }
+  }
+}
+/** Removes all items appearing in toSubtract from inArray, in-place */
+
+function subtractFromArray(inArray, toSubtract) {
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = toSubtract[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var value = _step3.value;
+      inArray.splice(inArray.indexOf(value), 1);
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
       }
     }
   }
@@ -23369,26 +23447,26 @@ function omitInPlace(object, keys) {
     return object;
   }
 
-  var _iteratorNormalCompletion3 = true;
-  var _didIteratorError3 = false;
-  var _iteratorError3 = undefined;
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
 
   try {
-    for (var _iterator3 = keys[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-      var key = _step3.value;
+    for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var key = _step4.value;
       delete object[key];
     }
   } catch (err) {
-    _didIteratorError3 = true;
-    _iteratorError3 = err;
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-        _iterator3.return();
+      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+        _iterator4.return();
       }
     } finally {
-      if (_didIteratorError3) {
-        throw _iteratorError3;
+      if (_didIteratorError4) {
+        throw _iteratorError4;
       }
     }
   }
@@ -23404,26 +23482,26 @@ function omitByCopy(object, fields) {
    * when payload is an ES6 item class. So we instead manually omit each key.
    */
 
-  var _iteratorNormalCompletion4 = true;
-  var _didIteratorError4 = false;
-  var _iteratorError4 = undefined;
+  var _iteratorNormalCompletion5 = true;
+  var _didIteratorError5 = false;
+  var _iteratorError5 = undefined;
 
   try {
-    for (var _iterator4 = fields[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-      var key = _step4.value;
+    for (var _iterator5 = fields[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+      var key = _step5.value;
       delete newObject[key];
     }
   } catch (err) {
-    _didIteratorError4 = true;
-    _iteratorError4 = err;
+    _didIteratorError5 = true;
+    _iteratorError5 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-        _iterator4.return();
+      if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+        _iterator5.return();
       }
     } finally {
-      if (_didIteratorError4) {
-        throw _iteratorError4;
+      if (_didIteratorError5) {
+        throw _iteratorError5;
       }
     }
   }
@@ -23474,45 +23552,14 @@ function deepMergeByCopy(a, b) {
 
 function pickByCopy(object, keys) {
   var result = {};
-  var _iteratorNormalCompletion5 = true;
-  var _didIteratorError5 = false;
-  var _iteratorError5 = undefined;
-
-  try {
-    for (var _iterator5 = keys[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-      var key = _step5.value;
-      result[key] = object[key];
-    }
-  } catch (err) {
-    _didIteratorError5 = true;
-    _iteratorError5 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-        _iterator5.return();
-      }
-    } finally {
-      if (_didIteratorError5) {
-        throw _iteratorError5;
-      }
-    }
-  }
-
-  return Copy(result);
-}
-function deepFreeze(object) {
-  // Retrieve the property names defined on object
-  var propNames = Object.getOwnPropertyNames(object); // Freeze properties before freezing self
-
   var _iteratorNormalCompletion6 = true;
   var _didIteratorError6 = false;
   var _iteratorError6 = undefined;
 
   try {
-    for (var _iterator6 = propNames[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-      var name = _step6.value;
-      var value = object[name];
-      object[name] = value && _typeof(value) === "object" ? deepFreeze(value) : value;
+    for (var _iterator6 = keys[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+      var key = _step6.value;
+      result[key] = object[key];
     }
   } catch (err) {
     _didIteratorError6 = true;
@@ -23525,6 +23572,37 @@ function deepFreeze(object) {
     } finally {
       if (_didIteratorError6) {
         throw _iteratorError6;
+      }
+    }
+  }
+
+  return Copy(result);
+}
+function deepFreeze(object) {
+  // Retrieve the property names defined on object
+  var propNames = Object.getOwnPropertyNames(object); // Freeze properties before freezing self
+
+  var _iteratorNormalCompletion7 = true;
+  var _didIteratorError7 = false;
+  var _iteratorError7 = undefined;
+
+  try {
+    for (var _iterator7 = propNames[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+      var name = _step7.value;
+      var value = object[name];
+      object[name] = value && _typeof(value) === "object" ? deepFreeze(value) : value;
+    }
+  } catch (err) {
+    _didIteratorError7 = true;
+    _iteratorError7 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+        _iterator7.return();
+      }
+    } finally {
+      if (_didIteratorError7) {
+        throw _iteratorError7;
       }
     }
   }
@@ -31584,6 +31662,45 @@ function uniq(array) {
 }
 
 module.exports = uniq;
+
+/***/ }),
+
+/***/ "./node_modules/lodash/uniqWith.js":
+/*!*****************************************!*\
+  !*** ./node_modules/lodash/uniqWith.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseUniq = __webpack_require__(/*! ./_baseUniq */ "./node_modules/lodash/_baseUniq.js");
+/**
+ * This method is like `_.uniq` except that it accepts `comparator` which
+ * is invoked to compare elements of `array`. The order of result values is
+ * determined by the order they occur in the array.The comparator is invoked
+ * with two arguments: (arrVal, othVal).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Array
+ * @param {Array} array The array to inspect.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new duplicate free array.
+ * @example
+ *
+ * var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }, { 'x': 1, 'y': 2 }];
+ *
+ * _.uniqWith(objects, _.isEqual);
+ * // => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }]
+ */
+
+
+function uniqWith(array, comparator) {
+  comparator = typeof comparator == 'function' ? comparator : undefined;
+  return array && array.length ? baseUniq(array, undefined, comparator) : [];
+}
+
+module.exports = uniqWith;
 
 /***/ }),
 

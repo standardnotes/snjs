@@ -46,7 +46,11 @@ describe("importing", () => {
     expect(note.tags.length).to.equal(1);
   });
 
-  it('importing same conflicting note many times should create 1 duplicate', async () => {
+  it('importing same note many times should create many duplicates', async () => {
+    /**
+     * Used strategy here will be KEEP_LEFT_DUPLICATE_RIGHT
+     * which means that new right items will be created with different
+     */
     const modelManager = await createModelManager();
     const notePayload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
@@ -65,7 +69,7 @@ describe("importing", () => {
     expect(imported.content.title).to.equal(mutatedNote.content.title);
   });
 
-  it('importing a tag with lesser references should create a duplicate', async () => {
+  it('importing a tag with lesser references should not create duplicate', async () => {
     const modelManager = await createModelManager();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
@@ -81,10 +85,8 @@ describe("importing", () => {
     await modelManager.importItemsFromRaw([
       mutatedTag
     ]);
-    expect(modelManager.tags.length).to.equal(2);
-    const imported = modelManager.tags.find((t) => t.uuid !== tagPayload.uuid);
+    expect(modelManager.tags.length).to.equal(1);
     expect(modelManager.findItem(tagPayload.uuid).content.references.length).to.equal(1);
-    expect(modelManager.findItem(imported.uuid).content.references.length).to.equal(0);
   });
 
   it('importing data with differing content should create duplicates', async () => {
@@ -171,8 +173,9 @@ describe("importing", () => {
       externalTag
     ]);
 
-    // We expect now that the total item count is 3, not 4.
+    /** We expect now that the total item count is 3, not 4. */
     expect(modelManager.allItems.length).to.equal(3);
+    /** References from both items have merged. */
     expect(tag.content.references.length).to.equal(2);
   });
 });

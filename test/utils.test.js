@@ -52,6 +52,23 @@ describe('utils', () => {
     expect(result).to.eql([1, 4]);
   })
 
+  it('uniqCombineObjArrays', () => {
+    const arrayA = [
+      { a: 'a', b: 'a' }
+    ]
+    const arrayB = [
+      { a: 'a', b: 'a' },
+      { a: '2', b: '2' }
+    ]
+
+    const result = uniqCombineObjArrays(arrayA, arrayB, ['a', 'b']);
+    expect(result.length).to.equal(2);
+  })
+
+  it('greaterOfTwoDates', () => {
+
+  })
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {
