@@ -1538,7 +1538,7 @@ function () {
               this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_12__["APPLICATION_EVENT_DID_SIGN_IN"]);
               _context5.next = 11;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_11__["SYNC_MODE_DOWNLOAD_FIRST"]
+                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_11__["SYNC_MODE_INITIAL"]
               }));
 
             case 11:
@@ -21899,96 +21899,82 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var AccountDownloader =
 /*#__PURE__*/
 function () {
-  function AccountDownloader() {
+  function AccountDownloader(_ref) {
+    var apiService = _ref.apiService,
+        protocolManager = _ref.protocolManager,
+        contentType = _ref.contentType,
+        customEvent = _ref.customEvent,
+        limit = _ref.limit;
+
     _classCallCheck(this, AccountDownloader);
+
+    this.apiService = apiService;
+    this.protocolManager = protocolManager;
+    this.contentType = contentType;
+    this.customEvent = customEvent;
+    this.limit = limit;
+    this.progressObj = {
+      retrievedPayloads: []
+    };
   }
+  /**
+   * Executes a sync request with a blank sync token and high download limit. It will download all items,
+   * but won't do anything with them other than decrypting and creating respective objects.
+   */
 
-  _createClass(AccountDownloader, null, [{
-    key: "downloadAllPayloads",
 
-    /**
-     * Executes a sync request with a blank sync token and high download limit. It will download all items,
-     * but won't do anything with them other than decrypting and creating respective objects.
-     */
-    value: function downloadAllPayloads(_ref) {
-      var _this = this;
-
-      var apiService, protocolManager, contentType, customEvent, progress, limit, response;
-      return regeneratorRuntime.async(function downloadAllPayloads$(_context2) {
+  _createClass(AccountDownloader, [{
+    key: "run",
+    value: function run() {
+      var response, encryptedPayloads, decryptedPayloads;
+      return regeneratorRuntime.async(function run$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
-              apiService = _ref.apiService, protocolManager = _ref.protocolManager, contentType = _ref.contentType, customEvent = _ref.customEvent, progress = _ref.progress, limit = _ref.limit;
-              _context2.next = 3;
-              return regeneratorRuntime.awrap(apiService.sync({
-                lastSyncToken: syncToken,
-                paginationToken: paginationToken,
-                limit: limit || 500,
-                contentType: contentType,
-                customEvent: customEvent
-              }).then(function _callee(response) {
-                var encryptedPayloads, decryptedPayloads;
-                return regeneratorRuntime.async(function _callee$(_context) {
-                  while (1) {
-                    switch (_context.prev = _context.next) {
-                      case 0:
-                        if (!progress) {
-                          progress = {
-                            retrievedPayloads: []
-                          };
-                        }
-
-                        encryptedPayloads = response.retrieved_items.map(function (rawRetrievedPayload) {
-                          return Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_0__["CreateSourcedPayloadFromObject"])({
-                            object: rawRetrievedPayload,
-                            source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
-                          });
-                        });
-                        _context.next = 4;
-                        return regeneratorRuntime.awrap(protocolManager.payloadsByDecryptingPayloads({
-                          payloads: encryptedPayloads
-                        }));
-
-                      case 4:
-                        decryptedPayloads = _context.sent;
-                        progress.retrievedPayloads = progress.retrievedPayloads.concat(decryptedPayloads);
-                        progress.syncToken = response.sync_token;
-                        progress.cursorToken = response.cursor_token;
-
-                        if (!cursorToken) {
-                          _context.next = 12;
-                          break;
-                        }
-
-                        return _context.abrupt("return", _this.stateless_downloadAllItems({
-                          apiService: apiService,
-                          protocolManager: protocolManager,
-                          contentType: contentType,
-                          customEvent: customEvent,
-                          progress: progress,
-                          limit: limit
-                        }));
-
-                      case 12:
-                        return _context.abrupt("return", retrievedPayloads);
-
-                      case 13:
-                      case "end":
-                        return _context.stop();
-                    }
-                  }
-                });
+              _context.next = 2;
+              return regeneratorRuntime.awrap(this.apiService.sync({
+                lastSyncToken: this.progressObj.lastSyncToken,
+                paginationToken: this.progressObj.paginationToken,
+                limit: this.limit || 500,
+                contentType: this.contentType,
+                customEvent: this.customEvent
               }));
 
-            case 3:
-              response = _context2.sent;
+            case 2:
+              response = _context.sent;
+              encryptedPayloads = response.retrieved_items.map(function (rawRetrievedPayload) {
+                return Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_0__["CreateSourcedPayloadFromObject"])({
+                  object: rawRetrievedPayload,
+                  source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]
+                });
+              });
+              _context.next = 6;
+              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
+                payloads: encryptedPayloads
+              }));
 
-            case 4:
+            case 6:
+              decryptedPayloads = _context.sent;
+              this.progressObj.retrievedPayloads = this.progressObj.retrievedPayloads.concat(decryptedPayloads);
+              this.progressObj.lastSyncToken = response.sync_token;
+              this.progressObj.paginationToken = response.cursor_token;
+
+              if (!response.cursor_token) {
+                _context.next = 14;
+                break;
+              }
+
+              return _context.abrupt("return", this.run());
+
+            case 14:
+              return _context.abrupt("return", this.progressObj.retrievedPayloads);
+
+            case 15:
             case "end":
-              return _context2.stop();
+              return _context.stop();
           }
         }
-      });
+      }, null, this);
     }
   }]);
 
@@ -22011,7 +21997,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_account_response__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/sync/account/response */ "./lib/services/sync/account/response.js");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
 /* harmony import */ var _Services_sync_constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/sync/constants */ "./lib/services/sync/constants.js");
-/* harmony import */ var _Services_sync_constants__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_Services_sync_constants__WEBPACK_IMPORTED_MODULE_3__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -22066,7 +22051,7 @@ function () {
   }, {
     key: "run",
     value: function run() {
-      var payloads, rawResponse, response, needsMoreSync;
+      var payloads, rawResponse, response;
       return regeneratorRuntime.async(function run$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -22101,16 +22086,14 @@ function () {
               return regeneratorRuntime.awrap(this.receiver(response, _Services_sync_signals__WEBPACK_IMPORTED_MODULE_2__["SIGNAL_TYPE_RESPONSE"]));
 
             case 14:
-              needsMoreSync = this.pendingPayloads.length > 0 || this.paginationToken;
-
-              if (!needsMoreSync) {
-                _context.next = 17;
+              if (this.done) {
+                _context.next = 16;
                 break;
               }
 
               return _context.abrupt("return", this.run());
 
-            case 17:
+            case 16:
             case "end":
               return _context.stop();
           }
@@ -22141,6 +22124,11 @@ function () {
     key: "payloadsSavedOrSaving",
     get: function get() {
       return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["arrayByDifference"])(this.payloads, this.pendingPayloads);
+    }
+  }, {
+    key: "done",
+    get: function get() {
+      return this.pendingPayloads.length === 0 && !this.paginationToken;
     }
   }, {
     key: "upLimit",
@@ -22523,6 +22511,11 @@ function () {
       var dirty = current ? current.dirtyCount > 0 : false;
       return dirty;
     }
+  }, {
+    key: "conflictsNeedSync",
+    get: function get() {
+      return this.needsMoreSync;
+    }
   }]);
 
   return AccountSyncResponseResolver;
@@ -22534,9 +22527,12 @@ function () {
 /*!****************************************!*\
   !*** ./lib/services/sync/constants.js ***!
   \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: DEFAULT_UP_DOWN_LIMIT */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEFAULT_UP_DOWN_LIMIT", function() { return DEFAULT_UP_DOWN_LIMIT; });
 var DEFAULT_UP_DOWN_LIMIT = 150;
 
 /***/ }),
@@ -22736,7 +22732,7 @@ var SIGNAL_TYPE_STATUS_CHANGED = 2;
 /*!*******************************************!*\
   !*** ./lib/services/sync/sync_manager.js ***!
   \*******************************************/
-/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SYNC_MODE_DEFAULT, SYNC_MODE_DOWNLOAD_FIRST, SNSyncManager */
+/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SYNC_MODE_DEFAULT, SYNC_MODE_INITIAL, SNSyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22744,7 +22740,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return TIMING_STRATEGY_RESOLVE_ON_NEXT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return TIMING_STRATEGY_FORCE_SPAWN_NEW; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DEFAULT", function() { return SYNC_MODE_DEFAULT; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DOWNLOAD_FIRST", function() { return SYNC_MODE_DOWNLOAD_FIRST; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_INITIAL", function() { return SYNC_MODE_INITIAL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return SNSyncManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
@@ -22759,8 +22755,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/payloads/fields */ "./lib/protocol/payloads/fields.js");
 /* harmony import */ var _Protocol_payloads__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Protocol/payloads */ "./lib/protocol/payloads/index.js");
 /* harmony import */ var _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Protocol/payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
-/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
+/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
+/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22794,6 +22791,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 var DEFAULT_MAX_DISCORDANCE = 5;
 var DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
@@ -22801,7 +22799,7 @@ var INVALID_SESSION_RESPONSE_STATUS = 401;
 var TIMING_STRATEGY_RESOLVE_ON_NEXT = 1;
 var TIMING_STRATEGY_FORCE_SPAWN_NEW = 2;
 var SYNC_MODE_DEFAULT = 1;
-var SYNC_MODE_DOWNLOAD_FIRST = 2;
+var SYNC_MODE_INITIAL = 2;
 var SNSyncManager =
 /*#__PURE__*/
 function (_SNService) {
@@ -23047,7 +23045,7 @@ function (_SNService) {
           switch (_context3.prev = _context3.next) {
             case 0:
               this.syncToken = token;
-              return _context3.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
+              return _context3.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
 
             case 2:
             case "end":
@@ -23070,11 +23068,11 @@ function (_SNService) {
                 break;
               }
 
-              return _context4.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_PAGINATION_TOKEN"], token));
+              return _context4.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"], token));
 
             case 5:
               _context4.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 7:
               return _context4.abrupt("return", _context4.sent);
@@ -23099,7 +23097,7 @@ function (_SNService) {
               }
 
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 3:
               this.syncToken = _context5.sent;
@@ -23127,7 +23125,7 @@ function (_SNService) {
               }
 
               _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 3:
               this.cursorToken = _context6.sent;
@@ -23152,11 +23150,11 @@ function (_SNService) {
               this.syncToken = null;
               this.cursorToken = null;
               _context7.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 4:
               _context7.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_14__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 6:
             case "end":
@@ -23413,9 +23411,9 @@ function (_SNService) {
      *
      * @param mode            SYNC_MODE_DEFAULT
      *                        Performs a standard sync, uploading any dirty items and retrieving items.
-     *                        SYNC_MODE_DOWNLOAD_FIRST
-     *                        Performs a special sync where we first want to download all remote data first,
-     *                        before uploading any content. This allows a consumer, for example, to download
+     *                        SYNC_MODE_INITIAL
+     *                        The first sync for an account, where we first want to download all remote items first
+     *                        before uploading any dirty items. This allows a consumer, for example, to download
      *                        all data to see if user has an items key, and if not, only then create a new one.
      * @param checkIntegrity  Whether the server should compute and return an integrity hash.
      */
@@ -23551,7 +23549,7 @@ function (_SNService) {
               break;
 
             case 41:
-              if (useMode === SYNC_MODE_DOWNLOAD_FIRST) {
+              if (useMode === SYNC_MODE_INITIAL) {
                 uploadPayloads = [];
               }
 
@@ -23656,7 +23654,7 @@ function (_SNService) {
                 operation: operation
               });
 
-              if (!(useMode === SYNC_MODE_DOWNLOAD_FIRST)) {
+              if (!(useMode === SYNC_MODE_INITIAL)) {
                 _context11.next = 84;
                 break;
               }
@@ -23707,7 +23705,7 @@ function (_SNService) {
                   while (1) {
                     switch (_context12.prev = _context12.next) {
                       case 0:
-                        if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_13__["SIGNAL_TYPE_RESPONSE"])) {
+                        if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_RESPONSE"])) {
                           _context12.next = 11;
                           break;
                         }
@@ -23741,7 +23739,7 @@ function (_SNService) {
                         break;
 
                       case 11:
-                        if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_13__["SIGNAL_TYPE_STATUS_CHANGED"])) {
+                        if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_STATUS_CHANGED"])) {
                           _context12.next = 14;
                           break;
                         }
@@ -23795,7 +23793,7 @@ function (_SNService) {
                     while (1) {
                       switch (_context14.prev = _context14.next) {
                         case 0:
-                          if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_13__["SIGNAL_TYPE_RESPONSE"])) {
+                          if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_RESPONSE"])) {
                             _context14.next = 5;
                             break;
                           }
@@ -23808,7 +23806,7 @@ function (_SNService) {
                           break;
 
                         case 5:
-                          if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_13__["SIGNAL_TYPE_STATUS_CHANGED"])) {
+                          if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_STATUS_CHANGED"])) {
                             _context14.next = 8;
                             break;
                           }
@@ -24103,12 +24101,12 @@ function (_SNService) {
               }));
 
             case 79:
-              if (this.state.needsSync) {
+              if (this.state.needsSync && operation.done) {
                 this.sync();
               }
 
             case 80:
-              if (resolver.needsMoreSync) {
+              if (resolver.conflictsNeedSync) {
                 this.sync();
               }
 
@@ -24315,20 +24313,39 @@ function (_SNService) {
   }, {
     key: "stateless_downloadAllItems",
     value: function stateless_downloadAllItems() {
-      var _ref11 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          contentType = _ref11.contentType,
-          customEvent = _ref11.customEvent;
+      var _ref11,
+          contentType,
+          customEvent,
+          downloader,
+          payloads,
+          _args24 = arguments;
 
-      return _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
-        apiService: this.apiService,
-        protocolManager: this.protocolManager,
-        contentType: contentType,
-        customEvent: customEvent
-      }).then(function (allPayloads) {
-        return allPayloads.map(function (payload) {
-          return CreateItemFromPayload(payload);
-        });
-      });
+      return regeneratorRuntime.async(function stateless_downloadAllItems$(_context24) {
+        while (1) {
+          switch (_context24.prev = _context24.next) {
+            case 0:
+              _ref11 = _args24.length > 0 && _args24[0] !== undefined ? _args24[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
+              downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"]({
+                apiService: this.apiService,
+                protocolManager: this.protocolManager,
+                contentType: contentType,
+                customEvent: customEvent
+              });
+              _context24.next = 4;
+              return regeneratorRuntime.awrap(downloader.run());
+
+            case 4:
+              payloads = _context24.sent;
+              return _context24.abrupt("return", payloads.map(function (payload) {
+                return Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_13__["CreateItemFromPayload"])(payload);
+              }));
+
+            case 6:
+            case "end":
+              return _context24.stop();
+          }
+        }
+      }, null, this);
     }
     /** @unit_testing */
 

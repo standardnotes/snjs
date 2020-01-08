@@ -64,7 +64,7 @@ describe('online syncing', () => {
     }
     /** Items key and note */
     expect(rawPayloads.length).to.equal(2);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should login and retrieve synced item", async function() {
     const note = await Factory.createSyncedNote(this.application);
@@ -80,7 +80,7 @@ describe('online syncing', () => {
     const notes = this.application.modelManager.notes;
     expect(notes.length).to.equal(1);
     expect(notes[0].title).to.equal(note.title);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("resolve on next timing strategy", async function() {
     const syncCount = 7;
@@ -112,7 +112,7 @@ describe('online syncing', () => {
     this.application.syncManager.endLatencySimulator();
     // Since the syncs all happen after one another, extra syncs may be queued on that we are not awaiting.
     await Factory.sleep(0.5);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("force spawn new timing strategy", async function() {
     const syncCount = 7;
@@ -141,7 +141,7 @@ describe('online syncing', () => {
     expect(successes).to.equal(syncCount);
     expect(events).to.equal(syncCount);
     this.application.syncManager.endLatencySimulator();
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("allows me to save data after I've signed out", async function() {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
@@ -182,7 +182,7 @@ describe('online syncing', () => {
       // if an item comes back from the server, it is saved to disk immediately without a dirty value.
       expect(payload.dirty).to.not.be.ok;
     }
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("mapping should not mutate items with error decrypting state", async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -216,7 +216,7 @@ describe('online syncing', () => {
     const mappedItem2 = mappedItems2[0];
     expect(typeof mappedItem2.content).to.equal("object");
     expect(mappedItem2.content.title).to.equal(originalTitle);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should create conflicted copy if incoming server item attempts to overwrite local dirty item",
   async function() {
@@ -260,7 +260,7 @@ describe('online syncing', () => {
 
     const newRawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(newRawPayloads.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should handle sync conflicts by duplicating differing data", async function() {
     // create an item and sync it
@@ -286,7 +286,7 @@ describe('online syncing', () => {
     const note1 = this.application.modelManager.notes[0];
     const note2 = this.application.modelManager.notes[1];
     expect(note1.content.title).to.not.equal(note2.content.title);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should duplicate item if saving a modified item and clearing our sync token", async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -311,7 +311,7 @@ describe('online syncing', () => {
 
     const allItems =this.application.modelManager.allItems;
     expect(allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should handle sync conflicts by not duplicating same data", async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -327,7 +327,7 @@ describe('online syncing', () => {
 
     await this.application.syncManager.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -348,7 +348,7 @@ describe('online syncing', () => {
     // conflict_of is a key to ignore when comparing content, so item should
     // not be duplicated.
     await this.application.syncManager.sync(syncOptions);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('setting property on two clients simultaneously should create conflict', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -367,7 +367,7 @@ describe('online syncing', () => {
     await this.application.modelManager.setItemDirty(note, true);
     await this.application.syncManager.sync(syncOptions);
     this.expectedItemCount++;
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('removes item from storage upon deletion', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -390,7 +390,7 @@ describe('online syncing', () => {
 
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('retrieving item with no content should correctly map local state', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -417,7 +417,7 @@ describe('online syncing', () => {
     await this.application.syncManager.sync(syncOptions);
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('if server says deleted but client says not deleted, keep server state', async function() {
     const payload = Factory.createStorageItemNotePayload();
@@ -460,7 +460,7 @@ describe('online syncing', () => {
 
     // We expect that this item is now gone for good, and a duplicate has not been created.
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('if server says not deleted but client says deleted, keep server state', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -483,7 +483,7 @@ describe('online syncing', () => {
 
     // We expect that this item maintained.
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should create conflict if syncing an item that is stale", async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -511,7 +511,7 @@ describe('online syncing', () => {
     for(const payload of rawPayloads) {
       expect(payload.dirty).to.not.be.ok;
     }
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('creating conflict with exactly equal content should keep us in sync', async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -525,7 +525,7 @@ describe('online syncing', () => {
     await this.application.syncManager.sync(syncOptions);
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("marking an item dirty then saving to disk should retain that dirty state when restored", async function() {
     const note = await Factory.createMappedNote(this.application);
@@ -561,7 +561,7 @@ describe('online syncing', () => {
     const foundNote = this.application.modelManager.findItem(note.uuid);
     expect(foundNote.dirty).to.equal(true);
     await this.application.syncManager.sync();
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('duplicating an item should maintian its relationships', async function() {
     const payload1 = Factory.createStorageItemPayload('Foo');
@@ -624,33 +624,63 @@ describe('online syncing', () => {
     for(const item of this.application.modelManager.allItems) {
       expect(item.dirty).to.not.be.ok;
     }
-  }).timeout(60000);
+  }).timeout(10000);
 
-  let largeItemCount = 160;
 
-  it.only("should handle syncing pagination", async function() {
-    for(var i = 0; i < largeItemCount; i++) {
+  it("should handle uploading with sync pagination", async function() {
+    const largeItemCount = 160;
+    for(let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application);
-      await this.application.modelManager.setItemDirty(item, true);
-      this.application.modelManager.addItem(item);
+      await this.application.modelManager.setItemDirty(note, true);
     }
 
     this.expectedItemCount += largeItemCount;
 
-    let response = await this.application.syncManager.sync(syncOptions);
-    expect(response).to.be.ok;
+    await this.application.syncManager.sync(syncOptions);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
+
+  it("should handle downloading with sync pagination", async function() {
+    const largeItemCount = 160;
+    for(let i = 0; i < largeItemCount; i++) {
+      const note = await Factory.createMappedNote(this.application);
+      await this.application.modelManager.setItemDirty(note, true);
+    }
+    /** Upload */
+    await this.application.syncManager.sync(syncOptions);
+    this.expectedItemCount += largeItemCount;
+
+    /** Clear local data */
+    await this.application.modelManager.handleSignOut();
+    await this.application.syncManager.handleSignOut();
+    await this.application.storageManager.clearAllPayloads();
+    expect(this.application.modelManager.allItems.length).to.equal(0);
+
+    /** Download all data */
+    await this.application.syncManager.sync({syncOptions});
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+  }).timeout(20000);
 
   it("should be able to download all items separate of sync", async function() {
-    return expect(syncManager.stateless_downloadAllItems()).to.be.fulfilled.then(async (downloadedItems) => {
-      expect(downloadedItems.length).to.equal(this.expectedItemCount);
-      // ensure it's decrypted
-      expect(downloadedItems[0].content.text.length).to.be.above(1);
-      expect(downloadedItems[0].text.length).to.be.above(1);
-    })
-  }).timeout(60000);
+    const largeItemCount = 20;
+    for(let i = 0; i < largeItemCount; i++) {
+      const note = await Factory.createMappedNote(this.application);
+      await this.application.modelManager.setItemDirty(note, true);
+    }
+    /** Upload */
+    await this.application.syncManager.sync(syncOptions);
+    this.expectedItemCount += largeItemCount;
+
+    /** Download */
+    const downloadedItems = await this.application.syncManager.stateless_downloadAllItems();
+    expect(downloadedItems.length).to.equal(this.expectedItemCount);
+    // ensure it's decrypted
+    expect(downloadedItems[10].content.text.length).to.be.above(1);
+    expect(downloadedItems[10].text.length).to.be.above(1);
+  }).timeout(10000);
 
   it("syncing a new item before local data has loaded should still persist the item to disk, even if sync is locked", async function() {
     let modelManager = this.application.modelManager;
@@ -695,7 +725,7 @@ describe('online syncing', () => {
     expect(currentItem.content.text).to.equal(note.content.text);
     expect(currentItem.text).to.equal(note.text);
     expect(currentItem.dirty).to.not.be.ok;
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("load local items should respect sort priority", async function() {
     let contentTypes = ["A", "B", "C"];
@@ -724,7 +754,7 @@ describe('online syncing', () => {
     expect(items[0].content_type).to.equal("C");
     expect(items[2].content_type).to.equal("A");
     expect(items[4].content_type).to.equal("B");
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("handles stale data in bulk", async function() {
     await this.application.syncManager.loadDataFromDatabase();
@@ -765,7 +795,7 @@ describe('online syncing', () => {
 
     let storage = await this.application.storageManager.getAllRawPayloads();
     expect(storage.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should sign in and retrieve large number of items", async function() {
     // logout
@@ -784,7 +814,7 @@ describe('online syncing', () => {
 
     models = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('when a note is conflicted, its tags should not be duplicated.', async function() {
     await this.application.syncManager.loadDataFromDatabase();
@@ -825,7 +855,7 @@ describe('online syncing', () => {
     this.expectedItemCount += 1;
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(tag.content.references.length).to.equal(2);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it('should keep an item dirty thats been modified after low latency sync request began', async function() {
     await this.application.syncManager.loadDataFromDatabase();
@@ -870,7 +900,7 @@ describe('online syncing', () => {
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(modelManager.findItem(note.uuid).content.text).to.equal(text);
     expect(modelManager.findItem(note.uuid).text).to.equal(text);
-  }).timeout(60000);
+  }).timeout(10000);
 
   it("should sync an item twice if it's marked dirty while a sync is ongoing", async function() {
     // create an item and sync it
@@ -893,5 +923,5 @@ describe('online syncing', () => {
 
     await syncRequest;
     expect(modelManager.getDirtyItems().length).to.equal(1);
-  }).timeout(60000);
+  }).timeout(10000);
 });
