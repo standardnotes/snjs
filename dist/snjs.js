@@ -7561,7 +7561,7 @@ function PayloadsByUpdatingReferences(_ref3) {
 /*!********************************************!*\
   !*** ./lib/protocol/payloads/generator.js ***!
   \********************************************/
-/*! exports provided: CreateMaxPayloadFromAnyObject, CreateIntentPayloadFromObject, CreateSourcedPayloadFromObject, CopyPayload, CreateEncryptionParameters, CopyEncryptionParameters, itemPayloadClassForPayloadSource */
+/*! exports provided: CreateMaxPayloadFromAnyObject, CreateIntentPayloadFromObject, CreateSourcedPayloadFromObject, CopyPayload, CreateEncryptionParameters, CopyEncryptionParameters, payloadClassForSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7572,7 +7572,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return CopyPayload; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return CopyEncryptionParameters; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForPayloadSource", function() { return itemPayloadClassForPayloadSource; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "payloadClassForSource", function() { return payloadClassForSource; });
 /* harmony import */ var _Protocol_payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.js");
 /* harmony import */ var _Protocol_payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/payloads/server_item_payload */ "./lib/protocol/payloads/server_item_payload.js");
 /* harmony import */ var _Protocol_payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/file_item_payload */ "./lib/protocol/payloads/file_item_payload.js");
@@ -7627,7 +7627,7 @@ function CreateSourcedPayloadFromObject(_ref3) {
   var object = _ref3.object,
       source = _ref3.source,
       override = _ref3.override;
-  var payloadClass = itemPayloadClassForPayloadSource(source);
+  var payloadClass = payloadClassForSource(source);
   return CreatePayload({
     object: object,
     payloadClass: payloadClass,
@@ -7696,7 +7696,7 @@ function itemPayloadClassForIntent(intent) {
   }
 }
 
-function itemPayloadClassForPayloadSource(source) {
+function payloadClassForSource(source) {
   if (source === _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PAYLOAD_SOURCE_FILE_IMPORT"]) {
     return _Protocol_payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_2__["SNFileItemPayload"];
   }
@@ -7722,7 +7722,7 @@ function itemPayloadClassForPayloadSource(source) {
 /*!****************************************!*\
   !*** ./lib/protocol/payloads/index.js ***!
   \****************************************/
-/*! exports provided: PayloadCollection, PayloadCollectionSet, CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, itemPayloadClassForPayloadSource */
+/*! exports provided: PayloadCollection, PayloadCollectionSet, CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, payloadClassForSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7746,7 +7746,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateIntentPayloadFromObject", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreateIntentPayloadFromObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "itemPayloadClassForPayloadSource", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["itemPayloadClassForPayloadSource"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "payloadClassForSource", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["payloadClassForSource"]; });
 
 
 
@@ -7902,11 +7902,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return PurePayload; });
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/payloads/generator */ "./lib/protocol/payloads/generator.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -7971,6 +7973,14 @@ function () {
   }
 
   _createClass(PurePayload, [{
+    key: "mergedWith",
+    value: function mergedWith(otherPayload) {
+      return Object(_Protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
+        payload: this,
+        override: otherPayload
+      });
+    }
+  }, {
     key: "fields",
     value: function fields() {
       return this.constructor.fields();
@@ -8617,37 +8627,45 @@ function () {
               throw 'Attempting to encrypt already encrypted payload.';
 
             case 11:
+              if (payload.content) {
+                _context5.next = 13;
+                break;
+              }
+
+              throw 'Attempting to encrypt payload with no content.';
+
+            case 13:
               version = key ? key.version : this.latestVersion();
               format = this.payloadContentFormatForIntent({
                 key: key,
                 intent: intent
               });
               operator = this.operatorForVersion(version);
-              _context5.next = 16;
+              _context5.next = 18;
               return regeneratorRuntime.awrap(operator.generateEncryptionParameters({
                 payload: payload,
                 key: key,
                 format: format
               }));
 
-            case 16:
+            case 18:
               encryptionParameters = _context5.sent;
 
               if (encryptionParameters) {
-                _context5.next = 19;
+                _context5.next = 21;
                 break;
               }
 
               throw 'Unable to generate encryption parameters';
 
-            case 19:
+            case 21:
               return _context5.abrupt("return", Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_10__["CreateIntentPayloadFromObject"])({
                 object: payload,
                 override: encryptionParameters,
                 intent: intent
               }));
 
-            case 20:
+            case 22:
             case "end":
               return _context5.stop();
           }
@@ -9046,48 +9064,6 @@ function () {
       }
 
       throw "No auth params version found.";
-    }
-    /**
-     * Computes a hash of all items updated_at strings joined with a comma.
-     * The server will also do the same, to determine whether the client values match server values.
-     * @returns A SHA256 digest string (hex).
-     */
-
-  }, {
-    key: "computeDataIntegrityHash",
-    value: function computeDataIntegrityHash() {
-      var items, dates, string, hash;
-      return regeneratorRuntime.async(function computeDataIntegrityHash$(_context11) {
-        while (1) {
-          switch (_context11.prev = _context11.next) {
-            case 0:
-              _context11.prev = 0;
-              items = this.modelManager.nonDeletedItems.sort(function (a, b) {
-                return b.updated_at - a.updated_at;
-              });
-              dates = items.map(function (item) {
-                return item.updatedAtTimestamp();
-              });
-              string = dates.join(',');
-              _context11.next = 6;
-              return regeneratorRuntime.awrap(this.crypto.sha256(string));
-
-            case 6:
-              hash = _context11.sent;
-              return _context11.abrupt("return", hash);
-
-            case 10:
-              _context11.prev = 10;
-              _context11.t0 = _context11["catch"](0);
-              console.error("Error computing data integrity hash", _context11.t0);
-              return _context11.abrupt("return", null);
-
-            case 14:
-            case "end":
-              return _context11.stop();
-          }
-        }
-      }, null, this, [[0, 10]]);
     }
   }]);
 
@@ -17178,20 +17154,19 @@ function () {
               return _context19.abrupt("return", itemsKey);
 
             case 6:
-              console.log("Version for payload", payload);
               payloadProtocolVersion = this.protocolManager.versionForPayload(payload);
 
               if (!(payloadProtocolVersion === this.protocolManager.latestVersion())) {
-                _context19.next = 10;
+                _context19.next = 9;
                 break;
               }
 
               throw 'No associated key found for item encrypted with latest protocol version.';
 
-            case 10:
+            case 9:
               return _context19.abrupt("return", this.defaultItemsKeyForProtocolVersion(payloadProtocolVersion));
 
-            case 11:
+            case 10:
             case "end":
               return _context19.stop();
           }
@@ -22945,19 +22920,13 @@ function (_SNService) {
   }, {
     key: "getDatabasePayloads",
     value: function getDatabasePayloads() {
-      var rawPayloads;
       return regeneratorRuntime.async(function getDatabasePayloads$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getAllRawPayloads());
+              return _context.abrupt("return", this.storageManager.getAllRawPayloads());
 
-            case 2:
-              rawPayloads = _context.sent;
-              return _context.abrupt("return", rawPayloads);
-
-            case 4:
+            case 1:
             case "end":
               return _context.stop();
           }
@@ -22967,7 +22936,7 @@ function (_SNService) {
   }, {
     key: "loadDatabasePayloads",
     value: function loadDatabasePayloads(rawPayloads) {
-      var unsortedPayloads, payloads, payloadCount, batchSize, numBatches, batchIndex, currentPosition, batch, decrypted;
+      var unsortedPayloads, payloads, itemsKeysPayloads, decryptedItemsKeys, payloadCount, batchSize, numBatches, batchIndex, currentPosition, batch, decrypted;
       return regeneratorRuntime.async(function loadDatabasePayloads$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -22986,51 +22955,70 @@ function (_SNService) {
                 });
               });
               payloads = Object(_Services_sync_utils__WEBPACK_IMPORTED_MODULE_2__["SortPayloadsByRecentAndContentPriority"])(unsortedPayloads, this.localLoadPriorty);
-              /** Map in batches to give interface a chance to update */
+              /** Decrypt and map items keys first */
 
+              itemsKeysPayloads = payloads.filter(function (payload) {
+                return payload.content_type === 'SN|ItemsKey';
+              });
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["subtractFromArray"])(payloads, itemsKeysPayloads);
+              _context2.next = 8;
+              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
+                payloads: itemsKeysPayloads
+              }));
+
+            case 8:
+              decryptedItemsKeys = _context2.sent;
+              _context2.next = 11;
+              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
+                payloads: decryptedItemsKeys,
+                source: PAYLOAD_SOURCE_LOCAL_RETRIEVED
+              }));
+
+            case 11:
+              /** Map in batches to give interface a chance to update */
               payloadCount = payloads.length;
               batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
               numBatches = Math.ceil(payloadCount / batchSize);
               batchIndex = 0;
 
-            case 8:
+            case 15:
               if (!(batchIndex < numBatches)) {
-                _context2.next = 21;
+                _context2.next = 28;
                 break;
               }
 
               currentPosition = batchIndex * batchSize;
               batch = payloads.slice(currentPosition, currentPosition + batchSize);
-              _context2.next = 13;
+              _context2.next = 20;
               return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
                 payloads: batch
               }));
 
-            case 13:
+            case 20:
               decrypted = _context2.sent;
-              _context2.next = 16;
+              _context2.next = 23;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: payloads,
                 source: PAYLOAD_SOURCE_LOCAL_RETRIEVED
               }));
 
-            case 16:
+            case 23:
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_LOCAL_DATA_INCREMENTAL_LOAD"]);
               this.opStatus.setLocalDataLoadStatus({
                 current: current,
                 total: payloadCount
               });
 
-            case 18:
+            case 25:
               batchIndex++;
-              _context2.next = 8;
+              _context2.next = 15;
               break;
 
-            case 21:
+            case 28:
               this.databaseLoaded = true;
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_LOCAL_DATA_LOADED"]);
 
-            case 23:
+            case 30:
             case "end":
               return _context2.stop();
           }
@@ -23643,7 +23631,7 @@ function (_SNService) {
               return _context11.finish(71);
 
             case 79:
-              subtractFromArray(this.resolveQueue, inTimeResolveQueue);
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
 
               if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
                 this.log('Syncing again from resolve queue');
@@ -23913,7 +23901,7 @@ function (_SNService) {
   }, {
     key: "handleSuccessServerResponse",
     value: function handleSuccessServerResponse(_ref8) {
-      var operation, response, decryptedPayloads, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, collection, clientHash;
+      var operation, response, decryptedPayloads, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, collection, payloadsToPersist, payloadClass, clientHash;
 
       return regeneratorRuntime.async(function handleSuccessServerResponse$(_context19) {
         while (1) {
@@ -24026,7 +24014,7 @@ function (_SNService) {
 
             case 49:
               if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context19.next = 58;
+                _context19.next = 61;
                 break;
               }
 
@@ -24037,85 +24025,98 @@ function (_SNService) {
               }));
 
             case 53:
-              _context19.next = 55;
+              payloadsToPersist = void 0;
+              payloadClass = Object(_Protocol_payloads__WEBPACK_IMPORTED_MODULE_11__["payloadClassForSource"])(collection.source);
+
+              if (!payloadClass.fields().includes(_Protocol_payloads_fields__WEBPACK_IMPORTED_MODULE_10__["ITEM_PAYLOAD_CONTENT"])) {
+                /** Before persisting, merge with current base value that has content field */
+                payloadsToPersist = collection.allPayloads.map(function (payload) {
+                  var base = masterCollection.findPayload(payload.uuid);
+                  return base.mergedWith(payload);
+                });
+              } else {
+                payloadsToPersist = collection.allPayloads;
+              }
+
+              _context19.next = 58;
               return regeneratorRuntime.awrap(this.persistPayloads({
-                decryptedPayloads: collection.allPayloads
+                decryptedPayloads: payloadsToPersist
               }));
 
-            case 55:
+            case 58:
               _iteratorNormalCompletion5 = true;
               _context19.next = 49;
               break;
 
-            case 58:
-              _context19.next = 64;
+            case 61:
+              _context19.next = 67;
               break;
 
-            case 60:
-              _context19.prev = 60;
+            case 63:
+              _context19.prev = 63;
               _context19.t1 = _context19["catch"](47);
               _didIteratorError5 = true;
               _iteratorError5 = _context19.t1;
 
-            case 64:
-              _context19.prev = 64;
-              _context19.prev = 65;
+            case 67:
+              _context19.prev = 67;
+              _context19.prev = 68;
 
               if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                 _iterator5.return();
               }
 
-            case 67:
-              _context19.prev = 67;
+            case 70:
+              _context19.prev = 70;
 
               if (!_didIteratorError5) {
-                _context19.next = 70;
+                _context19.next = 73;
                 break;
               }
 
               throw _iteratorError5;
 
-            case 70:
+            case 73:
+              return _context19.finish(70);
+
+            case 74:
               return _context19.finish(67);
 
-            case 71:
-              return _context19.finish(64);
-
-            case 72:
+            case 75:
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_SINGLE_SYNC_COMPLETED"]);
 
               if (!response.checkIntegrity) {
-                _context19.next = 80;
+                _context19.next = 83;
                 break;
               }
 
-              _context19.next = 76;
-              return regeneratorRuntime.awrap(this.protocolManager.computeDataIntegrityHash());
-
-            case 76:
-              clientHash = _context19.sent;
               _context19.next = 79;
+              return regeneratorRuntime.awrap(this.computeDataIntegrityHash());
+
+            case 79:
+              clientHash = _context19.sent;
+              _context19.next = 82;
               return regeneratorRuntime.awrap(this.state.setIntegrityHashes({
                 clientHash: clientHash,
                 serverHash: response.integrityHash
               }));
 
-            case 79:
+            case 82:
               if (this.state.needsSync && operation.done) {
                 this.sync();
               }
 
-            case 80:
+            case 83:
               if (resolver.conflictsNeedSync) {
                 this.sync();
               }
 
-            case 81:
+            case 84:
             case "end":
               return _context19.stop();
           }
         }
-      }, null, this, [[12, 27, 31, 39], [32,, 34, 38], [47, 60, 64, 72], [65,, 67, 71]]);
+      }, null, this, [[12, 27, 31, 39], [32,, 34, 38], [47, 63, 67, 75], [68,, 70, 74]]);
     }
   }, {
     key: "handleSyncOperationCompletion",
@@ -24235,23 +24236,60 @@ function (_SNService) {
         }
       }, null, this, [[5, 18, 22, 30], [23,, 25, 29]]);
     }
+    /**
+     * Computes a hash of all items updated_at strings joined with a comma.
+     * The server will also do the same, to determine whether the client values match server values.
+     * @returns A SHA256 digest string (hex).
+     */
+
+  }, {
+    key: "computeDataIntegrityHash",
+    value: function computeDataIntegrityHash() {
+      var items, dates, string;
+      return regeneratorRuntime.async(function computeDataIntegrityHash$(_context22) {
+        while (1) {
+          switch (_context22.prev = _context22.next) {
+            case 0:
+              _context22.prev = 0;
+              items = this.modelManager.nonDeletedItems.sort(function (a, b) {
+                return b.updated_at - a.updated_at;
+              });
+              dates = items.map(function (item) {
+                return item.updatedAtTimestamp();
+              });
+              string = dates.join(',');
+              return _context22.abrupt("return", this.protocolManager.crypto.sha256(string));
+
+            case 7:
+              _context22.prev = 7;
+              _context22.t0 = _context22["catch"](0);
+              console.error("Error computing data integrity hash", _context22.t0);
+              return _context22.abrupt("return", null);
+
+            case 11:
+            case "end":
+              return _context22.stop();
+          }
+        }
+      }, null, this, [[0, 7]]);
+    }
   }, {
     key: "handleSignOut",
     value: function handleSignOut() {
-      return regeneratorRuntime.async(function handleSignOut$(_context22) {
+      return regeneratorRuntime.async(function handleSignOut$(_context23) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context23.prev = _context23.next) {
             case 0:
               this.state.reset();
               this.opStatus.reset();
               this.resolveQueue = [];
               this.spawnQueue = [];
-              _context22.next = 6;
+              _context23.next = 6;
               return regeneratorRuntime.awrap(this.clearSyncPositionTokens());
 
             case 6:
             case "end":
-              return _context22.stop();
+              return _context23.stop();
           }
         }
       }, null, this);
@@ -24262,11 +24300,11 @@ function (_SNService) {
     key: "resolveOutOfSync",
     value: function resolveOutOfSync() {
       var payloads, delta, collection;
-      return regeneratorRuntime.async(function resolveOutOfSync$(_context23) {
+      return regeneratorRuntime.async(function resolveOutOfSync$(_context24) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context24.prev = _context24.next) {
             case 0:
-              _context23.next = 2;
+              _context24.next = 2;
               return regeneratorRuntime.awrap(_Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
                 apiService: this.apiService,
                 protocolManager: this.protocolManager,
@@ -24274,7 +24312,7 @@ function (_SNService) {
               }));
 
             case 2:
-              payloads = _context23.sent;
+              payloads = _context24.sent;
               delta = new _Protocol_payloads_deltas__WEBPACK_IMPORTED_MODULE_12__["DeltaOutOfSync"]({
                 baseCollection: this.modelManager.getMasterCollection(),
                 applyCollection: new _Protocol_payloads__WEBPACK_IMPORTED_MODULE_11__["PayloadCollection"]({
@@ -24282,30 +24320,30 @@ function (_SNService) {
                   source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
                 })
               });
-              _context23.next = 6;
+              _context24.next = 6;
               return regeneratorRuntime.awrap(delta.resultingCollection());
 
             case 6:
-              collection = _context23.sent;
-              _context23.next = 9;
+              collection = _context24.sent;
+              _context24.next = 9;
               return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
                 collection: collection
               }));
 
             case 9:
-              _context23.next = 11;
+              _context24.next = 11;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 decryptedPayloads: collection.payloads
               }));
 
             case 11:
-              return _context23.abrupt("return", this.sync({
+              return _context24.abrupt("return", this.sync({
                 checkIntegrity: true
               }));
 
             case 12:
             case "end":
-              return _context23.stop();
+              return _context24.stop();
           }
         }
       }, null, this);
@@ -24318,31 +24356,31 @@ function (_SNService) {
           customEvent,
           downloader,
           payloads,
-          _args24 = arguments;
+          _args25 = arguments;
 
-      return regeneratorRuntime.async(function stateless_downloadAllItems$(_context24) {
+      return regeneratorRuntime.async(function stateless_downloadAllItems$(_context25) {
         while (1) {
-          switch (_context24.prev = _context24.next) {
+          switch (_context25.prev = _context25.next) {
             case 0:
-              _ref11 = _args24.length > 0 && _args24[0] !== undefined ? _args24[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
+              _ref11 = _args25.length > 0 && _args25[0] !== undefined ? _args25[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
               downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"]({
                 apiService: this.apiService,
                 protocolManager: this.protocolManager,
                 contentType: contentType,
                 customEvent: customEvent
               });
-              _context24.next = 4;
+              _context25.next = 4;
               return regeneratorRuntime.awrap(downloader.run());
 
             case 4:
-              payloads = _context24.sent;
-              return _context24.abrupt("return", payloads.map(function (payload) {
+              payloads = _context25.sent;
+              return _context25.abrupt("return", payloads.map(function (payload) {
                 return Object(_Services_modelManager__WEBPACK_IMPORTED_MODULE_13__["CreateItemFromPayload"])(payload);
               }));
 
             case 6:
             case "end":
-              return _context24.stop();
+              return _context25.stop();
           }
         }
       }, null, this);
@@ -24350,8 +24388,15 @@ function (_SNService) {
     /** @unit_testing */
 
   }, {
-    key: "beginLatencySimulator",
-    value: function beginLatencySimulator(latency) {
+    key: "ut_setDatabaseLoaded",
+    value: function ut_setDatabaseLoaded(loaded) {
+      this.databaseLoaded = loaded;
+    }
+    /** @unit_testing */
+
+  }, {
+    key: "ut_beginLatencySimulator",
+    value: function ut_beginLatencySimulator(latency) {
       this._simulate_latency = {
         latency: latency || 1000,
         enabled: true
@@ -24360,8 +24405,8 @@ function (_SNService) {
     /** @unit_testing */
 
   }, {
-    key: "endLatencySimulator",
-    value: function endLatencySimulator() {
+    key: "ut_endLatencySimulator",
+    value: function ut_endLatencySimulator() {
       this._simulate_latency = null;
     }
   }]);

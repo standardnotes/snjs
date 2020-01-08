@@ -87,7 +87,7 @@ describe('online syncing', () => {
     let successes = 0;
     let events = 0;
 
-    this.application.syncManager.beginLatencySimulator(250);
+    this.application.syncManager.ut_beginLatencySimulator(250);
     this.application.syncManager.addEventObserver({callback: (event, data) => {
       if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
         events++;
@@ -109,7 +109,7 @@ describe('online syncing', () => {
     // We don't know how many will execute above.
     expect(events).to.be.at.least(1);
 
-    this.application.syncManager.endLatencySimulator();
+    this.application.syncManager.ut_endLatencySimulator();
     // Since the syncs all happen after one another, extra syncs may be queued on that we are not awaiting.
     await Factory.sleep(0.5);
   }).timeout(10000);
@@ -119,7 +119,7 @@ describe('online syncing', () => {
     let successes = 0;
     let events = 0;
 
-    this.application.syncManager.beginLatencySimulator(250);
+    this.application.syncManager.ut_beginLatencySimulator(250);
 
     this.application.syncManager.addEventObserver({callback: (event, data) => {
       if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
@@ -140,7 +140,7 @@ describe('online syncing', () => {
     await Promise.all(promises);
     expect(successes).to.equal(syncCount);
     expect(events).to.equal(syncCount);
-    this.application.syncManager.endLatencySimulator();
+    this.application.syncManager.ut_endLatencySimulator();
   }).timeout(10000);
 
   it("allows me to save data after I've signed out", async function() {
@@ -682,49 +682,88 @@ describe('online syncing', () => {
     expect(downloadedItems[10].text.length).to.be.above(1);
   }).timeout(10000);
 
-  it("syncing a new item before local data has loaded should still persist the item to disk, even if sync is locked", async function() {
-    let modelManager = this.application.modelManager;
-    let syncManager = this.application.syncManager;
-    this.application.syncManager.__setLocalDataNotLoaded();
-    this.application.modelManager.handleSignOut();
-    this.application.syncManager.handleSignOut();
-    expect(this.application.modelManager.allItems.length).to.equal(0);
+  it("syncing an item should storage it encrypted", async function() {
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(note);
+    await this.application.syncManager.sync(syncOptions);
+    this.expectedItemCount++;
+    const rawPayloads = await this.application.syncManager.getDatabasePayloads();
+    const notePayload = rawPayloads.find((p) => p.content_type === 'Note');
+    expect(typeof notePayload.content).to.equal('string');
+  });
 
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
-
-    let item = Factory.createStorageItemNotePayload();
-    note.text = `${Math.random()}`;
-    this.application.modelManager.addItem(item);
+  it("syncing an item before data load should storage it encrypted", async function() {
+    const note = await Factory.createMappedNote(this.application);
     await this.application.modelManager.setItemDirty(note);
     this.expectedItemCount++;
 
+    /** Simulate database not loaded */
+    await this.application.syncManager.handleSignOut();
+    this.application.syncManager.ut_setDatabaseLoaded(false);
+    this.application.syncManager.sync(syncOptions);
+    await Factory.sleep(0.3);
+
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const notePayload = rawPayloads.find((p) => p.content_type === 'Note');
+    expect(typeof notePayload.content).to.equal('string');
+  });
+
+  it.only("saving an item after sync should persist it with content property", async function() {
+    const note = await Factory.createMappedNote(this.application);
+    const text = Factory.randomString(10000);
+    note.text = text;
+    this.application.modelManager.setItemDirty(note);
+    await this.application.syncManager.sync();
+    this.expectedItemCount++;
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const notePayload = rawPayloads.find((p) => p.content_type === 'Note');
+    expect(typeof notePayload.content).to.equal('string');
+    expect(notePayload.content.length).to.be.above(text.length);
+  });
+
+  it("syncing a new item before local data has loaded should still persist the item to disk",
+  async function() {
+    this.application.syncManager.loggingEnabled = true;
+    this.application.syncManager.ut_setDatabaseLoaded(false);
+    /** You don't want to clear model manager state as we'll lose encrypting items key */
+    // await this.application.modelManager.handleSignOut();
+    await this.application.syncManager.handleSignOut();
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
+
+    const note = await Factory.createMappedNote(this.application);
+    note.text = `${Math.random()}`;
+    await this.application.modelManager.setItemDirty(note);
+    /** This sync request should exit prematurely as we called ut_setDatabaseNotLoaded */
+    /** Do not await. Sleep instead. */
+    this.application.syncManager.sync(syncOptions);
+    await Factory.sleep(0.3);
+    this.expectedItemCount++;
+
+    /** Item should still be dirty */
+    expect(note.dirty).to.equal(true);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
 
-    await this.application.syncManager.sync(syncOptions);
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    const rawPayload = rawPayloads.find((p) => p.uuid === note.uuid);
+    expect(rawPayload.uuid).to.equal(note.uuid);
+    expect(rawPayload.dirty).equal(true);
+    expect(typeof rawPayload.content).to.equal('string');
 
-    let storageModels = await storageManager.getAllRawPayloads();
-    expect(storageModels.length).to.equal(this.expectedItemCount);
-    let savedModel = storageModels.find((m) => m.uuid == note.uuid);
-
-    expect(savedModel.uuid).to.equal(note.uuid);
-    expect(savedModel.dirty).equal(true);
-
-    this.application.syncManager.handleSignOut();
-    this.application.modelManager.handleSignOut();
-
-    await this.application.syncManager.loadDataFromDatabase();
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-    expect(this.application.syncManager.initialDataLoaded()).to.equal(true);
-
-    await this.application.syncManager.sync(syncOptions);
-
-    storageModels = await storageManager.getAllRawPayloads();
-    expect(storageModels.length).to.equal(this.expectedItemCount);
-
-    let currentItem = this.application.modelManager.findItem(note.uuid);
-    expect(currentItem.content.text).to.equal(note.content.text);
-    expect(currentItem.text).to.equal(note.text);
-    expect(currentItem.dirty).to.not.be.ok;
+    /** Clear state data and upload item from storage to server */
+    await this.application.syncManager.handleSignOut();
+    await this.application.modelManager.handleSignOut();
+    const databasePayloads = await this.application.storageManager.getAllRawPayloads();
+    await this.application.syncManager.loadDatabasePayloads(databasePayloads);
+    // await this.application.syncManager.sync(syncOptions);
+    //
+    // const newRawPayloads = await this.application.storageManager.getAllRawPayloads();
+    // expect(newRawPayloads.length).to.equal(this.expectedItemCount);
+    //
+    // const currentItem = this.application.modelManager.findItem(note.uuid);
+    // expect(currentItem.content.text).to.equal(note.content.text);
+    // expect(currentItem.text).to.equal(note.text);
+    // expect(currentItem.dirty).to.equal(false);
   }).timeout(10000);
 
   it("load local items should respect sort priority", async function() {

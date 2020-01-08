@@ -66,9 +66,9 @@ describe.skip('offline deprecated', () => {
     // This test is to ensure that when that mapping happens, it doesn't overwrite any pending changes we may have made
     // since the load.
     const latency = 1000;
-    this.application.syncManager.beginLatencySimulator(latency);
+    this.application.syncManager.ut_beginLatencySimulator(latency);
     await this.application.syncManager.sync();
-    this.application.syncManager.endLatencySimulator();
+    this.application.syncManager.ut_endLatencySimulator();
 
     // This item should be saved to disk at this point.
     const models = await this.application.storageManager.getAllRawPayloads()
