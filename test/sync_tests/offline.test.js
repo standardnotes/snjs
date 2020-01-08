@@ -31,7 +31,7 @@ describe('offline syncing', () => {
       payloads: [payload]
     });
     const item = items[0];
-    this.application.modelManager.setItemDirty(item);
+    await this.application.modelManager.setItemDirty(item);
 
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(0);

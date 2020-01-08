@@ -67,7 +67,7 @@ describe('sync discordance', () => {
     let response = await localSyncManager.sync();
 
     var item = Factory.createStorageItemNotePayload();
-    localModelManager.setItemDirty(item, true);
+    await localModelManager.setItemDirty(item, true);
     localModelManager.addItem(item);
     itemCount++;
 
@@ -102,7 +102,7 @@ describe('sync discordance', () => {
 
     // We will now reinstate the item and sync, which should repair everything
     localModelManager.addItem(item);
-    localModelManager.setItemDirty(item, true);
+    await localModelManager.setItemDirty(item, true);
     await localSyncManager.sync({checkIntegrity: true});
 
     expect(localSyncManager.isOutOfSync()).to.equal(false);
@@ -112,7 +112,7 @@ describe('sync discordance', () => {
   it("should perform sync resolution in which differing items are duplicated instead of merged", async () => {
     var item = Factory.createStorageItemNotePayload();
     localModelManager.addItem(item);
-    localModelManager.setItemDirty(item, true);
+    await localModelManager.setItemDirty(item, true);
     itemCount++;
 
     // localSyncManager.loggingEnabled = true;
@@ -155,7 +155,7 @@ describe('sync discordance', () => {
     }
 
     // now lets sync the item, just to make sure it doesn't cause any problems
-    localModelManager.setItemDirty(item, true);
+    await localModelManager.setItemDirty(item, true);
     await localSyncManager.sync({checkIntegrity: true});
     expect(localSyncManager.isOutOfSync()).to.equal(false);
     expect(localModelManager.allItems.length).to.equal(itemCount + 1);

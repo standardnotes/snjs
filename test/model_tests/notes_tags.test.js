@@ -94,7 +94,7 @@ describe("notes and tags", () => {
     expect(note.tags.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
 
-    modelManager.setItemToBeDeleted(note);
+    await modelManager.setItemToBeDeleted(note);
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
 
@@ -319,7 +319,7 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(1);
 
-    modelManager.setItemToBeDeleted(tag);
+    await modelManager.setItemToBeDeleted(tag);
     const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
     modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
     expect(tag.content.references.length).to.equal(0);
@@ -388,7 +388,7 @@ describe("notes and tags", () => {
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 
-    modelManager.setItemToBeDeleted(tag);
+    await modelManager.setItemToBeDeleted(tag);
 
     expect(tag.dirty).to.equal(true);
     expect(note.dirty).to.not.be.ok;

@@ -19,7 +19,7 @@ describe("items", () => {
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
-    modelManager.setItemDirty(item, true, true);
+    await modelManager.setItemDirty(item, true, true);
     var newDate = item.client_updated_at.getTime();
     expect(prevDate).to.not.equal(newDate);
   });
@@ -31,7 +31,7 @@ describe("items", () => {
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     var newDate = item.client_updated_at.getTime();
     expect(prevDate).to.equal(newDate);
   });
@@ -120,7 +120,7 @@ describe("items", () => {
     // There was an issue where calling that function would modify values directly to omit keys
     // in contentKeysToIgnoreWhenCheckingEquality.
 
-    modelManager.setItemsDirty([item1, item2], true);
+    await modelManager.setItemsDirty([item1, item2], true);
 
     expect(item1.getAppDataItem("client_updated_at")).to.be.ok;
     expect(item2.getAppDataItem("client_updated_at")).to.be.ok;

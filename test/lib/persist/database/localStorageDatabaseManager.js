@@ -12,9 +12,17 @@ export default class LocalStorageDatabaseManager extends SNDatabaseManager {
     }
   }
 
+  keyForItem(item) {
+    return this.keyForId(item.uuid);
+  }
+
+  keyForId(id) {
+    return `${this.getKeyPrefix()}${id}`;
+  }
+
   async getAllRawPayloads() {
     const models = [];
-    for(var key in localStorage) {
+    for(const key in localStorage) {
       if(key.startsWith(this.getKeyPrefix())) {
         models.push(JSON.parse(localStorage[key]))
       }
@@ -28,18 +36,18 @@ export default class LocalStorageDatabaseManager extends SNDatabaseManager {
 
   async savePayloads(items) {
     for(const item of items) {
-      localStorage.setItem(`${this.getKeyPrefix()}${item.uuid}`, JSON.stringify(item));
+      localStorage.setItem(this.keyForItem(item), JSON.stringify(item));
     }
   }
 
   async deletePayloadWithId(id) {
-    return localStorage.removeItem(`${this.getKeyPrefix()}${id}`);
+    localStorage.removeItem(this.keyForId(id));
   }
 
   async clearAllPayloads() {
-    for(var key in localStorage) {
+    for(const key in localStorage) {
       if(key.startsWith(this.getKeyPrefix())) {
-        this.deletePayloadWithId(key);
+        await this.deletePayloadWithId(key);
       }
     }
   }

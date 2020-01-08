@@ -32,15 +32,15 @@ describe('application instances', () => {
     const app2 = await Factory.createAndInitializeApplication('app2');
 
     const app1Item = await Factory.createMappedNote(app1.modelManager);
-    app1.modelManager.setItemDirty(app1Item, true);
-    app1.modelManager.addItem(app1Item);
+    await app1.modelManager.setItemDirty(app1Item, true);
+    await app1.modelManager.addItem(app1Item);
     await app1.syncManager.sync();
 
     expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(1);
     expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(0);
 
     const app2Item = await Factory.createMappedNote(app2.modelManager);
-    app2.modelManager.setItemDirty(app2Item, true);
+    await app2.modelManager.setItemDirty(app2Item, true);
     app2.modelManager.addItem(app2Item);
     await app2.syncManager.sync();
 

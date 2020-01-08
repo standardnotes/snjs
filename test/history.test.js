@@ -45,7 +45,7 @@ describe('session history', () => {
 
   const setTextAndSync = async (item, text) => {
     item.text = text;
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     return syncManager.sync();
   }
 
@@ -63,7 +63,7 @@ describe('session history', () => {
 
   it("create basic history entries", async () => {
     var item = Factory.createStorageItemNotePayload();
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     await syncManager.sync();
 
@@ -72,13 +72,13 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(1);
 
     // sync with same contents, should not create new entry
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     await syncManager.sync();
     expect(itemHistory.entries.length).to.equal(1);
 
     // sync with different contents, should create new entry
     item.title = Math.random();
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     await syncManager.sync();
     expect(itemHistory.entries.length).to.equal(2);
 
@@ -86,7 +86,7 @@ describe('session history', () => {
     var itemHistory = historyManager.historyForItem(item);
     expect(itemHistory.entries.length).to.equal(0);
 
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     await syncManager.sync();
     expect(itemHistory.entries.length).to.equal(1);
 
@@ -96,7 +96,7 @@ describe('session history', () => {
 
   it("should optimize basic entries", async () => {
     var item = Factory.createStorageItemNotePayload();
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     await syncManager.sync();
 
@@ -136,7 +136,7 @@ describe('session history', () => {
 
   it("should keep the entry right before a large deletion, regardless of its delta", async () => {
     var item = Factory.createStorageItemNotePayload();
-    modelManager.setItemDirty(item, true);
+    await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     item.text = stringOfSize(100);
     await syncManager.sync();

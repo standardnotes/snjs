@@ -55,11 +55,11 @@ describe("basic auth", () => {
 
     syncManager.loggingEnabled = true;
 
-    var totalItemCount = 105;
+    const totalItemCount = 105;
     for(var i = 0; i < totalItemCount; i++) {
       var item = Factory.createStorageItemNotePayload();
       modelManager.addItem(item);
-      modelManager.setItemDirty(item, true);
+      await modelManager.setItemDirty(item, true);
     }
 
     await syncManager.loadDataFromDatabase();
@@ -132,7 +132,7 @@ describe("basic auth", () => {
     for(var i = 0; i < totalItemCount; i++) {
       var item = Factory.createStorageItemNotePayload();
       modelManager.addItem(item);
-      modelManager.setItemDirty(item, true);
+      await modelManager.setItemDirty(item, true);
     }
 
     await syncManager.sync();
@@ -156,7 +156,7 @@ describe("basic auth", () => {
       expect(modelManager.allItems.length).to.equal(totalItemCount);
       expect(modelManager.invalidItems().length).to.equal(0);
 
-      modelManager.setAllItemsDirty();
+      await modelManager.setAllItemsDirty();
       await syncManager.sync();
 
       // clear sync token, clear storage, download all items, and ensure none of them have error decrypting

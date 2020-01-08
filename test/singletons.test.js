@@ -33,7 +33,7 @@ describe("singletons", () => {
     await syncManager.loadDataFromDatabase();
 
     modelManager.addItems([item1, item2, item3]);
-    modelManager.setItemsDirty([item1, item2, item3], true);
+    await modelManager.setItemsDirty([item1, item2, item3], true);
 
     expect(modelManager.allItems.length).to.equal(3);
 

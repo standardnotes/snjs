@@ -56,8 +56,8 @@ describe('app models', () => {
     expect(result.uuid).to.equal(sharedCreatedItem.uuid);
   });
 
-  it('removing item from modelmanager should remove it from its items', () => {
-    application.modelManager.removeItemLocally(sharedCreatedItem);
+  it('removing item from modelmanager should remove it from its items', async () => {
+    await application.modelManager.removeItemLocally(sharedCreatedItem);
     expect(application.modelManager.items.length).to.equal(0);
   });
 
