@@ -39,7 +39,7 @@ describe('payloads', () => {
       object: rawPayload,
       override: {
         dirty: true,
-        dirtyCount: 3,
+        lastSyncBegan: new Date(),
         waitingForKey: false,
         dummy: true,
         errorDecrypting: false
@@ -55,7 +55,7 @@ describe('payloads', () => {
     expect(encryptedPayload.errorDecrypting).to.not.be.ok;
     expect(encryptedPayload.errorDecryptingValueChanged).to.not.be.ok;
     expect(encryptedPayload.waitingForKey).to.not.be.ok;
-    expect(encryptedPayload.dirtyCount).to.not.be.ok;
+    expect(encryptedPayload.lastSyncBegan).to.not.be.ok;
     expect(encryptedPayload.dummy).to.not.be.ok;
   });
 

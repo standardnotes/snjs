@@ -132,14 +132,14 @@ describe("model manager mapping", () => {
   it('sync observers should be notified of changes', async () => {
     let modelManager = await createModelManager();
     const payload = Factory.createStorageItemNotePayload();
-    modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     let item = modelManager.items[0];
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       modelManager.addItemSyncObserver("test", "*", (items, validItems, deletedItems, source, sourceKey) => {
         expect(items[0].uuid == item.uuid);
         resolve();
       })
-      modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+      await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     })
   });
 })

@@ -106,7 +106,7 @@ describe('keys', () => {
     expect(keyToUse).to.equal(await localApplication.keyManager.getRootKey());
   })
 
-  it('items key should be encrypted with root key', async function() {
+  it('@todo items key should be encrypted with root key', async function() {
     expect(true).to.equal(false);
     expect(itemsKey.items_key_id).to.not.be.ok;
   })

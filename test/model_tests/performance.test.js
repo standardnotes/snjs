@@ -133,7 +133,7 @@ describe("mapping performance", () => {
 
     const t1 = performance.now();
     const seconds = (t1 - t0) / 1000;
-    const expectedRunTime = 3; // seconds
+    const expectedRunTime = 3.5; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
     const mappedTag = modelManager.validItemsForContentType("Tag")[0];

@@ -24,7 +24,7 @@ describe("importing", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
 

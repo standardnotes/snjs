@@ -40,7 +40,7 @@ describe("notes + tags syncing", async function() {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
     const note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
     const tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
@@ -64,7 +64,7 @@ describe("notes + tags syncing", async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    this.application.modelManager.mapPayloadsToLocalItems({
+    await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [notePayload, tagPayload]
     });
     const originalNote = this.application.modelManager.notes[0];
@@ -105,7 +105,7 @@ describe("notes + tags syncing", async function() {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    this.application.modelManager.mapPayloadsToLocalItems({
+    await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [notePayload, tagPayload]
     });
     const note = this.application.modelManager.notes[0];
