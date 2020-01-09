@@ -145,8 +145,8 @@ describe("importing", () => {
      * ahead of time before any changes are made.
      */
     const modelManager = this.application.modelManager;
-    const note = await Factory.createMappedNote(modelManager);
-    const tag = await Factory.createMappedTag(modelManager);
+    const note = await Factory.createMappedNote(this.application);
+    const tag = await Factory.createMappedTag(this.application);
 
     tag.addItemAsRelationship(note);
     await this.application.saveItem({item: tag});

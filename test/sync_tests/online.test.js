@@ -708,7 +708,7 @@ describe('online syncing', () => {
     expect(typeof notePayload.content).to.equal('string');
   });
 
-  it.only("saving an item after sync should persist it with content property", async function() {
+  it("saving an item after sync should persist it with content property", async function() {
     const note = await Factory.createMappedNote(this.application);
     const text = Factory.randomString(10000);
     note.text = text;
@@ -755,121 +755,107 @@ describe('online syncing', () => {
     await this.application.modelManager.handleSignOut();
     const databasePayloads = await this.application.storageManager.getAllRawPayloads();
     await this.application.syncManager.loadDatabasePayloads(databasePayloads);
-    // await this.application.syncManager.sync(syncOptions);
-    //
-    // const newRawPayloads = await this.application.storageManager.getAllRawPayloads();
-    // expect(newRawPayloads.length).to.equal(this.expectedItemCount);
-    //
-    // const currentItem = this.application.modelManager.findItem(note.uuid);
-    // expect(currentItem.content.text).to.equal(note.content.text);
-    // expect(currentItem.text).to.equal(note.text);
-    // expect(currentItem.dirty).to.equal(false);
+    await this.application.syncManager.sync(syncOptions);
+
+    const newRawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(newRawPayloads.length).to.equal(this.expectedItemCount);
+
+    const currentItem = this.application.modelManager.findItem(note.uuid);
+    expect(currentItem.content.text).to.equal(note.content.text);
+    expect(currentItem.text).to.equal(note.text);
+    expect(currentItem.dirty).to.equal(false);
   }).timeout(10000);
 
   it("load local items should respect sort priority", async function() {
-    let contentTypes = ["A", "B", "C"];
-    let itemCount = 6;
-    for(var i = 0; i < itemCount; i++) {
-      var item = Factory.createStorageItemPayload(contentTypes[Math.floor(i/2)]);
+    const contentTypes = ['A', 'B', 'C'];
+    const itemCount = 6;
+    for(let i = 0; i < itemCount; i++) {
+      const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i/2)]);
+      const item = await Factory.mapPayloadToItem(payload, this.application.modelManager);
       await this.application.modelManager.setItemDirty(item, true);
-      this.application.modelManager.addItem(item);
     }
+    this.expectedItemCount += itemCount;
 
-    await this.application.syncManager.loadDataFromDatabase();
     await this.application.syncManager.sync(syncOptions);
-    let models = await localStorageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    expect(models.length).to.equal(itemCount);
-
-    // reset items
+    this.application.syncManager.ut_setDatabaseLoaded(false);
     this.application.syncManager.handleSignOut();
     this.application.modelManager.handleSignOut();
 
-    this.application.syncManager.contentTypeLoadPriority = ["C", "A", "B"];
-    await this.application.syncManager.loadDataFromDatabase();
+    this.application.syncManager.localLoadPriorty = ['C', 'A', 'B'];
+    const databasePayloads = await this.application.storageManager.getAllRawPayloads();
+    await this.application.syncManager.loadDatabasePayloads(databasePayloads);
 
-    let items = this.application.modelManager.allItems;
-
-    expect(items[0].content_type).to.equal("C");
-    expect(items[2].content_type).to.equal("A");
-    expect(items[4].content_type).to.equal("B");
+    const items = this.application.modelManager.allItemsMatchingTypes(contentTypes);
+    expect(items[0].content_type).to.equal('C');
+    expect(items[2].content_type).to.equal('A');
+    expect(items[4].content_type).to.equal('B');
   }).timeout(10000);
 
   it("handles stale data in bulk", async function() {
-    await this.application.syncManager.loadDataFromDatabase();
+    const largeItemCount = 160;
+    await Factory.createManyMappedNotes(this.application, largeItemCount);
+    /** Upload */
     await this.application.syncManager.sync(syncOptions);
-    let items = this.application.modelManager.allItems;
+    this.expectedItemCount += largeItemCount;
+    const items = this.application.modelManager.allItems;
     expect(items.length).to.equal(this.expectedItemCount);
-
-    // We want to see what will happen if we upload everything we have to the server as dirty,
-    // with no sync token, so that the server also gives us everything it has. Where I expect some awkwardness
-    // is with subsets. That is, sync requests are broken up, so if I'm sending up 150/400, will the server know to conflict it?
-
-    // With rails-engine behavior 0.3.1, we expect syncing up stale data with old updated_at dates
-    // to overwrite whatever is on the server. With the 0.3.2 update, we expect this data will be conflicted
-    // since what the server has for updated_at doesn't match what we're sending it.
-
-    // In the test below, we expect all models to double. We'll modify the content, and act as if the change
-    // were from yesterday. The server would have the current time as its updated_at. This test succeeds
-    // when you're only dealing with 100 items. But if you go up to 300 where pagination is required, you can see
-    // that the server can't properly handle conflicts. 0.3.2 of the server will add an additional conflict check
-    // by comparing the incoming updated_at with the existing, and if it's in the past, we'll conflict it.
-
-    let yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
-    for(let item of items) {
-      // Use .text here, assuming it's a Note
-      if(note.content_type === "Note") {
-        note.text = `${Math.random()}`;
-        note.updated_at = yesterday;
-        await this.application.modelManager.setItemDirty(item, true);
-        // We expect all the notes to be duplicated.
-        this.expectedItemCount++;
-      }
+    /**
+     * We want to see what will happen if we upload everything we have to
+     * the server as dirty, with no sync token, so that the server also
+     * gives us everything it has.
+     */
+    const yesterday = Factory.yesterday();
+    for(const note of this.application.modelManager.notes) {
+      note.text = `${Math.random()}`;
+      note.updated_at = yesterday;
+      await this.application.modelManager.setItemDirty(note, true);
+      // We expect all the notes to be duplicated.
+      this.expectedItemCount++;
     }
 
+    await this.application.syncManager.clearSyncPositionTokens();
     await this.application.syncManager.sync(syncOptions);
 
-    items = this.application.modelManager.allItems;
-    expect(items.length).to.equal(this.expectedItemCount);
-
-    let storage = await this.application.storageManager.getAllRawPayloads();
-    expect(storage.length).to.equal(this.expectedItemCount);
-  }).timeout(10000);
+    const allItems2 = this.application.modelManager.allItems;
+    expect(allItems2.length).to.equal(this.expectedItemCount);
+  }).timeout(20000);
 
   it("should sign in and retrieve large number of items", async function() {
-    // logout
-    await Factory.globalSessionManager().signOut();
-    this.application.syncManager.handleSignOut();
-    this.application.modelManager.handleSignOut();
+    const largeItemCount = 1;
+    await Factory.createManyMappedNotes(this.application, largeItemCount);
+    this.expectedItemCount += largeItemCount;
+    await this.application.syncManager.sync();
 
-    await this.application.storageManager.clearAllData();
-    await Factory.globalSessionManager().login(Factory.serverURL(), email, password, true, null);
-
+    await this.application.signOut();
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
-    expect(models.length).to.equal(0);
+    expect(rawPayloads.length).to.equal(0);
 
-    await this.application.syncManager.loadDataFromDatabase();
+    await this.application.signIn({
+      email: this.email,
+      password: this.password
+    })
+
+    this.application.syncManager.ut_setDatabaseLoaded(false);
+    const databasePayloads = await this.application.storageManager.getAllRawPayloads();
+    await this.application.syncManager.loadDatabasePayloads(databasePayloads);
     await this.application.syncManager.sync(syncOptions);
 
-    models = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    const items = await this.application.modelManager.allItems;
+    expect(items.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
 
   it('when a note is conflicted, its tags should not be duplicated.', async function() {
-    await this.application.syncManager.loadDataFromDatabase();
-    /*
-      If you have a note and a tag, and the tag has 1 reference to the note,
-      and you import the same two items, except modify the note value so that a duplicate is created,
-      we expect only the note to be duplicated, and the tag not to.
-      However, if only the note changes, and you duplicate the note, which causes the tag's references content to change,
-      then when the incoming tag is being processed, it will also think it has changed, since our local value now doesn't match
-      what's coming in. The solution is to get all values ahead of time before any changes are made.
-    */
-    var tag = Factory.createStorageItemPayload("Tag");
-
-    var note = Factory.createStorageItemNotePayload();
-    this.application.modelManager.addItem(note);
-    this.application.modelManager.addItem(tag);
+    /**
+     * If you have a note and a tag, and the tag has 1 reference to the note,
+     * and you import the same two items, except modify the note value so that
+     * a duplicate is created, we expect only the note to be duplicated,
+     * and the tag not to.
+     */
+    const tag = await Factory.createMappedTag(this.application);
+    const note = await Factory.createMappedNote(this.application);
     tag.addItemAsRelationship(note);
     await this.application.modelManager.setItemDirty(tag, true);
     await this.application.modelManager.setItemDirty(note, true);
@@ -878,7 +864,7 @@ describe('online syncing', () => {
     await this.application.syncManager.sync(syncOptions);
 
     // conflict the note
-    let newText = `${Math.random()}`;
+    const newText = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
     note.text = newText;
     await this.application.modelManager.setItemDirty(note, true);
@@ -886,13 +872,13 @@ describe('online syncing', () => {
     // conflict the tag but keep its content the same
     tag.updated_at = Factory.yesterday();
     await this.application.modelManager.setItemDirty(tag, true);
-
-    await Factory.sleep(1.1);
     await this.application.syncManager.sync(syncOptions);
-
-    // We expect now that the total item count has went up by just 1 (the note), and not 2 (the note and tag)
+    /**
+     * We expect now that the total item count has went up by just 1 (the note),
+     * and not 2 (the note and tag)
+     */
     this.expectedItemCount += 1;
-    expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(tag.content.references.length).to.equal(2);
   }).timeout(10000);
 

@@ -1627,15 +1627,15 @@ function () {
             case 0:
               _ref7 = _args7.length > 0 && _args7[0] !== undefined ? _args7[0] : {}, dontClearData = _ref7.dontClearData;
               _context7.next = 3;
-              return regeneratorRuntime.awrap(this.syncManager.handleSignOut());
+              return regeneratorRuntime.awrap(this.sessionManager.signOut());
 
             case 3:
               _context7.next = 5;
-              return regeneratorRuntime.awrap(this.modelManager.handleSignOut());
+              return regeneratorRuntime.awrap(this.syncManager.handleSignOut());
 
             case 5:
               _context7.next = 7;
-              return regeneratorRuntime.awrap(this.sessionManager.signOut());
+              return regeneratorRuntime.awrap(this.modelManager.handleSignOut());
 
             case 7:
               _context7.next = 9;
@@ -22998,14 +22998,14 @@ function (_SNService) {
               decrypted = _context2.sent;
               _context2.next = 23;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: payloads,
+                payloads: decrypted,
                 source: PAYLOAD_SOURCE_LOCAL_RETRIEVED
               }));
 
             case 23:
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_LOCAL_DATA_INCREMENTAL_LOAD"]);
-              this.opStatus.setLocalDataLoadStatus({
-                current: current,
+              this.opStatus.setDatabaseLoadStatus({
+                current: currentPosition,
                 total: payloadCount
               });
 
@@ -23015,10 +23015,13 @@ function (_SNService) {
               break;
 
             case 28:
+              this.opStatus.setDatabaseLoadStatus({
+                done: true
+              });
               this.databaseLoaded = true;
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_LOCAL_DATA_LOADED"]);
 
-            case 30:
+            case 31:
             case "end":
               return _context2.stop();
           }
@@ -24467,6 +24470,16 @@ function () {
     value: function setDownloadStatus(_ref3) {
       var downloaded = _ref3.downloaded;
       this.downloaded = downloaded;
+    }
+  }, {
+    key: "setDatabaseLoadStatus",
+    value: function setDatabaseLoadStatus(_ref4) {
+      var current = _ref4.current,
+          total = _ref4.total,
+          done = _ref4.done;
+      this.databaseLoadCurrent = current;
+      this.databaseLoadTotal = total;
+      this.databaseLoadDone = done;
     }
   }, {
     key: "setDidBegin",

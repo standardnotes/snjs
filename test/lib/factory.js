@@ -2,20 +2,10 @@ import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
-
 import LocalStorageManager from './persist/storage/localStorageManager.js';
 import MemoryStorageManager from './persist/storage/memoryStorageManager.js';
-
 import LocalStorageDatabaseManager from './persist/database/localStorageDatabaseManager.js';
 import MemoryDatabaseManager from './persist/database/memoryDatabaseManager.js';
-
-var _globalStorageManager = null;
-var _globalDatabaseManager = null;
-var _globalHttpManager = null;
-var _globalSessionManager = null;
-var _globalModelManager = null;
-var _globalProtocolManager = null;
-var _globalKeyManager = null;
 
 export default class Factory {
   static createApplication(namespace) {
@@ -80,7 +70,9 @@ export default class Factory {
   }
 
   static createStorageItemPayload(contentType) {
-    return CreateMaxPayloadFromAnyObject({object: this.createItemParams(contentType)});
+    return CreateMaxPayloadFromAnyObject({
+      object: this.createItemParams(contentType)
+    });
   }
 
   static createStorageItemNotePayload() {
@@ -105,6 +97,11 @@ export default class Factory {
     return this.mapPayloadToItem(payload, application.modelManager);
   }
 
+  static createMappedTag(application) {
+    const payload = this.createStorageItemTagPayload();
+    return this.mapPayloadToItem(payload, application.modelManager);
+  }
+
   static async createSyncedNote(application) {
     const payload = this.createStorageItemNotePayload();
     const note = await this.mapPayloadToItem(payload, application.modelManager);
@@ -113,17 +110,19 @@ export default class Factory {
     return note;
   }
 
+  static async createManyMappedNotes(application, count) {
+    for(let i = 0; i < count; i++) {
+      const note = await Factory.createMappedNote(application);
+      await application.modelManager.setItemDirty(note, true);
+    }
+  }
+
   static async loginToApplication({application, email, password}) {
     return application.signIn({
       url: Factory.serverURL(),
       email: email,
       password: password
     });
-  }
-
-  static createMappedTag(modelManager) {
-    const payload = this.createStorageItemTagPayload();
-    return this.mapPayloadToItem(payload, modelManager);
   }
 
   static createNotePayload() {

@@ -38,7 +38,7 @@ describe('payload collections', () => {
   });
 
   it('master collection', async () => {
-    const note = await Factory.createMappedNote(sharedApplication.modelManager);
+    const note = await Factory.createMappedNote(sharedApplication);
     const masterCollection = sharedApplication.modelManager.getMasterCollection();
     const result = masterCollection.findPayload(note.uuid);
     expect(result.uuid).to.equal(note.uuid);

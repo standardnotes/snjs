@@ -20,14 +20,14 @@ describe('payloads', () => {
   })
 
   it('creating payload from item should create copy not by reference', async () => {
-    const item = await Factory.createMappedNote(sharedApplication.modelManager);
+    const item = await Factory.createMappedNote(sharedApplication);
     const payload = CreateMaxPayloadFromAnyObject({object: item});
     expect(item.content === payload.content).to.equal(false);
     expect(item.content.references === payload.content.references).to.equal(false);
   });
 
   it('creating payload from item should preserve appData', async () => {
-    const item = await Factory.createMappedNote(sharedApplication.modelManager);
+    const item = await Factory.createMappedNote(sharedApplication);
     const payload = CreateMaxPayloadFromAnyObject({object: item});
     expect(item.content.appData).to.be.ok;
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
@@ -93,7 +93,7 @@ describe('payloads', () => {
   });
 
   it('copying payload with override should override selected fields only', async () => {
-    const item = await Factory.createMappedNote(sharedApplication.modelManager);
+    const item = await Factory.createMappedNote(sharedApplication);
     const payload = CreateMaxPayloadFromAnyObject({object: item});
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,

@@ -43,7 +43,7 @@ describe('app models', () => {
   });
 
   it('adding item to modelmanager should add it to its items', async function() {
-    sharedCreatedItem = await Factory.createMappedNote(application.modelManager);
+    sharedCreatedItem = await Factory.createMappedNote(application);
     application.modelManager.addItem(sharedCreatedItem);
     expect(application.modelManager.items.length).to.equal(1);
     expect(application.modelManager.allItems.length).to.equal(1);
@@ -123,8 +123,8 @@ describe('app models', () => {
 
   it('mapping item twice should preserve references', async function() {
     const modelManager = this.application.modelManager;
-    const item1 = await Factory.createMappedNote(modelManager);
-    const item2 = await Factory.createMappedNote(modelManager);
+    const item1 = await Factory.createMappedNote(this.application);
+    const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
     item2.addItemAsRelationship(item1);
@@ -139,8 +139,8 @@ describe('app models', () => {
 
   it('fixes relationship integrity', async function() {
     let modelManager = this.application.modelManager;
-    var item1 = await Factory.createMappedNote(modelManager);
-    var item2 = await Factory.createMappedNote(modelManager);
+    var item1 = await Factory.createMappedNote(this.application);
+    var item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
     item2.addItemAsRelationship(item1);
@@ -159,8 +159,8 @@ describe('app models', () => {
 
   it('creating and removing relationships between two items should have valid references', async function() {
     let modelManager = this.application.modelManager;
-    var item1 = await Factory.createMappedNote(modelManager);
-    var item2 = await Factory.createMappedNote(modelManager);
+    var item1 = await Factory.createMappedNote(this.application);
+    var item2 = await Factory.createMappedNote(this.application);
     item1.addItemAsRelationship(item2);
     item2.addItemAsRelationship(item1);
 
@@ -182,7 +182,7 @@ describe('app models', () => {
 
   // it('notifies observers of item uuid alternation', async function() {
   //   const modelManager = this.application.modelManager;
-  //   const item = await Factory.createMappedNote(modelManager);
+  //   const item = await Factory.createMappedNote(this.application);
   //
   //   return new Promise((resolve, reject) => {
   //     modelManager.addModelUuidChangeObserver("test", (oldItem, newItem) => {
@@ -196,7 +196,7 @@ describe('app models', () => {
 
   it('properly duplicates item with no relationships', async function() {
     const modelManager = this.application.modelManager;
-    const item = await Factory.createMappedNote(modelManager);
+    const item = await Factory.createMappedNote(this.application);
     const duplicate = await modelManager.duplicateItem({item});
     expect(duplicate.uuid).to.not.equal(item.uuid);
     expect(item.isItemContentEqualWith(duplicate)).to.equal(true);
@@ -207,8 +207,8 @@ describe('app models', () => {
   it('properly duplicates item with relationships', async function() {
     const modelManager = this.application.modelManager;
 
-    const item1 = await Factory.createMappedNote(modelManager);
-    const item2 = await Factory.createMappedNote(modelManager);
+    const item1 = await Factory.createMappedNote(this.application);
+    const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
 
@@ -233,8 +233,8 @@ describe('app models', () => {
 
   it('properly handles single item uuid alternation', async function() {
     const modelManager = this.application.modelManager;
-    const item1 = await Factory.createMappedNote(modelManager);
-    const item2 = await Factory.createMappedNote(modelManager);
+    const item1 = await Factory.createMappedNote(this.application);
+    const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadsToLocalItems({
@@ -272,8 +272,8 @@ describe('app models', () => {
 
   it('properly handles mutli item uuid alternation', async function() {
     const modelManager = this.application.modelManager;
-    const item1 = await Factory.createMappedNote(modelManager);
-    const item2 = await Factory.createMappedNote(modelManager);
+    const item1 = await Factory.createMappedNote(this.application);
+    const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadsToLocalItems({
@@ -305,8 +305,8 @@ describe('app models', () => {
 
   it('maintains referencing relationships when duplicating', async function() {
     const modelManager = this.application.modelManager;
-    const tag = await Factory.createMappedTag(modelManager);
-    const note = await Factory.createMappedNote(modelManager);
+    const tag = await Factory.createMappedTag(this.application);
+    const note = await Factory.createMappedNote(this.application);
     tag.addItemAsRelationship(note);
     await this.application.saveItem({item: tag});
 

@@ -47,7 +47,7 @@ export default class LocalStorageDatabaseManager extends SNDatabaseManager {
   async clearAllPayloads() {
     for(const key in localStorage) {
       if(key.startsWith(this.getKeyPrefix())) {
-        await this.deletePayloadWithId(key);
+        localStorage.removeItem(key);
       }
     }
   }
