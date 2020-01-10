@@ -13,7 +13,8 @@ module.exports = {
         "@Lib": path.resolve(__dirname, "lib"),
         "@Services": path.resolve(__dirname, "lib/services"),
         "@Models": path.resolve(__dirname, "lib/models"),
-        "@Protocol": path.resolve(__dirname, "lib/protocol")
+        "@Protocol": path.resolve(__dirname, "lib/protocol"),
+        "@Payloads": path.resolve(__dirname, "lib/protocol/payloads")
       }
     },
     output: {

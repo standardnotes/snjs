@@ -18,7 +18,6 @@ describe('app models', () => {
     this.application = await Factory.createInitAppWithRandNamespace();
   })
 
-
   it('modelManager should be defined', () => {
     expect(application.modelManager).to.not.be.null;
   });
