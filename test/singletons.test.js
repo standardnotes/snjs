@@ -3,97 +3,84 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
-import MemoryStorageManager from './lib/memoryStorageManager.js';
-
-SFItem.AppDomain = "org.standardnotes.sn";
-
 chai.use(chaiAsPromised);
-var expect = chai.expect;
-
-const storageManager = Factory.createMemoryStorageManager();
-const modelManager = new SNModelManager();
-const syncManager = new SNSyncManager({
-  modelManager,
-  sessionManager: Factory.globalSessionManager(),
-  storageManager: storageManager,
-  protocolManager: Factory.globalProtocolManager(),
-  httpManager: Factory.globalHttpManager()
-});
-const singletonManager = new SNSingletonManager(modelManager, syncManager);
+const expect = chai.expect;
 
 describe("singletons", () => {
 
-  it("only resolves to 1 item", async () => {
-    let item1 = Factory.createStorageItemNotePayload();
-    let item2 = Factory.createStorageItemNotePayload();
-    let item3 = Factory.createStorageItemNotePayload();
-    let contentTypePredicate = new SFPredicate("content_type", "=", item1.content_type);
-    singletonManager.registerSingleton([contentTypePredicate]);
+  const BASE_ITEM_COUNT = 1; /** Default items key */
 
-    await syncManager.loadDataFromDatabase();
-
-    modelManager.addItems([item1, item2, item3]);
-    await modelManager.setItemsDirty([item1, item2, item3], true);
-
-    expect(modelManager.allItems.length).to.equal(3);
-
-    await syncManager.sync();
-
-    return new Promise((resolve, reject) => {
-      setTimeout(function () {
-        // Sync completion event is not dispatched in any particular order, so lets wait for everyone
-        // to have had a fair chance to handle it
-
-        // after sync, only 1 should remain
-        expect(modelManager.allItems.length).to.equal(1);
-        expect(modelManager.allItems[0].uuid).to.equal(item1.uuid);
-        resolve();
-      }, 100);
-    })
-  });
-
-  it("if only result is errorDecrypting, create new item", async () => {
-    await storageManager.clearAllData();
-    await modelManager.handleSignOut();
-    await syncManager.loadDataFromDatabase();
-
-    let item1 = Factory.createStorageItemNotePayload();
-    modelManager.addItem(item1);
-    modelManager.setItemDirty(item1, true);
-    await syncManager.sync();
-
-    // set after sync so that it syncs properly
-    item1.errorDecrypting = true;
-
-    let resolvedItem = item1;
-
-    let contentTypePredicate = new SFPredicate("content_type", "=", item1.content_type);
-    singletonManager.registerSingleton([contentTypePredicate], (resolvedSingleton) => {
-      resolvedItem = resolvedSingleton;
-    }, async (valueCallback) => {
-      let newItem = Factory.createStorageItemNotePayload();
-      modelManager.addItem(newItem);
-      modelManager.setItemDirty(newItem, true);
-      valueCallback(newItem);
+  function createPrivsPayload() {
+    const params = {
+      uuid: SFItem.GenerateUuidSynchronously(),
+      content_type: 'SN|Privileges',
+      content: {
+        foo: 'bar'
+      }
+    };
+    return CreateMaxPayloadFromAnyObject({
+      object: params
     });
+  }
 
-    expect(modelManager.allItems.length).to.equal(1);
+  before(async function() {
+    localStorage.clear();
+  })
 
-    // We use this instead of a sync event to simulate initial loading conditions
-    syncManager.notifyEvent("local-data-loaded");
+  after(async function() {
+    localStorage.clear();
+  })
 
-    return new Promise((resolve, reject) => {
-      setTimeout(function () {
-        // Sync completion event is not dispatched in any particular order, so lets wait for everyone
-        // to have had a fair chance to handle it
-        // after sync, 1 should remain
-        expect(modelManager.allItems.length).to.equal(1);
-        expect(resolvedItem.uuid).to.not.equal(item1.uuid);
-        expect(resolvedItem.errorDecrypting).to.not.be.ok;
-        resolve();
-      }, 100);
+  beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = SFItem.GenerateUuidSynchronously();
+    this.password = SFItem.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+  })
+
+  afterEach(async function() {
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+  })
+
+  it("only resolves to 1 item", async function() {
+    /** Privileges are an item we know to always return true for isSingleton */
+    const privs1 = createPrivsPayload();
+    const privs2 = createPrivsPayload();
+    const privs3 = createPrivsPayload();
+
+    this.expectedItemCount++;
+    const items = await this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [privs1, privs2, privs3]
     })
+    await this.application.modelManager.setItemsDirty(items);
+    await this.application.syncManager.sync();
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
+  it("if only result is errorDecrypting, create new item", async function() {
+    const payload = createPrivsPayload();
+    const item = await this.application.modelManager.mapPayloadToLocalItems({
+      payload: payload
+    })
+    this.expectedItemCount++;
+    await this.application.syncManager.sync();
+    /** Set after sync so that it syncs properly */
+    item.errorDecrypting = true;
 
+    const predicate = new SFPredicate("content_type", "=", item.content_type);
+    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
+      predicate: predicate,
+      createPayload: payload
+    })
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(resolvedItem.uuid).to.not.equal(item.uuid);
+    expect(resolvedItem.errorDecrypting).to.not.be.ok;
+  });
 })
