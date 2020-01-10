@@ -10,21 +10,6 @@ import MemoryDatabaseManager from './persist/database/memoryDatabaseManager.js';
 export default class Factory {
   static createApplication(namespace) {
     const url = this.serverURL();
-    return new SNApplication({namespace, host: url});
-  }
-
-  static async createInitAppWithRandNamespace() {
-    const namespace = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    return this.createAndInitializeApplication(namespace);
-  }
-
-  static async createAndInitializeApplication(namespace) {
-    const application = this.createApplication(namespace);
-    await this.initializeApplication(application);
-    return application;
-  }
-
-  static async initializeApplication(application) {
     let keychainValue;
     const keychainDelegate = new SNKeychainDelegate({
       setKeyChainValue: async (value) => {
@@ -37,9 +22,10 @@ export default class Factory {
         keychainValue = null;
       }
     });
-
-    await application.initialize({
-      keychainDelegate,
+    return new SNApplication({
+      namespace: namespace,
+      host: url,
+      keychainDelegate: keychainDelegate,
       swapClasses: [
         {
           swap: SNStorageManager,
@@ -53,13 +39,29 @@ export default class Factory {
       skipClasses: [
         SNComponentManager
       ],
+      timeout: setTimeout.bind(window),
+      interval: setInterval.bind(window)
+    });
+  }
+
+  static async createInitAppWithRandNamespace() {
+    const namespace = Math.random().toString(36).substring(2, 15);
+    return this.createAndInitializeApplication(namespace);
+  }
+
+  static async createAndInitializeApplication(namespace) {
+    const application = this.createApplication(namespace);
+    await this.initializeApplication(application);
+    return application;
+  }
+
+  static async initializeApplication(application) {
+    await application.initialize({
       callbacks: {
         onRequiresAuthentication: (sources, handleResponses) => {
 
         }
       },
-      timeout: setTimeout.bind(window),
-      interval: setInterval.bind(window)
     });
   }
 

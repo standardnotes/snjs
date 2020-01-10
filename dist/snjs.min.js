@@ -1228,56 +1228,91 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 var SNApplication =
 /*#__PURE__*/
 function () {
   /**
-   * @param namespace  Optional - a unique identifier to namespace storage and other persistent properties.
-   *                   Defaults to empty string.
+   * @param namespace
+      Optional - a unique identifier to namespace storage and
+      other persistent properties. Defaults to empty string.
+   * @param keychainDelegate
+      A SNKeychainDelegate object.
+   * @param swapClasses
+      Gives consumers the ability to provide their own custom
+      subclass for a service. swapClasses should be an array
+      of key/value pairs consisting of keys 'swap' and 'with'.
+      'swap' is the base class you wish to replace, and 'with'
+      is the custom subclass to use.
+   * @param skipClasses
+      An optional array of classes to skip making services for.
+   * @param timeout
+      A platform-specific function that is fed functions to run
+      when other operations have completed. This is similar to
+      setImmediate on the web, or setTimeout(fn, 0).
+   * @param interval
+      A platform-specific function that is fed functions to
+      perform repeatedly. Similar to setInterval.
    */
   function SNApplication() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         namespace = _ref.namespace,
-        host = _ref.host;
+        host = _ref.host,
+        keychainDelegate = _ref.keychainDelegate,
+        swapClasses = _ref.swapClasses,
+        skipClasses = _ref.skipClasses,
+        timeout = _ref.timeout,
+        interval = _ref.interval;
 
     _classCallCheck(this, SNApplication);
 
+    if (!timeout) {
+      throw "'timeout' is required to initialize application.";
+    }
+
+    if (!keychainDelegate) {
+      throw 'Keychain delegate must be supplied.';
+    }
+
+    SFItem.AppDomain = DEFAULT_APP_DOMAIN;
     this.namespace = namespace || '';
     this.host = host;
+    this.keychainDelegate = keychainDelegate;
+    this.swapClasses = swapClasses;
+    this.skipClasses = skipClasses;
+    this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
+    this.interval = interval || setInterval.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
+    this.eventHandlers = [];
   }
   /**
+   * @public
+   */
+
+  /**
    * The first thing consumers should call when starting their app.
-   * This function will load all services in their correct order and run migrations.
-   * It will also handle device authentication, and issue a callback if a device activation
-   * requires user input (i.e local passcode or fingerprint).
-   * @param keychainDelegate  A SNKeychainDelegate object.
-   * @param swapClasses  Gives consumers the ability to provide their own custom subclass for a service.
-   *                     swapClasses should be an array of key/value pairs consisting of keys 'swap' and 'with'.
-   *                     'swap' is the base class you wish to replace, and 'with' is the custom subclass to use.
-   *
-   * @param skipClasses  An optional array of classes to skip making services for.
-   *
-   * @param timeout  A platform-specific function that is fed functions to run when other operations have completed.
-   *                 This is similar to setImmediate on the web, or setTimeout(fn, 0).
-   *
-   * @param interval  A platform-specific function that is fed functions to perform repeatedly. Similar to setInterval.
+   * This function will load all services in their correct order and
+   * run migrations. It will also handle device authentication, and issue
+   * a callback if a device activation requires user input
+   * (i.e local passcode or fingerprint).
    * @param callbacks
    *          .onRequiresAuthentication(sources, handleResponses)
-   *            @param sources  An array of DeviceAuthenticationSources that require responses.
-   *            @param handleResponses  Once the consumer has valid responses for all sources, they must
-   *                                    call handleResponses with an array of DeviceAuthenticationResponses.
+   *            @param sources
+                  An array of DeviceAuthenticationSources that require responses.
+   *            @param handleResponses
+                  Once the consumer has valid responses for all sources, they must
+                  call handleResponses with an array of DeviceAuthenticationResponses.
    */
 
 
   _createClass(SNApplication, [{
     key: "initialize",
     value: function initialize(_ref2) {
-      var keychainDelegate, swapClasses, skipClasses, callbacks, timeout, interval, databasePayloads;
+      var callbacks;
       return regeneratorRuntime.async(function initialize$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              keychainDelegate = _ref2.keychainDelegate, swapClasses = _ref2.swapClasses, skipClasses = _ref2.skipClasses, callbacks = _ref2.callbacks, timeout = _ref2.timeout, interval = _ref2.interval;
+              callbacks = _ref2.callbacks;
 
               if (callbacks.onRequiresAuthentication) {
                 _context.next = 3;
@@ -1287,70 +1322,10 @@ function () {
               throw 'Application.initialize callbacks are not properly configured.';
 
             case 3:
-              if (timeout) {
-                _context.next = 5;
-                break;
-              }
-
-              throw "'timeout' is required to initialize application.";
+              _context.next = 5;
+              return regeneratorRuntime.awrap(this.createServices());
 
             case 5:
-              if (keychainDelegate) {
-                _context.next = 7;
-                break;
-              }
-
-              throw 'Keychain delegate must be supplied.';
-
-            case 7:
-              // console.log("Initializing application with namespace", this.namespace);
-              SFItem.AppDomain = 'org.standardnotes.sn';
-              this.swapClasses = swapClasses;
-              this.skipClasses = skipClasses;
-              this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
-              this.interval = interval || setInterval.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
-              this.eventHandlers = [];
-              this.createAlertManager();
-              this.createHttpManager();
-              this.createDatabaseManager();
-              _context.next = 18;
-              return regeneratorRuntime.awrap(this.databaseManager.openDatabase());
-
-            case 18:
-              this.createModelManager();
-              this.createProtocolManager();
-              this.createStorageManager();
-              _context.next = 23;
-              return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
-
-            case 23:
-              this.createApiService();
-              this.createSessionManager();
-              _context.next = 27;
-              return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
-
-            case 27:
-              this.createSyncManager();
-              _context.next = 30;
-              return regeneratorRuntime.awrap(this.syncManager.getDatabasePayloads());
-
-            case 30:
-              databasePayloads = _context.sent;
-
-              /**
-              * We don't want to await this, as we want to begin allow the app to function
-              * before local data has been loaded fully and mapped. We only await initial
-              * `getDatabasePayloads` to lock in on database state.
-              */
-              this.syncManager.loadDatabasePayloads(databasePayloads);
-              this.createKeyManager();
-              this.protocolManager.setKeyManager(this.keyManager);
-              this.keyManager.setKeychainDelegate(keychainDelegate);
-              this.createSingletonManager(); // this.createMigrationManager();
-
-              this.createComponentManager();
-
-            case 37:
             case "end":
               return _context.stop();
           }
@@ -1661,6 +1636,176 @@ function () {
       }, null, this);
     }
   }, {
+    key: "setPasscode",
+    value: function setPasscode(passcode) {
+      var identifier, _ref8, key, keyParams;
+
+      return regeneratorRuntime.async(function setPasscode$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              _context8.next = 2;
+              return regeneratorRuntime.awrap(this.protocolManager.crypto.generateUUID());
+
+            case 2:
+              identifier = _context8.sent;
+              _context8.next = 5;
+              return regeneratorRuntime.awrap(this.protocolManager.createRootKey({
+                identifier: identifier,
+                password: passcode
+              }));
+
+            case 5:
+              _ref8 = _context8.sent;
+              key = _ref8.key;
+              keyParams = _ref8.keyParams;
+              _context8.next = 10;
+              return regeneratorRuntime.awrap(this.keyManager.setRootKeyWrapper({
+                wrappingKey: key,
+                keyParams: keyParams
+              }));
+
+            case 10:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "unlockPasscode",
+    value: function unlockPasscode(passcode) {
+      var keyParams, key, result;
+      return regeneratorRuntime.async(function unlockPasscode$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              _context9.next = 2;
+              return regeneratorRuntime.awrap(this.keyManager.getRootKeyWrapperKeyParams());
+
+            case 2:
+              keyParams = _context9.sent;
+              _context9.next = 5;
+              return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
+                password: password,
+                keyParams: keyParams
+              }));
+
+            case 5:
+              key = _context9.sent;
+              _context9.next = 8;
+              return regeneratorRuntime.awrap(this.keyManager.unwrapRootKey({
+                wrappingKey: key
+              }));
+
+            case 8:
+              result = _context9.sent;
+              return _context9.abrupt("return", result.success);
+
+            case 10:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "removePasscode",
+    value: function removePasscode() {
+      return regeneratorRuntime.async(function removePasscode$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              _context10.next = 2;
+              return regeneratorRuntime.awrap(this.keyManager.removeRootKeyWrapper());
+
+            case 2:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "changePasscode",
+    value: function changePasscode(passcode) {
+      return regeneratorRuntime.async(function changePasscode$(_context11) {
+        while (1) {
+          switch (_context11.prev = _context11.next) {
+            case 0:
+              _context11.next = 2;
+              return regeneratorRuntime.awrap(this.removePasscode());
+
+            case 2:
+              return _context11.abrupt("return", this.setPasscode(passcode));
+
+            case 3:
+            case "end":
+              return _context11.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     @private
+     */
+
+  }, {
+    key: "createServices",
+    value: function createServices() {
+      var databasePayloads;
+      return regeneratorRuntime.async(function createServices$(_context12) {
+        while (1) {
+          switch (_context12.prev = _context12.next) {
+            case 0:
+              this.createAlertManager();
+              this.createHttpManager();
+              this.createDatabaseManager();
+              _context12.next = 5;
+              return regeneratorRuntime.awrap(this.databaseManager.openDatabase());
+
+            case 5:
+              this.createModelManager();
+              this.createProtocolManager();
+              this.createStorageManager();
+              _context12.next = 10;
+              return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
+
+            case 10:
+              this.createApiService();
+              this.createSessionManager();
+              _context12.next = 14;
+              return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
+
+            case 14:
+              this.createSyncManager();
+              _context12.next = 17;
+              return regeneratorRuntime.awrap(this.syncManager.getDatabasePayloads());
+
+            case 17:
+              databasePayloads = _context12.sent;
+
+              /**
+              * We don't want to await this, as we want to begin allow the app to function
+              * before local data has been loaded fully and mapped. We only await initial
+              * `getDatabasePayloads` to lock in on database state.
+              */
+              this.syncManager.loadDatabasePayloads(databasePayloads);
+              this.createKeyManager();
+              this.protocolManager.setKeyManager(this.keyManager);
+              this.keyManager.setKeychainDelegate(this.keychainDelegate);
+              this.createSingletonManager(); // this.createMigrationManager();
+
+              this.createComponentManager();
+
+            case 24:
+            case "end":
+              return _context12.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
     key: "createAlertManager",
     value: function createAlertManager() {
       if (this.shouldSkipClass(_Services_alertManager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"])) {
@@ -1899,8 +2044,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./models/app/tag */ "./lib/models/app/tag.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _models_app_tag__WEBPACK_IMPORTED_MODULE_15__["SNTag"]; });
 
-/* harmony import */ var _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_16__["SNSmartTag"]; });
+/* harmony import */ var _models_app_smartTag__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./models/app/smartTag */ "./lib/models/app/smartTag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _models_app_smartTag__WEBPACK_IMPORTED_MODULE_48__["SNSmartTag"]; });
 
 /* harmony import */ var _models_server_mfa__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./models/server/mfa */ "./lib/models/server/mfa.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMfa", function() { return _models_server_mfa__WEBPACK_IMPORTED_MODULE_17__["SNMfa"]; });
@@ -1919,161 +2064,161 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models_app_extension__WEBPACK_IMPORTED_MODULE_21__["Action"]; });
 
-/* harmony import */ var _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/subclasses/theme */ "./lib/models/subclasses/theme.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_subclasses_theme__WEBPACK_IMPORTED_MODULE_22__["SNTheme"]; });
+/* harmony import */ var _models_app_theme__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./models/app/theme */ "./lib/models/app/theme.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models_app_theme__WEBPACK_IMPORTED_MODULE_49__["SNTheme"]; });
 
-/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__["SNEncryptedStorage"]; });
+/* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_22__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_24__["SNComponentManager"]; });
+/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_23__["SNComponentManager"]; });
 
-/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_25__["SFHistorySession"]; });
+/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_24__["SFHistorySession"]; });
 
-/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__["SFItemHistory"]; });
+/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_25__["SFItemHistory"]; });
 
-/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__["SFItemHistoryEntry"]; });
+/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_26__["SFItemHistoryEntry"]; });
 
-/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_28__["SFPrivileges"]; });
+/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_27__["SFPrivileges"]; });
 
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_29___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_29__);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_29__["SNWebCrypto"]; });
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_28___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_28__);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNWebCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_28__["SNWebCrypto"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_29__["SNReactNativeCrypto"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNReactNativeCrypto", function() { return sncrypto__WEBPACK_IMPORTED_MODULE_28__["SNReactNativeCrypto"]; });
 
-/* harmony import */ var _services_database_manager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/database_manager */ "./lib/services/database_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_database_manager__WEBPACK_IMPORTED_MODULE_30__["SNDatabaseManager"]; });
+/* harmony import */ var _services_database_manager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/database_manager */ "./lib/services/database_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_database_manager__WEBPACK_IMPORTED_MODULE_29__["SNDatabaseManager"]; });
 
-/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_31__["SNModelManager"]; });
+/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_30__["SNModelManager"]; });
 
-/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_32__["SNHttpManager"]; });
+/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_31__["SNHttpManager"]; });
 
-/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_33__["SNStorageManager"]; });
+/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_32__["SNStorageManager"]; });
 
-/* harmony import */ var _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_34__["SNSyncManager"]; });
+/* harmony import */ var _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__["SNSyncManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_34__["TIMING_STRATEGY_RESOLVE_ON_NEXT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__["TIMING_STRATEGY_RESOLVE_ON_NEXT"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_34__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_33__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]; });
 
-/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_35__["SNSessionManager"]; });
+/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_34__["SNSessionManager"]; });
 
-/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_36__["SNMigrationManager"]; });
+/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_35__["SNMigrationManager"]; });
 
-/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_37__["SNAlertManager"]; });
+/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_36__["SNAlertManager"]; });
 
-/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_38__["SFSessionHistoryManager"]; });
+/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_37__["SFSessionHistoryManager"]; });
 
-/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_39__["SFPrivilegesManager"]; });
+/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_38__["SFPrivilegesManager"]; });
 
-/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_40__["SNSingletonManager"]; });
+/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_39__["SNSingletonManager"]; });
 
-/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_41__["SNKeyManager"]; });
+/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_40__["SNKeyManager"]; });
 
-/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_42__["SNApiService"]; });
+/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_41__["SNApiService"]; });
 
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["findInArray"]; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["findInArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["isNullOrUndefined"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["isNullOrUndefined"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["deepMerge"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["deepMerge"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["extendArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["extendArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["removeFromIndex"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["removeFromIndex"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["subtractFromArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["subtractFromArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["arrayByDifference"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["arrayByDifference"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["uniqCombineObjArrays"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["uniqCombineObjArrays"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_43__["greaterOfTwoDates"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_42__["greaterOfTwoDates"]; });
 
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]; });
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_FILE_DECRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_FILE_DECRYPTED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_FILE_DECRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_FILE_DECRYPTED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_FILE_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_FILE_ENCRYPTED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_FILE_ENCRYPTED", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_FILE_ENCRYPTED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_SYNC", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["ENCRYPTION_INTENT_SYNC"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ENCRYPTION_INTENT_SYNC", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["ENCRYPTION_INTENT_SYNC"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["isLocalStorageIntent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["isLocalStorageIntent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["isFileIntent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["isFileIntent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["isDecryptedIntent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["isDecryptedIntent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_44__["intentRequiresEncryption"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_43__["intentRequiresEncryption"]; });
 
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ROOT_KEY", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_ROOT_KEY"]; });
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ROOT_KEY", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_ROOT_KEY"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ITEMS_KEY", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_ITEMS_KEY"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ITEMS_KEY", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_ITEMS_KEY"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ENCRYPTED_STORAGE", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_ENCRYPTED_STORAGE"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_ENCRYPTED_STORAGE", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_ENCRYPTED_STORAGE"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_NOTE", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_NOTE"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_NOTE", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_NOTE"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_TAG", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_TAG"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_TAG", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_TAG"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_USER_PREFS", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_USER_PREFS"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_USER_PREFS", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_USER_PREFS"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_COMPONENT", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_COMPONENT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_COMPONENT", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_COMPONENT"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_PRIVILEGES", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_45__["CONTENT_TYPE_PRIVILEGES"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CONTENT_TYPE_PRIVILEGES", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_44__["CONTENT_TYPE_PRIVILEGES"]; });
 
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]; });
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_REMOTE_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_SAVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_REMOTE_SAVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_SAVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_SAVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_LOCAL_SAVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_LOCAL_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_DIRTIED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_LOCAL_DIRTIED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_COMPONENT_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_COMPONENT_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_COMPONENT_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_COMPONENT_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_DESKTOP_INSTALLED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_DESKTOP_INSTALLED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_DESKTOP_INSTALLED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_DESKTOP_INSTALLED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_FILE_IMPORT", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_46__["PAYLOAD_SOURCE_FILE_IMPORT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PAYLOAD_SOURCE_FILE_IMPORT", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PAYLOAD_SOURCE_FILE_IMPORT"]; });
 
-/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_WILL_SIGN_IN", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_47__["APPLICATION_EVENT_WILL_SIGN_IN"]; });
+/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_WILL_SIGN_IN", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_46__["APPLICATION_EVENT_WILL_SIGN_IN"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_IN", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_47__["APPLICATION_EVENT_DID_SIGN_IN"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_IN", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_46__["APPLICATION_EVENT_DID_SIGN_IN"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_OUT", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_47__["APPLICATION_EVENT_DID_SIGN_OUT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_OUT", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_46__["APPLICATION_EVENT_DID_SIGN_OUT"]; });
 
-/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_EVENT_FULL_SYNC_COMPLETED", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_48__["SYNC_EVENT_FULL_SYNC_COMPLETED"]; });
+/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_EVENT_FULL_SYNC_COMPLETED", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_47__["SYNC_EVENT_FULL_SYNC_COMPLETED"]; });
 
 
 
@@ -2911,6 +3056,97 @@ function (_SFItem) {
 
 /***/ }),
 
+/***/ "./lib/models/app/smartTag.js":
+/*!************************************!*\
+  !*** ./lib/models/app/smartTag.js ***!
+  \************************************/
+/*! exports provided: SNSmartTag */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return SNSmartTag; });
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var SYSTEM_TAG_ALL_NOTES = "all-notes";
+var SYSTEM_TAG_ARCHIVED_NOTES = "archived-notes";
+var SYSTEM_TAG_TRASHED_NOTES = "trashed-notes";
+var SNSmartTag =
+/*#__PURE__*/
+function (_SNTag) {
+  _inherits(SNSmartTag, _SNTag);
+
+  function SNSmartTag(payload) {
+    var _this;
+
+    _classCallCheck(this, SNSmartTag);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSmartTag).call(this, payload));
+    _this.content_type = _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_SMART_TAG"];
+    return _this;
+  }
+
+  _createClass(SNSmartTag, null, [{
+    key: "systemSmartTags",
+    value: function systemSmartTags() {
+      return [new SNSmartTag({
+        uuid: SYSTEM_TAG_ALL_NOTES,
+        dummy: true,
+        content: {
+          title: "All notes",
+          isSystemTag: true,
+          isAllTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_NOTE"]])
+        }
+      }), new SNSmartTag({
+        uuid: SYSTEM_TAG_ARCHIVED_NOTES,
+        dummy: true,
+        content: {
+          title: "Archived",
+          isSystemTag: true,
+          isArchiveTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['archived', '=', true])
+        }
+      }), new SNSmartTag({
+        uuid: SYSTEM_TAG_TRASHED_NOTES,
+        dummy: true,
+        content: {
+          title: "Trash",
+          isSystemTag: true,
+          isTrashTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['content.trashed', '=', true])
+        }
+      })];
+    }
+  }]);
+
+  return SNSmartTag;
+}(_Models_app_tag__WEBPACK_IMPORTED_MODULE_0__["SNTag"]);
+
+/***/ }),
+
 /***/ "./lib/models/app/tag.js":
 /*!*******************************!*\
   !*** ./lib/models/app/tag.js ***!
@@ -3101,6 +3337,136 @@ function (_SFItem) {
 
   return SNTag;
 }(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SFItem"]);
+
+/***/ }),
+
+/***/ "./lib/models/app/theme.js":
+/*!*********************************!*\
+  !*** ./lib/models/app/theme.js ***!
+  \*********************************/
+/*! exports provided: SNTheme */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return SNTheme; });
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var SNTheme =
+/*#__PURE__*/
+function (_SNComponent) {
+  _inherits(SNTheme, _SNComponent);
+
+  function SNTheme(payload) {
+    var _this;
+
+    _classCallCheck(this, SNTheme);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNTheme).call(this, payload));
+    _this.area = 'themes';
+    return _this;
+  }
+
+  _createClass(SNTheme, [{
+    key: "isLayerable",
+    value: function isLayerable() {
+      return this.package_info && this.package_info.layerable;
+    }
+  }, {
+    key: "strategyWhenConflictingWithItem",
+
+    /** Do not duplicate under most circumstances. Always keep original */
+    value: function strategyWhenConflictingWithItem(_ref) {
+      var item = _ref.item;
+
+      if (this.errorDecrypting) {
+        return _get(_getPrototypeOf(SNTheme.prototype), "strategyWhenConflictingWithItem", this).call(this, {
+          item: item
+        });
+      }
+
+      return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_2__["CONFLICT_STRATEGY_KEEP_LEFT"];
+    }
+  }, {
+    key: "setMobileRules",
+    value: function setMobileRules(rules) {
+      this.setAppDataItem('mobileRules', rules);
+    }
+  }, {
+    key: "getMobileRules",
+    value: function getMobileRules() {
+      return this.getAppDataItem('mobileRules') || {
+        constants: {},
+        rules: {}
+      };
+    }
+    /** Same as getMobileRules but without default value. */
+
+  }, {
+    key: "hasMobileRules",
+    value: function hasMobileRules() {
+      return this.getAppDataItem('mobileRules');
+    }
+  }, {
+    key: "setNotAvailOnMobile",
+    value: function setNotAvailOnMobile(na) {
+      this.setAppDataItem('notAvailableOnMobile', na);
+    }
+  }, {
+    key: "getNotAvailOnMobile",
+    value: function getNotAvailOnMobile() {
+      return this.getAppDataItem('notAvailableOnMobile');
+    }
+    /**
+     * We must not use .active because if you set that to true, it will also
+     * activate that theme on desktop/web
+     */
+
+  }, {
+    key: "setMobileActive",
+    value: function setMobileActive(active) {
+      this.setAppDataItem('mobileActive', active);
+    }
+  }, {
+    key: "isMobileActive",
+    value: function isMobileActive() {
+      return this.getAppDataItem('mobileActive');
+    }
+  }, {
+    key: "content_type",
+    get: function get() {
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["CONTENT_TYPE_THEME"];
+    }
+  }]);
+
+  return SNTheme;
+}(_Models_app_component__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]);
 
 /***/ }),
 
@@ -4374,11 +4740,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_11__["SNServerExtension"]; });
 
-/* harmony import */ var _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/subclasses/smartTag */ "./lib/models/subclasses/smartTag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_subclasses_smartTag__WEBPACK_IMPORTED_MODULE_12__["SNSmartTag"]; });
+/* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_13__["SNSmartTag"]; });
 
-/* harmony import */ var _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/subclasses/theme */ "./lib/models/subclasses/theme.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_subclasses_theme__WEBPACK_IMPORTED_MODULE_13__["SNTheme"]; });
+/* harmony import */ var _Models_app_theme__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/app/theme */ "./lib/models/app/theme.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_app_theme__WEBPACK_IMPORTED_MODULE_14__["SNTheme"]; });
 
 
 
@@ -5454,206 +5820,6 @@ function () {
 
   return SFItemHistoryEntry;
 }();
-
-/***/ }),
-
-/***/ "./lib/models/subclasses/smartTag.js":
-/*!*******************************************!*\
-  !*** ./lib/models/subclasses/smartTag.js ***!
-  \*******************************************/
-/*! exports provided: SNSmartTag */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return SNSmartTag; });
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-
-var SYSTEM_TAG_ALL_NOTES = "all-notes";
-var SYSTEM_TAG_ARCHIVED_NOTES = "archived-notes";
-var SYSTEM_TAG_TRASHED_NOTES = "trashed-notes";
-var SNSmartTag =
-/*#__PURE__*/
-function (_SNTag) {
-  _inherits(SNSmartTag, _SNTag);
-
-  function SNSmartTag(payload) {
-    var _this;
-
-    _classCallCheck(this, SNSmartTag);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSmartTag).call(this, payload));
-    _this.content_type = _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_SMART_TAG"];
-    return _this;
-  }
-
-  _createClass(SNSmartTag, null, [{
-    key: "systemSmartTags",
-    value: function systemSmartTags() {
-      return [new SNSmartTag({
-        uuid: SYSTEM_TAG_ALL_NOTES,
-        dummy: true,
-        content: {
-          title: "All notes",
-          isSystemTag: true,
-          isAllTag: true,
-          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_NOTE"]])
-        }
-      }), new SNSmartTag({
-        uuid: SYSTEM_TAG_ARCHIVED_NOTES,
-        dummy: true,
-        content: {
-          title: "Archived",
-          isSystemTag: true,
-          isArchiveTag: true,
-          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['archived', '=', true])
-        }
-      }), new SNSmartTag({
-        uuid: SYSTEM_TAG_TRASHED_NOTES,
-        dummy: true,
-        content: {
-          title: "Trash",
-          isSystemTag: true,
-          isTrashTag: true,
-          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].fromArray(['content.trashed', '=', true])
-        }
-      })];
-    }
-  }]);
-
-  return SNSmartTag;
-}(_Models_app_tag__WEBPACK_IMPORTED_MODULE_0__["SNTag"]);
-
-/***/ }),
-
-/***/ "./lib/models/subclasses/theme.js":
-/*!****************************************!*\
-  !*** ./lib/models/subclasses/theme.js ***!
-  \****************************************/
-/*! exports provided: SNTheme */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return SNTheme; });
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-var SNTheme =
-/*#__PURE__*/
-function (_SNComponent) {
-  _inherits(SNTheme, _SNComponent);
-
-  function SNTheme(payload) {
-    var _this;
-
-    _classCallCheck(this, SNTheme);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNTheme).call(this, payload));
-    _this.area = 'themes';
-    return _this;
-  }
-
-  _createClass(SNTheme, [{
-    key: "isLayerable",
-    value: function isLayerable() {
-      return this.package_info && this.package_info.layerable;
-    }
-  }, {
-    key: "setMobileRules",
-    value: function setMobileRules(rules) {
-      this.setAppDataItem('mobileRules', rules);
-    }
-  }, {
-    key: "getMobileRules",
-    value: function getMobileRules() {
-      return this.getAppDataItem('mobileRules') || {
-        constants: {},
-        rules: {}
-      };
-    }
-    /** Same as getMobileRules but without default value. */
-
-  }, {
-    key: "hasMobileRules",
-    value: function hasMobileRules() {
-      return this.getAppDataItem('mobileRules');
-    }
-  }, {
-    key: "setNotAvailOnMobile",
-    value: function setNotAvailOnMobile(na) {
-      this.setAppDataItem('notAvailableOnMobile', na);
-    }
-  }, {
-    key: "getNotAvailOnMobile",
-    value: function getNotAvailOnMobile() {
-      return this.getAppDataItem('notAvailableOnMobile');
-    }
-    /**
-     * We must not use .active because if you set that to true, it will also
-     * activate that theme on desktop/web
-     */
-
-  }, {
-    key: "setMobileActive",
-    value: function setMobileActive(active) {
-      this.setAppDataItem('mobileActive', active);
-    }
-  }, {
-    key: "isMobileActive",
-    value: function isMobileActive() {
-      return this.getAppDataItem('mobileActive');
-    }
-  }, {
-    key: "content_type",
-    get: function get() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["CONTENT_TYPE_THEME"];
-    }
-  }]);
-
-  return SNTheme;
-}(_Models_app_component__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]);
 
 /***/ }),
 
@@ -9373,44 +9539,6 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/storageKeys.js":
-/*!*************************************!*\
-  !*** ./lib/protocol/storageKeys.js ***!
-  \*************************************/
-/*! exports provided: ROOT_KEY_PARAMS, WRAPPED_ROOT_KEY, WRAPPED_ROOT_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_ENCRYPTED_STORAGE, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_PARAMS", function() { return ROOT_KEY_PARAMS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY", function() { return WRAPPED_ROOT_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY_PARAMS", function() { return WRAPPED_ROOT_KEY_PARAMS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_JWT", function() { return STORAGE_KEY_JWT; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_USER", function() { return STORAGE_KEY_USER; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SERVER_HOST", function() { return STORAGE_KEY_SERVER_HOST; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_LEGACY_UUID", function() { return STORAGE_KEY_LEGACY_UUID; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_LAST_SYNC_TOKEN", function() { return STORAGE_KEY_LAST_SYNC_TOKEN; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_PAGINATION_TOKEN", function() { return STORAGE_KEY_PAGINATION_TOKEN; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_ENCRYPTED_STORAGE", function() { return STORAGE_KEY_ENCRYPTED_STORAGE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_PERSIST_KEY", function() { return SESSION_HISTORY_PERSIST_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_REVISIONS_KEY", function() { return SESSION_HISTORY_REVISIONS_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_OPTIMIZE_KEY", function() { return SESSION_HISTORY_OPTIMIZE_KEY; });
-var ROOT_KEY_PARAMS = 'ROOT_KEY_PARAMS';
-var WRAPPED_ROOT_KEY = 'WRAPPED_ROOT_KEY';
-var WRAPPED_ROOT_KEY_PARAMS = 'WRAPPED_ROOT_KEY_PARAMS';
-var STORAGE_KEY_JWT = 'jwt';
-var STORAGE_KEY_USER = 'user';
-var STORAGE_KEY_SERVER_HOST = 'server';
-var STORAGE_KEY_LEGACY_UUID = 'uuid';
-var STORAGE_KEY_LAST_SYNC_TOKEN = 'syncToken';
-var STORAGE_KEY_PAGINATION_TOKEN = 'cursorToken';
-var STORAGE_KEY_ENCRYPTED_STORAGE = 'encryptedStorage';
-var SESSION_HISTORY_PERSIST_KEY = 'sessionHistory_persist';
-var SESSION_HISTORY_REVISIONS_KEY = 'sessionHistory_revisions';
-var SESSION_HISTORY_OPTIMIZE_KEY = 'sessionHistory_autoOptimize';
-
-/***/ }),
-
 /***/ "./lib/protocol/versions.js":
 /*!**********************************!*\
   !*** ./lib/protocol/versions.js ***!
@@ -12851,7 +12979,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return SNSessionManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_alertManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alertManager */ "./lib/services/alertManager.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -12894,7 +13022,7 @@ function () {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_USER"]));
 
             case 2:
               userData = _context.sent;
@@ -12910,7 +13038,7 @@ function () {
 
             case 7:
               _context.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_LEGACY_UUID"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_LEGACY_UUID"]));
 
             case 9:
               uuid = _context.sent;
@@ -13297,7 +13425,7 @@ function () {
               user = response.user;
               this.user = user;
               _context10.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"], JSON.stringify(user)));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_USER"], JSON.stringify(user)));
 
             case 4:
               _context10.next = 6;
@@ -13322,7 +13450,7 @@ function () {
             case 0:
               token = _ref7.token;
               _context11.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_JWT"], token));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_JWT"], token));
 
             case 3:
               this.apiService.setSessionAuthentication({
@@ -16620,7 +16748,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 /* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -16795,21 +16923,47 @@ function () {
       }, null, this);
     }
     /**
+     * @returns  Key params object containing root key wrapper key params
+    */
+
+  }, {
+    key: "getRootKeyWrapperKeyParams",
+    value: function getRootKeyWrapperKeyParams() {
+      var rawKeyParams;
+      return regeneratorRuntime.async(function getRootKeyWrapperKeyParams$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return regeneratorRuntime.awrap(this.storage.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"]));
+
+            case 2:
+              rawKeyParams = _context3.sent;
+              return _context3.abrupt("return", this.protocolManager.createVersionedKeyParams(rawKeyParams));
+
+            case 4:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
      * @returns  Plain object containing persisted wrapped (encrypted) root key
     */
 
   }, {
     key: "getWrappedKeyFromStorage",
     value: function getWrappedKeyFromStorage() {
-      return regeneratorRuntime.async(function getWrappedKeyFromStorage$(_context3) {
+      return regeneratorRuntime.async(function getWrappedKeyFromStorage$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              return _context3.abrupt("return", this.storage.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
+              return _context4.abrupt("return", this.storage.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 1:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -16822,20 +16976,20 @@ function () {
     key: "rootKeyRequiresUnwrapping",
     value: function rootKeyRequiresUnwrapping() {
       var wrappedKey;
-      return regeneratorRuntime.async(function rootKeyRequiresUnwrapping$(_context4) {
+      return regeneratorRuntime.async(function rootKeyRequiresUnwrapping$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              _context4.next = 2;
+              _context5.next = 2;
               return regeneratorRuntime.awrap(this.getWrappedKeyFromStorage());
 
             case 2:
-              wrappedKey = _context4.sent;
-              return _context4.abrupt("return", wrappedKey !== null);
+              wrappedKey = _context5.sent;
+              return _context5.abrupt("return", wrappedKey !== null);
 
             case 4:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
       }, null, this);
@@ -16849,32 +17003,47 @@ function () {
   }, {
     key: "unwrapRootKey",
     value: function unwrapRootKey(_ref3) {
-      var wrappingKey, wrappedKey, payload;
-      return regeneratorRuntime.async(function unwrapRootKey$(_context5) {
+      var wrappingKey, wrappedKey, payload, decrypted;
+      return regeneratorRuntime.async(function unwrapRootKey$(_context6) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               wrappingKey = _ref3.wrappingKey;
-              _context5.next = 3;
+              _context6.next = 3;
               return regeneratorRuntime.awrap(this.getWrappedKeyFromStorage());
 
             case 3:
-              wrappedKey = _context5.sent;
+              wrappedKey = _context6.sent;
               payload = CreateMaxPayloadFromAnyObject({
                 object: wrappedKey
               });
-              _context5.next = 7;
+              _context6.next = 7;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
                 payload: payload,
                 key: wrappingKey
               }));
 
             case 7:
-              this.rootKey = new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"](wrappedKey);
+              decrypted = _context6.sent;
 
-            case 8:
+              if (!decrypted.errorDecrypting) {
+                _context6.next = 12;
+                break;
+              }
+
+              return _context6.abrupt("return", {
+                success: false
+              });
+
+            case 12:
+              this.rootKey = new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"](decrypted);
+              return _context6.abrupt("return", {
+                success: true
+              });
+
+            case 14:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -16886,16 +17055,16 @@ function () {
   }, {
     key: "loadRootKey",
     value: function loadRootKey() {
-      return regeneratorRuntime.async(function loadRootKey$(_context6) {
+      return regeneratorRuntime.async(function loadRootKey$(_context7) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              _context6.next = 2;
+              _context7.next = 2;
               return regeneratorRuntime.awrap(this.rootKeyRequiresUnwrapping());
 
             case 2:
-              if (!_context6.sent) {
-                _context6.next = 4;
+              if (!_context7.sent) {
+                _context7.next = 4;
                 break;
               }
 
@@ -16903,23 +17072,23 @@ function () {
 
             case 4:
               if (!(this.rootKey !== null)) {
-                _context6.next = 6;
+                _context7.next = 6;
                 break;
               }
 
-              return _context6.abrupt("return");
+              return _context7.abrupt("return");
 
             case 6:
-              _context6.next = 8;
+              _context7.next = 8;
               return regeneratorRuntime.awrap(this.loadRootKeyFromKeychain());
 
             case 8:
-              this.rootKey = _context6.sent;
+              this.rootKey = _context7.sent;
               this.notifyKeyObserversOfKeyChange();
 
             case 10:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -16934,28 +17103,28 @@ function () {
     key: "setRootKeyWrapper",
     value: function setRootKeyWrapper(_ref4) {
       var wrappingKey, keyParams, payload, wrappedKey;
-      return regeneratorRuntime.async(function setRootKeyWrapper$(_context7) {
+      return regeneratorRuntime.async(function setRootKeyWrapper$(_context8) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               wrappingKey = _ref4.wrappingKey, keyParams = _ref4.keyParams;
 
               if (!(this.rootKey === null)) {
-                _context7.next = 3;
+                _context8.next = 3;
                 break;
               }
 
               throw 'Attempting to set a root key wrapper on an unloaded root key.';
 
             case 3:
-              _context7.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"], keyParams));
+              _context8.next = 5;
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"], keyParams));
 
             case 5:
               payload = CreateMaxPayloadFromAnyObject({
                 object: this.rootKey
               });
-              _context7.next = 8;
+              _context8.next = 8;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
                 payload: payload,
                 key: wrappingKey,
@@ -16963,17 +17132,17 @@ function () {
               }));
 
             case 8:
-              wrappedKey = _context7.sent;
-              _context7.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey));
+              wrappedKey = _context8.sent;
+              _context8.next = 11;
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey));
 
             case 11:
-              _context7.next = 13;
+              _context8.next = 13;
               return regeneratorRuntime.awrap(this.keychainDelegate.clearKeyChainValue());
 
             case 13:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -16985,46 +17154,46 @@ function () {
   }, {
     key: "removeRootKeyWrapper",
     value: function removeRootKeyWrapper() {
-      return regeneratorRuntime.async(function removeRootKeyWrapper$(_context8) {
+      return regeneratorRuntime.async(function removeRootKeyWrapper$(_context9) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               if (!(this.rootKey === null)) {
-                _context8.next = 2;
+                _context9.next = 2;
                 break;
               }
 
               throw 'Attempting to remove root key wrapper on an unloaded root key.';
 
             case 2:
-              _context8.next = 4;
+              _context9.next = 4;
               return regeneratorRuntime.awrap(this.rootKeyRequiresUnwrapping());
 
             case 4:
-              _context8.t0 = _context8.sent;
+              _context9.t0 = _context9.sent;
 
-              if (!(_context8.t0 === false)) {
-                _context8.next = 7;
+              if (!(_context9.t0 === false)) {
+                _context9.next = 7;
                 break;
               }
 
               throw 'Attempting to unwrap already unwrapped key.';
 
             case 7:
-              _context8.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
+              _context9.next = 9;
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 9:
-              _context8.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"]));
+              _context9.next = 11;
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"]));
 
             case 11:
-              _context8.next = 13;
+              _context9.next = 13;
               return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
 
             case 13:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -17039,14 +17208,14 @@ function () {
     key: "setRootKey",
     value: function setRootKey(_ref5) {
       var key, keyParams;
-      return regeneratorRuntime.async(function setRootKey$(_context9) {
+      return regeneratorRuntime.async(function setRootKey$(_context10) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               key = _ref5.key, keyParams = _ref5.keyParams;
 
               if (!(key.content_type !== _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_ROOT_KEY"])) {
-                _context9.next = 3;
+                _context10.next = 3;
                 break;
               }
 
@@ -17054,7 +17223,7 @@ function () {
 
             case 3:
               if (keyParams) {
-                _context9.next = 5;
+                _context10.next = 5;
                 break;
               }
 
@@ -17062,11 +17231,11 @@ function () {
 
             case 5:
               this.rootKey = key;
-              _context9.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams));
+              _context10.next = 8;
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams));
 
             case 8:
-              _context9.next = 10;
+              _context10.next = 10;
               return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
 
             case 10:
@@ -17074,7 +17243,7 @@ function () {
 
             case 11:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -17095,23 +17264,23 @@ function () {
   }, {
     key: "getRootKey",
     value: function getRootKey() {
-      return regeneratorRuntime.async(function getRootKey$(_context10) {
+      return regeneratorRuntime.async(function getRootKey$(_context11) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               if (this.rootKey) {
-                _context10.next = 2;
+                _context11.next = 2;
                 break;
               }
 
               throw 'Attempting to access non-existing root key';
 
             case 2:
-              return _context10.abrupt("return", this.rootKey);
+              return _context11.abrupt("return", this.rootKey);
 
             case 3:
             case "end":
-              return _context10.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -17123,28 +17292,28 @@ function () {
   }, {
     key: "deleteRootKey",
     value: function deleteRootKey() {
-      return regeneratorRuntime.async(function deleteRootKey$(_context11) {
+      return regeneratorRuntime.async(function deleteRootKey$(_context12) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
-              _context11.next = 2;
+              _context12.next = 2;
               return regeneratorRuntime.awrap(this.keychainDelegate.clearKeyChainValue());
 
             case 2:
-              _context11.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
+              _context12.next = 4;
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"]));
 
             case 4:
-              _context11.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"]));
+              _context12.next = 6;
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY_PARAMS"]));
 
             case 6:
-              _context11.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"]));
+              _context12.next = 8;
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"]));
 
             case 8:
             case "end":
-              return _context11.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -17156,15 +17325,15 @@ function () {
   }, {
     key: "getRootKeyParams",
     value: function getRootKeyParams() {
-      return regeneratorRuntime.async(function getRootKeyParams$(_context12) {
+      return regeneratorRuntime.async(function getRootKeyParams$(_context13) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
-              return _context12.abrupt("return", this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"]));
+              return _context13.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"]));
 
             case 1:
             case "end":
-              return _context12.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -17178,33 +17347,33 @@ function () {
     key: "verifyAccountPassword",
     value: function verifyAccountPassword(password) {
       var keyParams, key, success;
-      return regeneratorRuntime.async(function verifyAccountPassword$(_context13) {
+      return regeneratorRuntime.async(function verifyAccountPassword$(_context14) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
-              _context13.next = 2;
+              _context14.next = 2;
               return regeneratorRuntime.awrap(this.getRootKeyParams());
 
             case 2:
-              keyParams = _context13.sent;
-              _context13.next = 5;
+              keyParams = _context14.sent;
+              _context14.next = 5;
               return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }));
 
             case 5:
-              key = _context13.sent;
-              _context13.next = 8;
+              key = _context14.sent;
+              _context14.next = 8;
               return regeneratorRuntime.awrap(this.protocolManager.compareKeys(key, this.rootKey));
 
             case 8:
-              success = _context13.sent;
-              return _context13.abrupt("return", success);
+              success = _context14.sent;
+              return _context14.abrupt("return", success);
 
             case 10:
             case "end":
-              return _context13.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -17218,28 +17387,28 @@ function () {
     key: "createNewItemsKey",
     value: function createNewItemsKey() {
       var itemsKey, currentDefault, payload;
-      return regeneratorRuntime.async(function createNewItemsKey$(_context14) {
+      return regeneratorRuntime.async(function createNewItemsKey$(_context15) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
-              _context14.next = 2;
+              _context15.next = 2;
               return regeneratorRuntime.awrap(this.protocolManager.defaultOperator().createItemsKey());
 
             case 2:
-              itemsKey = _context14.sent;
-              _context14.next = 5;
+              itemsKey = _context15.sent;
+              _context15.next = 5;
               return regeneratorRuntime.awrap(this.getDefaultItemsKey());
 
             case 5:
-              currentDefault = _context14.sent;
+              currentDefault = _context15.sent;
 
               if (!currentDefault) {
-                _context14.next = 10;
+                _context15.next = 10;
                 break;
               }
 
               currentDefault.content.isDefault = false;
-              _context14.next = 10;
+              _context15.next = 10;
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(currentDefault));
 
             case 10:
@@ -17249,17 +17418,17 @@ function () {
                   dirty: true
                 }
               });
-              _context14.next = 14;
+              _context15.next = 14;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: [payload]
               }));
 
             case 14:
-              return _context14.abrupt("return", itemsKey);
+              return _context15.abrupt("return", itemsKey);
 
             case 15:
             case "end":
-              return _context14.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -17271,17 +17440,17 @@ function () {
   }, {
     key: "getDefaultItemsKey",
     value: function getDefaultItemsKey() {
-      return regeneratorRuntime.async(function getDefaultItemsKey$(_context15) {
+      return regeneratorRuntime.async(function getDefaultItemsKey$(_context16) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
-              return _context15.abrupt("return", this.allItemsKeys.find(function (key) {
+              return _context16.abrupt("return", this.allItemsKeys.find(function (key) {
                 return key.isDefault === true;
               }));
 
             case 1:
             case "end":
-              return _context15.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -17295,17 +17464,17 @@ function () {
   }, {
     key: "defaultItemsKeyForProtocolVersion",
     value: function defaultItemsKeyForProtocolVersion(version) {
-      return regeneratorRuntime.async(function defaultItemsKeyForProtocolVersion$(_context16) {
+      return regeneratorRuntime.async(function defaultItemsKeyForProtocolVersion$(_context17) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
-              return _context16.abrupt("return", this.allItemsKeys.find(function (key) {
+              return _context17.abrupt("return", this.allItemsKeys.find(function (key) {
                 return key.version === version;
               }));
 
             case 1:
             case "end":
-              return _context16.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -17317,15 +17486,15 @@ function () {
   }, {
     key: "getItemsKeyForId",
     value: function getItemsKeyForId(uuid) {
-      return regeneratorRuntime.async(function getItemsKeyForId$(_context17) {
+      return regeneratorRuntime.async(function getItemsKeyForId$(_context18) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
-              return _context17.abrupt("return", this.modelManager.findItem(uuid));
+              return _context18.abrupt("return", this.modelManager.findItem(uuid));
 
             case 1:
             case "end":
-              return _context17.stop();
+              return _context18.stop();
           }
         }
       }, null, this);
@@ -17351,14 +17520,14 @@ function () {
     key: "keyToUseForEncryptionOfPayload",
     value: function keyToUseForEncryptionOfPayload(_ref6) {
       var payload, intent, hasRootKey;
-      return regeneratorRuntime.async(function keyToUseForEncryptionOfPayload$(_context18) {
+      return regeneratorRuntime.async(function keyToUseForEncryptionOfPayload$(_context19) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               payload = _ref6.payload, intent = _ref6.intent;
 
               if (!(intent === null || intent === undefined)) {
-                _context18.next = 3;
+                _context19.next = 3;
                 break;
               }
 
@@ -17366,48 +17535,48 @@ function () {
 
             case 3:
               if (!this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
-                _context18.next = 16;
+                _context19.next = 16;
                 break;
               }
 
-              _context18.next = 6;
+              _context19.next = 6;
               return regeneratorRuntime.awrap(this.hasRootKey());
 
             case 6:
-              hasRootKey = _context18.sent;
+              hasRootKey = _context19.sent;
 
               if (hasRootKey) {
-                _context18.next = 13;
+                _context19.next = 13;
                 break;
               }
 
               if (!Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["intentRequiresEncryption"])(intent)) {
-                _context18.next = 12;
+                _context19.next = 12;
                 break;
               }
 
               throw 'Root key encryption is required but no root key is available.';
 
             case 12:
-              return _context18.abrupt("return", null);
+              return _context19.abrupt("return", null);
 
             case 13:
-              return _context18.abrupt("return", this.getRootKey());
+              return _context19.abrupt("return", this.getRootKey());
 
             case 16:
               if (!(this.localDatabaseEncryptionDisabled && isLocalStorageIntent(intent))) {
-                _context18.next = 18;
+                _context19.next = 18;
                 break;
               }
 
-              return _context18.abrupt("return", null);
+              return _context19.abrupt("return", null);
 
             case 18:
-              return _context18.abrupt("return", this.getDefaultItemsKey());
+              return _context19.abrupt("return", this.getDefaultItemsKey());
 
             case 19:
             case "end":
-              return _context18.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
@@ -17432,44 +17601,44 @@ function () {
     key: "keyToUseForDecryptionOfPayload",
     value: function keyToUseForDecryptionOfPayload(_ref7) {
       var payload, itemsKey, payloadProtocolVersion;
-      return regeneratorRuntime.async(function keyToUseForDecryptionOfPayload$(_context19) {
+      return regeneratorRuntime.async(function keyToUseForDecryptionOfPayload$(_context20) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
               payload = _ref7.payload;
 
               if (!this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
-                _context19.next = 3;
+                _context20.next = 3;
                 break;
               }
 
-              return _context19.abrupt("return", this.getRootKey());
+              return _context20.abrupt("return", this.getRootKey());
 
             case 3:
               if (!payload.items_key_id) {
-                _context19.next = 6;
+                _context20.next = 6;
                 break;
               }
 
               itemsKey = this.itemsKeyForPayload(payload);
-              return _context19.abrupt("return", itemsKey);
+              return _context20.abrupt("return", itemsKey);
 
             case 6:
               payloadProtocolVersion = this.protocolManager.versionForPayload(payload);
 
               if (!(payloadProtocolVersion === this.protocolManager.latestVersion())) {
-                _context19.next = 9;
+                _context20.next = 9;
                 break;
               }
 
               throw 'No associated key found for item encrypted with latest protocol version.';
 
             case 9:
-              return _context19.abrupt("return", this.defaultItemsKeyForProtocolVersion(payloadProtocolVersion));
+              return _context20.abrupt("return", this.defaultItemsKeyForProtocolVersion(payloadProtocolVersion));
 
             case 10:
             case "end":
-              return _context19.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -17482,16 +17651,16 @@ function () {
     key: "setLocalDatabaseEncryptionPolicy",
     value: function setLocalDatabaseEncryptionPolicy(_ref8) {
       var encrypted;
-      return regeneratorRuntime.async(function setLocalDatabaseEncryptionPolicy$(_context20) {
+      return regeneratorRuntime.async(function setLocalDatabaseEncryptionPolicy$(_context21) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
               encrypted = _ref8.encrypted;
               this.localDatabaseEncryptionDisabled = !encrypted;
 
             case 2:
             case "end":
-              return _context20.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -20985,7 +21154,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_session_history_historySession__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/session_history/historySession */ "./lib/models/session_history/historySession.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -21109,7 +21278,7 @@ function () {
           switch (_context2.prev = _context2.next) {
             case 0:
               this.historySession.clearAllHistory();
-              return _context2.abrupt("return", this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 2:
             case "end":
@@ -21132,14 +21301,14 @@ function () {
                 break;
               }
 
-              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
+              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
               this.saveToDisk();
               _context3.next = 8;
               break;
 
             case 6:
-              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
-              return _context3.abrupt("return", this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
+              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
+              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 8:
             case "end":
@@ -21163,7 +21332,7 @@ function () {
               return _context4.abrupt("return");
 
             case 2:
-              this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
+              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
 
             case 3:
             case "end":
@@ -21181,7 +21350,7 @@ function () {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"]));
 
             case 2:
               diskValue = _context5.sent;
@@ -21191,7 +21360,7 @@ function () {
               }
 
               _context5.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 6:
               historyValue = _context5.sent;
@@ -21205,7 +21374,7 @@ function () {
               }
 
               _context5.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"]));
 
             case 10:
               autoOptimizeValue = _context5.sent;
@@ -21234,9 +21403,9 @@ function () {
               this.autoOptimize = !this.autoOptimize;
 
               if (this.autoOptimize) {
-                this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
+                this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
               } else {
-                this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
+                this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
               }
 
             case 2:
@@ -21325,6 +21494,18 @@ function () {
           });
         }
       });
+      /** @todo needs replacement */
+      // If an item alternates its uuid on account registration, singletonHandlers might need to update
+      // their local reference to the object, since the object reference will change on uuid alternation
+      // modelManager.addModelUuidChangeObserver("singleton-manager", (oldModel, newModel) => {
+      //   for(const handler of this.singletonHandlers) {
+      //     if(handler.singleton && SFPredicate.ItemSatisfiesPredicates(newModel, handler.predicates)) {
+      //       // Reference is now invalid, calling resolveSingleton should update it
+      //       handler.singleton = null;
+      //       this.resolveSingletons([newModel]);
+      //     }
+      //   }
+      // })
     }
   }, {
     key: "validItemsMatchingPredicate",
@@ -21574,7 +21755,7 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return SNStorageManager; });
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21663,10 +21844,10 @@ function () {
                 break;
               }
 
-              return _context3.abrupt("return", "".concat(this.namespace, "-").concat(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"]));
+              return _context3.abrupt("return", "".concat(this.namespace, "-").concat(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_ENCRYPTED_STORAGE"]));
 
             case 4:
-              return _context3.abrupt("return", _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"]);
+              return _context3.abrupt("return", _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_3__["STORAGE_KEY_ENCRYPTED_STORAGE"]);
 
             case 5:
             case "end":
@@ -23069,7 +23250,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
-/* harmony import */ var _Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Protocol/storageKeys */ "./lib/protocol/storageKeys.js");
+/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23378,7 +23559,7 @@ function (_SNService) {
           switch (_context3.prev = _context3.next) {
             case 0:
               this.syncToken = token;
-              return _context3.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
+              return _context3.abrupt("return", this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
 
             case 2:
             case "end":
@@ -23401,11 +23582,11 @@ function (_SNService) {
                 break;
               }
 
-              return _context4.abrupt("return", this.storageManager.setValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"], token));
+              return _context4.abrupt("return", this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_PAGINATION_TOKEN"], token));
 
             case 5:
               _context4.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 7:
               return _context4.abrupt("return", _context4.sent);
@@ -23430,7 +23611,7 @@ function (_SNService) {
               }
 
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 3:
               this.syncToken = _context5.sent;
@@ -23458,7 +23639,7 @@ function (_SNService) {
               }
 
               _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 3:
               this.cursorToken = _context6.sent;
@@ -23483,11 +23664,11 @@ function (_SNService) {
               this.syncToken = null;
               this.cursorToken = null;
               _context7.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 4:
               _context7.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Protocol_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_16__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 6:
             case "end":
@@ -25074,6 +25255,44 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
     return aPriority < bPriority ? -1 : 1;
   });
 }
+
+/***/ }),
+
+/***/ "./lib/storageKeys.js":
+/*!****************************!*\
+  !*** ./lib/storageKeys.js ***!
+  \****************************/
+/*! exports provided: ROOT_KEY_PARAMS, WRAPPED_ROOT_KEY, WRAPPED_ROOT_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_ENCRYPTED_STORAGE, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_PARAMS", function() { return ROOT_KEY_PARAMS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY", function() { return WRAPPED_ROOT_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY_PARAMS", function() { return WRAPPED_ROOT_KEY_PARAMS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_JWT", function() { return STORAGE_KEY_JWT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_USER", function() { return STORAGE_KEY_USER; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SERVER_HOST", function() { return STORAGE_KEY_SERVER_HOST; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_LEGACY_UUID", function() { return STORAGE_KEY_LEGACY_UUID; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_LAST_SYNC_TOKEN", function() { return STORAGE_KEY_LAST_SYNC_TOKEN; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_PAGINATION_TOKEN", function() { return STORAGE_KEY_PAGINATION_TOKEN; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_ENCRYPTED_STORAGE", function() { return STORAGE_KEY_ENCRYPTED_STORAGE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_PERSIST_KEY", function() { return SESSION_HISTORY_PERSIST_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_REVISIONS_KEY", function() { return SESSION_HISTORY_REVISIONS_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_OPTIMIZE_KEY", function() { return SESSION_HISTORY_OPTIMIZE_KEY; });
+var ROOT_KEY_PARAMS = 'ROOT_KEY_PARAMS';
+var WRAPPED_ROOT_KEY = 'WRAPPED_ROOT_KEY';
+var WRAPPED_ROOT_KEY_PARAMS = 'WRAPPED_ROOT_KEY_PARAMS';
+var STORAGE_KEY_JWT = 'jwt';
+var STORAGE_KEY_USER = 'user';
+var STORAGE_KEY_SERVER_HOST = 'server';
+var STORAGE_KEY_LEGACY_UUID = 'uuid';
+var STORAGE_KEY_LAST_SYNC_TOKEN = 'syncToken';
+var STORAGE_KEY_PAGINATION_TOKEN = 'cursorToken';
+var STORAGE_KEY_ENCRYPTED_STORAGE = 'encryptedStorage';
+var SESSION_HISTORY_PERSIST_KEY = 'sessionHistory_persist';
+var SESSION_HISTORY_REVISIONS_KEY = 'sessionHistory_revisions';
+var SESSION_HISTORY_OPTIMIZE_KEY = 'sessionHistory_autoOptimize';
 
 /***/ }),
 
