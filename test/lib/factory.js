@@ -56,9 +56,10 @@ export default class Factory {
   }
 
   static async initializeApplication(application) {
-    await application.initialize({
+    await application.prepareForLaunch();
+    await application.launch({
       callbacks: {
-        onRequiresAuthentication: (sources, handleResponses) => {
+        authSourcesResponses: (sources, handleResponses) => {
 
         }
       },
@@ -210,7 +211,7 @@ export default class Factory {
     return a;
   }
 
-  static randomString(length) {
+  static randomString(length = 10) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;

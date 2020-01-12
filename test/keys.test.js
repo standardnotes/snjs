@@ -10,7 +10,12 @@ describe('keys', () => {
   let sharedApplication;
 
   before(async () => {
+    localStorage.clear();
     sharedApplication = await Factory.createInitAppWithRandNamespace();
+  })
+
+  after(async () => {
+    localStorage.clear();
   })
 
   beforeEach(async function() {
@@ -57,7 +62,7 @@ describe('keys', () => {
   })
 
   it('should not have root key by default', async () => {
-    expect(sharedApplication.keyManager.hasRootKey()).to.equal(false);
+    expect(sharedApplication.keyManager.getRootKey()).to.not.be.ok;
   })
 
   it('validates content types requiring root encryption', async () => {
@@ -81,7 +86,7 @@ describe('keys', () => {
   it('has root key and one items key after registering user', async () => {
     const localApplication = await Factory.createInitAppWithRandNamespace();
     await Factory.registerUserToApplication({application: localApplication});
-    expect(localApplication.keyManager.hasRootKey()).to.equal(true);
+    expect(localApplication.keyManager.getRootKey()).to.be.ok;
     expect(localApplication.keyManager.allItemsKeys.length).to.equal(1);
   })
 
