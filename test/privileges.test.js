@@ -35,7 +35,7 @@ privilegesManager.setDelegate({
   getFromStorage: async (key) => {
     return storageManager.getValue(key)
   },
-  verifyAccountPassword: async () => {
+  validateAccountPassword: async () => {
     return true;
   },
   verifyLocalPasscode: async () => {

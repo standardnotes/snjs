@@ -59,8 +59,8 @@ export default class Factory {
     await application.prepareForLaunch();
     await application.launch({
       callbacks: {
-        authSourcesResponses: (sources, handleResponses) => {
-
+        authChallengeResponses: (handleChallengeResponses) => {
+          throw 'Factory application shouldnt have challenges';
         }
       },
     });
@@ -186,6 +186,8 @@ export default class Factory {
       CreateMaxPayloadFromAnyObject({object: tagParams})
     ];
   }
+
+
 
   static serverURL() {
     return "http://localhost:3000";
