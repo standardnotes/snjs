@@ -5,7 +5,11 @@ export default class LocalStorageManager extends SNStorageManager {
     this.setInitialValues(JSON.parse(payload));
   }
 
-  async persistAsPayloadToDisk(payload) {
+  async persistAsValueToDisk(payload) {
     localStorage.setItem(this.getPersistenceKey(), JSON.stringify(payload));
+  }
+
+  async clearPersistenceValue() {
+    localStorage.removeItem(this.getPersistenceKey());
   }
 }

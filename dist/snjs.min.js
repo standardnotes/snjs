@@ -1206,7 +1206,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_migrationManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/migrationManager */ "./lib/services/migrationManager.js");
 /* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
 /* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
-/* harmony import */ var _Services_storageManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storageManager */ "./lib/services/storageManager.js");
+/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
 /* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
 /* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
@@ -1326,6 +1326,8 @@ function () {
   }, {
     key: "launch",
     value: function launch(_ref2) {
+      var _this = this;
+
       var callbacks, databasePayloads;
       return regeneratorRuntime.async(function launch$(_context2) {
         while (1) {
@@ -1356,7 +1358,11 @@ function () {
               * before local data has been loaded fully. We await only initial
               * `getDatabasePayloads` to lock in on database state.
               */
-              this.syncManager.loadDatabasePayloads(databasePayloads);
+              this.syncManager.loadDatabasePayloads(databasePayloads).then(function () {
+                _this.syncManager.sync({
+                  mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
+                });
+              });
 
             case 9:
             case "end":
@@ -1611,7 +1617,7 @@ function () {
               result = _context7.sent;
 
               if (result.response.error) {
-                _context7.next = 16;
+                _context7.next = 14;
                 break;
               }
 
@@ -1627,26 +1633,19 @@ function () {
 
             case 9:
               _context7.next = 11;
-              return regeneratorRuntime.awrap(this.storageManager.setLocalStoragePolicy({
-                encrypt: true,
-                ephemeral: ephemeral
-              }));
+              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
 
             case 11:
-              _context7.next = 13;
-              return regeneratorRuntime.awrap(this.storageManager.setLocalDatabaseStoragePolicy({
-                ephemeral: ephemeral
+              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_IN"]);
+              _context7.next = 14;
+              return regeneratorRuntime.awrap(this.syncManager.sync({
+                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
               }));
 
-            case 13:
-              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_IN"]);
-              _context7.next = 16;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
-
-            case 16:
+            case 14:
               return _context7.abrupt("return", result.response);
 
-            case 17:
+            case 15:
             case "end":
               return _context7.stop();
           }
@@ -1676,7 +1675,7 @@ function () {
               result = _context8.sent;
 
               if (result.response.error) {
-                _context8.next = 11;
+                _context8.next = 13;
                 break;
               }
 
@@ -1687,16 +1686,20 @@ function () {
               }));
 
             case 8:
+              _context8.next = 10;
+              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
+
+            case 10:
               this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_IN"]);
-              _context8.next = 11;
+              _context8.next = 13;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
               }));
 
-            case 11:
+            case 13:
               return _context8.abrupt("return", result.response);
 
-            case 12:
+            case 14:
             case "end":
               return _context8.stop();
           }
@@ -1815,7 +1818,7 @@ function () {
   }, {
     key: "setPasscode",
     value: function setPasscode(passcode) {
-      var identifier, _ref8, key, keyParams;
+      var identifier, _ref8, key, keyParams, currentItemsKey;
 
       return regeneratorRuntime.async(function setPasscode$(_context11) {
         while (1) {
@@ -1843,6 +1846,21 @@ function () {
               }));
 
             case 10:
+              _context11.next = 12;
+              return regeneratorRuntime.awrap(this.keyManager.getDefaultItemsKey());
+
+            case 12:
+              currentItemsKey = _context11.sent;
+
+              if (currentItemsKey) {
+                _context11.next = 16;
+                break;
+              }
+
+              _context11.next = 16;
+              return regeneratorRuntime.awrap(this.keyManager.createNewItemsKey());
+
+            case 16:
             case "end":
               return _context11.stop();
           }
@@ -1886,34 +1904,54 @@ function () {
         }
       }, null, this);
     }
+  }, {
+    key: "setStorageEncryptionPolicy",
+    value: function setStorageEncryptionPolicy(encryptionPolicy) {
+      return regeneratorRuntime.async(function setStorageEncryptionPolicy$(_context14) {
+        while (1) {
+          switch (_context14.prev = _context14.next) {
+            case 0:
+              _context14.next = 2;
+              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
+
+            case 2:
+              return _context14.abrupt("return", this.syncManager.repersistAllItems());
+
+            case 3:
+            case "end":
+              return _context14.stop();
+          }
+        }
+      }, null, this);
+    }
     /**
-     @private
+     * @private
      */
 
   }, {
     key: "createServices",
     value: function createServices() {
-      return regeneratorRuntime.async(function createServices$(_context14) {
+      return regeneratorRuntime.async(function createServices$(_context15) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               this.createAlertManager();
               this.createHttpManager();
               this.createDatabaseManager();
-              _context14.next = 5;
+              _context15.next = 5;
               return regeneratorRuntime.awrap(this.databaseManager.openDatabase());
 
             case 5:
               this.createModelManager();
               this.createProtocolManager();
               this.createStorageManager();
-              _context14.next = 10;
+              _context15.next = 10;
               return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
 
             case 10:
               this.createApiService();
               this.createSessionManager();
-              _context14.next = 14;
+              _context15.next = 14;
               return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
 
             case 14:
@@ -1922,7 +1960,7 @@ function () {
               this.protocolManager.setKeyManager(this.keyManager);
               this.storageManager.setKeyManager(this.keyManager);
               this.keyManager.setKeychainDelegate(this.keychainDelegate);
-              _context14.next = 21;
+              _context15.next = 21;
               return regeneratorRuntime.awrap(this.keyManager.initialize());
 
             case 21:
@@ -1930,10 +1968,42 @@ function () {
               this.createSingletonManager(); // this.createMigrationManager();
 
               this.createComponentManager();
+              this.registerSyncCompletionObserver();
 
-            case 24:
+            case 25:
             case "end":
-              return _context14.stop();
+              return _context15.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "registerSyncCompletionObserver",
+    value: function registerSyncCompletionObserver() {
+      var _this2 = this;
+
+      return regeneratorRuntime.async(function registerSyncCompletionObserver$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              this.syncManager.addEventObserver({
+                callback: function callback(event, data) {
+                  if (event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
+                    if (!_this2.keyManager.getDefaultItemsKey()) {
+                      _this2.keyManager.createItemsKey();
+
+                      if (_this2.keyManager.keyMode === KEY_MODE_WRAPPER_ONLY) {
+                        /** Items need to be re-persisted to disk */
+                        _this2.syncManager.repersistAllItems();
+                      }
+                    }
+                  }
+                }
+              });
+
+            case 1:
+            case "end":
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -2000,8 +2070,7 @@ function () {
       this.keyManager = new (this.getClass(_Services_keyManager__WEBPACK_IMPORTED_MODULE_6__["SNKeyManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
-        protocolManager: this.protocolManager,
-        syncManager: this.syncManager
+        protocolManager: this.protocolManager
       });
     }
   }, {
@@ -2030,7 +2099,7 @@ function () {
   }, {
     key: "createStorageManager",
     value: function createStorageManager() {
-      this.storageManager = new (this.getClass(_Services_storageManager__WEBPACK_IMPORTED_MODULE_10__["SNStorageManager"]))({
+      this.storageManager = new (this.getClass(_Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["SNStorageManager"]))({
         protocolManager: this.protocolManager,
         databaseManager: this.databaseManager,
         namespace: this.namespace
@@ -2148,7 +2217,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, SYNC_EVENT_FULL_SYNC_COMPLETED */
+/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, SYNC_EVENT_FULL_SYNC_COMPLETED */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2259,8 +2328,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_32__["SNHttpManager"]; });
 
-/* harmony import */ var _services_storageManager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/storageManager */ "./lib/services/storageManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storageManager__WEBPACK_IMPORTED_MODULE_33__["SNStorageManager"]; });
+/* harmony import */ var _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["SNStorageManager"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_PERSISTENCE_POLICY_DEFAULT", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_PERSISTENCE_POLICY_EPHEMERAL", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_ENCRYPTION_POLICY_DEFAULT", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["STORAGE_ENCRYPTION_POLICY_DEFAULT"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_ENCRYPTION_POLICY_DISABLED", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["STORAGE_ENCRYPTION_POLICY_DISABLED"]; });
 
 /* harmony import */ var _services_device_auth_service__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./services/device_auth/service */ "./lib/services/device_auth/service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_service__WEBPACK_IMPORTED_MODULE_34__["DeviceAuthService"]; });
@@ -3986,7 +4063,7 @@ function () {
   }, {
     key: "populateDefaultContentValues",
     value: function populateDefaultContentValues() {
-      if (this.errorDecrypting) {
+      if (this.errorDecrypting || this.deleted) {
         return;
       }
 
@@ -16720,7 +16797,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return DeviceAuthService; });
 /* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_storageManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/storageManager */ "./lib/services/storageManager.js");
+/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -16794,7 +16871,7 @@ function () {
               }
 
               _context2.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], _Services_storageManager__WEBPACK_IMPORTED_MODULE_2__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
               biometricPrefs = _context2.sent;
@@ -16823,7 +16900,7 @@ function () {
               _context3.next = 2;
               return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], {
                 enabled: true
-              }, _Services_storageManager__WEBPACK_IMPORTED_MODULE_2__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              }, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 2:
             case "end":
@@ -17202,7 +17279,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
 /* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
-/* harmony import */ var _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/services/storageManager */ "./lib/services/storageManager.js");
+/* harmony import */ var _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/services/storage_manager */ "./lib/services/storage_manager.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -17237,12 +17314,11 @@ function () {
 
     var modelManager = _ref.modelManager,
         storageManager = _ref.storageManager,
-        protocolManager = _ref.protocolManager,
-        syncManager = _ref.syncManager;
+        protocolManager = _ref.protocolManager;
 
     _classCallCheck(this, SNKeyManager);
 
-    if (!modelManager || !storageManager || !protocolManager || !syncManager) {
+    if (!modelManager || !storageManager || !protocolManager) {
       throw 'Invalid KeyManager construction';
     }
 
@@ -17250,17 +17326,7 @@ function () {
     this.protocolManager = protocolManager;
     this.modelManager = modelManager;
     this.storageManager = storageManager;
-    this.syncManager = syncManager;
     this.keyObservers = [];
-    this.syncManager.addEventObserver({
-      callback: function callback(event, data) {
-        if (event === _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SYNC_EVENT_FULL_SYNC_COMPLETED"]) {
-          if (!_this.getDefaultItemsKey()) {
-            _this.createItemsKey();
-          }
-        }
-      }
-    });
     this.modelManager.addMappingObserver('key-manager', [_Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_ITEMS_KEY"]], function (allItems) {
       _this.notifyKeyObserversOfKeyChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_ITEMS_KEY"]);
     });
@@ -17499,7 +17565,7 @@ function () {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 2:
               rawKeyParams = _context4.sent;
@@ -17533,7 +17599,7 @@ function () {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 1:
             case "end":
@@ -17567,7 +17633,7 @@ function () {
                 break;
               }
 
-              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               throw 'Unhandled key mode';
@@ -17774,7 +17840,7 @@ function () {
 
             case 19:
               _context9.next = 21;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 21:
               return _context9.abrupt("return");
@@ -17813,7 +17879,7 @@ function () {
             case 4:
               wrappedKey = _context10.sent;
               _context10.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
             case "end":
@@ -17850,11 +17916,11 @@ function () {
               }
 
               _context11.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 5:
               _context11.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
@@ -17942,7 +18008,7 @@ function () {
               previousRootKey = this.rootKey;
               this.rootKey = key;
               _context12.next = 22;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams, _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 22:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
@@ -18016,15 +18082,15 @@ function () {
 
             case 2:
               _context14.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 4:
               _context14.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 6:
               _context14.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storageManager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               this.keyMode = KEY_MODE_ROOT_KEY_NONE;
@@ -22442,17 +22508,21 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/storageManager.js":
-/*!****************************************!*\
-  !*** ./lib/services/storageManager.js ***!
-  \****************************************/
-/*! exports provided: STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_UNWRAPPED, SNStorageManager */
+/***/ "./lib/services/storage_manager.js":
+/*!*****************************************!*\
+  !*** ./lib/services/storage_manager.js ***!
+  \*****************************************/
+/*! exports provided: STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_UNWRAPPED, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, SNStorageManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_VALUE_MODE_DEFAULT", function() { return STORAGE_VALUE_MODE_DEFAULT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_VALUE_MODE_UNWRAPPED", function() { return STORAGE_VALUE_MODE_UNWRAPPED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_PERSISTENCE_POLICY_DEFAULT", function() { return STORAGE_PERSISTENCE_POLICY_DEFAULT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_PERSISTENCE_POLICY_EPHEMERAL", function() { return STORAGE_PERSISTENCE_POLICY_EPHEMERAL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_ENCRYPTION_POLICY_DEFAULT", function() { return STORAGE_ENCRYPTION_POLICY_DEFAULT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_ENCRYPTION_POLICY_DISABLED", function() { return STORAGE_ENCRYPTION_POLICY_DISABLED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return SNStorageManager; });
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
@@ -22476,6 +22546,10 @@ var STORAGE_VALUE_MODE_DEFAULT = 1;
 /** Stored outside storage object, unencrypted */
 
 var STORAGE_VALUE_MODE_UNWRAPPED = 2;
+var STORAGE_PERSISTENCE_POLICY_DEFAULT = 1;
+var STORAGE_PERSISTENCE_POLICY_EPHEMERAL = 2;
+var STORAGE_ENCRYPTION_POLICY_DEFAULT = 1;
+var STORAGE_ENCRYPTION_POLICY_DISABLED = 2;
 var SNStorageManager =
 /*#__PURE__*/
 function () {
@@ -22489,22 +22563,61 @@ function () {
     this.protocolManager = protocolManager;
     this.databaseManager = databaseManager;
     this.namespace = namespace;
-    this.setLocalStoragePolicy({
-      encrypt: true,
-      ephemeral: false
-    });
-    this.setLocalDatabaseStoragePolicy({
-      ephemeral: false
-    });
+    this.setPersistencePolicy(STORAGE_PERSISTENCE_POLICY_DEFAULT);
+    this.setEncryptionPolicy(STORAGE_ENCRYPTION_POLICY_DEFAULT);
   }
-  /**
-   * To avoid circular dependencies in constructor, applications must create a
-   * key manager separately and feed it into the protocolManager here.
-   * @param keyManager  A fully constructed keyManager
-   */
-
 
   _createClass(SNStorageManager, [{
+    key: "setPersistencePolicy",
+    value: function setPersistencePolicy(persistencePolicy) {
+      return regeneratorRuntime.async(function setPersistencePolicy$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.persistencePolicy = persistencePolicy;
+
+              if (!(this.persistencePolicy === STORAGE_PERSISTENCE_POLICY_EPHEMERAL)) {
+                _context.next = 6;
+                break;
+              }
+
+              _context.next = 4;
+              return regeneratorRuntime.awrap(this.clearPersistenceValue());
+
+            case 4:
+              _context.next = 6;
+              return regeneratorRuntime.awrap(this.databaseManager.clearAllPayloads());
+
+            case 6:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "setEncryptionPolicy",
+    value: function setEncryptionPolicy(encryptionPolicy) {
+      return regeneratorRuntime.async(function setEncryptionPolicy$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              this.encryptionPolicy = encryptionPolicy;
+
+            case 1:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * To avoid circular dependencies in constructor, applications must create a
+     * key manager separately and feed it into the protocolManager here.
+     * @param keyManager  A fully constructed keyManager
+     */
+
+  }, {
     key: "setKeyManager",
     value: function setKeyManager(keyManager) {
       var _this = this;
@@ -22531,15 +22644,15 @@ function () {
   }, {
     key: "initializeFromDisk",
     value: function initializeFromDisk() {
-      return regeneratorRuntime.async(function initializeFromDisk$(_context) {
+      return regeneratorRuntime.async(function initializeFromDisk$(_context3) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
               throw 'Must override';
 
             case 1:
             case "end":
-              return _context.stop();
+              return _context3.stop();
           }
         }
       });
@@ -22549,17 +22662,37 @@ function () {
      */
 
   }, {
-    key: "persistAsPayloadToDisk",
-    value: function persistAsPayloadToDisk(payload) {
-      return regeneratorRuntime.async(function persistAsPayloadToDisk$(_context2) {
+    key: "persistAsValueToDisk",
+    value: function persistAsValueToDisk(payload) {
+      return regeneratorRuntime.async(function persistAsValueToDisk$(_context4) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               throw 'Must override';
 
             case 1:
             case "end":
-              return _context2.stop();
+              return _context4.stop();
+          }
+        }
+      });
+    }
+    /**
+     * Platforms must override this to clear any persisted value on disk.
+     */
+
+  }, {
+    key: "clearPersistenceValue",
+    value: function clearPersistenceValue() {
+      return regeneratorRuntime.async(function clearPersistenceValue$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              throw 'Must override';
+
+            case 1:
+            case "end":
+              return _context5.stop();
           }
         }
       });
@@ -22573,9 +22706,9 @@ function () {
   }, {
     key: "setInitialValues",
     value: function setInitialValues(values) {
-      return regeneratorRuntime.async(function setInitialValues$(_context3) {
+      return regeneratorRuntime.async(function setInitialValues$(_context6) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               if (!values) {
                 values = this.defaultValuesObject();
@@ -22585,7 +22718,7 @@ function () {
 
             case 2:
             case "end":
-              return _context3.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -22604,12 +22737,12 @@ function () {
     key: "canDecryptWithKey",
     value: function canDecryptWithKey(key) {
       var wrappedValue, decryptedPayload;
-      return regeneratorRuntime.async(function canDecryptWithKey$(_context4) {
+      return regeneratorRuntime.async(function canDecryptWithKey$(_context7) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
               wrappedValue = this.values[this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT)];
-              _context4.next = 3;
+              _context7.next = 3;
               return regeneratorRuntime.awrap(this.decryptWrappedValue({
                 wrappedValue: wrappedValue,
                 key: key,
@@ -22617,12 +22750,12 @@ function () {
               }));
 
             case 3:
-              decryptedPayload = _context4.sent;
-              return _context4.abrupt("return", !decryptedPayload.errorDecrypting);
+              decryptedPayload = _context7.sent;
+              return _context7.abrupt("return", !decryptedPayload.errorDecrypting);
 
             case 5:
             case "end":
-              return _context4.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -22633,26 +22766,26 @@ function () {
     key: "decryptWrappedValue",
     value: function decryptWrappedValue(_ref2) {
       var wrappedValue, key, throws, payload, decryptedPayload;
-      return regeneratorRuntime.async(function decryptWrappedValue$(_context5) {
+      return regeneratorRuntime.async(function decryptWrappedValue$(_context8) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               wrappedValue = _ref2.wrappedValue, key = _ref2.key, throws = _ref2.throws;
 
               if (wrappedValue.content_type) {
-                _context5.next = 5;
+                _context8.next = 5;
                 break;
               }
 
               if (!throws) {
-                _context5.next = 4;
+                _context8.next = 4;
                 break;
               }
 
               throw 'Attempting to decrypt nonexistent wrapped value';
 
             case 4:
-              return _context5.abrupt("return");
+              return _context8.abrupt("return");
 
             case 5:
               payload = CreateMaxPayloadFromAnyObject({
@@ -22661,19 +22794,19 @@ function () {
                   content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_ENCRYPTED_STORAGE"]
                 }
               });
-              _context5.next = 8;
+              _context8.next = 8;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
                 payload: payload,
                 key: key
               }));
 
             case 8:
-              decryptedPayload = _context5.sent;
-              return _context5.abrupt("return", decryptedPayload);
+              decryptedPayload = _context8.sent;
+              return _context8.abrupt("return", decryptedPayload);
 
             case 10:
             case "end":
-              return _context5.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -22684,12 +22817,12 @@ function () {
     key: "decryptStorage",
     value: function decryptStorage() {
       var wrappedValue, decryptedPayload;
-      return regeneratorRuntime.async(function decryptStorage$(_context6) {
+      return regeneratorRuntime.async(function decryptStorage$(_context9) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               wrappedValue = this.values[this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT)];
-              _context6.next = 3;
+              _context9.next = 3;
               return regeneratorRuntime.awrap(this.decryptWrappedValue({
                 wrappedValue: wrappedValue,
                 key: null,
@@ -22697,12 +22830,12 @@ function () {
               }));
 
             case 3:
-              decryptedPayload = _context6.sent;
+              decryptedPayload = _context9.sent;
               this.values[this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT)] = decryptedPayload.content;
 
             case 5:
             case "end":
-              return _context6.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -22716,44 +22849,44 @@ function () {
     key: "generatePersistenceValue",
     value: function generatePersistenceValue() {
       var rawContent, intent, wrappedValue, payload, encryptedPayload;
-      return regeneratorRuntime.async(function generatePersistenceValue$(_context7) {
+      return regeneratorRuntime.async(function generatePersistenceValue$(_context10) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               rawContent = Object.assign({}, this.values);
-              intent = this.localStorageEncryptionDisabled ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"];
+              intent = this.encryptionPolicy === STORAGE_ENCRYPTION_POLICY_DISABLED ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"];
               wrappedValue = rawContent[this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT)];
-              _context7.t0 = CreateMaxPayloadFromAnyObject;
-              _context7.next = 6;
+              _context10.t0 = CreateMaxPayloadFromAnyObject;
+              _context10.next = 6;
               return regeneratorRuntime.awrap(SFItem.GenerateUuid());
 
             case 6:
-              _context7.t1 = _context7.sent;
-              _context7.t2 = wrappedValue;
-              _context7.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
-              _context7.t4 = {
-                uuid: _context7.t1,
-                content: _context7.t2,
-                content_type: _context7.t3
+              _context10.t1 = _context10.sent;
+              _context10.t2 = wrappedValue;
+              _context10.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
+              _context10.t4 = {
+                uuid: _context10.t1,
+                content: _context10.t2,
+                content_type: _context10.t3
               };
-              _context7.t5 = {
-                object: _context7.t4
+              _context10.t5 = {
+                object: _context10.t4
               };
-              payload = (0, _context7.t0)(_context7.t5);
-              _context7.next = 14;
+              payload = (0, _context10.t0)(_context10.t5);
+              _context10.next = 14;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
                 payload: payload,
                 intent: intent
               }));
 
             case 14:
-              encryptedPayload = _context7.sent;
+              encryptedPayload = _context10.sent;
               rawContent[this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT)] = encryptedPayload;
-              return _context7.abrupt("return", rawContent);
+              return _context10.abrupt("return", rawContent);
 
             case 17:
             case "end":
-              return _context7.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -22779,56 +22912,31 @@ function () {
       return _ref3 = {}, _defineProperty(_ref3, this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT), {}), _defineProperty(_ref3, this.domainKeyForMode(STORAGE_VALUE_MODE_UNWRAPPED), {}), _ref3;
     }
   }, {
-    key: "setLocalStoragePolicy",
-    value: function setLocalStoragePolicy(_ref4) {
-      var encrypt, ephemeral;
-      return regeneratorRuntime.async(function setLocalStoragePolicy$(_context8) {
-        while (1) {
-          switch (_context8.prev = _context8.next) {
-            case 0:
-              encrypt = _ref4.encrypt, ephemeral = _ref4.ephemeral;
-              this.localStorageEncryptionDisabled = !encrypt;
-              this.localStorageEphemeral = ephemeral;
-
-            case 3:
-            case "end":
-              return _context8.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "setLocalDatabaseStoragePolicy",
-    value: function setLocalDatabaseStoragePolicy(_ref5) {
-      var ephemeral = _ref5.ephemeral;
-      this.localDatabaseEphemeral = ephemeral;
-    }
-  }, {
     key: "repersistToDisk",
     value: function repersistToDisk() {
-      var payload;
-      return regeneratorRuntime.async(function repersistToDisk$(_context9) {
+      var value;
+      return regeneratorRuntime.async(function repersistToDisk$(_context11) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
-              if (!(this.localStorageEphemeral === true)) {
-                _context9.next = 2;
+              if (!(this.persistencePolicy === STORAGE_PERSISTENCE_POLICY_EPHEMERAL)) {
+                _context11.next = 2;
                 break;
               }
 
-              return _context9.abrupt("return");
+              return _context11.abrupt("return");
 
             case 2:
-              _context9.next = 4;
+              _context11.next = 4;
               return regeneratorRuntime.awrap(this.generatePersistenceValue());
 
             case 4:
-              payload = _context9.sent;
-              return _context9.abrupt("return", this.persistAsPayloadToDisk(payload));
+              value = _context11.sent;
+              return _context11.abrupt("return", this.persistAsValueToDisk(value));
 
             case 6:
             case "end":
-              return _context9.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -22837,15 +22945,15 @@ function () {
     key: "setValue",
     value: function setValue(key, value) {
       var mode,
-          _args10 = arguments;
-      return regeneratorRuntime.async(function setValue$(_context10) {
+          _args12 = arguments;
+      return regeneratorRuntime.async(function setValue$(_context12) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
-              mode = _args10.length > 2 && _args10[2] !== undefined ? _args10[2] : STORAGE_VALUE_MODE_DEFAULT;
+              mode = _args12.length > 2 && _args12[2] !== undefined ? _args12[2] : STORAGE_VALUE_MODE_DEFAULT;
 
               if (this.values) {
-                _context10.next = 3;
+                _context12.next = 3;
                 break;
               }
 
@@ -22853,11 +22961,11 @@ function () {
 
             case 3:
               this.values[this.domainKeyForMode(mode)][this.namespacedKeyForKey(key)] = value;
-              return _context10.abrupt("return", this.repersistToDisk());
+              return _context12.abrupt("return", this.repersistToDisk());
 
             case 5:
             case "end":
-              return _context10.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -22866,26 +22974,26 @@ function () {
     key: "getValue",
     value: function getValue(key) {
       var mode,
-          _args11 = arguments;
-      return regeneratorRuntime.async(function getValue$(_context11) {
+          _args13 = arguments;
+      return regeneratorRuntime.async(function getValue$(_context13) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
-              mode = _args11.length > 1 && _args11[1] !== undefined ? _args11[1] : STORAGE_VALUE_MODE_DEFAULT;
+              mode = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : STORAGE_VALUE_MODE_DEFAULT;
 
               if (this.values) {
-                _context11.next = 3;
+                _context13.next = 3;
                 break;
               }
 
               throw 'Attempting to access storage value before loading local storage.';
 
             case 3:
-              return _context11.abrupt("return", this.values[this.domainKeyForMode(mode)][this.namespacedKeyForKey(key)]);
+              return _context13.abrupt("return", this.values[this.domainKeyForMode(mode)][this.namespacedKeyForKey(key)]);
 
             case 4:
             case "end":
-              return _context11.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -22894,15 +23002,15 @@ function () {
     key: "removeValue",
     value: function removeValue(key) {
       var mode,
-          _args12 = arguments;
-      return regeneratorRuntime.async(function removeValue$(_context12) {
+          _args14 = arguments;
+      return regeneratorRuntime.async(function removeValue$(_context14) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
-              mode = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : STORAGE_VALUE_MODE_DEFAULT;
+              mode = _args14.length > 1 && _args14[1] !== undefined ? _args14[1] : STORAGE_VALUE_MODE_DEFAULT;
 
               if (this.values) {
-                _context12.next = 3;
+                _context14.next = 3;
                 break;
               }
 
@@ -22910,11 +23018,11 @@ function () {
 
             case 3:
               delete this.values[this.domainKeyForMode(mode)][this.namespacedKeyForKey(key)];
-              return _context12.abrupt("return", this.repersistToDisk());
+              return _context14.abrupt("return", this.repersistToDisk());
 
             case 5:
             case "end":
-              return _context12.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -22948,17 +23056,17 @@ function () {
   }, {
     key: "clear",
     value: function clear() {
-      return regeneratorRuntime.async(function clear$(_context13) {
+      return regeneratorRuntime.async(function clear$(_context15) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               this.values = this.defaultValuesObject();
-              _context13.next = 3;
+              _context15.next = 3;
               return regeneratorRuntime.awrap(this.repersistToDisk());
 
             case 3:
             case "end":
-              return _context13.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -22970,15 +23078,15 @@ function () {
   }, {
     key: "getAllRawPayloads",
     value: function getAllRawPayloads() {
-      return regeneratorRuntime.async(function getAllRawPayloads$(_context14) {
+      return regeneratorRuntime.async(function getAllRawPayloads$(_context16) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
-              return _context14.abrupt("return", this.databaseManager.getAllRawPayloads());
+              return _context16.abrupt("return", this.databaseManager.getAllRawPayloads());
 
             case 1:
             case "end":
-              return _context14.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -22986,173 +23094,198 @@ function () {
   }, {
     key: "savePayload",
     value: function savePayload(payload) {
-      return regeneratorRuntime.async(function savePayload$(_context15) {
+      return regeneratorRuntime.async(function savePayload$(_context17) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
-              return _context15.abrupt("return", this.savePayloads([payload]));
+              return _context17.abrupt("return", this.savePayloads([payload]));
 
             case 1:
             case "end":
-              return _context15.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
     }
   }, {
     key: "savePayloads",
-    value: function savePayloads(payloads) {
-      var deleted, nondeleted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload;
+    value: function savePayloads(decryptedPayloads) {
+      var deleted, nondeleted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, encrypted;
 
-      return regeneratorRuntime.async(function savePayloads$(_context16) {
+      return regeneratorRuntime.async(function savePayloads$(_context18) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
-              if (!this.localDatabaseEphemeral) {
-                _context16.next = 2;
+              if (!(this.persistencePolicy === STORAGE_PERSISTENCE_POLICY_EPHEMERAL)) {
+                _context18.next = 2;
                 break;
               }
 
-              return _context16.abrupt("return");
+              return _context18.abrupt("return");
 
             case 2:
               deleted = [], nondeleted = [];
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context16.prev = 6;
+              _context18.prev = 6;
+              _iterator = decryptedPayloads[Symbol.iterator]();
 
-              for (_iterator = payloads[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                payload = _step.value;
-
-                /** If the payload is deleted and not dirty, remove it from db. */
-                if (payload.discardable) {
-                  deleted.push(payload);
-                } else {
-                  nondeleted.push(payload);
-                }
+            case 8:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context18.next = 21;
+                break;
               }
 
-              _context16.next = 14;
+              payload = _step.value;
+
+              if (!payload.discardable) {
+                _context18.next = 14;
+                break;
+              }
+
+              /** If the payload is deleted and not dirty, remove it from db. */
+              deleted.push(payload);
+              _context18.next = 18;
               break;
 
-            case 10:
-              _context16.prev = 10;
-              _context16.t0 = _context16["catch"](6);
-              _didIteratorError = true;
-              _iteratorError = _context16.t0;
-
             case 14:
-              _context16.prev = 14;
-              _context16.prev = 15;
+              _context18.next = 16;
+              return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
+                payload: payload,
+                intent: this.encryptionPolicy === STORAGE_ENCRYPTION_POLICY_DEFAULT ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]
+              }));
+
+            case 16:
+              encrypted = _context18.sent;
+              nondeleted.push(encrypted);
+
+            case 18:
+              _iteratorNormalCompletion = true;
+              _context18.next = 8;
+              break;
+
+            case 21:
+              _context18.next = 27;
+              break;
+
+            case 23:
+              _context18.prev = 23;
+              _context18.t0 = _context18["catch"](6);
+              _didIteratorError = true;
+              _iteratorError = _context18.t0;
+
+            case 27:
+              _context18.prev = 27;
+              _context18.prev = 28;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
-            case 17:
-              _context16.prev = 17;
+            case 30:
+              _context18.prev = 30;
 
               if (!_didIteratorError) {
-                _context16.next = 20;
+                _context18.next = 33;
                 break;
               }
 
               throw _iteratorError;
 
-            case 20:
-              return _context16.finish(17);
+            case 33:
+              return _context18.finish(30);
 
-            case 21:
-              return _context16.finish(14);
+            case 34:
+              return _context18.finish(27);
 
-            case 22:
+            case 35:
               if (!(deleted.length > 0)) {
-                _context16.next = 25;
+                _context18.next = 38;
                 break;
               }
 
-              _context16.next = 25;
+              _context18.next = 38;
               return regeneratorRuntime.awrap(this.deletePayloads(deleted));
 
-            case 25:
-              _context16.next = 27;
+            case 38:
+              _context18.next = 40;
               return regeneratorRuntime.awrap(this.databaseManager.savePayloads(nondeleted));
 
-            case 27:
+            case 40:
             case "end":
-              return _context16.stop();
+              return _context18.stop();
           }
         }
-      }, null, this, [[6, 10, 14, 22], [15,, 17, 21]]);
+      }, null, this, [[6, 23, 27, 35], [28,, 30, 34]]);
     }
   }, {
     key: "deletePayloads",
     value: function deletePayloads(payloads) {
       var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, payload;
 
-      return regeneratorRuntime.async(function deletePayloads$(_context17) {
+      return regeneratorRuntime.async(function deletePayloads$(_context19) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context17.prev = 3;
+              _context19.prev = 3;
               _iterator2 = payloads[Symbol.iterator]();
 
             case 5:
               if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context17.next = 12;
+                _context19.next = 12;
                 break;
               }
 
               payload = _step2.value;
-              _context17.next = 9;
+              _context19.next = 9;
               return regeneratorRuntime.awrap(this.deletePayloadWithId(payload.uuid));
 
             case 9:
               _iteratorNormalCompletion2 = true;
-              _context17.next = 5;
+              _context19.next = 5;
               break;
 
             case 12:
-              _context17.next = 18;
+              _context19.next = 18;
               break;
 
             case 14:
-              _context17.prev = 14;
-              _context17.t0 = _context17["catch"](3);
+              _context19.prev = 14;
+              _context19.t0 = _context19["catch"](3);
               _didIteratorError2 = true;
-              _iteratorError2 = _context17.t0;
+              _iteratorError2 = _context19.t0;
 
             case 18:
-              _context17.prev = 18;
-              _context17.prev = 19;
+              _context19.prev = 18;
+              _context19.prev = 19;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
             case 21:
-              _context17.prev = 21;
+              _context19.prev = 21;
 
               if (!_didIteratorError2) {
-                _context17.next = 24;
+                _context19.next = 24;
                 break;
               }
 
               throw _iteratorError2;
 
             case 24:
-              return _context17.finish(21);
+              return _context19.finish(21);
 
             case 25:
-              return _context17.finish(18);
+              return _context19.finish(18);
 
             case 26:
             case "end":
-              return _context17.stop();
+              return _context19.stop();
           }
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -23160,15 +23293,15 @@ function () {
   }, {
     key: "deletePayloadWithId",
     value: function deletePayloadWithId(id) {
-      return regeneratorRuntime.async(function deletePayloadWithId$(_context18) {
+      return regeneratorRuntime.async(function deletePayloadWithId$(_context20) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
-              return _context18.abrupt("return", this.databaseManager.deletePayloadWithId(id));
+              return _context20.abrupt("return", this.databaseManager.deletePayloadWithId(id));
 
             case 1:
             case "end":
-              return _context18.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -23176,15 +23309,15 @@ function () {
   }, {
     key: "clearAllPayloads",
     value: function clearAllPayloads() {
-      return regeneratorRuntime.async(function clearAllPayloads$(_context19) {
+      return regeneratorRuntime.async(function clearAllPayloads$(_context21) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
-              return _context19.abrupt("return", this.databaseManager.clearAllPayloads());
+              return _context21.abrupt("return", this.databaseManager.clearAllPayloads());
 
             case 1:
             case "end":
-              return _context19.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -23196,15 +23329,15 @@ function () {
   }, {
     key: "clearAllData",
     value: function clearAllData() {
-      return regeneratorRuntime.async(function clearAllData$(_context20) {
+      return regeneratorRuntime.async(function clearAllData$(_context22) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
-              return _context20.abrupt("return", Promise.all([this.clear(), this.clearAllPayloads()]));
+              return _context22.abrupt("return", Promise.all([this.clear(), this.clearAllPayloads()]));
 
             case 1:
             case "end":
-              return _context20.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -23958,95 +24091,32 @@ function () {
   _createClass(OfflineSyncOperation, [{
     key: "run",
     value: function run() {
-      var outPayloads, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, response;
-
+      var responsePayloads, response;
       return regeneratorRuntime.async(function run$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              outPayloads = [];
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context.prev = 4;
-
-              for (_iterator = this.payloads[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                payload = _step.value;
-                outPayloads.push(Object(_Payloads__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])({
+              responsePayloads = this.payloads.map(function (payload) {
+                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])({
                   payload: payload,
                   override: {
                     updated_at: new Date(),
                     dirty: false
                   }
-                }));
-              }
-
-              _context.next = 12;
-              break;
-
-            case 8:
-              _context.prev = 8;
-              _context.t0 = _context["catch"](4);
-              _didIteratorError = true;
-              _iteratorError = _context.t0;
-
-            case 12:
-              _context.prev = 12;
-              _context.prev = 13;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 15:
-              _context.prev = 15;
-
-              if (!_didIteratorError) {
-                _context.next = 18;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 18:
-              return _context.finish(15);
-
-            case 19:
-              return _context.finish(12);
-
-            case 20:
+                });
+              });
               response = {
-                payloads: outPayloads
+                payloads: responsePayloads
               };
-              _context.next = 23;
+              _context.next = 4;
               return regeneratorRuntime.awrap(this.receiver(response, _Services_sync_signals__WEBPACK_IMPORTED_MODULE_1__["SIGNAL_TYPE_RESPONSE"]));
 
-            case 23:
+            case 4:
             case "end":
               return _context.stop();
           }
         }
-      }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
-    }
-  }, {
-    key: "lockCancelation",
-    value: function lockCancelation() {
-      this.cancelable = false;
-    }
-  }, {
-    key: "unlockCancelation",
-    value: function unlockCancelation() {
-      this.cancelable = true;
-    }
-  }, {
-    key: "tryCancel",
-    value: function tryCancel() {
-      if (!this.cancelable) {
-        this.cancleled = true;
-        return true;
-      } else {
-        return false;
-      }
+      }, null, this);
     }
   }]);
 
@@ -24391,8 +24461,8 @@ function (_SNService) {
               this.opStatus.setDatabaseLoadStatus({
                 done: true
               });
-              this.databaseLoaded = true;
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_LOCAL_DATA_LOADED"]);
+              this.databaseLoaded = true;
 
             case 31:
             case "end":
@@ -24667,6 +24737,38 @@ function (_SNService) {
       }, null, this, [[6, 17, 21, 29], [22,, 24, 28]]);
     }
     /**
+     * @public
+     * If encryption status changes (esp. on mobile, where local storage encryption
+     * can be disabled), consumers may call this function to repersist all items to
+     * disk using latest encryption status.
+     */
+
+  }, {
+    key: "repersistAllItems",
+    value: function repersistAllItems() {
+      var items, payloads;
+      return regeneratorRuntime.async(function repersistAllItems$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              items = this.modelManager.allItems;
+              payloads = items.map(function (item) {
+                return CreateMaxPayloadFromAnyObject({
+                  object: item
+                });
+              });
+              return _context10.abrupt("return", this.persistPayloads({
+                decryptedPayloads: payloads
+              }));
+
+            case 3:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
      * Return the payloads that need local persistence, before beginning a sync.
      * This way, if the application is closed before a sync request completes,
      * pending data will be saved to disk, and synced the next time the app opens.
@@ -24676,29 +24778,29 @@ function (_SNService) {
     key: "popPayloadsNeedingPreSyncSave",
     value: function popPayloadsNeedingPreSyncSave(from) {
       var lastPreSyncSave, payloads;
-      return regeneratorRuntime.async(function popPayloadsNeedingPreSyncSave$(_context10) {
+      return regeneratorRuntime.async(function popPayloadsNeedingPreSyncSave$(_context11) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               lastPreSyncSave = this.state.lastPreSyncSaveDate;
 
               if (lastPreSyncSave) {
-                _context10.next = 3;
+                _context11.next = 3;
                 break;
               }
 
-              return _context10.abrupt("return", from);
+              return _context11.abrupt("return", from);
 
             case 3:
               payloads = from.filter(function (candidate) {
                 return candidate.dirtiedDate > lastPreSyncSave;
               });
               this.state.setLastPresaveSyncDate(new Date());
-              return _context10.abrupt("return", payloads);
+              return _context11.abrupt("return", payloads);
 
             case 6:
             case "end":
-              return _context10.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -24778,68 +24880,59 @@ function (_SNService) {
           items,
           decryptedPayloads,
           payloadsNeedingSave,
-          needsSaveEncrypted,
           inTimeResolveQueue,
           useStrategy,
           syncInProgress,
           databaseLoaded,
           beginDate,
           useMode,
+          online,
           uploadPayloads,
           operation,
-          online,
           _iteratorNormalCompletion3,
           _didIteratorError3,
           _iteratorError3,
           _iterator3,
           _step3,
           callback,
-          _args11 = arguments;
+          _args12 = arguments;
 
-      return regeneratorRuntime.async(function sync$(_context11) {
+      return regeneratorRuntime.async(function sync$(_context12) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
-              _ref3 = _args11.length > 0 && _args11[0] !== undefined ? _args11[0] : {}, timingStrategy = _ref3.timingStrategy, mode = _ref3.mode, checkIntegrity = _ref3.checkIntegrity;
+              _ref3 = _args12.length > 0 && _args12[0] !== undefined ? _args12[0] : {}, timingStrategy = _ref3.timingStrategy, mode = _ref3.mode, checkIntegrity = _ref3.checkIntegrity;
 
               if (!this.locked) {
-                _context11.next = 4;
+                _context12.next = 4;
                 break;
               }
 
               this.log('Sync Locked');
-              return _context11.abrupt("return");
+              return _context12.abrupt("return");
 
             case 4:
-              _context11.next = 6;
+              _context12.next = 6;
               return regeneratorRuntime.awrap(this.itemsNeedingSync());
 
             case 6:
-              items = _context11.sent;
+              items = _context12.sent;
               decryptedPayloads = items.map(function (item) {
                 return CreateMaxPayloadFromAnyObject({
                   object: item
                 });
               });
-              _context11.next = 10;
+              _context12.next = 10;
               return regeneratorRuntime.awrap(this.popPayloadsNeedingPreSyncSave(decryptedPayloads));
 
             case 10:
-              payloadsNeedingSave = _context11.sent;
-              _context11.next = 13;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByEncryptingPayloads({
-                payloads: payloadsNeedingSave,
-                intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
+              payloadsNeedingSave = _context12.sent;
+              _context12.next = 13;
+              return regeneratorRuntime.awrap(this.persistPayloads({
+                decryptedPayloads: payloadsNeedingSave
               }));
 
             case 13:
-              needsSaveEncrypted = _context11.sent;
-              _context11.next = 16;
-              return regeneratorRuntime.awrap(this.persistPayloads({
-                encryptedPayloads: needsSaveEncrypted
-              }));
-
-            case 16:
               /** The resolve queue before we add any new elements to it below */
               inTimeResolveQueue = this.resolveQueue.slice();
               useStrategy = !isNullOrUndefined(timingStrategy) ? timingStrategy : TIMING_STRATEGY_RESOLVE_ON_NEXT;
@@ -24847,31 +24940,31 @@ function (_SNService) {
               databaseLoaded = this.databaseLoaded;
 
               if (!(syncInProgress || !databaseLoaded)) {
-                _context11.next = 31;
+                _context12.next = 28;
                 break;
               }
 
               this.log(syncInProgress ? 'Attempting to sync while existing sync in progress.' : 'Attempting to sync before local database has loaded.');
 
               if (!(useStrategy === TIMING_STRATEGY_RESOLVE_ON_NEXT)) {
-                _context11.next = 26;
+                _context12.next = 23;
                 break;
               }
 
-              return _context11.abrupt("return", this.timingStrategyResolveOnNext());
+              return _context12.abrupt("return", this.timingStrategyResolveOnNext());
 
-            case 26:
+            case 23:
               if (!(useStrategy === TIMING_STRATEGY_FORCE_SPAWN_NEW)) {
-                _context11.next = 30;
+                _context12.next = 27;
                 break;
               }
 
-              return _context11.abrupt("return", this.timingStrategyForceSpawnNew());
+              return _context12.abrupt("return", this.timingStrategyForceSpawnNew());
 
-            case 30:
+            case 27:
               throw "Unhandled timing strategy ".concat(strategy);
 
-            case 31:
+            case 28:
               /** Lock syncing immediately after checking in progress above */
               this.opStatus.setDidBegin();
               /**
@@ -24879,7 +24972,7 @@ function (_SNService) {
                */
 
               beginDate = new Date();
-              _context11.next = 35;
+              _context12.next = 32;
               return regeneratorRuntime.awrap(this.modelManager.setItemsProperties({
                 items: items,
                 properties: {
@@ -24887,67 +24980,74 @@ function (_SNService) {
                 }
               }));
 
-            case 35:
+            case 32:
               useMode = !isNullOrUndefined(mode) ? mode : SYNC_MODE_DEFAULT;
+              _context12.next = 35;
+              return regeneratorRuntime.awrap(this.sessionManager.online());
+
+            case 35:
+              online = _context12.sent;
 
               if (!(useMode === SYNC_MODE_DEFAULT)) {
-                _context11.next = 42;
+                _context12.next = 44;
                 break;
               }
 
-              _context11.next = 39;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByEncryptingPayloads({
-                payloads: decryptedPayloads,
-                intent: online ? ENCRYPTION_INTENT_SYNC : ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
-              }));
+              if (this.completedInitialSync) {
+                _context12.next = 39;
+                break;
+              }
+
+              throw 'Attempting to default mode sync without having completed initial.';
 
             case 39:
-              uploadPayloads = _context11.sent;
-              _context11.next = 43;
+              _context12.next = 41;
+              return regeneratorRuntime.awrap(this.protocolManager.payloadsByEncryptingPayloads({
+                payloads: decryptedPayloads,
+                intent: online ? ENCRYPTION_INTENT_SYNC : ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED
+              }));
+
+            case 41:
+              uploadPayloads = _context12.sent;
+              _context12.next = 45;
               break;
 
-            case 42:
+            case 44:
               if (useMode === SYNC_MODE_INITIAL) {
                 uploadPayloads = [];
               }
 
-            case 43:
-              _context11.next = 45;
-              return regeneratorRuntime.awrap(this.sessionManager.online());
-
             case 45:
-              online = _context11.sent;
-
               if (!online) {
-                _context11.next = 52;
+                _context12.next = 51;
                 break;
               }
 
-              _context11.next = 49;
+              _context12.next = 48;
               return regeneratorRuntime.awrap(this.syncOnlineOperation({
                 payloads: uploadPayloads,
                 checkIntegrity: checkIntegrity
               }));
 
-            case 49:
-              operation = _context11.sent;
-              _context11.next = 55;
+            case 48:
+              operation = _context12.sent;
+              _context12.next = 54;
               break;
 
-            case 52:
-              _context11.next = 54;
+            case 51:
+              _context12.next = 53;
               return regeneratorRuntime.awrap(this.syncOfflineOperation({
                 payloads: uploadPayloads
               }));
 
-            case 54:
-              operation = _context11.sent;
+            case 53:
+              operation = _context12.sent;
 
-            case 55:
-              _context11.next = 57;
+            case 54:
+              _context12.next = 56;
               return regeneratorRuntime.awrap(operation.run());
 
-            case 57:
+            case 56:
               this.opStatus.setDidEnd();
               /**
                * For timing strategy TIMING_STRATEGY_RESOLVE_ON_NEXT.
@@ -24957,47 +25057,47 @@ function (_SNService) {
               _iteratorNormalCompletion3 = true;
               _didIteratorError3 = false;
               _iteratorError3 = undefined;
-              _context11.prev = 61;
+              _context12.prev = 60;
 
               for (_iterator3 = inTimeResolveQueue[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                 callback = _step3.value;
                 callback.resolve();
               }
 
-              _context11.next = 69;
+              _context12.next = 68;
               break;
 
-            case 65:
-              _context11.prev = 65;
-              _context11.t0 = _context11["catch"](61);
+            case 64:
+              _context12.prev = 64;
+              _context12.t0 = _context12["catch"](60);
               _didIteratorError3 = true;
-              _iteratorError3 = _context11.t0;
+              _iteratorError3 = _context12.t0;
 
-            case 69:
-              _context11.prev = 69;
-              _context11.prev = 70;
+            case 68:
+              _context12.prev = 68;
+              _context12.prev = 69;
 
               if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                 _iterator3.return();
               }
 
-            case 72:
-              _context11.prev = 72;
+            case 71:
+              _context12.prev = 71;
 
               if (!_didIteratorError3) {
-                _context11.next = 75;
+                _context12.next = 74;
                 break;
               }
 
               throw _iteratorError3;
 
+            case 74:
+              return _context12.finish(71);
+
             case 75:
-              return _context11.finish(72);
+              return _context12.finish(68);
 
             case 76:
-              return _context11.finish(69);
-
-            case 77:
               Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
 
               if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
@@ -25010,18 +25110,21 @@ function (_SNService) {
               });
 
               if (!(useMode === SYNC_MODE_INITIAL)) {
-                _context11.next = 82;
+                _context12.next = 82;
                 break;
               }
 
-              return _context11.abrupt("return", this.sync());
+              this.completedInitialSync = true;
+              /** Perform regular sync now that we've finished download first sync */
+
+              return _context12.abrupt("return", this.sync());
 
             case 82:
             case "end":
-              return _context11.stop();
+              return _context12.stop();
           }
         }
-      }, null, this, [[61, 65, 69, 77], [70,, 72, 76]]);
+      }, null, this, [[60, 64, 68, 76], [69,, 71, 75]]);
     }
     /**
      * @private
@@ -25033,99 +25136,99 @@ function (_SNService) {
       var _this7 = this;
 
       var payloads, checkIntegrity, operation;
-      return regeneratorRuntime.async(function syncOnlineOperation$(_context13) {
+      return regeneratorRuntime.async(function syncOnlineOperation$(_context14) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               payloads = _ref4.payloads, checkIntegrity = _ref4.checkIntegrity;
               this.log('Syncing online user');
-              _context13.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_7__["AccountSyncOperation"];
-              _context13.t1 = this.apiService;
-              _context13.t2 = payloads;
-              _context13.t3 = checkIntegrity;
-              _context13.next = 8;
+              _context14.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_7__["AccountSyncOperation"];
+              _context14.t1 = this.apiService;
+              _context14.t2 = payloads;
+              _context14.t3 = checkIntegrity;
+              _context14.next = 8;
               return regeneratorRuntime.awrap(this.getLastSyncToken());
 
             case 8:
-              _context13.t4 = _context13.sent;
-              _context13.next = 11;
+              _context14.t4 = _context14.sent;
+              _context14.next = 11;
               return regeneratorRuntime.awrap(this.getPaginationToken());
 
             case 11:
-              _context13.t5 = _context13.sent;
+              _context14.t5 = _context14.sent;
 
-              _context13.t6 = function receiver(signal, type) {
+              _context14.t6 = function receiver(signal, type) {
                 var response;
-                return regeneratorRuntime.async(function receiver$(_context12) {
+                return regeneratorRuntime.async(function receiver$(_context13) {
                   while (1) {
-                    switch (_context12.prev = _context12.next) {
+                    switch (_context13.prev = _context13.next) {
                       case 0:
                         if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_RESPONSE"])) {
-                          _context12.next = 11;
+                          _context13.next = 11;
                           break;
                         }
 
                         response = signal;
 
                         if (!response.hasError) {
-                          _context12.next = 7;
+                          _context13.next = 7;
                           break;
                         }
 
-                        _context12.next = 5;
+                        _context13.next = 5;
                         return regeneratorRuntime.awrap(_this7.handleErrorServerResponse({
                           operation: operation,
                           response: response
                         }));
 
                       case 5:
-                        _context12.next = 9;
+                        _context13.next = 9;
                         break;
 
                       case 7:
-                        _context12.next = 9;
+                        _context13.next = 9;
                         return regeneratorRuntime.awrap(_this7.handleSuccessServerResponse({
                           operation: operation,
                           response: response
                         }));
 
                       case 9:
-                        _context12.next = 14;
+                        _context13.next = 14;
                         break;
 
                       case 11:
                         if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_STATUS_CHANGED"])) {
-                          _context12.next = 14;
+                          _context13.next = 14;
                           break;
                         }
 
-                        _context12.next = 14;
+                        _context13.next = 14;
                         return regeneratorRuntime.awrap(_this7.handleStatusChange({
                           operation: operation
                         }));
 
                       case 14:
                       case "end":
-                        return _context12.stop();
+                        return _context13.stop();
                     }
                   }
                 });
               };
 
-              _context13.t7 = {
-                apiService: _context13.t1,
-                payloads: _context13.t2,
-                checkIntegrity: _context13.t3,
-                lastSyncToken: _context13.t4,
-                paginationToken: _context13.t5,
-                receiver: _context13.t6
+              _context14.t7 = {
+                apiService: _context14.t1,
+                payloads: _context14.t2,
+                checkIntegrity: _context14.t3,
+                lastSyncToken: _context14.t4,
+                paginationToken: _context14.t5,
+                receiver: _context14.t6
               };
-              operation = new _context13.t0(_context13.t7);
-              return _context13.abrupt("return", operation);
+              operation = new _context14.t0(_context14.t7);
+              return _context14.abrupt("return", operation);
 
             case 16:
             case "end":
-              return _context13.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -25136,54 +25239,54 @@ function (_SNService) {
       var _this8 = this;
 
       var payloads, operation;
-      return regeneratorRuntime.async(function syncOfflineOperation$(_context15) {
+      return regeneratorRuntime.async(function syncOfflineOperation$(_context16) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
               payloads = _ref5.payloads;
               operation = new _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_8__["OfflineSyncOperation"]({
                 payloads: payloads,
                 receiver: function receiver(signal, type) {
-                  return regeneratorRuntime.async(function receiver$(_context14) {
+                  return regeneratorRuntime.async(function receiver$(_context15) {
                     while (1) {
-                      switch (_context14.prev = _context14.next) {
+                      switch (_context15.prev = _context15.next) {
                         case 0:
                           if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_RESPONSE"])) {
-                            _context14.next = 5;
+                            _context15.next = 5;
                             break;
                           }
 
-                          _context14.next = 3;
+                          _context15.next = 3;
                           return regeneratorRuntime.awrap(_this8.handleOfflineResponse(signal));
 
                         case 3:
-                          _context14.next = 8;
+                          _context15.next = 8;
                           break;
 
                         case 5:
                           if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__["SIGNAL_TYPE_STATUS_CHANGED"])) {
-                            _context14.next = 8;
+                            _context15.next = 8;
                             break;
                           }
 
-                          _context14.next = 8;
+                          _context15.next = 8;
                           return regeneratorRuntime.awrap(_this8.handleStatusChange({
                             operation: operation
                           }));
 
                         case 8:
                         case "end":
-                          return _context14.stop();
+                          return _context15.stop();
                       }
                     }
                   });
                 }
               });
-              return _context15.abrupt("return", operation);
+              return _context16.abrupt("return", operation);
 
             case 3:
             case "end":
-              return _context15.stop();
+              return _context16.stop();
           }
         }
       });
@@ -25192,9 +25295,9 @@ function (_SNService) {
     key: "handleStatusChange",
     value: function handleStatusChange(_ref6) {
       var operation, pendingUploadCount, totalUploadCount, completedUploadCount;
-      return regeneratorRuntime.async(function handleStatusChange$(_context16) {
+      return regeneratorRuntime.async(function handleStatusChange$(_context17) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
               operation = _ref6.operation;
               pendingUploadCount = operaiton.pendingUploadCount();
@@ -25207,7 +25310,7 @@ function (_SNService) {
 
             case 5:
             case "end":
-              return _context16.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -25215,27 +25318,27 @@ function (_SNService) {
   }, {
     key: "handleOfflineResponse",
     value: function handleOfflineResponse(response) {
-      var payloads;
-      return regeneratorRuntime.async(function handleOfflineResponse$(_context17) {
+      var decryptedPayloads;
+      return regeneratorRuntime.async(function handleOfflineResponse$(_context18) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
-              payloads = response.payloads;
-              _context17.next = 3;
+              decryptedPayloads = response.payloads;
+              _context18.next = 3;
               return regeneratorRuntime.awrap(this.persistPayloads({
-                encryptedPayloads: payloads
+                decryptedPayloads: decryptedPayloads
               }));
 
             case 3:
-              _context17.next = 5;
+              _context18.next = 5;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: payloads,
+                payloads: decryptedPayloads,
                 source: PAYLOAD_SOURCE_LOCAL_SAVED
               }));
 
             case 5:
             case "end":
-              return _context17.stop();
+              return _context18.stop();
           }
         }
       }, null, this);
@@ -25244,9 +25347,9 @@ function (_SNService) {
     key: "handleErrorServerResponse",
     value: function handleErrorServerResponse(_ref7) {
       var operation, response;
-      return regeneratorRuntime.async(function handleErrorServerResponse$(_context18) {
+      return regeneratorRuntime.async(function handleErrorServerResponse$(_context19) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               operation = _ref7.operation, response = _ref7.response;
               this.log('Sync Error', response);
@@ -25260,7 +25363,7 @@ function (_SNService) {
 
             case 5:
             case "end":
-              return _context18.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
@@ -25270,18 +25373,18 @@ function (_SNService) {
     value: function handleSuccessServerResponse(_ref8) {
       var operation, response, decryptedPayloads, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, collection, payloadsToPersist, payloadClass, clientHash;
 
-      return regeneratorRuntime.async(function handleSuccessServerResponse$(_context19) {
+      return regeneratorRuntime.async(function handleSuccessServerResponse$(_context20) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
               operation = _ref8.operation, response = _ref8.response;
 
               if (!this._simulate_latency) {
-                _context19.next = 4;
+                _context20.next = 4;
                 break;
               }
 
-              _context19.next = 4;
+              _context20.next = 4;
               return regeneratorRuntime.awrap(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["sleep"])(this._simulate_latency.latency));
 
             case 4:
@@ -25293,72 +25396,72 @@ function (_SNService) {
               _iteratorNormalCompletion4 = true;
               _didIteratorError4 = false;
               _iteratorError4 = undefined;
-              _context19.prev = 12;
+              _context20.prev = 12;
               _iterator4 = response.allProcessedPayloads[Symbol.iterator]();
 
             case 14:
               if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                _context19.next = 25;
+                _context20.next = 25;
                 break;
               }
 
               payload = _step4.value;
 
               if (!(payload.deleted || !payload.fields().includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_10__["ITEM_PAYLOAD_CONTENT"]))) {
-                _context19.next = 18;
+                _context20.next = 18;
                 break;
               }
 
-              return _context19.abrupt("continue", 22);
+              return _context20.abrupt("continue", 22);
 
             case 18:
-              _context19.next = 20;
+              _context20.next = 20;
               return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
                 payload: payload
               }));
 
             case 20:
-              decrypted = _context19.sent;
+              decrypted = _context20.sent;
               decryptedPayloads.push(decrypted);
 
             case 22:
               _iteratorNormalCompletion4 = true;
-              _context19.next = 14;
+              _context20.next = 14;
               break;
 
             case 25:
-              _context19.next = 31;
+              _context20.next = 31;
               break;
 
             case 27:
-              _context19.prev = 27;
-              _context19.t0 = _context19["catch"](12);
+              _context20.prev = 27;
+              _context20.t0 = _context20["catch"](12);
               _didIteratorError4 = true;
-              _iteratorError4 = _context19.t0;
+              _iteratorError4 = _context20.t0;
 
             case 31:
-              _context19.prev = 31;
-              _context19.prev = 32;
+              _context20.prev = 31;
+              _context20.prev = 32;
 
               if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                 _iterator4.return();
               }
 
             case 34:
-              _context19.prev = 34;
+              _context20.prev = 34;
 
               if (!_didIteratorError4) {
-                _context19.next = 37;
+                _context20.next = 37;
                 break;
               }
 
               throw _iteratorError4;
 
             case 37:
-              return _context19.finish(34);
+              return _context20.finish(34);
 
             case 38:
-              return _context19.finish(31);
+              return _context20.finish(31);
 
             case 39:
               masterCollection = this.modelManager.getMasterCollection();
@@ -25368,25 +25471,25 @@ function (_SNService) {
                 payloadsSavedOrSaving: operation.payloadsSavedOrSaving,
                 baseCollection: masterCollection
               });
-              _context19.next = 43;
+              _context20.next = 43;
               return regeneratorRuntime.awrap(resolver.collectionsByProcessingResponse());
 
             case 43:
-              collections = _context19.sent;
+              collections = _context20.sent;
               _iteratorNormalCompletion5 = true;
               _didIteratorError5 = false;
               _iteratorError5 = undefined;
-              _context19.prev = 47;
+              _context20.prev = 47;
               _iterator5 = collections[Symbol.iterator]();
 
             case 49:
               if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context19.next = 61;
+                _context20.next = 61;
                 break;
               }
 
               collection = _step5.value;
-              _context19.next = 53;
+              _context20.next = 53;
               return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
                 collection: collection
               }));
@@ -25405,64 +25508,64 @@ function (_SNService) {
                 payloadsToPersist = collection.allPayloads;
               }
 
-              _context19.next = 58;
+              _context20.next = 58;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 decryptedPayloads: payloadsToPersist
               }));
 
             case 58:
               _iteratorNormalCompletion5 = true;
-              _context19.next = 49;
+              _context20.next = 49;
               break;
 
             case 61:
-              _context19.next = 67;
+              _context20.next = 67;
               break;
 
             case 63:
-              _context19.prev = 63;
-              _context19.t1 = _context19["catch"](47);
+              _context20.prev = 63;
+              _context20.t1 = _context20["catch"](47);
               _didIteratorError5 = true;
-              _iteratorError5 = _context19.t1;
+              _iteratorError5 = _context20.t1;
 
             case 67:
-              _context19.prev = 67;
-              _context19.prev = 68;
+              _context20.prev = 67;
+              _context20.prev = 68;
 
               if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                 _iterator5.return();
               }
 
             case 70:
-              _context19.prev = 70;
+              _context20.prev = 70;
 
               if (!_didIteratorError5) {
-                _context19.next = 73;
+                _context20.next = 73;
                 break;
               }
 
               throw _iteratorError5;
 
             case 73:
-              return _context19.finish(70);
+              return _context20.finish(70);
 
             case 74:
-              return _context19.finish(67);
+              return _context20.finish(67);
 
             case 75:
               this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_9__["SYNC_EVENT_SINGLE_SYNC_COMPLETED"]);
 
               if (!response.checkIntegrity) {
-                _context19.next = 83;
+                _context20.next = 83;
                 break;
               }
 
-              _context19.next = 79;
+              _context20.next = 79;
               return regeneratorRuntime.awrap(this.computeDataIntegrityHash());
 
             case 79:
-              clientHash = _context19.sent;
-              _context19.next = 82;
+              clientHash = _context20.sent;
+              _context20.next = 82;
               return regeneratorRuntime.awrap(this.state.setIntegrityHashes({
                 clientHash: clientHash,
                 serverHash: response.integrityHash
@@ -25480,7 +25583,7 @@ function (_SNService) {
 
             case 84:
             case "end":
-              return _context19.stop();
+              return _context20.stop();
           }
         }
       }, null, this, [[12, 27, 31, 39], [32,, 34, 38], [47, 63, 67, 75], [68,, 70, 74]]);
@@ -25489,9 +25592,9 @@ function (_SNService) {
     key: "handleSyncOperationCompletion",
     value: function handleSyncOperationCompletion(_ref9) {
       var operation;
-      return regeneratorRuntime.async(function handleSyncOperationCompletion$(_context20) {
+      return regeneratorRuntime.async(function handleSyncOperationCompletion$(_context21) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
               operation = _ref9.operation;
               this.opStatus.reset();
@@ -25505,7 +25608,7 @@ function (_SNService) {
 
             case 5:
             case "end":
-              return _context20.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -25513,110 +25616,31 @@ function (_SNService) {
   }, {
     key: "persistPayloads",
     value: function persistPayloads(_ref10) {
-      var _ref10$encryptedPaylo, encryptedPayloads, _ref10$decryptedPaylo, decryptedPayloads, newlyProcessed, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, payload, encrypted, allPayloads;
+      var _ref10$decryptedPaylo, decryptedPayloads;
 
-      return regeneratorRuntime.async(function persistPayloads$(_context21) {
+      return regeneratorRuntime.async(function persistPayloads$(_context22) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
-              _ref10$encryptedPaylo = _ref10.encryptedPayloads, encryptedPayloads = _ref10$encryptedPaylo === void 0 ? [] : _ref10$encryptedPaylo, _ref10$decryptedPaylo = _ref10.decryptedPayloads, decryptedPayloads = _ref10$decryptedPaylo === void 0 ? [] : _ref10$decryptedPaylo;
-              newlyProcessed = [];
-              _iteratorNormalCompletion6 = true;
-              _didIteratorError6 = false;
-              _iteratorError6 = undefined;
-              _context21.prev = 5;
-              _iterator6 = decryptedPayloads[Symbol.iterator]();
+              _ref10$decryptedPaylo = _ref10.decryptedPayloads, decryptedPayloads = _ref10$decryptedPaylo === void 0 ? [] : _ref10$decryptedPaylo;
 
-            case 7:
-              if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                _context21.next = 20;
+              if (!(decryptedPayloads.length === 0)) {
+                _context22.next = 3;
                 break;
               }
 
-              payload = _step6.value;
+              return _context22.abrupt("return");
 
-              if (!payload.discardable) {
-                _context21.next = 13;
-                break;
-              }
+            case 3:
+              _context22.next = 5;
+              return regeneratorRuntime.awrap(this.storageManager.savePayloads(decryptedPayloads));
 
-              /**
-              * StorageManager will remove this payload from its database.
-              */
-              newlyProcessed.push(payload);
-              _context21.next = 17;
-              break;
-
-            case 13:
-              _context21.next = 15;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
-                payload: payload,
-                intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
-              }));
-
-            case 15:
-              encrypted = _context21.sent;
-              newlyProcessed.push(encrypted);
-
-            case 17:
-              _iteratorNormalCompletion6 = true;
-              _context21.next = 7;
-              break;
-
-            case 20:
-              _context21.next = 26;
-              break;
-
-            case 22:
-              _context21.prev = 22;
-              _context21.t0 = _context21["catch"](5);
-              _didIteratorError6 = true;
-              _iteratorError6 = _context21.t0;
-
-            case 26:
-              _context21.prev = 26;
-              _context21.prev = 27;
-
-              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                _iterator6.return();
-              }
-
-            case 29:
-              _context21.prev = 29;
-
-              if (!_didIteratorError6) {
-                _context21.next = 32;
-                break;
-              }
-
-              throw _iteratorError6;
-
-            case 32:
-              return _context21.finish(29);
-
-            case 33:
-              return _context21.finish(26);
-
-            case 34:
-              allPayloads = encryptedPayloads.concat(newlyProcessed);
-
-              if (!(allPayloads.length === 0)) {
-                _context21.next = 37;
-                break;
-              }
-
-              return _context21.abrupt("return");
-
-            case 37:
-              _context21.next = 39;
-              return regeneratorRuntime.awrap(this.storageManager.savePayloads(allPayloads));
-
-            case 39:
+            case 5:
             case "end":
-              return _context21.stop();
+              return _context22.stop();
           }
         }
-      }, null, this, [[5, 22, 26, 34], [27,, 29, 33]]);
+      }, null, this);
     }
     /**
      * Computes a hash of all items updated_at strings joined with a comma.
@@ -25628,11 +25652,11 @@ function (_SNService) {
     key: "computeDataIntegrityHash",
     value: function computeDataIntegrityHash() {
       var items, dates, string;
-      return regeneratorRuntime.async(function computeDataIntegrityHash$(_context22) {
+      return regeneratorRuntime.async(function computeDataIntegrityHash$(_context23) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context23.prev = _context23.next) {
             case 0:
-              _context22.prev = 0;
+              _context23.prev = 0;
               items = this.modelManager.nonDeletedItems.sort(function (a, b) {
                 return b.updated_at - a.updated_at;
               });
@@ -25640,17 +25664,17 @@ function (_SNService) {
                 return item.updatedAtTimestamp();
               });
               string = dates.join(',');
-              return _context22.abrupt("return", this.protocolManager.crypto.sha256(string));
+              return _context23.abrupt("return", this.protocolManager.crypto.sha256(string));
 
             case 7:
-              _context22.prev = 7;
-              _context22.t0 = _context22["catch"](0);
-              console.error("Error computing data integrity hash", _context22.t0);
-              return _context22.abrupt("return", null);
+              _context23.prev = 7;
+              _context23.t0 = _context23["catch"](0);
+              console.error("Error computing data integrity hash", _context23.t0);
+              return _context23.abrupt("return", null);
 
             case 11:
             case "end":
-              return _context22.stop();
+              return _context23.stop();
           }
         }
       }, null, this, [[0, 7]]);
@@ -25658,20 +25682,20 @@ function (_SNService) {
   }, {
     key: "handleSignOut",
     value: function handleSignOut() {
-      return regeneratorRuntime.async(function handleSignOut$(_context23) {
+      return regeneratorRuntime.async(function handleSignOut$(_context24) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context24.prev = _context24.next) {
             case 0:
               this.state.reset();
               this.opStatus.reset();
               this.resolveQueue = [];
               this.spawnQueue = [];
-              _context23.next = 6;
+              _context24.next = 6;
               return regeneratorRuntime.awrap(this.clearSyncPositionTokens());
 
             case 6:
             case "end":
-              return _context23.stop();
+              return _context24.stop();
           }
         }
       }, null, this);
@@ -25682,11 +25706,11 @@ function (_SNService) {
     key: "resolveOutOfSync",
     value: function resolveOutOfSync() {
       var payloads, delta, collection;
-      return regeneratorRuntime.async(function resolveOutOfSync$(_context24) {
+      return regeneratorRuntime.async(function resolveOutOfSync$(_context25) {
         while (1) {
-          switch (_context24.prev = _context24.next) {
+          switch (_context25.prev = _context25.next) {
             case 0:
-              _context24.next = 2;
+              _context25.next = 2;
               return regeneratorRuntime.awrap(_Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
                 apiService: this.apiService,
                 protocolManager: this.protocolManager,
@@ -25694,7 +25718,7 @@ function (_SNService) {
               }));
 
             case 2:
-              payloads = _context24.sent;
+              payloads = _context25.sent;
               delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_12__["DeltaOutOfSync"]({
                 baseCollection: this.modelManager.getMasterCollection(),
                 applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_11__["PayloadCollection"]({
@@ -25702,30 +25726,30 @@ function (_SNService) {
                   source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
                 })
               });
-              _context24.next = 6;
+              _context25.next = 6;
               return regeneratorRuntime.awrap(delta.resultingCollection());
 
             case 6:
-              collection = _context24.sent;
-              _context24.next = 9;
+              collection = _context25.sent;
+              _context25.next = 9;
               return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
                 collection: collection
               }));
 
             case 9:
-              _context24.next = 11;
+              _context25.next = 11;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 decryptedPayloads: collection.payloads
               }));
 
             case 11:
-              return _context24.abrupt("return", this.sync({
+              return _context25.abrupt("return", this.sync({
                 checkIntegrity: true
               }));
 
             case 12:
             case "end":
-              return _context24.stop();
+              return _context25.stop();
           }
         }
       }, null, this);
@@ -25738,31 +25762,31 @@ function (_SNService) {
           customEvent,
           downloader,
           payloads,
-          _args25 = arguments;
+          _args26 = arguments;
 
-      return regeneratorRuntime.async(function stateless_downloadAllItems$(_context25) {
+      return regeneratorRuntime.async(function stateless_downloadAllItems$(_context26) {
         while (1) {
-          switch (_context25.prev = _context25.next) {
+          switch (_context26.prev = _context26.next) {
             case 0:
-              _ref11 = _args25.length > 0 && _args25[0] !== undefined ? _args25[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
+              _ref11 = _args26.length > 0 && _args26[0] !== undefined ? _args26[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
               downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"]({
                 apiService: this.apiService,
                 protocolManager: this.protocolManager,
                 contentType: contentType,
                 customEvent: customEvent
               });
-              _context25.next = 4;
+              _context26.next = 4;
               return regeneratorRuntime.awrap(downloader.run());
 
             case 4:
-              payloads = _context25.sent;
-              return _context25.abrupt("return", payloads.map(function (payload) {
+              payloads = _context26.sent;
+              return _context26.abrupt("return", payloads.map(function (payload) {
                 return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_13__["CreateItemFromPayload"])(payload);
               }));
 
             case 6:
             case "end":
-              return _context25.stop();
+              return _context26.stop();
           }
         }
       }, null, this);

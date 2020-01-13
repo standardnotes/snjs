@@ -25,14 +25,10 @@ describe('offline syncing', () => {
     localStorage.clear();
   })
 
-  it("should sync basic model offline", async function() {
-    const payload = Factory.createStorageItemNotePayload();
-    const items = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [payload]
-    });
-    const item = items[0];
+  it("should sync item with no passcode", async function() {
+    const item = await Factory.createMappedNote(this.application);
     await this.application.modelManager.setItemDirty(item);
-
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(0);
 
@@ -41,7 +37,30 @@ describe('offline syncing', () => {
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
     const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(1);
+
+    const payload = rawPayloads2[0];
+    expect(typeof payload.content).to.equal('object');
   });
+
+  it("should sync item encrypted with passcode", async function() {
+    await this.application.setPasscode('foobar');
+    const item = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(item);
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(2);
+    const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads1.length).to.equal(0);
+
+    await this.application.syncManager.sync()
+
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
+    const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads2.length).to.equal(2);
+
+    const payload = rawPayloads2[0];
+    expect(typeof payload.content).to.equal('string');
+    expect(payload.content.startsWith(this.application.protocolManager.latestVersion())).to.equal(true);
+  });
+
 });
 
 describe.skip('offline deprecated', () => {

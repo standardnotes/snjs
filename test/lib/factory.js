@@ -66,10 +66,10 @@ export default class Factory {
     });
   }
 
-  static async registerUserToApplication({application, email, password}) {
+  static async registerUserToApplication({application, email, password, ephemeral}) {
     if(!email) email = SFItem.GenerateUuidSynchronously();
     if(!password) password = SFItem.GenerateUuidSynchronously();
-    return application.register({email, password});
+    return application.register({email, password, ephemeral});
   }
 
   static createStorageItemPayload(contentType) {
@@ -120,11 +120,12 @@ export default class Factory {
     }
   }
 
-  static async loginToApplication({application, email, password}) {
+  static async loginToApplication({application, email, password, ephemeral}) {
     return application.signIn({
       url: Factory.serverURL(),
       email: email,
-      password: password
+      password: password,
+      ephemeral: ephemeral
     });
   }
 
@@ -187,7 +188,9 @@ export default class Factory {
     ];
   }
 
+  static challengeResponse(correct = true) {
 
+  }
 
   static serverURL() {
     return "http://localhost:3000";

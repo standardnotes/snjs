@@ -417,6 +417,7 @@ describe('online syncing', () => {
 
   it('if server says deleted but client says not deleted, keep server state', async function() {
     const note = await Factory.createMappedNote(this.application);
+    const originalPayload = note.payloadRepresentation();
     this.expectedItemCount++;
     await this.application.modelManager.setItemDirty(note, true);
     await this.application.syncManager.sync(syncOptions);
@@ -433,7 +434,7 @@ describe('online syncing', () => {
     await this.application.syncManager.clearSyncPositionTokens();
     // Add the item back and say it's not deleted
     const mutatedPayload = CreateMaxPayloadFromAnyObject({
-      object: note.payloadRepresentation(),
+      object: originalPayload ,
       override: {
         deleted: false,
         updated_at: Factory.yesterday()
@@ -444,7 +445,7 @@ describe('online syncing', () => {
     })
     const resultNote = this.application.modelManager.findItem(note.uuid);
     expect(resultNote.uuid).to.equal(note.uuid);
-    await this.application.modelManager.setItemDirty(resultNote, true);
+    await this.application.modelManager.setItemDirty(resultNote);
     await this.application.syncManager.sync(syncOptions);
 
     // We expect that this item is now gone for good, and a duplicate has not been created.
@@ -809,10 +810,10 @@ describe('online syncing', () => {
 
     const allItems2 = this.application.modelManager.allItems;
     expect(allItems2.length).to.equal(this.expectedItemCount);
-  }).timeout(20000);
+  }).timeout(30000);
 
   it("should sign in and retrieve large number of items", async function() {
-    const largeItemCount = 1;
+    const largeItemCount = 50;
     await Factory.createManyMappedNotes(this.application, largeItemCount);
     this.expectedItemCount += largeItemCount;
     await this.application.syncManager.sync();
@@ -833,7 +834,7 @@ describe('online syncing', () => {
 
     const items = await this.application.modelManager.allItems;
     expect(items.length).to.equal(this.expectedItemCount);
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('when a note is conflicted, its tags should not be duplicated.', async function() {
     /**
