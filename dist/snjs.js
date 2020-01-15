@@ -4462,6 +4462,10 @@ function () {
       if (this.errorDecrypting) {
         return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT_DUPLICATE_RIGHT"];
       }
+
+      if (this.isSingleton) {
+        return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_5__["CONFLICT_STRATEGY_KEEP_LEFT"];
+      }
       /**
         * The number of seconds in between changes to constitue a
         * subjective measure of what we think is active editing of an item
@@ -12099,7 +12103,7 @@ function (_SNProtocolOperator) {
 
             case 16:
               encryptedItemKey = _context7.sent;
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.uuid), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
+              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
 
             case 18:
             case "end":
@@ -19234,6 +19238,7 @@ function () {
 
     this.timeout = timeout;
     this.mappingObservers = [];
+    this.creationObservers = [];
     this.items = [];
     this.itemsKeys = [];
     this.notes = [];
@@ -19558,7 +19563,7 @@ function () {
   }, {
     key: "mapPayloadsToLocalItems",
     value: function mapPayloadsToLocalItems(_ref9) {
-      var payloads, source, sourceKey, itemsToNotifyObserversOf, processed, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, isCorrupt, item, isDirtyDeleted, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, interestedItem, newCollection;
+      var payloads, source, sourceKey, itemsToNotifyObserversOf, newItems, processed, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, isCorrupt, item, isDirtyDeleted, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, interestedItem, newCollection;
 
       return regeneratorRuntime.async(function mapPayloadsToLocalItems$(_context9) {
         while (1) {
@@ -19566,61 +19571,62 @@ function () {
             case 0:
               payloads = _ref9.payloads, source = _ref9.source, sourceKey = _ref9.sourceKey;
               itemsToNotifyObserversOf = [];
+              newItems = [];
               processed = {};
               /** First loop should process payloads and add items only; no relationship handling. */
 
               _iteratorNormalCompletion3 = true;
               _didIteratorError3 = false;
               _iteratorError3 = undefined;
-              _context9.prev = 6;
+              _context9.prev = 7;
               _iterator3 = payloads[Symbol.iterator]();
 
-            case 8:
+            case 9:
               if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                _context9.next = 39;
+                _context9.next = 40;
                 break;
               }
 
               payload = _step3.value;
 
               if (payload) {
-                _context9.next = 13;
+                _context9.next = 14;
                 break;
               }
 
               console.error("Payload is null");
-              return _context9.abrupt("continue", 36);
+              return _context9.abrupt("continue", 37);
 
-            case 13:
+            case 14:
               if (payload.isPayload) {
-                _context9.next = 15;
+                _context9.next = 16;
                 break;
               }
 
               throw 'Attempting to map non-payload object into local model.';
 
-            case 15:
+            case 16:
               isCorrupt = !payload.content_type || !payload.uuid;
 
               if (!(isCorrupt && !payload.deleted)) {
-                _context9.next = 19;
+                _context9.next = 20;
                 break;
               }
 
               console.error("Payload is corrupt:", payload);
-              return _context9.abrupt("continue", 36);
+              return _context9.abrupt("continue", 37);
 
-            case 19:
+            case 20:
               item = this.findItem(payload.uuid);
               isDirtyDeleted = false;
 
               if (!(payload.deleted === true)) {
-                _context9.next = 33;
+                _context9.next = 34;
                 break;
               }
 
               if (!payload.dirty) {
-                _context9.next = 27;
+                _context9.next = 28;
                 break;
               }
 
@@ -19637,26 +19643,26 @@ function () {
                 item.updateLocalRelationships();
               }
 
-              _context9.next = 33;
+              _context9.next = 34;
               break;
 
-            case 27:
+            case 28:
               if (!item) {
-                _context9.next = 32;
+                _context9.next = 33;
                 break;
               }
 
-              _context9.next = 30;
+              _context9.next = 31;
               return regeneratorRuntime.awrap(this.removeItemLocally(item));
 
-            case 30:
-              _context9.next = 33;
+            case 31:
+              _context9.next = 34;
               break;
 
-            case 32:
-              return _context9.abrupt("continue", 36);
-
             case 33:
+              return _context9.abrupt("continue", 37);
+
+            case 34:
               if (item) {
                 item.updateFromPayload(payload);
                 /** If an item goes through mapping, it can no longer be a dummy. */
@@ -19668,6 +19674,7 @@ function () {
                   items: [item],
                   globalOnly: isDirtyDeleted
                 });
+                newItems.push(item);
               }
               /** Observers do not need to handle items that errored while decrypting. */
 
@@ -19681,53 +19688,53 @@ function () {
                 payload: payload
               };
 
-            case 36:
+            case 37:
               _iteratorNormalCompletion3 = true;
-              _context9.next = 8;
+              _context9.next = 9;
               break;
 
-            case 39:
-              _context9.next = 45;
+            case 40:
+              _context9.next = 46;
               break;
 
-            case 41:
-              _context9.prev = 41;
-              _context9.t0 = _context9["catch"](6);
+            case 42:
+              _context9.prev = 42;
+              _context9.t0 = _context9["catch"](7);
               _didIteratorError3 = true;
               _iteratorError3 = _context9.t0;
 
-            case 45:
-              _context9.prev = 45;
+            case 46:
               _context9.prev = 46;
+              _context9.prev = 47;
 
               if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                 _iterator3.return();
               }
 
-            case 48:
-              _context9.prev = 48;
+            case 49:
+              _context9.prev = 49;
 
               if (!_didIteratorError3) {
-                _context9.next = 51;
+                _context9.next = 52;
                 break;
               }
 
               throw _iteratorError3;
 
-            case 51:
-              return _context9.finish(48);
-
             case 52:
-              return _context9.finish(45);
+              return _context9.finish(49);
 
             case 53:
+              return _context9.finish(46);
+
+            case 54:
               /** Second loop should process references */
               allPayloads = [], allItems = [];
               _i = 0, _Object$keys = Object.keys(processed);
 
-            case 55:
+            case 56:
               if (!(_i < _Object$keys.length)) {
-                _context9.next = 87;
+                _context9.next = 88;
                 break;
               }
 
@@ -19737,69 +19744,69 @@ function () {
               allItems.push(_item);
 
               if (!(_payload.content && !_item.deleted)) {
-                _context9.next = 63;
+                _context9.next = 64;
                 break;
               }
 
-              _context9.next = 63;
+              _context9.next = 64;
               return regeneratorRuntime.awrap(this.resolveReferencesForItem(_item));
 
-            case 63:
+            case 64:
               interestedItems = this.popItemsInterestedInMissingItem({
                 item: _item
               });
               _iteratorNormalCompletion4 = true;
               _didIteratorError4 = false;
               _iteratorError4 = undefined;
-              _context9.prev = 67;
+              _context9.prev = 68;
 
               for (_iterator4 = interestedItems[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                 interestedItem = _step4.value;
                 interestedItem.addItemAsRelationship(_item);
               }
 
-              _context9.next = 75;
+              _context9.next = 76;
               break;
 
-            case 71:
-              _context9.prev = 71;
-              _context9.t1 = _context9["catch"](67);
+            case 72:
+              _context9.prev = 72;
+              _context9.t1 = _context9["catch"](68);
               _didIteratorError4 = true;
               _iteratorError4 = _context9.t1;
 
-            case 75:
-              _context9.prev = 75;
+            case 76:
               _context9.prev = 76;
+              _context9.prev = 77;
 
               if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                 _iterator4.return();
               }
 
-            case 78:
-              _context9.prev = 78;
+            case 79:
+              _context9.prev = 79;
 
               if (!_didIteratorError4) {
-                _context9.next = 81;
+                _context9.next = 82;
                 break;
               }
 
               throw _iteratorError4;
 
-            case 81:
-              return _context9.finish(78);
-
             case 82:
-              return _context9.finish(75);
+              return _context9.finish(79);
 
             case 83:
-              _item.didFinishSyncing();
+              return _context9.finish(76);
 
             case 84:
+              _item.didFinishSyncing();
+
+            case 85:
               _i++;
-              _context9.next = 55;
+              _context9.next = 56;
               break;
 
-            case 87:
+            case 88:
               newCollection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"]({
                 payloads: allItems.map(function (item) {
                   return item.payloadRepresentation();
@@ -19807,18 +19814,22 @@ function () {
                 source: source
               });
               this.masterCollection = this.masterCollection.concat(newCollection);
-              _context9.next = 91;
-              return regeneratorRuntime.awrap(this.notifyMappingObservers(itemsToNotifyObserversOf, source, sourceKey));
-
-            case 91:
-              return _context9.abrupt("return", allItems);
+              _context9.next = 92;
+              return regeneratorRuntime.awrap(this.notifyCreationObservers(newItems, source, sourceKey));
 
             case 92:
+              _context9.next = 94;
+              return regeneratorRuntime.awrap(this.notifyMappingObservers(itemsToNotifyObserversOf, source, sourceKey));
+
+            case 94:
+              return _context9.abrupt("return", allItems);
+
+            case 95:
             case "end":
               return _context9.stop();
           }
         }
-      }, null, this, [[6, 41, 45, 53], [46,, 48, 52], [67, 71, 75, 83], [76,, 78, 82]]);
+      }, null, this, [[7, 42, 46, 54], [47,, 49, 53], [68, 72, 76, 84], [77,, 79, 83]]);
     }
   }, {
     key: "insertItems",
@@ -20037,429 +20048,97 @@ function () {
         }
       }, null, this, [[14, 32, 36, 44], [37,, 39, 43]]);
     }
-    /* Note that this function is public, and can also be called manually (desktopManager uses it) */
+    /**
+     * @observers
+     */
+
+    /* Notifies observers when an item has been created */
 
   }, {
-    key: "notifyMappingObservers",
-    value: function notifyMappingObservers(models, source, sourceKey) {
-      var _this = this;
+    key: "addCreationObserver",
+    value: function addCreationObserver(observer) {
+      this.creationObservers.push(observer);
+      return observer;
+    }
+  }, {
+    key: "removeCreationObserver",
+    value: function removeCreationObserver(observer) {
+      lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.creationObservers, observer);
+    }
+  }, {
+    key: "notifyCreationObservers",
+    value: function notifyCreationObservers(items, source, sourceKey) {
+      var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, observer;
 
-      var observers, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _loop, _iterator7, _step7;
-
-      return regeneratorRuntime.async(function notifyMappingObservers$(_context12) {
+      return regeneratorRuntime.async(function notifyCreationObservers$(_context11) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
-              observers = this.mappingObservers.sort(function (a, b) {
-                return a.priority < b.priority ? -1 : 1;
-              });
               _iteratorNormalCompletion7 = true;
               _didIteratorError7 = false;
               _iteratorError7 = undefined;
-              _context12.prev = 4;
+              _context11.prev = 3;
+              _iterator7 = this.creationObservers[Symbol.iterator]();
 
-              _loop = function _loop() {
-                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, item;
-
-                return regeneratorRuntime.async(function _loop$(_context11) {
-                  while (1) {
-                    switch (_context11.prev = _context11.next) {
-                      case 0:
-                        observer = _step7.value;
-                        allRelevantItems = observer.types.includes('*') ? models : models.filter(function (item) {
-                          return observer.types.includes(item.content_type);
-                        });
-                        validItems = [], deletedItems = [];
-                        _iteratorNormalCompletion8 = true;
-                        _didIteratorError8 = false;
-                        _iteratorError8 = undefined;
-                        _context11.prev = 6;
-
-                        for (_iterator8 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                          item = _step8.value;
-
-                          if (item.deleted) {
-                            deletedItems.push(item);
-                          } else {
-                            validItems.push(item);
-                          }
-                        }
-
-                        _context11.next = 14;
-                        break;
-
-                      case 10:
-                        _context11.prev = 10;
-                        _context11.t0 = _context11["catch"](6);
-                        _didIteratorError8 = true;
-                        _iteratorError8 = _context11.t0;
-
-                      case 14:
-                        _context11.prev = 14;
-                        _context11.prev = 15;
-
-                        if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-                          _iterator8.return();
-                        }
-
-                      case 17:
-                        _context11.prev = 17;
-
-                        if (!_didIteratorError8) {
-                          _context11.next = 20;
-                          break;
-                        }
-
-                        throw _iteratorError8;
-
-                      case 20:
-                        return _context11.finish(17);
-
-                      case 21:
-                        return _context11.finish(14);
-
-                      case 22:
-                        if (!(allRelevantItems.length > 0)) {
-                          _context11.next = 25;
-                          break;
-                        }
-
-                        _context11.next = 25;
-                        return regeneratorRuntime.awrap(_this._callMappingObserver(observer, allRelevantItems, validItems, deletedItems, source, sourceKey));
-
-                      case 25:
-                      case "end":
-                        return _context11.stop();
-                    }
-                  }
-                }, null, null, [[6, 10, 14, 22], [15,, 17, 21]]);
-              };
-
-              _iterator7 = observers[Symbol.iterator]();
-
-            case 7:
+            case 5:
               if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                _context12.next = 13;
+                _context11.next = 12;
                 break;
               }
 
-              _context12.next = 10;
-              return regeneratorRuntime.awrap(_loop());
+              observer = _step7.value;
+              _context11.next = 9;
+              return regeneratorRuntime.awrap(observer.callback({
+                items: items,
+                source: source,
+                sourceKey: sourceKey
+              }));
 
-            case 10:
+            case 9:
               _iteratorNormalCompletion7 = true;
-              _context12.next = 7;
+              _context11.next = 5;
               break;
 
-            case 13:
-              _context12.next = 19;
+            case 12:
+              _context11.next = 18;
               break;
 
-            case 15:
-              _context12.prev = 15;
-              _context12.t0 = _context12["catch"](4);
+            case 14:
+              _context11.prev = 14;
+              _context11.t0 = _context11["catch"](3);
               _didIteratorError7 = true;
-              _iteratorError7 = _context12.t0;
+              _iteratorError7 = _context11.t0;
 
-            case 19:
-              _context12.prev = 19;
-              _context12.prev = 20;
+            case 18:
+              _context11.prev = 18;
+              _context11.prev = 19;
 
               if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
                 _iterator7.return();
               }
 
-            case 22:
-              _context12.prev = 22;
+            case 21:
+              _context11.prev = 21;
 
               if (!_didIteratorError7) {
-                _context12.next = 25;
+                _context11.next = 24;
                 break;
               }
 
               throw _iteratorError7;
 
+            case 24:
+              return _context11.finish(21);
+
             case 25:
-              return _context12.finish(22);
+              return _context11.finish(18);
 
             case 26:
-              return _context12.finish(19);
-
-            case 27:
             case "end":
-              return _context12.stop();
+              return _context11.stop();
           }
         }
-      }, null, this, [[4, 15, 19, 27], [20,, 22, 26]]);
-    }
-  }, {
-    key: "_callMappingObserver",
-    value: function _callMappingObserver(observer, allRelevantItems, validItems, deletedItems, source, sourceKey) {
-      var _this2 = this;
-
-      return regeneratorRuntime.async(function _callMappingObserver$(_context14) {
-        while (1) {
-          switch (_context14.prev = _context14.next) {
-            case 0:
-              return _context14.abrupt("return", new Promise(function (resolve, reject) {
-                _this2.timeout(function _callee() {
-                  return regeneratorRuntime.async(function _callee$(_context13) {
-                    while (1) {
-                      switch (_context13.prev = _context13.next) {
-                        case 0:
-                          _context13.prev = 0;
-                          _context13.next = 3;
-                          return regeneratorRuntime.awrap(observer.callback(allRelevantItems, validItems, deletedItems, source, sourceKey));
-
-                        case 3:
-                          _context13.next = 8;
-                          break;
-
-                        case 5:
-                          _context13.prev = 5;
-                          _context13.t0 = _context13["catch"](0);
-                          console.error("Mapping observer exception", _context13.t0);
-
-                        case 8:
-                          _context13.prev = 8;
-                          resolve();
-                          return _context13.finish(8);
-
-                        case 11:
-                        case "end":
-                          return _context13.stop();
-                      }
-                    }
-                  }, null, null, [[0, 5, 8, 11]]);
-                });
-              }));
-
-            case 1:
-            case "end":
-              return _context14.stop();
-          }
-        }
-      });
-    }
-    /**
-     * When a client sets an item as dirty, it means its values has changed,
-     * and everyone should know about it. Particularly extensions. For example,
-     * if you edit the title of a note, extensions won't be notified until
-     * the save sync completes. With this, they'll be notified immediately.
-     */
-
-  }, {
-    key: "setItemDirty",
-    value: function setItemDirty(item) {
-      var dirty,
-          updateClientDate,
-          source,
-          sourceKey,
-          _args15 = arguments;
-      return regeneratorRuntime.async(function setItemDirty$(_context15) {
-        while (1) {
-          switch (_context15.prev = _context15.next) {
-            case 0:
-              dirty = _args15.length > 1 && _args15[1] !== undefined ? _args15[1] : true;
-              updateClientDate = _args15.length > 2 ? _args15[2] : undefined;
-              source = _args15.length > 3 ? _args15[3] : undefined;
-              sourceKey = _args15.length > 4 ? _args15[4] : undefined;
-              return _context15.abrupt("return", this.setItemsDirty([item], dirty, updateClientDate, source, sourceKey));
-
-            case 5:
-            case "end":
-              return _context15.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "setItemsDirty",
-    value: function setItemsDirty(items) {
-      var dirty,
-          updateClientDate,
-          source,
-          sourceKey,
-          _iteratorNormalCompletion9,
-          _didIteratorError9,
-          _iteratorError9,
-          _iterator9,
-          _step9,
-          item,
-          _args16 = arguments;
-
-      return regeneratorRuntime.async(function setItemsDirty$(_context16) {
-        while (1) {
-          switch (_context16.prev = _context16.next) {
-            case 0:
-              dirty = _args16.length > 1 && _args16[1] !== undefined ? _args16[1] : true;
-              updateClientDate = _args16.length > 2 ? _args16[2] : undefined;
-              source = _args16.length > 3 ? _args16[3] : undefined;
-              sourceKey = _args16.length > 4 ? _args16[4] : undefined;
-              _iteratorNormalCompletion9 = true;
-              _didIteratorError9 = false;
-              _iteratorError9 = undefined;
-              _context16.prev = 7;
-
-              for (_iterator9 = items[Symbol.iterator](); !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                item = _step9.value;
-                item.setDirty({
-                  dirty: dirty,
-                  updateClientDate: updateClientDate,
-                  authorized: true
-                });
-              }
-
-              _context16.next = 15;
-              break;
-
-            case 11:
-              _context16.prev = 11;
-              _context16.t0 = _context16["catch"](7);
-              _didIteratorError9 = true;
-              _iteratorError9 = _context16.t0;
-
-            case 15:
-              _context16.prev = 15;
-              _context16.prev = 16;
-
-              if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
-                _iterator9.return();
-              }
-
-            case 18:
-              _context16.prev = 18;
-
-              if (!_didIteratorError9) {
-                _context16.next = 21;
-                break;
-              }
-
-              throw _iteratorError9;
-
-            case 21:
-              return _context16.finish(18);
-
-            case 22:
-              return _context16.finish(15);
-
-            case 23:
-              return _context16.abrupt("return", this.mapItems({
-                items: items,
-                source: source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_11__["PAYLOAD_SOURCE_LOCAL_DIRTIED"],
-                sourceKey: sourceKey
-              }));
-
-            case 24:
-            case "end":
-              return _context16.stop();
-          }
-        }
-      }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
-    }
-  }, {
-    key: "duplicateItem",
-    value: function duplicateItem(_ref13) {
-      var item, isConflict, payload, payloads, results, copy;
-      return regeneratorRuntime.async(function duplicateItem$(_context17) {
-        while (1) {
-          switch (_context17.prev = _context17.next) {
-            case 0:
-              item = _ref13.item, isConflict = _ref13.isConflict;
-
-              if (item.isItem) {
-                _context17.next = 3;
-                break;
-              }
-
-              throw 'Attempting to duplicate non-item object.';
-
-            case 3:
-              payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
-                object: item
-              });
-              _context17.next = 6;
-              return regeneratorRuntime.awrap(Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_8__["PayloadsByDuplicating"])({
-                payload: payload,
-                baseCollection: this.getMasterCollection(),
-                isConflict: isConflict
-              }));
-
-            case 6:
-              payloads = _context17.sent;
-              _context17.next = 9;
-              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
-                payloads: payloads
-              }));
-
-            case 9:
-              results = _context17.sent;
-              copy = results.find(function (p) {
-                return p.uuid === payloads[0].uuid;
-              });
-              return _context17.abrupt("return", copy);
-
-            case 12:
-            case "end":
-              return _context17.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
-     * Adds items to model management.
-     * @param globalOnly  Whether the item should only be added to main .items
-     *                    array, and not individual item arrays like .notes,
-     *                    .tags, .components, etc.
-     */
-
-  }, {
-    key: "addItem",
-    value: function addItem(item) {
-      var globalOnly,
-          _args18 = arguments;
-      return regeneratorRuntime.async(function addItem$(_context18) {
-        while (1) {
-          switch (_context18.prev = _context18.next) {
-            case 0:
-              globalOnly = _args18.length > 1 && _args18[1] !== undefined ? _args18[1] : false;
-              return _context18.abrupt("return", this.addItems([item], globalOnly));
-
-            case 2:
-            case "end":
-              return _context18.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "addItems",
-    value: function addItems(items) {
-      var globalOnly,
-          payloads,
-          _args19 = arguments;
-      return regeneratorRuntime.async(function addItems$(_context19) {
-        while (1) {
-          switch (_context19.prev = _context19.next) {
-            case 0:
-              globalOnly = _args19.length > 1 && _args19[1] !== undefined ? _args19[1] : false;
-              console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
-              payloads = items.map(function (item) {
-                return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
-                  object: item
-                });
-              });
-              _context19.next = 5;
-              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
-                payloads: payloads
-              }));
-
-            case 5:
-            case "end":
-              return _context19.stop();
-          }
-        }
-      }, null, this);
+      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }
     /* Notifies observers when an item has been mapped from */
 
@@ -20475,11 +20154,11 @@ function () {
     }
   }, {
     key: "addMappingObserverWithPriority",
-    value: function addMappingObserverWithPriority(_ref14) {
-      var id = _ref14.id,
-          priority = _ref14.priority,
-          types = _ref14.types,
-          callback = _ref14.callback;
+    value: function addMappingObserverWithPriority(_ref13) {
+      var id = _ref13.id,
+          priority = _ref13.priority,
+          types = _ref13.types,
+          callback = _ref13.callback;
 
       if (!Array.isArray(types)) {
         types = [types];
@@ -20499,6 +20178,430 @@ function () {
         id: id
       }));
     }
+    /* Note that this function is public, and can also be called manually (desktopManager uses it) */
+
+  }, {
+    key: "notifyMappingObservers",
+    value: function notifyMappingObservers(items, source, sourceKey) {
+      var _this = this;
+
+      var observers, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _loop, _iterator8, _step8;
+
+      return regeneratorRuntime.async(function notifyMappingObservers$(_context13) {
+        while (1) {
+          switch (_context13.prev = _context13.next) {
+            case 0:
+              observers = this.mappingObservers.sort(function (a, b) {
+                return a.priority < b.priority ? -1 : 1;
+              });
+              _iteratorNormalCompletion8 = true;
+              _didIteratorError8 = false;
+              _iteratorError8 = undefined;
+              _context13.prev = 4;
+
+              _loop = function _loop() {
+                var observer, allRelevantItems, validItems, deletedItems, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, item;
+
+                return regeneratorRuntime.async(function _loop$(_context12) {
+                  while (1) {
+                    switch (_context12.prev = _context12.next) {
+                      case 0:
+                        observer = _step8.value;
+                        allRelevantItems = observer.types.includes('*') ? items : items.filter(function (item) {
+                          return observer.types.includes(item.content_type);
+                        });
+                        validItems = [], deletedItems = [];
+                        _iteratorNormalCompletion9 = true;
+                        _didIteratorError9 = false;
+                        _iteratorError9 = undefined;
+                        _context12.prev = 6;
+
+                        for (_iterator9 = allRelevantItems[Symbol.iterator](); !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                          item = _step9.value;
+
+                          if (item.deleted) {
+                            deletedItems.push(item);
+                          } else {
+                            validItems.push(item);
+                          }
+                        }
+
+                        _context12.next = 14;
+                        break;
+
+                      case 10:
+                        _context12.prev = 10;
+                        _context12.t0 = _context12["catch"](6);
+                        _didIteratorError9 = true;
+                        _iteratorError9 = _context12.t0;
+
+                      case 14:
+                        _context12.prev = 14;
+                        _context12.prev = 15;
+
+                        if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
+                          _iterator9.return();
+                        }
+
+                      case 17:
+                        _context12.prev = 17;
+
+                        if (!_didIteratorError9) {
+                          _context12.next = 20;
+                          break;
+                        }
+
+                        throw _iteratorError9;
+
+                      case 20:
+                        return _context12.finish(17);
+
+                      case 21:
+                        return _context12.finish(14);
+
+                      case 22:
+                        if (!(allRelevantItems.length > 0)) {
+                          _context12.next = 25;
+                          break;
+                        }
+
+                        _context12.next = 25;
+                        return regeneratorRuntime.awrap(_this._callMappingObserver(observer, allRelevantItems, validItems, deletedItems, source, sourceKey));
+
+                      case 25:
+                      case "end":
+                        return _context12.stop();
+                    }
+                  }
+                }, null, null, [[6, 10, 14, 22], [15,, 17, 21]]);
+              };
+
+              _iterator8 = observers[Symbol.iterator]();
+
+            case 7:
+              if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
+                _context13.next = 13;
+                break;
+              }
+
+              _context13.next = 10;
+              return regeneratorRuntime.awrap(_loop());
+
+            case 10:
+              _iteratorNormalCompletion8 = true;
+              _context13.next = 7;
+              break;
+
+            case 13:
+              _context13.next = 19;
+              break;
+
+            case 15:
+              _context13.prev = 15;
+              _context13.t0 = _context13["catch"](4);
+              _didIteratorError8 = true;
+              _iteratorError8 = _context13.t0;
+
+            case 19:
+              _context13.prev = 19;
+              _context13.prev = 20;
+
+              if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+                _iterator8.return();
+              }
+
+            case 22:
+              _context13.prev = 22;
+
+              if (!_didIteratorError8) {
+                _context13.next = 25;
+                break;
+              }
+
+              throw _iteratorError8;
+
+            case 25:
+              return _context13.finish(22);
+
+            case 26:
+              return _context13.finish(19);
+
+            case 27:
+            case "end":
+              return _context13.stop();
+          }
+        }
+      }, null, this, [[4, 15, 19, 27], [20,, 22, 26]]);
+    }
+  }, {
+    key: "_callMappingObserver",
+    value: function _callMappingObserver(observer, allRelevantItems, validItems, deletedItems, source, sourceKey) {
+      var _this2 = this;
+
+      return regeneratorRuntime.async(function _callMappingObserver$(_context15) {
+        while (1) {
+          switch (_context15.prev = _context15.next) {
+            case 0:
+              return _context15.abrupt("return", new Promise(function (resolve, reject) {
+                _this2.timeout(function _callee() {
+                  return regeneratorRuntime.async(function _callee$(_context14) {
+                    while (1) {
+                      switch (_context14.prev = _context14.next) {
+                        case 0:
+                          _context14.prev = 0;
+                          _context14.next = 3;
+                          return regeneratorRuntime.awrap(observer.callback(allRelevantItems, validItems, deletedItems, source, sourceKey));
+
+                        case 3:
+                          _context14.next = 8;
+                          break;
+
+                        case 5:
+                          _context14.prev = 5;
+                          _context14.t0 = _context14["catch"](0);
+                          console.error("Mapping observer exception", _context14.t0);
+
+                        case 8:
+                          _context14.prev = 8;
+                          resolve();
+                          return _context14.finish(8);
+
+                        case 11:
+                        case "end":
+                          return _context14.stop();
+                      }
+                    }
+                  }, null, null, [[0, 5, 8, 11]]);
+                });
+              }));
+
+            case 1:
+            case "end":
+              return _context15.stop();
+          }
+        }
+      });
+    }
+    /**
+     * When a client sets an item as dirty, it means its values has changed,
+     * and everyone should know about it. Particularly extensions. For example,
+     * if you edit the title of a note, extensions won't be notified until
+     * the save sync completes. With this, they'll be notified immediately.
+     */
+
+  }, {
+    key: "setItemDirty",
+    value: function setItemDirty(item) {
+      var dirty,
+          updateClientDate,
+          source,
+          sourceKey,
+          _args16 = arguments;
+      return regeneratorRuntime.async(function setItemDirty$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              dirty = _args16.length > 1 && _args16[1] !== undefined ? _args16[1] : true;
+              updateClientDate = _args16.length > 2 ? _args16[2] : undefined;
+              source = _args16.length > 3 ? _args16[3] : undefined;
+              sourceKey = _args16.length > 4 ? _args16[4] : undefined;
+              return _context16.abrupt("return", this.setItemsDirty([item], dirty, updateClientDate, source, sourceKey));
+
+            case 5:
+            case "end":
+              return _context16.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "setItemsDirty",
+    value: function setItemsDirty(items) {
+      var dirty,
+          updateClientDate,
+          source,
+          sourceKey,
+          _iteratorNormalCompletion10,
+          _didIteratorError10,
+          _iteratorError10,
+          _iterator10,
+          _step10,
+          item,
+          _args17 = arguments;
+
+      return regeneratorRuntime.async(function setItemsDirty$(_context17) {
+        while (1) {
+          switch (_context17.prev = _context17.next) {
+            case 0:
+              dirty = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : true;
+              updateClientDate = _args17.length > 2 ? _args17[2] : undefined;
+              source = _args17.length > 3 ? _args17[3] : undefined;
+              sourceKey = _args17.length > 4 ? _args17[4] : undefined;
+              _iteratorNormalCompletion10 = true;
+              _didIteratorError10 = false;
+              _iteratorError10 = undefined;
+              _context17.prev = 7;
+
+              for (_iterator10 = items[Symbol.iterator](); !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                item = _step10.value;
+                item.setDirty({
+                  dirty: dirty,
+                  updateClientDate: updateClientDate,
+                  authorized: true
+                });
+              }
+
+              _context17.next = 15;
+              break;
+
+            case 11:
+              _context17.prev = 11;
+              _context17.t0 = _context17["catch"](7);
+              _didIteratorError10 = true;
+              _iteratorError10 = _context17.t0;
+
+            case 15:
+              _context17.prev = 15;
+              _context17.prev = 16;
+
+              if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
+                _iterator10.return();
+              }
+
+            case 18:
+              _context17.prev = 18;
+
+              if (!_didIteratorError10) {
+                _context17.next = 21;
+                break;
+              }
+
+              throw _iteratorError10;
+
+            case 21:
+              return _context17.finish(18);
+
+            case 22:
+              return _context17.finish(15);
+
+            case 23:
+              return _context17.abrupt("return", this.mapItems({
+                items: items,
+                source: source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_11__["PAYLOAD_SOURCE_LOCAL_DIRTIED"],
+                sourceKey: sourceKey
+              }));
+
+            case 24:
+            case "end":
+              return _context17.stop();
+          }
+        }
+      }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+    }
+  }, {
+    key: "duplicateItem",
+    value: function duplicateItem(_ref14) {
+      var item, isConflict, payload, payloads, results, copy;
+      return regeneratorRuntime.async(function duplicateItem$(_context18) {
+        while (1) {
+          switch (_context18.prev = _context18.next) {
+            case 0:
+              item = _ref14.item, isConflict = _ref14.isConflict;
+
+              if (item.isItem) {
+                _context18.next = 3;
+                break;
+              }
+
+              throw 'Attempting to duplicate non-item object.';
+
+            case 3:
+              payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
+                object: item
+              });
+              _context18.next = 6;
+              return regeneratorRuntime.awrap(Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_8__["PayloadsByDuplicating"])({
+                payload: payload,
+                baseCollection: this.getMasterCollection(),
+                isConflict: isConflict
+              }));
+
+            case 6:
+              payloads = _context18.sent;
+              _context18.next = 9;
+              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
+                payloads: payloads
+              }));
+
+            case 9:
+              results = _context18.sent;
+              copy = results.find(function (p) {
+                return p.uuid === payloads[0].uuid;
+              });
+              return _context18.abrupt("return", copy);
+
+            case 12:
+            case "end":
+              return _context18.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Adds items to model management.
+     * @param globalOnly  Whether the item should only be added to main .items
+     *                    array, and not individual item arrays like .notes,
+     *                    .tags, .components, etc.
+     */
+
+  }, {
+    key: "addItem",
+    value: function addItem(item) {
+      var globalOnly,
+          _args19 = arguments;
+      return regeneratorRuntime.async(function addItem$(_context19) {
+        while (1) {
+          switch (_context19.prev = _context19.next) {
+            case 0:
+              globalOnly = _args19.length > 1 && _args19[1] !== undefined ? _args19[1] : false;
+              return _context19.abrupt("return", this.addItems([item], globalOnly));
+
+            case 2:
+            case "end":
+              return _context19.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "addItems",
+    value: function addItems(items) {
+      var globalOnly,
+          payloads,
+          _args20 = arguments;
+      return regeneratorRuntime.async(function addItems$(_context20) {
+        while (1) {
+          switch (_context20.prev = _context20.next) {
+            case 0:
+              globalOnly = _args20.length > 1 && _args20[1] !== undefined ? _args20[1] : false;
+              console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
+              payloads = items.map(function (item) {
+                return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
+                  object: item
+                });
+              });
+              _context20.next = 5;
+              return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
+                payloads: payloads
+              }));
+
+            case 5:
+            case "end":
+              return _context20.stop();
+          }
+        }
+      }, null, this);
+    }
   }, {
     key: "getDirtyItems",
     value: function getDirtyItems() {
@@ -20511,15 +20614,15 @@ function () {
   }, {
     key: "clearDirtyItems",
     value: function clearDirtyItems(items) {
-      return regeneratorRuntime.async(function clearDirtyItems$(_context20) {
+      return regeneratorRuntime.async(function clearDirtyItems$(_context21) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
-              return _context20.abrupt("return", this.setItemsDirty(items, false));
+              return _context21.abrupt("return", this.setItemsDirty(items, false));
 
             case 1:
             case "end":
-              return _context20.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -20527,154 +20630,154 @@ function () {
   }, {
     key: "removeAndDirtyAllRelationshipsForItem",
     value: function removeAndDirtyAllRelationshipsForItem(item) {
-      var _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, reference, relationship, referencingItems, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, _item2;
+      var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, reference, relationship, referencingItems, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, _item2;
 
-      return regeneratorRuntime.async(function removeAndDirtyAllRelationshipsForItem$(_context21) {
+      return regeneratorRuntime.async(function removeAndDirtyAllRelationshipsForItem$(_context22) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
               if (item.errorDecrypting) {
-                _context21.next = 32;
+                _context22.next = 32;
                 break;
               }
 
-              _iteratorNormalCompletion10 = true;
-              _didIteratorError10 = false;
-              _iteratorError10 = undefined;
-              _context21.prev = 4;
-              _iterator10 = item.content.references[Symbol.iterator]();
+              _iteratorNormalCompletion11 = true;
+              _didIteratorError11 = false;
+              _iteratorError11 = undefined;
+              _context22.prev = 4;
+              _iterator11 = item.content.references[Symbol.iterator]();
 
             case 6:
-              if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
-                _context21.next = 18;
+              if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                _context22.next = 18;
                 break;
               }
 
-              reference = _step10.value;
+              reference = _step11.value;
               relationship = this.findItem(reference.uuid);
 
               if (!relationship) {
-                _context21.next = 15;
+                _context22.next = 15;
                 break;
               }
 
               item.removeItemAsRelationship(relationship);
 
               if (!relationship.hasRelationshipWithItem(item)) {
-                _context21.next = 15;
+                _context22.next = 15;
                 break;
               }
 
               relationship.removeItemAsRelationship(item);
-              _context21.next = 15;
+              _context22.next = 15;
               return regeneratorRuntime.awrap(this.setItemDirty(relationship, true));
 
             case 15:
-              _iteratorNormalCompletion10 = true;
-              _context21.next = 6;
+              _iteratorNormalCompletion11 = true;
+              _context22.next = 6;
               break;
 
             case 18:
-              _context21.next = 24;
+              _context22.next = 24;
               break;
 
             case 20:
-              _context21.prev = 20;
-              _context21.t0 = _context21["catch"](4);
-              _didIteratorError10 = true;
-              _iteratorError10 = _context21.t0;
+              _context22.prev = 20;
+              _context22.t0 = _context22["catch"](4);
+              _didIteratorError11 = true;
+              _iteratorError11 = _context22.t0;
 
             case 24:
-              _context21.prev = 24;
-              _context21.prev = 25;
-
-              if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
-                _iterator10.return();
-              }
-
-            case 27:
-              _context21.prev = 27;
-
-              if (!_didIteratorError10) {
-                _context21.next = 30;
-                break;
-              }
-
-              throw _iteratorError10;
-
-            case 30:
-              return _context21.finish(27);
-
-            case 31:
-              return _context21.finish(24);
-
-            case 32:
-              /** Handle indirect relationships */
-              referencingItems = item.allReferencingItems;
-              _iteratorNormalCompletion11 = true;
-              _didIteratorError11 = false;
-              _iteratorError11 = undefined;
-              _context21.prev = 36;
-              _iterator11 = referencingItems[Symbol.iterator]();
-
-            case 38:
-              if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
-                _context21.next = 46;
-                break;
-              }
-
-              _item2 = _step11.value;
-
-              _item2.removeItemAsRelationship(_item2);
-
-              _context21.next = 43;
-              return regeneratorRuntime.awrap(this.setItemDirty(_item2, true));
-
-            case 43:
-              _iteratorNormalCompletion11 = true;
-              _context21.next = 38;
-              break;
-
-            case 46:
-              _context21.next = 52;
-              break;
-
-            case 48:
-              _context21.prev = 48;
-              _context21.t1 = _context21["catch"](36);
-              _didIteratorError11 = true;
-              _iteratorError11 = _context21.t1;
-
-            case 52:
-              _context21.prev = 52;
-              _context21.prev = 53;
+              _context22.prev = 24;
+              _context22.prev = 25;
 
               if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
                 _iterator11.return();
               }
 
-            case 55:
-              _context21.prev = 55;
+            case 27:
+              _context22.prev = 27;
 
               if (!_didIteratorError11) {
-                _context21.next = 58;
+                _context22.next = 30;
                 break;
               }
 
               throw _iteratorError11;
 
+            case 30:
+              return _context22.finish(27);
+
+            case 31:
+              return _context22.finish(24);
+
+            case 32:
+              /** Handle indirect relationships */
+              referencingItems = item.allReferencingItems;
+              _iteratorNormalCompletion12 = true;
+              _didIteratorError12 = false;
+              _iteratorError12 = undefined;
+              _context22.prev = 36;
+              _iterator12 = referencingItems[Symbol.iterator]();
+
+            case 38:
+              if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
+                _context22.next = 46;
+                break;
+              }
+
+              _item2 = _step12.value;
+
+              _item2.removeItemAsRelationship(_item2);
+
+              _context22.next = 43;
+              return regeneratorRuntime.awrap(this.setItemDirty(_item2, true));
+
+            case 43:
+              _iteratorNormalCompletion12 = true;
+              _context22.next = 38;
+              break;
+
+            case 46:
+              _context22.next = 52;
+              break;
+
+            case 48:
+              _context22.prev = 48;
+              _context22.t1 = _context22["catch"](36);
+              _didIteratorError12 = true;
+              _iteratorError12 = _context22.t1;
+
+            case 52:
+              _context22.prev = 52;
+              _context22.prev = 53;
+
+              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
+                _iterator12.return();
+              }
+
+            case 55:
+              _context22.prev = 55;
+
+              if (!_didIteratorError12) {
+                _context22.next = 58;
+                break;
+              }
+
+              throw _iteratorError12;
+
             case 58:
-              return _context21.finish(55);
+              return _context22.finish(55);
 
             case 59:
-              return _context21.finish(52);
+              return _context22.finish(52);
 
             case 60:
               item.resetLocalReferencePointers();
 
             case 61:
             case "end":
-              return _context21.stop();
+              return _context22.stop();
           }
         }
       }, null, this, [[4, 20, 24, 32], [25,, 27, 31], [36, 48, 52, 60], [53,, 55, 59]]);
@@ -20685,46 +20788,15 @@ function () {
     key: "setAllItemsDirty",
     value: function setAllItemsDirty() {
       var relevantItems;
-      return regeneratorRuntime.async(function setAllItemsDirty$(_context22) {
-        while (1) {
-          switch (_context22.prev = _context22.next) {
-            case 0:
-              relevantItems = this.allItems;
-              _context22.next = 3;
-              return regeneratorRuntime.awrap(this.setItemsDirty(relevantItems, true));
-
-            case 3:
-            case "end":
-              return _context22.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "setItemToBeDeleted",
-    value: function setItemToBeDeleted(item) {
-      return regeneratorRuntime.async(function setItemToBeDeleted$(_context23) {
+      return regeneratorRuntime.async(function setAllItemsDirty$(_context23) {
         while (1) {
           switch (_context23.prev = _context23.next) {
             case 0:
-              item.deleted = true;
+              relevantItems = this.allItems;
+              _context23.next = 3;
+              return regeneratorRuntime.awrap(this.setItemsDirty(relevantItems, true));
 
-              if (item.dummy) {
-                _context23.next = 4;
-                break;
-              }
-
-              _context23.next = 4;
-              return regeneratorRuntime.awrap(this.setItemDirty(item, true));
-
-            case 4:
-              _context23.next = 6;
-              return regeneratorRuntime.awrap(this.removeAndDirtyAllRelationshipsForItem(item));
-
-            case 6:
-              this.removeItemFromRespectiveArray(item);
-
-            case 7:
+            case 3:
             case "end":
               return _context23.stop();
           }
@@ -20732,72 +20804,103 @@ function () {
       }, null, this);
     }
   }, {
-    key: "setItemsToBeDeleted",
-    value: function setItemsToBeDeleted(items) {
-      var _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, item;
-
-      return regeneratorRuntime.async(function setItemsToBeDeleted$(_context24) {
+    key: "setItemToBeDeleted",
+    value: function setItemToBeDeleted(item) {
+      return regeneratorRuntime.async(function setItemToBeDeleted$(_context24) {
         while (1) {
           switch (_context24.prev = _context24.next) {
             case 0:
-              _iteratorNormalCompletion12 = true;
-              _didIteratorError12 = false;
-              _iteratorError12 = undefined;
-              _context24.prev = 3;
-              _iterator12 = items[Symbol.iterator]();
+              item.deleted = true;
 
-            case 5:
-              if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
-                _context24.next = 12;
+              if (item.dummy) {
+                _context24.next = 4;
                 break;
               }
 
-              item = _step12.value;
-              _context24.next = 9;
+              _context24.next = 4;
+              return regeneratorRuntime.awrap(this.setItemDirty(item, true));
+
+            case 4:
+              _context24.next = 6;
+              return regeneratorRuntime.awrap(this.removeAndDirtyAllRelationshipsForItem(item));
+
+            case 6:
+              this.removeItemFromRespectiveArray(item);
+
+            case 7:
+            case "end":
+              return _context24.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "setItemsToBeDeleted",
+    value: function setItemsToBeDeleted(items) {
+      var _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, item;
+
+      return regeneratorRuntime.async(function setItemsToBeDeleted$(_context25) {
+        while (1) {
+          switch (_context25.prev = _context25.next) {
+            case 0:
+              _iteratorNormalCompletion13 = true;
+              _didIteratorError13 = false;
+              _iteratorError13 = undefined;
+              _context25.prev = 3;
+              _iterator13 = items[Symbol.iterator]();
+
+            case 5:
+              if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
+                _context25.next = 12;
+                break;
+              }
+
+              item = _step13.value;
+              _context25.next = 9;
               return regeneratorRuntime.awrap(this.setItemToBeDeleted(item));
 
             case 9:
-              _iteratorNormalCompletion12 = true;
-              _context24.next = 5;
+              _iteratorNormalCompletion13 = true;
+              _context25.next = 5;
               break;
 
             case 12:
-              _context24.next = 18;
+              _context25.next = 18;
               break;
 
             case 14:
-              _context24.prev = 14;
-              _context24.t0 = _context24["catch"](3);
-              _didIteratorError12 = true;
-              _iteratorError12 = _context24.t0;
+              _context25.prev = 14;
+              _context25.t0 = _context25["catch"](3);
+              _didIteratorError13 = true;
+              _iteratorError13 = _context25.t0;
 
             case 18:
-              _context24.prev = 18;
-              _context24.prev = 19;
+              _context25.prev = 18;
+              _context25.prev = 19;
 
-              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
-                _iterator12.return();
+              if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
+                _iterator13.return();
               }
 
             case 21:
-              _context24.prev = 21;
+              _context25.prev = 21;
 
-              if (!_didIteratorError12) {
-                _context24.next = 24;
+              if (!_didIteratorError13) {
+                _context25.next = 24;
                 break;
               }
 
-              throw _iteratorError12;
+              throw _iteratorError13;
 
             case 24:
-              return _context24.finish(21);
+              return _context25.finish(21);
 
             case 25:
-              return _context24.finish(18);
+              return _context25.finish(18);
 
             case 26:
             case "end":
-              return _context24.stop();
+              return _context25.stop();
           }
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -20805,9 +20908,9 @@ function () {
   }, {
     key: "removeItemLocally",
     value: function removeItemLocally(item) {
-      return regeneratorRuntime.async(function removeItemLocally$(_context25) {
+      return regeneratorRuntime.async(function removeItemLocally$(_context26) {
         while (1) {
-          switch (_context25.prev = _context25.next) {
+          switch (_context26.prev = _context26.next) {
             case 0:
               lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.items, {
                 uuid: item.uuid
@@ -20818,7 +20921,7 @@ function () {
 
             case 4:
             case "end":
-              return _context25.stop();
+              return _context26.stop();
           }
         }
       }, null, this);
@@ -20848,12 +20951,12 @@ function () {
     key: "alternateUuidForItem",
     value: function alternateUuidForItem(item) {
       var payload, results, mapped;
-      return regeneratorRuntime.async(function alternateUuidForItem$(_context26) {
+      return regeneratorRuntime.async(function alternateUuidForItem$(_context27) {
         while (1) {
-          switch (_context26.prev = _context26.next) {
+          switch (_context27.prev = _context27.next) {
             case 0:
               if (item.isItem) {
-                _context26.next = 2;
+                _context27.next = 2;
                 break;
               }
 
@@ -20863,27 +20966,27 @@ function () {
               payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
                 object: item
               });
-              _context26.next = 5;
+              _context27.next = 5;
               return regeneratorRuntime.awrap(Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_8__["PayloadsByAlternatingUuid"])({
                 payload: payload,
                 baseCollection: this.getMasterCollection()
               }));
 
             case 5:
-              results = _context26.sent;
-              _context26.next = 8;
+              results = _context27.sent;
+              _context27.next = 8;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: results,
                 source: PAYLOAD_SOURCE_LOCAL_SAVED
               }));
 
             case 8:
-              mapped = _context26.sent;
-              return _context26.abrupt("return", mapped[0]);
+              mapped = _context27.sent;
+              return _context27.abrupt("return", mapped[0]);
 
             case 10:
             case "end":
-              return _context26.stop();
+              return _context27.stop();
           }
         }
       }, null, this);
@@ -20926,13 +21029,13 @@ function () {
     value: function findItems(ids) {
       var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var results = [];
-      var _iteratorNormalCompletion13 = true;
-      var _didIteratorError13 = false;
-      var _iteratorError13 = undefined;
+      var _iteratorNormalCompletion14 = true;
+      var _didIteratorError14 = false;
+      var _iteratorError14 = undefined;
 
       try {
-        for (var _iterator13 = ids[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-          var id = _step13.value;
+        for (var _iterator14 = ids[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+          var id = _step14.value;
           var item = this.itemsHash[id];
 
           if (item || includeBlanks) {
@@ -20940,16 +21043,16 @@ function () {
           }
         }
       } catch (err) {
-        _didIteratorError13 = true;
-        _iteratorError13 = err;
+        _didIteratorError14 = true;
+        _iteratorError14 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
-            _iterator13.return();
+          if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
+            _iterator14.return();
           }
         } finally {
-          if (_didIteratorError13) {
-            throw _iteratorError13;
+          if (_didIteratorError14) {
+            throw _iteratorError14;
           }
         }
       }
@@ -20970,29 +21073,29 @@ function () {
     key: "filterItemsWithPredicates",
     value: function filterItemsWithPredicates(items, predicates) {
       var results = items.filter(function (item) {
-        var _iteratorNormalCompletion14 = true;
-        var _didIteratorError14 = false;
-        var _iteratorError14 = undefined;
+        var _iteratorNormalCompletion15 = true;
+        var _didIteratorError15 = false;
+        var _iteratorError15 = undefined;
 
         try {
-          for (var _iterator14 = predicates[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-            var predicate = _step14.value;
+          for (var _iterator15 = predicates[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+            var predicate = _step15.value;
 
             if (!item.satisfiesPredicate(predicate)) {
               return false;
             }
           }
         } catch (err) {
-          _didIteratorError14 = true;
-          _iteratorError14 = err;
+          _didIteratorError15 = true;
+          _iteratorError15 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion14 && _iterator14.return != null) {
-              _iterator14.return();
+            if (!_iteratorNormalCompletion15 && _iterator15.return != null) {
+              _iterator15.return();
             }
           } finally {
-            if (_didIteratorError14) {
-              throw _iteratorError14;
+            if (_didIteratorError15) {
+              throw _iteratorError15;
             }
           }
         }
@@ -21004,11 +21107,11 @@ function () {
   }, {
     key: "importItemsFromRaw",
     value: function importItemsFromRaw(rawPayloads) {
-      var payloads, delta, collection, items, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, item;
+      var payloads, delta, collection, items, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, item;
 
-      return regeneratorRuntime.async(function importItemsFromRaw$(_context27) {
+      return regeneratorRuntime.async(function importItemsFromRaw$(_context28) {
         while (1) {
-          switch (_context27.prev = _context27.next) {
+          switch (_context28.prev = _context28.next) {
             case 0:
               payloads = rawPayloads.map(function (rawPayload) {
                 return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateSourcedPayloadFromObject"])({
@@ -21023,79 +21126,79 @@ function () {
                   source: PAYLOAD_SOURCE_FILE_IMPORT
                 })
               });
-              _context27.next = 4;
+              _context28.next = 4;
               return regeneratorRuntime.awrap(delta.resultingCollection());
 
             case 4:
-              collection = _context27.sent;
-              _context27.next = 7;
+              collection = _context28.sent;
+              _context28.next = 7;
               return regeneratorRuntime.awrap(this.mapCollectionToLocalItems({
                 collection: collection
               }));
 
             case 7:
-              items = _context27.sent;
-              _iteratorNormalCompletion15 = true;
-              _didIteratorError15 = false;
-              _iteratorError15 = undefined;
-              _context27.prev = 11;
-              _iterator15 = items[Symbol.iterator]();
+              items = _context28.sent;
+              _iteratorNormalCompletion16 = true;
+              _didIteratorError16 = false;
+              _iteratorError16 = undefined;
+              _context28.prev = 11;
+              _iterator16 = items[Symbol.iterator]();
 
             case 13:
-              if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
-                _context27.next = 21;
+              if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
+                _context28.next = 21;
                 break;
               }
 
-              item = _step15.value;
-              _context27.next = 17;
+              item = _step16.value;
+              _context28.next = 17;
               return regeneratorRuntime.awrap(this.setItemDirty(item, true, false));
 
             case 17:
               item.deleted = false;
 
             case 18:
-              _iteratorNormalCompletion15 = true;
-              _context27.next = 13;
+              _iteratorNormalCompletion16 = true;
+              _context28.next = 13;
               break;
 
             case 21:
-              _context27.next = 27;
+              _context28.next = 27;
               break;
 
             case 23:
-              _context27.prev = 23;
-              _context27.t0 = _context27["catch"](11);
-              _didIteratorError15 = true;
-              _iteratorError15 = _context27.t0;
+              _context28.prev = 23;
+              _context28.t0 = _context28["catch"](11);
+              _didIteratorError16 = true;
+              _iteratorError16 = _context28.t0;
 
             case 27:
-              _context27.prev = 27;
-              _context27.prev = 28;
+              _context28.prev = 27;
+              _context28.prev = 28;
 
-              if (!_iteratorNormalCompletion15 && _iterator15.return != null) {
-                _iterator15.return();
+              if (!_iteratorNormalCompletion16 && _iterator16.return != null) {
+                _iterator16.return();
               }
 
             case 30:
-              _context27.prev = 30;
+              _context28.prev = 30;
 
-              if (!_didIteratorError15) {
-                _context27.next = 33;
+              if (!_didIteratorError16) {
+                _context28.next = 33;
                 break;
               }
 
-              throw _iteratorError15;
+              throw _iteratorError16;
 
             case 33:
-              return _context27.finish(30);
+              return _context28.finish(30);
 
             case 34:
-              return _context27.finish(27);
+              return _context28.finish(27);
 
             case 35:
             case "end":
-              return _context27.stop();
+              return _context28.stop();
           }
         }
       }, null, this, [[11, 23, 27, 35], [28,, 30, 34]]);
@@ -21103,15 +21206,15 @@ function () {
   }, {
     key: "getAllItemsJSONData",
     value: function getAllItemsJSONData(keyParams, returnNullIfEmpty) {
-      return regeneratorRuntime.async(function getAllItemsJSONData$(_context28) {
+      return regeneratorRuntime.async(function getAllItemsJSONData$(_context29) {
         while (1) {
-          switch (_context28.prev = _context28.next) {
+          switch (_context29.prev = _context29.next) {
             case 0:
-              return _context28.abrupt("return", this.getJSONDataForItems(this.allItems, keyParams, returnNullIfEmpty));
+              return _context29.abrupt("return", this.getJSONDataForItems(this.allItems, keyParams, returnNullIfEmpty));
 
             case 1:
             case "end":
-              return _context28.stop();
+              return _context29.stop();
           }
         }
       }, null, this);
@@ -21120,12 +21223,12 @@ function () {
     key: "getJSONDataForItems",
     value: function getJSONDataForItems(items, keyParams, returnNullIfEmpty) {
       var intent;
-      return regeneratorRuntime.async(function getJSONDataForItems$(_context29) {
+      return regeneratorRuntime.async(function getJSONDataForItems$(_context30) {
         while (1) {
-          switch (_context29.prev = _context29.next) {
+          switch (_context30.prev = _context30.next) {
             case 0:
               intent = keyParams ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_10__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_10__["ENCRYPTION_INTENT_FILE_DECRYPTED"];
-              return _context29.abrupt("return", Promise.all(items.map(function (item) {
+              return _context30.abrupt("return", Promise.all(items.map(function (item) {
                 var payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
                   object: item
                 });
@@ -21152,7 +21255,7 @@ function () {
 
             case 2:
             case "end":
-              return _context29.stop();
+              return _context30.stop();
           }
         }
       });
@@ -22198,14 +22301,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return SNSingletonManager; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -22222,35 +22323,26 @@ function () {
 
     this.syncManager = syncManager;
     this.modelManager = modelManager;
-    this.addMappingObserver();
+    this.addCreationObserver();
   }
 
   _createClass(SNSingletonManager, [{
-    key: "addMappingObserver",
-    value: function addMappingObserver() {
+    key: "addCreationObserver",
+    value: function addCreationObserver() {
       var _this = this;
 
-      this.modelManager.addMappingObserverWithPriority({
-        id: 'singleton-manager',
-        types: '*',
-        priority: -1,
-        callback: function callback(allItems, validItems, deletedItems, source, sourceKey) {
+      this.modelManager.addCreationObserver({
+        callback: function callback(_ref2) {
+          var items, source, sourceKey;
           return regeneratorRuntime.async(function callback$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  if (!(source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PAYLOAD_SOURCE_LOCAL_DIRTIED"])) {
-                    _context.next = 2;
-                    break;
-                  }
+                  items = _ref2.items, source = _ref2.source, sourceKey = _ref2.sourceKey;
+                  _context.next = 3;
+                  return regeneratorRuntime.awrap(_this.resolveSingletonsForItems(items));
 
-                  return _context.abrupt("return");
-
-                case 2:
-                  _context.next = 4;
-                  return regeneratorRuntime.awrap(_this.resolveSingletonsForItems(validItems));
-
-                case 4:
+                case 3:
                 case "end":
                   return _context.stop();
               }
@@ -22258,18 +22350,6 @@ function () {
           });
         }
       });
-      /** @todo needs replacement */
-      // If an item alternates its uuid on account registration, singletonHandlers might need to update
-      // their local reference to the object, since the object reference will change on uuid alternation
-      // modelManager.addModelUuidChangeObserver("singleton-manager", (oldModel, newModel) => {
-      //   for(const handler of this.singletonHandlers) {
-      //     if(handler.singleton && SFPredicate.ItemSatisfiesPredicates(newModel, handler.predicates)) {
-      //       // Reference is now invalid, calling resolveSingleton should update it
-      //       handler.singleton = null;
-      //       this.resolveSingletons([newModel]);
-      //     }
-      //   }
-      // })
     }
   }, {
     key: "validItemsMatchingPredicate",
@@ -22374,13 +22454,13 @@ function () {
     }
   }, {
     key: "handleStrategy",
-    value: function handleStrategy(_ref2) {
+    value: function handleStrategy(_ref3) {
       var items, strategy, earliestFirst, keep, deleteItems;
       return regeneratorRuntime.async(function handleStrategy$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              items = _ref2.items, strategy = _ref2.strategy;
+              items = _ref3.items, strategy = _ref3.strategy;
 
               if (!(strategy !== _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SINGLETON_STRATEGY_KEEP_EARLIEST"])) {
                 _context3.next = 3;
@@ -22420,13 +22500,13 @@ function () {
     }
   }, {
     key: "findOrCreateSingleton",
-    value: function findOrCreateSingleton(_ref3) {
+    value: function findOrCreateSingleton(_ref4) {
       var predicate, createPayload, items, refreshedItems, errorDecrypting, dirtyPayload, item;
       return regeneratorRuntime.async(function findOrCreateSingleton$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              predicate = _ref3.predicate, createPayload = _ref3.createPayload;
+              predicate = _ref4.predicate, createPayload = _ref4.createPayload;
               items = this.validItemsMatchingPredicate(predicate);
 
               if (!(items.length > 0)) {
@@ -22465,7 +22545,7 @@ function () {
               return regeneratorRuntime.awrap(this.modelManager.setItemsToBeDeleted(errorDecrypting));
 
             case 13:
-              _context4.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"];
+              _context4.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"];
               _context4.t1 = createPayload;
               _context4.next = 17;
               return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"].GenerateUuid());

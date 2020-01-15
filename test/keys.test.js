@@ -111,9 +111,25 @@ describe('keys', () => {
     expect(keyToUse).to.equal(await localApplication.keyManager.getRootKey());
   })
 
-  it('@todo items key should be encrypted with root key', async function() {
-    expect(true).to.equal(false);
-    expect(itemsKey.items_key_id).to.not.be.ok;
+  it('items key should be encrypted with root key', async function() {
+    const itemsKey = await this.application.keyManager.getDefaultItemsKey();
+    /** Encrypt items key */
+    const encryptedPayload = await this.application.protocolManager.payloadByEncryptingPayload({
+      payload: itemsKey.payloadRepresentation(),
+      intent: ENCRYPTION_INTENT_SYNC
+    });
+    /** Should not have an items_key_id */
+    expect(encryptedPayload.items_key_id).to.not.be.ok;
+
+    /** Attempt to decrypt with root key. Should succeed. */
+    const rootKey = await this.application.keyManager.getRootKey();
+    const decryptedPayload = await this.application.protocolManager.payloadByDecryptingPayload({
+      payload: encryptedPayload,
+      key: rootKey
+    });
+
+    expect(decryptedPayload.errorDecrypting).to.equal(false);
+    expect(decryptedPayload.content.itemsKey).to.equal(itemsKey.content.itemsKey);
   })
 
   it('should use items key for encryption of note', async function() {
@@ -214,7 +230,6 @@ describe('keys', () => {
       localApplication.protocolManager.latestVersion()
     );
   })
-
   //
   // it('rotating account keys should save new root keys and create new keys object for old keys', async () => {
   //

@@ -83,4 +83,28 @@ describe("singletons", () => {
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
+
+  it("alternating the uuid of a singleton should return correct result", async function() {
+    const payload = createPrivsPayload();
+    const item = await this.application.modelManager.mapPayloadToLocalItems({
+      payload: payload
+    })
+    this.expectedItemCount++;
+    await this.application.syncManager.sync();
+    const predicate = new SFPredicate("content_type", "=", item.content_type);
+    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
+      predicate: predicate,
+      createPayload: payload
+    });
+    await this.application.modelManager.alternateUuidForItem(resolvedItem);
+    await this.application.syncManager.sync();
+    const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton({
+      predicate: predicate,
+      createPayload: payload
+    });
+    expect(resolvedItem.uuid).to.equal(item.uuid);
+    expect(resolvedItem2.uuid).to.not.equal(resolvedItem.uuid);
+    expect(resolvedItem.deleted).to.equal(true);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  });
 })
