@@ -1199,17 +1199,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alert_manager */ "./lib/services/alert_manager.js");
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
-/* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
+/* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
 /* harmony import */ var _Services_database_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/database_manager */ "./lib/services/database_manager.js");
 /* harmony import */ var _Services_http_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/http_manager */ "./lib/services/http_manager.js");
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
-/* harmony import */ var _Services_migration_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/migration_service */ "./lib/services/migration_service.js");
+/* harmony import */ var _Lib_migration_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/migration/service */ "./lib/migration/service.js");
 /* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
 /* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
 /* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
 /* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
 /* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony import */ var _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Lib/migration/stages */ "./lib/migration/stages.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -1230,16 +1231,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 var SNApplication =
 /*#__PURE__*/
 function () {
   /**
+   * @param platform
+      Required - The PLATFORM that identifies your application.
    * @param namespace
       Optional - a unique identifier to namespace storage and
       other persistent properties. Defaults to empty string.
-   * @param keychainDelegate
-      A SNKeychainDelegate object.
+   * @param deviceInterface
+      A DeviceInterface object.
    * @param swapClasses
       Gives consumers the ability to provide their own custom
       subclass for a service. swapClasses should be an array
@@ -1258,9 +1262,10 @@ function () {
    */
   function SNApplication() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        platform = _ref.platform,
         namespace = _ref.namespace,
         host = _ref.host,
-        keychainDelegate = _ref.keychainDelegate,
+        deviceInterface = _ref.deviceInterface,
         swapClasses = _ref.swapClasses,
         skipClasses = _ref.skipClasses,
         timeout = _ref.timeout,
@@ -1272,14 +1277,19 @@ function () {
       throw "'timeout' is required to initialize application.";
     }
 
-    if (!keychainDelegate) {
-      throw 'Keychain delegate must be supplied.';
+    if (!deviceInterface) {
+      throw 'Device Interface must be supplied.';
+    }
+
+    if (!platform) {
+      throw 'Platform must be supplied when creating an application.';
     }
 
     SFItem.AppDomain = DEFAULT_APP_DOMAIN;
+    this.platform = platform;
     this.namespace = namespace || '';
     this.host = host;
-    this.keychainDelegate = keychainDelegate;
+    this.deviceInterface = deviceInterface;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
     this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
@@ -1352,7 +1362,10 @@ function () {
 
             case 7:
               databasePayloads = _context2.sent;
+              _context2.next = 10;
+              return regeneratorRuntime.awrap(this.migrationService.applicationAtStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__["MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD"]));
 
+            case 10:
               /**
               * We don't want to await this, as we want to begin allowing the app to function
               * before local data has been loaded fully. We await only initial
@@ -1364,7 +1377,7 @@ function () {
                 });
               });
 
-            case 9:
+            case 11:
             case "end":
               return _context2.stop();
           }
@@ -1489,6 +1502,10 @@ function () {
               break;
 
             case 42:
+              _context3.next = 44;
+              return regeneratorRuntime.awrap(this.migrationService.applicationAtStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__["MIGRATION_STAGE_AFTER_APP_UNLOCKED"]));
+
+            case 44:
             case "end":
               return _context3.stop();
           }
@@ -1935,44 +1952,80 @@ function () {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
+              this.createMigrationService();
+              _context15.next = 3;
+              return regeneratorRuntime.awrap(this.migrationService.initialize());
+
+            case 3:
+              _context15.next = 5;
+              return regeneratorRuntime.awrap(this.migrationService.applicationAtStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__["MIGRATION_STAGE_BEFORE_SERVICES_INIT"]));
+
+            case 5:
               this.createAlertManager();
               this.createHttpManager();
               this.createDatabaseManager();
-              _context15.next = 5;
+              _context15.next = 10;
               return regeneratorRuntime.awrap(this.databaseManager.openDatabase());
 
-            case 5:
+            case 10:
               this.createModelManager();
               this.createProtocolService();
               this.createStorageManager();
-              _context15.next = 10;
+              _context15.next = 15;
               return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
 
-            case 10:
+            case 15:
+              _context15.next = 17;
+              return regeneratorRuntime.awrap(this.migrationService.applicationAtStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__["MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT"]));
+
+            case 17:
               this.createApiService();
               this.createSessionManager();
-              _context15.next = 14;
+              _context15.next = 21;
               return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
 
-            case 14:
+            case 21:
               this.createSyncManager();
               this.createKeyManager();
               this.protocolService.setKeyManager(this.keyManager);
               this.storageManager.setKeyManager(this.keyManager);
-              this.keyManager.setKeychainDelegate(this.keychainDelegate);
-              _context15.next = 21;
+              this.keyManager.setDeviceInterface(this.deviceInterface);
+              _context15.next = 28;
               return regeneratorRuntime.awrap(this.keyManager.initialize());
 
-            case 21:
+            case 28:
               this.createDeviceAuthService();
-              this.createSingletonManager(); // this.createMigrationService();
-
+              this.createSingletonManager();
               this.createComponentManager();
               this.registerSyncCompletionObserver();
+              _context15.next = 34;
+              return regeneratorRuntime.awrap(this.migrationService.applicationAtStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_14__["MIGRATION_STAGE_AFTER_SERVICES_INIT"]));
 
-            case 25:
+            case 34:
             case "end":
               return _context15.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Dynamically change the device interface, i.e when Desktop wants to override
+     * default web interface.
+     */
+
+  }, {
+    key: "changeDeviceInterface",
+    value: function changeDeviceInterface(deviceInterface) {
+      return regeneratorRuntime.async(function changeDeviceInterface$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              this.deviceInterface = deviceInterface;
+              this.keyManager.setDeviceInterface(this.deviceInterface);
+
+            case 2:
+            case "end":
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -1982,9 +2035,9 @@ function () {
     value: function registerSyncCompletionObserver() {
       var _this2 = this;
 
-      return regeneratorRuntime.async(function registerSyncCompletionObserver$(_context16) {
+      return regeneratorRuntime.async(function registerSyncCompletionObserver$(_context17) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
               this.syncManager.addEventObserver({
                 callback: function callback(event, data) {
@@ -2003,7 +2056,7 @@ function () {
 
             case 1:
             case "end":
-              return _context16.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -2011,6 +2064,7 @@ function () {
   }, {
     key: "clearServices",
     value: function clearServices() {
+      this.migrationService = null;
       this.alertManager = null;
       this.httpManager = null;
       this.databaseManager = null;
@@ -2046,7 +2100,7 @@ function () {
   }, {
     key: "createComponentManager",
     value: function createComponentManager() {
-      if (this.shouldSkipClass(_Services_component_manager__WEBPACK_IMPORTED_MODULE_14__["SNComponentManager"])) {
+      if (this.shouldSkipClass(_Services_component_manager__WEBPACK_IMPORTED_MODULE_3__["SNComponentManager"])) {
         return;
       }
 
@@ -2076,11 +2130,8 @@ function () {
   }, {
     key: "createMigrationService",
     value: function createMigrationService() {
-      this.migrationService = new (this.getClass(_Services_migration_service__WEBPACK_IMPORTED_MODULE_7__["SNMigrationService"]))({
-        modelManager: this.modelManager,
-        storageManager: this.storageManager,
-        sessionManager: this.sessionManager,
-        syncManager: this.syncManager
+      this.migrationService = new (this.getClass(_Lib_migration_service__WEBPACK_IMPORTED_MODULE_7__["MigrationService"]))({
+        application: this
       });
     }
   }, {
@@ -2169,11 +2220,144 @@ function () {
 
 /***/ }),
 
+/***/ "./lib/device_interface.js":
+/*!*********************************!*\
+  !*** ./lib/device_interface.js ***!
+  \*********************************/
+/*! exports provided: DeviceInterface */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return DeviceInterface; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * Platforms must override this class to provide platform specific utilities
+ * and access to the migration service, such as exposing an interface to read
+ * raw values from the database or value storage.
+
+ * This avoids the need for platforms to override migrations directly.
+ */
+var DeviceInterface =
+/*#__PURE__*/
+function () {
+  function DeviceInterface() {
+    _classCallCheck(this, DeviceInterface);
+  }
+
+  _createClass(DeviceInterface, [{
+    key: "getRawStorageValue",
+    value: function getRawStorageValue(key) {
+      return regeneratorRuntime.async(function getRawStorageValue$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              throw 'Must override DeviceInterface.getRawStorageValue';
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "setRawStorageValue",
+    value: function setRawStorageValue(key, value) {
+      return regeneratorRuntime.async(function setRawStorageValue$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              throw 'Must override DeviceInterface.setRawStorageValue';
+
+            case 1:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "getRawDatabaseValue",
+    value: function getRawDatabaseValue(key) {
+      return regeneratorRuntime.async(function getRawDatabaseValue$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              throw 'Must override DeviceInterface.getRawDatabaseValue';
+
+            case 1:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "getRawKeychainValue",
+    value: function getRawKeychainValue() {
+      return regeneratorRuntime.async(function getRawKeychainValue$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              throw 'Must override DeviceInterface.getRawKeychainValue';
+
+            case 1:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "setKeychainValue",
+    value: function setKeychainValue(value) {
+      return regeneratorRuntime.async(function setKeychainValue$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              throw 'Must override DeviceInterface.setKeychainValue';
+
+            case 1:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "clearKeychainValue",
+    value: function clearKeychainValue() {
+      return regeneratorRuntime.async(function clearKeychainValue$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              throw 'Must override DeviceInterface.clearKeychainValue';
+
+            case 1:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      });
+    }
+  }]);
+
+  return DeviceInterface;
+}();
+
+/***/ }),
+
 /***/ "./lib/events.js":
 /*!***********************!*\
   !*** ./lib/events.js ***!
   \***********************/
-/*! exports provided: APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT */
+/*! exports provided: APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, APPLICATION_EVENT_DID_UNLOCK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2181,35 +2365,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_WILL_SIGN_IN", function() { return APPLICATION_EVENT_WILL_SIGN_IN; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_IN", function() { return APPLICATION_EVENT_DID_SIGN_IN; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_OUT", function() { return APPLICATION_EVENT_DID_SIGN_OUT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_UNLOCK", function() { return APPLICATION_EVENT_DID_UNLOCK; });
 var APPLICATION_EVENT_WILL_SIGN_IN = 'APPLICATION_EVENT_WILL_SIGN_IN';
 var APPLICATION_EVENT_DID_SIGN_IN = 'APPLICATION_EVENT_DID_SIGN_IN';
 var APPLICATION_EVENT_DID_SIGN_OUT = 'APPLICATION_EVENT_DID_SIGN_OUT';
-
-/***/ }),
-
-/***/ "./lib/keychain.js":
-/*!*************************!*\
-  !*** ./lib/keychain.js ***!
-  \*************************/
-/*! exports provided: SNKeychainDelegate */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeychainDelegate", function() { return SNKeychainDelegate; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
-  var setKeyChainValue = _ref.setKeyChainValue,
-      getKeyChainValue = _ref.getKeyChainValue,
-      clearKeyChainValue = _ref.clearKeyChainValue;
-
-  _classCallCheck(this, SNKeychainDelegate);
-
-  this.setKeyChainValue = setKeyChainValue;
-  this.getKeyChainValue = getKeyChainValue;
-  this.clearKeyChainValue = clearKeyChainValue;
-};
+var APPLICATION_EVENT_DID_UNLOCK = 'APPLICATION_EVENT_DID_UNLOCK';
 
 /***/ }),
 
@@ -2217,7 +2377,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, SYNC_EVENT_FULL_SYNC_COMPLETED */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, MigrationService, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, PLATFORM_MOBILE, PLATFORM_WEB, PLATFORM_DESKTOP, isPlatformWebOrDesktop, isPlatformMobile, SYNC_EVENT_FULL_SYNC_COMPLETED */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2254,8 +2414,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateSourcedPayloadFromObject"]; });
 
-/* harmony import */ var _Lib_keychain__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/keychain */ "./lib/keychain.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeychainDelegate", function() { return _Lib_keychain__WEBPACK_IMPORTED_MODULE_10__["SNKeychainDelegate"]; });
+/* harmony import */ var _Lib_device_interface__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/device_interface */ "./lib/device_interface.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return _Lib_device_interface__WEBPACK_IMPORTED_MODULE_10__["DeviceInterface"]; });
 
 /* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_11__["SFItem"]; });
@@ -2298,8 +2458,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_51__["SNComponentManager"]; });
+/* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_24__["SNComponentManager"]; });
 
 /* harmony import */ var _models_history_historySession__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/history/historySession */ "./lib/models/history/historySession.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_history_historySession__WEBPACK_IMPORTED_MODULE_25__["SFHistorySession"]; });
@@ -2361,8 +2521,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_37__["SNSessionManager"]; });
 
-/* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_38__["SNMigrationService"]; });
+/* harmony import */ var _migration_service__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./migration/service */ "./lib/migration/service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MigrationService", function() { return _migration_service__WEBPACK_IMPORTED_MODULE_38__["MigrationService"]; });
 
 /* harmony import */ var _services_alert_manager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/alert_manager */ "./lib/services/alert_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alert_manager__WEBPACK_IMPORTED_MODULE_39__["SNAlertManager"]; });
@@ -2473,8 +2633,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "APPLICATION_EVENT_DID_SIGN_OUT", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_49__["APPLICATION_EVENT_DID_SIGN_OUT"]; });
 
-/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_EVENT_FULL_SYNC_COMPLETED", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_50__["SYNC_EVENT_FULL_SYNC_COMPLETED"]; });
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_MOBILE", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__["PLATFORM_MOBILE"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_WEB", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__["PLATFORM_WEB"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_DESKTOP", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__["PLATFORM_DESKTOP"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPlatformWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__["isPlatformWebOrDesktop"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPlatformMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_50__["isPlatformMobile"]; });
+
+/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_EVENT_FULL_SYNC_COMPLETED", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_51__["SYNC_EVENT_FULL_SYNC_COMPLETED"]; });
 
 
 
@@ -2527,6 +2698,880 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+/***/ }),
+
+/***/ "./lib/migration/migrations/2020-01-01-base.js":
+/*!*****************************************************!*\
+  !*** ./lib/migration/migrations/2020-01-01-base.js ***!
+  \*****************************************************/
+/*! exports provided: BaseMigration */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return BaseMigration; });
+/* harmony import */ var _Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations/migration */ "./lib/migration/migrations/migration.js");
+/* harmony import */ var _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migration/stages */ "./lib/migration/stages.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var BaseMigration =
+/*#__PURE__*/
+function (_Migration) {
+  _inherits(BaseMigration, _Migration);
+
+  function BaseMigration() {
+    _classCallCheck(this, BaseMigration);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(BaseMigration).apply(this, arguments));
+  }
+
+  _createClass(BaseMigration, null, [{
+    key: "timestamp",
+    value: function timestamp() {
+      return new Date('2020-01-01').getTime();
+    }
+  }, {
+    key: "handleStageAll",
+    value: function handleStageAll(_ref) {
+      var stage, application, deviceInterface, LEGACY_MIGRATIONS_KEY, legacyMigrationsValue, lastDate, hasLegacyValue, hasNewStructure, newLastMigrationDate, _newLastMigrationDate;
+
+      return regeneratorRuntime.async(function handleStageAll$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              stage = _ref.stage, application = _ref.application, deviceInterface = _ref.deviceInterface;
+
+              /**
+               * Establish last_migration_date.
+               * We need to determine if this is a new application download,
+               * or if we're coming from an older, non-current client.
+                * If new application download, we expect last_migration_date
+               * to be null. However, last_migration_date can also be null if you
+               * haven't yet migration to using this system.
+                * So in addition to this date being null, we check if deviceInterface
+               * has pre-existing storage values for old migration system.
+               * If so, this means this is a legacy client making its first jump to
+               * this new migration system.
+               */
+              LEGACY_MIGRATIONS_KEY = 'migrations';
+              _context.next = 4;
+              return regeneratorRuntime.awrap(deviceInterface.getRawStorageValue(LEGACY_MIGRATIONS_KEY));
+
+            case 4:
+              legacyMigrationsValue = _context.sent;
+              _context.next = 7;
+              return regeneratorRuntime.awrap(deviceInterface.getRawStorageValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RAW_STORAGE_KEY_LAST_MIGRATION_DATE"]));
+
+            case 7:
+              lastDate = _context.sent;
+              hasLegacyValue = !isNullOrUndefined(legacyMigrationsValue);
+              hasNewStructure = !isNullOrUndefined(lastDate);
+
+              if (!(!hasNewStructure && hasLegacyValue)) {
+                _context.next = 16;
+                break;
+              }
+
+              /**
+               * Old client updating for the first time. We need to run all migrations.
+               * Set last migration date as epoch.
+               */
+              newLastMigrationDate = new Date(0).getTime();
+              _context.next = 14;
+              return regeneratorRuntime.awrap(deviceInterface.setRawStorageValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RAW_STORAGE_KEY_LAST_MIGRATION_DATE"], newLastMigrationDate));
+
+            case 14:
+              _context.next = 23;
+              break;
+
+            case 16:
+              if (!(!hasNewStructure && !hasLegacyValue)) {
+                _context.next = 22;
+                break;
+              }
+
+              /** New application, dont run any migrations. Set last migration date as now. */
+              _newLastMigrationDate = new Date().getTime();
+              _context.next = 20;
+              return regeneratorRuntime.awrap(deviceInterface.setRawStorageValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RAW_STORAGE_KEY_LAST_MIGRATION_DATE"], _newLastMigrationDate));
+
+            case 20:
+              _context.next = 23;
+              break;
+
+            case 22:
+              if (hasNewStructure) {
+                /** Application which has already performed base migration. Keep date as is. */
+              }
+
+            case 23:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    }
+  }]);
+
+  return BaseMigration;
+}(_Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
+
+/***/ }),
+
+/***/ "./lib/migration/migrations/2020-01-15.js":
+/*!************************************************!*\
+  !*** ./lib/migration/migrations/2020-01-15.js ***!
+  \************************************************/
+/*! exports provided: Migration20200115 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Migration20200115", function() { return Migration20200115; });
+/* harmony import */ var _Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations/migration */ "./lib/migration/migrations/migration.js");
+/* harmony import */ var _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migration/stages */ "./lib/migration/stages.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var Migration20200115 =
+/*#__PURE__*/
+function (_Migration) {
+  _inherits(Migration20200115, _Migration);
+
+  function Migration20200115() {
+    _classCallCheck(this, Migration20200115);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Migration20200115).apply(this, arguments));
+  }
+
+  _createClass(Migration20200115, null, [{
+    key: "timestamp",
+    value: function timestamp() {
+      return new Date('2020-01-15').getTime();
+    }
+  }, {
+    key: "handleStageAll",
+    value: function handleStageAll(_ref) {
+      var stage, application, deviceInterface, rootKeyParams, rootKey, itemsKey;
+      return regeneratorRuntime.async(function handleStageAll$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              stage = _ref.stage, application = _ref.application, deviceInterface = _ref.deviceInterface;
+
+              if (!(stage === _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__["MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT"])) {
+                _context.next = 12;
+                break;
+              }
+
+              _context.t0 = regeneratorRuntime;
+              _context.t1 = application.storageManager;
+              _context.t2 = STORAGE_KEY_ROOT_KEY_PARAMS;
+              _context.next = 7;
+              return regeneratorRuntime.awrap(deviceInterface.getStorageValue('auth_params'));
+
+            case 7:
+              _context.t3 = _context.sent;
+              _context.t4 = STORAGE_VALUE_MODE_DEFAULT;
+              _context.t5 = _context.t1.setValue.call(_context.t1, _context.t2, _context.t3, _context.t4);
+              _context.next = 12;
+              return _context.t0.awrap.call(_context.t0, _context.t5);
+
+            case 12:
+              if (!(stage === _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__["MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD"])) {
+                _context.next = 26;
+                break;
+              }
+
+              _context.next = 15;
+              return regeneratorRuntime.awrap(application.keyManager.getRootKeyParams());
+
+            case 15:
+              rootKeyParams = _context.sent;
+              _context.next = 18;
+              return regeneratorRuntime.awrap(this.keyManager.getRootKey());
+
+            case 18:
+              rootKey = _context.sent;
+              itemsKey = SNItemsKey.FromRaw({
+                itemsKey: rootKey.masterKey,
+                dataAuthenticationKey: rootKey.dataAuthenticationKey,
+                version: rootKeyParams.version
+              });
+              _context.next = 22;
+              return regeneratorRuntime.awrap(itemsKey.initUUID());
+
+            case 22:
+              _context.next = 24;
+              return regeneratorRuntime.awrap(application.modelManager.mapItem({
+                item: itemsKey
+              }));
+
+            case 24:
+              _context.next = 26;
+              return regeneratorRuntime.awrap(application.modelManager.setItemDirty(itemsKey));
+
+            case 26:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "handleStageDesktopWeb",
+    value: function handleStageDesktopWeb(_ref2) {
+      var stage, application, deviceInterface;
+      return regeneratorRuntime.async(function handleStageDesktopWeb$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              stage = _ref2.stage, application = _ref2.application, deviceInterface = _ref2.deviceInterface;
+
+              if (!(stage === _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__["MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT"])) {
+                _context2.next = 12;
+                break;
+              }
+
+              _context2.t0 = regeneratorRuntime;
+              _context2.t1 = application.storageManager;
+              _context2.t2 = _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"];
+              _context2.next = 7;
+              return regeneratorRuntime.awrap(deviceInterface.getStorageValue('offlineParams'));
+
+            case 7:
+              _context2.t3 = _context2.sent;
+              _context2.t4 = STORAGE_VALUE_MODE_UNWRAPPED;
+              _context2.t5 = _context2.t1.setValue.call(_context2.t1, _context2.t2, _context2.t3, _context2.t4);
+              _context2.next = 12;
+              return _context2.t0.awrap.call(_context2.t0, _context2.t5);
+
+            case 12:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "handleStageMobile",
+    value: function handleStageMobile(_ref3) {
+      var stage, application, deviceInterface, encryptedStorage, newStructure;
+      return regeneratorRuntime.async(function handleStageMobile$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              stage = _ref3.stage, application = _ref3.application, deviceInterface = _ref3.deviceInterface;
+
+              if (!(stage === _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__["MIGRATION_STAGE_BEFORE_SERVICES_INIT"])) {
+                _context3.next = 8;
+                break;
+              }
+
+              _context3.next = 4;
+              return regeneratorRuntime.awrap(deviceInterface.getStorageValue('storage_encryption'));
+
+            case 4:
+              encryptedStorage = _context3.sent;
+              newStructure = SNStorageManager.defaultValuesObject({
+                defaultModeSeed: encryptedStorage
+              });
+              _context3.next = 8;
+              return regeneratorRuntime.awrap(deviceInterface.setStorageValue(STORAGE_KEY_ENCRYPTED_STORAGE, newStructure));
+
+            case 8:
+              if (!(stage === _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_1__["MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT"])) {
+                _context3.next = 29;
+                break;
+              }
+
+              _context3.t0 = regeneratorRuntime;
+              _context3.t1 = application.storageManager;
+              _context3.t2 = _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_WRAPPED_ROOT_KEY"];
+              _context3.next = 14;
+              return regeneratorRuntime.awrap(deviceInterface.getStorageValue('encrypted_account_keys'));
+
+            case 14:
+              _context3.t3 = _context3.sent;
+              _context3.t4 = STORAGE_VALUE_MODE_UNWRAPPED;
+              _context3.t5 = _context3.t1.setValue.call(_context3.t1, _context3.t2, _context3.t3, _context3.t4);
+              _context3.next = 19;
+              return _context3.t0.awrap.call(_context3.t0, _context3.t5);
+
+            case 19:
+              _context3.t6 = regeneratorRuntime;
+              _context3.t7 = application.storageManager;
+              _context3.t8 = _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"];
+              _context3.next = 24;
+              return regeneratorRuntime.awrap(deviceInterface.getStorageValue('pc_params'));
+
+            case 24:
+              _context3.t9 = _context3.sent;
+              _context3.t10 = STORAGE_VALUE_MODE_UNWRAPPED;
+              _context3.t11 = _context3.t7.setValue.call(_context3.t7, _context3.t8, _context3.t9, _context3.t10);
+              _context3.next = 29;
+              return _context3.t6.awrap.call(_context3.t6, _context3.t11);
+
+            case 29:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      });
+    }
+  }]);
+
+  return Migration20200115;
+}(_Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
+
+/***/ }),
+
+/***/ "./lib/migration/migrations/index.js":
+/*!*******************************************!*\
+  !*** ./lib/migration/migrations/index.js ***!
+  \*******************************************/
+/*! exports provided: Migration20200115 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _2020_01_15__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./2020-01-15 */ "./lib/migration/migrations/2020-01-15.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Migration20200115", function() { return _2020_01_15__WEBPACK_IMPORTED_MODULE_0__["Migration20200115"]; });
+
+
+
+/***/ }),
+
+/***/ "./lib/migration/migrations/migration.js":
+/*!***********************************************!*\
+  !*** ./lib/migration/migrations/migration.js ***!
+  \***********************************************/
+/*! exports provided: Migration */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Migration", function() { return Migration; });
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var Migration =
+/*#__PURE__*/
+function () {
+  function Migration() {
+    _classCallCheck(this, Migration);
+  }
+
+  _createClass(Migration, null, [{
+    key: "timestamp",
+    value: function timestamp() {
+      throw 'Must override Migration.timestamp';
+    }
+  }, {
+    key: "handleStage",
+    value: function handleStage(_ref) {
+      var application, stage, platform, deviceInterface;
+      return regeneratorRuntime.async(function handleStage$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              application = _ref.application, stage = _ref.stage, platform = _ref.platform, deviceInterface = _ref.deviceInterface;
+              _context.next = 3;
+              return regeneratorRuntime.awrap(this.handleStageAll({
+                stage: stage,
+                application: application,
+                deviceInterface: deviceInterface
+              }));
+
+            case 3:
+              if (!Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_0__["isPlatformWebOrDesktop"])(platform)) {
+                _context.next = 8;
+                break;
+              }
+
+              _context.next = 6;
+              return regeneratorRuntime.awrap(this.handleStageDesktopWeb({
+                stage: stage,
+                application: application,
+                deviceInterface: deviceInterface
+              }));
+
+            case 6:
+              _context.next = 11;
+              break;
+
+            case 8:
+              if (!Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_0__["isPlatformMobile"])(platform)) {
+                _context.next = 11;
+                break;
+              }
+
+              _context.next = 11;
+              return regeneratorRuntime.awrap(this.handleStageMobile({
+                stage: stage,
+                application: application,
+                deviceInterface: deviceInterface
+              }));
+
+            case 11:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }]);
+
+  return Migration;
+}();
+
+/***/ }),
+
+/***/ "./lib/migration/service.js":
+/*!**********************************!*\
+  !*** ./lib/migration/service.js ***!
+  \**********************************/
+/*! exports provided: MigrationService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MigrationService", function() { return MigrationService; });
+/* harmony import */ var _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/stages */ "./lib/migration/stages.js");
+/* harmony import */ var _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migration/migrations */ "./lib/migration/migrations/index.js");
+/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
+/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+var STORAGE_KEY_COMPLETED_MIGRATIONS = 'completed_migrations';
+var MigrationService =
+/*#__PURE__*/
+function () {
+  function MigrationService(_ref) {
+    var application = _ref.application;
+
+    _classCallCheck(this, MigrationService);
+
+    this.application = application;
+    this.addLoginObserver();
+    this.addSyncObserver();
+  }
+
+  _createClass(MigrationService, [{
+    key: "initialize",
+    value: function initialize() {
+      return regeneratorRuntime.async(function initialize$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return regeneratorRuntime.awrap(this.runBaseMigration());
+
+            case 2:
+              _context.next = 4;
+              return regeneratorRuntime.awrap(this.getRequiredMigrations());
+
+            case 4:
+              this.activeMigrations = _context.sent;
+              _context.next = 7;
+              return regeneratorRuntime.awrap(this.updateLastMigrationTimestamp());
+
+            case 7:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "runBaseMigration",
+    value: function runBaseMigration() {
+      return regeneratorRuntime.async(function runBaseMigration$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return regeneratorRuntime.awrap(_Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__["BaseMigration"].handleStageAll({
+                stage: _Lib_migration_stages__WEBPACK_IMPORTED_MODULE_0__["MIGRATION_STAGE_BEFORE_SERVICES_INIT"],
+                application: this.application,
+                deviceInterface: this.application.deviceInterface
+              }));
+
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "getRequiredMigrations",
+    value: function getRequiredMigrations() {
+      var lastMigrationTimestamp, activeMigrations, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationClass, migrationTimestamp;
+
+      return regeneratorRuntime.async(function getRequiredMigrations$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return regeneratorRuntime.awrap(this.getLastMigrationTimestamp());
+
+            case 2:
+              lastMigrationTimestamp = _context3.sent;
+              activeMigrations = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context3.prev = 7;
+
+              for (_iterator = _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_1__[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                migrationClass = _step.value;
+                migrationTimestamp = migrationClass.timestamp();
+
+                if (migrationTimestamp > lastMigrationTimestamp) {
+                  activeMigrations.push(migrationClass);
+                }
+              }
+
+              _context3.next = 15;
+              break;
+
+            case 11:
+              _context3.prev = 11;
+              _context3.t0 = _context3["catch"](7);
+              _didIteratorError = true;
+              _iteratorError = _context3.t0;
+
+            case 15:
+              _context3.prev = 15;
+              _context3.prev = 16;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 18:
+              _context3.prev = 18;
+
+              if (!_didIteratorError) {
+                _context3.next = 21;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 21:
+              return _context3.finish(18);
+
+            case 22:
+              return _context3.finish(15);
+
+            case 23:
+              return _context3.abrupt("return", activeMigrations);
+
+            case 24:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+    }
+  }, {
+    key: "getLastMigrationTimestamp",
+    value: function getLastMigrationTimestamp() {
+      var timestamp;
+      return regeneratorRuntime.async(function getLastMigrationTimestamp$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawStorageValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_DATE"]));
+
+            case 2:
+              timestamp = _context4.sent;
+
+              if (!isNullOrUndefined(timestamp)) {
+                _context4.next = 5;
+                break;
+              }
+
+              throw 'Timestamp should not be null. Be sure to run base migration first.';
+
+            case 5:
+              return _context4.abrupt("return", timestamp);
+
+            case 6:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "updateLastMigrationTimestamp",
+    value: function updateLastMigrationTimestamp() {
+      var timestamp;
+      return regeneratorRuntime.async(function updateLastMigrationTimestamp$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              timestamp = new Date().getTime();
+              _context5.next = 3;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_DATE"], timestamp));
+
+            case 3:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+    * @public
+    * Application instances will call this function directly when they arrive
+    * at a certain migratory state.
+    */
+
+  }, {
+    key: "applicationAtStage",
+    value: function applicationAtStage(migrationStage) {
+      return regeneratorRuntime.async(function applicationAtStage$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.handleStage(migrationStage));
+
+            case 2:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @private
+     */
+
+  }, {
+    key: "addLoginObserver",
+    value: function addLoginObserver() {
+      var _this = this;
+
+      this.application.addEventObserver({
+        callback: function callback(event, data) {
+          return regeneratorRuntime.async(function callback$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  if (!(event === _Lib_events__WEBPACK_IMPORTED_MODULE_3__["APPLICATION_EVENT_DID_SIGN_IN"])) {
+                    _context7.next = 3;
+                    break;
+                  }
+
+                  _context7.next = 3;
+                  return regeneratorRuntime.awrap(_this.handleStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_0__["MIGRATION_STAGE_AFTER_SIGN_IN"]));
+
+                case 3:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          });
+        }
+      });
+    }
+  }, {
+    key: "addSyncObserver",
+    value: function addSyncObserver() {
+      var _this2 = this;
+
+      this.application.syncManager.addEventObserver({
+        callback: function callback(event, data) {
+          return regeneratorRuntime.async(function callback$(_context8) {
+            while (1) {
+              switch (_context8.prev = _context8.next) {
+                case 0:
+                  if (!(event === SYNC_EVENT_FULL_SYNC_COMPLETED)) {
+                    _context8.next = 3;
+                    break;
+                  }
+
+                  _context8.next = 3;
+                  return regeneratorRuntime.awrap(_this2.handleStage(_Lib_migration_stages__WEBPACK_IMPORTED_MODULE_0__["MIGRATION_STAGE_AFTER_FIRST_SYNC"]));
+
+                case 3:
+                case "end":
+                  return _context8.stop();
+              }
+            }
+          });
+        }
+      });
+    }
+  }, {
+    key: "handleStage",
+    value: function handleStage(_ref2) {
+      var stage, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migrationClass;
+
+      return regeneratorRuntime.async(function handleStage$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              stage = _ref2.stage;
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context9.prev = 4;
+              _iterator2 = this.activeMigrations[Symbol.iterator]();
+
+            case 6:
+              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                _context9.next = 13;
+                break;
+              }
+
+              migrationClass = _step2.value;
+              _context9.next = 10;
+              return regeneratorRuntime.awrap(migrationClass.handleStage({
+                application: this.application,
+                stage: stage,
+                platform: application.platform,
+                deviceInterface: this.application.deviceInterface
+              }));
+
+            case 10:
+              _iteratorNormalCompletion2 = true;
+              _context9.next = 6;
+              break;
+
+            case 13:
+              _context9.next = 19;
+              break;
+
+            case 15:
+              _context9.prev = 15;
+              _context9.t0 = _context9["catch"](4);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context9.t0;
+
+            case 19:
+              _context9.prev = 19;
+              _context9.prev = 20;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 22:
+              _context9.prev = 22;
+
+              if (!_didIteratorError2) {
+                _context9.next = 25;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 25:
+              return _context9.finish(22);
+
+            case 26:
+              return _context9.finish(19);
+
+            case 27:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, this, [[4, 15, 19, 27], [20,, 22, 26]]);
+    }
+  }]);
+
+  return MigrationService;
+}();
+
+/***/ }),
+
+/***/ "./lib/migration/stages.js":
+/*!*********************************!*\
+  !*** ./lib/migration/stages.js ***!
+  \*********************************/
+/*! exports provided: MIGRATION_STAGE_BEFORE_SERVICES_INIT, MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT, MIGRATION_STAGE_AFTER_SERVICES_INIT, MIGRATION_STAGE_AFTER_APP_UNLOCKED, MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD, MIGRATION_STAGE_AFTER_FIRST_SYNC, MIGRATION_STAGE_AFTER_SIGN_IN */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_BEFORE_SERVICES_INIT", function() { return MIGRATION_STAGE_BEFORE_SERVICES_INIT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT", function() { return MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_AFTER_SERVICES_INIT", function() { return MIGRATION_STAGE_AFTER_SERVICES_INIT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_AFTER_APP_UNLOCKED", function() { return MIGRATION_STAGE_AFTER_APP_UNLOCKED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD", function() { return MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_AFTER_FIRST_SYNC", function() { return MIGRATION_STAGE_AFTER_FIRST_SYNC; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MIGRATION_STAGE_AFTER_SIGN_IN", function() { return MIGRATION_STAGE_AFTER_SIGN_IN; });
+var MIGRATION_STAGE_BEFORE_SERVICES_INIT = 0;
+var MIGRATION_STAGE_AFTER_STORAGE_SERVICE_INIT = 0.5;
+var MIGRATION_STAGE_AFTER_SERVICES_INIT = 1;
+var MIGRATION_STAGE_AFTER_APP_UNLOCKED = 2;
+var MIGRATION_STAGE_BEFORE_LOCAL_DATA_LOAD = 2.5;
+var MIGRATION_STAGE_AFTER_FIRST_SYNC = 3;
+var MIGRATION_STAGE_AFTER_SIGN_IN = 4;
 
 /***/ }),
 
@@ -5347,8 +6392,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]; });
 
-/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_14__["SNItemsKey"]; });
+/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]; });
 
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]; });
@@ -5413,7 +6458,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
-/* harmony import */ var _Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/keys/pure_key */ "./lib/models/keys/pure_key.js");
+/* harmony import */ var _Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pure_key */ "./lib/models/keys/pure_key.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
@@ -5477,20 +6522,6 @@ function (_SNPureKey) {
       return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["CONTENT_TYPE_ITEMS_KEY"];
     }
   }, {
-    key: "itemsKey",
-    get: function get() {
-      return this.keyContent.itemsKey;
-    }
-  }, {
-    key: "dataAuthenticationKey",
-    get: function get() {
-      if (this.keyContent.version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__["PROTOCOL_VERSION_004"]) {
-        throw 'Attempting to access legacy data authentication key.';
-      }
-
-      return this.keyContent.dataAuthenticationKey;
-    }
-  }, {
     key: "isDefault",
     get: function get() {
       return this.content.isDefault;
@@ -5514,7 +6545,7 @@ function (_SNPureKey) {
   }]);
 
   return SNItemsKey;
-}(_Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_5__["SNPureKey"]);
+}(_Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
 
 /***/ }),
 
@@ -5640,6 +6671,20 @@ function (_SFItem) {
     key: "content_type",
     get: function get() {
       throw 'Must override SNPureKey.content_type';
+    }
+  }, {
+    key: "itemsKey",
+    get: function get() {
+      return this.keyContent.itemsKey;
+    }
+  }, {
+    key: "dataAuthenticationKey",
+    get: function get() {
+      if (this.keyContent.version === PROTOCOL_VERSION_004) {
+        throw 'Attempting to access legacy data authentication key.';
+      }
+
+      return this.keyContent.dataAuthenticationKey;
     }
   }, {
     key: "isRootKey",
@@ -6082,6 +7127,32 @@ function (_SFItem) {
 
   return SNServerExtension;
 }(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+
+/***/ }),
+
+/***/ "./lib/platforms.js":
+/*!**************************!*\
+  !*** ./lib/platforms.js ***!
+  \**************************/
+/*! exports provided: PLATFORM_WEB, PLATFORM_DESKTOP, PLATFORM_MOBILE, isPlatformWebOrDesktop, isPlatformMobile */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_WEB", function() { return PLATFORM_WEB; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_DESKTOP", function() { return PLATFORM_DESKTOP; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PLATFORM_MOBILE", function() { return PLATFORM_MOBILE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPlatformWebOrDesktop", function() { return isPlatformWebOrDesktop; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPlatformMobile", function() { return isPlatformMobile; });
+var PLATFORM_WEB = 1;
+var PLATFORM_DESKTOP = 2;
+var PLATFORM_MOBILE = 3;
+function isPlatformWebOrDesktop(platform) {
+  return platform === PLATFORM_WEB || platform === PLATFORM_DESKTOP;
+}
+function isPlatformMobile(platform) {
+  return platform === PLATFORM_MOBILE;
+}
 
 /***/ }),
 
@@ -9157,7 +10228,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/001/key_params_001 */ "./lib/protocol/versions/001/key_params_001.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 /* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
@@ -9609,7 +10680,7 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context7.sent;
-              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].FromRaw({
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 version: this.constructor.versionString()
@@ -9826,7 +10897,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -10305,7 +11376,7 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context7.sent;
-              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_10__["SNRootKey"].FromRaw({
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 ak: partitions[2],
@@ -10534,7 +11605,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
 /* harmony import */ var _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/002/operator_002 */ "./lib/protocol/versions/002/operator_002.js");
-/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -10853,16 +11924,16 @@ function (_SNRootKeyParams) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return SNProtocolOperator004; });
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
-/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
+/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
 /* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
-/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -11076,7 +12147,7 @@ function (_SNProtocolOperator) {
                   }
                 }
               });
-              itemsKey = new _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_10__["SNItemsKey"](payload);
+              itemsKey = new _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"](payload);
               _context4.next = 8;
               return regeneratorRuntime.awrap(itemsKey.initUUID());
 
@@ -11212,7 +12283,7 @@ function (_SNProtocolOperator) {
             case 0:
               payload = _ref6.payload, key = _ref6.key, format = _ref6.format;
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
                 _context7.next = 3;
                 break;
               }
@@ -11224,7 +12295,7 @@ function (_SNProtocolOperator) {
               }));
 
             case 3:
-              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"])) {
+              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"])) {
                 _context7.next = 5;
                 break;
               }
@@ -11266,7 +12337,7 @@ function (_SNProtocolOperator) {
 
             case 16:
               encryptedItemKey = _context7.sent;
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
+              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
 
             case 18:
             case "end":
@@ -11287,7 +12358,7 @@ function (_SNProtocolOperator) {
               encryptedParameters = _ref7.encryptedParameters, key = _ref7.key;
               format = encryptedParameters.getContentFormat();
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
                 _context8.next = 4;
                 break;
               }
@@ -11320,9 +12391,9 @@ function (_SNProtocolOperator) {
               }
 
               console.error('Error decrypting parameters', encryptedParameters);
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
+                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
               }));
 
             case 11:
@@ -11347,15 +12418,15 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
+                override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
               }));
 
             case 19:
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override3)
+                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override3)
               }));
 
             case 20:
@@ -11466,7 +12537,7 @@ function (_SNProtocolOperator) {
               };
               /** @todo: HKDF each key to domain-seperate. */
 
-              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_11__["SNRootKey"].FromRaw(params);
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].FromRaw(params);
               return _context10.abrupt("return", key);
 
             case 12:
@@ -11483,7 +12554,7 @@ function (_SNProtocolOperator) {
      * The protocol version. Will be prefixed to encrypted payloads.
      */
     value: function versionString() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["PROTOCOL_VERSION_004"];
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_8__["PROTOCOL_VERSION_004"];
     }
     /**
      * The number of PBKDF2 iterations.
@@ -16193,7 +17264,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_history_historySession__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/history/historySession */ "./lib/models/history/historySession.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -16317,7 +17388,7 @@ function () {
           switch (_context2.prev = _context2.next) {
             case 0:
               this.historySession.clearAllHistory();
-              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 2:
             case "end":
@@ -16340,14 +17411,14 @@ function () {
                 break;
               }
 
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
               this.saveToDisk();
               _context3.next = 8;
               break;
 
             case 6:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
-              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
+              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 8:
             case "end":
@@ -16371,7 +17442,7 @@ function () {
               return _context4.abrupt("return");
 
             case 2:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
 
             case 3:
             case "end":
@@ -16389,7 +17460,7 @@ function () {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"]));
 
             case 2:
               diskValue = _context5.sent;
@@ -16399,7 +17470,7 @@ function () {
               }
 
               _context5.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
 
             case 6:
               historyValue = _context5.sent;
@@ -16413,7 +17484,7 @@ function () {
               }
 
               _context5.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"]));
 
             case 10:
               autoOptimizeValue = _context5.sent;
@@ -16442,9 +17513,9 @@ function () {
               this.autoOptimize = !this.autoOptimize;
 
               if (this.autoOptimize) {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
               } else {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
               }
 
             case 2:
@@ -16922,13 +17993,13 @@ function () {
      */
 
   }, {
-    key: "setKeychainDelegate",
+    key: "setDeviceInterface",
 
     /**
-     * Dynamically set an SNKeychainDelegate object
+     * Dynamically set a DeviceInterface object
      */
-    value: function setKeychainDelegate(delegate) {
-      this.keychainDelegate = delegate;
+    value: function setDeviceInterface(deviceInterface) {
+      this.deviceInterface = deviceInterface;
     }
     /** @private */
 
@@ -16941,7 +18012,7 @@ function () {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return regeneratorRuntime.awrap(this.keychainDelegate.getKeyChainValue());
+              return regeneratorRuntime.awrap(this.deviceInterface.getRawKeychainValue());
 
             case 2:
               rawKey = _context2.sent;
@@ -16991,7 +18062,7 @@ function () {
             case 4:
               rawKey = this.rootKey.rootValues();
               _context3.next = 7;
-              return regeneratorRuntime.awrap(this.keychainDelegate.setKeyChainValue(rawKey));
+              return regeneratorRuntime.awrap(this.deviceInterface.setKeychainValue(rawKey));
 
             case 7:
             case "end":
@@ -17014,7 +18085,7 @@ function () {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 2:
               rawKeyParams = _context4.sent;
@@ -17048,7 +18119,7 @@ function () {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 1:
             case "end":
@@ -17082,7 +18153,7 @@ function () {
                 break;
               }
 
-              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               throw 'Unhandled key mode';
@@ -17264,7 +18335,7 @@ function () {
 
             case 10:
               _context9.next = 12;
-              return regeneratorRuntime.awrap(this.keychainDelegate.clearKeyChainValue());
+              return regeneratorRuntime.awrap(this.deviceInterface.clearKeychainValue());
 
             case 12:
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
@@ -17289,7 +18360,7 @@ function () {
 
             case 19:
               _context9.next = 21;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 21:
               return _context9.abrupt("return");
@@ -17328,7 +18399,7 @@ function () {
             case 4:
               wrappedKey = _context10.sent;
               _context10.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
             case "end":
@@ -17365,11 +18436,11 @@ function () {
               }
 
               _context11.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 5:
               _context11.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
@@ -17457,7 +18528,7 @@ function () {
               previousRootKey = this.rootKey;
               this.rootKey = key;
               _context12.next = 22;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 22:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
@@ -17527,19 +18598,19 @@ function () {
           switch (_context14.prev = _context14.next) {
             case 0:
               _context14.next = 2;
-              return regeneratorRuntime.awrap(this.keychainDelegate.clearKeyChainValue());
+              return regeneratorRuntime.awrap(this.deviceInterface.clearKeychainValue());
 
             case 2:
               _context14.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 4:
               _context14.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 6:
               _context14.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               this.keyMode = KEY_MODE_ROOT_KEY_NONE;
@@ -17886,741 +18957,6 @@ function () {
   }]);
 
   return SNKeyManager;
-}();
-
-/***/ }),
-
-/***/ "./lib/services/migration_service.js":
-/*!*******************************************!*\
-  !*** ./lib/services/migration_service.js ***!
-  \*******************************************/
-/*! exports provided: SNMigrationService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-var SNMigrationService =
-/*#__PURE__*/
-function () {
-  function SNMigrationService(_ref) {
-    var _this = this;
-
-    var modelManager = _ref.modelManager,
-        syncManager = _ref.syncManager,
-        storageManager = _ref.storageManager,
-        sessionManager = _ref.sessionManager;
-
-    _classCallCheck(this, SNMigrationService);
-
-    if (!storageManager || !syncManager || !modelManager || !sessionManager) {
-      throw 'Invalid MigrationService construction';
-    }
-
-    this.modelManager = modelManager;
-    this.syncManager = syncManager;
-    this.storageManager = storageManager;
-    this.completionHandlers = [];
-    this.loadMigrations(); // The syncManager used to dispatch a param called 'initialSync' in the 'sync:completed' event
-    // to let us know of the first sync completion after login.
-    // however it was removed as it was deemed to be unreliable (returned wrong value when a single sync request repeats on completion for pagination)
-    // We'll now use session_managers events instead
-
-    var didReceiveSignInEvent = false;
-    var signInHandler = sessionManager.addEventObserver(function (event) {
-      if (event == APPLICATION_EVENT_DID_SIGN_IN) {
-        didReceiveSignInEvent = true;
-      }
-    });
-    this.receivedLocalDataEvent = syncManager.initialDataLoaded();
-    this.syncManager.addEventObserver(function _callee(event, data) {
-      var dataLoadedEvent, syncCompleteEvent, completedList, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationName, migration;
-
-      return regeneratorRuntime.async(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              dataLoadedEvent = event == "local-data-loaded";
-              syncCompleteEvent = event == "sync:completed";
-
-              if (!(dataLoadedEvent || syncCompleteEvent)) {
-                _context.next = 40;
-                break;
-              }
-
-              if (dataLoadedEvent) {
-                _this.receivedLocalDataEvent = true;
-              } else if (syncCompleteEvent) {
-                _this.receivedSyncCompletedEvent = true;
-              } // We want to run pending migrations only after local data has been loaded, and a sync has been completed.
-
-
-              if (!(_this.receivedLocalDataEvent && _this.receivedSyncCompletedEvent)) {
-                _context.next = 40;
-                break;
-              }
-
-              if (!didReceiveSignInEvent) {
-                _context.next = 39;
-                break;
-              }
-
-              // Reset our collected state about sign in
-              didReceiveSignInEvent = false;
-              sessionManager.removeEventObserver(signInHandler); // If initial online sync, clear any completed migrations that occurred while offline,
-              // so they can run again now that we have updated user items. Only clear migrations that
-              // don't have `runOnlyOnce` set
-
-              _context.next = 10;
-              return regeneratorRuntime.awrap(_this.getCompletedMigrations());
-
-            case 10:
-              completedList = _context.sent.slice();
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context.prev = 14;
-              _iterator = completedList[Symbol.iterator]();
-
-            case 16:
-              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context.next = 25;
-                break;
-              }
-
-              migrationName = _step.value;
-              _context.next = 20;
-              return regeneratorRuntime.awrap(_this.migrationForEncodedName(migrationName));
-
-            case 20:
-              migration = _context.sent;
-
-              if (!migration.runOnlyOnce) {
-                lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(_this._completed, migrationName);
-              }
-
-            case 22:
-              _iteratorNormalCompletion = true;
-              _context.next = 16;
-              break;
-
-            case 25:
-              _context.next = 31;
-              break;
-
-            case 27:
-              _context.prev = 27;
-              _context.t0 = _context["catch"](14);
-              _didIteratorError = true;
-              _iteratorError = _context.t0;
-
-            case 31:
-              _context.prev = 31;
-              _context.prev = 32;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 34:
-              _context.prev = 34;
-
-              if (!_didIteratorError) {
-                _context.next = 37;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 37:
-              return _context.finish(34);
-
-            case 38:
-              return _context.finish(31);
-
-            case 39:
-              _this.runPendingMigrations();
-
-            case 40:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, null, [[14, 27, 31, 39], [32,, 34, 38]]);
-    });
-  }
-
-  _createClass(SNMigrationService, [{
-    key: "addCompletionHandler",
-    value: function addCompletionHandler(handler) {
-      this.completionHandlers.push(handler);
-    }
-  }, {
-    key: "removeCompletionHandler",
-    value: function removeCompletionHandler(handler) {
-      lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(this.completionHandlers, handler);
-    }
-  }, {
-    key: "migrationForEncodedName",
-    value: function migrationForEncodedName(name) {
-      var decoded;
-      return regeneratorRuntime.async(function migrationForEncodedName$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return regeneratorRuntime.awrap(this.decode(name));
-
-            case 2:
-              decoded = _context2.sent;
-              return _context2.abrupt("return", this.migrations.find(function (migration) {
-                return migration.name == decoded;
-              }));
-
-            case 4:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "loadMigrations",
-    value: function loadMigrations() {
-      this.migrations = this.registeredMigrations();
-    }
-  }, {
-    key: "registeredMigrations",
-    value: function registeredMigrations() {
-      throw 'SNMigrationService.registeredMigrations must be overriden.'; // Subclasses should return an array of migrations here.
-      // Migrations should have a unique `name`, `content_type`,
-      // and `handler`, which is a function that accepts an array of matching items to migration.
-    }
-  }, {
-    key: "runPendingMigrations",
-    value: function runPendingMigrations() {
-      var pending, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migration, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, item, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, handler;
-
-      return regeneratorRuntime.async(function runPendingMigrations$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return regeneratorRuntime.awrap(this.getPendingMigrations());
-
-            case 2:
-              pending = _context3.sent;
-              // run in pre loop, keeping in mind that a migration may be run twice: when offline then again when signing in.
-              // we need to reset the items to a new array.
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context3.prev = 6;
-
-              for (_iterator2 = pending[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                migration = _step2.value;
-                migration.items = [];
-              }
-
-              _context3.next = 14;
-              break;
-
-            case 10:
-              _context3.prev = 10;
-              _context3.t0 = _context3["catch"](6);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context3.t0;
-
-            case 14:
-              _context3.prev = 14;
-              _context3.prev = 15;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 17:
-              _context3.prev = 17;
-
-              if (!_didIteratorError2) {
-                _context3.next = 20;
-                break;
-              }
-
-              throw _iteratorError2;
-
-            case 20:
-              return _context3.finish(17);
-
-            case 21:
-              return _context3.finish(14);
-
-            case 22:
-              _iteratorNormalCompletion3 = true;
-              _didIteratorError3 = false;
-              _iteratorError3 = undefined;
-              _context3.prev = 25;
-              _iterator3 = this.modelManager.allNondummyItems[Symbol.iterator]();
-
-            case 27:
-              if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                _context3.next = 51;
-                break;
-              }
-
-              item = _step3.value;
-              _iteratorNormalCompletion6 = true;
-              _didIteratorError6 = false;
-              _iteratorError6 = undefined;
-              _context3.prev = 32;
-
-              for (_iterator6 = pending[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                migration = _step6.value;
-
-                if (item.content_type == migration.content_type) {
-                  migration.items.push(item);
-                }
-              }
-
-              _context3.next = 40;
-              break;
-
-            case 36:
-              _context3.prev = 36;
-              _context3.t1 = _context3["catch"](32);
-              _didIteratorError6 = true;
-              _iteratorError6 = _context3.t1;
-
-            case 40:
-              _context3.prev = 40;
-              _context3.prev = 41;
-
-              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                _iterator6.return();
-              }
-
-            case 43:
-              _context3.prev = 43;
-
-              if (!_didIteratorError6) {
-                _context3.next = 46;
-                break;
-              }
-
-              throw _iteratorError6;
-
-            case 46:
-              return _context3.finish(43);
-
-            case 47:
-              return _context3.finish(40);
-
-            case 48:
-              _iteratorNormalCompletion3 = true;
-              _context3.next = 27;
-              break;
-
-            case 51:
-              _context3.next = 57;
-              break;
-
-            case 53:
-              _context3.prev = 53;
-              _context3.t2 = _context3["catch"](25);
-              _didIteratorError3 = true;
-              _iteratorError3 = _context3.t2;
-
-            case 57:
-              _context3.prev = 57;
-              _context3.prev = 58;
-
-              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                _iterator3.return();
-              }
-
-            case 60:
-              _context3.prev = 60;
-
-              if (!_didIteratorError3) {
-                _context3.next = 63;
-                break;
-              }
-
-              throw _iteratorError3;
-
-            case 63:
-              return _context3.finish(60);
-
-            case 64:
-              return _context3.finish(57);
-
-            case 65:
-              _iteratorNormalCompletion4 = true;
-              _didIteratorError4 = false;
-              _iteratorError4 = undefined;
-              _context3.prev = 68;
-              _iterator4 = pending[Symbol.iterator]();
-
-            case 70:
-              if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                _context3.next = 81;
-                break;
-              }
-
-              migration = _step4.value;
-
-              if (!(migration.items && migration.items.length > 0 || migration.customHandler)) {
-                _context3.next = 77;
-                break;
-              }
-
-              _context3.next = 75;
-              return regeneratorRuntime.awrap(this.runMigration(migration, migration.items));
-
-            case 75:
-              _context3.next = 78;
-              break;
-
-            case 77:
-              this.markMigrationCompleted(migration);
-
-            case 78:
-              _iteratorNormalCompletion4 = true;
-              _context3.next = 70;
-              break;
-
-            case 81:
-              _context3.next = 87;
-              break;
-
-            case 83:
-              _context3.prev = 83;
-              _context3.t3 = _context3["catch"](68);
-              _didIteratorError4 = true;
-              _iteratorError4 = _context3.t3;
-
-            case 87:
-              _context3.prev = 87;
-              _context3.prev = 88;
-
-              if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                _iterator4.return();
-              }
-
-            case 90:
-              _context3.prev = 90;
-
-              if (!_didIteratorError4) {
-                _context3.next = 93;
-                break;
-              }
-
-              throw _iteratorError4;
-
-            case 93:
-              return _context3.finish(90);
-
-            case 94:
-              return _context3.finish(87);
-
-            case 95:
-              _iteratorNormalCompletion5 = true;
-              _didIteratorError5 = false;
-              _iteratorError5 = undefined;
-              _context3.prev = 98;
-
-              for (_iterator5 = this.completionHandlers[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                handler = _step5.value;
-                handler();
-              }
-
-              _context3.next = 106;
-              break;
-
-            case 102:
-              _context3.prev = 102;
-              _context3.t4 = _context3["catch"](98);
-              _didIteratorError5 = true;
-              _iteratorError5 = _context3.t4;
-
-            case 106:
-              _context3.prev = 106;
-              _context3.prev = 107;
-
-              if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                _iterator5.return();
-              }
-
-            case 109:
-              _context3.prev = 109;
-
-              if (!_didIteratorError5) {
-                _context3.next = 112;
-                break;
-              }
-
-              throw _iteratorError5;
-
-            case 112:
-              return _context3.finish(109);
-
-            case 113:
-              return _context3.finish(106);
-
-            case 114:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this, [[6, 10, 14, 22], [15,, 17, 21], [25, 53, 57, 65], [32, 36, 40, 48], [41,, 43, 47], [58,, 60, 64], [68, 83, 87, 95], [88,, 90, 94], [98, 102, 106, 114], [107,, 109, 113]]);
-    }
-  }, {
-    key: "encode",
-    value: function encode(text) {
-      return regeneratorRuntime.async(function encode$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              return _context4.abrupt("return", window.btoa(text));
-
-            case 1:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      });
-    }
-  }, {
-    key: "decode",
-    value: function decode(text) {
-      return regeneratorRuntime.async(function decode$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              return _context5.abrupt("return", window.atob(text));
-
-            case 1:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      });
-    }
-  }, {
-    key: "getCompletedMigrations",
-    value: function getCompletedMigrations() {
-      var rawCompleted;
-      return regeneratorRuntime.async(function getCompletedMigrations$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              if (this._completed) {
-                _context6.next = 5;
-                break;
-              }
-
-              _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue("migrations"));
-
-            case 3:
-              rawCompleted = _context6.sent;
-
-              if (rawCompleted) {
-                this._completed = JSON.parse(rawCompleted);
-              } else {
-                this._completed = [];
-              }
-
-            case 5:
-              return _context6.abrupt("return", this._completed);
-
-            case 6:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "getPendingMigrations",
-    value: function getPendingMigrations() {
-      var completed, pending, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, migration;
-
-      return regeneratorRuntime.async(function getPendingMigrations$(_context7) {
-        while (1) {
-          switch (_context7.prev = _context7.next) {
-            case 0:
-              _context7.next = 2;
-              return regeneratorRuntime.awrap(this.getCompletedMigrations());
-
-            case 2:
-              completed = _context7.sent;
-              pending = [];
-              _iteratorNormalCompletion7 = true;
-              _didIteratorError7 = false;
-              _iteratorError7 = undefined;
-              _context7.prev = 7;
-              _iterator7 = this.migrations[Symbol.iterator]();
-
-            case 9:
-              if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                _context7.next = 22;
-                break;
-              }
-
-              migration = _step7.value;
-              _context7.t0 = completed;
-              _context7.next = 14;
-              return regeneratorRuntime.awrap(this.encode(migration.name));
-
-            case 14:
-              _context7.t1 = _context7.sent;
-              _context7.t2 = _context7.t0.indexOf.call(_context7.t0, _context7.t1);
-              _context7.t3 = -1;
-
-              if (!(_context7.t2 == _context7.t3)) {
-                _context7.next = 19;
-                break;
-              }
-
-              pending.push(migration);
-
-            case 19:
-              _iteratorNormalCompletion7 = true;
-              _context7.next = 9;
-              break;
-
-            case 22:
-              _context7.next = 28;
-              break;
-
-            case 24:
-              _context7.prev = 24;
-              _context7.t4 = _context7["catch"](7);
-              _didIteratorError7 = true;
-              _iteratorError7 = _context7.t4;
-
-            case 28:
-              _context7.prev = 28;
-              _context7.prev = 29;
-
-              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                _iterator7.return();
-              }
-
-            case 31:
-              _context7.prev = 31;
-
-              if (!_didIteratorError7) {
-                _context7.next = 34;
-                break;
-              }
-
-              throw _iteratorError7;
-
-            case 34:
-              return _context7.finish(31);
-
-            case 35:
-              return _context7.finish(28);
-
-            case 36:
-              return _context7.abrupt("return", pending);
-
-            case 37:
-            case "end":
-              return _context7.stop();
-          }
-        }
-      }, null, this, [[7, 24, 28, 36], [29,, 31, 35]]);
-    }
-  }, {
-    key: "markMigrationCompleted",
-    value: function markMigrationCompleted(migration) {
-      var completed;
-      return regeneratorRuntime.async(function markMigrationCompleted$(_context8) {
-        while (1) {
-          switch (_context8.prev = _context8.next) {
-            case 0:
-              _context8.next = 2;
-              return regeneratorRuntime.awrap(this.getCompletedMigrations());
-
-            case 2:
-              completed = _context8.sent;
-              _context8.t0 = completed;
-              _context8.next = 6;
-              return regeneratorRuntime.awrap(this.encode(migration.name));
-
-            case 6:
-              _context8.t1 = _context8.sent;
-
-              _context8.t0.push.call(_context8.t0, _context8.t1);
-
-              this.storageManager.setValue("migrations", JSON.stringify(completed));
-              migration.running = false;
-
-            case 10:
-            case "end":
-              return _context8.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "runMigration",
-    value: function runMigration(migration, items) {
-      var _this2 = this;
-
-      return regeneratorRuntime.async(function runMigration$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              if (!migration.running) {
-                _context9.next = 2;
-                break;
-              }
-
-              return _context9.abrupt("return");
-
-            case 2:
-              console.log("Running migration:", migration.name);
-              migration.running = true;
-
-              if (!migration.customHandler) {
-                _context9.next = 8;
-                break;
-              }
-
-              return _context9.abrupt("return", migration.customHandler().then(function () {
-                _this2.markMigrationCompleted(migration);
-              }));
-
-            case 8:
-              return _context9.abrupt("return", migration.handler(items).then(function () {
-                _this2.markMigrationCompleted(migration);
-              }));
-
-            case 9:
-            case "end":
-              return _context9.stop();
-          }
-        }
-      });
-    }
-  }]);
-
-  return SNMigrationService;
 }();
 
 /***/ }),
@@ -22987,9 +23323,13 @@ function () {
   }, {
     key: "defaultValuesObject",
     value: function defaultValuesObject() {
-      var _ref3;
+      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref3$defaultModeSeed = _ref3.defaultModeSeed,
+          defaultModeSeed = _ref3$defaultModeSeed === void 0 ? {} : _ref3$defaultModeSeed;
 
-      return _ref3 = {}, _defineProperty(_ref3, this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT), {}), _defineProperty(_ref3, this.domainKeyForMode(STORAGE_VALUE_MODE_UNWRAPPED), {}), _ref3;
+      return this.constructor.defaultValuesObject({
+        defaultModeSeed: defaultModeSeed
+      });
     }
   }, {
     key: "repersistToDisk",
@@ -23421,6 +23761,17 @@ function () {
           }
         }
       }, null, this);
+    }
+  }], [{
+    key: "defaultValuesObject",
+    value: function defaultValuesObject() {
+      var _ref5;
+
+      var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref4$defaultModeSeed = _ref4.defaultModeSeed,
+          defaultModeSeed = _ref4$defaultModeSeed === void 0 ? {} : _ref4$defaultModeSeed;
+
+      return _ref5 = {}, _defineProperty(_ref5, this.domainKeyForMode(STORAGE_VALUE_MODE_DEFAULT), defaultModeSeed), _defineProperty(_ref5, this.domainKeyForMode(STORAGE_VALUE_MODE_UNWRAPPED), {}), _ref5;
     }
   }]);
 
@@ -26216,14 +26567,14 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
 /*!*****************************!*\
   !*** ./lib/storage_keys.js ***!
   \*****************************/
-/*! exports provided: ROOT_KEY_PARAMS, WRAPPED_ROOT_KEY, ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_ENCRYPTED_STORAGE, STORAGE_KEY_BIOMETRIC_PREFS, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY */
+/*! exports provided: STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_WRAPPED_ROOT_KEY, STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_ENCRYPTED_STORAGE, STORAGE_KEY_BIOMETRIC_PREFS, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY, RAW_STORAGE_KEY_LAST_MIGRATION_DATE */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_PARAMS", function() { return ROOT_KEY_PARAMS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WRAPPED_ROOT_KEY", function() { return WRAPPED_ROOT_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ROOT_KEY_WRAPPER_KEY_PARAMS", function() { return ROOT_KEY_WRAPPER_KEY_PARAMS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_ROOT_KEY_PARAMS", function() { return STORAGE_KEY_ROOT_KEY_PARAMS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_WRAPPED_ROOT_KEY", function() { return STORAGE_KEY_WRAPPED_ROOT_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS", function() { return STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_JWT", function() { return STORAGE_KEY_JWT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_USER", function() { return STORAGE_KEY_USER; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SERVER_HOST", function() { return STORAGE_KEY_SERVER_HOST; });
@@ -26235,9 +26586,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_PERSIST_KEY", function() { return SESSION_HISTORY_PERSIST_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_REVISIONS_KEY", function() { return SESSION_HISTORY_REVISIONS_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_OPTIMIZE_KEY", function() { return SESSION_HISTORY_OPTIMIZE_KEY; });
-var ROOT_KEY_PARAMS = 'ROOT_KEY_PARAMS';
-var WRAPPED_ROOT_KEY = 'WRAPPED_ROOT_KEY';
-var ROOT_KEY_WRAPPER_KEY_PARAMS = 'ROOT_KEY_WRAPPER_KEY_PARAMS';
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RAW_STORAGE_KEY_LAST_MIGRATION_DATE", function() { return RAW_STORAGE_KEY_LAST_MIGRATION_DATE; });
+var STORAGE_KEY_ROOT_KEY_PARAMS = 'STORAGE_KEY_ROOT_KEY_PARAMS';
+var STORAGE_KEY_WRAPPED_ROOT_KEY = 'STORAGE_KEY_WRAPPED_ROOT_KEY';
+var STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS = 'STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS';
 var STORAGE_KEY_JWT = 'jwt';
 var STORAGE_KEY_USER = 'user';
 var STORAGE_KEY_SERVER_HOST = 'server';
@@ -26249,6 +26601,9 @@ var STORAGE_KEY_BIOMETRIC_PREFS = 'biometrics_prefs';
 var SESSION_HISTORY_PERSIST_KEY = 'sessionHistory_persist';
 var SESSION_HISTORY_REVISIONS_KEY = 'sessionHistory_revisions';
 var SESSION_HISTORY_OPTIMIZE_KEY = 'sessionHistory_autoOptimize';
+/** Raw storage keys exist outside of StorageManager domain */
+
+var RAW_STORAGE_KEY_LAST_MIGRATION_DATE = 'last_migration_date';
 
 /***/ }),
 

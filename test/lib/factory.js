@@ -12,13 +12,13 @@ export default class Factory {
     const url = this.serverURL();
     let keychainValue;
     const keychainDelegate = new SNKeychainDelegate({
-      setKeyChainValue: async (value) => {
+      setKeychainValue: async (value) => {
         keychainValue = value;
       },
-      getKeyChainValue: async () => {
+      getKeychainValue: async () => {
         return keychainValue;
       },
-      clearKeyChainValue: async () => {
+      clearKeychainValue: async () => {
         keychainValue = null;
       }
     });
