@@ -24,8 +24,8 @@ describe('003 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    var currentVersion = application.protocolManager.latestVersion();
-    expect(application.protocolManager.costMinimumForVersion("003")).to.equal(110000);
+    var currentVersion = application.protocolService.latestVersion();
+    expect(application.protocolService.costMinimumForVersion("003")).to.equal(110000);
   });
 
   it('generates random key', async () => {

@@ -18,12 +18,12 @@ This library can be used in any JavaScript environment, including web, desktop, 
 
 ## Usage
 
-On the web, SNJS objects will be available as on the global window, such as `window.protocolManager`.
+On the web, SNJS objects will be available as on the global window, such as `window.protocolService`.
 
 If in a module environment, you can import it via:
 
 ```javascript
-import { protocolManager } from 'snjs';
+import { protocolService } from 'snjs';
 ```
 
 ### Generating keys for user
@@ -31,7 +31,7 @@ import { protocolManager } from 'snjs';
 #### New user (registration):
 
 ```javascript
-protocolManager.createRootKey({identifier: email, password: password}).then((results) => {
+protocolService.createRootKey({identifier: email, password: password}).then((results) => {
   const keys = results.keys;
   const keyParams = results.keyParams;
 
@@ -45,7 +45,7 @@ protocolManager.createRootKey({identifier: email, password: password}).then((res
 
 ```javascript
 let keyParams = getPreviouslyCreatedKeyParams();
-protocolManager.computeRootKey({password, keyParams}).then((keys) => {
+protocolService.computeRootKey({password, keyParams}).then((keys) => {
   const serverPassword = keys.serverPassword;
   const masterKey = keys.masterKey;
   // itemKey is generated once then uploaded to server in encrypted form.
@@ -61,13 +61,13 @@ protocolManager.computeRootKey({password, keyParams}).then((keys) => {
 
 ### Encrypting and decrypting items
 
-Use `protocolManager` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
+Use `protocolService` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
 
 #### Encrypt:
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.generateEncryptionParameters({item, keys, keyParams}).then(() => {
+protocolService.generateEncryptionParameters({item, keys, keyParams}).then(() => {
  // item.content is now encrypted
 })
 ```
@@ -76,7 +76,7 @@ protocolManager.generateEncryptionParameters({item, keys, keyParams}).then(() =>
 
 ```javascript
 let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolManager.payloadByDecryptingPayload({payload: item, keys}).then(() => {
+protocolService.payloadByDecryptingPayload({payload: item, keys}).then(() => {
  // item.content is now decrypted
 })
 ```

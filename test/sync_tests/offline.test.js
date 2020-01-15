@@ -58,7 +58,7 @@ describe('offline syncing', () => {
 
     const payload = rawPayloads2[0];
     expect(typeof payload.content).to.equal('string');
-    expect(payload.content.startsWith(this.application.protocolManager.latestVersion())).to.equal(true);
+    expect(payload.content.startsWith(this.application.protocolService.latestVersion())).to.equal(true);
   });
 
 });

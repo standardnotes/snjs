@@ -15,7 +15,7 @@ describe('sync discordance', () => {
     storageManager: localStorageManager,
     httpManager: Factory.globalHttpManager(),
     keyManager: Factory.globalKeyManager(),
-    protocolManager: Factory.globalProtocolManager()
+    protocolService: Factory.globalProtocolService()
   });
   let localHttpManager = new SNHttpManager();
   let localModelManager = Factory.createModelManager();
@@ -23,7 +23,7 @@ describe('sync discordance', () => {
     modelManager: localModelManager,
     sessionManager: Factory.globalSessionManager(),
     storageManager: localStorageManager,
-    protocolManager: Factory.globalProtocolManager(),
+    protocolService: Factory.globalProtocolService(),
     httpManager: localHttpManager
   });
 

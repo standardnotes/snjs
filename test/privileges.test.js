@@ -16,7 +16,7 @@ const syncManager = new SNSyncManager({
   modelManager,
   sessionManager: Factory.globalSessionManager(),
   storageManager: storageManager,
-  protocolManager: Factory.globalProtocolManager(),
+  protocolService: Factory.globalProtocolService(),
   httpManager: Factory.globalHttpManager()
 });
 const singletonManager = new SNSingletonManager(modelManager, syncManager);

@@ -48,7 +48,7 @@ describe("basic auth", () => {
       modelManager,
       storageManager,
       sessionManager: Factory.globalSessionManager(),
-      protocolManager: Factory.globalProtocolManager(),
+      protocolService: Factory.globalProtocolService(),
       httpManager: Factory.globalHttpManager()
     });
 
@@ -64,7 +64,7 @@ describe("basic auth", () => {
     await syncManager.loadDataFromDatabase();
     await syncManager.sync();
 
-    // const result = await Factory.globalProtocolManager().createRootKey({
+    // const result = await Factory.globalProtocolService().createRootKey({
     //   identifier: email,
     //   password: password
     // });
@@ -123,7 +123,7 @@ describe("basic auth", () => {
       modelManager,
       storageManager,
       sessionManager: Factory.globalSessionManager(),
-      protocolManager: Factory.globalProtocolManager(),
+      protocolService: Factory.globalProtocolService(),
       httpManager: Factory.globalHttpManager()
     });
 
@@ -139,7 +139,7 @@ describe("basic auth", () => {
     var strict = false;
 
     for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalProtocolManager().createRootKey({identifier: email, password});
+      var result = await Factory.globalProtocolService().createRootKey({identifier: email, password});
       var newKeys = result.key;
       var newKeyParams = result.keyParams;
 

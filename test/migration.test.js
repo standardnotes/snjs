@@ -27,13 +27,13 @@ describe('migrations', () => {
       modelManager,
       sessionManager,
       storageManager: Factory.globalStorageManager(),
-      protocolManager: Factory.globalProtocolManager(),
+      protocolService: Factory.globalProtocolService(),
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
+    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
-    migrationManager.registeredMigrations = () => {
+    migrationService.registeredMigrations = () => {
       return [
         {
           name: "migration-1",
@@ -50,21 +50,21 @@ describe('migrations', () => {
     var item = modelManager.allItems[0];
     expect(item.content.foo).to.not.equal("bar");
 
-    migrationManager.loadMigrations();
+    migrationService.loadMigrations();
 
     await syncManager.sync();
-    var pending = await migrationManager.getPendingMigrations();
-    var completed = await migrationManager.getCompletedMigrations();
+    var pending = await migrationService.getPendingMigrations();
+    var completed = await migrationService.getCompletedMigrations();
     expect(pending.length).to.equal(1);
     expect(completed.length).to.equal(0);
 
     await syncManager.loadDataFromDatabase();
     await syncManager.sync();
     // should be completed now
-    // migrationManager works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
+    // migrationService works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
     await Factory.sleep(0.3);
-    var pending = await migrationManager.getPendingMigrations();
-    var completed = await migrationManager.getCompletedMigrations();
+    var pending = await migrationService.getPendingMigrations();
+    var completed = await migrationService.getCompletedMigrations();
     expect(pending.length).to.equal(0);
     expect(completed.length).to.equal(1);
 
@@ -80,17 +80,17 @@ describe('migrations', () => {
       modelManager,
       sessionManager,
       storageManager: Factory.globalStorageManager(),
-      protocolManager: Factory.globalProtocolManager(),
+      protocolService: Factory.globalProtocolService(),
       httpManager: Factory.globalHttpManager()
     });
 
     await syncManager.loadDataFromDatabase();
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
+    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
     let randValue1 = Math.random();
     let randValue2 = Math.random();
-    migrationManager.registeredMigrations = () => {
+    migrationService.registeredMigrations = () => {
       return [
         {
           name: "migration-2",
@@ -114,13 +114,13 @@ describe('migrations', () => {
     }
 
     return new Promise(async (resolve, reject) => {
-      migrationManager.addCompletionHandler(() => {
+      migrationService.addCompletionHandler(() => {
         expect(item.content.bar).to.equal(randValue1);
         expect(item.content.foo).to.equal(randValue2);
         resolve();
       })
 
-      migrationManager.loadMigrations();
+      migrationService.loadMigrations();
 
       var item = modelManager.allItems[0];
       expect(item.content.bar).to.not.equal(randValue1);
@@ -141,17 +141,17 @@ describe('migrations', () => {
       modelManager,
       sessionManager,
       storageManager: Factory.globalStorageManager(),
-      protocolManager: Factory.globalProtocolManager(),
+      protocolService: Factory.globalProtocolService(),
       httpManager: Factory.globalHttpManager()
     });
 
-    var migrationManager = new SNMigrationManager(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
+    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
 
     var params1 = Factory.createStorageItemNotePayload();
     modelManager.addItem(params1);
 
     let randValue = Math.random();
-    migrationManager.registeredMigrations = () => {
+    migrationService.registeredMigrations = () => {
       return [
         {
           name: "migration-1",
@@ -165,21 +165,21 @@ describe('migrations', () => {
       ]
     }
 
-    migrationManager.loadMigrations();
+    migrationService.loadMigrations();
 
     await syncManager.sync();
-    var pending = await migrationManager.getPendingMigrations();
-    var completed = await migrationManager.getCompletedMigrations();
+    var pending = await migrationService.getPendingMigrations();
+    var completed = await migrationService.getCompletedMigrations();
     expect(pending.length).to.equal(1);
     expect(completed.length).to.equal(0);
 
     await syncManager.loadDataFromDatabase();
     await syncManager.sync();
     // should be completed now
-    // migrationManager works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
+    // migrationService works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
     await Factory.sleep(0.1);
-    var pending = await migrationManager.getPendingMigrations();
-    var completed = await migrationManager.getCompletedMigrations();
+    var pending = await migrationService.getPendingMigrations();
+    var completed = await migrationService.getCompletedMigrations();
     expect(pending.length).to.equal(0);
     expect(completed.length).to.equal(1);
 

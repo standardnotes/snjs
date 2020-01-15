@@ -24,7 +24,7 @@ describe('session history', () => {
     modelManager,
     sessionManager,
     storageManager: Factory.globalStorageManager(),
-    protocolManager: Factory.globalProtocolManager(),
+    protocolService: Factory.globalProtocolService(),
     httpManager: Factory.globalHttpManager()
   });
 

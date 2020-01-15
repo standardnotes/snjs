@@ -189,7 +189,7 @@ describe('online syncing', () => {
     await this.application.modelManager.setItemDirty(note, true);
     await this.application.syncManager.sync(syncOptions);
 
-    const encrypted = await this.application.protocolManager.payloadByEncryptingPayload({
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload({
       payload: note.payloadRepresentation(),
       intent: ENCRYPTION_INTENT_SYNC
     });
@@ -205,7 +205,7 @@ describe('online syncing', () => {
     const mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal("string");
 
-    const decryptedPayload = await this.application.protocolManager
+    const decryptedPayload = await this.application.protocolService
     .payloadByDecryptingPayload({
       payload: errorred
     });
@@ -538,7 +538,7 @@ describe('online syncing', () => {
     const payloads = [];
     for(const payload of encryptedPayloads) {
       expect(payload.dirty).to.equal(true);
-      const decrypted = await this.application.protocolManager
+      const decrypted = await this.application.protocolService
       .payloadByDecryptingPayload({
         payload: payload
       })

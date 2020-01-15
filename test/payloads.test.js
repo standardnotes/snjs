@@ -46,7 +46,7 @@ describe('payloads', () => {
       }
     })
 
-    const encryptedPayload = await sharedApplication.protocolManager.payloadByEncryptingPayload({
+    const encryptedPayload = await sharedApplication.protocolService.payloadByEncryptingPayload({
       payload: notePayload,
       intent: ENCRYPTION_INTENT_SYNC
     });
@@ -137,7 +137,7 @@ describe('payloads', () => {
 
   it("returns valid encrypted params for syncing", async () => {
     const payload = Factory.createStorageItemNotePayload();
-    const encryptedPayload = await sharedApplication.protocolManager
+    const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_SYNC
@@ -148,13 +148,13 @@ describe('payloads', () => {
     expect(encryptedPayload.content_type).to.not.be.null;
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolManager.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.latestVersion());
     });
   }).timeout(5000);
 
   it("returns unencrypted params with no keys", async () => {
     var payload = Factory.createStorageItemNotePayload();
-    const encodedPayload = await sharedApplication.protocolManager
+    const encodedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_FILE_DECRYPTED
@@ -172,7 +172,7 @@ describe('payloads', () => {
   it("returns additional fields for local storage", async () => {
     const payload = Factory.createStorageItemNotePayload();
 
-    const encryptedPayload = await sharedApplication.protocolManager
+    const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED
@@ -187,13 +187,13 @@ describe('payloads', () => {
     expect(encryptedPayload.deleted).to.not.be.null;
     expect(encryptedPayload.errorDecrypting).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolManager.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.latestVersion());
     });
   });
 
   it("omits deleted for export file", async () => {
     const payload = Factory.createStorageItemNotePayload();
-    const encryptedPayload = await sharedApplication.protocolManager
+    const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_FILE_ENCRYPTED
@@ -204,7 +204,7 @@ describe('payloads', () => {
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.deleted).to.not.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolManager.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.latestVersion());
     });
   });
 
@@ -216,7 +216,7 @@ describe('payloads', () => {
         errorDecrypting: true
       }
     })
-    const encryptedPayload = await sharedApplication.protocolManager
+    const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: mutatedPayload,
       intent: ENCRYPTION_INTENT_SYNC

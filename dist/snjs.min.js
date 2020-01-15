@@ -1197,14 +1197,14 @@ return /******/ (function(modules) { // webpackBootstrap
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return SNApplication; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_alertManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alertManager */ "./lib/services/alertManager.js");
+/* harmony import */ var _Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alert_manager */ "./lib/services/alert_manager.js");
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
-/* harmony import */ var _Services_componentManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/componentManager */ "./lib/services/componentManager.js");
+/* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
 /* harmony import */ var _Services_database_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/database_manager */ "./lib/services/database_manager.js");
-/* harmony import */ var _Services_httpManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/httpManager */ "./lib/services/httpManager.js");
-/* harmony import */ var _Services_keyManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/keyManager */ "./lib/services/keyManager.js");
-/* harmony import */ var _Services_migrationManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/migrationManager */ "./lib/services/migrationManager.js");
-/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
+/* harmony import */ var _Services_http_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/http_manager */ "./lib/services/http_manager.js");
+/* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
+/* harmony import */ var _Services_migration_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/migration_service */ "./lib/services/migration_service.js");
+/* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
 /* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
 /* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
 /* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
@@ -1825,12 +1825,12 @@ function () {
           switch (_context11.prev = _context11.next) {
             case 0:
               _context11.next = 2;
-              return regeneratorRuntime.awrap(this.protocolManager.crypto.generateUUID());
+              return regeneratorRuntime.awrap(this.protocolService.crypto.generateUUID());
 
             case 2:
               identifier = _context11.sent;
               _context11.next = 5;
-              return regeneratorRuntime.awrap(this.protocolManager.createRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: identifier,
                 password: passcode
               }));
@@ -1943,7 +1943,7 @@ function () {
 
             case 5:
               this.createModelManager();
-              this.createProtocolManager();
+              this.createProtocolService();
               this.createStorageManager();
               _context15.next = 10;
               return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
@@ -1957,7 +1957,7 @@ function () {
             case 14:
               this.createSyncManager();
               this.createKeyManager();
-              this.protocolManager.setKeyManager(this.keyManager);
+              this.protocolService.setKeyManager(this.keyManager);
               this.storageManager.setKeyManager(this.keyManager);
               this.keyManager.setKeychainDelegate(this.keychainDelegate);
               _context15.next = 21;
@@ -1965,7 +1965,7 @@ function () {
 
             case 21:
               this.createDeviceAuthService();
-              this.createSingletonManager(); // this.createMigrationManager();
+              this.createSingletonManager(); // this.createMigrationService();
 
               this.createComponentManager();
               this.registerSyncCompletionObserver();
@@ -2015,7 +2015,7 @@ function () {
       this.httpManager = null;
       this.databaseManager = null;
       this.modelManager = null;
-      this.protocolManager = null;
+      this.protocolService = null;
       this.storageManager = null;
       this.apiService = null;
       this.sessionManager = null;
@@ -2028,11 +2028,11 @@ function () {
   }, {
     key: "createAlertManager",
     value: function createAlertManager() {
-      if (this.shouldSkipClass(_Services_alertManager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"])) {
+      if (this.shouldSkipClass(_Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"])) {
         return;
       }
 
-      this.alertManager = new (this.getClass(_Services_alertManager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"]))();
+      this.alertManager = new (this.getClass(_Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"]))();
     }
   }, {
     key: "createApiService",
@@ -2046,7 +2046,7 @@ function () {
   }, {
     key: "createComponentManager",
     value: function createComponentManager() {
-      if (this.shouldSkipClass(_Services_componentManager__WEBPACK_IMPORTED_MODULE_3__["SNComponentManager"])) {
+      if (this.shouldSkipClass(_Services_component_manager__WEBPACK_IMPORTED_MODULE_14__["SNComponentManager"])) {
         return;
       }
 
@@ -2062,21 +2062,21 @@ function () {
   }, {
     key: "createHttpManager",
     value: function createHttpManager() {
-      this.httpManager = new (this.getClass(_Services_httpManager__WEBPACK_IMPORTED_MODULE_5__["SNHttpManager"]))(this.timeout);
+      this.httpManager = new (this.getClass(_Services_http_manager__WEBPACK_IMPORTED_MODULE_5__["SNHttpManager"]))(this.timeout);
     }
   }, {
     key: "createKeyManager",
     value: function createKeyManager() {
-      this.keyManager = new (this.getClass(_Services_keyManager__WEBPACK_IMPORTED_MODULE_6__["SNKeyManager"]))({
+      this.keyManager = new (this.getClass(_Services_key_manager__WEBPACK_IMPORTED_MODULE_6__["SNKeyManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
-        protocolManager: this.protocolManager
+        protocolService: this.protocolService
       });
     }
   }, {
-    key: "createMigrationManager",
-    value: function createMigrationManager() {
-      this.migrationManager = new (this.getClass(_Services_migrationManager__WEBPACK_IMPORTED_MODULE_7__["SNMigrationManager"]))({
+    key: "createMigrationService",
+    value: function createMigrationService() {
+      this.migrationService = new (this.getClass(_Services_migration_service__WEBPACK_IMPORTED_MODULE_7__["SNMigrationService"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         sessionManager: this.sessionManager,
@@ -2086,7 +2086,7 @@ function () {
   }, {
     key: "createModelManager",
     value: function createModelManager() {
-      this.modelManager = new (this.getClass(_Services_modelManager__WEBPACK_IMPORTED_MODULE_8__["SNModelManager"]))(this.timeout);
+      this.modelManager = new (this.getClass(_Services_model_manager__WEBPACK_IMPORTED_MODULE_8__["SNModelManager"]))(this.timeout);
     }
   }, {
     key: "createSingletonManager",
@@ -2100,15 +2100,15 @@ function () {
     key: "createStorageManager",
     value: function createStorageManager() {
       this.storageManager = new (this.getClass(_Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["SNStorageManager"]))({
-        protocolManager: this.protocolManager,
+        protocolService: this.protocolService,
         databaseManager: this.databaseManager,
         namespace: this.namespace
       });
     }
   }, {
-    key: "createProtocolManager",
-    value: function createProtocolManager() {
-      this.protocolManager = new (this.getClass(SNProtocolManager))({
+    key: "createProtocolService",
+    value: function createProtocolService() {
+      this.protocolService = new (this.getClass(SNProtocolService))({
         modelManager: this.modelManager
       });
     }
@@ -2118,7 +2118,7 @@ function () {
       this.sessionManager = new (this.getClass(_Services_api_session_manager__WEBPACK_IMPORTED_MODULE_2__["SNSessionManager"]))({
         storageManager: this.storageManager,
         alertManager: this.alertManager,
-        protocolManager: this.protocolManager,
+        protocolService: this.protocolService,
         apiService: this.apiService,
         timeout: this.timeout
       });
@@ -2130,7 +2130,7 @@ function () {
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         sessionManager: this.sessionManager,
-        protocolManager: this.protocolManager,
+        protocolService: this.protocolService,
         apiService: this.apiService,
         interval: this.interval
       });
@@ -2140,7 +2140,7 @@ function () {
     value: function createDeviceAuthService() {
       this.deviceAuthService = new (this.getClass(_Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__["DeviceAuthService"]))({
         storageManager: this.storageManager,
-        protocolManager: this.protocolManager,
+        protocolService: this.protocolService,
         keyManager: this.keyManager
       });
     }
@@ -2217,7 +2217,7 @@ var SNKeychainDelegate = function SNKeychainDelegate(_ref) {
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolManager, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationManager, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, SYNC_EVENT_FULL_SYNC_COMPLETED */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, SNKeychainDelegate, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNDatabaseManager, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, SYNC_EVENT_FULL_SYNC_COMPLETED */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2225,8 +2225,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_application__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/application */ "./lib/application.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return _Lib_application__WEBPACK_IMPORTED_MODULE_0__["SNApplication"]; });
 
-/* harmony import */ var _Protocol_protocolManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/protocolManager */ "./lib/protocol/protocolManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolManager", function() { return _Protocol_protocolManager__WEBPACK_IMPORTED_MODULE_1__["SNProtocolManager"]; });
+/* harmony import */ var _Services_protocol_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/protocol_service */ "./lib/services/protocol_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return _Services_protocol_service__WEBPACK_IMPORTED_MODULE_1__["SNProtocolService"]; });
 
 /* harmony import */ var _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/001/operator_001 */ "./lib/protocol/versions/001/operator_001.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator001", function() { return _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_2__["SNProtocolOperator001"]; });
@@ -2260,8 +2260,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./models/core/item */ "./lib/models/core/item.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models_core_item__WEBPACK_IMPORTED_MODULE_11__["SFItem"]; });
 
-/* harmony import */ var _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_12__["SNItemsKey"]; });
+/* harmony import */ var _models_keys_items_key__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/keys/items_key */ "./lib/models/keys/items_key.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models_keys_items_key__WEBPACK_IMPORTED_MODULE_12__["SNItemsKey"]; });
 
 /* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models_core_predicate__WEBPACK_IMPORTED_MODULE_13__["SFPredicate"]; });
@@ -2298,17 +2298,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_23__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/componentManager */ "./lib/services/componentManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_componentManager__WEBPACK_IMPORTED_MODULE_24__["SNComponentManager"]; });
+/* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_51__["SNComponentManager"]; });
 
-/* harmony import */ var _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/session_history/historySession */ "./lib/models/session_history/historySession.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_session_history_historySession__WEBPACK_IMPORTED_MODULE_25__["SFHistorySession"]; });
+/* harmony import */ var _models_history_historySession__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./models/history/historySession */ "./lib/models/history/historySession.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_history_historySession__WEBPACK_IMPORTED_MODULE_25__["SFHistorySession"]; });
 
-/* harmony import */ var _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__["SFItemHistory"]; });
+/* harmony import */ var _models_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./models/history/itemHistory */ "./lib/models/history/itemHistory.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_history_itemHistory__WEBPACK_IMPORTED_MODULE_26__["SFItemHistory"]; });
 
-/* harmony import */ var _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__["SFItemHistoryEntry"]; });
+/* harmony import */ var _models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./models/history/itemHistoryEntry */ "./lib/models/history/itemHistoryEntry.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_27__["SFItemHistoryEntry"]; });
 
 /* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_28__["SFPrivileges"]; });
@@ -2322,11 +2322,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_database_manager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/database_manager */ "./lib/services/database_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNDatabaseManager", function() { return _services_database_manager__WEBPACK_IMPORTED_MODULE_30__["SNDatabaseManager"]; });
 
-/* harmony import */ var _services_modelManager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/modelManager */ "./lib/services/modelManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_modelManager__WEBPACK_IMPORTED_MODULE_31__["SNModelManager"]; });
+/* harmony import */ var _services_model_manager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/model_manager */ "./lib/services/model_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_model_manager__WEBPACK_IMPORTED_MODULE_31__["SNModelManager"]; });
 
-/* harmony import */ var _services_httpManager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/httpManager */ "./lib/services/httpManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_httpManager__WEBPACK_IMPORTED_MODULE_32__["SNHttpManager"]; });
+/* harmony import */ var _services_http_manager__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/http_manager */ "./lib/services/http_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_http_manager__WEBPACK_IMPORTED_MODULE_32__["SNHttpManager"]; });
 
 /* harmony import */ var _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./services/storage_manager */ "./lib/services/storage_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_33__["SNStorageManager"]; });
@@ -2361,31 +2361,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_37__["SNSessionManager"]; });
 
-/* harmony import */ var _services_migrationManager__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/migrationManager */ "./lib/services/migrationManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationManager", function() { return _services_migrationManager__WEBPACK_IMPORTED_MODULE_38__["SNMigrationManager"]; });
+/* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_38__["SNMigrationService"]; });
 
-/* harmony import */ var _services_alertManager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/alertManager */ "./lib/services/alertManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alertManager__WEBPACK_IMPORTED_MODULE_39__["SNAlertManager"]; });
+/* harmony import */ var _services_alert_manager__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./services/alert_manager */ "./lib/services/alert_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alert_manager__WEBPACK_IMPORTED_MODULE_39__["SNAlertManager"]; });
 
-/* harmony import */ var _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./services/session_history/sessionHistoryManager */ "./lib/services/session_history/sessionHistoryManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_session_history_sessionHistoryManager__WEBPACK_IMPORTED_MODULE_40__["SFSessionHistoryManager"]; });
+/* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_40__["SFSessionHistoryManager"]; });
 
-/* harmony import */ var _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./services/privileges/privilegesManager */ "./lib/services/privileges/privilegesManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privilegesManager__WEBPACK_IMPORTED_MODULE_41__["SFPrivilegesManager"]; });
+/* harmony import */ var _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./services/privileges/privileges_manager */ "./lib/services/privileges/privileges_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivilegesManager", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_41__["SFPrivilegesManager"]; });
 
 /* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_42__["SNSingletonManager"]; });
 
-/* harmony import */ var _services_keyManager__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./services/keyManager */ "./lib/services/keyManager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_43__["SNKeyManager"]; });
+/* harmony import */ var _services_key_manager__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./services/key_manager */ "./lib/services/key_manager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _services_key_manager__WEBPACK_IMPORTED_MODULE_43__["SNKeyManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_NONE", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_NONE"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_NONE", function() { return _services_key_manager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_NONE"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_ONLY", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_ONLY"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_ONLY", function() { return _services_key_manager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_ONLY"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_PLUS_WRAPPER", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_PLUS_WRAPPER"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_ROOT_KEY_PLUS_WRAPPER", function() { return _services_key_manager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_ROOT_KEY_PLUS_WRAPPER"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_WRAPPER_ONLY", function() { return _services_keyManager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_WRAPPER_ONLY"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_WRAPPER_ONLY", function() { return _services_key_manager__WEBPACK_IMPORTED_MODULE_43__["KEY_MODE_WRAPPER_ONLY"]; });
 
 /* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_44__["SNApiService"]; });
@@ -4957,6 +4957,384 @@ function CreateItemFromPayload(payload) {
 
 /***/ }),
 
+/***/ "./lib/models/history/historySession.js":
+/*!**********************************************!*\
+  !*** ./lib/models/history/historySession.js ***!
+  \**********************************************/
+/*! exports provided: SFHistorySession */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return SFHistorySession; });
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/history/itemHistory */ "./lib/models/history/itemHistory.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+/**
+ * SFHistorySession is the only object in the session history domain that is
+ * persistable. A history session contains one main content object: the
+ * itemUUIDToItemHistoryMapping. This is a dictionary whose keys are item uuids,
+ * and each value is an SFItemHistory object.
+
+ * Each SFItemHistory object contains an array called `entires` which contain
+ * `SFItemHistory` entries or subclasses, if the `SFItemHistory.HistoryEntryClassMapping`
+ * class property value is set.
+ */
+
+
+var SFHistorySession =
+/*#__PURE__*/
+function (_SFItem) {
+  _inherits(SFHistorySession, _SFItem);
+
+  function SFHistorySession(payload) {
+    var _this;
+
+    _classCallCheck(this, SFHistorySession);
+
+    SFHistorySession.LargeItemEntryAmountThreshold = 60;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFHistorySession).call(this, payload));
+
+    if (!_this.content.itemUUIDToItemHistoryMapping) {
+      _this.content.itemUUIDToItemHistoryMapping = {};
+    }
+
+    var uuids = Object.keys(_this.content.itemUUIDToItemHistoryMapping);
+    uuids.forEach(function (itemUUID) {
+      var itemHistory = _this.content.itemUUIDToItemHistoryMapping[itemUUID];
+      _this.content.itemUUIDToItemHistoryMapping[itemUUID] = new _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"](itemHistory);
+    });
+    return _this;
+  }
+
+  _createClass(SFHistorySession, [{
+    key: "addEntryForItem",
+    value: function addEntryForItem(item) {
+      var itemHistory = this.historyForItem(item);
+      return itemHistory.addHistoryEntryForItem(item);
+    }
+  }, {
+    key: "historyForItem",
+    value: function historyForItem(item) {
+      var history = this.content.itemUUIDToItemHistoryMapping[item.uuid];
+
+      if (!history) {
+        history = new _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"]();
+        this.content.itemUUIDToItemHistoryMapping[item.uuid] = history;
+      }
+
+      return history;
+    }
+  }, {
+    key: "clearItemHistory",
+    value: function clearItemHistory(item) {
+      this.historyForItem(item).clear();
+    }
+  }, {
+    key: "clearAllHistory",
+    value: function clearAllHistory() {
+      this.content.itemUUIDToItemHistoryMapping = {};
+    }
+  }, {
+    key: "optimizeHistoryForItem",
+    value: function optimizeHistoryForItem(item) {
+      /**
+       * Clean up if there are too many revisions. Note LargeItemEntryAmountThreshold
+       * is the amount of revisions which above, call for an optimization. An
+       * optimization may not remove entries above this threshold. It will
+       * determine what it should keep and what it shouldn't. So, it is possible
+       * to have a threshold of 60 but have 600 entries, if the item history deems
+       * those worth keeping.
+       */
+      var itemHistory = this.historyForItem(item);
+
+      if (itemHistory.entries.length > SFHistorySession.LargeItemEntryAmountThreshold) {
+        itemHistory.optimize();
+      }
+    }
+  }]);
+
+  return SFHistorySession;
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+
+/***/ }),
+
+/***/ "./lib/models/history/itemHistory.js":
+/*!*******************************************!*\
+  !*** ./lib/models/history/itemHistory.js ***!
+  \*******************************************/
+/*! exports provided: SFItemHistory */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return SFItemHistory; });
+/* harmony import */ var _Models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/history/itemHistoryEntry */ "./lib/models/history/itemHistoryEntry.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// See default class values at bottom of this file, including `SFItemHistory.LargeEntryDeltaThreshold`.
+
+var SFItemHistory =
+/*#__PURE__*/
+function () {
+  function SFItemHistory() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, SFItemHistory);
+
+    if (!this.entries) {
+      this.entries = [];
+    } // Deserialize the entries into entry objects.
+
+
+    if (params.entries) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = params.entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var entryParams = _step.value;
+          var entry = this.createEntryForItem(entryParams.item);
+          entry.setPreviousEntry(this.getLastEntry());
+          this.entries.push(entry);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }
+
+  _createClass(SFItemHistory, [{
+    key: "createEntryForItem",
+    value: function createEntryForItem(item) {
+      var historyItemClass = SFItemHistory.HistoryEntryClassMapping && SFItemHistory.HistoryEntryClassMapping[item.content_type];
+
+      if (!historyItemClass) {
+        historyItemClass = _Models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__["SFItemHistoryEntry"];
+      }
+
+      var entry = new historyItemClass(item);
+      return entry;
+    }
+  }, {
+    key: "getLastEntry",
+    value: function getLastEntry() {
+      return this.entries[this.entries.length - 1];
+    }
+  }, {
+    key: "addHistoryEntryForItem",
+    value: function addHistoryEntryForItem(item) {
+      var prospectiveEntry = this.createEntryForItem(item);
+      var previousEntry = this.getLastEntry();
+      prospectiveEntry.setPreviousEntry(previousEntry); // Don't add first revision if text length is 0, as this means it's a new note.
+      // Actually, nevermind. If we do this, the first character added to a new note
+      // will be displayed as "1 characters loaded".
+      // if(!previousRevision && prospectiveRevision.textCharDiffLength == 0) {
+      //   return;
+      // }
+      // Don't add if text is the same
+
+      if (prospectiveEntry.isSameAsEntry(previousEntry)) {
+        return;
+      }
+
+      this.entries.push(prospectiveEntry);
+      return prospectiveEntry;
+    }
+  }, {
+    key: "clear",
+    value: function clear() {
+      this.entries.length = 0;
+    }
+  }, {
+    key: "optimize",
+    value: function optimize() {
+      var _this = this;
+
+      var keepEntries = [];
+
+      var isEntrySignificant = function isEntrySignificant(entry) {
+        return entry.deltaSize() > SFItemHistory.LargeEntryDeltaThreshold;
+      };
+
+      var processEntry = function processEntry(entry, index, keep) {
+        // Entries may be processed retrospectively, meaning it can be decided to be deleted, then an upcoming processing can change that.
+        if (keep) {
+          keepEntries.push(entry);
+        } else {
+          // Remove if in keep
+          var index = keepEntries.indexOf(entry);
+
+          if (index !== -1) {
+            keepEntries.splice(index, 1);
+          }
+        }
+
+        if (keep && isEntrySignificant(entry) && entry.operationVector() == -1) {
+          // This is a large negative change. Hang on to the previous entry.
+          var previousEntry = _this.entries[index - 1];
+
+          if (previousEntry) {
+            keepEntries.push(previousEntry);
+          }
+        }
+      };
+
+      this.entries.forEach(function (entry, index) {
+        if (index == 0 || index == _this.entries.length - 1) {
+          // Keep the first and last
+          processEntry(entry, index, true);
+        } else {
+          var significant = isEntrySignificant(entry);
+          processEntry(entry, index, significant);
+        }
+      });
+      this.entries = this.entries.filter(function (entry, index) {
+        return keepEntries.indexOf(entry) !== -1;
+      });
+    }
+  }]);
+
+  return SFItemHistory;
+}(); // The amount of characters added or removed that constitute a keepable entry after optimization.
+
+SFItemHistory.LargeEntryDeltaThreshold = 15;
+
+/***/ }),
+
+/***/ "./lib/models/history/itemHistoryEntry.js":
+/*!************************************************!*\
+  !*** ./lib/models/history/itemHistoryEntry.js ***!
+  \************************************************/
+/*! exports provided: SFItemHistoryEntry */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return SFItemHistoryEntry; });
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var SFItemHistoryEntry =
+/*#__PURE__*/
+function () {
+  function SFItemHistoryEntry(item) {
+    _classCallCheck(this, SFItemHistoryEntry);
+
+    // Whatever values `item` has will be persisted, so be sure that the values are picked beforehand.
+    this.item = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["deepMerge"])({}, item); // We'll assume a `text` content value to diff on. If it doesn't exist, no problem.
+
+    this.defaultContentKeyToDiffOn = "text"; // Default value
+
+    this.textCharDiffLength = 0;
+
+    if (typeof this.item.updated_at == 'string') {
+      this.item.updated_at = new Date(this.item.updated_at);
+    }
+  }
+
+  _createClass(SFItemHistoryEntry, [{
+    key: "setPreviousEntry",
+    value: function setPreviousEntry(previousEntry) {
+      this.hasPreviousEntry = previousEntry != null; // we'll try to compute the delta based on an assumed content property of `text`, if it exists.
+
+      if (this.item.content[this.defaultContentKeyToDiffOn]) {
+        if (previousEntry) {
+          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length - previousEntry.item.content[this.defaultContentKeyToDiffOn].length;
+        } else {
+          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length;
+        }
+      }
+    }
+  }, {
+    key: "operationVector",
+    value: function operationVector() {
+      // We'll try to use the value of `textCharDiffLength` to help determine this, if it's set
+      if (this.textCharDiffLength != undefined) {
+        if (!this.hasPreviousEntry || this.textCharDiffLength == 0) {
+          return 0;
+        } else if (this.textCharDiffLength < 0) {
+          return -1;
+        } else {
+          return 1;
+        }
+      } // Otherwise use a default value of 1
+
+
+      return 1;
+    }
+  }, {
+    key: "deltaSize",
+    value: function deltaSize() {
+      // Up to the subclass to determine how large the delta was, i.e number of characters changed.
+      // But this general class won't be able to determine which property it should diff on, or even its format.
+      // We can return the `textCharDiffLength` if it's set, otherwise, just return 1;
+      if (this.textCharDiffLength != undefined) {
+        return Math.abs(this.textCharDiffLength);
+      } // Otherwise return 1 here to constitute a basic positive delta.
+      // The value returned should always be positive. override `operationVector` to return the direction of the delta.
+
+
+      return 1;
+    }
+  }, {
+    key: "isSameAsEntry",
+    value: function isSameAsEntry(entry) {
+      if (!entry) {
+        return false;
+      }
+
+      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](this.item);
+      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](entry.item);
+      return lhs.isItemContentEqualWith(rhs);
+    }
+  }]);
+
+  return SFItemHistoryEntry;
+}();
+
+/***/ }),
+
 /***/ "./lib/models/index.js":
 /*!*****************************!*\
   !*** ./lib/models/index.js ***!
@@ -4969,8 +5347,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]; });
 
-/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]; });
+/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_14__["SNItemsKey"]; });
 
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]; });
@@ -5025,17 +5403,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./lib/models/keys/itemsKey.js":
-/*!*************************************!*\
-  !*** ./lib/models/keys/itemsKey.js ***!
-  \*************************************/
+/***/ "./lib/models/keys/items_key.js":
+/*!**************************************!*\
+  !*** ./lib/models/keys/items_key.js ***!
+  \**************************************/
 /*! exports provided: SNItemsKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
-/* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
+/* harmony import */ var _Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/keys/pure_key */ "./lib/models/keys/pure_key.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
@@ -5136,14 +5514,14 @@ function (_SNPureKey) {
   }]);
 
   return SNItemsKey;
-}(_Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
+}(_Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_5__["SNPureKey"]);
 
 /***/ }),
 
-/***/ "./lib/models/keys/pureKey.js":
-/*!************************************!*\
-  !*** ./lib/models/keys/pureKey.js ***!
-  \************************************/
+/***/ "./lib/models/keys/pure_key.js":
+/*!*************************************!*\
+  !*** ./lib/models/keys/pure_key.js ***!
+  \*************************************/
 /*! exports provided: SNPureKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5280,17 +5658,17 @@ function (_SFItem) {
 
 /***/ }),
 
-/***/ "./lib/models/keys/rootKey.js":
-/*!************************************!*\
-  !*** ./lib/models/keys/rootKey.js ***!
-  \************************************/
+/***/ "./lib/models/keys/root_key.js":
+/*!*************************************!*\
+  !*** ./lib/models/keys/root_key.js ***!
+  \*************************************/
 /*! exports provided: SNRootKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return SNRootKey; });
-/* harmony import */ var _Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pureKey */ "./lib/models/keys/pureKey.js");
+/* harmony import */ var _Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/keys/pure_key */ "./lib/models/keys/pure_key.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -5391,7 +5769,7 @@ function (_SNPureKey) {
   }]);
 
   return SNRootKey;
-}(_Models_keys_pureKey__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
+}(_Models_keys_pure_key__WEBPACK_IMPORTED_MODULE_0__["SNPureKey"]);
 
 /***/ }),
 
@@ -5704,384 +6082,6 @@ function (_SFItem) {
 
   return SNServerExtension;
 }(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/session_history/historySession.js":
-/*!******************************************************!*\
-  !*** ./lib/models/session_history/historySession.js ***!
-  \******************************************************/
-/*! exports provided: SFHistorySession */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return SFHistorySession; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/session_history/itemHistory */ "./lib/models/session_history/itemHistory.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/**
- * SFHistorySession is the only object in the session history domain that is
- * persistable. A history session contains one main content object: the
- * itemUUIDToItemHistoryMapping. This is a dictionary whose keys are item uuids,
- * and each value is an SFItemHistory object.
-
- * Each SFItemHistory object contains an array called `entires` which contain
- * `SFItemHistory` entries or subclasses, if the `SFItemHistory.HistoryEntryClassMapping`
- * class property value is set.
- */
-
-
-var SFHistorySession =
-/*#__PURE__*/
-function (_SFItem) {
-  _inherits(SFHistorySession, _SFItem);
-
-  function SFHistorySession(payload) {
-    var _this;
-
-    _classCallCheck(this, SFHistorySession);
-
-    SFHistorySession.LargeItemEntryAmountThreshold = 60;
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFHistorySession).call(this, payload));
-
-    if (!_this.content.itemUUIDToItemHistoryMapping) {
-      _this.content.itemUUIDToItemHistoryMapping = {};
-    }
-
-    var uuids = Object.keys(_this.content.itemUUIDToItemHistoryMapping);
-    uuids.forEach(function (itemUUID) {
-      var itemHistory = _this.content.itemUUIDToItemHistoryMapping[itemUUID];
-      _this.content.itemUUIDToItemHistoryMapping[itemUUID] = new _Models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"](itemHistory);
-    });
-    return _this;
-  }
-
-  _createClass(SFHistorySession, [{
-    key: "addEntryForItem",
-    value: function addEntryForItem(item) {
-      var itemHistory = this.historyForItem(item);
-      return itemHistory.addHistoryEntryForItem(item);
-    }
-  }, {
-    key: "historyForItem",
-    value: function historyForItem(item) {
-      var history = this.content.itemUUIDToItemHistoryMapping[item.uuid];
-
-      if (!history) {
-        history = new _Models_session_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"]();
-        this.content.itemUUIDToItemHistoryMapping[item.uuid] = history;
-      }
-
-      return history;
-    }
-  }, {
-    key: "clearItemHistory",
-    value: function clearItemHistory(item) {
-      this.historyForItem(item).clear();
-    }
-  }, {
-    key: "clearAllHistory",
-    value: function clearAllHistory() {
-      this.content.itemUUIDToItemHistoryMapping = {};
-    }
-  }, {
-    key: "optimizeHistoryForItem",
-    value: function optimizeHistoryForItem(item) {
-      /**
-       * Clean up if there are too many revisions. Note LargeItemEntryAmountThreshold
-       * is the amount of revisions which above, call for an optimization. An
-       * optimization may not remove entries above this threshold. It will
-       * determine what it should keep and what it shouldn't. So, it is possible
-       * to have a threshold of 60 but have 600 entries, if the item history deems
-       * those worth keeping.
-       */
-      var itemHistory = this.historyForItem(item);
-
-      if (itemHistory.entries.length > SFHistorySession.LargeItemEntryAmountThreshold) {
-        itemHistory.optimize();
-      }
-    }
-  }]);
-
-  return SFHistorySession;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/session_history/itemHistory.js":
-/*!***************************************************!*\
-  !*** ./lib/models/session_history/itemHistory.js ***!
-  \***************************************************/
-/*! exports provided: SFItemHistory */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return SFItemHistory; });
-/* harmony import */ var _Models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/session_history/itemHistoryEntry */ "./lib/models/session_history/itemHistoryEntry.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-// See default class values at bottom of this file, including `SFItemHistory.LargeEntryDeltaThreshold`.
-
-var SFItemHistory =
-/*#__PURE__*/
-function () {
-  function SFItemHistory() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, SFItemHistory);
-
-    if (!this.entries) {
-      this.entries = [];
-    } // Deserialize the entries into entry objects.
-
-
-    if (params.entries) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = params.entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var entryParams = _step.value;
-          var entry = this.createEntryForItem(entryParams.item);
-          entry.setPreviousEntry(this.getLastEntry());
-          this.entries.push(entry);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }
-
-  _createClass(SFItemHistory, [{
-    key: "createEntryForItem",
-    value: function createEntryForItem(item) {
-      var historyItemClass = SFItemHistory.HistoryEntryClassMapping && SFItemHistory.HistoryEntryClassMapping[item.content_type];
-
-      if (!historyItemClass) {
-        historyItemClass = _Models_session_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__["SFItemHistoryEntry"];
-      }
-
-      var entry = new historyItemClass(item);
-      return entry;
-    }
-  }, {
-    key: "getLastEntry",
-    value: function getLastEntry() {
-      return this.entries[this.entries.length - 1];
-    }
-  }, {
-    key: "addHistoryEntryForItem",
-    value: function addHistoryEntryForItem(item) {
-      var prospectiveEntry = this.createEntryForItem(item);
-      var previousEntry = this.getLastEntry();
-      prospectiveEntry.setPreviousEntry(previousEntry); // Don't add first revision if text length is 0, as this means it's a new note.
-      // Actually, nevermind. If we do this, the first character added to a new note
-      // will be displayed as "1 characters loaded".
-      // if(!previousRevision && prospectiveRevision.textCharDiffLength == 0) {
-      //   return;
-      // }
-      // Don't add if text is the same
-
-      if (prospectiveEntry.isSameAsEntry(previousEntry)) {
-        return;
-      }
-
-      this.entries.push(prospectiveEntry);
-      return prospectiveEntry;
-    }
-  }, {
-    key: "clear",
-    value: function clear() {
-      this.entries.length = 0;
-    }
-  }, {
-    key: "optimize",
-    value: function optimize() {
-      var _this = this;
-
-      var keepEntries = [];
-
-      var isEntrySignificant = function isEntrySignificant(entry) {
-        return entry.deltaSize() > SFItemHistory.LargeEntryDeltaThreshold;
-      };
-
-      var processEntry = function processEntry(entry, index, keep) {
-        // Entries may be processed retrospectively, meaning it can be decided to be deleted, then an upcoming processing can change that.
-        if (keep) {
-          keepEntries.push(entry);
-        } else {
-          // Remove if in keep
-          var index = keepEntries.indexOf(entry);
-
-          if (index !== -1) {
-            keepEntries.splice(index, 1);
-          }
-        }
-
-        if (keep && isEntrySignificant(entry) && entry.operationVector() == -1) {
-          // This is a large negative change. Hang on to the previous entry.
-          var previousEntry = _this.entries[index - 1];
-
-          if (previousEntry) {
-            keepEntries.push(previousEntry);
-          }
-        }
-      };
-
-      this.entries.forEach(function (entry, index) {
-        if (index == 0 || index == _this.entries.length - 1) {
-          // Keep the first and last
-          processEntry(entry, index, true);
-        } else {
-          var significant = isEntrySignificant(entry);
-          processEntry(entry, index, significant);
-        }
-      });
-      this.entries = this.entries.filter(function (entry, index) {
-        return keepEntries.indexOf(entry) !== -1;
-      });
-    }
-  }]);
-
-  return SFItemHistory;
-}(); // The amount of characters added or removed that constitute a keepable entry after optimization.
-
-SFItemHistory.LargeEntryDeltaThreshold = 15;
-
-/***/ }),
-
-/***/ "./lib/models/session_history/itemHistoryEntry.js":
-/*!********************************************************!*\
-  !*** ./lib/models/session_history/itemHistoryEntry.js ***!
-  \********************************************************/
-/*! exports provided: SFItemHistoryEntry */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return SFItemHistoryEntry; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-var SFItemHistoryEntry =
-/*#__PURE__*/
-function () {
-  function SFItemHistoryEntry(item) {
-    _classCallCheck(this, SFItemHistoryEntry);
-
-    // Whatever values `item` has will be persisted, so be sure that the values are picked beforehand.
-    this.item = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["deepMerge"])({}, item); // We'll assume a `text` content value to diff on. If it doesn't exist, no problem.
-
-    this.defaultContentKeyToDiffOn = "text"; // Default value
-
-    this.textCharDiffLength = 0;
-
-    if (typeof this.item.updated_at == 'string') {
-      this.item.updated_at = new Date(this.item.updated_at);
-    }
-  }
-
-  _createClass(SFItemHistoryEntry, [{
-    key: "setPreviousEntry",
-    value: function setPreviousEntry(previousEntry) {
-      this.hasPreviousEntry = previousEntry != null; // we'll try to compute the delta based on an assumed content property of `text`, if it exists.
-
-      if (this.item.content[this.defaultContentKeyToDiffOn]) {
-        if (previousEntry) {
-          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length - previousEntry.item.content[this.defaultContentKeyToDiffOn].length;
-        } else {
-          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length;
-        }
-      }
-    }
-  }, {
-    key: "operationVector",
-    value: function operationVector() {
-      // We'll try to use the value of `textCharDiffLength` to help determine this, if it's set
-      if (this.textCharDiffLength != undefined) {
-        if (!this.hasPreviousEntry || this.textCharDiffLength == 0) {
-          return 0;
-        } else if (this.textCharDiffLength < 0) {
-          return -1;
-        } else {
-          return 1;
-        }
-      } // Otherwise use a default value of 1
-
-
-      return 1;
-    }
-  }, {
-    key: "deltaSize",
-    value: function deltaSize() {
-      // Up to the subclass to determine how large the delta was, i.e number of characters changed.
-      // But this general class won't be able to determine which property it should diff on, or even its format.
-      // We can return the `textCharDiffLength` if it's set, otherwise, just return 1;
-      if (this.textCharDiffLength != undefined) {
-        return Math.abs(this.textCharDiffLength);
-      } // Otherwise return 1 here to constitute a basic positive delta.
-      // The value returned should always be positive. override `operationVector` to return the direction of the delta.
-
-
-      return 1;
-    }
-  }, {
-    key: "isSameAsEntry",
-    value: function isSameAsEntry(entry) {
-      if (!entry) {
-        return false;
-      }
-
-      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](this.item);
-      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](entry.item);
-      return lhs.isItemContentEqualWith(rhs);
-    }
-  }]);
-
-  return SFItemHistoryEntry;
-}();
 
 /***/ }),
 
@@ -8976,843 +8976,6 @@ function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/protocolManager.js":
-/*!*****************************************!*\
-  !*** ./lib/protocol/protocolManager.js ***!
-  \*****************************************/
-/*! exports provided: SNProtocolManager */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolManager", function() { return SNProtocolManager; });
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
-/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/001/operator_001 */ "./lib/protocol/versions/001/operator_001.js");
-/* harmony import */ var _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions/002/operator_002 */ "./lib/protocol/versions/002/operator_002.js");
-/* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
-/* harmony import */ var _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions/004/operator_004 */ "./lib/protocol/versions/004/operator_004.js");
-/* harmony import */ var _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions/001/key_params_001 */ "./lib/protocol/versions/001/key_params_001.js");
-/* harmony import */ var _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions/002/key_params_002 */ "./lib/protocol/versions/002/key_params_002.js");
-/* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
-/* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var SNProtocolManager =
-/*#__PURE__*/
-function () {
-  function SNProtocolManager(_ref) {
-    var modelManager = _ref.modelManager,
-        crypto = _ref.crypto;
-
-    _classCallCheck(this, SNProtocolManager);
-
-    if (!modelManager) {
-      throw 'Invalid ProtocolManager construction.';
-    }
-
-    this.operators = [];
-    this.modelManager = modelManager;
-    this.loadCryptoInstance(crypto);
-  }
-  /**
-   * To avoid circular dependencies in constructor, applications must create
-   * a key manager separately and feed it into the protocolManager here.
-   * @param keyManager  A fully constructed keyManager
-   */
-
-
-  _createClass(SNProtocolManager, [{
-    key: "setKeyManager",
-    value: function setKeyManager(keyManager) {
-      var _this = this;
-
-      this.keyManager = keyManager;
-      this.keyManager.addKeyChangeObserver({
-        name: 'protocol-manager',
-        callback: function callback(contentType) {
-          if (contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_ITEMS_KEY"]) {
-            _this.decryptErroredItems();
-          }
-        }
-      });
-    }
-  }, {
-    key: "loadCryptoInstance",
-    value: function loadCryptoInstance(crypto) {
-      if (!crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isWebEnvironment"])()) {
-        // IE and Edge do not support pbkdf2 in WebCrypto.
-        if (Object(sncrypto__WEBPACK_IMPORTED_MODULE_0__["isWebCryptoAvailable"])()) {
-          this.crypto = new sncrypto__WEBPACK_IMPORTED_MODULE_0__["SNWebCrypto"]();
-        } else {
-          console.error("WebCrypto is not available.");
-        }
-      } else {
-        this.crypto = crypto;
-      }
-
-      _Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"].SetUuidGenerators({
-        syncImpl: this.crypto.generateUUIDSync,
-        asyncImpl: this.crypto.generateUUIDSync
-      });
-    }
-  }, {
-    key: "latestVersion",
-    value: function latestVersion() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"];
-    }
-  }, {
-    key: "getUserVersion",
-    value: function getUserVersion() {
-      var keyParams;
-      return regeneratorRuntime.async(function getUserVersion$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              keyParams = this.keyManager.getRootKeyParams();
-              return _context.abrupt("return", keyParams && keyParams.version);
-
-            case 2:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "supportsPasswordDerivationCost",
-    value: function supportsPasswordDerivationCost(cost) {
-      // Some passwords are created on platforms with stronger pbkdf2 capabilities, like iOS or WebCrypto,
-      // if user has high password cost and is using browser that doesn't support WebCrypto,
-      // we want to tell them that they can't login with this browser.
-      if (cost > 5000) {
-        return this.crypto instanceof sncrypto__WEBPACK_IMPORTED_MODULE_0__["SNWebCrypto"];
-      } else {
-        return true;
-      }
-    }
-    /**
-     * @returns  The versions that this library supports.
-    */
-
-  }, {
-    key: "supportedVersions",
-    value: function supportedVersions() {
-      return [_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]];
-    }
-  }, {
-    key: "isVersionNewerThanLibraryVersion",
-    value: function isVersionNewerThanLibraryVersion(version) {
-      var libraryVersion = this.latestVersion();
-      return parseInt(version) > parseInt(libraryVersion);
-    }
-  }, {
-    key: "isProtocolVersionOutdated",
-    value: function isProtocolVersionOutdated(version) {
-      // YYYY-MM-DD
-      var expirationDates = {};
-      expirationDates[_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]] = Date.parse('2018-01-01');
-      expirationDates[_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]] = Date.parse('2020-01-01');
-      var date = expirationDates[version];
-
-      if (!date) {
-        // No expiration date, is active version
-        return false;
-      }
-
-      var expired = new Date() > date;
-      return expired;
-    }
-  }, {
-    key: "costMinimumForVersion",
-    value: function costMinimumForVersion(version) {
-      switch (version) {
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]:
-          return _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__["SNProtocolOperator001"].pwCost();
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]:
-          return _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator002"].pwCost();
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]:
-          return _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__["SNProtocolOperator003"].pwCost();
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]:
-          return _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__["SNProtocolOperator004"].kdfIterations();
-
-        default:
-          throw "Unable to find cost minimum for version ".concat(version);
-      }
-    }
-  }, {
-    key: "versionForPayload",
-    value: function versionForPayload(payload) {
-      return payload.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_LENGTH"]);
-    }
-  }, {
-    key: "createOperatorForLatestVersion",
-    value: function createOperatorForLatestVersion() {
-      return this.createOperatorForVersion(this.latestVersion());
-    }
-  }, {
-    key: "createOperatorForVersion",
-    value: function createOperatorForVersion(version) {
-      if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]) {
-        return new _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__["SNProtocolOperator001"](this.crypto);
-      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]) {
-        return new _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator002"](this.crypto);
-      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]) {
-        return new _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__["SNProtocolOperator003"](this.crypto);
-      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]) {
-        return new _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__["SNProtocolOperator004"](this.crypto);
-      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_BASE_64_DECRYPTED"]) {
-        return this.createOperatorForLatestVersion();
-      } else {
-        throw "Unable to find operator for version ".concat(version);
-      }
-    }
-  }, {
-    key: "operatorForVersion",
-    value: function operatorForVersion(version) {
-      var operatorKey = version;
-      var operator = this.operators[operatorKey];
-
-      if (!operator) {
-        operator = this.createOperatorForVersion(version);
-        this.operators[operatorKey] = operator;
-      }
-
-      return operator;
-    }
-  }, {
-    key: "defaultOperator",
-    value: function defaultOperator() {
-      return this.operatorForVersion(this.latestVersion());
-    }
-  }, {
-    key: "computeRootKey",
-    value: function computeRootKey(_ref2) {
-      var password, keyParams, version, operator;
-      return regeneratorRuntime.async(function computeRootKey$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              password = _ref2.password, keyParams = _ref2.keyParams;
-              version = keyParams.version;
-              operator = this.operatorForVersion(version);
-              return _context2.abrupt("return", operator.computeRootKey({
-                password: password,
-                keyParams: keyParams
-              }));
-
-            case 4:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "createRootKey",
-    value: function createRootKey(_ref3) {
-      var identifier, password, operator;
-      return regeneratorRuntime.async(function createRootKey$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              identifier = _ref3.identifier, password = _ref3.password;
-              operator = this.defaultOperator();
-              return _context3.abrupt("return", operator.createRootKey({
-                identifier: identifier,
-                password: password
-              }));
-
-            case 3:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "getRootKeyParams",
-    value: function getRootKeyParams() {
-      return regeneratorRuntime.async(function getRootKeyParams$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              return _context4.abrupt("return", this.keyManager.getRootKeyParams());
-
-            case 1:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "payloadContentFormatForIntent",
-    value: function payloadContentFormatForIntent(_ref4) {
-      var key = _ref4.key,
-          intent = _ref4.intent;
-
-      if (!key) {
-        /** Decrypted */
-        if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_FILE_DECRYPTED"]) {
-          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"];
-        } else if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_SYNC"]) {
-          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"];
-        }
-      } else {
-        /** Encrypted */
-        if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_SYNC"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]) {
-          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"];
-        } else {
-          throw "Unhandled case in protocolManager.payloadContentFormat.";
-        }
-      }
-    }
-    /**
-     * Generates parameters for a payload that are typically encrypted, and used for syncing or saving locally.
-     * Parameters are non-typed objects that can later by converted to objects.
-     * @param key Optional. The key to use to encrypt the payload. Will be looked up if not supplied.
-     * @returns A plain key/value object.
-     */
-
-  }, {
-    key: "payloadByEncryptingPayload",
-    value: function payloadByEncryptingPayload(_ref5) {
-      var payload, key, intent, version, format, operator, encryptionParameters;
-      return regeneratorRuntime.async(function payloadByEncryptingPayload$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              payload = _ref5.payload, key = _ref5.key, intent = _ref5.intent;
-
-              if (!payload.errorDecrypting) {
-                _context5.next = 3;
-                break;
-              }
-
-              return _context5.abrupt("return", payload);
-
-            case 3:
-              if (!(!key && !Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["isDecryptedIntent"])(intent))) {
-                _context5.next = 7;
-                break;
-              }
-
-              _context5.next = 6;
-              return regeneratorRuntime.awrap(this.keyManager.keyToUseForEncryptionOfPayload({
-                payload: payload,
-                intent: intent
-              }));
-
-            case 6:
-              key = _context5.sent;
-
-            case 7:
-              if (!(!key && Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["intentRequiresEncryption"])(intent))) {
-                _context5.next = 9;
-                break;
-              }
-
-              throw 'Attempting to generate encrypted payload with no key.';
-
-            case 9:
-              if (!payload.isEncrypted) {
-                _context5.next = 11;
-                break;
-              }
-
-              throw 'Attempting to encrypt already encrypted payload.';
-
-            case 11:
-              if (payload.content) {
-                _context5.next = 13;
-                break;
-              }
-
-              throw 'Attempting to encrypt payload with no content.';
-
-            case 13:
-              if (payload.uuid) {
-                _context5.next = 15;
-                break;
-              }
-
-              throw 'Attempting to encrypt payload with no uuid.';
-
-            case 15:
-              version = key ? key.version : this.latestVersion();
-              format = this.payloadContentFormatForIntent({
-                key: key,
-                intent: intent
-              });
-              operator = this.operatorForVersion(version);
-              _context5.next = 20;
-              return regeneratorRuntime.awrap(operator.generateEncryptionParameters({
-                payload: payload,
-                key: key,
-                format: format
-              }));
-
-            case 20:
-              encryptionParameters = _context5.sent;
-
-              if (encryptionParameters) {
-                _context5.next = 23;
-                break;
-              }
-
-              throw 'Unable to generate encryption parameters';
-
-            case 23:
-              return _context5.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_11__["CreateIntentPayloadFromObject"])({
-                object: payload,
-                override: encryptionParameters,
-                intent: intent
-              }));
-
-            case 24:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "payloadsByEncryptingPayloads",
-    value: function payloadsByEncryptingPayloads(_ref6) {
-      var payloads, intent, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, encryptedPayload;
-
-      return regeneratorRuntime.async(function payloadsByEncryptingPayloads$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              payloads = _ref6.payloads, intent = _ref6.intent;
-              results = [];
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context6.prev = 5;
-              _iterator = payloads[Symbol.iterator]();
-
-            case 7:
-              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context6.next = 16;
-                break;
-              }
-
-              payload = _step.value;
-              _context6.next = 11;
-              return regeneratorRuntime.awrap(this.payloadByEncryptingPayload({
-                payload: payload,
-                intent: intent
-              }));
-
-            case 11:
-              encryptedPayload = _context6.sent;
-              results.push(encryptedPayload);
-
-            case 13:
-              _iteratorNormalCompletion = true;
-              _context6.next = 7;
-              break;
-
-            case 16:
-              _context6.next = 22;
-              break;
-
-            case 18:
-              _context6.prev = 18;
-              _context6.t0 = _context6["catch"](5);
-              _didIteratorError = true;
-              _iteratorError = _context6.t0;
-
-            case 22:
-              _context6.prev = 22;
-              _context6.prev = 23;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 25:
-              _context6.prev = 25;
-
-              if (!_didIteratorError) {
-                _context6.next = 28;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 28:
-              return _context6.finish(25);
-
-            case 29:
-              return _context6.finish(22);
-
-            case 30:
-              return _context6.abrupt("return", results);
-
-            case 31:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this, [[5, 18, 22, 30], [23,, 25, 29]]);
-    }
-    /**
-     * Generates a new payload by decrypting the input payload.
-     * @param payload - The payload to decrypt.
-     * @param key - Optional. The key to use to decrypt the payload. If none is supplied, it will be automatically looked up.
-     */
-
-  }, {
-    key: "payloadByDecryptingPayload",
-    value: function payloadByDecryptingPayload(_ref7) {
-      var payload, key, version, operator, encryptionParameters, decryptedParameters;
-      return regeneratorRuntime.async(function payloadByDecryptingPayload$(_context7) {
-        while (1) {
-          switch (_context7.prev = _context7.next) {
-            case 0:
-              payload = _ref7.payload, key = _ref7.key;
-
-              if (payload.content) {
-                _context7.next = 3;
-                break;
-              }
-
-              throw 'Attempting to decrypt payload that has no content.';
-
-            case 3:
-              if (key) {
-                _context7.next = 7;
-                break;
-              }
-
-              _context7.next = 6;
-              return regeneratorRuntime.awrap(this.keyManager.keyToUseForDecryptionOfPayload({
-                payload: payload
-              }));
-
-            case 6:
-              key = _context7.sent;
-
-            case 7:
-              if (key) {
-                _context7.next = 9;
-                break;
-              }
-
-              return _context7.abrupt("return", CreateMaxPayloadFromAnyObject({
-                object: payload,
-                override: {
-                  waitingForKey: true,
-                  errorDecrypting: true
-                }
-              }));
-
-            case 9:
-              version = this.versionForPayload(payload);
-              operator = this.operatorForVersion(version);
-              encryptionParameters = Object(_Payloads__WEBPACK_IMPORTED_MODULE_11__["CreateEncryptionParameters"])(payload);
-              _context7.next = 14;
-              return regeneratorRuntime.awrap(operator.generateDecryptedParameters({
-                encryptedParameters: encryptionParameters,
-                key: key
-              }));
-
-            case 14:
-              decryptedParameters = _context7.sent;
-              return _context7.abrupt("return", CreateMaxPayloadFromAnyObject({
-                object: payload,
-                override: decryptedParameters
-              }));
-
-            case 16:
-            case "end":
-              return _context7.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "payloadsByDecryptingPayloads",
-    value: function payloadsByDecryptingPayloads(_ref8) {
-      var payloads, throws, decryptedPayloads, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, encryptedPayload, isDecryptable, decryptedPayload, _override;
-
-      return regeneratorRuntime.async(function payloadsByDecryptingPayloads$(_context8) {
-        while (1) {
-          switch (_context8.prev = _context8.next) {
-            case 0:
-              payloads = _ref8.payloads, throws = _ref8.throws;
-              decryptedPayloads = [];
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context8.prev = 5;
-              _iterator2 = payloads[Symbol.iterator]();
-
-            case 7:
-              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context8.next = 37;
-                break;
-              }
-
-              encryptedPayload = _step2.value;
-
-              if (encryptedPayload) {
-                _context8.next = 12;
-                break;
-              }
-
-              /** Keep in counts similar to out counts */
-              decryptedPayloads.push(encryptedPayload);
-              return _context8.abrupt("continue", 34);
-
-            case 12:
-              if (encryptedPayload.isPayload) {
-                _context8.next = 14;
-                break;
-              }
-
-              throw 'Attempting to decrypt non-payload object in payloadsByDecryptingPayloads.';
-
-            case 14:
-              if (!(encryptedPayload.deleted === true && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isNullOrUndefined"])(encryptedPayload.content))) {
-                _context8.next = 17;
-                break;
-              }
-
-              decryptedPayloads.push(encryptedPayload);
-              return _context8.abrupt("continue", 34);
-
-            case 17:
-              isDecryptable = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isString"])(encryptedPayload.content);
-
-              if (isDecryptable) {
-                _context8.next = 21;
-                break;
-              }
-
-              decryptedPayloads.push(encryptedPayload);
-              return _context8.abrupt("continue", 34);
-
-            case 21:
-              _context8.prev = 21;
-              _context8.next = 24;
-              return regeneratorRuntime.awrap(this.payloadByDecryptingPayload({
-                payload: encryptedPayload
-              }));
-
-            case 24:
-              decryptedPayload = _context8.sent;
-              decryptedPayloads.push(decryptedPayload);
-              _context8.next = 34;
-              break;
-
-            case 28:
-              _context8.prev = 28;
-              _context8.t0 = _context8["catch"](21);
-              decryptedPayloads.push(CreateMaxPayloadFromAnyObject({
-                object: encryptedPayload,
-                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedPayload.errorDecrypting), _override)
-              }));
-
-              if (!throws) {
-                _context8.next = 33;
-                break;
-              }
-
-              throw _context8.t0;
-
-            case 33:
-              console.error("Error decrypting payload", encryptedPayload, _context8.t0);
-
-            case 34:
-              _iteratorNormalCompletion2 = true;
-              _context8.next = 7;
-              break;
-
-            case 37:
-              _context8.next = 43;
-              break;
-
-            case 39:
-              _context8.prev = 39;
-              _context8.t1 = _context8["catch"](5);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context8.t1;
-
-            case 43:
-              _context8.prev = 43;
-              _context8.prev = 44;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 46:
-              _context8.prev = 46;
-
-              if (!_didIteratorError2) {
-                _context8.next = 49;
-                break;
-              }
-
-              throw _iteratorError2;
-
-            case 49:
-              return _context8.finish(46);
-
-            case 50:
-              return _context8.finish(43);
-
-            case 51:
-              return _context8.abrupt("return", decryptedPayloads);
-
-            case 52:
-            case "end":
-              return _context8.stop();
-          }
-        }
-      }, null, this, [[5, 39, 43, 51], [21, 28], [44,, 46, 50]]);
-    }
-    /**
-     * If an item was attempting to decrypt, but failed, either because the keys
-     * for that item had not downloaded yet, or any other reason, it will be deferred
-     * item.errorDecrypting = true and possibly item.waitingForKey = true.
-     * Here we find such items, and attempt to decrypt them again.
-     */
-
-  }, {
-    key: "decryptErroredItems",
-    value: function decryptErroredItems() {
-      var items, payloads, decrypted;
-      return regeneratorRuntime.async(function decryptErroredItems$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              items = this.modelManager.allItems.filter(function (item) {
-                return item.waitingForKey || item.errorDecrypting;
-              });
-
-              if (!(items.length === 0)) {
-                _context9.next = 3;
-                break;
-              }
-
-              return _context9.abrupt("return");
-
-            case 3:
-              payloads = items.map(function (item) {
-                return CreateMaxPayloadFromAnyObject({
-                  object: item
-                });
-              });
-              _context9.next = 6;
-              return regeneratorRuntime.awrap(this.payloadsByDecryptingPayloads({
-                payloads: payloads
-              }));
-
-            case 6:
-              decrypted = _context9.sent;
-              _context9.next = 9;
-              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
-                payloads: decrypted
-              }));
-
-            case 9:
-            case "end":
-              return _context9.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
-     * Compares two keys for equality
-     * @returns Boolean
-    */
-
-  }, {
-    key: "compareKeys",
-    value: function compareKeys(keyA, keyB) {
-      return regeneratorRuntime.async(function compareKeys$(_context10) {
-        while (1) {
-          switch (_context10.prev = _context10.next) {
-            case 0:
-              return _context10.abrupt("return", keyA.compare(keyB));
-
-            case 1:
-            case "end":
-              return _context10.stop();
-          }
-        }
-      });
-    }
-  }, {
-    key: "createVersionedKeyParams",
-    value: function createVersionedKeyParams(keyParams) {
-      // 002 doesn't have version automatically, newer versions do.
-      var version = keyParams.version || _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"];
-
-      switch (version) {
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]:
-          return new _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_7__["SNRootKeyParams001"](keyParams);
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]:
-          return new _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_8__["SNRootKeyParams002"](keyParams);
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]:
-          return new _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_9__["SNRootKeyParams003"](keyParams);
-
-        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]:
-          return new _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_10__["SNRootKeyParams004"](keyParams);
-      }
-
-      throw "No auth params version found.";
-    }
-  }]);
-
-  return SNProtocolManager;
-}();
-
-/***/ }),
-
 /***/ "./lib/protocol/versions.js":
 /*!**********************************!*\
   !*** ./lib/protocol/versions.js ***!
@@ -9994,7 +9157,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/001/key_params_001 */ "./lib/protocol/versions/001/key_params_001.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 /* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
@@ -10446,7 +9609,7 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context7.sent;
-              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw({
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 version: this.constructor.versionString()
@@ -10663,7 +9826,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -11142,7 +10305,7 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context7.sent;
-              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].FromRaw({
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_10__["SNRootKey"].FromRaw({
                 pw: partitions[0],
                 mk: partitions[1],
                 ak: partitions[2],
@@ -11371,7 +10534,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
 /* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
 /* harmony import */ var _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/002/operator_002 */ "./lib/protocol/versions/002/operator_002.js");
-/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -11690,16 +10853,16 @@ function (_SNRootKeyParams) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return SNProtocolOperator004; });
 /* harmony import */ var _Protocol_versions_operator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions/operator */ "./lib/protocol/versions/operator.js");
-/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
+/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
 /* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
 /* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
-/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -11913,7 +11076,7 @@ function (_SNProtocolOperator) {
                   }
                 }
               });
-              itemsKey = new _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"](payload);
+              itemsKey = new _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_10__["SNItemsKey"](payload);
               _context4.next = 8;
               return regeneratorRuntime.awrap(itemsKey.initUUID());
 
@@ -12049,7 +11212,7 @@ function (_SNProtocolOperator) {
             case 0:
               payload = _ref6.payload, key = _ref6.key, format = _ref6.format;
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
                 _context7.next = 3;
                 break;
               }
@@ -12061,7 +11224,7 @@ function (_SNProtocolOperator) {
               }));
 
             case 3:
-              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"])) {
+              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"])) {
                 _context7.next = 5;
                 break;
               }
@@ -12103,7 +11266,7 @@ function (_SNProtocolOperator) {
 
             case 16:
               encryptedItemKey = _context7.sent;
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
+              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ITEMS_KEY_ID"], key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_CONTENT"], encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ENC_ITEM_KEY"], encryptedItemKey), _CreateEncryptionPara)));
 
             case 18:
             case "end":
@@ -12124,7 +11287,7 @@ function (_SNProtocolOperator) {
               encryptedParameters = _ref7.encryptedParameters, key = _ref7.key;
               format = encryptedParameters.getContentFormat();
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_9__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"] || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_8__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"])) {
                 _context8.next = 4;
                 break;
               }
@@ -12157,9 +11320,9 @@ function (_SNProtocolOperator) {
               }
 
               console.error('Error decrypting parameters', encryptedParameters);
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
+                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
               }));
 
             case 11:
@@ -12184,15 +11347,15 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
+                override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
               }));
 
             case 19:
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_7__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override3)
+                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override3)
               }));
 
             case 20:
@@ -12303,7 +11466,7 @@ function (_SNProtocolOperator) {
               };
               /** @todo: HKDF each key to domain-seperate. */
 
-              key = _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].FromRaw(params);
+              key = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_11__["SNRootKey"].FromRaw(params);
               return _context10.abrupt("return", key);
 
             case 12:
@@ -12320,7 +11483,7 @@ function (_SNProtocolOperator) {
      * The protocol version. Will be prefixed to encrypted payloads.
      */
     value: function versionString() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_8__["PROTOCOL_VERSION_004"];
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["PROTOCOL_VERSION_004"];
     }
     /**
      * The number of PBKDF2 iterations.
@@ -12658,10 +11821,10 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/alertManager.js":
-/*!**************************************!*\
-  !*** ./lib/services/alertManager.js ***!
-  \**************************************/
+/***/ "./lib/services/alert_manager.js":
+/*!***************************************!*\
+  !*** ./lib/services/alert_manager.js ***!
+  \***************************************/
 /*! exports provided: SNAlertManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13252,8 +12415,8 @@ function StrictSignInFailed(current, latest) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return SNSessionManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_alertManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alertManager */ "./lib/services/alertManager.js");
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
+/* harmony import */ var _Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/alert_manager */ "./lib/services/alert_manager.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -13271,19 +12434,19 @@ function () {
     var storageManager = _ref.storageManager,
         apiService = _ref.apiService,
         alertManager = _ref.alertManager,
-        protocolManager = _ref.protocolManager,
+        protocolService = _ref.protocolService,
         timeout = _ref.timeout;
 
     _classCallCheck(this, SNSessionManager);
 
-    if (!storageManager || !protocolManager) {
+    if (!storageManager || !protocolService) {
       throw 'Invalid SessionManager construction';
     }
 
-    this.protocolManager = protocolManager;
+    this.protocolService = protocolService;
     this.storageManager = storageManager;
     this.apiService = apiService;
-    this.alertManager = alertManager || new _Services_alertManager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"]();
+    this.alertManager = alertManager || new _Services_alert_manager__WEBPACK_IMPORTED_MODULE_1__["SNAlertManager"]();
     this.timeout = timeout || setTimeout.bind(window);
   }
 
@@ -13296,7 +12459,7 @@ function () {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"]));
 
             case 2:
               userData = _context.sent;
@@ -13312,7 +12475,7 @@ function () {
 
             case 7:
               _context.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_LEGACY_UUID"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_LEGACY_UUID"]));
 
             case 9:
               uuid = _context.sent;
@@ -13399,7 +12562,7 @@ function () {
 
             case 3:
               _context5.next = 5;
-              return regeneratorRuntime.awrap(this.protocolManager.createRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: email,
                 password: password
               }));
@@ -13461,7 +12624,7 @@ function () {
                 mfaKeyPath: mfaKeyPath,
                 mfaCode: mfaCode
               }).then(function (response) {
-                var keyParams = _this3.protocolManager.createVersionedKeyParams(response);
+                var keyParams = _this3.protocolService.createVersionedKeyParams(response);
 
                 return {
                   keyParams: keyParams
@@ -13489,12 +12652,12 @@ function () {
               return _context7.abrupt("return", this.apiService.error(messages.API_MESSAGE_FAILBACK_LOGIN_FAIL));
 
             case 9:
-              if (this.protocolManager.supportedVersions().includes(keyParams.version)) {
+              if (this.protocolService.supportedVersions().includes(keyParams.version)) {
                 _context7.next = 15;
                 break;
               }
 
-              if (!this.protocolManager.isVersionNewerThanLibraryVersion(keyParams.version)) {
+              if (!this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
                 _context7.next = 14;
                 break;
               }
@@ -13505,7 +12668,7 @@ function () {
               return _context7.abrupt("return", this.apiService.error(messages.EXPIRED_PROTOCOL_VERSION));
 
             case 15:
-              if (!this.protocolManager.isProtocolVersionOutdated(keyParams.version)) {
+              if (!this.protocolService.isProtocolVersionOutdated(keyParams.version)) {
                 _context7.next = 22;
                 break;
               }
@@ -13531,7 +12694,7 @@ function () {
               return _context7.abrupt("return", this.apiService.error());
 
             case 22:
-              if (this.protocolManager.supportsPasswordDerivationCost(keyParams.kdfIterations)) {
+              if (this.protocolService.supportsPasswordDerivationCost(keyParams.kdfIterations)) {
                 _context7.next = 24;
                 break;
               }
@@ -13539,7 +12702,7 @@ function () {
               return _context7.abrupt("return", this.apiService.error(messages.UNSUPPORTED_PASSWORD_COST));
 
             case 24:
-              minimum = this.protocolManager.costMinimumForVersion(keyParams.version);
+              minimum = this.protocolService.costMinimumForVersion(keyParams.version);
 
               if (!(keyParams.kdfIterations < minimum)) {
                 _context7.next = 27;
@@ -13554,7 +12717,7 @@ function () {
                 break;
               }
 
-              latest = this.protocolManager.latestVersion();
+              latest = this.protocolService.latestVersion();
 
               if (!(keyParams.version !== latest)) {
                 _context7.next = 31;
@@ -13565,7 +12728,7 @@ function () {
 
             case 31:
               _context7.next = 33;
-              return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }).then(function (rootKey) {
@@ -13627,7 +12790,7 @@ function () {
             case 0:
               email = _ref5.email, currentPassword = _ref5.currentPassword, currentKeyParams = _ref5.currentKeyParams, newPassword = _ref5.newPassword;
               _context9.next = 3;
-              return regeneratorRuntime.awrap(this.protocolManager.createRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: email,
                 password: currentPassword
               }).then(function (result) {
@@ -13637,7 +12800,7 @@ function () {
             case 3:
               currentSeverPassword = _context9.sent;
               _context9.next = 6;
-              return regeneratorRuntime.awrap(this.protocolManager.createRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: email,
                 password: newPassword
               }).then(function (result) {
@@ -13699,7 +12862,7 @@ function () {
               user = response.user;
               this.user = user;
               _context10.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"], JSON.stringify(user)));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_USER"], JSON.stringify(user)));
 
             case 4:
               _context10.next = 6;
@@ -13724,7 +12887,7 @@ function () {
             case 0:
               token = _ref7.token;
               _context11.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_JWT"], token));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["STORAGE_KEY_JWT"], token));
 
             case 3:
               this.apiService.setSessionAuthentication({
@@ -13745,10 +12908,10 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/componentManager.js":
-/*!******************************************!*\
-  !*** ./lib/services/componentManager.js ***!
-  \******************************************/
+/***/ "./lib/services/component_manager.js":
+/*!*******************************************!*\
+  !*** ./lib/services/component_manager.js ***!
+  \*******************************************/
 /*! exports provided: SNComponentManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13764,7 +12927,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
+/* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
@@ -16799,9 +15962,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CHALLENGE_ACCOUNT_PASSWORD", function() { return CHALLENGE_ACCOUNT_PASSWORD; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CHALLENGE_BIOMETRIC", function() { return CHALLENGE_BIOMETRIC; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return DeviceAuthService; });
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -16820,13 +15983,13 @@ function () {
   function DeviceAuthService(_ref) {
     var storageManager = _ref.storageManager,
         keyManager = _ref.keyManager,
-        protocolManager = _ref.protocolManager;
+        protocolService = _ref.protocolService;
 
     _classCallCheck(this, DeviceAuthService);
 
     this.storageManager = storageManager;
     this.keyManager = keyManager;
-    this.protocolManager = protocolManager;
+    this.protocolService = protocolService;
   }
   /**
    * @public
@@ -16875,7 +16038,7 @@ function () {
               }
 
               _context2.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
               biometricPrefs = _context2.sent;
@@ -16902,9 +16065,9 @@ function () {
           switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], {
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_0__["STORAGE_KEY_BIOMETRIC_PREFS"], {
                 enabled: true
-              }, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_3__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              }, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 2:
             case "end":
@@ -16932,7 +16095,7 @@ function () {
             case 3:
               keyParams = _context4.sent;
               _context4.next = 6;
-              return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: response.value,
                 keyParams: keyParams
               }));
@@ -16986,7 +16149,7 @@ function () {
             case 3:
               keyParams = _context5.sent;
               _context5.next = 6;
-              return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: response.value,
                 keyParams: keyParams
               }));
@@ -17016,10 +16179,292 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/httpManager.js":
-/*!*************************************!*\
-  !*** ./lib/services/httpManager.js ***!
-  \*************************************/
+/***/ "./lib/services/history/history_manager.js":
+/*!*************************************************!*\
+  !*** ./lib/services/history/history_manager.js ***!
+  \*************************************************/
+/*! exports provided: SFSessionHistoryManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return SFSessionHistoryManager; });
+/* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
+/* harmony import */ var _Models_history_historySession__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/history/historySession */ "./lib/models/history/historySession.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+var SFSessionHistoryManager =
+/*#__PURE__*/
+function () {
+  function SFSessionHistoryManager(modelManager, storageManager, contentTypes, timeout) {
+    var _this = this;
+
+    _classCallCheck(this, SFSessionHistoryManager);
+
+    this.modelManager = modelManager;
+    this.storageManager = storageManager;
+    this.timeout = timeout || setTimeout.bind(window);
+    this.loadFromDisk().then(function () {
+      _this.modelManager.addMappingObserver("session-history", contentTypes, function (allItems, validItems, deletedItems, source, sourceKey) {
+        if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]) {
+          return;
+        }
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = allItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var item = _step.value;
+
+            try {
+              _this.addHistoryEntryForItem(item);
+            } catch (e) {
+              console.log("Caught exception while trying to add item history entry", e);
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      });
+    });
+  }
+
+  _createClass(SFSessionHistoryManager, [{
+    key: "addHistoryEntryForItem",
+    value: function addHistoryEntryForItem(item) {
+      var _this2 = this;
+
+      var persistableItemParams = {
+        uuid: item.uuid,
+        content_type: item.content_type,
+        updated_at: item.updated_at,
+        content: item.getContentCopy()
+      };
+      var entry = this.historySession.addEntryForItem(persistableItemParams);
+
+      if (this.autoOptimize) {
+        this.historySession.optimizeHistoryForItem(item);
+      }
+
+      if (entry && this.diskEnabled) {
+        // Debounce, clear existing timeout
+        if (this.diskTimeout) {
+          if (this.timeout.hasOwnProperty("cancel")) {
+            this.timeout.cancel(this.diskTimeout);
+          } else {
+            clearTimeout(this.diskTimeout);
+          }
+        }
+
+        ;
+        this.diskTimeout = this.timeout(function () {
+          _this2.saveToDisk();
+        }, 2000);
+      }
+    }
+  }, {
+    key: "historyForItem",
+    value: function historyForItem(item) {
+      return this.historySession.historyForItem(item);
+    }
+  }, {
+    key: "clearHistoryForItem",
+    value: function clearHistoryForItem(item) {
+      return regeneratorRuntime.async(function clearHistoryForItem$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.historySession.clearItemHistory(item);
+              return _context.abrupt("return", this.saveToDisk());
+
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "clearAllHistory",
+    value: function clearAllHistory() {
+      return regeneratorRuntime.async(function clearAllHistory$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              this.historySession.clearAllHistory();
+              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "toggleDiskSaving",
+    value: function toggleDiskSaving() {
+      return regeneratorRuntime.async(function toggleDiskSaving$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              this.diskEnabled = !this.diskEnabled;
+
+              if (!this.diskEnabled) {
+                _context3.next = 6;
+                break;
+              }
+
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
+              this.saveToDisk();
+              _context3.next = 8;
+              break;
+
+            case 6:
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
+              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+
+            case 8:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "saveToDisk",
+    value: function saveToDisk() {
+      return regeneratorRuntime.async(function saveToDisk$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              if (this.diskEnabled) {
+                _context4.next = 2;
+                break;
+              }
+
+              return _context4.abrupt("return");
+
+            case 2:
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
+
+            case 3:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "loadFromDisk",
+    value: function loadFromDisk() {
+      var diskValue, historyValue, autoOptimizeValue;
+      return regeneratorRuntime.async(function loadFromDisk$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"]));
+
+            case 2:
+              diskValue = _context5.sent;
+
+              if (diskValue) {
+                this.diskEnabled = JSON.parse(diskValue);
+              }
+
+              _context5.next = 6;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
+
+            case 6:
+              historyValue = _context5.sent;
+
+              if (historyValue) {
+                historyValue = JSON.parse(historyValue);
+                ;
+                this.historySession = new _Models_history_historySession__WEBPACK_IMPORTED_MODULE_1__["SFHistorySession"](historyValue);
+              } else {
+                this.historySession = new _Models_history_historySession__WEBPACK_IMPORTED_MODULE_1__["SFHistorySession"]();
+              }
+
+              _context5.next = 10;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"]));
+
+            case 10:
+              autoOptimizeValue = _context5.sent;
+
+              if (autoOptimizeValue) {
+                this.autoOptimize = JSON.parse(autoOptimizeValue);
+              } else {
+                // default value is true
+                this.autoOptimize = true;
+              }
+
+            case 12:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "toggleAutoOptimize",
+    value: function toggleAutoOptimize() {
+      return regeneratorRuntime.async(function toggleAutoOptimize$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              this.autoOptimize = !this.autoOptimize;
+
+              if (this.autoOptimize) {
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
+              } else {
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
+              }
+
+            case 2:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+  }]);
+
+  return SFSessionHistoryManager;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/http_manager.js":
+/*!**************************************!*\
+  !*** ./lib/services/http_manager.js ***!
+  \**************************************/
 /*! exports provided: SNHttpManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -17262,10 +16707,10 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/keyManager.js":
-/*!************************************!*\
-  !*** ./lib/services/keyManager.js ***!
-  \************************************/
+/***/ "./lib/services/key_manager.js":
+/*!*************************************!*\
+  !*** ./lib/services/key_manager.js ***!
+  \*************************************/
 /*! exports provided: KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNKeyManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -17277,11 +16722,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KEY_MODE_WRAPPER_ONLY", function() { return KEY_MODE_WRAPPER_ONLY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return SNKeyManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models_keys_itemsKey__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/itemsKey */ "./lib/models/keys/itemsKey.js");
-/* harmony import */ var _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/keys/rootKey */ "./lib/models/keys/rootKey.js");
+/* harmony import */ var _Models_keys_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/keys/items_key */ "./lib/models/keys/items_key.js");
+/* harmony import */ var _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/keys/root_key */ "./lib/models/keys/root_key.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.js");
 /* harmony import */ var _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/services/storage_manager */ "./lib/services/storage_manager.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17318,16 +16763,16 @@ function () {
 
     var modelManager = _ref.modelManager,
         storageManager = _ref.storageManager,
-        protocolManager = _ref.protocolManager;
+        protocolService = _ref.protocolService;
 
     _classCallCheck(this, SNKeyManager);
 
-    if (!modelManager || !storageManager || !protocolManager) {
+    if (!modelManager || !storageManager || !protocolService) {
       throw 'Invalid KeyManager construction';
     }
 
     this.keyMode = KEY_MODE_ROOT_KEY_NONE;
-    this.protocolManager = protocolManager;
+    this.protocolService = protocolService;
     this.modelManager = modelManager;
     this.storageManager = storageManager;
     this.keyObservers = [];
@@ -17509,7 +16954,7 @@ function () {
               return _context2.abrupt("return", null);
 
             case 5:
-              return _context2.abrupt("return", new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"].FromRaw(rawKey));
+              return _context2.abrupt("return", new _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"].FromRaw(rawKey));
 
             case 6:
             case "end":
@@ -17569,7 +17014,7 @@ function () {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 2:
               rawKeyParams = _context4.sent;
@@ -17582,7 +17027,7 @@ function () {
               return _context4.abrupt("return", null);
 
             case 5:
-              return _context4.abrupt("return", this.protocolManager.createVersionedKeyParams(rawKeyParams));
+              return _context4.abrupt("return", this.protocolService.createVersionedKeyParams(rawKeyParams));
 
             case 6:
             case "end":
@@ -17603,7 +17048,7 @@ function () {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return _context5.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 1:
             case "end":
@@ -17637,7 +17082,7 @@ function () {
                 break;
               }
 
-              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return _context6.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               throw 'Unhandled key mode';
@@ -17691,7 +17136,7 @@ function () {
                 object: wrappedRootKey
               });
               _context7.next = 11;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload,
                 key: wrappingKey
               }));
@@ -17753,7 +17198,7 @@ function () {
                 object: wrappedKey
               });
               _context8.next = 12;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload,
                 key: wrappingKey
               }));
@@ -17769,7 +17214,7 @@ function () {
               throw 'Unable to decrypt root key with provided wrapping key.';
 
             case 17:
-              this.rootKey = new _Models_keys_rootKey__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"](decrypted);
+              this.rootKey = new _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"](decrypted);
 
             case 18:
             case "end":
@@ -17844,7 +17289,7 @@ function () {
 
             case 19:
               _context9.next = 21;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 21:
               return _context9.abrupt("return");
@@ -17874,7 +17319,7 @@ function () {
                 object: this.rootKey
               });
               _context10.next = 4;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 key: wrappingKey,
                 intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"]
@@ -17883,7 +17328,7 @@ function () {
             case 4:
               wrappedKey = _context10.sent;
               _context10.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
             case "end":
@@ -17920,11 +17365,11 @@ function () {
               }
 
               _context11.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 5:
               _context11.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
@@ -18012,7 +17457,7 @@ function () {
               previousRootKey = this.rootKey;
               this.rootKey = key;
               _context12.next = 22;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 22:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
@@ -18086,15 +17531,15 @@ function () {
 
             case 2:
               _context14.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["WRAPPED_ROOT_KEY"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 4:
               _context14.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_WRAPPER_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_UNWRAPPED"]));
 
             case 6:
               _context14.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["ROOT_KEY_PARAMS"], _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_7__["STORAGE_VALUE_MODE_DEFAULT"]));
 
             case 8:
               this.keyMode = KEY_MODE_ROOT_KEY_NONE;
@@ -18125,7 +17570,7 @@ function () {
             case 2:
               keyParams = _context15.sent;
               _context15.next = 5;
-              return regeneratorRuntime.awrap(this.protocolManager.computeRootKey({
+              return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }));
@@ -18133,7 +17578,7 @@ function () {
             case 5:
               key = _context15.sent;
               _context15.next = 8;
-              return regeneratorRuntime.awrap(this.protocolManager.compareKeys(key, this.rootKey));
+              return regeneratorRuntime.awrap(this.protocolService.compareKeys(key, this.rootKey));
 
             case 8:
               success = _context15.sent;
@@ -18160,7 +17605,7 @@ function () {
           switch (_context16.prev = _context16.next) {
             case 0:
               _context16.next = 2;
-              return regeneratorRuntime.awrap(this.protocolManager.defaultOperator().createItemsKey());
+              return regeneratorRuntime.awrap(this.protocolService.defaultOperator().createItemsKey());
 
             case 2:
               itemsKey = _context16.sent;
@@ -18392,9 +17837,9 @@ function () {
               return _context21.abrupt("return", itemsKey);
 
             case 6:
-              payloadProtocolVersion = this.protocolManager.versionForPayload(payload);
+              payloadProtocolVersion = this.protocolService.versionForPayload(payload);
 
-              if (!(payloadProtocolVersion === this.protocolManager.latestVersion())) {
+              if (!(payloadProtocolVersion === this.protocolService.latestVersion())) {
                 _context21.next = 9;
                 break;
               }
@@ -18445,16 +17890,16 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/migrationManager.js":
-/*!******************************************!*\
-  !*** ./lib/services/migrationManager.js ***!
-  \******************************************/
-/*! exports provided: SNMigrationManager */
+/***/ "./lib/services/migration_service.js":
+/*!*******************************************!*\
+  !*** ./lib/services/migration_service.js ***!
+  \*******************************************/
+/*! exports provided: SNMigrationService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationManager", function() { return SNMigrationManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
@@ -18466,10 +17911,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var SNMigrationManager =
+var SNMigrationService =
 /*#__PURE__*/
 function () {
-  function SNMigrationManager(_ref) {
+  function SNMigrationService(_ref) {
     var _this = this;
 
     var modelManager = _ref.modelManager,
@@ -18477,10 +17922,10 @@ function () {
         storageManager = _ref.storageManager,
         sessionManager = _ref.sessionManager;
 
-    _classCallCheck(this, SNMigrationManager);
+    _classCallCheck(this, SNMigrationService);
 
     if (!storageManager || !syncManager || !modelManager || !sessionManager) {
-      throw 'Invalid MigrationManager construction';
+      throw 'Invalid MigrationService construction';
     }
 
     this.modelManager = modelManager;
@@ -18616,7 +18061,7 @@ function () {
     });
   }
 
-  _createClass(SNMigrationManager, [{
+  _createClass(SNMigrationService, [{
     key: "addCompletionHandler",
     value: function addCompletionHandler(handler) {
       this.completionHandlers.push(handler);
@@ -18658,7 +18103,7 @@ function () {
   }, {
     key: "registeredMigrations",
     value: function registeredMigrations() {
-      throw 'SNMigrationManager.registeredMigrations must be overriden.'; // Subclasses should return an array of migrations here.
+      throw 'SNMigrationService.registeredMigrations must be overriden.'; // Subclasses should return an array of migrations here.
       // Migrations should have a unique `name`, `content_type`,
       // and `handler`, which is a function that accepts an array of matching items to migration.
     }
@@ -19175,15 +18620,15 @@ function () {
     }
   }]);
 
-  return SNMigrationManager;
+  return SNMigrationService;
 }();
 
 /***/ }),
 
-/***/ "./lib/services/modelManager.js":
-/*!**************************************!*\
-  !*** ./lib/services/modelManager.js ***!
-  \**************************************/
+/***/ "./lib/services/model_manager.js":
+/*!***************************************!*\
+  !*** ./lib/services/model_manager.js ***!
+  \***************************************/
 /*! exports provided: SNModelManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -21232,7 +20677,7 @@ function () {
                 var payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CreateMaxPayloadFromAnyObject"])({
                   object: item
                 });
-                return protocolManager.payloadByEncryptingPayload({
+                return protocolService.payloadByEncryptingPayload({
                   payload: payload,
                   intent: intent
                 });
@@ -21286,10 +20731,10 @@ function () {
 
 /***/ }),
 
-/***/ "./lib/services/privileges/privilegesManager.js":
-/*!******************************************************!*\
-  !*** ./lib/services/privileges/privilegesManager.js ***!
-  \******************************************************/
+/***/ "./lib/services/privileges/privileges_manager.js":
+/*!*******************************************************!*\
+  !*** ./lib/services/privileges/privileges_manager.js ***!
+  \*******************************************************/
 /*! exports provided: SFPrivilegesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -21966,6 +21411,843 @@ function () {
 
 /***/ }),
 
+/***/ "./lib/services/protocol_service.js":
+/*!******************************************!*\
+  !*** ./lib/services/protocol_service.js ***!
+  \******************************************/
+/*! exports provided: SNProtocolService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return SNProtocolService; });
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
+/* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions/001/operator_001 */ "./lib/protocol/versions/001/operator_001.js");
+/* harmony import */ var _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions/002/operator_002 */ "./lib/protocol/versions/002/operator_002.js");
+/* harmony import */ var _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/versions/003/operator_003 */ "./lib/protocol/versions/003/operator_003.js");
+/* harmony import */ var _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions/004/operator_004 */ "./lib/protocol/versions/004/operator_004.js");
+/* harmony import */ var _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/versions/001/key_params_001 */ "./lib/protocol/versions/001/key_params_001.js");
+/* harmony import */ var _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Protocol/versions/002/key_params_002 */ "./lib/protocol/versions/002/key_params_002.js");
+/* harmony import */ var _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/versions/003/key_params_003 */ "./lib/protocol/versions/003/key_params_003.js");
+/* harmony import */ var _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Protocol/versions/004/key_params_004 */ "./lib/protocol/versions/004/key_params_004.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var SNProtocolService =
+/*#__PURE__*/
+function () {
+  function SNProtocolService(_ref) {
+    var modelManager = _ref.modelManager,
+        crypto = _ref.crypto;
+
+    _classCallCheck(this, SNProtocolService);
+
+    if (!modelManager) {
+      throw 'Invalid ProtocolService construction.';
+    }
+
+    this.operators = [];
+    this.modelManager = modelManager;
+    this.loadCryptoInstance(crypto);
+  }
+  /**
+   * To avoid circular dependencies in constructor, applications must create
+   * a key manager separately and feed it into the protocolService here.
+   * @param keyManager  A fully constructed keyManager
+   */
+
+
+  _createClass(SNProtocolService, [{
+    key: "setKeyManager",
+    value: function setKeyManager(keyManager) {
+      var _this = this;
+
+      this.keyManager = keyManager;
+      this.keyManager.addKeyChangeObserver({
+        name: 'protocol-manager',
+        callback: function callback(contentType) {
+          if (contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["CONTENT_TYPE_ITEMS_KEY"]) {
+            _this.decryptErroredItems();
+          }
+        }
+      });
+    }
+  }, {
+    key: "loadCryptoInstance",
+    value: function loadCryptoInstance(crypto) {
+      if (!crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isWebEnvironment"])()) {
+        // IE and Edge do not support pbkdf2 in WebCrypto.
+        if (Object(sncrypto__WEBPACK_IMPORTED_MODULE_0__["isWebCryptoAvailable"])()) {
+          this.crypto = new sncrypto__WEBPACK_IMPORTED_MODULE_0__["SNWebCrypto"]();
+        } else {
+          console.error("WebCrypto is not available.");
+        }
+      } else {
+        this.crypto = crypto;
+      }
+
+      _Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"].SetUuidGenerators({
+        syncImpl: this.crypto.generateUUIDSync,
+        asyncImpl: this.crypto.generateUUIDSync
+      });
+    }
+  }, {
+    key: "latestVersion",
+    value: function latestVersion() {
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"];
+    }
+  }, {
+    key: "getUserVersion",
+    value: function getUserVersion() {
+      var keyParams;
+      return regeneratorRuntime.async(function getUserVersion$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              keyParams = this.keyManager.getRootKeyParams();
+              return _context.abrupt("return", keyParams && keyParams.version);
+
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "supportsPasswordDerivationCost",
+    value: function supportsPasswordDerivationCost(cost) {
+      // Some passwords are created on platforms with stronger pbkdf2 capabilities, like iOS or WebCrypto,
+      // if user has high password cost and is using browser that doesn't support WebCrypto,
+      // we want to tell them that they can't login with this browser.
+      if (cost > 5000) {
+        return this.crypto instanceof sncrypto__WEBPACK_IMPORTED_MODULE_0__["SNWebCrypto"];
+      } else {
+        return true;
+      }
+    }
+    /**
+     * @returns  The versions that this library supports.
+    */
+
+  }, {
+    key: "supportedVersions",
+    value: function supportedVersions() {
+      return [_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"], _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]];
+    }
+  }, {
+    key: "isVersionNewerThanLibraryVersion",
+    value: function isVersionNewerThanLibraryVersion(version) {
+      var libraryVersion = this.latestVersion();
+      return parseInt(version) > parseInt(libraryVersion);
+    }
+  }, {
+    key: "isProtocolVersionOutdated",
+    value: function isProtocolVersionOutdated(version) {
+      // YYYY-MM-DD
+      var expirationDates = {};
+      expirationDates[_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]] = Date.parse('2018-01-01');
+      expirationDates[_Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]] = Date.parse('2020-01-01');
+      var date = expirationDates[version];
+
+      if (!date) {
+        // No expiration date, is active version
+        return false;
+      }
+
+      var expired = new Date() > date;
+      return expired;
+    }
+  }, {
+    key: "costMinimumForVersion",
+    value: function costMinimumForVersion(version) {
+      switch (version) {
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]:
+          return _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__["SNProtocolOperator001"].pwCost();
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]:
+          return _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator002"].pwCost();
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]:
+          return _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__["SNProtocolOperator003"].pwCost();
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]:
+          return _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__["SNProtocolOperator004"].kdfIterations();
+
+        default:
+          throw "Unable to find cost minimum for version ".concat(version);
+      }
+    }
+  }, {
+    key: "versionForPayload",
+    value: function versionForPayload(payload) {
+      return payload.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_LENGTH"]);
+    }
+  }, {
+    key: "createOperatorForLatestVersion",
+    value: function createOperatorForLatestVersion() {
+      return this.createOperatorForVersion(this.latestVersion());
+    }
+  }, {
+    key: "createOperatorForVersion",
+    value: function createOperatorForVersion(version) {
+      if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]) {
+        return new _Protocol_versions_001_operator_001__WEBPACK_IMPORTED_MODULE_3__["SNProtocolOperator001"](this.crypto);
+      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]) {
+        return new _Protocol_versions_002_operator_002__WEBPACK_IMPORTED_MODULE_4__["SNProtocolOperator002"](this.crypto);
+      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]) {
+        return new _Protocol_versions_003_operator_003__WEBPACK_IMPORTED_MODULE_5__["SNProtocolOperator003"](this.crypto);
+      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]) {
+        return new _Protocol_versions_004_operator_004__WEBPACK_IMPORTED_MODULE_6__["SNProtocolOperator004"](this.crypto);
+      } else if (version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_BASE_64_DECRYPTED"]) {
+        return this.createOperatorForLatestVersion();
+      } else {
+        throw "Unable to find operator for version ".concat(version);
+      }
+    }
+  }, {
+    key: "operatorForVersion",
+    value: function operatorForVersion(version) {
+      var operatorKey = version;
+      var operator = this.operators[operatorKey];
+
+      if (!operator) {
+        operator = this.createOperatorForVersion(version);
+        this.operators[operatorKey] = operator;
+      }
+
+      return operator;
+    }
+  }, {
+    key: "defaultOperator",
+    value: function defaultOperator() {
+      return this.operatorForVersion(this.latestVersion());
+    }
+  }, {
+    key: "computeRootKey",
+    value: function computeRootKey(_ref2) {
+      var password, keyParams, version, operator;
+      return regeneratorRuntime.async(function computeRootKey$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              password = _ref2.password, keyParams = _ref2.keyParams;
+              version = keyParams.version;
+              operator = this.operatorForVersion(version);
+              return _context2.abrupt("return", operator.computeRootKey({
+                password: password,
+                keyParams: keyParams
+              }));
+
+            case 4:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "createRootKey",
+    value: function createRootKey(_ref3) {
+      var identifier, password, operator;
+      return regeneratorRuntime.async(function createRootKey$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              identifier = _ref3.identifier, password = _ref3.password;
+              operator = this.defaultOperator();
+              return _context3.abrupt("return", operator.createRootKey({
+                identifier: identifier,
+                password: password
+              }));
+
+            case 3:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "getRootKeyParams",
+    value: function getRootKeyParams() {
+      return regeneratorRuntime.async(function getRootKeyParams$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              return _context4.abrupt("return", this.keyManager.getRootKeyParams());
+
+            case 1:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "payloadContentFormatForIntent",
+    value: function payloadContentFormatForIntent(_ref4) {
+      var key = _ref4.key,
+          intent = _ref4.intent;
+
+      if (!key) {
+        /** Decrypted */
+        if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_FILE_DECRYPTED"]) {
+          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT"];
+        } else if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_SYNC"]) {
+          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING"];
+        }
+      } else {
+        /** Encrypted */
+        if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_SYNC"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_FILE_ENCRYPTED"] || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]) {
+          return _Payloads_formats__WEBPACK_IMPORTED_MODULE_16__["PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING"];
+        } else {
+          throw "Unhandled case in protocolService.payloadContentFormat.";
+        }
+      }
+    }
+    /**
+     * Generates parameters for a payload that are typically encrypted, and used for syncing or saving locally.
+     * Parameters are non-typed objects that can later by converted to objects.
+     * @param key Optional. The key to use to encrypt the payload. Will be looked up if not supplied.
+     * @returns A plain key/value object.
+     */
+
+  }, {
+    key: "payloadByEncryptingPayload",
+    value: function payloadByEncryptingPayload(_ref5) {
+      var payload, key, intent, version, format, operator, encryptionParameters;
+      return regeneratorRuntime.async(function payloadByEncryptingPayload$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              payload = _ref5.payload, key = _ref5.key, intent = _ref5.intent;
+
+              if (!payload.errorDecrypting) {
+                _context5.next = 3;
+                break;
+              }
+
+              return _context5.abrupt("return", payload);
+
+            case 3:
+              if (!(!key && !Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["isDecryptedIntent"])(intent))) {
+                _context5.next = 7;
+                break;
+              }
+
+              _context5.next = 6;
+              return regeneratorRuntime.awrap(this.keyManager.keyToUseForEncryptionOfPayload({
+                payload: payload,
+                intent: intent
+              }));
+
+            case 6:
+              key = _context5.sent;
+
+            case 7:
+              if (!(!key && Object(_Protocol_intents__WEBPACK_IMPORTED_MODULE_14__["intentRequiresEncryption"])(intent))) {
+                _context5.next = 9;
+                break;
+              }
+
+              throw 'Attempting to generate encrypted payload with no key.';
+
+            case 9:
+              if (!payload.isEncrypted) {
+                _context5.next = 11;
+                break;
+              }
+
+              throw 'Attempting to encrypt already encrypted payload.';
+
+            case 11:
+              if (payload.content) {
+                _context5.next = 13;
+                break;
+              }
+
+              throw 'Attempting to encrypt payload with no content.';
+
+            case 13:
+              if (payload.uuid) {
+                _context5.next = 15;
+                break;
+              }
+
+              throw 'Attempting to encrypt payload with no uuid.';
+
+            case 15:
+              version = key ? key.version : this.latestVersion();
+              format = this.payloadContentFormatForIntent({
+                key: key,
+                intent: intent
+              });
+              operator = this.operatorForVersion(version);
+              _context5.next = 20;
+              return regeneratorRuntime.awrap(operator.generateEncryptionParameters({
+                payload: payload,
+                key: key,
+                format: format
+              }));
+
+            case 20:
+              encryptionParameters = _context5.sent;
+
+              if (encryptionParameters) {
+                _context5.next = 23;
+                break;
+              }
+
+              throw 'Unable to generate encryption parameters';
+
+            case 23:
+              return _context5.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_11__["CreateIntentPayloadFromObject"])({
+                object: payload,
+                override: encryptionParameters,
+                intent: intent
+              }));
+
+            case 24:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "payloadsByEncryptingPayloads",
+    value: function payloadsByEncryptingPayloads(_ref6) {
+      var payloads, intent, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, encryptedPayload;
+
+      return regeneratorRuntime.async(function payloadsByEncryptingPayloads$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              payloads = _ref6.payloads, intent = _ref6.intent;
+              results = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context6.prev = 5;
+              _iterator = payloads[Symbol.iterator]();
+
+            case 7:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context6.next = 16;
+                break;
+              }
+
+              payload = _step.value;
+              _context6.next = 11;
+              return regeneratorRuntime.awrap(this.payloadByEncryptingPayload({
+                payload: payload,
+                intent: intent
+              }));
+
+            case 11:
+              encryptedPayload = _context6.sent;
+              results.push(encryptedPayload);
+
+            case 13:
+              _iteratorNormalCompletion = true;
+              _context6.next = 7;
+              break;
+
+            case 16:
+              _context6.next = 22;
+              break;
+
+            case 18:
+              _context6.prev = 18;
+              _context6.t0 = _context6["catch"](5);
+              _didIteratorError = true;
+              _iteratorError = _context6.t0;
+
+            case 22:
+              _context6.prev = 22;
+              _context6.prev = 23;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 25:
+              _context6.prev = 25;
+
+              if (!_didIteratorError) {
+                _context6.next = 28;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 28:
+              return _context6.finish(25);
+
+            case 29:
+              return _context6.finish(22);
+
+            case 30:
+              return _context6.abrupt("return", results);
+
+            case 31:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this, [[5, 18, 22, 30], [23,, 25, 29]]);
+    }
+    /**
+     * Generates a new payload by decrypting the input payload.
+     * @param payload - The payload to decrypt.
+     * @param key - Optional. The key to use to decrypt the payload. If none is supplied, it will be automatically looked up.
+     */
+
+  }, {
+    key: "payloadByDecryptingPayload",
+    value: function payloadByDecryptingPayload(_ref7) {
+      var payload, key, version, operator, encryptionParameters, decryptedParameters;
+      return regeneratorRuntime.async(function payloadByDecryptingPayload$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              payload = _ref7.payload, key = _ref7.key;
+
+              if (payload.content) {
+                _context7.next = 3;
+                break;
+              }
+
+              throw 'Attempting to decrypt payload that has no content.';
+
+            case 3:
+              if (key) {
+                _context7.next = 7;
+                break;
+              }
+
+              _context7.next = 6;
+              return regeneratorRuntime.awrap(this.keyManager.keyToUseForDecryptionOfPayload({
+                payload: payload
+              }));
+
+            case 6:
+              key = _context7.sent;
+
+            case 7:
+              if (key) {
+                _context7.next = 9;
+                break;
+              }
+
+              return _context7.abrupt("return", CreateMaxPayloadFromAnyObject({
+                object: payload,
+                override: {
+                  waitingForKey: true,
+                  errorDecrypting: true
+                }
+              }));
+
+            case 9:
+              version = this.versionForPayload(payload);
+              operator = this.operatorForVersion(version);
+              encryptionParameters = Object(_Payloads__WEBPACK_IMPORTED_MODULE_11__["CreateEncryptionParameters"])(payload);
+              _context7.next = 14;
+              return regeneratorRuntime.awrap(operator.generateDecryptedParameters({
+                encryptedParameters: encryptionParameters,
+                key: key
+              }));
+
+            case 14:
+              decryptedParameters = _context7.sent;
+              return _context7.abrupt("return", CreateMaxPayloadFromAnyObject({
+                object: payload,
+                override: decryptedParameters
+              }));
+
+            case 16:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "payloadsByDecryptingPayloads",
+    value: function payloadsByDecryptingPayloads(_ref8) {
+      var payloads, throws, decryptedPayloads, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, encryptedPayload, isDecryptable, decryptedPayload, _override;
+
+      return regeneratorRuntime.async(function payloadsByDecryptingPayloads$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              payloads = _ref8.payloads, throws = _ref8.throws;
+              decryptedPayloads = [];
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context8.prev = 5;
+              _iterator2 = payloads[Symbol.iterator]();
+
+            case 7:
+              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                _context8.next = 37;
+                break;
+              }
+
+              encryptedPayload = _step2.value;
+
+              if (encryptedPayload) {
+                _context8.next = 12;
+                break;
+              }
+
+              /** Keep in counts similar to out counts */
+              decryptedPayloads.push(encryptedPayload);
+              return _context8.abrupt("continue", 34);
+
+            case 12:
+              if (encryptedPayload.isPayload) {
+                _context8.next = 14;
+                break;
+              }
+
+              throw 'Attempting to decrypt non-payload object in payloadsByDecryptingPayloads.';
+
+            case 14:
+              if (!(encryptedPayload.deleted === true && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isNullOrUndefined"])(encryptedPayload.content))) {
+                _context8.next = 17;
+                break;
+              }
+
+              decryptedPayloads.push(encryptedPayload);
+              return _context8.abrupt("continue", 34);
+
+            case 17:
+              isDecryptable = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_15__["isString"])(encryptedPayload.content);
+
+              if (isDecryptable) {
+                _context8.next = 21;
+                break;
+              }
+
+              decryptedPayloads.push(encryptedPayload);
+              return _context8.abrupt("continue", 34);
+
+            case 21:
+              _context8.prev = 21;
+              _context8.next = 24;
+              return regeneratorRuntime.awrap(this.payloadByDecryptingPayload({
+                payload: encryptedPayload
+              }));
+
+            case 24:
+              decryptedPayload = _context8.sent;
+              decryptedPayloads.push(decryptedPayload);
+              _context8.next = 34;
+              break;
+
+            case 28:
+              _context8.prev = 28;
+              _context8.t0 = _context8["catch"](21);
+              decryptedPayloads.push(CreateMaxPayloadFromAnyObject({
+                object: encryptedPayload,
+                override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedPayload.errorDecrypting), _override)
+              }));
+
+              if (!throws) {
+                _context8.next = 33;
+                break;
+              }
+
+              throw _context8.t0;
+
+            case 33:
+              console.error("Error decrypting payload", encryptedPayload, _context8.t0);
+
+            case 34:
+              _iteratorNormalCompletion2 = true;
+              _context8.next = 7;
+              break;
+
+            case 37:
+              _context8.next = 43;
+              break;
+
+            case 39:
+              _context8.prev = 39;
+              _context8.t1 = _context8["catch"](5);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context8.t1;
+
+            case 43:
+              _context8.prev = 43;
+              _context8.prev = 44;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 46:
+              _context8.prev = 46;
+
+              if (!_didIteratorError2) {
+                _context8.next = 49;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 49:
+              return _context8.finish(46);
+
+            case 50:
+              return _context8.finish(43);
+
+            case 51:
+              return _context8.abrupt("return", decryptedPayloads);
+
+            case 52:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this, [[5, 39, 43, 51], [21, 28], [44,, 46, 50]]);
+    }
+    /**
+     * If an item was attempting to decrypt, but failed, either because the keys
+     * for that item had not downloaded yet, or any other reason, it will be deferred
+     * item.errorDecrypting = true and possibly item.waitingForKey = true.
+     * Here we find such items, and attempt to decrypt them again.
+     */
+
+  }, {
+    key: "decryptErroredItems",
+    value: function decryptErroredItems() {
+      var items, payloads, decrypted;
+      return regeneratorRuntime.async(function decryptErroredItems$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              items = this.modelManager.allItems.filter(function (item) {
+                return item.waitingForKey || item.errorDecrypting;
+              });
+
+              if (!(items.length === 0)) {
+                _context9.next = 3;
+                break;
+              }
+
+              return _context9.abrupt("return");
+
+            case 3:
+              payloads = items.map(function (item) {
+                return CreateMaxPayloadFromAnyObject({
+                  object: item
+                });
+              });
+              _context9.next = 6;
+              return regeneratorRuntime.awrap(this.payloadsByDecryptingPayloads({
+                payloads: payloads
+              }));
+
+            case 6:
+              decrypted = _context9.sent;
+              _context9.next = 9;
+              return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
+                payloads: decrypted
+              }));
+
+            case 9:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * Compares two keys for equality
+     * @returns Boolean
+    */
+
+  }, {
+    key: "compareKeys",
+    value: function compareKeys(keyA, keyB) {
+      return regeneratorRuntime.async(function compareKeys$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              return _context10.abrupt("return", keyA.compare(keyB));
+
+            case 1:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "createVersionedKeyParams",
+    value: function createVersionedKeyParams(keyParams) {
+      // 002 doesn't have version automatically, newer versions do.
+      var version = keyParams.version || _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"];
+
+      switch (version) {
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_001"]:
+          return new _Protocol_versions_001_key_params_001__WEBPACK_IMPORTED_MODULE_7__["SNRootKeyParams001"](keyParams);
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_002"]:
+          return new _Protocol_versions_002_key_params_002__WEBPACK_IMPORTED_MODULE_8__["SNRootKeyParams002"](keyParams);
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_003"]:
+          return new _Protocol_versions_003_key_params_003__WEBPACK_IMPORTED_MODULE_9__["SNRootKeyParams003"](keyParams);
+
+        case _Protocol_versions__WEBPACK_IMPORTED_MODULE_13__["PROTOCOL_VERSION_004"]:
+          return new _Protocol_versions_004_key_params_004__WEBPACK_IMPORTED_MODULE_10__["SNRootKeyParams004"](keyParams);
+      }
+
+      throw "No auth params version found.";
+    }
+  }]);
+
+  return SNProtocolService;
+}();
+
+/***/ }),
+
 /***/ "./lib/services/pure_service.js":
 /*!**************************************!*\
   !*** ./lib/services/pure_service.js ***!
@@ -22003,288 +22285,6 @@ function () {
   }]);
 
   return SNService;
-}();
-
-/***/ }),
-
-/***/ "./lib/services/session_history/sessionHistoryManager.js":
-/*!***************************************************************!*\
-  !*** ./lib/services/session_history/sessionHistoryManager.js ***!
-  \***************************************************************/
-/*! exports provided: SFSessionHistoryManager */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return SFSessionHistoryManager; });
-/* harmony import */ var _Services_modelManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/modelManager */ "./lib/services/modelManager.js");
-/* harmony import */ var _Models_session_history_historySession__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/session_history/historySession */ "./lib/models/session_history/historySession.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-
-
-var SFSessionHistoryManager =
-/*#__PURE__*/
-function () {
-  function SFSessionHistoryManager(modelManager, storageManager, contentTypes, timeout) {
-    var _this = this;
-
-    _classCallCheck(this, SFSessionHistoryManager);
-
-    this.modelManager = modelManager;
-    this.storageManager = storageManager;
-    this.timeout = timeout || setTimeout.bind(window);
-    this.loadFromDisk().then(function () {
-      _this.modelManager.addMappingObserver("session-history", contentTypes, function (allItems, validItems, deletedItems, source, sourceKey) {
-        if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]) {
-          return;
-        }
-
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = allItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var item = _step.value;
-
-            try {
-              _this.addHistoryEntryForItem(item);
-            } catch (e) {
-              console.log("Caught exception while trying to add item history entry", e);
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      });
-    });
-  }
-
-  _createClass(SFSessionHistoryManager, [{
-    key: "addHistoryEntryForItem",
-    value: function addHistoryEntryForItem(item) {
-      var _this2 = this;
-
-      var persistableItemParams = {
-        uuid: item.uuid,
-        content_type: item.content_type,
-        updated_at: item.updated_at,
-        content: item.getContentCopy()
-      };
-      var entry = this.historySession.addEntryForItem(persistableItemParams);
-
-      if (this.autoOptimize) {
-        this.historySession.optimizeHistoryForItem(item);
-      }
-
-      if (entry && this.diskEnabled) {
-        // Debounce, clear existing timeout
-        if (this.diskTimeout) {
-          if (this.timeout.hasOwnProperty("cancel")) {
-            this.timeout.cancel(this.diskTimeout);
-          } else {
-            clearTimeout(this.diskTimeout);
-          }
-        }
-
-        ;
-        this.diskTimeout = this.timeout(function () {
-          _this2.saveToDisk();
-        }, 2000);
-      }
-    }
-  }, {
-    key: "historyForItem",
-    value: function historyForItem(item) {
-      return this.historySession.historyForItem(item);
-    }
-  }, {
-    key: "clearHistoryForItem",
-    value: function clearHistoryForItem(item) {
-      return regeneratorRuntime.async(function clearHistoryForItem$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              this.historySession.clearItemHistory(item);
-              return _context.abrupt("return", this.saveToDisk());
-
-            case 2:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clearAllHistory",
-    value: function clearAllHistory() {
-      return regeneratorRuntime.async(function clearAllHistory$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              this.historySession.clearAllHistory();
-              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 2:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "toggleDiskSaving",
-    value: function toggleDiskSaving() {
-      return regeneratorRuntime.async(function toggleDiskSaving$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              this.diskEnabled = !this.diskEnabled;
-
-              if (!this.diskEnabled) {
-                _context3.next = 6;
-                break;
-              }
-
-              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
-              this.saveToDisk();
-              _context3.next = 8;
-              break;
-
-            case 6:
-              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
-              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 8:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "saveToDisk",
-    value: function saveToDisk() {
-      return regeneratorRuntime.async(function saveToDisk$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              if (this.diskEnabled) {
-                _context4.next = 2;
-                break;
-              }
-
-              return _context4.abrupt("return");
-
-            case 2:
-              this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
-
-            case 3:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "loadFromDisk",
-    value: function loadFromDisk() {
-      var diskValue, historyValue, autoOptimizeValue;
-      return regeneratorRuntime.async(function loadFromDisk$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              _context5.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_PERSIST_KEY"]));
-
-            case 2:
-              diskValue = _context5.sent;
-
-              if (diskValue) {
-                this.diskEnabled = JSON.parse(diskValue);
-              }
-
-              _context5.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 6:
-              historyValue = _context5.sent;
-
-              if (historyValue) {
-                historyValue = JSON.parse(historyValue);
-                ;
-                this.historySession = new _Models_session_history_historySession__WEBPACK_IMPORTED_MODULE_1__["SFHistorySession"](historyValue);
-              } else {
-                this.historySession = new _Models_session_history_historySession__WEBPACK_IMPORTED_MODULE_1__["SFHistorySession"]();
-              }
-
-              _context5.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"]));
-
-            case 10:
-              autoOptimizeValue = _context5.sent;
-
-              if (autoOptimizeValue) {
-                this.autoOptimize = JSON.parse(autoOptimizeValue);
-              } else {
-                // default value is true
-                this.autoOptimize = true;
-              }
-
-            case 12:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "toggleAutoOptimize",
-    value: function toggleAutoOptimize() {
-      return regeneratorRuntime.async(function toggleAutoOptimize$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              this.autoOptimize = !this.autoOptimize;
-
-              if (this.autoOptimize) {
-                this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
-              } else {
-                this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_4__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
-              }
-
-            case 2:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this);
-    }
-  }]);
-
-  return SFSessionHistoryManager;
 }();
 
 /***/ }),
@@ -22605,7 +22605,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_ENCRYPTION_POLICY_DISABLED", function() { return STORAGE_ENCRYPTION_POLICY_DISABLED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return SNStorageManager; });
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -22634,13 +22634,13 @@ var SNStorageManager =
 /*#__PURE__*/
 function () {
   function SNStorageManager(_ref) {
-    var protocolManager = _ref.protocolManager,
+    var protocolService = _ref.protocolService,
         databaseManager = _ref.databaseManager,
         namespace = _ref.namespace;
 
     _classCallCheck(this, SNStorageManager);
 
-    this.protocolManager = protocolManager;
+    this.protocolService = protocolService;
     this.databaseManager = databaseManager;
     this.namespace = namespace;
     this.setPersistencePolicy(STORAGE_PERSISTENCE_POLICY_DEFAULT);
@@ -22693,7 +22693,7 @@ function () {
     }
     /**
      * To avoid circular dependencies in constructor, applications must create a
-     * key manager separately and feed it into the protocolManager here.
+     * key manager separately and feed it into the protocolService here.
      * @param keyManager  A fully constructed keyManager
      */
 
@@ -22875,7 +22875,7 @@ function () {
                 }
               });
               _context8.next = 8;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload,
                 key: key
               }));
@@ -22954,7 +22954,7 @@ function () {
               };
               payload = (0, _context10.t0)(_context10.t5);
               _context10.next = 14;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 intent: intent
               }));
@@ -22979,9 +22979,9 @@ function () {
     key: "getPersistenceKey",
     value: function getPersistenceKey() {
       if (this.namespace) {
-        return "".concat(this.namespace, "-").concat(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"]);
+        return "".concat(this.namespace, "-").concat(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"]);
       } else {
-        return _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"];
+        return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["STORAGE_KEY_ENCRYPTED_STORAGE"];
       }
     }
   }, {
@@ -23231,7 +23231,7 @@ function () {
 
             case 14:
               _context18.next = 16;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByEncryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 intent: this.encryptionPolicy === STORAGE_ENCRYPTION_POLICY_DEFAULT ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_0__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]
               }));
@@ -23454,7 +23454,7 @@ var AccountDownloader =
 function () {
   function AccountDownloader(_ref) {
     var apiService = _ref.apiService,
-        protocolManager = _ref.protocolManager,
+        protocolService = _ref.protocolService,
         contentType = _ref.contentType,
         customEvent = _ref.customEvent,
         limit = _ref.limit;
@@ -23462,7 +23462,7 @@ function () {
     _classCallCheck(this, AccountDownloader);
 
     this.apiService = apiService;
-    this.protocolManager = protocolManager;
+    this.protocolService = protocolService;
     this.contentType = contentType;
     this.customEvent = customEvent;
     this.limit = limit;
@@ -23502,7 +23502,7 @@ function () {
                 });
               });
               _context.next = 6;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
+              return regeneratorRuntime.awrap(this.protocolService.payloadsByDecryptingPayloads({
                 payloads: encryptedPayloads
               }));
 
@@ -24250,7 +24250,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
-/* harmony import */ var _Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Lib/storageKeys */ "./lib/storageKeys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -24302,7 +24302,7 @@ function (_SNService) {
     var _this;
 
     var sessionManager = _ref.sessionManager,
-        protocolManager = _ref.protocolManager,
+        protocolService = _ref.protocolService,
         storageManager = _ref.storageManager,
         modelManager = _ref.modelManager,
         apiService = _ref.apiService,
@@ -24312,7 +24312,7 @@ function (_SNService) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSyncManager).call(this));
     _this.sessionManager = sessionManager;
-    _this.protocolManager = protocolManager;
+    _this.protocolService = protocolService;
     _this.modelManager = modelManager;
     _this.storageManager = storageManager;
     _this.apiService = apiService;
@@ -24485,7 +24485,7 @@ function (_SNService) {
               });
               Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["subtractFromArray"])(payloads, itemsKeysPayloads);
               _context2.next = 8;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
+              return regeneratorRuntime.awrap(this.protocolService.payloadsByDecryptingPayloads({
                 payloads: itemsKeysPayloads
               }));
 
@@ -24513,7 +24513,7 @@ function (_SNService) {
               currentPosition = batchIndex * batchSize;
               batch = payloads.slice(currentPosition, currentPosition + batchSize);
               _context2.next = 20;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByDecryptingPayloads({
+              return regeneratorRuntime.awrap(this.protocolService.payloadsByDecryptingPayloads({
                 payloads: batch
               }));
 
@@ -24559,7 +24559,7 @@ function (_SNService) {
           switch (_context3.prev = _context3.next) {
             case 0:
               this.syncToken = token;
-              return _context3.abrupt("return", this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
+              return _context3.abrupt("return", this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"], token));
 
             case 2:
             case "end":
@@ -24582,11 +24582,11 @@ function (_SNService) {
                 break;
               }
 
-              return _context4.abrupt("return", this.storageManager.setValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"], token));
+              return _context4.abrupt("return", this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"], token));
 
             case 5:
               _context4.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 7:
               return _context4.abrupt("return", _context4.sent);
@@ -24611,7 +24611,7 @@ function (_SNService) {
               }
 
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 3:
               this.syncToken = _context5.sent;
@@ -24639,7 +24639,7 @@ function (_SNService) {
               }
 
               _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 3:
               this.cursorToken = _context6.sent;
@@ -24664,11 +24664,11 @@ function (_SNService) {
               this.syncToken = null;
               this.cursorToken = null;
               _context7.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_LAST_SYNC_TOKEN"]));
 
             case 4:
               _context7.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storageKeys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
+              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_15__["STORAGE_KEY_PAGINATION_TOKEN"]));
 
             case 6:
             case "end":
@@ -25082,7 +25082,7 @@ function (_SNService) {
 
             case 39:
               _context12.next = 41;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadsByEncryptingPayloads({
+              return regeneratorRuntime.awrap(this.protocolService.payloadsByEncryptingPayloads({
                 payloads: decryptedPayloads,
                 intent: online ? ENCRYPTION_INTENT_SYNC : ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED
               }));
@@ -25496,7 +25496,7 @@ function (_SNService) {
 
             case 18:
               _context20.next = 20;
-              return regeneratorRuntime.awrap(this.protocolManager.payloadByDecryptingPayload({
+              return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload
               }));
 
@@ -25744,7 +25744,7 @@ function (_SNService) {
                 return item.updatedAtTimestamp();
               });
               string = dates.join(',');
-              return _context23.abrupt("return", this.protocolManager.crypto.sha256(string));
+              return _context23.abrupt("return", this.protocolService.crypto.sha256(string));
 
             case 7:
               _context23.prev = 7;
@@ -25793,7 +25793,7 @@ function (_SNService) {
               _context25.next = 2;
               return regeneratorRuntime.awrap(_Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
                 apiService: this.apiService,
-                protocolManager: this.protocolManager,
+                protocolService: this.protocolService,
                 customEvent: "resolve-out-of-sync"
               }));
 
@@ -25851,7 +25851,7 @@ function (_SNService) {
               _ref11 = _args26.length > 0 && _args26[0] !== undefined ? _args26[0] : {}, contentType = _ref11.contentType, customEvent = _ref11.customEvent;
               downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"]({
                 apiService: this.apiService,
-                protocolManager: this.protocolManager,
+                protocolService: this.protocolService,
                 contentType: contentType,
                 customEvent: customEvent
               });
@@ -26212,10 +26212,10 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
 
 /***/ }),
 
-/***/ "./lib/storageKeys.js":
-/*!****************************!*\
-  !*** ./lib/storageKeys.js ***!
-  \****************************/
+/***/ "./lib/storage_keys.js":
+/*!*****************************!*\
+  !*** ./lib/storage_keys.js ***!
+  \*****************************/
 /*! exports provided: ROOT_KEY_PARAMS, WRAPPED_ROOT_KEY, ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_ENCRYPTED_STORAGE, STORAGE_KEY_BIOMETRIC_PREFS, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
