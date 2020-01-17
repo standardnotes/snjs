@@ -1,4 +1,4 @@
-export default class LocalStorageDatabaseManager extends SNDatabaseManager {
+export default class WebDatabaseManager extends SNDatabaseManager {
 
   async openDatabase() {
 

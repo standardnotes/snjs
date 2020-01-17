@@ -3,205 +3,113 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
-
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe('migrations', () => {
-  var email = SFItem.GenerateUuidSynchronously();
-  var password = SFItem.GenerateUuidSynchronously();
 
-  before((done) => {
-    Factory.globalStorageManager().clearAllData().then(() => {
-      Factory.registerUserToApplication({email, password, application}).then((user) => {
-        done();
-      })
-    })
+  before(async () => {
+    localStorage.clear();
   })
 
-  it("should not run migrations until local data loading and sync is complete", async () => {
-    let sessionManager = Factory.globalSessionManager();
-    let modelManager = Factory.createModelManager();
-    modelManager.addItem(Factory.createStorageItemNotePayload);
-    const syncManager = new SNSyncManager({
-      modelManager,
-      sessionManager,
-      storageManager: Factory.globalStorageManager(),
-      protocolService: Factory.globalProtocolService(),
-      httpManager: Factory.globalHttpManager()
-    });
-
-    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
-
-    migrationService.registeredMigrations = () => {
-      return [
-        {
-          name: "migration-1",
-          content_type: "Note",
-          handler: async (items) => {
-            for(var item of items) {
-              item.content.foo = "bar";
-            }
-          }
-        }
-      ]
-    }
-
-    var item = modelManager.allItems[0];
-    expect(item.content.foo).to.not.equal("bar");
-
-    migrationService.loadMigrations();
-
-    await syncManager.sync();
-    var pending = await migrationService.getPendingMigrations();
-    var completed = await migrationService.getCompletedMigrations();
-    expect(pending.length).to.equal(1);
-    expect(completed.length).to.equal(0);
-
-    await syncManager.loadDataFromDatabase();
-    await syncManager.sync();
-    // should be completed now
-    // migrationService works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
-    await Factory.sleep(0.3);
-    var pending = await migrationService.getPendingMigrations();
-    var completed = await migrationService.getCompletedMigrations();
-    expect(pending.length).to.equal(0);
-    expect(completed.length).to.equal(1);
-
-    var item = modelManager.allItems[0];
-    expect(item.content.foo).to.equal("bar");
+  after(async () => {
+    localStorage.clear();
   })
 
-  it("should handle running multiple migrations", async () => {
-    let sessionManager = Factory.globalSessionManager();
-    let modelManager = Factory.createModelManager();
-    modelManager.addItem(Factory.createStorageItemNotePayload);
-    const syncManager = new SNSyncManager({
-      modelManager,
-      sessionManager,
-      storageManager: Factory.globalStorageManager(),
-      protocolService: Factory.globalProtocolService(),
-      httpManager: Factory.globalHttpManager()
+  it('migration timestamp should be a number', async function () {
+    const timestamp = BaseMigration.timestamp();
+    expect(typeof timestamp).to.equal('number');
+  });
+
+  it('last migration timestamp should be a number', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const timestamp = await application.migrationService
+      .getLastMigrationTimestamp();
+    expect(typeof timestamp).to.equal('number');
+  });
+
+  it('should run base migration', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const baseMigrationTimestamp = BaseMigration.timestamp();
+    const lastMigrationTimestamp = await application.migrationService
+      .getLastMigrationTimestamp();
+    expect(lastMigrationTimestamp).to.be.above(baseMigrationTimestamp);
+  });
+
+  it.only('should run 2020-01-15 migration for web', async function () {
+    const application = await Factory.createAppWithRandNamespace();
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = 'foo';
+    const passcode = 'bar';
+    /** Create old version passcode parameters */
+    const passcodeResult = await operator_003.createRootKey({
+      identifier: identifier,
+      password: passcode
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'offlineParams',
+      JSON.stringify(passcodeResult.keyParams)
+    );
+
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountResult = await operator_003.createRootKey({
+      identifier: identifier,
+      password: password
     });
 
-    await syncManager.loadDataFromDatabase();
-
-    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
-
-    let randValue1 = Math.random();
-    let randValue2 = Math.random();
-    migrationService.registeredMigrations = () => {
-      return [
-        {
-          name: "migration-2",
-          content_type: "Note",
-          handler: async (items) => {
-            for(var item of items) {
-              item.content.bar = randValue1;
-            }
+    /** Create legacy storage and encrypt it with passcode */
+    const storagePayload = CreateMaxPayloadFromAnyObject({
+      object: {
+        uuid: await operator_003.crypto.generateUUID(),
+        content: {
+          storage: {
+            auth_params: accountResult.keyParams
           }
         },
-        {
-          name: "migration-3",
-          content_type: "Note",
-          handler: async (items) => {
-            for(var item of items) {
-              item.content.foo = randValue2;
+        content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
+      }
+    })
+    const encryptionParams = await operator_003.generateEncryptionParameters({
+      payload: storagePayload,
+      key: passcodeResult.key,
+      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+    });
+    const persistPayload = CreateMaxPayloadFromAnyObject({
+      object: storagePayload,
+      override: encryptionParams
+    })
+    await application.deviceInterface.setRawStorageValue(
+      'encryptedStorage',
+      JSON.stringify(persistPayload)
+    );
+
+    /** Run migration */
+    await application.prepareForLaunch();
+    await application.launch({
+      callbacks: {
+        authChallengeResponses: (challenges) => {
+          const responses = [];
+          for(const challenge of challenges) {
+            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+              responses.push(new DeviceAuthResponse({
+                challenge,
+                value: passcode
+              }));
             }
           }
-        },
-      ]
-    }
-
-    return new Promise(async (resolve, reject) => {
-      migrationService.addCompletionHandler(() => {
-        expect(item.content.bar).to.equal(randValue1);
-        expect(item.content.foo).to.equal(randValue2);
-        resolve();
-      })
-
-      migrationService.loadMigrations();
-
-      var item = modelManager.allItems[0];
-      expect(item.content.bar).to.not.equal(randValue1);
-      expect(item.content.foo).to.not.equal(randValue2);
-
-      await syncManager.loadDataFromDatabase();
-      await syncManager.sync();
-    })
-  })
-
-  it("should run migrations while offline, then again after signing in", async () => {
-    // go offline
-    let sessionManager = Factory.globalSessionManager();
-    await Factory.globalStorageManager().clearAllData();
-    await Factory.globalStorageManager().setValue("server", Factory.serverURL());
-    let modelManager = Factory.createModelManager();
-    const syncManager = new SNSyncManager({
-      modelManager,
-      sessionManager,
-      storageManager: Factory.globalStorageManager(),
-      protocolService: Factory.globalProtocolService(),
-      httpManager: Factory.globalHttpManager()
+          return responses;
+        }
+      }
     });
 
-    var migrationService = new SNMigrationService(modelManager, syncManager, Factory.globalStorageManager(), sessionManager);
-
-    var params1 = Factory.createStorageItemNotePayload();
-    modelManager.addItem(params1);
-
-    let randValue = Math.random();
-    migrationService.registeredMigrations = () => {
-      return [
-        {
-          name: "migration-1",
-          content_type: "Note",
-          handler: async (items) => {
-            for(var item of items) {
-              item.content.foo = randValue;
-            }
-          }
-        }
-      ]
-    }
-
-    migrationService.loadMigrations();
-
-    await syncManager.sync();
-    var pending = await migrationService.getPendingMigrations();
-    var completed = await migrationService.getCompletedMigrations();
-    expect(pending.length).to.equal(1);
-    expect(completed.length).to.equal(0);
-
-    await syncManager.loadDataFromDatabase();
-    await syncManager.sync();
-    // should be completed now
-    // migrationService works on event obsesrver, so will be asyncrounous. We'll wait a tiny bit here
-    await Factory.sleep(0.1);
-    var pending = await migrationService.getPendingMigrations();
-    var completed = await migrationService.getCompletedMigrations();
-    expect(pending.length).to.equal(0);
-    expect(completed.length).to.equal(1);
-
-    var item1 = modelManager.findItem(params1.uuid);
-    expect(item1.content.foo).to.equal(randValue);
-
-    var params = Factory.createStorageItemNotePayload();
-    modelManager.addItem(params);
-    var item = modelManager.findItem(params.uuid);
-    expect(item.content.foo).to.not.equal(randValue);
-
-    // sign in, migrations should run again
-    var email = SFItem.GenerateUuidSynchronously();
-    var password = SFItem.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({email, password, application});
-    sessionManager.notifyEvent(APPLICATION_EVENT_DID_SIGN_IN);
-
-    await syncManager.sync();
-    // migrations run asyncronously
-    await Factory.sleep(0.1);
-    var item = modelManager.findItem(params.uuid);
-    expect(item.content.foo).to.equal(randValue);
-  })
+    expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
+    expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+  });
 
 });

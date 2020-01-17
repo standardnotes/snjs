@@ -3,7 +3,6 @@ import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
-import MemoryStorageManager from '../lib/persist/storage/memoryStorageManager.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 

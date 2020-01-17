@@ -2,38 +2,22 @@ import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
-import LocalStorageManager from './persist/storage/localStorageManager.js';
-import MemoryStorageManager from './persist/storage/memoryStorageManager.js';
-import LocalStorageDatabaseManager from './persist/database/localStorageDatabaseManager.js';
-import MemoryDatabaseManager from './persist/database/memoryDatabaseManager.js';
+import WebDeviceInterface from './web_device_interface.js';
+import WebDatabaseManager from './web_database_manager.js';
 
 export default class Factory {
   static createApplication(namespace) {
     const url = this.serverURL();
-    let keychainValue;
-    const keychainDelegate = new SNKeychainDelegate({
-      setKeychainValue: async (value) => {
-        keychainValue = value;
-      },
-      getKeychainValue: async () => {
-        return keychainValue;
-      },
-      clearKeychainValue: async () => {
-        keychainValue = null;
-      }
-    });
+    const deviceInterface = new WebDeviceInterface();
     return new SNApplication({
       namespace: namespace,
+      deviceInterface: deviceInterface,
+      platform: PLATFORM_WEB,
       host: url,
-      keychainDelegate: keychainDelegate,
       swapClasses: [
         {
-          swap: SNStorageManager,
-          with: LocalStorageManager
-        },
-        {
           swap: SNDatabaseManager,
-          with: LocalStorageDatabaseManager
+          with: WebDatabaseManager
         }
       ],
       skipClasses: [
@@ -42,6 +26,11 @@ export default class Factory {
       timeout: setTimeout.bind(window),
       interval: setInterval.bind(window)
     });
+  }
+
+  static async createAppWithRandNamespace() {
+    const namespace = Math.random().toString(36).substring(2, 15);
+    return this.createApplication(namespace);
   }
 
   static async createInitAppWithRandNamespace() {
