@@ -105,7 +105,7 @@ describe("storage manager", () => {
       STORAGE_ENCRYPTION_POLICY_DISABLED
     );
 
-    const payloads = await this.application.storageManager.databaseManager.getAllRawPayloads();
+    const payloads = await this.application.storageManager.getAllRawPayloads();
     const payload = payloads[0];
     expect(typeof payload.content).to.not.equal('string');
     expect(payload.content.references).to.be.ok;

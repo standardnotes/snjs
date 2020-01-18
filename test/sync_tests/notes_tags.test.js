@@ -55,7 +55,7 @@ describe("notes + tags syncing", async function() {
       expect(tag.notes.length).to.equal(1);
       expect(this.application.modelManager.notes.length).to.equal(1);
       expect(this.application.modelManager.tags.length).to.equal(1);
-      console.log("Waiting 0.1s...");
+      console.warn("Waiting 0.1s...");
       await Factory.sleep(0.1);
     }
   }).timeout(20000);

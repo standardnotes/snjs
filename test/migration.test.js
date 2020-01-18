@@ -55,6 +55,7 @@ describe('migrations', () => {
       'offlineParams',
       JSON.stringify(passcodeResult.keyParams)
     );
+    const passcodeKey = passcodeResult.key;
 
     /** Create old version account parameters */
     const password = 'tar';
@@ -64,13 +65,19 @@ describe('migrations', () => {
     });
 
     /** Create legacy storage and encrypt it with passcode */
+    const accountKey = accountResult.key;
+    const embeddedStorage = {
+      mk: accountKey.masterKey,
+      ak: accountKey.dataAuthenticationKey,
+      pw: accountKey.serverPassword,
+      auth_params: accountResult.keyParams,
+      foo: 'bar'
+    };
     const storagePayload = CreateMaxPayloadFromAnyObject({
       object: {
         uuid: await operator_003.crypto.generateUUID(),
         content: {
-          storage: {
-            auth_params: accountResult.keyParams
-          }
+          storage: embeddedStorage
         },
         content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
       }
@@ -89,9 +96,23 @@ describe('migrations', () => {
       JSON.stringify(persistPayload)
     );
 
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+      payload: notePayload,
+      key: accountKey,
+      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
+      object: notePayload,
+      override: noteEncryptionParams
+    });
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+
     /** Run migration */
     await application.prepareForLaunch();
     await application.launch({
+      ut_awaitDatabaseLoad: true,
       callbacks: {
         authChallengeResponses: (challenges) => {
           const responses = [];
@@ -108,8 +129,34 @@ describe('migrations', () => {
       }
     });
 
-    expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
-    expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(application.keyManager.keyMode).to.equal(
+      KEY_MODE_ROOT_KEY_PLUS_WRAPPER
+    );
+
+    /** Should be decrypted */
+    const storageMode = application.storageManager.domainKeyForMode(
+      STORAGE_VALUE_MODE_DEFAULT
+    );
+    const valueStore = application.storageManager.values[storageMode];
+    expect(valueStore.content_type).to.not.be.ok;
+
+    /** Embedded value should match */
+    const migratedKeyParams = await application.storageManager.getValue(
+      STORAGE_KEY_ROOT_KEY_PARAMS
+    );
+    expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
+    const rootKey = await application.keyManager.getRootKey()
+    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
+    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
+
+    /** Expect note is decrypted */
+    expect(application.modelManager.notes.length).to.equal(1);
+    const retrievedNote = application.modelManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
   });
 
 });

@@ -86,11 +86,11 @@ describe('online syncing', () => {
     let events = 0;
 
     this.application.syncManager.ut_beginLatencySimulator(250);
-    this.application.syncManager.addEventObserver({callback: (event, data) => {
+    this.application.syncManager.addEventObserver((event, data) => {
       if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
         events++;
       }
-    }});
+    });
 
     const promises = [];
     for(let i = 0; i < syncCount; i++) {
@@ -119,11 +119,11 @@ describe('online syncing', () => {
 
     this.application.syncManager.ut_beginLatencySimulator(250);
 
-    this.application.syncManager.addEventObserver({callback: (event, data) => {
+    this.application.syncManager.addEventObserver((event, data) => {
       if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
         events++;
       }
-    }});
+    });
 
     const promises = [];
     for(let i = 0; i < syncCount; i++) {

@@ -3,7 +3,6 @@ import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 import WebDeviceInterface from './web_device_interface.js';
-import WebDatabaseManager from './web_database_manager.js';
 
 export default class Factory {
   static createApplication(namespace) {
@@ -14,12 +13,6 @@ export default class Factory {
       deviceInterface: deviceInterface,
       platform: PLATFORM_WEB,
       host: url,
-      swapClasses: [
-        {
-          swap: SNDatabaseManager,
-          with: WebDatabaseManager
-        }
-      ],
       skipClasses: [
         SNComponentManager
       ],
@@ -56,8 +49,8 @@ export default class Factory {
   }
 
   static async registerUserToApplication({application, email, password, ephemeral}) {
-    if(!email) email = SFItem.GenerateUuidSynchronously();
-    if(!password) password = SFItem.GenerateUuidSynchronously();
+    if(!email) email = this.generateUuid();
+    if(!password) password = this.generateUuid();
     return application.register({email, password, ephemeral});
   }
 
@@ -119,12 +112,14 @@ export default class Factory {
   }
 
   static createNotePayload() {
-    return CreateMaxPayloadFromAnyObject({object: this.createNoteParams()});
+    return CreateMaxPayloadFromAnyObject({
+      object: this.createNoteParams()
+    });
   }
 
   static createItemParams(contentType) {
     const params = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: this.generateUuid(),
       content_type: contentType,
       content: {
         title: "hello",
@@ -134,9 +129,14 @@ export default class Factory {
     return params;
   }
 
+  static generateUuid() {
+    const crypto = new SNWebCrypto();
+    return crypto.generateUUIDSync();
+  }
+
   static createNoteParams() {
     const params = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: this.generateUuid(),
       content_type: "Note",
       content: {
         title: "hello",
@@ -149,7 +149,7 @@ export default class Factory {
 
   static createTagParams() {
     const params = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: this.generateUuid(),
       content_type: "Tag",
       content: {
         title: "thoughts",
@@ -162,7 +162,7 @@ export default class Factory {
   static createRelatedNoteTagPairPayload() {
     let noteParams = this.createNoteParams();
     let tagParams = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: this.generateUuid(),
       content_type: "Tag",
       content: { title: "thoughts" }
     };

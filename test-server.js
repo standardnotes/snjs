@@ -3,5 +3,5 @@
 var connect = require('connect');
 var serveStatic = require('serve-static');
 connect().use(serveStatic(__dirname)).listen(9001, function(){
-    console.log('Server running on 9001...');
+    console.info('Server running on 9001...');
 });
