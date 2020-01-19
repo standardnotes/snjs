@@ -4,6 +4,17 @@ export default class WebDeviceInterface extends DeviceInterface {
     return localStorage.getItem(key);
   }
 
+  async getAllRawStorageKeyValues() {
+    const results = [];
+    for(const key of Object.keys(localStorage)) {
+      results.push({
+        key: key,
+        value: localStorage[key]
+      })
+    }
+    return results;
+  }
+
   async setRawStorageValue(key, value) {
     localStorage.setItem(key, value);
   }
@@ -68,7 +79,21 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   /** @keychian */
   async getRawKeychainValue() {
-    return this.keychainValue;
+    if(this.keychainValue) {
+      return this.keychainValue;
+    } else {
+      const authParams = localStorage.getItem('auth_params');
+      let version;
+      if(authParams) {
+        version = JSON.parse(authParams).version;
+      }
+      return {
+        mk: localStorage.getItem('mk'),
+        pw: localStorage.getItem('pw'),
+        ak: localStorage.getItem('ak'),
+        version: version
+      }
+    }
   }
 
   async setKeychainValue(value) {
