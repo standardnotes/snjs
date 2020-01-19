@@ -42,7 +42,7 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   async saveRawDatabasePayload(payload) {
     localStorage.setItem(
-      this._keyForPayloadId(payload.id),
+      this._keyForPayloadId(payload.uuid),
       JSON.stringify(payload)
     );
   }

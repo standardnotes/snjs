@@ -30,8 +30,6 @@ describe('device authentication', () => {
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    await tmpApplication.prepareForLaunch();
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     let numPasscodeAttempts = 0;
     const handleChallenges = async (challenges) => {
       const responses = [];
@@ -45,7 +43,13 @@ describe('device authentication', () => {
       }
       return responses;
     }
-    await tmpApplication.launch({callbacks: { authChallengeResponses: handleChallenges} })
+    await tmpApplication.prepareForLaunch({
+      callbacks: {
+        authChallengeResponses: handleChallenges
+      }
+    });
+    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
+    await tmpApplication.launch();
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
   });
@@ -61,12 +65,9 @@ describe('device authentication', () => {
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
-    return;
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    await tmpApplication.prepareForLaunch();
-    expect((await tmpApplication.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     let numPasscodeAttempts = 0;
     const handleChallenges = async (challenges) => {
@@ -86,12 +87,18 @@ describe('device authentication', () => {
       }
       return responses;
     }
-    await tmpApplication.launch({callbacks: { authChallengeResponses: handleChallenges} })
+    await tmpApplication.prepareForLaunch({
+      callbacks: {
+        authChallengeResponses: handleChallenges
+      }
+    });
+    expect((await tmpApplication.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
+    await tmpApplication.launch();
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
   });
 
-  it('handles application launch with passcode and account', async function() {
+  it.only('handles application launch with passcode and account', async function() {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const email = SFItem.GenerateUuidSynchronously();
@@ -100,6 +107,9 @@ describe('device authentication', () => {
       application: application,
       email, password
     });
+    const sampleStorageKey = 'foo';
+    const sampleStorageValue = 'bar';
+    await application.storageManager.setValue(sampleStorageKey, sampleStorageValue);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
     const passcode = 'foobar';
     await application.setPasscode(passcode);
@@ -108,11 +118,11 @@ describe('device authentication', () => {
       await application.deviceAuthService.hasPasscodeEnabled()
     ).to.equal(true);
     await application.deinit();
+
+    console.warn('Creating tmpApplication');
+
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    await tmpApplication.prepareForLaunch();
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
-    let numPasscodeAttempts = 0;
     const handleChallenges = async (challenges) => {
       const responses = [];
       for(const challenge of challenges) {
@@ -120,17 +130,21 @@ describe('device authentication', () => {
           const value = passcode;
           const response = new DeviceAuthResponse({challenge, value});
           responses.push(response);
-          numPasscodeAttempts++;
         }
       }
       return responses;
     }
-    await tmpApplication.launch({
+    await tmpApplication.prepareForLaunch({
       callbacks: {
         authChallengeResponses: handleChallenges
       }
-    })
+    });
+    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
+    await tmpApplication.launch();
+    expect(
+      await tmpApplication.storageManager.getValue(sampleStorageKey)
+    ).to.equal(sampleStorageValue);
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
-  })
+  }).timeout(5000);
 })

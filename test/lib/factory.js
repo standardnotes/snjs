@@ -5,13 +5,13 @@ import '../vendor/chai-as-promised-built.js';
 import WebDeviceInterface from './web_device_interface.js';
 
 export default class Factory {
-  static createApplication(namespace) {
+  static createApplication(namespace, platform) {
     const url = this.serverURL();
     const deviceInterface = new WebDeviceInterface();
     return new SNApplication({
       namespace: namespace,
       deviceInterface: deviceInterface,
-      platform: PLATFORM_WEB,
+      platform: platform || PLATFORM_WEB,
       host: url,
       skipClasses: [
         SNComponentManager
@@ -21,31 +21,31 @@ export default class Factory {
     });
   }
 
-  static async createAppWithRandNamespace() {
+  static async createAppWithRandNamespace(platform) {
     const namespace = Math.random().toString(36).substring(2, 15);
-    return this.createApplication(namespace);
+    return this.createApplication(namespace, platform);
   }
 
-  static async createInitAppWithRandNamespace() {
+  static async createInitAppWithRandNamespace(platform) {
     const namespace = Math.random().toString(36).substring(2, 15);
-    return this.createAndInitializeApplication(namespace);
+    return this.createAndInitializeApplication(namespace, platform);
   }
 
-  static async createAndInitializeApplication(namespace) {
-    const application = this.createApplication(namespace);
+  static async createAndInitializeApplication(namespace, platform) {
+    const application = this.createApplication(namespace, platform);
     await this.initializeApplication(application);
     return application;
   }
 
   static async initializeApplication(application) {
-    await application.prepareForLaunch();
-    await application.launch({
+    await application.prepareForLaunch({
       callbacks: {
         authChallengeResponses: (handleChallengeResponses) => {
           throw 'Factory application shouldnt have challenges';
         }
       },
     });
+    await application.launch();
   }
 
   static async registerUserToApplication({application, email, password, ephemeral}) {
