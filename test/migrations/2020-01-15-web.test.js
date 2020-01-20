@@ -120,11 +120,9 @@ describe('2020-01-15 web migration', () => {
     await application.launch({
       ut_awaitDatabaseLoad: true
     });
-
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_PLUS_WRAPPER
     );
-
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
       STORAGE_VALUE_MODE_DEFAULT
@@ -251,11 +249,9 @@ describe('2020-01-15 web migration', () => {
     await application.launch({
       ut_awaitDatabaseLoad: true
     });
-
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_WRAPPER_ONLY
     );
-
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
       STORAGE_VALUE_MODE_DEFAULT
