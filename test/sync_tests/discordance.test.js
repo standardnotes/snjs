@@ -66,7 +66,7 @@ describe('sync discordance', () => {
   it("should increase discordance as client server mismatches", async () => {
     let response = await localSyncManager.sync();
 
-    var item = Factory.createStorageItemNotePayload();
+    var item = Factory.createNotePayload();
     await localModelManager.setItemDirty(item, true);
     localModelManager.addItem(item);
     itemCount++;
@@ -110,7 +110,7 @@ describe('sync discordance', () => {
   }).timeout(10000);
 
   it("should perform sync resolution in which differing items are duplicated instead of merged", async () => {
-    var item = Factory.createStorageItemNotePayload();
+    var item = Factory.createNotePayload();
     localModelManager.addItem(item);
     await localModelManager.setItemDirty(item, true);
     itemCount++;

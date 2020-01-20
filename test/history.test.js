@@ -62,7 +62,7 @@ describe('session history', () => {
   }
 
   it("create basic history entries", async () => {
-    var item = Factory.createStorageItemNotePayload();
+    var item = Factory.createNotePayload();
     await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     await syncManager.sync();
@@ -95,7 +95,7 @@ describe('session history', () => {
   });
 
   it("should optimize basic entries", async () => {
-    var item = Factory.createStorageItemNotePayload();
+    var item = Factory.createNotePayload();
     await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     await syncManager.sync();
@@ -135,7 +135,7 @@ describe('session history', () => {
   });
 
   it("should keep the entry right before a large deletion, regardless of its delta", async () => {
-    var item = Factory.createStorageItemNotePayload();
+    var item = Factory.createNotePayload();
     await modelManager.setItemDirty(item, true);
     modelManager.addItem(item);
     item.text = stringOfSize(100);

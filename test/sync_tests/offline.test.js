@@ -71,7 +71,7 @@ describe.skip('offline deprecated', () => {
   /*
   it.skip("should allow local saving before offline data has loaded, and should not overwrite present values when finished loading",
   async function() {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     const items = await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [payload]
     });

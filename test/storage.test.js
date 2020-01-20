@@ -42,7 +42,7 @@ describe("storage manager", () => {
   })
 
   it("should set and retrieve items", async function () {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     await sharedApplication.storageManager.savePayload(payload);
     const payloads = await sharedApplication.storageManager.getAllRawPayloads();
     expect(payloads.length).to.equal(1);

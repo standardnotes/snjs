@@ -27,13 +27,13 @@ describe('app models', () => {
   });
 
   it('item content should be assigned', () => {
-    var params = Factory.createStorageItemNotePayload();
+    var params = Factory.createNotePayload();
     var item = new SFItem(params);
     expect(item.content.title).to.equal(params.content.title);
   });
 
   it('should default updated_at to 1970 and created_at to the present', () => {
-    var params = Factory.createStorageItemNotePayload();
+    var params = Factory.createNotePayload();
     var item = new SFItem(params);
     let epoch = new Date(0);
     expect(item.updated_at - epoch).to.equal(0);
@@ -62,8 +62,8 @@ describe('app models', () => {
 
   it('handles delayed mapping', async function() {
     const modelManager = this.application.modelManager;
-    const params1 = Factory.createStorageItemNotePayload();
-    const params2 = Factory.createStorageItemNotePayload();
+    const params1 = Factory.createNotePayload();
+    const params2 = Factory.createNotePayload();
 
     const mutated = CreateMaxPayloadFromAnyObject({
       object: params1,
@@ -103,7 +103,7 @@ describe('app models', () => {
 
   it('mapping an item twice shouldnt cause problems', async function() {
     let modelManager = this.application.modelManager;
-    var payload = Factory.createStorageItemNotePayload();
+    var payload = Factory.createNotePayload();
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {foo: "bar"}}

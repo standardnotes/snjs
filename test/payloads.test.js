@@ -136,7 +136,7 @@ describe('payloads', () => {
   });
 
   it("returns valid encrypted params for syncing", async () => {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
@@ -153,7 +153,7 @@ describe('payloads', () => {
   }).timeout(5000);
 
   it("returns unencrypted params with no keys", async () => {
-    var payload = Factory.createStorageItemNotePayload();
+    var payload = Factory.createNotePayload();
     const encodedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
@@ -170,7 +170,7 @@ describe('payloads', () => {
   });
 
   it("returns additional fields for local storage", async () => {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
 
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
@@ -192,7 +192,7 @@ describe('payloads', () => {
   });
 
   it("omits deleted for export file", async () => {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
@@ -209,7 +209,7 @@ describe('payloads', () => {
   });
 
   it("items with error decrypting should remain as is", async () => {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     const mutatedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {

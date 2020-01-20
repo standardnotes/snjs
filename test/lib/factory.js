@@ -45,7 +45,7 @@ export default class Factory {
         }
       },
     });
-    await application.launch();
+    await application.launch({ut_awaitDatabaseLoad: true});
   }
 
   static async registerUserToApplication({application, email, password, ephemeral}) {
@@ -60,7 +60,7 @@ export default class Factory {
     });
   }
 
-  static createStorageItemNotePayload() {
+  static createNotePayload() {
     return CreateMaxPayloadFromAnyObject({object: this.createNoteParams()});
   }
 
@@ -78,7 +78,7 @@ export default class Factory {
   }
 
   static createMappedNote(application) {
-    const payload = this.createStorageItemNotePayload();
+    const payload = this.createNotePayload();
     return this.mapPayloadToItem(payload, application.modelManager);
   }
 
@@ -88,7 +88,7 @@ export default class Factory {
   }
 
   static async createSyncedNote(application) {
-    const payload = this.createStorageItemNotePayload();
+    const payload = this.createNotePayload();
     const note = await this.mapPayloadToItem(payload, application.modelManager);
     await application.modelManager.setItemDirty(note, true);
     await application.syncManager.sync();

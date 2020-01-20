@@ -20,9 +20,8 @@ describe('keys', () => {
 
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
-    const email = SFItem.GenerateUuidSynchronously();
-    const password = SFItem.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({application: this.application, email, password});
+    this.email = SFItem.GenerateUuidSynchronously();
+    this.password = SFItem.GenerateUuidSynchronously();
   })
 
   it('validate isLocalStorageIntent', async () => {
@@ -73,7 +72,7 @@ describe('keys', () => {
   })
 
   it('generating export params with no key should produce decrypted payload', async () => {
-    const payload = Factory.createStorageItemNotePayload();
+    const payload = Factory.createNotePayload();
     const title = payload.content.title;
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
@@ -84,18 +83,15 @@ describe('keys', () => {
   })
 
   it('has root key and one items key after registering user', async () => {
-    const localApplication = await Factory.createInitAppWithRandNamespace();
-    await Factory.registerUserToApplication({application: localApplication});
-    expect(localApplication.keyManager.getRootKey()).to.be.ok;
-    expect(localApplication.keyManager.allItemsKeys.length).to.equal(1);
+    await Factory.registerUserToApplication({application: this.application});
+    expect(this.application.keyManager.getRootKey()).to.be.ok;
+    expect(this.application.keyManager.allItemsKeys.length).to.equal(1);
   })
 
   it('should use root key for encryption of storage', async () => {
-    const localApplication = await Factory.createInitAppWithRandNamespace();
-
     const email = 'foo', password = 'bar';
-    const result = await localApplication.protocolService.createRootKey({identifier: email, password});
-    localApplication.keyManager.setRootKey({key: result.key, keyParams: result.keyParams});
+    const result = await this.application.protocolService.createRootKey({identifier: email, password});
+    this.application.keyManager.setRootKey({key: result.key, keyParams: result.keyParams});
 
     const payload = CreateMaxPayloadFromAnyObject({
       object: {
@@ -103,12 +99,12 @@ describe('keys', () => {
         content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
       }
     });
-    const keyToUse = await localApplication.keyManager.
+    const keyToUse = await this.application.keyManager.
     keyToUseForEncryptionOfPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
     })
-    expect(keyToUse).to.equal(await localApplication.keyManager.getRootKey());
+    expect(keyToUse).to.equal(await this.application.keyManager.getRootKey());
   })
 
   it('items key should be encrypted with root key', async function() {
@@ -130,10 +126,21 @@ describe('keys', () => {
 
     expect(decryptedPayload.errorDecrypting).to.equal(false);
     expect(decryptedPayload.content.itemsKey).to.equal(itemsKey.content.itemsKey);
-  })
+  });
+
+  it.only('should create random items key if no account and no passcode', async function() {
+    const itemsKeys = this.application.keyManager.allItemsKeys;
+    expect(itemsKeys.length).to.equal(1);
+    const notePayload = Factory.createNotePayload();
+    await this.application.savePayload({payload: notePayload});
+
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawNotePayload = rawPayloads.find((r) => r.content_type === 'Note');
+    expect(typeof rawNotePayload.content).to.equal('string');
+  });
 
   it('should use items key for encryption of note', async function() {
-    const note = Factory.createStorageItemNotePayload();
+    const note = Factory.createNotePayload();
     const keyToUse = await this.application.keyManager.
     keyToUseForEncryptionOfPayload({
       payload: note,
@@ -143,7 +150,7 @@ describe('keys', () => {
   })
 
   it('encrypting an item should associate an items key to it', async function() {
-    const note = Factory.createStorageItemNotePayload();
+    const note = Factory.createNotePayload();
     const encryptedPayload = await this.application.protocolService
     .payloadByEncryptingPayload({
       payload: note,
@@ -154,7 +161,7 @@ describe('keys', () => {
   })
 
   it('decrypt encrypted item with associated key', async function() {
-    const note = Factory.createStorageItemNotePayload();
+    const note = Factory.createNotePayload();
     const title = note.content.title;
     const encryptedPayload = await this.application.protocolService
     .payloadByEncryptingPayload({
@@ -174,7 +181,7 @@ describe('keys', () => {
   })
 
   it('decrypts items waiting for keys', async function() {
-    const notePayload = Factory.createStorageItemNotePayload();
+    const notePayload = Factory.createNotePayload();
     const title = notePayload.content.title;
     const encryptedPayload = await this.application.protocolService
     .payloadByEncryptingPayload({
@@ -217,17 +224,16 @@ describe('keys', () => {
   })
 
   it('generating export params with logged in account should produce encrypted payload', async () => {
-    const localApplication = await Factory.createInitAppWithRandNamespace();
-    await Factory.registerUserToApplication({application: localApplication});
-    const payload = Factory.createStorageItemNotePayload();
-    const encryptedPayload = await localApplication.protocolService
+    await Factory.registerUserToApplication({application: this.application});
+    const payload = Factory.createNotePayload();
+    const encryptedPayload = await this.application.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_SYNC
     })
     expect(typeof encryptedPayload.content).to.equal('string');
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
-      localApplication.protocolService.latestVersion()
+      this.application.protocolService.latestVersion()
     );
   })
   //

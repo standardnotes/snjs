@@ -19,7 +19,7 @@ describe('payload collections', () => {
   })
 
   it('find', async () => {
-    const payload = Factory.createStorageItemNotePayload()
+    const payload = Factory.createNotePayload()
     const collection = new PayloadCollection({
       payloads: [payload]
     });

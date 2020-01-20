@@ -21,7 +21,7 @@ describe('application instances', () => {
     expect(app1.modelManager).to.equal(app1.modelManager);
     expect(app1.modelManager).to.not.equal(app2.modelManager);
 
-    const app1Item = await Factory.createStorageItemNotePayload();
+    const app1Item = await Factory.createNotePayload();
     app1.modelManager.addItem(app1Item);
     expect(app1.modelManager.allItems.length).length.to.equal(1);
     expect(app2.modelManager.allItems.length).to.equal(0);

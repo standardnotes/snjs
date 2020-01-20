@@ -14,7 +14,7 @@ describe("items", () => {
 
   it('setting an item as dirty should update its client updated at', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
+    var params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
@@ -26,7 +26,7 @@ describe("items", () => {
 
   it('setting an item as dirty with option to skip client updated at', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
+    var params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
     let item = modelManager.items[0];
     var prevDate = item.client_updated_at.getTime();
@@ -38,7 +38,7 @@ describe("items", () => {
 
   it('properly pins, archives, and locks', async () => {
     let modelManager = await createModelManager();
-    var params = Factory.createStorageItemNotePayload();
+    var params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
 
     let item = modelManager.items[0];
@@ -56,8 +56,8 @@ describe("items", () => {
 
   it('properly compares item equality', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createStorageItemNotePayload();
-    var params2 = Factory.createStorageItemNotePayload();
+    var params1 = Factory.createNotePayload();
+    var params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
 
     let item1 = modelManager.items[0];
@@ -98,8 +98,8 @@ describe("items", () => {
 
   it('content equality should not have side effects', async () => {
     let modelManager = await createModelManager();
-    var params1 = Factory.createStorageItemNotePayload();
-    var params2 = Factory.createStorageItemNotePayload();
+    var params1 = Factory.createNotePayload();
+    var params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
 
     let item1 = modelManager.items[0];
