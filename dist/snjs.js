@@ -2703,7 +2703,7 @@ var APPLICATION_EVENT_DID_SIGN_OUT = 'APPLICATION_EVENT_DID_SIGN_OUT';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_NONWRAPPED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, MigrationService, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, PLATFORM_MOBILE, PLATFORM_WEB, PLATFORM_DESKTOP, isPlatformWebOrDesktop, isPlatformMobile, SYNC_EVENT_FULL_SYNC_COMPLETED, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING, STORAGE_KEY_ROOT_KEY_PARAMS, BaseMigration */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_NONWRAPPED, DeviceAuthService, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, DeviceAuthResponse, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, MigrationService, SNAlertManager, SFSessionHistoryManager, SFPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, PLATFORM_MOBILE, PLATFORM_WEB, PLATFORM_DESKTOP, isPlatformWebOrDesktop, isPlatformMobile, SYNC_EVENT_FULL_SYNC_COMPLETED, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING, STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, BaseMigration */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2983,6 +2983,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_ROOT_KEY_PARAMS", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_52__["STORAGE_KEY_ROOT_KEY_PARAMS"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_MOBILE_PASSCODE_TIMING", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_52__["STORAGE_KEY_MOBILE_PASSCODE_TIMING"]; });
 
 /* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_53__["BaseMigration"]; });
@@ -3359,7 +3361,7 @@ function (_Migration) {
   }, {
     key: "migrateStorageStructureForWebDesktop",
     value: function migrateStorageStructureForWebDesktop() {
-      var deviceInterface, newStorageRawStructure, accountKeyParams, encryptedStorage, encryptedStoragePayload, passcodeResult, passcodeKey, decryptedStoragePayload, passcodeKeyParams, storageValueStore, keyToEncryptStorageWith, hasAccountKeys, accountResult;
+      var deviceInterface, newStorageRawStructure, accountKeyParams, encryptedStorage, encryptedStoragePayload, passcodeResult, passcodeKey, decryptedStoragePayload, passcodeParams, storageValueStore, keyToEncryptStorageWith, hasAccountKeys, accountResult;
       return regeneratorRuntime.async(function migrateStorageStructureForWebDesktop$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -3402,8 +3404,8 @@ function (_Migration) {
               passcodeResult = _context4.sent;
               passcodeKey = passcodeResult.key;
               decryptedStoragePayload = passcodeResult.decryptedStoragePayload;
-              passcodeKeyParams = passcodeResult.keyParams;
-              newStorageRawStructure.nonwrapped[_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"]] = passcodeKeyParams;
+              passcodeParams = passcodeResult.keyParams;
+              newStorageRawStructure.nonwrapped[_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"]] = passcodeParams;
               storageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["Copy"])(decryptedStoragePayload.content.storage);
               /** Store previously encrypted auth_params into new nonwrapped key */
 
@@ -3629,6 +3631,13 @@ function (_Migration) {
      * in that the account key is encrypted with the passcode. But mobile did
      * not have encrypted storage, so we simply need to transfer all existing
      * storage values into new managed structure.
+       * If no account but passcode only, the only thing we stored on mobile
+      * previously was keys.offline.pw and keys.offline.timing in the keychain
+      * that we compared against for valid decryption.
+      * In the new version, we know a passcode is correct if it can decrypt storage.
+      * As part of the migration, we’ll need to request the raw passcode from user,
+      * compare it against the keychain offline.pw value, and if correct,
+      * migrate storage to new structure, and encrypt with passcode key.
      */
 
   }, {
@@ -3636,7 +3645,8 @@ function (_Migration) {
     value: function migrateStorageStructureForMobile() {
       var _nonwrapped;
 
-      var wrappedAccountKey, accountKeyParams, passcodeKeyParams;
+      var wrappedAccountKey, accountKeyParams, rawPasscodeParams, rawStructure, passcodeParams, keychainValue, timing, _keychainValue, savedPw, passcodeKey, response, passcode, payload, wrapped;
+
       return regeneratorRuntime.async(function migrateStorageStructureForMobile$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
@@ -3655,14 +3665,106 @@ function (_Migration) {
               return regeneratorRuntime.awrap(this.application.deviceInterface.getJsonParsedStorageValue(LEGACY_MOBILE_PASSCODE_PARAMS_KEY));
 
             case 8:
-              passcodeKeyParams = _context9.sent;
-              _context9.next = 11;
-              return regeneratorRuntime.awrap(this.allPlatformHelper_setStorageStructure({
-                nonwrapped: (_nonwrapped = {}, _defineProperty(_nonwrapped, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_WRAPPED_ROOT_KEY"], wrappedAccountKey), _defineProperty(_nonwrapped, STORAGE_KEY_ROOT_KEY_WAPPER_KEY_PARAMS, passcodeKeyParams), _defineProperty(_nonwrapped, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_ROOT_KEY_PARAMS"], accountKeyParams), _nonwrapped),
+              rawPasscodeParams = _context9.sent;
+              rawStructure = {
+                nonwrapped: (_nonwrapped = {}, _defineProperty(_nonwrapped, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_WRAPPED_ROOT_KEY"], wrappedAccountKey), _defineProperty(_nonwrapped, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS"], rawPasscodeParams), _defineProperty(_nonwrapped, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_ROOT_KEY_PARAMS"], accountKeyParams), _nonwrapped),
                 unwrapped: {}
+              };
+
+              if (!rawPasscodeParams) {
+                _context9.next = 47;
+                break;
+              }
+
+              passcodeParams = this.application.protocolService.createVersionedKeyParams(rawPasscodeParams);
+              /** Move passcode timing into unwrapped storage */
+
+              if (!passcodeParams) {
+                _context9.next = 18;
+                break;
+              }
+
+              _context9.next = 15;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawKeychainValue());
+
+            case 15:
+              keychainValue = _context9.sent;
+              timing = keychainValue.offline.timing;
+              rawStructure.unwrapped[_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_9__["STORAGE_KEY_MOBILE_PASSCODE_TIMING"]] = timing;
+
+            case 18:
+              if (wrappedAccountKey) {
+                _context9.next = 47;
+                break;
+              }
+
+              _context9.next = 21;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawKeychainValue());
+
+            case 21:
+              _keychainValue = _context9.sent;
+              savedPw = _keychainValue.offline.pw;
+              passcodeKey = {
+                serverPassword: null
+              };
+
+            case 24:
+              if (!(passcodeKey.serverPassword !== savedPw)) {
+                _context9.next = 34;
+                break;
+              }
+
+              _context9.next = 27;
+              return regeneratorRuntime.awrap(this.requestChallengeResponse(CHALLENGE_LOCAL_PASSCODE));
+
+            case 27:
+              response = _context9.sent;
+              passcode = response.value;
+              _context9.next = 31;
+              return regeneratorRuntime.awrap(this.application.protocolService.computeRootKey({
+                password: passcode,
+                keyParams: passcodeParams
               }));
 
-            case 11:
+            case 31:
+              passcodeKey = _context9.sent;
+              _context9.next = 24;
+              break;
+
+            case 34:
+              _context9.t0 = CreateMaxPayloadFromAnyObject;
+              _context9.next = 37;
+              return regeneratorRuntime.awrap(SFItem.GenerateUuid());
+
+            case 37:
+              _context9.t1 = _context9.sent;
+              _context9.t2 = rawStructure.unwrapped;
+              _context9.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_7__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
+              _context9.t4 = {
+                uuid: _context9.t1,
+                content: _context9.t2,
+                content_type: _context9.t3
+              };
+              _context9.t5 = {
+                object: _context9.t4
+              };
+              payload = (0, _context9.t0)(_context9.t5);
+              _context9.next = 45;
+              return regeneratorRuntime.awrap(this.application.protocolService.payloadByEncryptingPayload({
+                payload: payload,
+                key: passcodeKey,
+                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_8__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]
+              }));
+
+            case 45:
+              wrapped = _context9.sent;
+              rawStructure.wrapped = wrapped;
+
+            case 47:
+              _context9.next = 49;
+              return regeneratorRuntime.awrap(this.allPlatformHelper_setStorageStructure(rawStructure));
+
+            case 49:
             case "end":
               return _context9.stop();
           }
@@ -3692,12 +3794,15 @@ function (_Migration) {
 
               if (rootKey) {
                 accountKeys = rootKey.content.accountKeys;
-                version = accountKeys.ak ? _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_003"] : _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_002"];
-                rawKey = Object.assign({
-                  version: version
-                }, accountKeys);
-                newRootKey = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].FromRaw(rawKey);
-                this.application.keyManager.rootKey = newRootKey;
+
+                if (accountKeys) {
+                  version = accountKeys.ak ? _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_003"] : _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_002"];
+                  rawKey = Object.assign({
+                    version: version
+                  }, accountKeys);
+                  newRootKey = _Models_keys_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].FromRaw(rawKey);
+                  this.application.keyManager.rootKey = newRootKey;
+                }
               }
 
             case 4:
@@ -24526,19 +24631,18 @@ function (_PureService) {
   }, {
     key: "generatePersistenceValue",
     value: function generatePersistenceValue() {
-      var rawContent, intent, valuesToWrap, payload, encryptedPayload;
+      var rawContent, valuesToWrap, payload, encryptedPayload;
       return regeneratorRuntime.async(function generatePersistenceValue$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
               rawContent = Object.assign({}, this.values);
-              intent = this.encryptionPolicy === STORAGE_ENCRYPTION_POLICY_DISABLED ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"];
               valuesToWrap = rawContent[STORAGE_VALUES_KEY_UNWRAPPED];
               _context11.t0 = CreateMaxPayloadFromAnyObject;
-              _context11.next = 6;
+              _context11.next = 5;
               return regeneratorRuntime.awrap(SFItem.GenerateUuid());
 
-            case 6:
+            case 5:
               _context11.t1 = _context11.sent;
               _context11.t2 = valuesToWrap;
               _context11.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
@@ -24551,18 +24655,18 @@ function (_PureService) {
                 object: _context11.t4
               };
               payload = (0, _context11.t0)(_context11.t5);
-              _context11.next = 14;
+              _context11.next = 13;
               return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
-                intent: intent
+                intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]
               }));
 
-            case 14:
+            case 13:
               encryptedPayload = _context11.sent;
               rawContent[STORAGE_VALUES_KEY_WRAPPED] = encryptedPayload;
               return _context11.abrupt("return", rawContent);
 
-            case 17:
+            case 16:
             case "end":
               return _context11.stop();
           }
@@ -27790,7 +27894,7 @@ var APPLICATION_STAGE_30_SIGNED_IN = 3.0;
 /*!*****************************!*\
   !*** ./lib/storage_keys.js ***!
   \*****************************/
-/*! exports provided: STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_WRAPPED_ROOT_KEY, STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_STORAGE_OBJECT, STORAGE_KEY_BIOMETRIC_PREFS, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP, namespacedKey */
+/*! exports provided: STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_WRAPPED_ROOT_KEY, STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_STORAGE_OBJECT, STORAGE_KEY_BIOMETRIC_PREFS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -27806,6 +27910,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_PAGINATION_TOKEN", function() { return STORAGE_KEY_PAGINATION_TOKEN; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_STORAGE_OBJECT", function() { return STORAGE_KEY_STORAGE_OBJECT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_BIOMETRIC_PREFS", function() { return STORAGE_KEY_BIOMETRIC_PREFS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_MOBILE_PASSCODE_TIMING", function() { return STORAGE_KEY_MOBILE_PASSCODE_TIMING; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_PERSIST_KEY", function() { return SESSION_HISTORY_PERSIST_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_REVISIONS_KEY", function() { return SESSION_HISTORY_REVISIONS_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_OPTIMIZE_KEY", function() { return SESSION_HISTORY_OPTIMIZE_KEY; });
@@ -27822,6 +27927,7 @@ var STORAGE_KEY_LAST_SYNC_TOKEN = 'syncToken';
 var STORAGE_KEY_PAGINATION_TOKEN = 'cursorToken';
 var STORAGE_KEY_STORAGE_OBJECT = 'storage';
 var STORAGE_KEY_BIOMETRIC_PREFS = 'biometrics_prefs';
+var STORAGE_KEY_MOBILE_PASSCODE_TIMING = 'passcode_timing';
 var SESSION_HISTORY_PERSIST_KEY = 'sessionHistory_persist';
 var SESSION_HISTORY_REVISIONS_KEY = 'sessionHistory_revisions';
 var SESSION_HISTORY_OPTIMIZE_KEY = 'sessionHistory_autoOptimize';
