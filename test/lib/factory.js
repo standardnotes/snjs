@@ -7,7 +7,7 @@ import WebDeviceInterface from './web_device_interface.js';
 export default class Factory {
   static createApplication(namespace, platform) {
     const url = this.serverURL();
-    const deviceInterface = new WebDeviceInterface();
+    const deviceInterface = new WebDeviceInterface({namespace});
     return new SNApplication({
       namespace: namespace,
       deviceInterface: deviceInterface,
@@ -93,6 +93,15 @@ export default class Factory {
     await application.modelManager.setItemDirty(note, true);
     await application.syncManager.sync();
     return note;
+  }
+
+  static async getStoragePayloadsOfType(application, type) {
+    const rawPayloads = await application.storageManager.getAllRawPayloads();
+    return rawPayloads.filter((rp) => rp.content_type === type).map((rp) => {
+      return CreateMaxPayloadFromAnyObject({
+        object: rp
+      })
+    })
   }
 
   static async createManyMappedNotes(application, count) {

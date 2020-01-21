@@ -83,10 +83,10 @@ export default class WebDeviceInterface extends DeviceInterface {
       return this.keychainValue;
     } else {
       const authParams = localStorage.getItem('auth_params');
-      let version;
-      if(authParams) {
-        version = JSON.parse(authParams).version;
+      if(!authParams) {
+        return null;
       }
+      const version = JSON.parse(authParams).version;
       return {
         mk: localStorage.getItem('mk'),
         pw: localStorage.getItem('pw'),

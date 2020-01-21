@@ -7,14 +7,12 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('keys', () => {
-  let sharedApplication;
 
-  before(async () => {
+  before(async function () {
     localStorage.clear();
-    sharedApplication = await Factory.createInitAppWithRandNamespace();
   })
 
-  after(async () => {
+  after(async function () {
     localStorage.clear();
   })
 
@@ -24,7 +22,7 @@ describe('keys', () => {
     this.password = SFItem.GenerateUuidSynchronously();
   })
 
-  it('validate isLocalStorageIntent', async () => {
+  it('validate isLocalStorageIntent', async function () {
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_SYNC)).to.equal(false);
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED)).to.equal(true);
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED)).to.equal(true);
@@ -33,7 +31,7 @@ describe('keys', () => {
     expect(isLocalStorageIntent(ENCRYPTION_INTENT_FILE_DECRYPTED)).to.equal(false);
   })
 
-  it('validate isFileIntent', async () => {
+  it('validate isFileIntent', async function () {
     expect(isFileIntent(ENCRYPTION_INTENT_SYNC)).to.equal(false);
     expect(isFileIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED)).to.equal(false);
     expect(isFileIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED)).to.equal(false);
@@ -42,7 +40,7 @@ describe('keys', () => {
     expect(isFileIntent(ENCRYPTION_INTENT_FILE_DECRYPTED)).to.equal(true);
   })
 
-  it('validate isDecryptedIntent', async () => {
+  it('validate isDecryptedIntent', async function () {
     expect(isDecryptedIntent(ENCRYPTION_INTENT_SYNC)).to.equal(false);
     expect(isDecryptedIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED)).to.equal(false);
     expect(isDecryptedIntent(ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED)).to.equal(true);
@@ -51,7 +49,7 @@ describe('keys', () => {
     expect(isDecryptedIntent(ENCRYPTION_INTENT_FILE_DECRYPTED)).to.equal(true);
   })
 
-  it('validate intentRequiresEncryption', async () => {
+  it('validate intentRequiresEncryption', async function () {
     expect(intentRequiresEncryption(ENCRYPTION_INTENT_SYNC)).to.equal(true);
     expect(intentRequiresEncryption(ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED)).to.equal(true);
     expect(intentRequiresEncryption(ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED)).to.equal(false);
@@ -60,21 +58,21 @@ describe('keys', () => {
     expect(intentRequiresEncryption(ENCRYPTION_INTENT_FILE_DECRYPTED)).to.equal(false);
   })
 
-  it('should not have root key by default', async () => {
-    expect(sharedApplication.keyManager.getRootKey()).to.not.be.ok;
+  it('should not have root key by default', async function () {
+    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
   })
 
-  it('validates content types requiring root encryption', async () => {
-    expect(sharedApplication.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ITEMS_KEY)).to.equal(true);
-    expect(sharedApplication.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ENCRYPTED_STORAGE)).to.equal(true);
-    expect(sharedApplication.keyManager.contentTypeUsesRootKeyEncryption('SF|Item')).to.equal(false);
-    expect(sharedApplication.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
+  it('validates content types requiring root encryption', async function () {
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ITEMS_KEY)).to.equal(true);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ENCRYPTED_STORAGE)).to.equal(true);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('SF|Item')).to.equal(false);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
   })
 
-  it('generating export params with no key should produce decrypted payload', async () => {
+  it('generating export params with no key should produce decrypted payload', async function () {
     const payload = Factory.createNotePayload();
     const title = payload.content.title;
-    const encryptedPayload = await sharedApplication.protocolService
+    const encryptedPayload = await this.application.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
       intent: ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED
@@ -82,16 +80,16 @@ describe('keys', () => {
     expect(payload.content.title).to.equal(title);
   })
 
-  it('has root key and one items key after registering user', async () => {
+  it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({application: this.application});
     expect(this.application.keyManager.getRootKey()).to.be.ok;
     expect(this.application.keyManager.allItemsKeys.length).to.equal(1);
   })
 
-  it('should use root key for encryption of storage', async () => {
+  it('should use root key for encryption of storage', async function () {
     const email = 'foo', password = 'bar';
     const result = await this.application.protocolService.createRootKey({identifier: email, password});
-    this.application.keyManager.setRootKey({key: result.key, keyParams: result.keyParams});
+    this.application.keyManager.setNewRootKey({key: result.key, keyParams: result.keyParams});
 
     const payload = CreateMaxPayloadFromAnyObject({
       object: {
@@ -108,7 +106,8 @@ describe('keys', () => {
   })
 
   it('items key should be encrypted with root key', async function() {
-    const itemsKey = await this.application.keyManager.getDefaultItemsKey();
+    await Factory.registerUserToApplication({application: this.application});
+    const itemsKey = this.application.keyManager.getDefaultItemsKey();
     /** Encrypt items key */
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload({
       payload: itemsKey.payloadRepresentation(),
@@ -128,7 +127,7 @@ describe('keys', () => {
     expect(decryptedPayload.content.itemsKey).to.equal(itemsKey.content.itemsKey);
   });
 
-  it.only('should create random items key if no account and no passcode', async function() {
+  it('should create random items key if no account and no passcode', async function() {
     const itemsKeys = this.application.keyManager.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
@@ -223,7 +222,7 @@ describe('keys', () => {
     expect(note.content.title).to.equal(title);
   })
 
-  it('generating export params with logged in account should produce encrypted payload', async () => {
+  it('generating export params with logged in account should produce encrypted payload', async function () {
     await Factory.registerUserToApplication({application: this.application});
     const payload = Factory.createNotePayload();
     const encryptedPayload = await this.application.protocolService
@@ -233,20 +232,171 @@ describe('keys', () => {
     })
     expect(typeof encryptedPayload.content).to.equal('string');
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
-      this.application.protocolService.latestVersion()
+      this.application.protocolService.getLatestVersion()
     );
   })
-  //
-  // it('rotating account keys should save new root keys and create new keys object for old keys', async () => {
-  //
-  // });
-  //
-  //
-  // it('setting keys as default should use that for item encryption', async () => {
-  //
-  // });
-  //
-  // it('migrating from any version to 004 should create new items key objects and set new root keys', async () => {
-  //
-  // });
+
+  it('When setting passcode, should encrypt items keys', async function () {
+    await this.application.setPasscode('foo');
+    const itemsKey = this.application.keyManager.allItemsKeys[0];
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
+    const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
+      object: itemsKeyRawPayload
+    });
+    expect(itemsKeyPayload.isEncrypted).to.equal(true);
+  });
+
+  it('When root key changes, all items keys must be re-encrypted', async function () {
+    await this.application.setPasscode('foo');
+    await Factory.createSyncedNote(this.application);
+    const itemsKeys = this.application.keyManager.allItemsKeys;
+    expect(itemsKeys.length).to.equal(1);
+    const originalItemsKey = itemsKeys[0];
+
+    const originalRootKey = await this.application.keyManager.getRootKey();
+    /** Expect that we can decrypt raw payload with current root key */
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === originalItemsKey.uuid);
+    const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
+      object: itemsKeyRawPayload
+    });
+    const decrypted = await this.application.protocolService.payloadByDecryptingPayload({
+      payload: itemsKeyPayload,
+      key: originalRootKey
+    });
+    expect(decrypted.errorDecrypting).to.equal(false);
+    expect(decrypted.content).to.eql(originalItemsKey.content);
+
+    /** Change passcode */
+    await this.application.changePasscode('bar');
+
+    const newRootKey = await this.application.keyManager.getRootKey();
+    expect(newRootKey).to.not.equal(originalRootKey);
+    expect(newRootKey.masterKey).to.not.equal(originalRootKey.masterKey);
+
+    /**
+     * Expect that originalRootKey can no longer decrypt originalItemsKey
+     * as items key has been re-encrypted with new root key
+     */
+    const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
+    const itemsKeyRawPayload2 = rawPayloads2.find((p) => p.uuid === originalItemsKey.uuid);
+    expect(itemsKeyRawPayload2.content).to.not.equal(itemsKeyRawPayload.content);
+
+    const itemsKeyPayload2 = CreateMaxPayloadFromAnyObject({
+      object: itemsKeyRawPayload2
+    });
+    const decrypted2 = await this.application.protocolService.payloadByDecryptingPayload({
+     payload: itemsKeyRawPayload2,
+     key: originalRootKey
+    });
+    expect(decrypted2.errorDecrypting).to.equal(true);
+
+    /** Should be able to decrypt with new root key */
+    const decrypted3 = await this.application.protocolService.payloadByDecryptingPayload({
+     payload: itemsKeyRawPayload2,
+     key: newRootKey
+    });
+    expect(decrypted3.errorDecrypting).to.equal(false);
+  });
+
+  it('changing account password with key rotation option should create new items key', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application, email: this.email, password: this.password
+    });
+    const itemsKeys = this.application.keyManager.allItemsKeys;
+    expect(itemsKeys.length).to.equal(1);
+    const defaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+
+    await this.application.changePassword({
+      email: this.email,
+      currentPassword: this.password,
+      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
+      newPassword: 'foobar',
+      rotateItemsKey: true
+    });
+
+    expect(this.application.keyManager.allItemsKeys.length).to.equal(2);
+    const newDefaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+    expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
+  });
+
+  it('protocol version should be upgraded on password change', async function () {
+    /** Register with 003 version */
+    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = this.email;
+    const password = this.password;
+    const result = await operator_003.createRootKey({
+      identifier,
+      password
+    });
+    const accountKey = result.key;
+    const accountKeyParams = result.keyParams;
+    /** Delete default items key that is created on launch */
+    const itemsKey = this.application.keyManager.getDefaultItemsKey();
+    await this.application.modelManager.setItemToBeDeleted(itemsKey);
+    expect(this.application.keyManager.allItemsKeys.length).to.equal(0);
+
+    /** We must manually hook into API, otherwise using wrapper methods
+    always registers with latest version */
+    const response = await this.application.apiService.register({
+      email: identifier,
+      serverPassword: accountKey.serverPassword,
+      keyParams: accountKeyParams
+    });
+    await this.application.sessionManager.handleAuthResponse(response);
+    await this.application.keyManager.setNewRootKey({
+      key: accountKey,
+      keyParams: accountKeyParams
+    });
+    await this.application.syncManager.sync();
+    expect(this.application.keyManager.allItemsKeys.length).to.equal(1);
+
+    expect(
+      (await this.application.keyManager.getRootKeyParams()).version
+    ).to.equal('003');
+    expect(
+      (await this.application.keyManager.getRootKey()).version
+    ).to.equal('003');
+
+    /** Create note and ensure its encrypted with 003 */
+    await Factory.createSyncedNote(this.application);
+
+    const notePayloads = await Factory.getStoragePayloadsOfType(
+      this.application,
+      'Note'
+    );
+    const notePayload003 = notePayloads[0];
+    expect(notePayload003.version).to.equal('003');
+
+    await this.application.changePassword({
+      email: this.email,
+      currentPassword: this.password,
+      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
+      newPassword: 'foobar'
+    });
+
+    const latestVersion = this.application.protocolService.getLatestVersion();
+    expect(
+      (await this.application.keyManager.getRootKeyParams()).version
+    ).to.equal(latestVersion);
+    expect(
+      (await this.application.keyManager.getRootKey()).version
+    ).to.equal(latestVersion);
+
+    const defaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+    expect(defaultItemsKey.version).to.equal(latestVersion);
+
+    /** After change, note should now be encrypted with latest protocol version */
+
+    const note = this.application.modelManager.notes[0];
+    await this.application.saveItem({item: note});
+
+    const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
+      this.application,
+      'Note'
+    );
+    const refreshedNotePayload = refreshedNotePayloads[0];
+    expect(refreshedNotePayload.version).to.equal(latestVersion);
+  });
 })

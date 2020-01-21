@@ -148,7 +148,7 @@ describe('payloads', () => {
     expect(encryptedPayload.content_type).to.not.be.null;
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
     });
   }).timeout(5000);
 
@@ -187,7 +187,7 @@ describe('payloads', () => {
     expect(encryptedPayload.deleted).to.not.be.null;
     expect(encryptedPayload.errorDecrypting).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
     });
   });
 
@@ -204,7 +204,7 @@ describe('payloads', () => {
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.deleted).to.not.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.latestVersion());
+      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
     });
   });
 

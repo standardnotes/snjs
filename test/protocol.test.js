@@ -13,7 +13,7 @@ describe('protocol', () => {
   });
 
   it('checks version to make sure its 004', () => {
-    expect(application.protocolService.latestVersion()).to.equal("004");
+    expect(application.protocolService.getLatestVersion()).to.equal("004");
   });
 
   it('checks supported versions to make sure it includes 001, 002, 003, 004', () => {
@@ -33,12 +33,12 @@ describe('protocol', () => {
   });
 
   it('library version should not be outdated', () => {
-    var currentVersion = application.protocolService.latestVersion();
+    var currentVersion = application.protocolService.getLatestVersion();
     expect(application.protocolService.isProtocolVersionOutdated(currentVersion)).to.equal(false);
   });
 
   it('cost minimum for 003 to be 110,000', () => {
-    var currentVersion = application.protocolService.latestVersion();
+    var currentVersion = application.protocolService.getLatestVersion();
     expect(application.protocolService.costMinimumForVersion("003")).to.equal(110000);
   });
 });

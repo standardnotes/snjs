@@ -66,7 +66,7 @@ describe("singletons", () => {
 
   it("if only result is errorDecrypting, create new item", async function() {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItems({
+    const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
     })
     this.expectedItemCount++;
@@ -86,7 +86,7 @@ describe("singletons", () => {
 
   it("alternating the uuid of a singleton should return correct result", async function() {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItems({
+    const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
     })
     this.expectedItemCount++;
