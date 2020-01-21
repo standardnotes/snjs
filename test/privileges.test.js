@@ -3,76 +3,60 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
-
-SFItem.AppDomain = "org.standardnotes.sn";
-
 chai.use(chaiAsPromised);
-var expect = chai.expect;
-
-const storageManager = Factory.createMemoryStorageManager();
-const modelManager = new SNModelManager();
-const syncManager = new SNSyncManager({
-  modelManager,
-  sessionManager: Factory.globalSessionManager(),
-  storageManager: storageManager,
-  protocolService: Factory.globalProtocolService(),
-  httpManager: Factory.globalHttpManager()
-});
-const singletonManager = new SNSingletonManager(modelManager, syncManager);
-
-let privilegesManager = new SFPrivilegesManager(modelManager, syncManager, singletonManager);
-privilegesManager.setDelegate({
-  isOffline: async () => {
-    return false;
-  },
-  hasLocalPasscode: async () => {
-    return true;
-  },
-  saveToStorage: async (key, value) => {
-    return storageManager.setValue(key, value);
-  },
-  getFromStorage: async (key) => {
-    return storageManager.getValue(key)
-  },
-  validateAccountPassword: async () => {
-    return true;
-  },
-  verifyLocalPasscode: async () => {
-    return true;
-  }
-});
+const expect = chai.expect;
 
 describe("privileges", () => {
-  it("loads default actions and credentials", async () => {
-    expect(privilegesManager.getAvailableActions().length).to.be.above(0);
-    expect(privilegesManager.getAvailableCredentials().length).to.be.above(0);
+
+  before(async function () {
+    localStorage.clear();
+  })
+
+  after(async function () {
+    localStorage.clear();
+  })
+
+  beforeEach(async function() {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.privilegesManager = this.application.privilegesManager;
+    this.email = SFItem.GenerateUuidSynchronously();
+    this.password = SFItem.GenerateUuidSynchronously();
+  })
+
+  it("loads default actions and credentials", async function () {
+    expect(this.privilegesManager.getAvailableActions().length).to.be.above(0);
+    expect(this.privilegesManager.getAvailableCredentials().length).to.be.above(0);
   });
 
-  it('successfully loads privileges', async () => {
-    await syncManager.loadDataFromDatabase();
-    // Singleton handler doesn't run on initial data load, only after first sync
-    await syncManager.sync();
-
-    let privileges = await privilegesManager.getPrivileges();
+  it('successfully loads privileges', async function () {
+    const privileges = await this.privilegesManager.getPrivileges();
     expect(privileges).to.be.ok;
   });
 
-  it("adds credentials for actions", async () => {
-    let privileges = await privilegesManager.getPrivileges();
-    privileges.addCredentialForAction(SFPrivilegesManager.ActionViewProtectedNotes, SFPrivilegesManager.CredentialLocalPasscode);
-    let credentials = await privilegesManager.netCredentialsForAction(SFPrivilegesManager.ActionViewProtectedNotes);
+  it.only("adds credentials for actions", async function () {
+    const privileges = await this.privilegesManager.getPrivileges();
+    privileges.addCredentialForAction(
+      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES,
+      PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE
+    );
+    await this.application.setPasscode('foobar');
+    const credentials = await this.privilegesManager.netCredentialsForAction(
+      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES
+    );
     expect(credentials.length).to.equal(1);
-    let requiresCredentials = await privilegesManager.actionRequiresPrivilege(SFPrivilegesManager.ActionViewProtectedNotes);
+    const requiresCredentials = await this.privilegesManager.actionRequiresPrivilege(
+      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES
+    );
     expect(requiresCredentials).to.equal(true);
   });
 
-  it("handles session length", async () => {
-    await privilegesManager.setSessionLength(SFPrivilegesManager.SessionLengthFiveMinutes);
-    let length = await privilegesManager.getSelectedSessionLength();
-
-    expect(length).to.equal(SFPrivilegesManager.SessionLengthFiveMinutes);
-
-    let expirey = await privilegesManager.getSessionExpirey();
+  it("handles session length", async function () {
+    await this.privilegesManager.setSessionLength(
+      PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES
+    );
+    const length = await this.privilegesManager.getSelectedSessionLength();
+    expect(length).to.equal(PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES);
+    const expirey = await this.privilegesManager.getSessionExpirey();
     expect(expirey).to.be.ok;
   });
 })
