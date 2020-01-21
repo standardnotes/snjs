@@ -7,7 +7,11 @@ import WebDeviceInterface from './web_device_interface.js';
 export default class Factory {
   static createApplication(namespace, platform) {
     const url = this.serverURL();
-    const deviceInterface = new WebDeviceInterface({namespace});
+    const deviceInterface = new WebDeviceInterface({
+      namespace,
+      timeout: setTimeout.bind(window),
+      interval: setInterval.bind(window)
+    });
     return new SNApplication({
       namespace: namespace,
       deviceInterface: deviceInterface,
@@ -15,9 +19,7 @@ export default class Factory {
       host: url,
       skipClasses: [
         SNComponentManager
-      ],
-      timeout: setTimeout.bind(window),
-      interval: setInterval.bind(window)
+      ]
     });
   }
 
@@ -68,28 +70,23 @@ export default class Factory {
     return CreateMaxPayloadFromAnyObject({object: this.createTagParams()});
   }
 
-  static async mapPayloadToItem(payload, modelManager) {
-    const items = await modelManager.mapPayloadsToLocalItems({payloads: [payload]})
-    return items[0];
-  }
-
   static itemToStoragePayload(item) {
     return CreateMaxPayloadFromAnyObject({object: item});
   }
 
   static createMappedNote(application) {
     const payload = this.createNotePayload();
-    return this.mapPayloadToItem(payload, application.modelManager);
+    return application.modelManager.mapPayloadToLocalItem({payload});
   }
 
   static createMappedTag(application) {
     const payload = this.createStorageItemTagPayload();
-    return this.mapPayloadToItem(payload, application.modelManager);
+    return application.modelManager.mapPayloadToLocalItem({payload});
   }
 
   static async createSyncedNote(application) {
     const payload = this.createNotePayload();
-    const note = await this.mapPayloadToItem(payload, application.modelManager);
+    const note = await application.modelManager.mapPayloadToLocalItem({payload});
     await application.modelManager.setItemDirty(note, true);
     await application.syncManager.sync();
     return note;
@@ -143,13 +140,13 @@ export default class Factory {
     return crypto.generateUUIDSync();
   }
 
-  static createNoteParams() {
+  static createNoteParams({title, text} = {}) {
     const params = {
       uuid: this.generateUuid(),
       content_type: "Note",
       content: {
-        title: "hello",
-        text: "world",
+        title: title || "hello",
+        text: text || "world",
         references: []
       }
     };
@@ -184,10 +181,6 @@ export default class Factory {
       CreateMaxPayloadFromAnyObject({object: noteParams}),
       CreateMaxPayloadFromAnyObject({object: tagParams})
     ];
-  }
-
-  static challengeResponse(correct = true) {
-
   }
 
   static serverURL() {

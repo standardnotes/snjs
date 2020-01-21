@@ -1201,21 +1201,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
 /* harmony import */ var _Services_http_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/http_manager */ "./lib/services/http_manager.js");
-/* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
-/* harmony import */ var _Lib_migration_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/migration/service */ "./lib/migration/service.js");
-/* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
-/* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
-/* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
-/* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
-/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
-/* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
+/* harmony import */ var _Lib_migration_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/migration/service */ "./lib/migration/service.js");
+/* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
+/* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
+/* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
+/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1252,13 +1254,6 @@ function () {
       is the custom subclass to use.
    * @param skipClasses
       An optional array of classes to skip making services for.
-   * @param timeout
-      A platform-specific function that is fed functions to run
-      when other operations have completed. This is similar to
-      setImmediate on the web, or setTimeout(fn, 0).
-   * @param interval
-      A platform-specific function that is fed functions to
-      perform repeatedly. Similar to setInterval.
    */
   function SNApplication() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1267,15 +1262,9 @@ function () {
         host = _ref.host,
         deviceInterface = _ref.deviceInterface,
         swapClasses = _ref.swapClasses,
-        skipClasses = _ref.skipClasses,
-        timeout = _ref.timeout,
-        interval = _ref.interval;
+        skipClasses = _ref.skipClasses;
 
     _classCallCheck(this, SNApplication);
-
-    if (!timeout) {
-      throw "'timeout' is required to initialize application.";
-    }
 
     if (!deviceInterface) {
       throw 'Device Interface must be supplied.';
@@ -1292,8 +1281,6 @@ function () {
     this.deviceInterface = deviceInterface;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
-    this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
-    this.interval = interval || setInterval.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
     this.eventHandlers = [];
     this.services = [];
   }
@@ -1336,7 +1323,7 @@ function () {
 
             case 7:
               _context.next = 9;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_0_PREPARING_FOR_LAUNCH"]));
+              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_0_PREPARING_FOR_LAUNCH"]));
 
             case 9:
               _context.next = 11;
@@ -1351,10 +1338,11 @@ function () {
               return regeneratorRuntime.awrap(this.keyManager.initialize());
 
             case 15:
-              _context.next = 17;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_05_READY_FOR_LAUNCH"]));
+              this.historyManager.initialize();
+              _context.next = 18;
+              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_05_READY_FOR_LAUNCH"]));
 
-            case 17:
+            case 18:
             case "end":
               return _context.stop();
           }
@@ -1402,11 +1390,11 @@ function () {
 
             case 8:
               _context4.next = 10;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_09_STORAGE_DECRYPTED"]));
+              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_09_STORAGE_DECRYPTED"]));
 
             case 10:
               _context4.next = 12;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_10_LAUNCHED"]));
+              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_10_LAUNCHED"]));
 
             case 12:
               _context4.next = 14;
@@ -1415,7 +1403,7 @@ function () {
             case 14:
               databasePayloads = _context4.sent;
               _context4.next = 17;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_11_LOADING_DATABASE"]));
+              return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_11_LOADING_DATABASE"]));
 
             case 17:
               /**
@@ -1429,11 +1417,11 @@ function () {
                     switch (_context3.prev = _context3.next) {
                       case 0:
                         _context3.next = 2;
-                        return regeneratorRuntime.awrap(_this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_STAGE_12_LOADED_DATABASE"]));
+                        return regeneratorRuntime.awrap(_this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_15__["APPLICATION_STAGE_12_LOADED_DATABASE"]));
 
                       case 2:
                         return _context3.abrupt("return", _this.syncManager.sync({
-                          mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
+                          mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_13__["SYNC_MODE_INITIAL"]
                         }).then(function _callee() {
                           var currentItemsKey;
                           return regeneratorRuntime.async(function _callee$(_context2) {
@@ -1828,7 +1816,7 @@ function () {
           switch (_context11.prev = _context11.next) {
             case 0:
               payload = _ref4.payload;
-              dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_9__["CopyPayload"])({
+              dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_10__["CopyPayload"])({
                 payload: payload,
                 override: {
                   dirty: true
@@ -1920,13 +1908,13 @@ function () {
 
             case 7:
               _context14.next = 9;
-              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
 
             case 9:
-              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_IN"]);
+              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_EVENT_DID_SIGN_IN"]);
               _context14.next = 12;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
+                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_13__["SYNC_MODE_INITIAL"]
               }));
 
             case 12:
@@ -1948,7 +1936,7 @@ function () {
           switch (_context15.prev = _context15.next) {
             case 0:
               email = _ref7.email, password = _ref7.password, strict = _ref7.strict, ephemeral = _ref7.ephemeral, mfaKeyPath = _ref7.mfaKeyPath, mfaCode = _ref7.mfaCode;
-              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_WILL_SIGN_IN"]);
+              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_EVENT_WILL_SIGN_IN"]);
               _context15.next = 4;
               return regeneratorRuntime.awrap(this.sessionManager.signIn({
                 email: email,
@@ -1974,13 +1962,13 @@ function () {
 
             case 8:
               _context15.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
+              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__["STORAGE_PERSISTENCE_POLICY_EPHEMERAL"] : _Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__["STORAGE_PERSISTENCE_POLICY_DEFAULT"]));
 
             case 10:
-              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_IN"]);
+              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_EVENT_DID_SIGN_IN"]);
               _context15.next = 13;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SYNC_MODE_INITIAL"]
+                mode: _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_13__["SYNC_MODE_INITIAL"]
               }));
 
             case 13:
@@ -2087,7 +2075,7 @@ function () {
               return regeneratorRuntime.awrap(this.storageManager.clearAllData());
 
             case 12:
-              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_13__["APPLICATION_EVENT_DID_SIGN_OUT"]);
+              this.notifyEvent(_Lib_events__WEBPACK_IMPORTED_MODULE_14__["APPLICATION_EVENT_DID_SIGN_OUT"]);
 
             case 13:
             case "end":
@@ -2199,7 +2187,7 @@ function () {
   }, {
     key: "constructServices",
     value: function constructServices() {
-      this.createModelManager(this.timeout);
+      this.createModelManager();
       this.createProtocolService(this.modelManager);
       this.createMigrationService();
       this.createAlertManager();
@@ -2215,6 +2203,7 @@ function () {
       this.createSingletonManager();
       this.createComponentManager();
       this.createPrivilegesManager();
+      this.createHistoryManager();
     }
     /**
      * Dynamically change the device interface, i.e when Desktop wants to override
@@ -2259,7 +2248,7 @@ function () {
   }, {
     key: "createMigrationService",
     value: function createMigrationService() {
-      this.migrationService = new (this.getClass(_Lib_migration_service__WEBPACK_IMPORTED_MODULE_6__["MigrationService"]))({
+      this.migrationService = new (this.getClass(_Lib_migration_service__WEBPACK_IMPORTED_MODULE_7__["MigrationService"]))({
         application: this,
         challengeResponder: this.getMigrationChallengeResponder()
       });
@@ -2297,13 +2286,13 @@ function () {
   }, {
     key: "createHttpManager",
     value: function createHttpManager() {
-      this.httpManager = new (this.getClass(_Services_http_manager__WEBPACK_IMPORTED_MODULE_4__["SNHttpManager"]))(this.timeout);
+      this.httpManager = new (this.getClass(_Services_http_manager__WEBPACK_IMPORTED_MODULE_4__["SNHttpManager"]))();
       this.services.push(this.httpManager);
     }
   }, {
     key: "createKeyManager",
     value: function createKeyManager() {
-      this.keyManager = new (this.getClass(_Services_key_manager__WEBPACK_IMPORTED_MODULE_5__["SNKeyManager"]))({
+      this.keyManager = new (this.getClass(_Services_key_manager__WEBPACK_IMPORTED_MODULE_6__["SNKeyManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         protocolService: this.protocolService
@@ -2312,14 +2301,16 @@ function () {
     }
   }, {
     key: "createModelManager",
-    value: function createModelManager(timeout) {
-      this.modelManager = new (this.getClass(_Services_model_manager__WEBPACK_IMPORTED_MODULE_7__["SNModelManager"]))(timeout);
+    value: function createModelManager() {
+      this.modelManager = new (this.getClass(_Services_model_manager__WEBPACK_IMPORTED_MODULE_8__["SNModelManager"]))({
+        timeout: this.deviceInterface.timeout
+      });
       this.services.push(this.modelManager);
     }
   }, {
     key: "createSingletonManager",
     value: function createSingletonManager() {
-      this.singletonManager = new (this.getClass(_Services_singleton_manager__WEBPACK_IMPORTED_MODULE_8__["SNSingletonManager"]))({
+      this.singletonManager = new (this.getClass(_Services_singleton_manager__WEBPACK_IMPORTED_MODULE_9__["SNSingletonManager"]))({
         modelManager: this.modelManager,
         syncManager: this.syncManager
       });
@@ -2328,7 +2319,7 @@ function () {
   }, {
     key: "createStorageManager",
     value: function createStorageManager() {
-      this.storageManager = new (this.getClass(_Services_storage_manager__WEBPACK_IMPORTED_MODULE_10__["SNStorageManager"]))({
+      this.storageManager = new (this.getClass(_Services_storage_manager__WEBPACK_IMPORTED_MODULE_11__["SNStorageManager"]))({
         protocolService: this.protocolService,
         namespace: this.namespace,
         deviceInterface: this.deviceInterface
@@ -2351,27 +2342,27 @@ function () {
         alertManager: this.alertManager,
         protocolService: this.protocolService,
         apiService: this.apiService,
-        timeout: this.timeout
+        timeout: this.deviceInterface.timeout
       });
       this.services.push(this.sessionManager);
     }
   }, {
     key: "createSyncManager",
     value: function createSyncManager() {
-      this.syncManager = new (this.getClass(_Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_12__["SNSyncManager"]))({
+      this.syncManager = new (this.getClass(_Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_13__["SNSyncManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         sessionManager: this.sessionManager,
         protocolService: this.protocolService,
         apiService: this.apiService,
-        interval: this.interval
+        interval: this.deviceInterface.interval
       });
       this.services.push(this.syncManager);
     }
   }, {
     key: "createDeviceAuthService",
     value: function createDeviceAuthService() {
-      this.deviceAuthService = new (this.getClass(_Services_device_auth_service__WEBPACK_IMPORTED_MODULE_11__["DeviceAuthService"]))({
+      this.deviceAuthService = new (this.getClass(_Services_device_auth_service__WEBPACK_IMPORTED_MODULE_12__["DeviceAuthService"]))({
         storageManager: this.storageManager,
         protocolService: this.protocolService,
         keyManager: this.keyManager
@@ -2390,6 +2381,17 @@ function () {
         singletonManager: this.singletonManager
       });
       this.services.push(this.privilegesManager);
+    }
+  }, {
+    key: "createHistoryManager",
+    value: function createHistoryManager() {
+      this.historyManager = new (this.getClass(HistoryManager))({
+        storageManager: this.storageManager,
+        modelManager: this.modelManager,
+        contentTypes: [_Models_content_types__WEBPACK_IMPORTED_MODULE_5__["CONTENT_TYPE_NOTE"]],
+        timeout: this.deviceInterface.timeout
+      });
+      this.services.push(this.historyManager);
     }
   }, {
     key: "shouldSkipClass",
@@ -2444,29 +2446,48 @@ var CHALLENGE_BIOMETRIC = 3;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return DeviceInterface; });
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+
 /**
  * Platforms must override this class to provide platform specific utilities
  * and access to the migration service, such as exposing an interface to read
  * raw values from the database or value storage.
-
  * This avoids the need for platforms to override migrations directly.
  */
+
 var DeviceInterface =
 /*#__PURE__*/
 function () {
+  /**
+    * @param timeout
+       A platform-specific function that is fed functions to run
+       when other operations have completed. This is similar to
+       setImmediate on the web, or setTimeout(fn, 0).
+    * @param interval
+       A platform-specific function that is fed functions to
+       perform repeatedly. Similar to setInterval.
+  */
   function DeviceInterface() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        namespace = _ref.namespace;
+        namespace = _ref.namespace,
+        timeout = _ref.timeout,
+        interval = _ref.interval;
 
     _classCallCheck(this, DeviceInterface);
 
+    if (!timeout || !interval) {
+      throw "'timeout' and 'interval' are required to initialize device interface.";
+    }
+
     this.namespace = namespace;
+    this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
+    this.interval = interval || setInterval.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"])());
   }
 
   _createClass(DeviceInterface, [{
@@ -2728,7 +2749,7 @@ var APPLICATION_EVENT_DID_SIGN_OUT = 'APPLICATION_EVENT_DID_SIGN_OUT';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, SFHistorySession, SFItemHistory, SFItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, DeviceAuthResponse, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_NONWRAPPED, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, MigrationService, SNAlertManager, SFSessionHistoryManager, PrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, PLATFORM_MOBILE, PLATFORM_WEB, PLATFORM_DESKTOP, isPlatformWebOrDesktop, isPlatformMobile, SYNC_EVENT_FULL_SYNC_COMPLETED, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING, STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, BaseMigration, PRIVILEGE_ACTION_MANAGE_EXTENSIONS, PRIVILEGE_ACTION_MANAGE_BACKUPS, PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES, PRIVILEGE_ACTION_MANAGE_PRIVILEGES, PRIVILEGE_ACTION_MANAGE_PASSCODE, PRIVILEGE_ACTION_DELETE_NOTE, PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD, PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNMfa, SNServerExtension, SNComponent, SNEditor, SNExtension, Action, SNTheme, SNEncryptedStorage, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, DeviceAuthResponse, SNStorageManager, STORAGE_PERSISTENCE_POLICY_DEFAULT, STORAGE_PERSISTENCE_POLICY_EPHEMERAL, STORAGE_ENCRYPTION_POLICY_DEFAULT, STORAGE_ENCRYPTION_POLICY_DISABLED, STORAGE_VALUE_MODE_DEFAULT, STORAGE_VALUE_MODE_NONWRAPPED, CHALLENGE_LOCAL_PASSCODE, CHALLENGE_ACCOUNT_PASSWORD, CHALLENGE_BIOMETRIC, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, MigrationService, SNAlertManager, HistoryManager, PrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED, ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED, ENCRYPTION_INTENT_FILE_DECRYPTED, ENCRYPTION_INTENT_FILE_ENCRYPTED, ENCRYPTION_INTENT_SYNC, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, CONTENT_TYPE_ROOT_KEY, CONTENT_TYPE_ITEMS_KEY, CONTENT_TYPE_ENCRYPTED_STORAGE, CONTENT_TYPE_NOTE, CONTENT_TYPE_TAG, CONTENT_TYPE_USER_PREFS, CONTENT_TYPE_COMPONENT, CONTENT_TYPE_PRIVILEGES, APPLICATION_EVENT_WILL_SIGN_IN, APPLICATION_EVENT_DID_SIGN_IN, APPLICATION_EVENT_DID_SIGN_OUT, PLATFORM_MOBILE, PLATFORM_WEB, PLATFORM_DESKTOP, isPlatformWebOrDesktop, isPlatformMobile, SYNC_EVENT_FULL_SYNC_COMPLETED, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PAYLOAD_SOURCE_REMOTE_RETRIEVED, PAYLOAD_SOURCE_REMOTE_SAVED, PAYLOAD_SOURCE_LOCAL_SAVED, PAYLOAD_SOURCE_LOCAL_RETRIEVED, PAYLOAD_SOURCE_LOCAL_DIRTIED, PAYLOAD_SOURCE_COMPONENT_RETRIEVED, PAYLOAD_SOURCE_DESKTOP_INSTALLED, PAYLOAD_SOURCE_REMOTE_ACTION_RETRIEVED, PAYLOAD_SOURCE_FILE_IMPORT, PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT, PAYLOAD_CONTENT_FORMAT_DECRYPTED_BASE_64_STRING, STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, BaseMigration, PRIVILEGE_ACTION_MANAGE_EXTENSIONS, PRIVILEGE_ACTION_MANAGE_BACKUPS, PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES, PRIVILEGE_ACTION_MANAGE_PRIVILEGES, PRIVILEGE_ACTION_MANAGE_PASSCODE, PRIVILEGE_ACTION_DELETE_NOTE, PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD, PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2798,14 +2819,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_20__["SNComponentManager"]; });
 
-/* harmony import */ var _models_history_historySession__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./models/history/historySession */ "./lib/models/history/historySession.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return _models_history_historySession__WEBPACK_IMPORTED_MODULE_21__["SFHistorySession"]; });
+/* harmony import */ var _Services_history_history_session__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @Services/history/history_session */ "./lib/services/history/history_session.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HistorySession", function() { return _Services_history_history_session__WEBPACK_IMPORTED_MODULE_21__["HistorySession"]; });
 
-/* harmony import */ var _models_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./models/history/itemHistory */ "./lib/models/history/itemHistory.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return _models_history_itemHistory__WEBPACK_IMPORTED_MODULE_22__["SFItemHistory"]; });
+/* harmony import */ var _Services_history_item_history__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! @Services/history/item_history */ "./lib/services/history/item_history.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemHistory", function() { return _Services_history_item_history__WEBPACK_IMPORTED_MODULE_22__["ItemHistory"]; });
 
-/* harmony import */ var _models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./models/history/itemHistoryEntry */ "./lib/models/history/itemHistoryEntry.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return _models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_23__["SFItemHistoryEntry"]; });
+/* harmony import */ var _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! @Services/history/item_history_entry */ "./lib/services/history/item_history_entry.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_23__["ItemHistoryEntry"]; });
 
 /* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_24__["SFPrivileges"]; });
@@ -2867,7 +2888,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alert_manager__WEBPACK_IMPORTED_MODULE_35__["SNAlertManager"]; });
 
 /* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_36__["SFSessionHistoryManager"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_36__["HistoryManager"]; });
 
 /* harmony import */ var _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./services/privileges/privileges_manager */ "./lib/services/privileges/privileges_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegesManager", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_37__["PrivilegesManager"]; });
@@ -7149,384 +7170,6 @@ function CreateItemFromPayload(payload) {
   var itemClass = ContentTypeClassMapping[payload.content_type] || SFItem;
   return new itemClass(payload);
 }
-
-/***/ }),
-
-/***/ "./lib/models/history/historySession.js":
-/*!**********************************************!*\
-  !*** ./lib/models/history/historySession.js ***!
-  \**********************************************/
-/*! exports provided: SFHistorySession */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFHistorySession", function() { return SFHistorySession; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/history/itemHistory */ "./lib/models/history/itemHistory.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/**
- * SFHistorySession is the only object in the session history domain that is
- * persistable. A history session contains one main content object: the
- * itemUUIDToItemHistoryMapping. This is a dictionary whose keys are item uuids,
- * and each value is an SFItemHistory object.
-
- * Each SFItemHistory object contains an array called `entires` which contain
- * `SFItemHistory` entries or subclasses, if the `SFItemHistory.HistoryEntryClassMapping`
- * class property value is set.
- */
-
-
-var SFHistorySession =
-/*#__PURE__*/
-function (_SFItem) {
-  _inherits(SFHistorySession, _SFItem);
-
-  function SFHistorySession(payload) {
-    var _this;
-
-    _classCallCheck(this, SFHistorySession);
-
-    SFHistorySession.LargeItemEntryAmountThreshold = 60;
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFHistorySession).call(this, payload));
-
-    if (!_this.content.itemUUIDToItemHistoryMapping) {
-      _this.content.itemUUIDToItemHistoryMapping = {};
-    }
-
-    var uuids = Object.keys(_this.content.itemUUIDToItemHistoryMapping);
-    uuids.forEach(function (itemUUID) {
-      var itemHistory = _this.content.itemUUIDToItemHistoryMapping[itemUUID];
-      _this.content.itemUUIDToItemHistoryMapping[itemUUID] = new _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"](itemHistory);
-    });
-    return _this;
-  }
-
-  _createClass(SFHistorySession, [{
-    key: "addEntryForItem",
-    value: function addEntryForItem(item) {
-      var itemHistory = this.historyForItem(item);
-      return itemHistory.addHistoryEntryForItem(item);
-    }
-  }, {
-    key: "historyForItem",
-    value: function historyForItem(item) {
-      var history = this.content.itemUUIDToItemHistoryMapping[item.uuid];
-
-      if (!history) {
-        history = new _Models_history_itemHistory__WEBPACK_IMPORTED_MODULE_1__["SFItemHistory"]();
-        this.content.itemUUIDToItemHistoryMapping[item.uuid] = history;
-      }
-
-      return history;
-    }
-  }, {
-    key: "clearItemHistory",
-    value: function clearItemHistory(item) {
-      this.historyForItem(item).clear();
-    }
-  }, {
-    key: "clearAllHistory",
-    value: function clearAllHistory() {
-      this.content.itemUUIDToItemHistoryMapping = {};
-    }
-  }, {
-    key: "optimizeHistoryForItem",
-    value: function optimizeHistoryForItem(item) {
-      /**
-       * Clean up if there are too many revisions. Note LargeItemEntryAmountThreshold
-       * is the amount of revisions which above, call for an optimization. An
-       * optimization may not remove entries above this threshold. It will
-       * determine what it should keep and what it shouldn't. So, it is possible
-       * to have a threshold of 60 but have 600 entries, if the item history deems
-       * those worth keeping.
-       */
-      var itemHistory = this.historyForItem(item);
-
-      if (itemHistory.entries.length > SFHistorySession.LargeItemEntryAmountThreshold) {
-        itemHistory.optimize();
-      }
-    }
-  }]);
-
-  return SFHistorySession;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/history/itemHistory.js":
-/*!*******************************************!*\
-  !*** ./lib/models/history/itemHistory.js ***!
-  \*******************************************/
-/*! exports provided: SFItemHistory */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistory", function() { return SFItemHistory; });
-/* harmony import */ var _Models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/history/itemHistoryEntry */ "./lib/models/history/itemHistoryEntry.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-// See default class values at bottom of this file, including `SFItemHistory.LargeEntryDeltaThreshold`.
-
-var SFItemHistory =
-/*#__PURE__*/
-function () {
-  function SFItemHistory() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, SFItemHistory);
-
-    if (!this.entries) {
-      this.entries = [];
-    } // Deserialize the entries into entry objects.
-
-
-    if (params.entries) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = params.entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var entryParams = _step.value;
-          var entry = this.createEntryForItem(entryParams.item);
-          entry.setPreviousEntry(this.getLastEntry());
-          this.entries.push(entry);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }
-
-  _createClass(SFItemHistory, [{
-    key: "createEntryForItem",
-    value: function createEntryForItem(item) {
-      var historyItemClass = SFItemHistory.HistoryEntryClassMapping && SFItemHistory.HistoryEntryClassMapping[item.content_type];
-
-      if (!historyItemClass) {
-        historyItemClass = _Models_history_itemHistoryEntry__WEBPACK_IMPORTED_MODULE_0__["SFItemHistoryEntry"];
-      }
-
-      var entry = new historyItemClass(item);
-      return entry;
-    }
-  }, {
-    key: "getLastEntry",
-    value: function getLastEntry() {
-      return this.entries[this.entries.length - 1];
-    }
-  }, {
-    key: "addHistoryEntryForItem",
-    value: function addHistoryEntryForItem(item) {
-      var prospectiveEntry = this.createEntryForItem(item);
-      var previousEntry = this.getLastEntry();
-      prospectiveEntry.setPreviousEntry(previousEntry); // Don't add first revision if text length is 0, as this means it's a new note.
-      // Actually, nevermind. If we do this, the first character added to a new note
-      // will be displayed as "1 characters loaded".
-      // if(!previousRevision && prospectiveRevision.textCharDiffLength == 0) {
-      //   return;
-      // }
-      // Don't add if text is the same
-
-      if (prospectiveEntry.isSameAsEntry(previousEntry)) {
-        return;
-      }
-
-      this.entries.push(prospectiveEntry);
-      return prospectiveEntry;
-    }
-  }, {
-    key: "clear",
-    value: function clear() {
-      this.entries.length = 0;
-    }
-  }, {
-    key: "optimize",
-    value: function optimize() {
-      var _this = this;
-
-      var keepEntries = [];
-
-      var isEntrySignificant = function isEntrySignificant(entry) {
-        return entry.deltaSize() > SFItemHistory.LargeEntryDeltaThreshold;
-      };
-
-      var processEntry = function processEntry(entry, index, keep) {
-        // Entries may be processed retrospectively, meaning it can be decided to be deleted, then an upcoming processing can change that.
-        if (keep) {
-          keepEntries.push(entry);
-        } else {
-          // Remove if in keep
-          var index = keepEntries.indexOf(entry);
-
-          if (index !== -1) {
-            keepEntries.splice(index, 1);
-          }
-        }
-
-        if (keep && isEntrySignificant(entry) && entry.operationVector() == -1) {
-          // This is a large negative change. Hang on to the previous entry.
-          var previousEntry = _this.entries[index - 1];
-
-          if (previousEntry) {
-            keepEntries.push(previousEntry);
-          }
-        }
-      };
-
-      this.entries.forEach(function (entry, index) {
-        if (index == 0 || index == _this.entries.length - 1) {
-          // Keep the first and last
-          processEntry(entry, index, true);
-        } else {
-          var significant = isEntrySignificant(entry);
-          processEntry(entry, index, significant);
-        }
-      });
-      this.entries = this.entries.filter(function (entry, index) {
-        return keepEntries.indexOf(entry) !== -1;
-      });
-    }
-  }]);
-
-  return SFItemHistory;
-}(); // The amount of characters added or removed that constitute a keepable entry after optimization.
-
-SFItemHistory.LargeEntryDeltaThreshold = 15;
-
-/***/ }),
-
-/***/ "./lib/models/history/itemHistoryEntry.js":
-/*!************************************************!*\
-  !*** ./lib/models/history/itemHistoryEntry.js ***!
-  \************************************************/
-/*! exports provided: SFItemHistoryEntry */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItemHistoryEntry", function() { return SFItemHistoryEntry; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-var SFItemHistoryEntry =
-/*#__PURE__*/
-function () {
-  function SFItemHistoryEntry(item) {
-    _classCallCheck(this, SFItemHistoryEntry);
-
-    // Whatever values `item` has will be persisted, so be sure that the values are picked beforehand.
-    this.item = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["deepMerge"])({}, item); // We'll assume a `text` content value to diff on. If it doesn't exist, no problem.
-
-    this.defaultContentKeyToDiffOn = "text"; // Default value
-
-    this.textCharDiffLength = 0;
-
-    if (typeof this.item.updated_at == 'string') {
-      this.item.updated_at = new Date(this.item.updated_at);
-    }
-  }
-
-  _createClass(SFItemHistoryEntry, [{
-    key: "setPreviousEntry",
-    value: function setPreviousEntry(previousEntry) {
-      this.hasPreviousEntry = previousEntry != null; // we'll try to compute the delta based on an assumed content property of `text`, if it exists.
-
-      if (this.item.content[this.defaultContentKeyToDiffOn]) {
-        if (previousEntry) {
-          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length - previousEntry.item.content[this.defaultContentKeyToDiffOn].length;
-        } else {
-          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length;
-        }
-      }
-    }
-  }, {
-    key: "operationVector",
-    value: function operationVector() {
-      // We'll try to use the value of `textCharDiffLength` to help determine this, if it's set
-      if (this.textCharDiffLength != undefined) {
-        if (!this.hasPreviousEntry || this.textCharDiffLength == 0) {
-          return 0;
-        } else if (this.textCharDiffLength < 0) {
-          return -1;
-        } else {
-          return 1;
-        }
-      } // Otherwise use a default value of 1
-
-
-      return 1;
-    }
-  }, {
-    key: "deltaSize",
-    value: function deltaSize() {
-      // Up to the subclass to determine how large the delta was, i.e number of characters changed.
-      // But this general class won't be able to determine which property it should diff on, or even its format.
-      // We can return the `textCharDiffLength` if it's set, otherwise, just return 1;
-      if (this.textCharDiffLength != undefined) {
-        return Math.abs(this.textCharDiffLength);
-      } // Otherwise return 1 here to constitute a basic positive delta.
-      // The value returned should always be positive. override `operationVector` to return the direction of the delta.
-
-
-      return 1;
-    }
-  }, {
-    key: "isSameAsEntry",
-    value: function isSameAsEntry(entry) {
-      if (!entry) {
-        return false;
-      }
-
-      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](this.item);
-      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](entry.item);
-      return lhs.isItemContentEqualWith(rhs);
-    }
-  }]);
-
-  return SFItemHistoryEntry;
-}();
 
 /***/ }),
 
@@ -18336,15 +17979,15 @@ var SYNC_EVENT_EXIT_OUT_OF_SYNC = 'exit-out-of-sync';
 /*!*************************************************!*\
   !*** ./lib/services/history/history_manager.js ***!
   \*************************************************/
-/*! exports provided: SFSessionHistoryManager */
+/*! exports provided: HistoryManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFSessionHistoryManager", function() { return SFSessionHistoryManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HistoryManager", function() { return HistoryManager; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
-/* harmony import */ var _Models_history_historySession__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/history/historySession */ "./lib/models/history/historySession.js");
+/* harmony import */ var _Services_history_history_session__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/history/history_session */ "./lib/services/history/history_session.js");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
@@ -18372,23 +18015,55 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var SFSessionHistoryManager =
+var HistoryManager =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SFSessionHistoryManager, _PureService);
+  _inherits(HistoryManager, _PureService);
 
-  function SFSessionHistoryManager(modelManager, storageManager, contentTypes, timeout) {
+  function HistoryManager(_ref) {
     var _this;
 
-    _classCallCheck(this, SFSessionHistoryManager);
+    var modelManager = _ref.modelManager,
+        storageManager = _ref.storageManager,
+        contentTypes = _ref.contentTypes,
+        timeout = _ref.timeout;
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFSessionHistoryManager).call(this));
+    _classCallCheck(this, HistoryManager);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(HistoryManager).call(this));
     _this.modelManager = modelManager;
     _this.storageManager = storageManager;
-    _this.timeout = timeout || setTimeout.bind(window);
+    _this.contentTypes = contentTypes;
+    _this.timeout = timeout;
+    return _this;
+  }
 
-    _this.loadFromDisk().then(function () {
-      _this.modelManager.addMappingObserver("session-history", contentTypes, function (allItems, validItems, deletedItems, source, sourceKey) {
+  _createClass(HistoryManager, [{
+    key: "initialize",
+    value: function initialize() {
+      return regeneratorRuntime.async(function initialize$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return regeneratorRuntime.awrap(this.loadFromDisk());
+
+            case 2:
+              this.addMappingObserver();
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "addMappingObserver",
+    value: function addMappingObserver() {
+      var _this2 = this;
+
+      this.modelManager.addMappingObserver('session-history', this.contentTypes, function (allItems, validItems, deletedItems, source, sourceKey) {
         if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PAYLOAD_SOURCE_LOCAL_DIRTIED"]) {
           return;
         }
@@ -18402,9 +18077,9 @@ function (_PureService) {
             var item = _step.value;
 
             try {
-              _this.addHistoryEntryForItem(item);
+              _this2.addHistoryEntryForItem(item);
             } catch (e) {
-              console.error("Caught exception while trying to add item history entry", e);
+              console.error('Unable to add item history entry:', e);
             }
           }
         } catch (err) {
@@ -18422,43 +18097,122 @@ function (_PureService) {
           }
         }
       });
-    });
+    }
+  }, {
+    key: "loadFromDisk",
+    value: function loadFromDisk() {
+      var autoOptimize;
+      return regeneratorRuntime.async(function loadFromDisk$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_PERSISTABLE"]));
 
-    return _this;
-  }
+            case 2:
+              this.persistable = _context2.sent;
+              _context2.next = 5;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_REVISIONS"]).then(function (historyValue) {
+                return new _Services_history_history_session__WEBPACK_IMPORTED_MODULE_2__["HistorySession"](historyValue);
+              }));
 
-  _createClass(SFSessionHistoryManager, [{
-    key: "addHistoryEntryForItem",
-    value: function addHistoryEntryForItem(item) {
-      var _this2 = this;
+            case 5:
+              this.historySession = _context2.sent;
+              _context2.next = 8;
+              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_OPTIMIZE"]));
 
-      var persistableItemParams = {
-        uuid: item.uuid,
-        content_type: item.content_type,
-        updated_at: item.updated_at,
-        content: item.getContentCopy()
-      };
-      var entry = this.historySession.addEntryForItem(persistableItemParams);
+            case 8:
+              autoOptimize = _context2.sent;
 
-      if (this.autoOptimize) {
-        this.historySession.optimizeHistoryForItem(item);
-      }
+              if (isNullOrUndefined(autoOptimize)) {
+                /** Default to true */
+                this.autoOptimize = true;
+              } else {
+                this.autoOptimize = autoOptimize;
+              }
 
-      if (entry && this.diskEnabled) {
-        // Debounce, clear existing timeout
-        if (this.diskTimeout) {
-          if (this.timeout.hasOwnProperty("cancel")) {
-            this.timeout.cancel(this.diskTimeout);
-          } else {
-            clearTimeout(this.diskTimeout);
+            case 10:
+            case "end":
+              return _context2.stop();
           }
         }
+      }, null, this);
+    }
+  }, {
+    key: "saveToDisk",
+    value: function saveToDisk() {
+      return regeneratorRuntime.async(function saveToDisk$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              if (this.persistable) {
+                _context3.next = 2;
+                break;
+              }
 
-        ;
-        this.diskTimeout = this.timeout(function () {
-          _this2.saveToDisk();
-        }, 2000);
-      }
+              return _context3.abrupt("return");
+
+            case 2:
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_REVISIONS"], this.historySession);
+
+            case 3:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "setSessionItemRevisionThreshold",
+    value: function setSessionItemRevisionThreshold(threshold) {
+      this.historySession.setItemRevisionThreshold(threshold);
+    }
+  }, {
+    key: "addHistoryEntryForItem",
+    value: function addHistoryEntryForItem(item) {
+      var _this3 = this;
+
+      var persistableItemParams, entry, PERSIST_TIMEOUT;
+      return regeneratorRuntime.async(function addHistoryEntryForItem$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              persistableItemParams = {
+                uuid: item.uuid,
+                content_type: item.content_type,
+                updated_at: item.updated_at,
+                content: item.getContentCopy()
+              };
+              entry = this.historySession.addEntryForItem(persistableItemParams);
+
+              if (this.autoOptimize) {
+                this.historySession.optimizeHistoryForItem(item);
+              }
+
+              PERSIST_TIMEOUT = 2000;
+
+              if (entry && this.persistable) {
+                /** Debounce, clear existing timeout */
+                if (this.diskTimeout) {
+                  if (this.timeout.hasOwnProperty('cancel')) {
+                    this.timeout.cancel(this.diskTimeout);
+                  } else {
+                    clearTimeout(this.diskTimeout);
+                  }
+                }
+
+                ;
+                this.diskTimeout = this.timeout(function () {
+                  _this3.saveToDisk();
+                }, PERSIST_TIMEOUT);
+              }
+
+            case 5:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "historyForItem",
@@ -18468,137 +18222,14 @@ function (_PureService) {
   }, {
     key: "clearHistoryForItem",
     value: function clearHistoryForItem(item) {
-      return regeneratorRuntime.async(function clearHistoryForItem$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              this.historySession.clearItemHistory(item);
-              return _context.abrupt("return", this.saveToDisk());
-
-            case 2:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clearAllHistory",
-    value: function clearAllHistory() {
-      return regeneratorRuntime.async(function clearAllHistory$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              this.historySession.clearAllHistory();
-              return _context2.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 2:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "toggleDiskSaving",
-    value: function toggleDiskSaving() {
-      return regeneratorRuntime.async(function toggleDiskSaving$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              this.diskEnabled = !this.diskEnabled;
-
-              if (!this.diskEnabled) {
-                _context3.next = 6;
-                break;
-              }
-
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(true));
-              this.saveToDisk();
-              _context3.next = 8;
-              break;
-
-            case 6:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"], JSON.stringify(false));
-              return _context3.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 8:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "saveToDisk",
-    value: function saveToDisk() {
-      return regeneratorRuntime.async(function saveToDisk$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              if (this.diskEnabled) {
-                _context4.next = 2;
-                break;
-              }
-
-              return _context4.abrupt("return");
-
-            case 2:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"], JSON.stringify(this.historySession));
-
-            case 3:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "loadFromDisk",
-    value: function loadFromDisk() {
-      var diskValue, historyValue, autoOptimizeValue;
-      return regeneratorRuntime.async(function loadFromDisk$(_context5) {
+      return regeneratorRuntime.async(function clearHistoryForItem$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              _context5.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_PERSIST_KEY"]));
+              this.historySession.clearItemHistory(item);
+              return _context5.abrupt("return", this.saveToDisk());
 
             case 2:
-              diskValue = _context5.sent;
-
-              if (diskValue) {
-                this.diskEnabled = JSON.parse(diskValue);
-              }
-
-              _context5.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_REVISIONS_KEY"]));
-
-            case 6:
-              historyValue = _context5.sent;
-
-              if (historyValue) {
-                historyValue = JSON.parse(historyValue);
-                ;
-                this.historySession = new _Models_history_historySession__WEBPACK_IMPORTED_MODULE_2__["SFHistorySession"](historyValue);
-              } else {
-                this.historySession = new _Models_history_historySession__WEBPACK_IMPORTED_MODULE_2__["SFHistorySession"]();
-              }
-
-              _context5.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"]));
-
-            case 10:
-              autoOptimizeValue = _context5.sent;
-
-              if (autoOptimizeValue) {
-                this.autoOptimize = JSON.parse(autoOptimizeValue);
-              } else {
-                // default value is true
-                this.autoOptimize = true;
-              }
-
-            case 12:
             case "end":
               return _context5.stop();
           }
@@ -18606,19 +18237,14 @@ function (_PureService) {
       }, null, this);
     }
   }, {
-    key: "toggleAutoOptimize",
-    value: function toggleAutoOptimize() {
-      return regeneratorRuntime.async(function toggleAutoOptimize$(_context6) {
+    key: "clearAllHistory",
+    value: function clearAllHistory() {
+      return regeneratorRuntime.async(function clearAllHistory$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              this.autoOptimize = !this.autoOptimize;
-
-              if (this.autoOptimize) {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(true));
-              } else {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["SESSION_HISTORY_OPTIMIZE_KEY"], JSON.stringify(false));
-              }
+              this.historySession.clearAllHistory();
+              return _context6.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_REVISIONS"]));
 
             case 2:
             case "end":
@@ -18627,10 +18253,541 @@ function (_PureService) {
         }
       }, null, this);
     }
+  }, {
+    key: "toggleDiskSaving",
+    value: function toggleDiskSaving() {
+      return regeneratorRuntime.async(function toggleDiskSaving$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              this.persistable = !this.persistable;
+
+              if (!this.persistable) {
+                _context7.next = 6;
+                break;
+              }
+
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_PERSISTABLE"], true);
+              this.saveToDisk();
+              _context7.next = 8;
+              break;
+
+            case 6:
+              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_PERSISTABLE"], false);
+              return _context7.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_REVISIONS"]));
+
+            case 8:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "toggleAutoOptimize",
+    value: function toggleAutoOptimize() {
+      return regeneratorRuntime.async(function toggleAutoOptimize$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              this.autoOptimize = !this.autoOptimize;
+
+              if (this.autoOptimize) {
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_OPTIMIZE"], true);
+              } else {
+                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["STORAGE_KEY_SESSION_HISTORY_OPTIMIZE"], false);
+              }
+
+            case 2:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
   }]);
 
-  return SFSessionHistoryManager;
+  return HistoryManager;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
+
+/***/ }),
+
+/***/ "./lib/services/history/history_session.js":
+/*!*************************************************!*\
+  !*** ./lib/services/history/history_session.js ***!
+  \*************************************************/
+/*! exports provided: HistorySession */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HistorySession", function() { return HistorySession; });
+/* harmony import */ var _Services_history_item_history__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/history/item_history */ "./lib/services/history/item_history.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+/** The amount of revisions which above, call for an optimization. */
+
+var DEFAULT_ITEM_REVISIONS_THRESHOLD = 60;
+/**
+ * HistorySession is the only object in the session history domain that is
+ * persistable. A history session contains one main content object: the
+ * itemUUIDToItemHistoryMapping. This is a dictionary whose keys are item uuids,
+ * and each value is an ItemHistory object.
+ *
+ * Each ItemHistory object contains an array called `entries` which contain
+ * `ItemHistory` (or subclasses thereof) entries.
+ */
+
+var HistorySession =
+/*#__PURE__*/
+function () {
+  function HistorySession(raw) {
+    var _this = this;
+
+    _classCallCheck(this, HistorySession);
+
+    Object.assign(this, raw);
+
+    if (!this.content) {
+      this.content = {};
+    }
+
+    if (!this.content.itemUUIDToItemHistoryMapping) {
+      this.content.itemUUIDToItemHistoryMapping = {};
+    }
+
+    var uuids = Object.keys(this.content.itemUUIDToItemHistoryMapping);
+    uuids.forEach(function (itemUUID) {
+      var itemHistory = _this.content.itemUUIDToItemHistoryMapping[itemUUID];
+      _this.content.itemUUIDToItemHistoryMapping[itemUUID] = new _Services_history_item_history__WEBPACK_IMPORTED_MODULE_0__["ItemHistory"](itemHistory);
+    });
+    this.setItemRevisionThreshold(DEFAULT_ITEM_REVISIONS_THRESHOLD);
+  }
+
+  _createClass(HistorySession, [{
+    key: "addEntryForItem",
+    value: function addEntryForItem(item) {
+      var itemHistory = this.historyForItem(item);
+      return itemHistory.addHistoryEntryForItem(item);
+    }
+  }, {
+    key: "historyForItem",
+    value: function historyForItem(item) {
+      var history = this.content.itemUUIDToItemHistoryMapping[item.uuid];
+
+      if (!history) {
+        history = new _Services_history_item_history__WEBPACK_IMPORTED_MODULE_0__["ItemHistory"]();
+        this.content.itemUUIDToItemHistoryMapping[item.uuid] = history;
+      }
+
+      return history;
+    }
+  }, {
+    key: "clearItemHistory",
+    value: function clearItemHistory(item) {
+      this.historyForItem(item).clear();
+    }
+  }, {
+    key: "clearAllHistory",
+    value: function clearAllHistory() {
+      this.content.itemUUIDToItemHistoryMapping = {};
+    }
+  }, {
+    key: "setItemRevisionThreshold",
+    value: function setItemRevisionThreshold(threshold) {
+      this.itemRevisionThreshold = threshold;
+    }
+  }, {
+    key: "optimizeHistoryForItem",
+    value: function optimizeHistoryForItem(item) {
+      /**
+       * Clean up if there are too many revisions. Note itemRevisionThreshold
+       * is the amount of revisions which above, call for an optimization. An
+       * optimization may not remove entries above this threshold. It will
+       * determine what it should keep and what it shouldn't. So, it is possible
+       * to have a threshold of 60 but have 600 entries, if the item history deems
+       * those worth keeping.
+       */
+      var itemHistory = this.historyForItem(item);
+
+      if (itemHistory.entries.length > this.itemRevisionThreshold) {
+        itemHistory.optimize();
+      }
+    }
+  }]);
+
+  return HistorySession;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/history/item_history.js":
+/*!**********************************************!*\
+  !*** ./lib/services/history/item_history.js ***!
+  \**********************************************/
+/*! exports provided: ItemHistory */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemHistory", function() { return ItemHistory; });
+/* harmony import */ var _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/history/item_history_entry */ "./lib/services/history/item_history_entry.js");
+/* harmony import */ var _Services_history_note_history_entry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/history/note_history_entry */ "./lib/services/history/note_history_entry.js");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+/**
+ * The amount of characters added or removed that
+ * constitute a keepable entry after optimization.
+ */
+
+var LARGE_ENTRY_DELTA_THRESHOLD = 15;
+var ItemHistory =
+/*#__PURE__*/
+function () {
+  function ItemHistory() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, ItemHistory);
+
+    if (!this.entries) {
+      this.entries = [];
+    }
+    /** Deserialize the entries into entry objects. */
+
+
+    if (params.entries) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = params.entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var entryParams = _step.value;
+          var entry = this.createEntryForItem(entryParams.item);
+          entry.setPreviousEntry(this.getLastEntry());
+          this.entries.push(entry);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
+  }
+
+  _createClass(ItemHistory, [{
+    key: "createEntryForItem",
+    value: function createEntryForItem(item) {
+      var mapping = _defineProperty({}, CONTENT_TYPE_NOTE, _Services_history_note_history_entry__WEBPACK_IMPORTED_MODULE_1__["NoteHistoryEntry"]);
+
+      var historyItemClass = mapping[item.content_type];
+
+      if (!historyItemClass) {
+        throw 'Invalid item history class';
+      }
+
+      var entry = new historyItemClass(item);
+      return entry;
+    }
+  }, {
+    key: "getLastEntry",
+    value: function getLastEntry() {
+      return this.entries[this.entries.length - 1];
+    }
+  }, {
+    key: "addHistoryEntryForItem",
+    value: function addHistoryEntryForItem(item) {
+      var prospectiveEntry = this.createEntryForItem(item);
+      var previousEntry = this.getLastEntry();
+      prospectiveEntry.setPreviousEntry(previousEntry);
+
+      if (prospectiveEntry.isSameAsEntry(previousEntry)) {
+        return;
+      }
+
+      this.entries.push(prospectiveEntry);
+      return prospectiveEntry;
+    }
+  }, {
+    key: "clear",
+    value: function clear() {
+      this.entries.length = 0;
+    }
+  }, {
+    key: "optimize",
+    value: function optimize() {
+      var _this = this;
+
+      var keepEntries = [];
+
+      var isEntrySignificant = function isEntrySignificant(entry) {
+        return entry.deltaSize() > LARGE_ENTRY_DELTA_THRESHOLD;
+      };
+
+      var processEntry = function processEntry(entry, index, keep) {
+        /**
+         * Entries may be processed retrospectively, meaning it can be
+         * decided to be deleted, then an upcoming processing can change that.
+         */
+        if (keep) {
+          keepEntries.push(entry);
+        } else {
+          /** Remove if in keep */
+          var _index = keepEntries.indexOf(entry);
+
+          if (_index !== -1) {
+            keepEntries.splice(_index, 1);
+          }
+        }
+
+        if (keep && isEntrySignificant(entry) && entry.operationVector() == -1) {
+          /** This is a large negative change. Hang on to the previous entry. */
+          var previousEntry = _this.entries[index - 1];
+
+          if (previousEntry) {
+            keepEntries.push(previousEntry);
+          }
+        }
+      };
+
+      this.entries.forEach(function (entry, index) {
+        if (index == 0 || index == _this.entries.length - 1) {
+          /** Keep the first and last */
+          processEntry(entry, index, true);
+        } else {
+          var significant = isEntrySignificant(entry);
+          processEntry(entry, index, significant);
+        }
+      });
+      this.entries = this.entries.filter(function (entry, index) {
+        return keepEntries.indexOf(entry) !== -1;
+      });
+    }
+  }]);
+
+  return ItemHistory;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/history/item_history_entry.js":
+/*!****************************************************!*\
+  !*** ./lib/services/history/item_history_entry.js ***!
+  \****************************************************/
+/*! exports provided: ItemHistoryEntry */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return ItemHistoryEntry; });
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var ItemHistoryEntry =
+/*#__PURE__*/
+function () {
+  function ItemHistoryEntry(item) {
+    _classCallCheck(this, ItemHistoryEntry);
+
+    /**
+     * Whatever values `item` has will be persisted,
+     * so be sure that the values are picked beforehand.
+     */
+    this.item = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["deepMerge"])({}, item);
+    /**
+     * We'll assume a `text` content value to diff on.
+     * If it doesn't exist, no problem.
+     */
+
+    this.defaultContentKeyToDiffOn = 'text';
+    /** Default value */
+
+    this.textCharDiffLength = 0;
+
+    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isString"])(this.item.updated_at)) {
+      this.item.updated_at = new Date(this.item.updated_at);
+    }
+  }
+
+  _createClass(ItemHistoryEntry, [{
+    key: "setPreviousEntry",
+    value: function setPreviousEntry(previousEntry) {
+      this.hasPreviousEntry = previousEntry != null;
+      /** We'll try to compute the delta based on an assumed
+       * content property of `text`, if it exists.
+       */
+
+      if (this.item.content[this.defaultContentKeyToDiffOn]) {
+        if (previousEntry) {
+          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length - previousEntry.item.content[this.defaultContentKeyToDiffOn].length;
+        } else {
+          this.textCharDiffLength = this.item.content[this.defaultContentKeyToDiffOn].length;
+        }
+      }
+    }
+  }, {
+    key: "operationVector",
+    value: function operationVector() {
+      /**
+       * We'll try to use the value of `textCharDiffLength`
+       * to help determine this, if it's set
+       */
+      if (this.textCharDiffLength != undefined) {
+        if (!this.hasPreviousEntry || this.textCharDiffLength == 0) {
+          return 0;
+        } else if (this.textCharDiffLength < 0) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+      /** Otherwise use a default value of 1 */
+
+
+      return 1;
+    }
+  }, {
+    key: "deltaSize",
+    value: function deltaSize() {
+      /**
+       * Up to the subclass to determine how large the delta was,
+       * i.e number of characters changed.
+       * But this general class won't be able to determine which property it
+       * should diff on, or even its format.
+       */
+
+      /**
+       * We can return the `textCharDiffLength` if it's set,
+       * otherwise, just return 1;
+       */
+      if (this.textCharDiffLength != undefined) {
+        return Math.abs(this.textCharDiffLength);
+      }
+      /**
+       * Otherwise return 1 here to constitute a basic positive delta.
+       * The value returned should always be positive. Override `operationVector`
+       * to return the direction of the delta.
+       */
+
+
+      return 1;
+    }
+  }, {
+    key: "isSameAsEntry",
+    value: function isSameAsEntry(entry) {
+      if (!entry) {
+        return false;
+      }
+
+      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
+        object: this.item
+      }));
+      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
+        object: entry.item
+      }));
+      return lhs.isItemContentEqualWith(rhs);
+    }
+  }]);
+
+  return ItemHistoryEntry;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/history/note_history_entry.js":
+/*!****************************************************!*\
+  !*** ./lib/services/history/note_history_entry.js ***!
+  \****************************************************/
+/*! exports provided: NoteHistoryEntry */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NoteHistoryEntry", function() { return NoteHistoryEntry; });
+/* harmony import */ var _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/history/item_history_entry */ "./lib/services/history/item_history_entry.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+var NoteHistoryEntry =
+/*#__PURE__*/
+function (_ItemHistoryEntry) {
+  _inherits(NoteHistoryEntry, _ItemHistoryEntry);
+
+  function NoteHistoryEntry() {
+    _classCallCheck(this, NoteHistoryEntry);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(NoteHistoryEntry).apply(this, arguments));
+  }
+
+  _createClass(NoteHistoryEntry, [{
+    key: "previewTitle",
+    value: function previewTitle() {
+      return this.item.updated_at.toLocaleString();
+    }
+  }, {
+    key: "previewSubTitle",
+    value: function previewSubTitle() {
+      if (!this.hasPreviousEntry) {
+        return "".concat(this.textCharDiffLength, " characters loaded");
+      } else if (this.textCharDiffLength < 0) {
+        return "".concat(this.textCharDiffLength * -1, " characters removed");
+      } else if (this.textCharDiffLength > 0) {
+        return "".concat(this.textCharDiffLength, " characters added");
+      } else {
+        return "Title or metadata changed";
+      }
+    }
+  }]);
+
+  return NoteHistoryEntry;
+}(_Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_0__["ItemHistoryEntry"]);
 
 /***/ }),
 
@@ -20344,8 +20501,10 @@ var SNModelManager =
 function (_PureService) {
   _inherits(SNModelManager, _PureService);
 
-  function SNModelManager(timeout) {
+  function SNModelManager(_ref) {
     var _this;
+
+    var timeout = _ref.timeout;
 
     _classCallCheck(this, SNModelManager);
 
@@ -20395,13 +20554,13 @@ function (_PureService) {
 
   }, {
     key: "setItemProperties",
-    value: function setItemProperties(_ref) {
+    value: function setItemProperties(_ref2) {
       var item, properties;
       return regeneratorRuntime.async(function setItemProperties$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              item = _ref.item, properties = _ref.properties;
+              item = _ref2.item, properties = _ref2.properties;
               return _context.abrupt("return", this.setItemsProperties({
                 items: [item],
                 properties: properties
@@ -20416,14 +20575,14 @@ function (_PureService) {
     }
   }, {
     key: "setItemsProperties",
-    value: function setItemsProperties(_ref2) {
+    value: function setItemsProperties(_ref3) {
       var items, properties, keys, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, key;
 
       return regeneratorRuntime.async(function setItemsProperties$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              items = _ref2.items, properties = _ref2.properties;
+              items = _ref3.items, properties = _ref3.properties;
               keys = Object.keys(properties);
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
@@ -20535,13 +20694,13 @@ function (_PureService) {
     }
   }, {
     key: "modifyItem",
-    value: function modifyItem(_ref3) {
+    value: function modifyItem(_ref4) {
       var item, modifier;
       return regeneratorRuntime.async(function modifyItem$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              item = _ref3.item, modifier = _ref3.modifier;
+              item = _ref4.item, modifier = _ref4.modifier;
               return _context3.abrupt("return", this.modifyItems({
                 items: [item],
                 modifier: modifier
@@ -20556,13 +20715,13 @@ function (_PureService) {
     }
   }, {
     key: "modifyItems",
-    value: function modifyItems(_ref4) {
+    value: function modifyItems(_ref5) {
       var items, modifier;
       return regeneratorRuntime.async(function modifyItems$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              items = _ref4.items, modifier = _ref4.modifier;
+              items = _ref5.items, modifier = _ref5.modifier;
               _context4.next = 3;
               return regeneratorRuntime.awrap(modifier());
 
@@ -20579,13 +20738,13 @@ function (_PureService) {
     }
   }, {
     key: "mapCollectionToLocalItems",
-    value: function mapCollectionToLocalItems(_ref5) {
+    value: function mapCollectionToLocalItems(_ref6) {
       var collection, sourceKey;
       return regeneratorRuntime.async(function mapCollectionToLocalItems$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              collection = _ref5.collection, sourceKey = _ref5.sourceKey;
+              collection = _ref6.collection, sourceKey = _ref6.sourceKey;
               return _context5.abrupt("return", this.mapPayloadsToLocalItems({
                 payloads: collection.allPayloads,
                 source: collection.source
@@ -20600,13 +20759,13 @@ function (_PureService) {
     }
   }, {
     key: "mapItem",
-    value: function mapItem(_ref6) {
+    value: function mapItem(_ref7) {
       var item, source, sourceKey, items;
       return regeneratorRuntime.async(function mapItem$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              item = _ref6.item, source = _ref6.source, sourceKey = _ref6.sourceKey;
+              item = _ref7.item, source = _ref7.source, sourceKey = _ref7.sourceKey;
               _context6.next = 3;
               return regeneratorRuntime.awrap(this.mapItems({
                 items: [item],
@@ -20627,13 +20786,13 @@ function (_PureService) {
     }
   }, {
     key: "mapItems",
-    value: function mapItems(_ref7) {
+    value: function mapItems(_ref8) {
       var items, source, sourceKey, payloads;
       return regeneratorRuntime.async(function mapItems$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              items = _ref7.items, source = _ref7.source, sourceKey = _ref7.sourceKey;
+              items = _ref8.items, source = _ref8.source, sourceKey = _ref8.sourceKey;
               payloads = items.map(function (item) {
                 return item.payloadRepresentation();
               });
@@ -20652,13 +20811,13 @@ function (_PureService) {
     }
   }, {
     key: "mapPayloadToLocalItem",
-    value: function mapPayloadToLocalItem(_ref8) {
+    value: function mapPayloadToLocalItem(_ref9) {
       var payload, items;
       return regeneratorRuntime.async(function mapPayloadToLocalItem$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              payload = _ref8.payload;
+              payload = _ref9.payload;
               _context8.next = 3;
               return regeneratorRuntime.awrap(this.mapPayloadsToLocalItems({
                 payloads: [payload]
@@ -20677,14 +20836,14 @@ function (_PureService) {
     }
   }, {
     key: "mapPayloadsToLocalItems",
-    value: function mapPayloadsToLocalItems(_ref9) {
+    value: function mapPayloadsToLocalItems(_ref10) {
       var payloads, source, sourceKey, itemsToNotifyObserversOf, newItems, processed, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, isCorrupt, item, isDirtyDeleted, allPayloads, allItems, _i, _Object$keys, uuid, _processed$uuid, _item, _payload, interestedItems, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, interestedItem, newCollection;
 
       return regeneratorRuntime.async(function mapPayloadsToLocalItems$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              payloads = _ref9.payloads, source = _ref9.source, sourceKey = _ref9.sourceKey;
+              payloads = _ref10.payloads, source = _ref10.source, sourceKey = _ref10.sourceKey;
               itemsToNotifyObserversOf = [];
               newItems = [];
               processed = {};
@@ -20948,9 +21107,9 @@ function (_PureService) {
     }
   }, {
     key: "insertItems",
-    value: function insertItems(_ref10) {
-      var items = _ref10.items,
-          globalOnly = _ref10.globalOnly;
+    value: function insertItems(_ref11) {
+      var items = _ref11.items,
+          globalOnly = _ref11.globalOnly;
       var _iteratorNormalCompletion5 = true;
       var _didIteratorError5 = false;
       var _iteratorError5 = undefined;
@@ -21008,17 +21167,17 @@ function (_PureService) {
     }
   }, {
     key: "resolveRelationshipWhenItemAvailable",
-    value: function resolveRelationshipWhenItemAvailable(_ref11) {
-      var interestedItem = _ref11.interestedItem,
-          missingItemId = _ref11.missingItemId;
+    value: function resolveRelationshipWhenItemAvailable(_ref12) {
+      var interestedItem = _ref12.interestedItem,
+          missingItemId = _ref12.missingItemId;
       var interestedItems = this.resolveQueue[missingItemId] || [];
       interestedItems.push(interestedItem);
       this.resolveQueue[missingItemId] = interestedItems;
     }
   }, {
     key: "popItemsInterestedInMissingItem",
-    value: function popItemsInterestedInMissingItem(_ref12) {
-      var item = _ref12.item;
+    value: function popItemsInterestedInMissingItem(_ref13) {
+      var item = _ref13.item;
       var interestedItems = this.resolveQueue[item.uuid];
       delete this.resolveQueue[item.uuid];
       return interestedItems || [];
@@ -21269,11 +21428,11 @@ function (_PureService) {
     }
   }, {
     key: "addMappingObserverWithPriority",
-    value: function addMappingObserverWithPriority(_ref13) {
-      var id = _ref13.id,
-          priority = _ref13.priority,
-          types = _ref13.types,
-          callback = _ref13.callback;
+    value: function addMappingObserverWithPriority(_ref14) {
+      var id = _ref14.id,
+          priority = _ref14.priority,
+          types = _ref14.types,
+          callback = _ref14.callback;
 
       if (!Array.isArray(types)) {
         types = [types];
@@ -21615,13 +21774,13 @@ function (_PureService) {
     }
   }, {
     key: "duplicateItem",
-    value: function duplicateItem(_ref14) {
+    value: function duplicateItem(_ref15) {
       var item, isConflict, payload, payloads, results, copy;
       return regeneratorRuntime.async(function duplicateItem$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
-              item = _ref14.item, isConflict = _ref14.isConflict;
+              item = _ref15.item, isConflict = _ref15.isConflict;
 
               if (item.isItem) {
                 _context18.next = 3;
@@ -28025,7 +28184,7 @@ var APPLICATION_STAGE_30_SIGNED_IN = 3.0;
 /*!*****************************!*\
   !*** ./lib/storage_keys.js ***!
   \*****************************/
-/*! exports provided: STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_WRAPPED_ROOT_KEY, STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_STORAGE_OBJECT, STORAGE_KEY_BIOMETRIC_PREFS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, STORAGE_KEY_PRIVILEGES_EXPIREY, STORAGE_KEY_PRIVILEGES_SESSION_LENGTH, SESSION_HISTORY_PERSIST_KEY, SESSION_HISTORY_REVISIONS_KEY, SESSION_HISTORY_OPTIMIZE_KEY, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP, namespacedKey */
+/*! exports provided: STORAGE_KEY_ROOT_KEY_PARAMS, STORAGE_KEY_WRAPPED_ROOT_KEY, STORAGE_KEY_ROOT_KEY_WRAPPER_KEY_PARAMS, STORAGE_KEY_JWT, STORAGE_KEY_USER, STORAGE_KEY_SERVER_HOST, STORAGE_KEY_LEGACY_UUID, STORAGE_KEY_LAST_SYNC_TOKEN, STORAGE_KEY_PAGINATION_TOKEN, STORAGE_KEY_STORAGE_OBJECT, STORAGE_KEY_BIOMETRIC_PREFS, STORAGE_KEY_MOBILE_PASSCODE_TIMING, STORAGE_KEY_PRIVILEGES_EXPIREY, STORAGE_KEY_PRIVILEGES_SESSION_LENGTH, STORAGE_KEY_SESSION_HISTORY_PERSISTABLE, STORAGE_KEY_SESSION_HISTORY_REVISIONS, STORAGE_KEY_SESSION_HISTORY_OPTIMIZE, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28044,9 +28203,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_MOBILE_PASSCODE_TIMING", function() { return STORAGE_KEY_MOBILE_PASSCODE_TIMING; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_PRIVILEGES_EXPIREY", function() { return STORAGE_KEY_PRIVILEGES_EXPIREY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_PRIVILEGES_SESSION_LENGTH", function() { return STORAGE_KEY_PRIVILEGES_SESSION_LENGTH; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_PERSIST_KEY", function() { return SESSION_HISTORY_PERSIST_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_REVISIONS_KEY", function() { return SESSION_HISTORY_REVISIONS_KEY; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SESSION_HISTORY_OPTIMIZE_KEY", function() { return SESSION_HISTORY_OPTIMIZE_KEY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SESSION_HISTORY_PERSISTABLE", function() { return STORAGE_KEY_SESSION_HISTORY_PERSISTABLE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SESSION_HISTORY_REVISIONS", function() { return STORAGE_KEY_SESSION_HISTORY_REVISIONS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORAGE_KEY_SESSION_HISTORY_OPTIMIZE", function() { return STORAGE_KEY_SESSION_HISTORY_OPTIMIZE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP", function() { return RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return namespacedKey; });
 var STORAGE_KEY_ROOT_KEY_PARAMS = 'ROOT_KEY_PARAMS';
@@ -28063,9 +28222,9 @@ var STORAGE_KEY_BIOMETRIC_PREFS = 'biometrics_prefs';
 var STORAGE_KEY_MOBILE_PASSCODE_TIMING = 'passcode_timing';
 var STORAGE_KEY_PRIVILEGES_EXPIREY = 'SessionExpiresAtKey';
 var STORAGE_KEY_PRIVILEGES_SESSION_LENGTH = 'SessionLengthKey';
-var SESSION_HISTORY_PERSIST_KEY = 'sessionHistory_persist';
-var SESSION_HISTORY_REVISIONS_KEY = 'sessionHistory_revisions';
-var SESSION_HISTORY_OPTIMIZE_KEY = 'sessionHistory_autoOptimize';
+var STORAGE_KEY_SESSION_HISTORY_PERSISTABLE = 'sessionHistory_persist';
+var STORAGE_KEY_SESSION_HISTORY_REVISIONS = 'sessionHistory_revisions';
+var STORAGE_KEY_SESSION_HISTORY_OPTIMIZE = 'sessionHistory_autoOptimize';
 /** Raw storage keys exist outside of StorageManager domain */
 
 var RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP = 'last_migration_timestamp';
