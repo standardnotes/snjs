@@ -144,6 +144,7 @@ export default class Factory {
     const params = {
       uuid: this.generateUuid(),
       content_type: "Note",
+      dirty: true,
       content: {
         title: title || "hello",
         text: text || "world",

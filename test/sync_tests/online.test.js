@@ -66,7 +66,7 @@ describe('online syncing', () => {
   it("should login and retrieve synced item", async function() {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
-    await this.application.signOut({clearAllData: true});
+    await this.application.signOut();
 
     await Factory.loginToApplication({
       application: this.application,
@@ -141,9 +141,10 @@ describe('online syncing', () => {
     this.application.syncManager.ut_endLatencySimulator();
   }).timeout(10000);
 
-  it("allows me to save data after I've signed out", async function() {
+  it.only("allows me to save data after I've signed out", async function() {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     await this.application.signOut();
+    expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.modelManager.setItemDirty(note, true);
@@ -156,7 +157,7 @@ describe('online syncing', () => {
     // set item to be merged for when sign in occurs
     await this.application.syncManager.markAllItemsAsNeedingSync();
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(2);
 
     // Sign back in for next tests
     await Factory.loginToApplication({
@@ -170,12 +171,12 @@ describe('online syncing', () => {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     expect(this.application.modelManager.notes.length).to.equal(1);
 
-    for(let item of this.application.modelManager.notes)  {
+    for(const item of this.application.modelManager.notes)  {
       expect(note.content.title).to.be.ok;
     }
 
     const updatedRawPayloads = await this.application.storageManager.getAllRawPayloads();
-    for(let payload of updatedRawPayloads) {
+    for(const payload of updatedRawPayloads) {
       // if an item comes back from the server, it is saved to disk immediately without a dirty value.
       expect(payload.dirty).to.not.be.ok;
     }
@@ -263,8 +264,7 @@ describe('online syncing', () => {
   it("should handle sync conflicts by duplicating differing data", async function() {
     // create an item and sync it
     const note = await Factory.createMappedNote(this.application);
-    await this.application.modelManager.setItemDirty(note);
-    await this.application.syncManager.sync(syncOptions);
+    await this.application.saveItem({item: note});
     this.expectedItemCount++;
 
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
@@ -273,9 +273,7 @@ describe('online syncing', () => {
     // modify this item to have stale values
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    await this.application.modelManager.setItemDirty(note);
-    await this.application.syncManager.sync(syncOptions)
-
+    await this.application.saveItem({item: note});
     // We expect this item to be duplicated
     this.expectedItemCount++;
     const allItems = this.application.modelManager.allItems;
@@ -284,6 +282,42 @@ describe('online syncing', () => {
     const note1 = this.application.modelManager.notes[0];
     const note2 = this.application.modelManager.notes[1];
     expect(note1.content.title).to.not.equal(note2.content.title);
+  }).timeout(10000);
+
+
+  it("basic conflict with clearing local state", async function () {
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.saveItem({item: note});
+    this.expectedItemCount += 1;
+
+    /** Create conflict for a note */
+    note.title = `${Math.random()}`
+    note.updated_at = Factory.yesterday();
+    await this.application.saveItem({item: note});
+    this.expectedItemCount++;
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+
+    // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
+    await this.application.syncManager.clearSyncPositionTokens();
+    await this.application.storageManager.clearAllPayloads();
+    await this.application.modelManager.handleSignOut();
+    await this.application.syncManager.sync();
+
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  }).timeout(10000);
+
+  it("signing into account with pre-existing items", async function () {
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.saveItem({item: note});
+    this.expectedItemCount += 1;
+
+    await this.application.signOut();
+    await this.application.signIn({
+      email: this.email,
+      password: this.password
+    })
+
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
 
   it("should duplicate item if saving a modified item and clearing our sync token", async function() {
@@ -759,7 +793,7 @@ describe('online syncing', () => {
     const itemCount = 6;
     for(let i = 0; i < itemCount; i++) {
       const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i/2)]);
-      const item = await Factory.mapPayloadToItem(payload, this.application.modelManager);
+      const item = await this.application.modelManager.mapPayloadToLocalItem({payload});
       await this.application.modelManager.setItemDirty(item, true);
     }
     this.expectedItemCount += itemCount;
@@ -915,20 +949,29 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it("should sync an item twice if it's marked dirty while a sync is ongoing", async function() {
-    // create an item and sync it
+    /** We can't track how many times an item is synced, only how many times its mapped */
+    const expectedSaveCount = 2;
+    let actualSaveCount = 0;
+    /** Create an item and sync it */
     const note = await Factory.createMappedNote(this.application);
-    await this.application.modelManager.setItemDirty(note, true);
+    note.didCompleteMapping = (source) => {
+      if(source === PAYLOAD_SOURCE_REMOTE_SAVED) {
+        actualSaveCount++;
+      }
+    }
     this.expectedItemCount++;
-
     this.application.syncManager.ut_beginLatencySimulator(1000);
     /** Dont await */
     const syncRequest = this.application.syncManager.sync(syncOptions);
-
+    /** Dirty the item 100ms into 1s request */
     setTimeout(async function () {
-      await this.application.modelManager.setItemDirty(note, true);
+      await this.application.modelManager.setItemDirty(note);
     }.bind(this), 100);
-
+    /**
+     * Await sync request. A sync request will perform another request if there
+     * are still more dirty items, so awaiting this will perform two syncs.
+     */
     await syncRequest;
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
+    expect(actualSaveCount).to.equal(expectedSaveCount);
   }).timeout(10000);
 });

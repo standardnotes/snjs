@@ -16,7 +16,7 @@ describe("notes and tags", () => {
   it('uses proper class for note', async function() {
     const modelManager = await createModelManager();
     const payload = Factory.createNotePayload();
-    const item = await Factory.mapPayloadToItem(payload, modelManager);
+    const item = await modelManager.mapPayloadToLocalItem({payload});
     const note = modelManager.allItemsMatchingTypes(["Note"])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });

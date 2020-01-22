@@ -7,173 +7,184 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("basic auth", () => {
-  let url = "http://localhost:3000";
-  let email = SFItem.GenerateUuidSynchronously();
-  let password = SFItem.GenerateUuidSynchronously();
-  var _key;
+  const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  before(async () => {
-    await Factory.globalStorageManager().clearAllData();
+  before(async function () {
+    localStorage.clear();
   })
 
-  it("successfully register new account", (done) => {
-     Factory.globalSessionManager().register({
-       url,
-       email,
-       password
-     }).then(async (response) => {
-      expect(response.error).to.not.be.ok;
-      _key = await Factory.globalKeyManager().getRootKey();
-      done();
-    })
-  }).timeout(20000);
+  after(async function () {
+    localStorage.clear();
+  })
 
-  it("successfully logins to registered account", async () => {
-    await Factory.globalSessionManager().signOut({clearAllData: true});
-    const response = await Factory.globalSessionManager().login({url, email, password});
+  beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = SFItem.GenerateUuidSynchronously();
+    this.password = SFItem.GenerateUuidSynchronously();
+  })
+
+  it("successfully register new account",  async function () {
+    const response = await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+    expect(response).to.be.ok;
+    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+  }).timeout(5000);
+
+  it("successfully logs out of account", async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+
+    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    await this.application.signOut();
+    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
+    expect(this.application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(0);
+  });
+
+  it("successfully logins to registered account", async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+    await this.application.signOut();
+    const response = await this.application.signIn({
+      email: this.email,
+      password: this.password
+    });
+    expect(response).to.be.ok;
     expect(response.error).to.not.be.ok;
+    expect(await this.application.keyManager.getRootKey()).to.be.ok;
   }).timeout(20000);
 
-  it("fails login to registered account", (done) => {
-    Factory.globalSessionManager().login({url, email, password: "wrong-password"}).then((response) => {
-      expect(response.error).to.be.ok;
-      done();
-    })
+  it("fails login with wrong password", async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+    await this.application.signOut();
+    const response = await this.application.signIn({
+      email: this.email,
+      password: 'wrongpassword'
+    });
+    expect(response).to.be.ok;
+    expect(response.error).to.be.ok;
+    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
   }).timeout(20000);
 
-  it("successfully changes password", async () => {
-    let modelManager = Factory.globalModelManager();
-    let storageManager = Factory.globalStorageManager();
-    const syncManager = new SNSyncManager({
-      modelManager,
-      storageManager,
-      sessionManager: Factory.globalSessionManager(),
-      protocolService: Factory.globalProtocolService(),
-      httpManager: Factory.globalHttpManager()
+  it.only("successfully changes password", async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
     });
 
-    syncManager.loggingEnabled = true;
+    const noteCount = 1;
+    await Factory.createManyMappedNotes(this.application, noteCount);
+    this.expectedItemCount += noteCount;
+    await this.application.syncManager.sync();
 
-    const totalItemCount = 105;
-    for(var i = 0; i < totalItemCount; i++) {
-      var item = Factory.createNotePayload();
-      modelManager.addItem(item);
-      await modelManager.setItemDirty(item, true);
-    }
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    await syncManager.loadDataFromDatabase();
-    await syncManager.sync();
-
-    // const result = await Factory.globalProtocolService().createRootKey({
-    //   identifier: email,
-    //   password: password
-    // });
-    // const newKey = result.key;
-    // const newKeyParams = result.keyParams;
-    //
-    // var response = await Factory.globalSessionManager().changePassword({
-    //   url,
-    //   email,
-    //   serverPassword: _key.serverPassword,
-    //   newRootKey: newKey,
-    //   newRootKeyParams: newKeyParams
-    // });
-    //
-    // expect(response.error).to.not.be.ok;
-    // expect(modelManager.allItems.length).to.equal(totalItemCount);
-    // expect(modelManager.invalidItems().length).to.equal(0);
-    //
-    // modelManager.setAllItemsDirty();
-    // await syncManager.sync();
-    //
-    // expect(modelManager.allItems.length).to.equal(totalItemCount);
-    //
-    // // create conflict for an item
-    // var item = modelManager.allItems[0];
-    // item.content.foo = "bar";
-    // item.updated_at = Factory.yesterday();
-    // modelManager.setItemDirty(item, true);
-    // totalItemCount++;
-    //
-    // // Wait so that sync conflict can be created
-    // await Factory.sleep(1.1);
-    // await syncManager.sync();
-    //
-    // // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-    // await syncManager.handleSignOut();
-    // await storageManager.clearAllPayloads();
-    // await modelManager.handleSignOut();
-    //
-    // expect(modelManager.allItems.length).to.equal(0);
-    //
-    // await syncManager.sync();
-    //
-    // expect(modelManager.allItems.length).to.equal(totalItemCount);
-    // expect(modelManager.invalidItems().length).to.equal(0);
-    //
-    // await Factory.globalSessionManager().signOut({clearAllData: true});
-    // var loginResponse = await Factory.globalSessionManager().login(url, email, password, strict, null);
-    // expect(loginResponse.error).to.not.be.ok;
-  }).timeout(20000);
-
-  it.skip("changes password many times", async () => {
-    let modelManager = Factory.createModelManager();
-    let storageManager = Factory.globalStorageManager();
-    const syncManager = new SNSyncManager({
-      modelManager,
-      storageManager,
-      sessionManager: Factory.globalSessionManager(),
-      protocolService: Factory.globalProtocolService(),
-      httpManager: Factory.globalHttpManager()
+    const newPassword = 'newpassword';
+    const response = await this.application.changePassword({
+      email: this.email,
+      currentPassword: this.password,
+      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
+      newPassword: newPassword
     });
 
-    var totalItemCount = 400;
-    for(var i = 0; i < totalItemCount; i++) {
-      var item = Factory.createNotePayload();
-      modelManager.addItem(item);
-      await modelManager.setItemDirty(item, true);
-    }
+    expect(response.error).to.not.be.ok;
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
-    await syncManager.sync();
+    await this.application.modelManager.setAllItemsDirty();
+    await this.application.syncManager.sync();
 
-    var strict = false;
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    for(var i = 0; i < 5; i++) {
-      var result = await Factory.globalProtocolService().createRootKey({identifier: email, password});
-      var newKeys = result.key;
-      var newKeyParams = result.keyParams;
+    /** Create conflict for a note */
+    const note = this.application.modelManager.notes[0];
+    note.title = `${Math.random()}`
+    note.updated_at = Factory.yesterday();
+    await this.application.saveItem({item: note});
+    this.expectedItemCount++;
 
-      var response = await Factory.globalSessionManager().changePassword(
-        url,
-        email,
-        _key.serverPassword,
-        newKeys,
-        newKeyParams
-      );
-      expect(response.error).to.not.be.ok;
+    // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
+    await this.application.syncManager.clearSyncPositionTokens();
+    await this.application.storageManager.clearAllPayloads();
+    await this.application.modelManager.handleSignOut();
 
-      expect(modelManager.allItems.length).to.equal(totalItemCount);
-      expect(modelManager.invalidItems().length).to.equal(0);
+    expect(this.application.modelManager.allItems.length).to.equal(0);
 
-      await modelManager.setAllItemsDirty();
-      await syncManager.sync();
+    await this.application.syncManager.sync();
+
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.modelManager.invalidItems().length).to.equal(0);
+
+    await this.application.signOut();
+
+    /** Should login with new password */
+    const signinResponse = await this.application.signIn({
+      email: this.email,
+      password: newPassword
+    });
+    expect(signinResponse).to.be.ok;
+    expect(signinResponse.error).to.not.be.ok;
+    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+  }).timeout(20000);
+
+  it("changes password many times", async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+
+    const noteCount = 160;
+    await Factory.createManyMappedNotes(this.application, noteCount);
+    this.expectedItemCount += noteCount;
+    await this.application.syncManager.sync();
+
+    const numTimesToChangePw = 5;
+    const newPassword = 'newpassword';
+    for(let i = 0; i < numTimesToChangePw; i++) {
+      const response = await this.application.changePassword({
+        email: this.email,
+        currentPassword: this.password,
+        currentKeyParams: await this.application.keyManager.getRootKeyParams(),
+        newPassword: newPassword
+      });
+
+      expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+      expect(this.application.modelManager.invalidItems().length).to.equal(0);
+
+      await this.application.modelManager.setAllItemsDirty();
+      await this.application.syncManager.sync();
 
       // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-      await syncManager.clearSyncPositionTokens();
-      await syncManager.sync();
-      await syncManager.clearSyncPositionTokens();
-      await storageManager.clearAllPayloads();
-      modelManager.handleSignOut();
+      await this.application.syncManager.clearSyncPositionTokens();
+      await this.application.storageManager.clearAllPayloads();
+      this.application.modelManager.handleSignOut();
 
-      expect(modelManager.allItems.length).to.equal(0);
+      expect(this.application.modelManager.allItems.length).to.equal(0);
 
-      await syncManager.sync();
+      await this.application.syncManager.sync();
 
-      expect(modelManager.allItems.length).to.equal(totalItemCount);
-      expect(modelManager.invalidItems().length).to.equal(0);
+      expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+      expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
-      var loginResponse = await Factory.globalSessionManager().login(url, email, password, strict, null);
-      expect(loginResponse.error).to.not.be.ok;
+      /** Should login with new password */
+      const signinResponse = await this.application.signIn({
+        email: this.email,
+        password: newPassword
+      });
+      expect(signinResponse).to.be.ok;
+      expect(signinResponse.error).to.not.be.ok;
+      expect(await this.application.keyManager.getRootKey()).to.be.ok;
     }
   }).timeout(30000);
 
