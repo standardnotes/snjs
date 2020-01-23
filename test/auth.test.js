@@ -44,7 +44,7 @@ describe("basic auth", () => {
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
     expect(this.application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(0);
+    expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
   });
 
   it("successfully logins to registered account", async function () {
@@ -77,13 +77,13 @@ describe("basic auth", () => {
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
   }).timeout(20000);
 
-  it.only("successfully changes password", async function () {
+  it("successfully changes password", async function () {
     await this.application.register({
       email: this.email,
       password: this.password
     });
 
-    const noteCount = 1;
+    const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
     await this.application.syncManager.sync();
@@ -144,20 +144,24 @@ describe("basic auth", () => {
       password: this.password
     });
 
-    const noteCount = 160;
+    const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
     await this.application.syncManager.sync();
 
     const numTimesToChangePw = 5;
-    const newPassword = 'newpassword';
+    let newPassword = Factory.randomString();
+    let currentPassword = this.password;
     for(let i = 0; i < numTimesToChangePw; i++) {
       const response = await this.application.changePassword({
         email: this.email,
-        currentPassword: this.password,
+        currentPassword: currentPassword,
         currentKeyParams: await this.application.keyManager.getRootKeyParams(),
         newPassword: newPassword
       });
+
+      currentPassword = newPassword;
+      newPassword = Factory.randomString();
 
       expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
@@ -180,7 +184,7 @@ describe("basic auth", () => {
       /** Should login with new password */
       const signinResponse = await this.application.signIn({
         email: this.email,
-        password: newPassword
+        password: currentPassword
       });
       expect(signinResponse).to.be.ok;
       expect(signinResponse.error).to.not.be.ok;
