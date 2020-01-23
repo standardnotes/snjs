@@ -98,7 +98,7 @@ describe('device authentication', () => {
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
   });
 
-  it.only('handles application launch with passcode and account', async function() {
+  it('handles application launch with passcode and account', async function() {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const email = SFItem.GenerateUuidSynchronously();

@@ -140,11 +140,11 @@ export default class Factory {
     return crypto.generateUUIDSync();
   }
 
-  static createNoteParams({title, text} = {}) {
+  static createNoteParams({title, text, dirty = true} = {}) {
     const params = {
       uuid: this.generateUuid(),
       content_type: "Note",
-      dirty: true,
+      dirty: dirty,
       content: {
         title: title || "hello",
         text: text || "world",
@@ -154,7 +154,7 @@ export default class Factory {
     return params;
   }
 
-  static createTagParams() {
+  static createTagParams({dirty = true} = {}) {
     const params = {
       uuid: this.generateUuid(),
       content_type: "Tag",
@@ -166,13 +166,9 @@ export default class Factory {
     return params;
   }
 
-  static createRelatedNoteTagPairPayload() {
-    let noteParams = this.createNoteParams();
-    let tagParams = {
-      uuid: this.generateUuid(),
-      content_type: "Tag",
-      content: { title: "thoughts" }
-    };
+  static createRelatedNoteTagPairPayload({dirty = true} = {}) {
+    const noteParams = this.createNoteParams({dirty});
+    const tagParams = this.createTagParams({dirty});
     tagParams.content.references = [{
       uuid: noteParams.uuid,
       content_type: noteParams.content_type

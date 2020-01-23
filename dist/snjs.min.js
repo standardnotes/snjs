@@ -5397,9 +5397,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return SNNote; });
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5421,6 +5422,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -5485,7 +5487,7 @@ function (_SFItem) {
        * Now, only tags contain references to notes. For old notes that may have references to tags,
        * we want to transfer them over to the tag.
        */
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_TAG"]) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_TAG"]) {
         item.addItemAsRelationship(this);
       }
 
@@ -5494,20 +5496,30 @@ function (_SFItem) {
   }, {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_TAG"]) {
+        if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["findInArray"])(this.tags, 'uuid', item.uuid)) {
+          this.tags.push(item);
+        }
+      }
+
       _get(_getPrototypeOf(SNNote.prototype), "setIsBeingReferencedBy", this).call(this, item);
 
       this.clearSavedTagsString();
     }
   }, {
-    key: "setIsNoLongerBeingReferencedBy",
-    value: function setIsNoLongerBeingReferencedBy(item) {
-      _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerBeingReferencedBy", this).call(this, item);
+    key: "setIsNoLongerReferencedBy",
+    value: function setIsNoLongerReferencedBy(item) {
+      _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerReferencedBy", this).call(this, item);
+
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_TAG"]) {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.tags, item);
+      }
       /**
        * @legacy Two-way note-tag relationships need to be handled explicitly.
        */
 
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_TAG"] && this.hasRelationshipWithItem(item)) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_TAG"] && this.hasRelationshipWithItem(item)) {
         this.removeReferenceWithUuid(item.uuid);
         /** @todo Items shouldn't mark themselves dirty. */
 
@@ -5515,17 +5527,6 @@ function (_SFItem) {
       }
 
       this.clearSavedTagsString();
-    }
-  }, {
-    key: "isBeingRemovedLocally",
-    value: function isBeingRemovedLocally() {
-      this.tags.forEach(function (tag) {
-        lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(tag.notes, {
-          uuid: this.uuid
-        });
-      }.bind(this));
-
-      _get(_getPrototypeOf(SNNote.prototype), "isBeingRemovedLocally", this).call(this);
     }
   }, {
     key: "tagDidCompleteMapping",
@@ -5550,13 +5551,13 @@ function (_SFItem) {
   }, {
     key: "tagsString",
     value: function tagsString() {
-      this.savedTagsString = _Models_app_tag__WEBPACK_IMPORTED_MODULE_2__["SNTag"].arrayToDisplayString(this.tags);
+      this.savedTagsString = _Models_app_tag__WEBPACK_IMPORTED_MODULE_3__["SNTag"].arrayToDisplayString(this.tags);
       return this.savedTagsString;
     }
   }, {
     key: "content_type",
     get: function get() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_NOTE"];
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["CONTENT_TYPE_NOTE"];
     }
   }], [{
     key: "filterDummyNotes",
@@ -5568,7 +5569,7 @@ function (_SFItem) {
   }]);
 
   return SNNote;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SFItem"]);
 
 /***/ }),
 
@@ -5752,7 +5753,6 @@ function (_SFItem) {
       if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_NOTE"]) {
         if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["findInArray"])(this.notes, 'uuid', item.uuid)) {
           this.notes.push(item);
-          item.tags.push(this);
         }
       }
 
@@ -5764,9 +5764,6 @@ function (_SFItem) {
       if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_NOTE"]) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.notes, {
           uuid: item.uuid
-        });
-        lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(item.tags, {
-          uuid: this.uuid
         });
       }
 
@@ -5783,13 +5780,10 @@ function (_SFItem) {
       });
       this.notes.slice().forEach(function (note) {
         if (!uuids.includes(note.uuid)) {
-          lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(note.tags, {
-            uuid: _this2.uuid
-          });
           lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(_this2.notes, {
             uuid: note.uuid
           });
-          note.setIsNoLongerBeingReferencedBy(_this2);
+          note.setIsNoLongerReferencedBy(_this2);
         }
       });
     }
@@ -5799,10 +5793,7 @@ function (_SFItem) {
       var _this3 = this;
 
       this.notes.forEach(function (note) {
-        lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(note.tags, {
-          uuid: _this3.uuid
-        });
-        note.setIsNoLongerBeingReferencedBy(_this3);
+        note.setIsNoLongerReferencedBy(_this3);
       });
       this.notes.length = 0;
 
@@ -6503,21 +6494,28 @@ function () {
 
       this.collapseContent();
     }
+    /**
+     * Loops through all memory-based referenced items and checks to see
+     * if they're in our content.references. If not, we remove them from
+     * our memory state.
+     */
+
   }, {
     key: "updateLocalRelationships",
     value: function updateLocalRelationships() {
       var references = this.content.references;
-      var newUuids = references.map(function (ref) {
+      var uuids = references.map(function (ref) {
         return ref.uuid;
       });
+      var existingUuids = Object.keys(this._referencedItems);
 
-      for (var _i = 0, _Object$keys = Object.keys(this._referencedItems); _i < _Object$keys.length; _i++) {
-        var uuid = _Object$keys[_i];
-        var currentReferencedItem = this._referencedItems[uuid];
+      for (var _i = 0, _existingUuids = existingUuids; _i < _existingUuids.length; _i++) {
+        var uuid = _existingUuids[_i];
+        var ref = this._referencedItems[uuid];
 
-        if (!newUuids.includes(currentReferencedItem.uuid)) {
+        if (!uuids.includes(ref.uuid)) {
           delete this._referencedItems[uuid];
-          currentReferencedItem.setIsNoLongerBeingReferencedBy(this);
+          ref.setIsNoLongerReferencedBy(this);
         }
       }
     }
@@ -6544,11 +6542,15 @@ function () {
   }, {
     key: "removeItemAsRelationship",
     value: function removeItemAsRelationship(item) {
-      item.setIsNoLongerBeingReferencedBy(this);
+      item.setIsNoLongerReferencedBy(this);
       this.removeReferenceWithUuid(item.uuid);
       delete this._referencedItems[item.uuid];
-    } // When another object has a relationship with us, we push that object into memory here.
-    // We use this so that when `this` is deleted, we're able to update the references of those other objects.
+    }
+    /**
+     * When another object has a relationship with us, we push that object
+     * into memory here. We use this so that when `this` is deleted, we're able
+     * to update the references of those other objects.
+     */
 
   }, {
     key: "setIsBeingReferencedBy",
@@ -6558,8 +6560,8 @@ function () {
       }
     }
   }, {
-    key: "setIsNoLongerBeingReferencedBy",
-    value: function setIsNoLongerBeingReferencedBy(item) {
+    key: "setIsNoLongerReferencedBy",
+    value: function setIsNoLongerReferencedBy(item) {
       delete this._referencingItems[item.uuid];
     }
   }, {
@@ -6567,7 +6569,7 @@ function () {
     value: function removeReferenceWithUuid(uuid) {
       var references = this.content.references || [];
       references = references.filter(function (r) {
-        return r.uuid != uuid;
+        return r.uuid !== uuid;
       });
       this.content.references = references;
       delete this._referencedItems[uuid];
@@ -6576,17 +6578,17 @@ function () {
     key: "hasRelationshipWithItem",
     value: function hasRelationshipWithItem(item) {
       var target = this.content.references.find(function (r) {
-        return r.uuid == item.uuid;
+        return r.uuid === item.uuid;
       });
-      return target != null;
+      return !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(target);
     }
   }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      for (var _i2 = 0, _Object$keys2 = Object.keys(this._referencedItems); _i2 < _Object$keys2.length; _i2++) {
-        var uuid = _Object$keys2[_i2];
+      for (var _i2 = 0, _Object$keys = Object.keys(this._referencedItems); _i2 < _Object$keys.length; _i2++) {
+        var uuid = _Object$keys[_i2];
         var item = this._referencedItems[uuid];
-        item.setIsNoLongerBeingReferencedBy(this);
+        item.setIsNoLongerReferencedBy(this);
       }
     }
     /** The number of items this item currently references */
@@ -7699,17 +7701,14 @@ var PayloadCollection =
 function () {
   function PayloadCollection() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        payloads = _ref.payloads,
+        _ref$payloads = _ref.payloads,
+        payloads = _ref$payloads === void 0 ? [] : _ref$payloads,
         source = _ref.source;
 
     _classCallCheck(this, PayloadCollection);
 
-    if (!payloads) {
-      payloads = [];
-    }
-
     this.source = source;
-    this.payloads = {};
+    this.payloadMap = {};
     this.allPayloads = payloads;
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -7718,7 +7717,7 @@ function () {
     try {
       for (var _iterator = payloads[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var payload = _step.value;
-        this.payloads[payload.uuid] = payload;
+        this.payloadMap[payload.uuid] = payload;
       }
     } catch (err) {
       _didIteratorError = true;
@@ -7741,7 +7740,7 @@ function () {
   _createClass(PayloadCollection, [{
     key: "findPayload",
     value: function findPayload(id) {
-      return this.payloads[id];
+      return this.payloadMap[id];
     }
   }, {
     key: "concat",
@@ -7756,12 +7755,12 @@ function () {
     value: function payloadsThatReferencePayload(inPayload) {
       var results = [];
 
-      for (var _i = 0, _Object$keys = Object.keys(this.payloads); _i < _Object$keys.length; _i++) {
-        var id = _Object$keys[_i];
-        var payload = this.payloads[id];
-        var inReferences = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(payload.content.references, 'uuid', inPayload.uuid);
+      for (var _i = 0, _Object$keys = Object.keys(this.payloadMap); _i < _Object$keys.length; _i++) {
+        var uuid = _Object$keys[_i];
+        var payload = this.payloadMap[uuid];
+        var references = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(payload.content.references, 'uuid', inPayload.uuid);
 
-        if (inReferences) {
+        if (references) {
           results.push(payload);
         }
       }
@@ -9560,7 +9559,7 @@ function PayloadsByDuplicating(_ref) {
   });
 }
 /**
- * Return the payloads that result if you alternated the uuid for the instance payload.
+ * Return the payloads that result if you alternated the uuid for the payload.
  * Alternating a UUID involves instructing related items to drop old references of a uuid
  * for the new one.
  * @returns An array of payloads that have changed as a result of copying.
@@ -9598,7 +9597,7 @@ function PayloadsByAlternatingUuid(_ref2) {
           results.push(copy);
           /**
            * Get the payloads that make reference to payload and remove
-           * us as a relationship, instead adding the new copy.
+           * payload as a relationship, instead adding the new copy.
            */
 
           referencing = baseCollection.payloadsThatReferencePayload(payload);
@@ -9619,6 +9618,10 @@ function PayloadsByAlternatingUuid(_ref2) {
             payload: payload,
             override: {
               deleted: true,
+
+              /** Do not set as dirty; this item is non-syncable
+                and should be immediately discarded */
+              dirty: false,
               content: {
                 references: []
               }
@@ -21068,7 +21071,7 @@ function (_PureService) {
                 break;
               }
 
-              console.error("Payload is null");
+              console.error('Payload is null');
               return _context9.abrupt("continue", 37);
 
             case 14:
@@ -21087,7 +21090,7 @@ function (_PureService) {
                 break;
               }
 
-              console.error("Payload is corrupt:", payload);
+              console.error('Payload is corrupt:', payload);
               return _context9.abrupt("continue", 37);
 
             case 20:
@@ -21217,7 +21220,7 @@ function (_PureService) {
               allPayloads.push(_payload);
               allItems.push(_item);
 
-              if (!(_payload.content && !_item.deleted)) {
+              if (!_payload.content) {
                 _context9.next = 64;
                 break;
               }
@@ -21325,9 +21328,10 @@ function (_PureService) {
           this.itemsHash[item.uuid] = item;
           this.items.push(item);
           /**
-          * In some cases, you just want to add the item to this.items, and not to the individual arrays
-          * This applies when you want to keep an item syncable, but not display it via the individual arrays
-          */
+           * In some cases, you just want to add the item to this.items, and not to
+           * the individual arrays This applies when you want to keep an item
+           * syncable, but not display it via the individual arrays
+           */
 
           if (globalOnly) {
             continue;
@@ -21416,12 +21420,16 @@ function (_PureService) {
               return _context10.abrupt("return");
 
             case 3:
-              content = item.content; // If another client removes an item's references, this client won't pick up the removal unless
-              // we remove everything not present in the current list of references
+              content = item.content;
+              /**
+               * If another client removes an item's references, this client won't pick
+               * up the removal unless we remove everything not present in the current
+               * list of references
+               */
 
               item.updateLocalRelationships();
 
-              if (content.references) {
+              if (!(!content.references || item.deleted)) {
                 _context10.next = 7;
                 break;
               }
@@ -21429,8 +21437,8 @@ function (_PureService) {
               return _context10.abrupt("return");
 
             case 7:
-              references = content.references.slice(); // make copy, references will be modified in array
-
+              /** Make copy, references will be modified in array */
+              references = content.references.slice();
               referencesIds = references.map(function (ref) {
                 return ref.uuid;
               });
@@ -22101,178 +22109,23 @@ function (_PureService) {
         }
       }, null, this);
     }
-  }, {
-    key: "removeAndDirtyAllRelationshipsForItem",
-    value: function removeAndDirtyAllRelationshipsForItem(item) {
-      var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, reference, relationship, referencingItems, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, _item2;
-
-      return regeneratorRuntime.async(function removeAndDirtyAllRelationshipsForItem$(_context22) {
-        while (1) {
-          switch (_context22.prev = _context22.next) {
-            case 0:
-              if (item.errorDecrypting) {
-                _context22.next = 32;
-                break;
-              }
-
-              _iteratorNormalCompletion11 = true;
-              _didIteratorError11 = false;
-              _iteratorError11 = undefined;
-              _context22.prev = 4;
-              _iterator11 = item.content.references[Symbol.iterator]();
-
-            case 6:
-              if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
-                _context22.next = 18;
-                break;
-              }
-
-              reference = _step11.value;
-              relationship = this.findItem(reference.uuid);
-
-              if (!relationship) {
-                _context22.next = 15;
-                break;
-              }
-
-              item.removeItemAsRelationship(relationship);
-
-              if (!relationship.hasRelationshipWithItem(item)) {
-                _context22.next = 15;
-                break;
-              }
-
-              relationship.removeItemAsRelationship(item);
-              _context22.next = 15;
-              return regeneratorRuntime.awrap(this.setItemDirty(relationship, true));
-
-            case 15:
-              _iteratorNormalCompletion11 = true;
-              _context22.next = 6;
-              break;
-
-            case 18:
-              _context22.next = 24;
-              break;
-
-            case 20:
-              _context22.prev = 20;
-              _context22.t0 = _context22["catch"](4);
-              _didIteratorError11 = true;
-              _iteratorError11 = _context22.t0;
-
-            case 24:
-              _context22.prev = 24;
-              _context22.prev = 25;
-
-              if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
-                _iterator11.return();
-              }
-
-            case 27:
-              _context22.prev = 27;
-
-              if (!_didIteratorError11) {
-                _context22.next = 30;
-                break;
-              }
-
-              throw _iteratorError11;
-
-            case 30:
-              return _context22.finish(27);
-
-            case 31:
-              return _context22.finish(24);
-
-            case 32:
-              /** Handle indirect relationships */
-              referencingItems = item.allReferencingItems;
-              _iteratorNormalCompletion12 = true;
-              _didIteratorError12 = false;
-              _iteratorError12 = undefined;
-              _context22.prev = 36;
-              _iterator12 = referencingItems[Symbol.iterator]();
-
-            case 38:
-              if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
-                _context22.next = 46;
-                break;
-              }
-
-              _item2 = _step12.value;
-
-              _item2.removeItemAsRelationship(_item2);
-
-              _context22.next = 43;
-              return regeneratorRuntime.awrap(this.setItemDirty(_item2, true));
-
-            case 43:
-              _iteratorNormalCompletion12 = true;
-              _context22.next = 38;
-              break;
-
-            case 46:
-              _context22.next = 52;
-              break;
-
-            case 48:
-              _context22.prev = 48;
-              _context22.t1 = _context22["catch"](36);
-              _didIteratorError12 = true;
-              _iteratorError12 = _context22.t1;
-
-            case 52:
-              _context22.prev = 52;
-              _context22.prev = 53;
-
-              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
-                _iterator12.return();
-              }
-
-            case 55:
-              _context22.prev = 55;
-
-              if (!_didIteratorError12) {
-                _context22.next = 58;
-                break;
-              }
-
-              throw _iteratorError12;
-
-            case 58:
-              return _context22.finish(55);
-
-            case 59:
-              return _context22.finish(52);
-
-            case 60:
-              item.resetLocalReferencePointers();
-
-            case 61:
-            case "end":
-              return _context22.stop();
-          }
-        }
-      }, null, this, [[4, 20, 24, 32], [25,, 27, 31], [36, 48, 52, 60], [53,, 55, 59]]);
-    }
     /* Used when changing encryption key */
 
   }, {
     key: "setAllItemsDirty",
     value: function setAllItemsDirty() {
       var relevantItems;
-      return regeneratorRuntime.async(function setAllItemsDirty$(_context23) {
+      return regeneratorRuntime.async(function setAllItemsDirty$(_context22) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
               relevantItems = this.allItems;
-              _context23.next = 3;
+              _context22.next = 3;
               return regeneratorRuntime.awrap(this.setItemsDirty(relevantItems, true));
 
             case 3:
             case "end":
-              return _context23.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -22280,33 +22133,186 @@ function (_PureService) {
   }, {
     key: "setItemToBeDeleted",
     value: function setItemToBeDeleted(item) {
-      return regeneratorRuntime.async(function setItemToBeDeleted$(_context24) {
+      return regeneratorRuntime.async(function setItemToBeDeleted$(_context23) {
         while (1) {
-          switch (_context24.prev = _context24.next) {
+          switch (_context23.prev = _context23.next) {
             case 0:
               item.deleted = true;
 
               if (item.dummy) {
-                _context24.next = 4;
+                _context23.next = 4;
                 break;
               }
 
-              _context24.next = 4;
+              _context23.next = 4;
               return regeneratorRuntime.awrap(this.setItemDirty(item, true));
 
             case 4:
-              _context24.next = 6;
-              return regeneratorRuntime.awrap(this.removeAndDirtyAllRelationshipsForItem(item));
+              _context23.next = 6;
+              return regeneratorRuntime.awrap(this.handleReferencesForItemDeletion(item));
 
             case 6:
               this.removeItemFromRespectiveArray(item);
 
             case 7:
             case "end":
-              return _context24.stop();
+              return _context23.stop();
           }
         }
       }, null, this);
+    }
+  }, {
+    key: "handleReferencesForItemDeletion",
+    value: function handleReferencesForItemDeletion(item) {
+      var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, reference, relationship, referencingItems, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, referencingItem;
+
+      return regeneratorRuntime.async(function handleReferencesForItemDeletion$(_context24) {
+        while (1) {
+          switch (_context24.prev = _context24.next) {
+            case 0:
+              if (item.errorDecrypting) {
+                _context24.next = 32;
+                break;
+              }
+
+              _iteratorNormalCompletion11 = true;
+              _didIteratorError11 = false;
+              _iteratorError11 = undefined;
+              _context24.prev = 4;
+              _iterator11 = item.content.references[Symbol.iterator]();
+
+            case 6:
+              if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                _context24.next = 18;
+                break;
+              }
+
+              reference = _step11.value;
+              relationship = this.findItem(reference.uuid);
+
+              if (!relationship) {
+                _context24.next = 15;
+                break;
+              }
+
+              item.removeItemAsRelationship(relationship);
+
+              if (!relationship.hasRelationshipWithItem(item)) {
+                _context24.next = 15;
+                break;
+              }
+
+              relationship.removeItemAsRelationship(item);
+              _context24.next = 15;
+              return regeneratorRuntime.awrap(this.setItemDirty(relationship, true));
+
+            case 15:
+              _iteratorNormalCompletion11 = true;
+              _context24.next = 6;
+              break;
+
+            case 18:
+              _context24.next = 24;
+              break;
+
+            case 20:
+              _context24.prev = 20;
+              _context24.t0 = _context24["catch"](4);
+              _didIteratorError11 = true;
+              _iteratorError11 = _context24.t0;
+
+            case 24:
+              _context24.prev = 24;
+              _context24.prev = 25;
+
+              if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
+                _iterator11.return();
+              }
+
+            case 27:
+              _context24.prev = 27;
+
+              if (!_didIteratorError11) {
+                _context24.next = 30;
+                break;
+              }
+
+              throw _iteratorError11;
+
+            case 30:
+              return _context24.finish(27);
+
+            case 31:
+              return _context24.finish(24);
+
+            case 32:
+              /** Handle indirect relationships */
+              referencingItems = item.allReferencingItems;
+              _iteratorNormalCompletion12 = true;
+              _didIteratorError12 = false;
+              _iteratorError12 = undefined;
+              _context24.prev = 36;
+              _iterator12 = referencingItems[Symbol.iterator]();
+
+            case 38:
+              if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
+                _context24.next = 46;
+                break;
+              }
+
+              referencingItem = _step12.value;
+              referencingItem.removeItemAsRelationship(item);
+              _context24.next = 43;
+              return regeneratorRuntime.awrap(this.setItemDirty(referencingItem, true));
+
+            case 43:
+              _iteratorNormalCompletion12 = true;
+              _context24.next = 38;
+              break;
+
+            case 46:
+              _context24.next = 52;
+              break;
+
+            case 48:
+              _context24.prev = 48;
+              _context24.t1 = _context24["catch"](36);
+              _didIteratorError12 = true;
+              _iteratorError12 = _context24.t1;
+
+            case 52:
+              _context24.prev = 52;
+              _context24.prev = 53;
+
+              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
+                _iterator12.return();
+              }
+
+            case 55:
+              _context24.prev = 55;
+
+              if (!_didIteratorError12) {
+                _context24.next = 58;
+                break;
+              }
+
+              throw _iteratorError12;
+
+            case 58:
+              return _context24.finish(55);
+
+            case 59:
+              return _context24.finish(52);
+
+            case 60:
+              item.resetLocalReferencePointers();
+
+            case 61:
+            case "end":
+              return _context24.stop();
+          }
+        }
+      }, null, this, [[4, 20, 24, 32], [25,, 27, 31], [36, 48, 52, 60], [53,, 55, 59]]);
     }
   }, {
     key: "setItemsToBeDeleted",

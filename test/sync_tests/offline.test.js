@@ -7,8 +7,10 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('offline syncing', () => {
+  const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   })
 
@@ -26,34 +28,43 @@ describe('offline syncing', () => {
 
   it("should sync item with no passcode", async function() {
     const item = await Factory.createMappedNote(this.application);
-    await this.application.modelManager.setItemDirty(item);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads1.length).to.equal(0);
+    expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncManager.sync()
+    this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
     const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads2.length).to.equal(1);
+    expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
-    const payload = rawPayloads2[0];
-    expect(typeof payload.content).to.equal('object');
+    const itemsKeyRP = (await Factory.getStoragePayloadsOfType(
+      this.application, CONTENT_TYPE_ITEMS_KEY
+    ))[0];
+    const noteRP = (await Factory.getStoragePayloadsOfType(
+      this.application, CONTENT_TYPE_NOTE
+    ))[0];
+
+    /** Encrypts with default items key */
+    expect(typeof noteRP.content).to.equal('string');
+    /** Not encrypted as no passcode/root key */
+    expect(typeof itemsKeyRP.content).to.equal('object');
   });
 
   it("should sync item encrypted with passcode", async function() {
     await this.application.setPasscode('foobar');
     const item = await Factory.createMappedNote(this.application);
-    await this.application.modelManager.setItemDirty(item);
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(2);
+    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads1.length).to.equal(0);
+    expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncManager.sync()
+    this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
     const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads2.length).to.equal(2);
+    expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
     const payload = rawPayloads2[0];
     expect(typeof payload.content).to.equal('string');

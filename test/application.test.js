@@ -4,9 +4,11 @@ import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe('application instances', () => {
+  const BASE_ITEM_COUNT = 1; /** Default items key */
+
   before(async () => {
     localStorage.clear();
   });
@@ -21,10 +23,9 @@ describe('application instances', () => {
     expect(app1.modelManager).to.equal(app1.modelManager);
     expect(app1.modelManager).to.not.equal(app2.modelManager);
 
-    const app1Item = await Factory.createNotePayload();
-    app1.modelManager.addItem(app1Item);
-    expect(app1.modelManager.allItems.length).length.to.equal(1);
-    expect(app2.modelManager.allItems.length).to.equal(0);
+    const app1Item = await Factory.createMappedNote(app1);
+    expect(app1.modelManager.allItems.length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect(app2.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -32,19 +33,15 @@ describe('application instances', () => {
     const app2 = await Factory.createAndInitializeApplication('app2');
 
     const app1Item = await Factory.createMappedNote(app1);
-    await app1.modelManager.setItemDirty(app1Item, true);
-    await app1.modelManager.addItem(app1Item);
     await app1.syncManager.sync();
 
-    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(1);
-    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(0);
+    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT);
 
     const app2Item = await Factory.createMappedNote(app2);
-    await app2.modelManager.setItemDirty(app2Item, true);
-    app2.modelManager.addItem(app2Item);
     await app2.syncManager.sync();
 
-    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(1);
-    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(1);
+    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
   });
 })

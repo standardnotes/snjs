@@ -33,7 +33,7 @@ describe("privileges", () => {
     expect(privileges).to.be.ok;
   });
 
-  it.only("adds credentials for actions", async function () {
+  it("adds credentials for actions", async function () {
     const privileges = await this.privilegesManager.getPrivileges();
     privileges.addCredentialForAction(
       PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES,

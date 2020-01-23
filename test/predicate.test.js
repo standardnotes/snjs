@@ -6,9 +6,8 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-
 const createItemParams = () => {
-  var params = {
+  const params = {
     uuid: SFItem.GenerateUuidSynchronously(),
     content_type: "Item",
     content: {
@@ -42,6 +41,8 @@ const createItem = () => {
 }
 
 describe("predicates", () => {
+  const BASE_ITEM_COUNT = 1; /** Default items key */
+
   const application = Factory.createApplication();
   before(async function () {
     await Factory.initializeApplication(application);
@@ -176,13 +177,13 @@ describe("predicates", () => {
   it('model manager predicate matching', async function () {
     const modelManager = this.application.modelManager;
     const payload1 = CreateMaxPayloadFromAnyObject({object: createItemParams()});
-    const item1 = (await modelManager.mapPayloadsToLocalItems({
-      payloads: [payload1]
-    }))[0];
+    const item1 = await modelManager.mapPayloadToLocalItem({
+      payload: payload1
+    });
     item1.updated_at = new Date();
 
-    modelManager.addItem(item1);
-    var predicate = new SFPredicate("content.title", "=", "ello");
+    await modelManager.mapItem({item: item1});
+    const predicate = new SFPredicate("content.title", "=", "ello");
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     predicate.keypath = "content.desc";
@@ -210,18 +211,20 @@ describe("predicates", () => {
 
     predicate.keypath = "updated_at";
     predicate.operator = ">"
-    var date = new Date();
+    const date = new Date();
     date.setSeconds(date.getSeconds() + 1);
     predicate.value = date;
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     predicate.operator = "<"
-    expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(
+      modelManager.allItems.length
+    );
 
     predicate.keypath = "updated_at";
     predicate.operator = "<"
     predicate.value = "30.days.ago";
-    expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(BASE_ITEM_COUNT);
     predicate.operator = ">"
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
 
@@ -229,15 +232,19 @@ describe("predicates", () => {
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
 
     // multi matching
-    var predicate1 = new SFPredicate("content_type", "=", "Item");
-    var predicate2 = new SFPredicate("content.title", "=", "SHello");
-    expect(modelManager.itemsMatchingPredicates([predicate1, predicate2]).length).to.equal(0);
+    expect(modelManager.itemsMatchingPredicates([
+      new SFPredicate("content_type", "=", "Item"),
+      new SFPredicate("content.title", "=", "SHello")
+    ]).length).to.equal(0);
 
-    var predicate1 = new SFPredicate("content_type", "=", "Item");
-    var predicate2 = new SFPredicate("content.title", "=", "Hello");
-    expect(modelManager.itemsMatchingPredicates([predicate1, predicate2]).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicates([
+      new SFPredicate("content_type", "=", "Item"),
+      new SFPredicate("content.title", "=", "Hello")
+    ]).length).to.equal(1);
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.title", "startsWith", "H")).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(
+      new SFPredicate("content.title", "startsWith", "H")
+    ).length).to.equal(1);
   });
 
   it('model manager predicate matching 2', async function () {
@@ -270,21 +277,22 @@ describe("predicates", () => {
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("content.tags", "includes", new SFPredicate("title", "startsWith", "f"))).length).to.equal(1);
 
     expect(modelManager.itemsMatchingPredicate(new SFPredicate("archived", "=", true)).length).to.equal(0);
-    var contentPred = new SFPredicate("content_type", "=", "Item");
+    const contentPred = new SFPredicate("content_type", "=", "Item");
     item2.setAppDataItem("archived", true);
     expect(modelManager.itemsMatchingPredicates([contentPred, new SFPredicate("archived", "=", true)]).length).to.equal(1);
   });
 
   it("nonexistent property should not satisfy predicate", () => {
-    var item = createItem();
+    const item = createItem();
     expect(item.satisfiesPredicate(new SFPredicate("content.foobar.length", "=", 0))).to.equal(false);
   })
 
-  it("false should compare true with undefined", function () {
-    var item = createItem();
-    let modelManager = this.application.modelManager;
-    modelManager.addItem(item);
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate("pinned", "=", false)).length).to.equal(1);
+  it("false should compare true with undefined", async function () {
+    const item = createItem();
+    const modelManager = this.application.modelManager;
+    await modelManager.mapItem({item: item});
+    const predicate = new SFPredicate("pinned", "=", false);
+    expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(modelManager.allItems.length);
   })
 
   it("regex", async function () {
@@ -292,9 +300,8 @@ describe("predicates", () => {
     item.content.title = "123";
     let modelManager = this.application.modelManager;
     await modelManager.setItemDirty(item, true);
-    modelManager.addItem(item);
     // match only letters
-    var predicate = new SFPredicate("content.title", "matches", "^[a-zA-Z]+$");
+    const predicate = new SFPredicate("content.title", "matches", "^[a-zA-Z]+$");
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = "abc";

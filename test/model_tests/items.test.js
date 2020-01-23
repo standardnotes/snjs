@@ -4,44 +4,46 @@ import '../../node_modules/chai/chai.js';
 import './../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe("items", () => {
-  const createModelManager = async () => {
-    const isolatedApplication = await Factory.createInitAppWithRandNamespace();
-    return isolatedApplication.modelManager;
-  }
+  const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  it('setting an item as dirty should update its client updated at', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createNotePayload();
+  beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
+    this.application = await Factory.createInitAppWithRandNamespace();
+  })
+
+  it('setting an item as dirty should update its client updated at', async function () {
+    const modelManager = this.application.modelManager
+    const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
-    let item = modelManager.items[0];
-    var prevDate = item.client_updated_at.getTime();
+    const item = modelManager.items[0];
+    const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
     await modelManager.setItemDirty(item, true, true);
-    var newDate = item.client_updated_at.getTime();
+    const newDate = item.client_updated_at.getTime();
     expect(prevDate).to.not.equal(newDate);
   });
 
-  it('setting an item as dirty with option to skip client updated at', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createNotePayload();
+  it('setting an item as dirty with option to skip client updated at', async function () {
+    const modelManager = this.application.modelManager
+    const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
-    let item = modelManager.items[0];
-    var prevDate = item.client_updated_at.getTime();
+    const item = modelManager.items[0];
+    const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
     await modelManager.setItemDirty(item, true);
-    var newDate = item.client_updated_at.getTime();
+    const newDate = item.client_updated_at.getTime();
     expect(prevDate).to.equal(newDate);
   });
 
-  it('properly pins, archives, and locks', async () => {
-    let modelManager = await createModelManager();
-    var params = Factory.createNotePayload();
+  it('properly pins, archives, and locks', async function () {
+    const modelManager = this.application.modelManager
+    const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
 
-    let item = modelManager.items[0];
+    const item = modelManager.items[0];
     expect(item.pinned).to.not.be.ok;
 
     item.setAppDataItem("pinned", true);
@@ -54,14 +56,14 @@ describe("items", () => {
     expect(item.locked).to.equal(true);
   });
 
-  it('properly compares item equality', async () => {
-    let modelManager = await createModelManager();
-    var params1 = Factory.createNotePayload();
-    var params2 = Factory.createNotePayload();
+  it('properly compares item equality', async function () {
+    const modelManager = this.application.modelManager
+    const params1 = Factory.createNotePayload();
+    const params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
 
-    let item1 = modelManager.items[0];
-    let item2 = modelManager.items[1];
+    const item1 = modelManager.notes[0];
+    const item2 = modelManager.notes[1];
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
@@ -96,14 +98,14 @@ describe("items", () => {
     expect(item2.content.references.length).to.equal(0);
   });
 
-  it('content equality should not have side effects', async () => {
-    let modelManager = await createModelManager();
-    var params1 = Factory.createNotePayload();
-    var params2 = Factory.createNotePayload();
+  it('content equality should not have side effects', async function () {
+    const modelManager = this.application.modelManager
+    const params1 = Factory.createNotePayload();
+    const params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
 
-    let item1 = modelManager.items[0];
-    let item2 = modelManager.items[1];
+    const item1 = modelManager.notes[0];
+    const item2 = modelManager.notes[1];
 
     item1.content.foo = "bar";
     expect(item1.content.foo).to.equal("bar");

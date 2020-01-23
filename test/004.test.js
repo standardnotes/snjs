@@ -4,7 +4,7 @@ import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe('004 protocol operations', () => {
 
@@ -15,10 +15,12 @@ describe('004 protocol operations', () => {
   const application = Factory.createApplication();
   const protocol_004 = new SNProtocolOperator004(new SNWebCrypto());
 
-  // runs once before all tests in this block
   before(async () => {
     await Factory.initializeApplication(application);
-    const result = await protocol_004.createRootKey({identifier: _identifier, password: _password});
+    const result = await protocol_004.createRootKey({
+      identifier: _identifier,
+      password: _password
+    });
     _keyParams = result.keyParams;
     _key = result.key;
   });
@@ -29,13 +31,16 @@ describe('004 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await application.protocolService.createRootKey({identifier: _identifier, password: _password});
+    const result = await application.protocolService.createRootKey({
+      identifier: _identifier,
+      password: _password
+    });
 
     expect(result).to.have.property("key");
     expect(result).to.have.property("keyParams");
 
     expect(result.key.masterKey).to.be.ok;
-    expect(result.key.dataAuthenticationKey).to.not.be.ok;
+    expect(() => result.key.dataAuthenticationKey).to.throw();
     expect(result.key.serverPassword).to.not.be.null;
     expect(result.key.mk).to.not.be.ok;
 

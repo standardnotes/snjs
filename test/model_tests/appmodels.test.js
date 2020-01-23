@@ -9,17 +9,21 @@ const expect = chai.expect;
 describe('app models', () => {
   let sharedCreatedItem;
 
-  const application = Factory.createApplication();
+  const BASE_ITEM_COUNT = 1; /** Default items key */
+
+  const sharedApplication = Factory.createApplication();
+  let sharedItemCount = BASE_ITEM_COUNT;
   before(async function() {
-    await Factory.initializeApplication(application);
+    await Factory.initializeApplication(sharedApplication);
   });
 
   beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   })
 
   it('modelManager should be defined', () => {
-    expect(application.modelManager).to.not.be.null;
+    expect(sharedApplication.modelManager).to.not.be.null;
   });
 
   it('item should be defined', () => {
@@ -42,22 +46,23 @@ describe('app models', () => {
   });
 
   it('adding item to modelmanager should add it to its items', async function() {
-    sharedCreatedItem = await Factory.createMappedNote(application);
-    application.modelManager.addItem(sharedCreatedItem);
-    expect(application.modelManager.items.length).to.equal(1);
-    expect(application.modelManager.allItems.length).to.equal(1);
-    expect(application.modelManager.allItemsMatchingTypes([sharedCreatedItem.content_type]).length).to.equal(1);
-    expect(application.modelManager.validItemsForContentType([sharedCreatedItem.content_type]).length).to.equal(1);
+    sharedCreatedItem = await Factory.createMappedNote(sharedApplication);
+    sharedItemCount++;
+    sharedApplication.modelManager.addItem(sharedCreatedItem);
+    expect(sharedApplication.modelManager.allItems.length).to.equal(sharedItemCount);
+    expect(sharedApplication.modelManager.allItemsMatchingTypes([sharedCreatedItem.content_type]).length).to.equal(1);
+    expect(sharedApplication.modelManager.validItemsForContentType([sharedCreatedItem.content_type]).length).to.equal(1);
   });
 
   it('find added item', () => {
-    var result = application.modelManager.findItem(sharedCreatedItem.uuid);
+    var result = sharedApplication.modelManager.findItem(sharedCreatedItem.uuid);
     expect(result.uuid).to.equal(sharedCreatedItem.uuid);
   });
 
   it('removing item from modelmanager should remove it from its items', async () => {
-    await application.modelManager.removeItemLocally(sharedCreatedItem);
-    expect(application.modelManager.items.length).to.equal(0);
+    await sharedApplication.modelManager.removeItemLocally(sharedCreatedItem);
+    sharedItemCount--;
+    expect(sharedApplication.modelManager.allItems.length).to.equal(sharedItemCount);
   });
 
   it('handles delayed mapping', async function() {
@@ -98,7 +103,7 @@ describe('app models', () => {
     });
 
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
-    expect(modelManager.allItems.length).to.equal(0);
+    expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
   it('mapping an item twice shouldnt cause problems', async function() {
@@ -230,16 +235,38 @@ describe('app models', () => {
     expect(item2.referencedItemsCount).to.equal(0);
   });
 
+  it('removing references should update cross-refs', async function() {
+    const modelManager = this.application.modelManager;
+    const item1 = await Factory.createMappedNote(this.application);
+    const item2 = await Factory.createMappedNote(this.application);
+    item1.addItemAsRelationship(item2);
+    await modelManager.mapPayloadToLocalItem({
+      payload: CreateMaxPayloadFromAnyObject({object: item1})
+    })
+    expect(item2.referencingItemsCount).to.equal(1);
+    await modelManager.mapPayloadToLocalItem({
+      payload: item1.payloadRepresentation({
+        override: {
+          deleted: true,
+          content: {
+            references: []
+          }
+        }
+      })
+    })
+    expect(item2.referencingItemsCount).to.equal(0);
+    expect(item1.referencingItemsCount).to.equal(0);
+    expect(item1.referencedItemsCount).to.equal(0);
+  });
+
   it('properly handles single item uuid alternation', async function() {
     const modelManager = this.application.modelManager;
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [
-        CreateMaxPayloadFromAnyObject({object: item1})
-      ]
+    await modelManager.mapPayloadToLocalItem({
+      payload: CreateMaxPayloadFromAnyObject({object: item1})
     })
 
     expect(item1.content.references.length).to.equal(1);
@@ -248,7 +275,7 @@ describe('app models', () => {
 
     const alternatedItem = await modelManager.alternateUuidForItem(item1);
     expect(alternatedItem.isItem).to.equal(true);
-
+    expect(item1.deleted).to.equal(true);
     // they should not be same reference
     expect(item1.content === alternatedItem.content).to.equal(false);
     expect(item1.content.references === alternatedItem.content.references).to.equal(false);
@@ -273,12 +300,11 @@ describe('app models', () => {
     const modelManager = this.application.modelManager;
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
+    this.expectedItemCount +=2;
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [
-        CreateMaxPayloadFromAnyObject({object: item1})
-      ]
+    await modelManager.mapPayloadToLocalItem({
+      payload: CreateMaxPayloadFromAnyObject({object: item1})
     })
 
     expect(item2.referencingItemsCount).to.equal(1);
@@ -286,7 +312,7 @@ describe('app models', () => {
     const alternatedItem1 = await modelManager.alternateUuidForItem(item1);
     const alternatedItem2 = await modelManager.alternateUuidForItem(item2);
 
-    expect(modelManager.allItems.length).to.equal(2);
+    expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 
     expect(item1.uuid).to.not.equal(alternatedItem1.uuid);
     expect(item2.uuid).to.not.equal(alternatedItem2.uuid);
