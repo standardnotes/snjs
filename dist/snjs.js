@@ -1258,6 +1258,9 @@ function () {
       is the custom subclass to use.
    * @param skipClasses
       An optional array of classes to skip making services for.
+   * @param crypto
+      The platform-dependent instance of SNCrypto to use.
+      Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    */
   function SNApplication() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1266,7 +1269,8 @@ function () {
         host = _ref.host,
         deviceInterface = _ref.deviceInterface,
         swapClasses = _ref.swapClasses,
-        skipClasses = _ref.skipClasses;
+        skipClasses = _ref.skipClasses,
+        crypto = _ref.crypto;
 
     _classCallCheck(this, SNApplication);
 
@@ -1283,10 +1287,12 @@ function () {
     this.namespace = namespace || '';
     this.host = host;
     this.deviceInterface = deviceInterface;
+    this.crypto = crypto;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
     this.eventHandlers = [];
     this.services = [];
+    this.constructServices();
   }
   /**
    * @publilc
@@ -1318,32 +1324,31 @@ function () {
 
             case 3:
               this.launchCallbacks = callbacks;
-              this.constructServices();
-              _context.next = 7;
+              _context.next = 6;
               return regeneratorRuntime.awrap(this.migrationService.initialize());
 
-            case 7:
-              _context.next = 9;
+            case 6:
+              _context.next = 8;
               return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_17__["APPLICATION_STAGE_0_PREPARING_FOR_LAUNCH"]));
 
-            case 9:
-              _context.next = 11;
+            case 8:
+              _context.next = 10;
               return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
 
-            case 11:
-              _context.next = 13;
+            case 10:
+              _context.next = 12;
               return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
 
-            case 13:
-              _context.next = 15;
+            case 12:
+              _context.next = 14;
               return regeneratorRuntime.awrap(this.keyManager.initialize());
 
-            case 15:
+            case 14:
               this.historyManager.initialize();
-              _context.next = 18;
+              _context.next = 17;
               return regeneratorRuntime.awrap(this.handleStage(_Lib_stages__WEBPACK_IMPORTED_MODULE_17__["APPLICATION_STAGE_05_READY_FOR_LAUNCH"]));
 
-            case 18:
+            case 17:
             case "end":
               return _context.stop();
           }
@@ -2372,7 +2377,8 @@ function () {
     key: "createProtocolService",
     value: function createProtocolService(modelManager) {
       this.protocolService = new (this.getClass(SNProtocolService))({
-        modelManager: modelManager
+        modelManager: modelManager,
+        crypto: this.crypto
       });
       this.services.push(this.protocolService);
     }
@@ -2619,13 +2625,13 @@ function () {
       });
     }
   }, {
-    key: "getRawDatabasePayloadWithId",
-    value: function getRawDatabasePayloadWithId(id) {
-      return regeneratorRuntime.async(function getRawDatabasePayloadWithId$(_context6) {
+    key: "removeAllRawStorageValues",
+    value: function removeAllRawStorageValues() {
+      return regeneratorRuntime.async(function removeAllRawStorageValues$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              throw 'Must override DeviceInterface.getRawDatabasePayloadWithId';
+              throw 'Must override DeviceInterface.removeAllRawStorageValues';
 
             case 1:
             case "end":
@@ -2635,13 +2641,13 @@ function () {
       });
     }
   }, {
-    key: "getAllRawDatabasePayloads",
-    value: function getAllRawDatabasePayloads() {
-      return regeneratorRuntime.async(function getAllRawDatabasePayloads$(_context7) {
+    key: "getRawDatabasePayloadWithId",
+    value: function getRawDatabasePayloadWithId(id) {
+      return regeneratorRuntime.async(function getRawDatabasePayloadWithId$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              throw 'Must override DeviceInterface.getAllRawDatabasePayloads';
+              throw 'Must override DeviceInterface.getRawDatabasePayloadWithId';
 
             case 1:
             case "end":
@@ -2651,13 +2657,13 @@ function () {
       });
     }
   }, {
-    key: "saveRawDatabasePayload",
-    value: function saveRawDatabasePayload(payload) {
-      return regeneratorRuntime.async(function saveRawDatabasePayload$(_context8) {
+    key: "getAllRawDatabasePayloads",
+    value: function getAllRawDatabasePayloads() {
+      return regeneratorRuntime.async(function getAllRawDatabasePayloads$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              throw 'Must override DeviceInterface.saveRawDatabasePayload';
+              throw 'Must override DeviceInterface.getAllRawDatabasePayloads';
 
             case 1:
             case "end":
@@ -2667,13 +2673,13 @@ function () {
       });
     }
   }, {
-    key: "saveRawDatabasePayloads",
-    value: function saveRawDatabasePayloads(payloads) {
-      return regeneratorRuntime.async(function saveRawDatabasePayloads$(_context9) {
+    key: "saveRawDatabasePayload",
+    value: function saveRawDatabasePayload(payload) {
+      return regeneratorRuntime.async(function saveRawDatabasePayload$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              throw 'Must override DeviceInterface.saveRawDatabasePayloads';
+              throw 'Must override DeviceInterface.saveRawDatabasePayload';
 
             case 1:
             case "end":
@@ -2683,13 +2689,13 @@ function () {
       });
     }
   }, {
-    key: "removeRawDatabasePayloadWithId",
-    value: function removeRawDatabasePayloadWithId(id) {
-      return regeneratorRuntime.async(function removeRawDatabasePayloadWithId$(_context10) {
+    key: "saveRawDatabasePayloads",
+    value: function saveRawDatabasePayloads(payloads) {
+      return regeneratorRuntime.async(function saveRawDatabasePayloads$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
-              throw 'Must override DeviceInterface.removeRawDatabasePayloadWithId';
+              throw 'Must override DeviceInterface.saveRawDatabasePayloads';
 
             case 1:
             case "end":
@@ -2699,13 +2705,13 @@ function () {
       });
     }
   }, {
-    key: "removeAllRawDatabasePayloads",
-    value: function removeAllRawDatabasePayloads() {
-      return regeneratorRuntime.async(function removeAllRawDatabasePayloads$(_context11) {
+    key: "removeRawDatabasePayloadWithId",
+    value: function removeRawDatabasePayloadWithId(id) {
+      return regeneratorRuntime.async(function removeRawDatabasePayloadWithId$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
-              throw 'Must override DeviceInterface.removeAllRawDatabasePayloads';
+              throw 'Must override DeviceInterface.removeRawDatabasePayloadWithId';
 
             case 1:
             case "end":
@@ -2715,13 +2721,13 @@ function () {
       });
     }
   }, {
-    key: "getRawKeychainValue",
-    value: function getRawKeychainValue() {
-      return regeneratorRuntime.async(function getRawKeychainValue$(_context12) {
+    key: "removeAllRawDatabasePayloads",
+    value: function removeAllRawDatabasePayloads() {
+      return regeneratorRuntime.async(function removeAllRawDatabasePayloads$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              throw 'Must override DeviceInterface.getRawKeychainValue';
+              throw 'Must override DeviceInterface.removeAllRawDatabasePayloads';
 
             case 1:
             case "end":
@@ -2731,13 +2737,13 @@ function () {
       });
     }
   }, {
-    key: "setKeychainValue",
-    value: function setKeychainValue(value) {
-      return regeneratorRuntime.async(function setKeychainValue$(_context13) {
+    key: "getRawKeychainValue",
+    value: function getRawKeychainValue() {
+      return regeneratorRuntime.async(function getRawKeychainValue$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
-              throw 'Must override DeviceInterface.setKeychainValue';
+              throw 'Must override DeviceInterface.getRawKeychainValue';
 
             case 1:
             case "end":
@@ -2747,17 +2753,33 @@ function () {
       });
     }
   }, {
-    key: "clearKeychainValue",
-    value: function clearKeychainValue() {
-      return regeneratorRuntime.async(function clearKeychainValue$(_context14) {
+    key: "setKeychainValue",
+    value: function setKeychainValue(value) {
+      return regeneratorRuntime.async(function setKeychainValue$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
+            case 0:
+              throw 'Must override DeviceInterface.setKeychainValue';
+
+            case 1:
+            case "end":
+              return _context14.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "clearKeychainValue",
+    value: function clearKeychainValue() {
+      return regeneratorRuntime.async(function clearKeychainValue$(_context15) {
+        while (1) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               throw 'Must override DeviceInterface.clearKeychainValue';
 
             case 1:
             case "end":
-              return _context14.stop();
+              return _context15.stop();
           }
         }
       });
@@ -3605,7 +3627,7 @@ function (_Migration) {
 
             case 2:
               rawPasscodeParams = _context6.sent;
-              passcodeParams = this.application.protocolService.createVersionedKeyParams(rawPasscodeParams);
+              passcodeParams = this.application.protocolService.createVersionedRootKeyParams(rawPasscodeParams);
               /** Decrypt it with the passcode */
 
               decryptedStoragePayload = {
@@ -3665,38 +3687,47 @@ function (_Migration) {
   }, {
     key: "webDesktopHelper_extractAndWrapAccountKeysFromValueStore",
     value: function webDesktopHelper_extractAndWrapAccountKeysFromValueStore(passcodeKey, storageValueStore) {
-      var version, accountKey, encryptedAccountKey;
+      var version, accountKey, accountKeyPayload, encryptedAccountKey;
       return regeneratorRuntime.async(function webDesktopHelper_extractAndWrapAccountKeysFromValueStore$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
               version = storageValueStore.ak ? _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_003"] : _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_002"];
-              accountKey = _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].FromRaw({
-                mk: storageValueStore.mk,
-                pw: storageValueStore.pw,
-                ak: storageValueStore.ak,
-                version: version
-              });
+              _context7.next = 3;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].Create({
+                content: {
+                  mk: storageValueStore.mk,
+                  pw: storageValueStore.pw,
+                  ak: storageValueStore.ak,
+                  version: version
+                }
+              }));
+
+            case 3:
+              accountKey = _context7.sent;
               delete storageValueStore.mk;
               delete storageValueStore.pw;
               delete storageValueStore.ak;
+              accountKeyPayload = CreateMaxPayloadFromAnyObject({
+                object: accountKey
+              });
               /** Encrypt account key with passcode */
 
-              _context7.next = 7;
+              _context7.next = 10;
               return regeneratorRuntime.awrap(this.application.protocolService.payloadByEncryptingPayload({
-                payload: accountKey.payloadRepresentation(),
+                payload: accountKeyPayload,
                 key: passcodeKey,
                 intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_8__["ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED"]
               }));
 
-            case 7:
+            case 10:
               encryptedAccountKey = _context7.sent;
               return _context7.abrupt("return", {
                 unwrappedKey: accountKey,
                 wrappedKey: encryptedAccountKey
               });
 
-            case 9:
+            case 12:
             case "end":
               return _context7.stop();
           }
@@ -3793,7 +3824,7 @@ function (_Migration) {
                 break;
               }
 
-              passcodeParams = this.application.protocolService.createVersionedKeyParams(rawPasscodeParams);
+              passcodeParams = this.application.protocolService.createVersionedRootKeyParams(rawPasscodeParams);
               /** Move passcode timing into unwrapped storage */
 
               if (!passcodeParams) {
@@ -3909,20 +3940,32 @@ function (_Migration) {
             case 2:
               rootKey = _context10.sent;
 
-              if (rootKey) {
-                accountKeys = rootKey.content.accountKeys;
-
-                if (accountKeys) {
-                  version = accountKeys.ak ? _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_003"] : _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_002"];
-                  rawKey = Object.assign({
-                    version: version
-                  }, accountKeys);
-                  newRootKey = _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].FromRaw(rawKey);
-                  this.application.keyManager.rootKey = newRootKey;
-                }
+              if (!rootKey) {
+                _context10.next = 12;
+                break;
               }
 
-            case 4:
+              accountKeys = rootKey.content.accountKeys;
+
+              if (!accountKeys) {
+                _context10.next = 12;
+                break;
+              }
+
+              version = accountKeys.ak ? _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_003"] : _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["PROTOCOL_VERSION_002"];
+              rawKey = Object.assign({
+                version: version
+              }, accountKeys);
+              _context10.next = 10;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_1__["SNRootKey"].Create({
+                content: rawKey
+              }));
+
+            case 10:
+              newRootKey = _context10.sent;
+              this.application.keyManager.rootKey = newRootKey;
+
+            case 12:
             case "end":
               return _context10.stop();
           }
@@ -8425,7 +8468,7 @@ function (_PayloadsDelta) {
   _createClass(DeltaOutOfSync, [{
     key: "resultingCollection",
     value: function resultingCollection() {
-      var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, current, differs, copyResults;
+      var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, current, equal, copyResults;
 
       return regeneratorRuntime.async(function resultingCollection$(_context) {
         while (1) {
@@ -8447,8 +8490,8 @@ function (_PayloadsDelta) {
               payload = _step.value;
 
               /**
-               * Map the server payload as authoritive content. If client copy at all differed,
-               * we would have created a duplicate of it above and synced it.
+               * Map the server payload as authoritive content. If client copy differs,
+               * we will create a duplicate of it below.
                * This is also neccessary to map the updated_at value from the server
                */
               results.push(payload);
@@ -8464,9 +8507,9 @@ function (_PayloadsDelta) {
               return _context.abrupt("continue", 19);
 
             case 12:
-              differs = !Object(_Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadContentsEqual"])(payload, current);
+              equal = Object(_Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_0__["PayloadContentsEqual"])(payload, current);
 
-              if (differs) {
+              if (!equal) {
                 _context.next = 15;
                 break;
               }
@@ -11202,14 +11245,20 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context8.sent;
-              key = _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw({
-                pw: partitions[0],
-                mk: partitions[1],
-                version: this.constructor.versionString()
-              });
-              return _context8.abrupt("return", key);
+              _context8.next = 9;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].Create({
+                content: {
+                  pw: partitions[0],
+                  mk: partitions[1],
+                  version: this.constructor.versionString()
+                }
+              }));
 
             case 9:
+              key = _context8.sent;
+              return _context8.abrupt("return", key);
+
+            case 11:
             case "end":
               return _context8.stop();
           }
@@ -11814,13 +11863,21 @@ function (_SNProtocolOperator) {
               return _context7.abrupt("return", encryptedParameters);
 
             case 7:
+              if (!(!key || !key.itemsKey)) {
+                _context7.next = 9;
+                break;
+              }
+
+              throw 'Attempting to generateDecryptedParameters with no itemsKey.';
+
+            case 9:
               // decrypt encrypted key
               encryptedItemKey = encryptedParameters.enc_item_key;
               requiresAuth = true;
               itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey, key.dataAuthenticationKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
               if (!(itemKeyComponents.uuid && itemKeyComponents.uuid !== encryptedParameters.uuid)) {
-                _context7.next = 13;
+                _context7.next = 15;
                 break;
               }
 
@@ -11830,15 +11887,15 @@ function (_SNProtocolOperator) {
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
               }));
 
-            case 13:
-              _context7.next = 15;
+            case 15:
+              _context7.next = 17;
               return regeneratorRuntime.awrap(this.decryptText(itemKeyComponents, requiresAuth));
 
-            case 15:
+            case 17:
               item_key = _context7.sent;
 
               if (item_key) {
-                _context7.next = 19;
+                _context7.next = 21;
                 break;
               }
 
@@ -11848,21 +11905,21 @@ function (_SNProtocolOperator) {
                 override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
               }));
 
-            case 19:
-              _context7.next = 21;
+            case 21:
+              _context7.next = 23;
               return regeneratorRuntime.awrap(this.firstHalfOfKey(item_key));
 
-            case 21:
+            case 23:
               ek = _context7.sent;
-              _context7.next = 24;
+              _context7.next = 26;
               return regeneratorRuntime.awrap(this.secondHalfOfKey(item_key));
 
-            case 24:
+            case 26:
               ak = _context7.sent;
               itemParams = this.encryptionComponentsFromString(encryptedParameters.content, ek, ak); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
               if (!(itemParams.uuid && itemParams.uuid !== encryptedParameters.uuid)) {
-                _context7.next = 28;
+                _context7.next = 30;
                 break;
               }
 
@@ -11871,15 +11928,15 @@ function (_SNProtocolOperator) {
                 override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override3)
               }));
 
-            case 28:
-              _context7.next = 30;
+            case 30:
+              _context7.next = 32;
               return regeneratorRuntime.awrap(this.decryptText(itemParams, true));
 
-            case 30:
+            case 32:
               content = _context7.sent;
 
               if (content) {
-                _context7.next = 35;
+                _context7.next = 37;
                 break;
               }
 
@@ -11888,34 +11945,34 @@ function (_SNProtocolOperator) {
                 override: (_override4 = {}, _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override4)
               }));
 
-            case 35:
-              _context7.prev = 35;
+            case 37:
+              _context7.prev = 37;
               _context7.t0 = JSON;
-              _context7.next = 39;
+              _context7.next = 41;
               return regeneratorRuntime.awrap(this.crypto.base64Decode(itemParams.authParams));
 
-            case 39:
+            case 41:
               _context7.t1 = _context7.sent;
               auth_params = _context7.t0.parse.call(_context7.t0, _context7.t1);
-              _context7.next = 45;
+              _context7.next = 47;
               break;
 
-            case 43:
-              _context7.prev = 43;
-              _context7.t2 = _context7["catch"](35);
-
             case 45:
+              _context7.prev = 45;
+              _context7.t2 = _context7["catch"](37);
+
+            case 47:
               return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override5 = {}, _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_LEGACY_003_AUTH_PARAMS"], authParams), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override5)
               }));
 
-            case 46:
+            case 48:
             case "end":
               return _context7.stop();
           }
         }
-      }, null, this, [[35, 43]]);
+      }, null, this, [[37, 45]]);
     }
     /**
      * @private
@@ -11956,15 +12013,21 @@ function (_SNProtocolOperator) {
 
             case 6:
               partitions = _context8.sent;
-              key = _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].FromRaw({
-                pw: partitions[0],
-                mk: partitions[1],
-                ak: partitions[2],
-                version: this.constructor.versionString()
-              });
-              return _context8.abrupt("return", key);
+              _context8.next = 9;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_9__["SNRootKey"].Create({
+                content: {
+                  pw: partitions[0],
+                  mk: partitions[1],
+                  ak: partitions[2],
+                  version: this.constructor.versionString()
+                }
+              }));
 
             case 9:
+              key = _context8.sent;
+              return _context8.abrupt("return", key);
+
+            case 11:
             case "end":
               return _context8.stop();
           }
@@ -12942,9 +13005,17 @@ function (_SNProtocolOperator) {
               }));
 
             case 4:
+              if (!(!key || !key.itemsKey)) {
+                _context8.next = 6;
+                break;
+              }
+
+              throw 'Attempting to generateDecryptedParameters with no itemsKey.';
+
+            case 6:
               /** Decrypt item_key payload. */
               itemKeyComponents = this.deconstructEncryptedPayloadString(encryptedParameters.enc_item_key);
-              _context8.next = 7;
+              _context8.next = 9;
               return regeneratorRuntime.awrap(this.decryptText({
                 ciphertext: itemKeyComponents.ciphertext,
                 rawKey: key.itemsKey,
@@ -12955,11 +13026,11 @@ function (_SNProtocolOperator) {
                 }
               }));
 
-            case 7:
+            case 9:
               item_key = _context8.sent;
 
               if (item_key) {
-                _context8.next = 11;
+                _context8.next = 13;
                 break;
               }
 
@@ -12969,10 +13040,10 @@ function (_SNProtocolOperator) {
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override)
               }));
 
-            case 11:
+            case 13:
               /** Decrypt content payload. */
               contentComponents = this.deconstructEncryptedPayloadString(encryptedParameters.content);
-              _context8.next = 14;
+              _context8.next = 16;
               return regeneratorRuntime.awrap(this.decryptText({
                 ciphertext: contentComponents.ciphertext,
                 rawKey: item_key,
@@ -12983,11 +13054,11 @@ function (_SNProtocolOperator) {
                 }
               }));
 
-            case 14:
+            case 16:
               content = _context8.sent;
 
               if (content) {
-                _context8.next = 19;
+                _context8.next = 21;
                 break;
               }
 
@@ -12996,13 +13067,13 @@ function (_SNProtocolOperator) {
                 override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], !encryptedParameters.errorDecrypting), _override2)
               }));
 
-            case 19:
+            case 21:
               return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_CONTENT"], JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING"], false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_ERROR_DECRYPTING_CHANGED"], encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_6__["ITEM_PAYLOAD_WAITING_FOR_KEY"], false), _override3)
               }));
 
-            case 20:
+            case 22:
             case "end":
               return _context8.stop();
           }
@@ -13110,10 +13181,16 @@ function (_SNProtocolOperator) {
               };
               /** @todo: HKDF each key to domain-seperate. */
 
-              key = _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw(params);
-              return _context10.abrupt("return", key);
+              _context10.next = 12;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].Create({
+                content: params
+              }));
 
             case 12:
+              key = _context10.sent;
+              return _context10.abrupt("return", key);
+
+            case 14:
             case "end":
               return _context10.stop();
           }
@@ -13554,6 +13631,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions_001_key_content_001__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions/001/key_content_001 */ "./lib/protocol/versions/001/key_content_001.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -13567,19 +13645,53 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var SNRootKey =
 /*#__PURE__*/
 function () {
   _createClass(SNRootKey, null, [{
-    key: "FromRaw",
-    value: function FromRaw(key) {
-      return new SNRootKey(key);
+    key: "Create",
+    value: function Create(_ref) {
+      var uuid, content;
+      return regeneratorRuntime.async(function Create$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              uuid = _ref.uuid, content = _ref.content;
+
+              if (uuid) {
+                _context.next = 5;
+                break;
+              }
+
+              _context.next = 4;
+              return regeneratorRuntime.awrap(_Models_core_item__WEBPACK_IMPORTED_MODULE_7__["SFItem"].GenerateUuid());
+
+            case 4:
+              uuid = _context.sent;
+
+            case 5:
+              return _context.abrupt("return", new SNRootKey({
+                uuid: uuid,
+                content: content
+              }));
+
+            case 6:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
     }
   }]);
 
-  function SNRootKey(content) {
+  function SNRootKey(_ref2) {
+    var uuid = _ref2.uuid,
+        content = _ref2.content;
+
     _classCallCheck(this, SNRootKey);
 
+    this.uuid = uuid;
     this.content = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["Copy"])(content);
 
     if (!this.content.version) {
@@ -14555,7 +14667,7 @@ function (_PureService) {
                 mfaKeyPath: mfaKeyPath,
                 mfaCode: mfaCode
               }).then(function (response) {
-                var keyParams = _this4.protocolService.createVersionedKeyParams(response);
+                var keyParams = _this4.protocolService.createVersionedRootKeyParams(response);
 
                 return {
                   keyParams: keyParams
@@ -19756,7 +19868,9 @@ function (_PureService) {
               return _context4.abrupt("return", null);
 
             case 5:
-              return _context4.abrupt("return", new _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].FromRaw(rawKey));
+              return _context4.abrupt("return", _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].Create({
+                content: rawKey
+              }));
 
             case 6:
             case "end":
@@ -19856,7 +19970,7 @@ function (_PureService) {
               return _context7.abrupt("return", null);
 
             case 5:
-              return _context7.abrupt("return", this.protocolService.createVersionedKeyParams(rawKeyParams));
+              return _context7.abrupt("return", this.protocolService.createVersionedRootKeyParams(rawKeyParams));
 
             case 6:
             case "end":
@@ -20065,9 +20179,16 @@ function (_PureService) {
               throw 'Unable to decrypt root key with provided wrapping key.';
 
             case 17:
-              this.rootKey = new _Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"](decrypted);
+              _context12.next = 19;
+              return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_3__["SNRootKey"].Create({
+                uuid: decrypted.uuid,
+                content: decrypted.content
+              }));
 
-            case 18:
+            case 19:
+              this.rootKey = _context12.sent;
+
+            case 20:
             case "end":
               return _context12.stop();
           }
@@ -23489,9 +23610,17 @@ function (_PureService) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNProtocolService).call(this));
     _this.operators = [];
     _this.modelManager = modelManager;
+    _this.crypto = crypto;
 
-    _this.loadCryptoInstance(crypto);
+    if (!_this.crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_16__["isWebEnvironment"])() && Object(sncrypto__WEBPACK_IMPORTED_MODULE_1__["isWebCryptoAvailable"])()) {
+      /** IE and Edge do not support pbkdf2 in WebCrypto. */
+      _this.crypto = new sncrypto__WEBPACK_IMPORTED_MODULE_1__["SNWebCrypto"]();
+    }
 
+    _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SFItem"].SetUuidGenerators({
+      syncImpl: _this.crypto.generateUUIDSync,
+      asyncImpl: _this.crypto.generateUUIDSync
+    });
     return _this;
   }
   /**
@@ -23526,25 +23655,6 @@ function (_PureService) {
             }
           }
         });
-      });
-    }
-  }, {
-    key: "loadCryptoInstance",
-    value: function loadCryptoInstance(crypto) {
-      if (!crypto && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_16__["isWebEnvironment"])()) {
-        // IE and Edge do not support pbkdf2 in WebCrypto.
-        if (Object(sncrypto__WEBPACK_IMPORTED_MODULE_1__["isWebCryptoAvailable"])()) {
-          this.crypto = new sncrypto__WEBPACK_IMPORTED_MODULE_1__["SNWebCrypto"]();
-        } else {
-          console.error("WebCrypto is not available.");
-        }
-      } else {
-        this.crypto = crypto;
-      }
-
-      _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SFItem"].SetUuidGenerators({
-        syncImpl: this.crypto.generateUUIDSync,
-        asyncImpl: this.crypto.generateUUIDSync
       });
     }
   }, {
@@ -24244,8 +24354,8 @@ function (_PureService) {
       });
     }
   }, {
-    key: "createVersionedKeyParams",
-    value: function createVersionedKeyParams(keyParams) {
+    key: "createVersionedRootKeyParams",
+    value: function createVersionedRootKeyParams(keyParams) {
       // 002 doesn't have version automatically, newer versions do.
       var version = keyParams.version || _Protocol_versions__WEBPACK_IMPORTED_MODULE_14__["PROTOCOL_VERSION_002"];
 
@@ -24881,7 +24991,7 @@ function (_PureService) {
               }
 
               _context2.next = 4;
-              return regeneratorRuntime.awrap(this.clearPersistenceValue());
+              return regeneratorRuntime.awrap(this.deviceInterface.removeAllRawStorageValues());
 
             case 4:
               _context2.next = 6;
@@ -24951,27 +25061,6 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * Platforms must override this to clear any persisted value on disk.
-     */
-
-  }, {
-    key: "clearPersistenceValue",
-    value: function clearPersistenceValue() {
-      return regeneratorRuntime.async(function clearPersistenceValue$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              _context6.next = 2;
-              return regeneratorRuntime.awrap(this.deviceInterface.removeRawStorageValue(this.getPersistenceKey()));
-
-            case 2:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
      * @protected
      * Called by platforms with the value they load from disk,
      * after they handle initializeFromDisk
@@ -24980,9 +25069,9 @@ function (_PureService) {
   }, {
     key: "setInitialValues",
     value: function setInitialValues(values) {
-      return regeneratorRuntime.async(function setInitialValues$(_context7) {
+      return regeneratorRuntime.async(function setInitialValues$(_context6) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               if (!values) {
                 values = this.defaultValuesObject();
@@ -24992,7 +25081,7 @@ function (_PureService) {
 
             case 2:
             case "end":
-              return _context7.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -25011,12 +25100,12 @@ function (_PureService) {
     key: "canDecryptWithKey",
     value: function canDecryptWithKey(key) {
       var wrappedValue, decryptedPayload;
-      return regeneratorRuntime.async(function canDecryptWithKey$(_context8) {
+      return regeneratorRuntime.async(function canDecryptWithKey$(_context7) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
               wrappedValue = this.values[STORAGE_VALUES_KEY_WRAPPED];
-              _context8.next = 3;
+              _context7.next = 3;
               return regeneratorRuntime.awrap(this.decryptWrappedValue({
                 wrappedValue: wrappedValue,
                 key: key,
@@ -25024,12 +25113,12 @@ function (_PureService) {
               }));
 
             case 3:
-              decryptedPayload = _context8.sent;
-              return _context8.abrupt("return", !decryptedPayload.errorDecrypting);
+              decryptedPayload = _context7.sent;
+              return _context7.abrupt("return", !decryptedPayload.errorDecrypting);
 
             case 5:
             case "end":
-              return _context8.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -25039,15 +25128,15 @@ function (_PureService) {
   }, {
     key: "decryptWrappedValue",
     value: function decryptWrappedValue(_ref2) {
-      var wrappedValue, key, throws, payload, decryptedPayload;
-      return regeneratorRuntime.async(function decryptWrappedValue$(_context9) {
+      var wrappedValue, key, payload, decryptedPayload;
+      return regeneratorRuntime.async(function decryptWrappedValue$(_context8) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
-              wrappedValue = _ref2.wrappedValue, key = _ref2.key, throws = _ref2.throws;
+              wrappedValue = _ref2.wrappedValue, key = _ref2.key;
 
               if (wrappedValue.content_type) {
-                _context9.next = 3;
+                _context8.next = 3;
                 break;
               }
 
@@ -25060,19 +25149,19 @@ function (_PureService) {
                   content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_ENCRYPTED_STORAGE"]
                 }
               });
-              _context9.next = 6;
+              _context8.next = 6;
               return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload,
                 key: key
               }));
 
             case 6:
-              decryptedPayload = _context9.sent;
-              return _context9.abrupt("return", decryptedPayload);
+              decryptedPayload = _context8.sent;
+              return _context8.abrupt("return", decryptedPayload);
 
             case 8:
             case "end":
-              return _context9.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -25083,23 +25172,21 @@ function (_PureService) {
     key: "decryptStorage",
     value: function decryptStorage() {
       var wrappedValue, decryptedPayload;
-      return regeneratorRuntime.async(function decryptStorage$(_context10) {
+      return regeneratorRuntime.async(function decryptStorage$(_context9) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               wrappedValue = this.values[STORAGE_VALUES_KEY_WRAPPED];
-              _context10.next = 3;
+              _context9.next = 3;
               return regeneratorRuntime.awrap(this.decryptWrappedValue({
-                wrappedValue: wrappedValue,
-                key: null,
-                throws: true
+                wrappedValue: wrappedValue
               }));
 
             case 3:
-              decryptedPayload = _context10.sent;
+              decryptedPayload = _context9.sent;
 
               if (!decryptedPayload.errorDecrypting) {
-                _context10.next = 6;
+                _context9.next = 6;
                 break;
               }
 
@@ -25111,7 +25198,7 @@ function (_PureService) {
 
             case 8:
             case "end":
-              return _context10.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -25125,43 +25212,43 @@ function (_PureService) {
     key: "generatePersistenceValue",
     value: function generatePersistenceValue() {
       var rawContent, valuesToWrap, payload, encryptedPayload;
-      return regeneratorRuntime.async(function generatePersistenceValue$(_context11) {
+      return regeneratorRuntime.async(function generatePersistenceValue$(_context10) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               rawContent = Object.assign({}, this.values);
               valuesToWrap = rawContent[STORAGE_VALUES_KEY_UNWRAPPED];
-              _context11.t0 = CreateMaxPayloadFromAnyObject;
-              _context11.next = 5;
+              _context10.t0 = CreateMaxPayloadFromAnyObject;
+              _context10.next = 5;
               return regeneratorRuntime.awrap(SFItem.GenerateUuid());
 
             case 5:
-              _context11.t1 = _context11.sent;
-              _context11.t2 = valuesToWrap;
-              _context11.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
-              _context11.t4 = {
-                uuid: _context11.t1,
-                content: _context11.t2,
-                content_type: _context11.t3
+              _context10.t1 = _context10.sent;
+              _context10.t2 = valuesToWrap;
+              _context10.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["CONTENT_TYPE_ENCRYPTED_STORAGE"];
+              _context10.t4 = {
+                uuid: _context10.t1,
+                content: _context10.t2,
+                content_type: _context10.t3
               };
-              _context11.t5 = {
-                object: _context11.t4
+              _context10.t5 = {
+                object: _context10.t4
               };
-              payload = (0, _context11.t0)(_context11.t5);
-              _context11.next = 13;
+              payload = (0, _context10.t0)(_context10.t5);
+              _context10.next = 13;
               return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 intent: _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"]
               }));
 
             case 13:
-              encryptedPayload = _context11.sent;
+              encryptedPayload = _context10.sent;
               rawContent[STORAGE_VALUES_KEY_WRAPPED] = encryptedPayload;
-              return _context11.abrupt("return", rawContent);
+              return _context10.abrupt("return", rawContent);
 
             case 16:
             case "end":
-              return _context11.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -25170,36 +25257,36 @@ function (_PureService) {
     key: "repersistToDisk",
     value: function repersistToDisk() {
       var value;
-      return regeneratorRuntime.async(function repersistToDisk$(_context12) {
+      return regeneratorRuntime.async(function repersistToDisk$(_context11) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               if (this.storagePersistable) {
-                _context12.next = 2;
+                _context11.next = 2;
                 break;
               }
 
-              return _context12.abrupt("return");
+              return _context11.abrupt("return");
 
             case 2:
               if (!(this.persistencePolicy === STORAGE_PERSISTENCE_POLICY_EPHEMERAL)) {
-                _context12.next = 4;
+                _context11.next = 4;
                 break;
               }
 
-              return _context12.abrupt("return");
+              return _context11.abrupt("return");
 
             case 4:
-              _context12.next = 6;
+              _context11.next = 6;
               return regeneratorRuntime.awrap(this.generatePersistenceValue());
 
             case 6:
-              value = _context12.sent;
-              return _context12.abrupt("return", this.persistAsValueToDisk(value));
+              value = _context11.sent;
+              return _context11.abrupt("return", this.persistAsValueToDisk(value));
 
             case 8:
             case "end":
-              return _context12.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -25208,15 +25295,15 @@ function (_PureService) {
     key: "setValue",
     value: function setValue(key, value) {
       var mode,
-          _args13 = arguments;
-      return regeneratorRuntime.async(function setValue$(_context13) {
+          _args12 = arguments;
+      return regeneratorRuntime.async(function setValue$(_context12) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
-              mode = _args13.length > 2 && _args13[2] !== undefined ? _args13[2] : STORAGE_VALUE_MODE_DEFAULT;
+              mode = _args12.length > 2 && _args12[2] !== undefined ? _args12[2] : STORAGE_VALUE_MODE_DEFAULT;
 
               if (this.values) {
-                _context13.next = 3;
+                _context12.next = 3;
                 break;
               }
 
@@ -25224,11 +25311,11 @@ function (_PureService) {
 
             case 3:
               this.values[this.domainKeyForMode(mode)][key] = value;
-              return _context13.abrupt("return", this.repersistToDisk());
+              return _context12.abrupt("return", this.repersistToDisk());
 
             case 5:
             case "end":
-              return _context13.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -25237,8 +25324,36 @@ function (_PureService) {
     key: "getValue",
     value: function getValue(key) {
       var mode,
+          _args13 = arguments;
+      return regeneratorRuntime.async(function getValue$(_context13) {
+        while (1) {
+          switch (_context13.prev = _context13.next) {
+            case 0:
+              mode = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : STORAGE_VALUE_MODE_DEFAULT;
+
+              if (this.values) {
+                _context13.next = 3;
+                break;
+              }
+
+              throw 'Attempting to access storage value before loading local storage.';
+
+            case 3:
+              return _context13.abrupt("return", this.values[this.domainKeyForMode(mode)][key]);
+
+            case 4:
+            case "end":
+              return _context13.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "removeValue",
+    value: function removeValue(key) {
+      var mode,
           _args14 = arguments;
-      return regeneratorRuntime.async(function getValue$(_context14) {
+      return regeneratorRuntime.async(function removeValue$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
@@ -25252,40 +25367,12 @@ function (_PureService) {
               throw 'Attempting to access storage value before loading local storage.';
 
             case 3:
-              return _context14.abrupt("return", this.values[this.domainKeyForMode(mode)][key]);
-
-            case 4:
-            case "end":
-              return _context14.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "removeValue",
-    value: function removeValue(key) {
-      var mode,
-          _args15 = arguments;
-      return regeneratorRuntime.async(function removeValue$(_context15) {
-        while (1) {
-          switch (_context15.prev = _context15.next) {
-            case 0:
-              mode = _args15.length > 1 && _args15[1] !== undefined ? _args15[1] : STORAGE_VALUE_MODE_DEFAULT;
-
-              if (this.values) {
-                _context15.next = 3;
-                break;
-              }
-
-              throw 'Attempting to access storage value before loading local storage.';
-
-            case 3:
               delete this.values[this.domainKeyForMode(mode)][key];
-              return _context15.abrupt("return", this.repersistToDisk());
+              return _context14.abrupt("return", this.repersistToDisk());
 
             case 5:
             case "end":
-              return _context15.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -25327,17 +25414,17 @@ function (_PureService) {
   }, {
     key: "clear",
     value: function clear() {
-      return regeneratorRuntime.async(function clear$(_context16) {
+      return regeneratorRuntime.async(function clear$(_context15) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               this.values = this.defaultValuesObject();
-              _context16.next = 3;
+              _context15.next = 3;
               return regeneratorRuntime.awrap(this.repersistToDisk());
 
             case 3:
             case "end":
-              return _context16.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -25349,11 +25436,27 @@ function (_PureService) {
   }, {
     key: "getAllRawPayloads",
     value: function getAllRawPayloads() {
-      return regeneratorRuntime.async(function getAllRawPayloads$(_context17) {
+      return regeneratorRuntime.async(function getAllRawPayloads$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              return _context16.abrupt("return", this.deviceInterface.getAllRawDatabasePayloads());
+
+            case 1:
+            case "end":
+              return _context16.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "savePayload",
+    value: function savePayload(payload) {
+      return regeneratorRuntime.async(function savePayload$(_context17) {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
-              return _context17.abrupt("return", this.deviceInterface.getAllRawDatabasePayloads());
+              return _context17.abrupt("return", this.savePayloads([payload]));
 
             case 1:
             case "end":
@@ -25363,129 +25466,113 @@ function (_PureService) {
       }, null, this);
     }
   }, {
-    key: "savePayload",
-    value: function savePayload(payload) {
-      return regeneratorRuntime.async(function savePayload$(_context18) {
-        while (1) {
-          switch (_context18.prev = _context18.next) {
-            case 0:
-              return _context18.abrupt("return", this.savePayloads([payload]));
-
-            case 1:
-            case "end":
-              return _context18.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
     key: "savePayloads",
     value: function savePayloads(decryptedPayloads) {
       var deleted, nondeleted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, encrypted;
 
-      return regeneratorRuntime.async(function savePayloads$(_context19) {
+      return regeneratorRuntime.async(function savePayloads$(_context18) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
               if (!(this.persistencePolicy === STORAGE_PERSISTENCE_POLICY_EPHEMERAL)) {
-                _context19.next = 2;
+                _context18.next = 2;
                 break;
               }
 
-              return _context19.abrupt("return");
+              return _context18.abrupt("return");
 
             case 2:
               deleted = [], nondeleted = [];
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context19.prev = 6;
+              _context18.prev = 6;
               _iterator = decryptedPayloads[Symbol.iterator]();
 
             case 8:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context19.next = 21;
+                _context18.next = 21;
                 break;
               }
 
               payload = _step.value;
 
               if (!payload.discardable) {
-                _context19.next = 14;
+                _context18.next = 14;
                 break;
               }
 
               /** If the payload is deleted and not dirty, remove it from db. */
               deleted.push(payload);
-              _context19.next = 18;
+              _context18.next = 18;
               break;
 
             case 14:
-              _context19.next = 16;
+              _context18.next = 16;
               return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 intent: this.encryptionPolicy === STORAGE_ENCRYPTION_POLICY_DEFAULT ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_PREFER_ENCRYPTED"] : _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["ENCRYPTION_INTENT_LOCAL_STORAGE_DECRYPTED"]
               }));
 
             case 16:
-              encrypted = _context19.sent;
+              encrypted = _context18.sent;
               nondeleted.push(encrypted);
 
             case 18:
               _iteratorNormalCompletion = true;
-              _context19.next = 8;
+              _context18.next = 8;
               break;
 
             case 21:
-              _context19.next = 27;
+              _context18.next = 27;
               break;
 
             case 23:
-              _context19.prev = 23;
-              _context19.t0 = _context19["catch"](6);
+              _context18.prev = 23;
+              _context18.t0 = _context18["catch"](6);
               _didIteratorError = true;
-              _iteratorError = _context19.t0;
+              _iteratorError = _context18.t0;
 
             case 27:
-              _context19.prev = 27;
-              _context19.prev = 28;
+              _context18.prev = 27;
+              _context18.prev = 28;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
             case 30:
-              _context19.prev = 30;
+              _context18.prev = 30;
 
               if (!_didIteratorError) {
-                _context19.next = 33;
+                _context18.next = 33;
                 break;
               }
 
               throw _iteratorError;
 
             case 33:
-              return _context19.finish(30);
+              return _context18.finish(30);
 
             case 34:
-              return _context19.finish(27);
+              return _context18.finish(27);
 
             case 35:
               if (!(deleted.length > 0)) {
-                _context19.next = 38;
+                _context18.next = 38;
                 break;
               }
 
-              _context19.next = 38;
+              _context18.next = 38;
               return regeneratorRuntime.awrap(this.deletePayloads(deleted));
 
             case 38:
-              _context19.next = 40;
+              _context18.next = 40;
               return regeneratorRuntime.awrap(this.deviceInterface.saveRawDatabasePayloads(nondeleted));
 
             case 40:
             case "end":
-              return _context19.stop();
+              return _context18.stop();
           }
         }
       }, null, this, [[6, 23, 27, 35], [28,, 30, 34]]);
@@ -25495,68 +25582,68 @@ function (_PureService) {
     value: function deletePayloads(payloads) {
       var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, payload;
 
-      return regeneratorRuntime.async(function deletePayloads$(_context20) {
+      return regeneratorRuntime.async(function deletePayloads$(_context19) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context20.prev = 3;
+              _context19.prev = 3;
               _iterator2 = payloads[Symbol.iterator]();
 
             case 5:
               if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context20.next = 12;
+                _context19.next = 12;
                 break;
               }
 
               payload = _step2.value;
-              _context20.next = 9;
+              _context19.next = 9;
               return regeneratorRuntime.awrap(this.deletePayloadWithId(payload.uuid));
 
             case 9:
               _iteratorNormalCompletion2 = true;
-              _context20.next = 5;
+              _context19.next = 5;
               break;
 
             case 12:
-              _context20.next = 18;
+              _context19.next = 18;
               break;
 
             case 14:
-              _context20.prev = 14;
-              _context20.t0 = _context20["catch"](3);
+              _context19.prev = 14;
+              _context19.t0 = _context19["catch"](3);
               _didIteratorError2 = true;
-              _iteratorError2 = _context20.t0;
+              _iteratorError2 = _context19.t0;
 
             case 18:
-              _context20.prev = 18;
-              _context20.prev = 19;
+              _context19.prev = 18;
+              _context19.prev = 19;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
             case 21:
-              _context20.prev = 21;
+              _context19.prev = 21;
 
               if (!_didIteratorError2) {
-                _context20.next = 24;
+                _context19.next = 24;
                 break;
               }
 
               throw _iteratorError2;
 
             case 24:
-              return _context20.finish(21);
+              return _context19.finish(21);
 
             case 25:
-              return _context20.finish(18);
+              return _context19.finish(18);
 
             case 26:
             case "end":
-              return _context20.stop();
+              return _context19.stop();
           }
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -25564,15 +25651,15 @@ function (_PureService) {
   }, {
     key: "deletePayloadWithId",
     value: function deletePayloadWithId(id) {
-      return regeneratorRuntime.async(function deletePayloadWithId$(_context21) {
+      return regeneratorRuntime.async(function deletePayloadWithId$(_context20) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
-              return _context21.abrupt("return", this.deviceInterface.removeRawDatabasePayloadWithId(id));
+              return _context20.abrupt("return", this.deviceInterface.removeRawDatabasePayloadWithId(id));
 
             case 1:
             case "end":
-              return _context21.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -25580,15 +25667,15 @@ function (_PureService) {
   }, {
     key: "clearAllPayloads",
     value: function clearAllPayloads() {
-      return regeneratorRuntime.async(function clearAllPayloads$(_context22) {
+      return regeneratorRuntime.async(function clearAllPayloads$(_context21) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
-              return _context22.abrupt("return", this.deviceInterface.removeAllRawDatabasePayloads());
+              return _context21.abrupt("return", this.deviceInterface.removeAllRawDatabasePayloads());
 
             case 1:
             case "end":
-              return _context22.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -25600,15 +25687,15 @@ function (_PureService) {
   }, {
     key: "clearAllData",
     value: function clearAllData() {
-      return regeneratorRuntime.async(function clearAllData$(_context23) {
+      return regeneratorRuntime.async(function clearAllData$(_context22) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
-              return _context23.abrupt("return", Promise.all([this.clear(), this.clearAllPayloads()]));
+              return _context22.abrupt("return", Promise.all([this.clear(), this.clearAllPayloads()]));
 
             case 1:
             case "end":
-              return _context23.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -26426,6 +26513,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -27035,13 +27128,14 @@ function (_PureService) {
     }
   }, {
     key: "timingStrategyForceSpawnNew",
-    value: function timingStrategyForceSpawnNew() {
+    value: function timingStrategyForceSpawnNew(options) {
       var _this6 = this;
 
       return new Promise(function (resolve, reject) {
         _this6.spawnQueue.push({
           resolve: resolve,
-          reject: reject
+          reject: reject,
+          options: options
         });
       });
     }
@@ -27060,9 +27154,9 @@ function (_PureService) {
       var promise = this.spawnQueue[0];
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromIndex"])(this.spawnQueue, 0);
       this.log('Syncing again from spawn queue');
-      return this.sync({
+      return this.sync(_objectSpread({
         timingStrategy: TIMING_STRATEGY_FORCE_SPAWN_NEW
-      }).then(function () {
+      }, promise.options)).then(function () {
         promise.resolve();
       }).catch(function () {
         promise.reject();
@@ -27185,7 +27279,9 @@ function (_PureService) {
                 break;
               }
 
-              return _context12.abrupt("return", this.timingStrategyForceSpawnNew());
+              return _context12.abrupt("return", this.timingStrategyForceSpawnNew({
+                checkIntegrity: checkIntegrity
+              }));
 
             case 29:
               throw "Unhandled timing strategy ".concat(strategy);
@@ -27810,7 +27906,7 @@ function (_PureService) {
 
             case 77:
               if (!response.checkIntegrity) {
-                _context20.next = 84;
+                _context20.next = 86;
                 break;
               }
 
@@ -27827,10 +27923,20 @@ function (_PureService) {
 
             case 83:
               if (this.state.needsSync && operation.done) {
-                this.sync();
+                this.sync({
+                  checkIntegrity: true,
+                  timingStrategy: TIMING_STRATEGY_FORCE_SPAWN_NEW
+                });
               }
 
-            case 84:
+              _context20.next = 88;
+              break;
+
+            case 86:
+              _context20.next = 88;
+              return regeneratorRuntime.awrap(this.state.clearIntegrityHashes());
+
+            case 88:
             case "end":
               return _context20.stop();
           }
@@ -27994,19 +28100,20 @@ function (_PureService) {
   }, {
     key: "resolveOutOfSync",
     value: function resolveOutOfSync() {
-      var payloads, delta, collection;
+      var downloader, payloads, delta, collection;
       return regeneratorRuntime.async(function resolveOutOfSync$(_context26) {
         while (1) {
           switch (_context26.prev = _context26.next) {
             case 0:
-              _context26.next = 2;
-              return regeneratorRuntime.awrap(_Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"].downloadAllPayloads({
+              downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_5__["AccountDownloader"]({
                 apiService: this.apiService,
                 protocolService: this.protocolService,
-                customEvent: "resolve-out-of-sync"
-              }));
+                customEvent: 'resolve-out-of-sync'
+              });
+              _context26.next = 3;
+              return regeneratorRuntime.awrap(downloader.run());
 
-            case 2:
+            case 3:
               payloads = _context26.sent;
               delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_12__["DeltaOutOfSync"]({
                 baseCollection: this.modelManager.getMasterCollection(),
@@ -28015,28 +28122,28 @@ function (_PureService) {
                   source: PAYLOAD_SOURCE_REMOTE_RETRIEVED
                 })
               });
-              _context26.next = 6;
+              _context26.next = 7;
               return regeneratorRuntime.awrap(delta.resultingCollection());
 
-            case 6:
+            case 7:
               collection = _context26.sent;
-              _context26.next = 9;
+              _context26.next = 10;
               return regeneratorRuntime.awrap(this.modelManager.mapCollectionToLocalItems({
                 collection: collection
               }));
 
-            case 9:
-              _context26.next = 11;
+            case 10:
+              _context26.next = 12;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 decryptedPayloads: collection.payloads
               }));
 
-            case 11:
+            case 12:
               return _context26.abrupt("return", this.sync({
                 checkIntegrity: true
               }));
 
-            case 12:
+            case 13:
             case "end":
               return _context26.stop();
           }
@@ -28280,7 +28387,7 @@ function () {
 
     _classCallCheck(this, SyncState);
 
-    this.syncDiscordance = 0;
+    this.discordance = 0;
     this.receiver = receiver;
     this.maxDiscordance = maxDiscordance;
     this.reset();
@@ -28307,6 +28414,17 @@ function () {
       this.outOfSync = false;
     }
   }, {
+    key: "getLastClientIntegrityHash",
+    value: function getLastClientIntegrityHash() {
+      return this.lastClientHash;
+    }
+  }, {
+    key: "clearIntegrityHashes",
+    value: function clearIntegrityHashes() {
+      this.lastClientHash = null;
+      this.lastServerHash = null;
+    }
+  }, {
     key: "setIntegrityHashes",
     value: function setIntegrityHashes(_ref2) {
       var clientHash, serverHash, isInSync;
@@ -28315,6 +28433,8 @@ function () {
           switch (_context.prev = _context.next) {
             case 0:
               clientHash = _ref2.clientHash, serverHash = _ref2.serverHash;
+              this.lastClientHash = clientHash;
+              this.lastServerHash = serverHash;
               isInSync = !serverHash || serverHash.length === 0 || !clientHash || clientHash === serverHash;
 
               if (isInSync) {
@@ -28323,17 +28443,17 @@ function () {
                   this.receiver(_Services_events__WEBPACK_IMPORTED_MODULE_0__["SYNC_EVENT_EXIT_OUT_OF_SYNC"]);
                 }
 
-                this.syncDiscordance = 0;
+                this.discordance = 0;
               } else {
-                this.syncDiscordance++;
+                this.discordance++;
 
-                if (this.syncDiscordance >= this.maxDiscordance && !this.outOfSync) {
+                if (this.discordance >= this.maxDiscordance && !this.outOfSync) {
                   this.outOfSync = true;
                   this.receiver(_Services_events__WEBPACK_IMPORTED_MODULE_0__["SYNC_EVENT_ENTER_OUT_OF_SYNC"]);
                 }
               }
 
-            case 3:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -28351,14 +28471,9 @@ function () {
       return this._lastSyncDate;
     }
   }, {
-    key: "currentSyncDiscordance",
-    get: function get() {
-      return this.syncDiscordance;
-    }
-  }, {
     key: "needsSync",
     get: function get() {
-      return this.currentSyncDiscordance > 0 && this.currentSyncDiscordance < this.maxDiscordance;
+      return this.discordance > 0 && this.discordance < this.maxDiscordance;
     }
   }]);
 

@@ -68,7 +68,6 @@ describe('device authentication', () => {
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     let numPasscodeAttempts = 0;
     const handleChallenges = async (challenges) => {
       const responses = [];
@@ -92,6 +91,7 @@ describe('device authentication', () => {
         authChallengeResponses: handleChallenges
       }
     });
+    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     expect((await tmpApplication.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
     await tmpApplication.launch();
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
@@ -118,8 +118,6 @@ describe('device authentication', () => {
       await application.deviceAuthService.hasPasscodeEnabled()
     ).to.equal(true);
     await application.deinit();
-
-    console.warn('Creating tmpApplication');
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);

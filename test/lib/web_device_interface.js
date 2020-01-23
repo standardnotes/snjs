@@ -23,6 +23,11 @@ export default class WebDeviceInterface extends DeviceInterface {
     localStorage.removeItem(key);
   }
 
+  async removeAllRawStorageValues() {
+    localStorage.clear();
+  }
+
+
   /** @database */
 
   _getDatabaseKeyPrefix() {

@@ -414,7 +414,7 @@ describe('online syncing', () => {
     this.expectedItemCount--;
     await this.application.syncManager.sync(syncOptions);
     expect(note.dirty).to.equal(false);
-    expect(this.application.syncManager.state.currentSyncDiscordance).to.equal(0);
+    expect(this.application.syncManager.state.discordance).to.equal(0);
 
     // We expect that this item is now gone for good, and no duplicate has been created.
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);

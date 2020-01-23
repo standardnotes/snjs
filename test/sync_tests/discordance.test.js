@@ -1,163 +1,167 @@
-import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
+import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('sync discordance', () => {
-  var email = SFItem.GenerateUuidSynchronously();
-  var password = SFItem.GenerateUuidSynchronously();
-  var totalItemCount = 0;
+  const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  let localStorageManager = Factory.createMemoryStorageManager();
-  let localSessionManager = new SNSessionManager({
-    storageManager: localStorageManager,
-    httpManager: Factory.globalHttpManager(),
-    keyManager: Factory.globalKeyManager(),
-    protocolService: Factory.globalProtocolService()
-  });
-  let localHttpManager = new SNHttpManager();
-  let localModelManager = Factory.createModelManager();
-  const localSyncManager = new SNSyncManager({
-    modelManager: localModelManager,
-    sessionManager: Factory.globalSessionManager(),
-    storageManager: localStorageManager,
-    protocolService: Factory.globalProtocolService(),
-    httpManager: localHttpManager
-  });
+  const syncOptions = {
+    checkIntegrity: true
+  }
 
-  before((done) => {
-    localStorageManager.clearAllData().then(() => {
-      Factory.registerUserToApplication({email, password, application}).then((user) => {
-        done();
-      })
-    })
+  before(async function() {
+    localStorage.clear();
   })
 
-  beforeEach(async () => {
-    await localSyncManager.loadDataFromDatabase();
-  });
+  after(async function() {
+    localStorage.clear();
+  })
 
-  let itemCount = 0;
+  beforeEach(async function() {
+    this.expectedItemCount = BASE_ITEM_COUNT;
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = SFItem.GenerateUuidSynchronously();
+    this.password = SFItem.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+  })
 
-  it("should begin discordance upon instructions", async () => {
-    let response = await localSyncManager.sync({checkIntegrity: false});
-    expect(response.integrity_hash).to.not.be.ok;
+  afterEach(async function() {
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+  })
 
-    response = await localSyncManager.sync({checkIntegrity: true});
-    expect(response.integrity_hash).to.not.be.null;
+  it("should begin discordance upon instructions", async function () {
+    await this.application.syncManager.sync({checkIntegrity: false});
+    expect(this.application.syncManager.state.getLastClientIntegrityHash()).to.not.be.ok;
+
+    await this.application.syncManager.sync({checkIntegrity: true});
+    expect(this.application.syncManager.state.getLastClientIntegrityHash()).to.not.be.null;
 
     // integrity should be valid
-    expect(localSyncManager.syncDiscordance).to.equal(0);
+    expect(this.application.syncManager.state.discordance).to.equal(0);
 
     // sync should no longer request integrity hash from server
-    response = await localSyncManager.sync({checkIntegrity: false});
-    expect(response.integrity_hash).to.not.be.ok;
+    await this.application.syncManager.sync({checkIntegrity: false});
+    expect(this.application.syncManager.state.getLastClientIntegrityHash()).to.not.be.ok;
 
     // we expect another integrity check here
-    response = await localSyncManager.sync({checkIntegrity: true});
-    expect(response.integrity_hash).to.not.be.null;
+    await this.application.syncManager.sync({checkIntegrity: true});
+    expect(this.application.syncManager.state.getLastClientIntegrityHash()).to.not.be.null;
 
     // integrity should be valid
-    expect(localSyncManager.syncDiscordance).to.equal(0);
+    expect(this.application.syncManager.state.discordance).to.equal(0);
   }).timeout(10000);
 
-  it("should increase discordance as client server mismatches", async () => {
-    let response = await localSyncManager.sync();
+  it("should increase discordance as client server mismatches", async function () {
+    await this.application.syncManager.sync();
 
-    var item = Factory.createNotePayload();
-    await localModelManager.setItemDirty(item, true);
-    localModelManager.addItem(item);
-    itemCount++;
+    const payload = Factory.createNotePayload();
+    const item = await this.application.modelManager.mapPayloadToLocalItem({payload: payload});
+    this.expectedItemCount++;
 
-    await localSyncManager.sync({checkIntegrity: true});
+    await this.application.syncManager.sync({checkIntegrity: true});
 
     // Expect no discordance
-    expect(localSyncManager.syncDiscordance).to.equal(0);
+    expect(this.application.syncManager.state.discordance).to.equal(0);
 
     // Delete item locally only without notifying server. We should then be in discordance.
-    await localModelManager.removeItemLocally(item);
+    await this.application.modelManager.removeItemLocally(item);
 
     // wait for integrity check interval
-    await localSyncManager.sync({checkIntegrity: true});
+    await this.application.syncManager.sync({checkIntegrity: true});
 
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
 
     // We expect now to be in discordance. What the client has is different from what the server has
     // The above sync will not resolve until it syncs enough time to meet discordance threshold
-    expect(localSyncManager.syncDiscordance).to.equal(localSyncManager.MaxDiscordanceBeforeOutOfSync);
+    expect(this.application.syncManager.state.discordance).to.equal(
+      this.application.syncManager.maxDiscordance
+    );
 
-    // We now expect out of sync to be true, since we have reached MaxDiscordanceBeforeOutOfSync
-    expect(localSyncManager.isOutOfSync()).to.equal(true);
+    // We now expect out of sync to be true, since we have reached maxDiscordance
+    expect(this.application.syncManager.isOutOfSync()).to.equal(true);
 
     // Integrity checking should now be disabled until the next interval
-    response = await localSyncManager.sync();
-    expect(response.integrity_hash).to.not.be.ok;
+    await this.application.syncManager.sync();
+    expect(this.application.syncManager.state.getLastClientIntegrityHash()).to.not.be.ok;
 
     // We should still be in discordance and out of sync at this point
-    expect(localSyncManager.syncDiscordance).to.equal(localSyncManager.MaxDiscordanceBeforeOutOfSync);
-    expect(localSyncManager.isOutOfSync()).to.equal(true);
+    expect(this.application.syncManager.state.discordance).to.equal(
+      this.application.syncManager.maxDiscordance
+    );
+    expect(this.application.syncManager.isOutOfSync()).to.equal(true);
 
     // We will now reinstate the item and sync, which should repair everything
-    localModelManager.addItem(item);
-    await localModelManager.setItemDirty(item, true);
-    await localSyncManager.sync({checkIntegrity: true});
+    await this.application.modelManager.setItemDirty(item, true);
+    await this.application.syncManager.sync({checkIntegrity: true});
 
-    expect(localSyncManager.isOutOfSync()).to.equal(false);
-    expect(localSyncManager.syncDiscordance).to.equal(0);
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.syncManager.state.discordance).to.equal(0);
   }).timeout(10000);
 
-  it("should perform sync resolution in which differing items are duplicated instead of merged", async () => {
-    var item = Factory.createNotePayload();
-    localModelManager.addItem(item);
-    await localModelManager.setItemDirty(item, true);
-    itemCount++;
+  it("should perform sync resolution in which differing items are duplicated instead of merged", async function () {
+    const payload = Factory.createNotePayload();
+    const item = await this.application.modelManager.mapPayloadToLocalItem({payload});
+    this.expectedItemCount++;
 
-    // localSyncManager.loggingEnabled = true;
+    // this.application.syncManager.loggingEnabled = true;
 
-    await localSyncManager.sync();
+    await this.application.syncManager.sync();
 
     // Delete item locally only without notifying server. We should then be in discordance.
-    // Don't use localModelManager.removeItemLocally(item), as it saves some state about itemsPendingDeletion. Use internal API
+    // Don't use this.application.modelManager.removeItemLocally(item), as it saves some state about itemsPendingDeletion. Use internal API
 
-    localModelManager.items = localModelManager.items.filter((candidate) => candidate.uuid != item.uuid);
-    delete localModelManager.itemsHash[item.uuid]
+    this.application.modelManager.items = this.application.modelManager.items.filter((candidate) => {
+      return candidate.uuid !== item.uuid;
+    });
 
-    await localSyncManager.sync({checkIntegrity: true});
+    await this.application.modelManager.removeItemLocally(item);
+    this.expectedItemCount--;
+
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+
+    await this.application.syncManager.sync({checkIntegrity: true});
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
-    expect(localSyncManager.isOutOfSync()).to.equal(true);
+    expect(this.application.syncManager.isOutOfSync()).to.equal(true);
 
     // lets resolve sync where content does not differ
-    await localSyncManager.resolveOutOfSync();
-    expect(localSyncManager.isOutOfSync()).to.equal(false);
+    await this.application.syncManager.resolveOutOfSync();
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    this.expectedItemCount++;
 
     // expect a clean merge
-    expect(localModelManager.allItems.length).to.equal(itemCount);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    // lets enter back into out of sync
-    item = localModelManager.allItems[0];
     // now lets change the local content without syncing it.
-    item.text = "discordance";
-    // typically this is done by setDirty, but because we don't want to sync it, we'll apply this directly.
-    item.collapseContent();
+    const aNote = this.application.modelManager.notes[0];
+    aNote.text = "discordance";
+    await this.application.modelManager.setItemDirty(aNote);
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)
-    // we expect that the remote content coming in doesn't wipe out our pending change. A conflict should be created
-    await localSyncManager.resolveOutOfSync();
-    expect(localSyncManager.isOutOfSync()).to.equal(false);
-    expect(localModelManager.allItems.length).to.equal(itemCount + 1);
+    // we expect that the remote content coming in doesn't wipe our pending change. A conflict should be created
+    await this.application.syncManager.resolveOutOfSync();
+    this.expectedItemCount++;
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    for(let item of localModelManager.allItems) {
+    for(const item of this.application.modelManager.allItems) {
       expect(item.uuid).not.be.null;
     }
 
     // now lets sync the item, just to make sure it doesn't cause any problems
-    await localModelManager.setItemDirty(item, true);
-    await localSyncManager.sync({checkIntegrity: true});
-    expect(localSyncManager.isOutOfSync()).to.equal(false);
-    expect(localModelManager.allItems.length).to.equal(itemCount + 1);
+    await this.application.modelManager.setItemDirty(aNote, true);
+    await this.application.syncManager.sync({checkIntegrity: true});
+    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 });

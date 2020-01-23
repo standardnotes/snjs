@@ -9,18 +9,15 @@ const expect = chai.expect;
 describe("storage manager", () => {
   /**
    * Items are saved in localStorage in tests.
-   * Default items key for registered user is stored on registration.
+   * Base keys are `storage` and `last_migration_timestamp`
    */
-  const BASE_KEY_COUNT = 1;
+  const BASE_KEY_COUNT = 2;
   const sharedApplication = Factory.createApplication();
 
   before(async function () {
     localStorage.clear();
     await Factory.initializeApplication(sharedApplication);
   });
-
-  after(async function () {
-  })
 
   beforeEach(async function() {
     localStorage.clear();
