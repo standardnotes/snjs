@@ -141,7 +141,7 @@ describe('online syncing', () => {
     this.application.syncManager.ut_endLatencySimulator();
   }).timeout(10000);
 
-  it.only("allows me to save data after I've signed out", async function() {
+  it("allows me to save data after I've signed out", async function() {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     await this.application.signOut();
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
@@ -853,7 +853,7 @@ describe('online syncing', () => {
 
     await this.application.signOut();
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(0);
+    expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
 
     await this.application.signIn({
       email: this.email,

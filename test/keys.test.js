@@ -83,7 +83,7 @@ describe('keys', () => {
   it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({application: this.application});
     expect(this.application.keyManager.getRootKey()).to.be.ok;
-    expect(this.application.keyManager.allItemsKeys.length).to.equal(1);
+    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
   })
 
   it('should use root key for encryption of storage', async function () {
@@ -107,7 +107,7 @@ describe('keys', () => {
 
   it('items key should be encrypted with root key', async function() {
     await Factory.registerUserToApplication({application: this.application});
-    const itemsKey = this.application.keyManager.getDefaultItemsKey();
+    const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     /** Encrypt items key */
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload({
       payload: itemsKey.payloadRepresentation(),
@@ -128,7 +128,7 @@ describe('keys', () => {
   });
 
   it('should create random items key if no account and no passcode', async function() {
-    const itemsKeys = this.application.keyManager.allItemsKeys;
+    const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
     await this.application.savePayload({payload: notePayload});
@@ -155,7 +155,7 @@ describe('keys', () => {
       payload: note,
       intent: ENCRYPTION_INTENT_SYNC
     });
-    const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
+    const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
   })
 
@@ -168,7 +168,7 @@ describe('keys', () => {
       intent: ENCRYPTION_INTENT_SYNC
     });
 
-    const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
+    const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
 
     const decryptedPayload = await this.application.protocolService
@@ -188,7 +188,7 @@ describe('keys', () => {
       intent: ENCRYPTION_INTENT_SYNC
     });
 
-    const itemsKey = this.application.keyManager.itemsKeyForPayload(encryptedPayload);
+    const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     await this.application.modelManager.removeItemLocally(itemsKey);
 
     const decryptedPayload = await this.application.protocolService
@@ -238,7 +238,7 @@ describe('keys', () => {
 
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.setPasscode('foo');
-    const itemsKey = this.application.keyManager.allItemsKeys[0];
+    const itemsKey = this.application.itemsKeyManager.allItemsKeys[0];
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
@@ -250,7 +250,7 @@ describe('keys', () => {
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');
     await Factory.createSyncedNote(this.application);
-    const itemsKeys = this.application.keyManager.allItemsKeys;
+    const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const originalItemsKey = itemsKeys[0];
 
@@ -304,9 +304,9 @@ describe('keys', () => {
     await Factory.registerUserToApplication({
       application: this.application, email: this.email, password: this.password
     });
-    const itemsKeys = this.application.keyManager.allItemsKeys;
+    const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
-    const defaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
 
     await this.application.changePassword({
       email: this.email,
@@ -316,8 +316,8 @@ describe('keys', () => {
       rotateItemsKey: true
     });
 
-    expect(this.application.keyManager.allItemsKeys.length).to.equal(2);
-    const newDefaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(2);
+    const newDefaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
   });
 
@@ -333,9 +333,9 @@ describe('keys', () => {
     const accountKey = result.key;
     const accountKeyParams = result.keyParams;
     /** Delete default items key that is created on launch */
-    const itemsKey = this.application.keyManager.getDefaultItemsKey();
+    const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     await this.application.modelManager.setItemToBeDeleted(itemsKey);
-    expect(this.application.keyManager.allItemsKeys.length).to.equal(0);
+    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(0);
 
     /** We must manually hook into API, otherwise using wrapper methods
     always registers with latest version */
@@ -350,7 +350,7 @@ describe('keys', () => {
       keyParams: accountKeyParams
     });
     await this.application.syncManager.sync();
-    expect(this.application.keyManager.allItemsKeys.length).to.equal(1);
+    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
 
     expect(
       (await this.application.keyManager.getRootKeyParams()).version
@@ -384,7 +384,7 @@ describe('keys', () => {
       (await this.application.keyManager.getRootKey()).version
     ).to.equal(latestVersion);
 
-    const defaultItemsKey = this.application.keyManager.getDefaultItemsKey();
+    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     expect(defaultItemsKey.version).to.equal(latestVersion);
 
     /** After change, note should now be encrypted with latest protocol version */
