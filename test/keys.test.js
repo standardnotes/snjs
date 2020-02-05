@@ -63,8 +63,8 @@ describe('keys', () => {
   })
 
   it('validates content types requiring root encryption', async function () {
-    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ITEMS_KEY)).to.equal(true);
-    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(CONTENT_TYPE_ENCRYPTED_STORAGE)).to.equal(true);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.ItemsKey)).to.equal(true);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.EncryptedStorage)).to.equal(true);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('SF|Item')).to.equal(false);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
   })
@@ -94,7 +94,7 @@ describe('keys', () => {
     const payload = CreateMaxPayloadFromAnyObject({
       object: {
         content: {foo: 'bar'},
-        content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
+        content_type: ContentTypes.EncryptedStorage
       }
     });
     const keyToUse = await this.application.keyManager.
@@ -145,7 +145,7 @@ describe('keys', () => {
       payload: note,
       intent: ENCRYPTION_INTENT_SYNC
     })
-    expect(keyToUse.content_type).to.equal(CONTENT_TYPE_ITEMS_KEY);
+    expect(keyToUse.content_type).to.equal(ContentTypes.ItemsKey);
   })
 
   it('encrypting an item should associate an items key to it', async function() {

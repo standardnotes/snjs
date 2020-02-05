@@ -70,7 +70,7 @@ describe('2020-01-15 web migration', () => {
         content: {
           storage: embeddedStorage
         },
-        content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
+        content_type: ContentTypes.EncryptedStorage
       }
     })
     const encryptionParams = await operator_003.generateEncryptionParameters({
@@ -199,7 +199,7 @@ describe('2020-01-15 web migration', () => {
         content: {
           storage: embeddedStorage
         },
-        content_type: CONTENT_TYPE_ENCRYPTED_STORAGE
+        content_type: ContentTypes.EncryptedStorage
       }
     })
     const encryptionParams = await operator_003.generateEncryptionParameters({

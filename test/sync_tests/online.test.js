@@ -955,7 +955,7 @@ describe('online syncing', () => {
     /** Create an item and sync it */
     const note = await Factory.createMappedNote(this.application);
     note.didCompleteMapping = (source) => {
-      if(source === PAYLOAD_SOURCE_REMOTE_SAVED) {
+      if(source === PayloadSoures.RemoteSaved) {
         actualSaveCount++;
       }
     }

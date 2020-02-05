@@ -40,10 +40,10 @@ describe('offline syncing', () => {
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
     const itemsKeyRP = (await Factory.getStoragePayloadsOfType(
-      this.application, CONTENT_TYPE_ITEMS_KEY
+      this.application, ContentTypes.ItemsKey
     ))[0];
     const noteRP = (await Factory.getStoragePayloadsOfType(
-      this.application, CONTENT_TYPE_NOTE
+      this.application, ContentTypes.Note
     ))[0];
 
     /** Encrypts with default items key */
