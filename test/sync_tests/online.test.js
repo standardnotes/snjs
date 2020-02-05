@@ -595,8 +595,8 @@ describe('online syncing', () => {
     })
     this.expectedItemCount += 2;
 
-    const fooItem = this.application.modelManager.itemsForContentType('Foo')[0];
-    const barItem = this.application.modelManager.itemsForContentType('Bar')[0];
+    const fooItem = this.application.modelManager.getItems('Foo')[0];
+    const barItem = this.application.modelManager.getItems('Bar')[0];
 
     await this.application.modelManager.modifyItems({
       items: [fooItem, barItem],
@@ -627,7 +627,7 @@ describe('online syncing', () => {
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    const fooItems = this.application.modelManager.itemsForContentType('Foo');
+    const fooItems = this.application.modelManager.getItems('Foo');
     const fooItem2 = fooItems[1];
 
     expect(fooItem2.content.conflict_of).to.equal(fooItem.uuid);
@@ -810,7 +810,7 @@ describe('online syncing', () => {
     const databasePayloads = await this.application.storageManager.getAllRawPayloads();
     await this.application.syncManager.loadDatabasePayloads(databasePayloads);
 
-    const items = this.application.modelManager.allItemsMatchingTypes(contentTypes);
+    const items = this.application.modelManager.getItems(contentTypes);
     expect(items[0].content_type).to.equal('C');
     expect(items[2].content_type).to.equal('A');
     expect(items[4].content_type).to.equal('B');

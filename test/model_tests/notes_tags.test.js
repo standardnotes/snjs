@@ -17,7 +17,7 @@ describe("notes and tags", () => {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
     const item = await modelManager.mapPayloadToLocalItem({payload});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const note = modelManager.getItems(["Note"])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
 
@@ -61,8 +61,8 @@ describe("notes and tags", () => {
     })
 
     await modelManager.mapPayloadsToLocalItems({payloads: [mutatedNote, mutatedTag]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.tags.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -114,8 +114,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
@@ -145,8 +145,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
@@ -178,8 +178,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
@@ -204,8 +204,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.tagsString()).to.equal(`#${tagPayload.content.title}`);
 
@@ -239,8 +239,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
@@ -300,8 +300,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     const duplicateNote = await modelManager.duplicateItem({item: note, isConflict: true});
 
@@ -317,8 +317,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(tag.content.references.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -337,7 +337,7 @@ describe("notes and tags", () => {
     const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
+    const note = modelManager.getItems(["Note"])[0];
     expect(note.content === notePayload.content).to.equal(false);
     /** Items transfer payload values on update, so these should be equal */
     expect(note.content.references === notePayload.content.references).to.equal(false);
@@ -365,8 +365,8 @@ describe("notes and tags", () => {
     })
 
     await modelManager.mapPayloadsToLocalItems({payloads: [mutatedPayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     expect(tag.notes.length).to.equal(1);
     expect(note.tags.length).to.equal(1);
@@ -392,8 +392,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
 
     await this.application.syncManager.sync();
 

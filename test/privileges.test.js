@@ -36,16 +36,16 @@ describe("privileges", () => {
   it("adds credentials for actions", async function () {
     const privileges = await this.privilegesManager.getPrivileges();
     privileges.addCredentialForAction(
-      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES,
+      ProtectedActions.ViewProtectedNotes,
       PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE
     );
     await this.application.setPasscode('foobar');
     const credentials = await this.privilegesManager.netCredentialsForAction(
-      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES
+      ProtectedActions.ViewProtectedNotes
     );
     expect(credentials.length).to.equal(1);
     const requiresCredentials = await this.privilegesManager.actionRequiresPrivilege(
-      PRIVILEGE_ACTION_VIEW_PROTECTED_NOTES
+      ProtectedActions.ViewProtectedNotes
     );
     expect(requiresCredentials).to.equal(true);
   });

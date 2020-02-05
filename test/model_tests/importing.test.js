@@ -22,8 +22,8 @@ describe("importing", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = modelManager.getItems(["Note"])[0];
+    const tag = modelManager.getItems(["Tag"])[0];
     this.expectedItemCount += 2;
 
     expect(tag.content.references.length).to.equal(1);

@@ -41,8 +41,8 @@ describe("notes + tags syncing", async function() {
     const tagPayload = pair[1];
 
     await this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = this.application.modelManager.allItemsMatchingTypes(["Note"])[0];
-    const tag = this.application.modelManager.allItemsMatchingTypes(["Tag"])[0];
+    const note = this.application.modelManager.getItems(["Note"])[0];
+    const tag = this.application.modelManager.getItems(["Tag"])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 

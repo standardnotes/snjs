@@ -50,7 +50,7 @@ describe('app models', () => {
     sharedItemCount++;
     sharedApplication.modelManager.addItem(sharedCreatedItem);
     expect(sharedApplication.modelManager.allItems.length).to.equal(sharedItemCount);
-    expect(sharedApplication.modelManager.allItemsMatchingTypes([sharedCreatedItem.content_type]).length).to.equal(1);
+    expect(sharedApplication.modelManager.getItems([sharedCreatedItem.content_type]).length).to.equal(1);
     expect(sharedApplication.modelManager.validItemsForContentType([sharedCreatedItem.content_type]).length).to.equal(1);
   });
 

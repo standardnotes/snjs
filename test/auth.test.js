@@ -94,7 +94,6 @@ describe("basic auth", () => {
     const response = await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
       newPassword: newPassword
     });
 
@@ -156,7 +155,6 @@ describe("basic auth", () => {
       const response = await this.application.changePassword({
         email: this.email,
         currentPassword: currentPassword,
-        currentKeyParams: await this.application.keyManager.getRootKeyParams(),
         newPassword: newPassword
       });
 

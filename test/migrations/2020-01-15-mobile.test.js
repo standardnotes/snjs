@@ -17,7 +17,7 @@ describe('2020-01-15 mobile migration', () => {
   })
 
   it('2020-01-15 migration with passcode and account', async function () {
-    const application = await Factory.createAppWithRandNamespace(PLATFORM_MOBILE);
+    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -115,7 +115,7 @@ describe('2020-01-15 mobile migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -172,7 +172,7 @@ describe('2020-01-15 mobile migration', () => {
 
 
   it('2020-01-15 migration with passcode only', async function () {
-    const application = await Factory.createAppWithRandNamespace(PLATFORM_MOBILE);
+    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -228,7 +228,7 @@ describe('2020-01-15 mobile migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -286,7 +286,7 @@ describe('2020-01-15 mobile migration', () => {
 
 
   it('2020-01-15 migration with account only', async function () {
-    const application = await Factory.createAppWithRandNamespace(PLATFORM_MOBILE);
+    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -342,7 +342,7 @@ describe('2020-01-15 mobile migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -398,7 +398,7 @@ describe('2020-01-15 mobile migration', () => {
 
 
   it('2020-01-15 migration with no account and no passcode', async function () {
-    const application = await Factory.createAppWithRandNamespace(PLATFORM_MOBILE);
+    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -436,7 +436,7 @@ describe('2020-01-15 mobile migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode

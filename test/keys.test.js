@@ -311,7 +311,6 @@ describe('keys', () => {
     await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
       newPassword: 'foobar',
       rotateItemsKey: true
     });
@@ -372,7 +371,6 @@ describe('keys', () => {
     await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      currentKeyParams: await this.application.keyManager.getRootKeyParams(),
       newPassword: 'foobar'
     });
 

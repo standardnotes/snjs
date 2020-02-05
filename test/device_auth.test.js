@@ -23,7 +23,7 @@ describe('device authentication', () => {
     const wrongPasscode = 'barfoo';
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(0);
     await application.setPasscode(passcode);
-    expect(await application.deviceAuthService.hasPasscodeEnabled()).to.equal(true);
+    expect(await application.deviceAuthService.hasPasscode()).to.equal(true);
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(1);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
@@ -34,7 +34,7 @@ describe('device authentication', () => {
     const handleChallenges = async (challenges) => {
       const responses = [];
       for(const challenge of challenges) {
-        if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+        if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
           const response = new DeviceAuthResponse({challenge, value});
           responses.push(response);
@@ -61,7 +61,7 @@ describe('device authentication', () => {
     const wrongPasscode = 'barfoo';
     await application.setPasscode(passcode);
     await application.deviceAuthService.enableBiometrics();
-    expect(await application.deviceAuthService.hasPasscodeEnabled()).to.equal(true);
+    expect(await application.deviceAuthService.hasPasscode()).to.equal(true);
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
@@ -72,12 +72,12 @@ describe('device authentication', () => {
     const handleChallenges = async (challenges) => {
       const responses = [];
       for(const challenge of challenges) {
-        if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+        if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
           const response = new DeviceAuthResponse({challenge, value});
           responses.push(response);
           numPasscodeAttempts++;
-        } else if(challenge === CHALLENGE_BIOMETRIC) {
+        } else if(challenge === Challenges.Biometric) {
           responses.push(new DeviceAuthResponse({
             challenge: challenge,
             value: true
@@ -115,7 +115,7 @@ describe('device authentication', () => {
     await application.setPasscode(passcode);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
     expect(
-      await application.deviceAuthService.hasPasscodeEnabled()
+      await application.deviceAuthService.hasPasscode()
     ).to.equal(true);
     await application.deinit();
 
@@ -124,7 +124,7 @@ describe('device authentication', () => {
     const handleChallenges = async (challenges) => {
       const responses = [];
       for(const challenge of challenges) {
-        if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+        if(challenge === Challenges.LocalPasscode) {
           const value = passcode;
           const response = new DeviceAuthResponse({challenge, value});
           responses.push(response);

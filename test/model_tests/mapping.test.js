@@ -143,7 +143,7 @@ describe("model manager mapping", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     const item = modelManager.allItems[0];
     return new Promise(async (resolve, reject) => {
-      modelManager.addMappingObserver("test", "*", (items, validItems, deletedItems, source, sourceKey) => {
+      modelManager.addMappingObserver("*", (items, validItems, deletedItems, source, sourceKey) => {
         expect(items[0].uuid == item.uuid);
         resolve();
       })

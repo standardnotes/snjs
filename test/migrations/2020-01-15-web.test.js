@@ -106,7 +106,7 @@ describe('2020-01-15 web migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -235,7 +235,7 @@ describe('2020-01-15 web migration', () => {
         authChallengeResponses: (challenges) => {
           const responses = [];
           for(const challenge of challenges) {
-            if(challenge === CHALLENGE_LOCAL_PASSCODE) {
+            if(challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
