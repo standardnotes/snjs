@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -17,7 +19,7 @@ describe('payloads', () => {
 
   after(async () => {
     localStorage.clear();
-  })
+  });
 
   it('creating payload from item should create copy not by reference', async () => {
     const item = await Factory.createMappedNote(sharedApplication);

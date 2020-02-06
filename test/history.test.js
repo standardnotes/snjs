@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -23,8 +25,8 @@ describe('session history', () => {
     this.modelManager = this.application.modelManager;
     /** Automatically optimize after every revision by setting this to 0 */
     this.historyManager.setSessionItemRevisionThreshold(0);
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
   })
 
   async function setTextAndSync(application, item, text) {

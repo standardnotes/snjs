@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -8,16 +10,17 @@ const expect = chai.expect;
 
 describe('004 protocol operations', () => {
 
-  var _identifier = "hello@test.com";
-  var _password = "password";
-  var _keyParams, _key;
+  const _identifier = "hello@test.com";
+  const _password = "password";
+  let _keyParams;
+  let _key;
 
   const application = Factory.createApplication();
-  const protocol_004 = new SNProtocolOperator004(new SNWebCrypto());
+  const protocol004 = new SNProtocolOperator004(new SNWebCrypto());
 
   before(async () => {
     await Factory.initializeApplication(application);
-    const result = await protocol_004.createRootKey({
+    const result = await protocol004.createRootKey({
       identifier: _identifier,
       password: _password
     });
@@ -26,7 +29,6 @@ describe('004 protocol operations', () => {
   });
 
   it('cost minimum for 004 to be 500,000', () => {
-    var currentVersion = application.protocolService.getLatestVersion();
     expect(application.protocolService.costMinimumForVersion("004")).to.equal(500000);
   });
 
@@ -61,40 +63,40 @@ describe('004 protocol operations', () => {
     var rawKey = _key.masterKey;
     var iv = await application.protocolService.crypto.generateRandomKey(96);
     const additionalData = {foo: "bar"};
-    let wc_encryptionResult = await application.protocolService.defaultOperator().encryptText({
+    const wcEncryptionResult = await application.protocolService.defaultOperator().encryptText({
       plaintext: text,
       rawKey: rawKey,
       iv: iv,
       aad: additionalData
     });
-    let wc_decryptionResult = await application.protocolService.defaultOperator().decryptText({
-      ciphertext: wc_encryptionResult,
+    const wcDecryptionResult = await application.protocolService.defaultOperator().decryptText({
+      ciphertext: wcEncryptionResult,
       rawKey: rawKey,
       iv: iv,
       aad: additionalData
-    })
-    expect(wc_decryptionResult).to.equal(text);
+    });
+    expect(wcDecryptionResult).to.equal(text);
   });
 
   it('fails to decrypt non-matching aad', async () => {
-    var text = "hello world";
-    var rawKey = _key.masterKey;
-    var iv = await application.protocolService.crypto.generateRandomKey(96);
+    const text = "hello world";
+    const rawKey = _key.masterKey;
+    const iv = await application.protocolService.crypto.generateRandomKey(96);
     const aad = {foo: "bar"};
     const nonmatchingAad = {foo: "rab"};
-    let wc_encryptionResult = await application.protocolService.defaultOperator().encryptText({
+    const wcEncryptionResult = await application.protocolService.defaultOperator().encryptText({
       plaintext: text,
       rawKey: rawKey,
       iv,
       aad: aad
     });
-    let wc_decryptionResult = await application.protocolService.defaultOperator().decryptText({
-      ciphertext: wc_encryptionResult,
+    const wcDecryptionResult = await application.protocolService.defaultOperator().decryptText({
+      ciphertext: wcEncryptionResult,
       rawKey: rawKey,
       iv: iv,
       aad: nonmatchingAad
-    })
-    expect(wc_decryptionResult).to.not.equal(text);
+    });
+    expect(wcDecryptionResult).to.not.equal(text);
   });
 
   it('generates existing keys for key params', async () => {
@@ -104,4 +106,4 @@ describe('004 protocol operations', () => {
     });
     expect(key.compare(_key)).to.be.true;
   });
-})
+});

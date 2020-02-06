@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
@@ -6,26 +8,26 @@ import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online syncing', () => {
+describe.only('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
     checkIntegrity: true
-  }
+  };
 
   before(async function() {
     localStorage.clear();
-  })
+  });
 
   after(async function() {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -141,7 +143,7 @@ describe('online syncing', () => {
     this.application.syncManager.ut_endLatencySimulator();
   }).timeout(10000);
 
-  it("allows me to save data after I've signed out", async function() {
+  it.only("allows me to save data after I've signed out", async function() {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     await this.application.signOut();
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
@@ -164,7 +166,7 @@ describe('online syncing', () => {
       application: this.application,
       email: this.email,
       password: this.password
-    })
+    });
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
@@ -172,7 +174,7 @@ describe('online syncing', () => {
     expect(this.application.modelManager.notes.length).to.equal(1);
 
     for(const item of this.application.modelManager.notes)  {
-      expect(note.content.title).to.be.ok;
+      expect(item.content.title).to.be.ok;
     }
 
     const updatedRawPayloads = await this.application.storageManager.getAllRawPayloads();

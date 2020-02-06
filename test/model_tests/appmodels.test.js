@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
@@ -7,20 +9,24 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('app models', () => {
-  let sharedCreatedItem;
-
   const BASE_ITEM_COUNT = 1; /** Default items key */
-
-  const sharedApplication = Factory.createApplication();
   let sharedItemCount = BASE_ITEM_COUNT;
+  let sharedCreatedItem;
+  const sharedApplication = Factory.createApplication();
+
   before(async function() {
+    localStorage.clear();
     await Factory.initializeApplication(sharedApplication);
+  });
+
+  after(async function () {
+    localStorage.clear();
   });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-  })
+  });
 
   it('modelManager should be defined', () => {
     expect(sharedApplication.modelManager).to.not.be.null;
@@ -31,15 +37,15 @@ describe('app models', () => {
   });
 
   it('item content should be assigned', () => {
-    var params = Factory.createNotePayload();
-    var item = new SFItem(params);
+    const params = Factory.createNotePayload();
+    const item = new SFItem(params);
     expect(item.content.title).to.equal(params.content.title);
   });
 
   it('should default updated_at to 1970 and created_at to the present', () => {
-    var params = Factory.createNotePayload();
-    var item = new SFItem(params);
-    let epoch = new Date(0);
+    const params = Factory.createNotePayload();
+    const item = new SFItem(params);
+    const epoch = new Date(0);
     expect(item.updated_at - epoch).to.equal(0);
     expect(item.created_at - epoch).to.be.above(0);
     expect(new Date() - item.created_at).to.be.below(5); // < 5ms
@@ -48,7 +54,7 @@ describe('app models', () => {
   it('adding item to modelmanager should add it to its items', async function() {
     sharedCreatedItem = await Factory.createMappedNote(sharedApplication);
     sharedItemCount++;
-    sharedApplication.modelManager.addItem(sharedCreatedItem);
+    await sharedApplication.modelManager.addItem(sharedCreatedItem);
     expect(sharedApplication.modelManager.allItems.length).to.equal(sharedItemCount);
     expect(sharedApplication.modelManager.getItems([sharedCreatedItem.content_type]).length).to.equal(1);
     expect(sharedApplication.modelManager.validItemsForContentType([sharedCreatedItem.content_type]).length).to.equal(1);
@@ -80,7 +86,7 @@ describe('app models', () => {
           }]
         }
       }
-    })
+    });
 
     await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     await modelManager.mapPayloadsToLocalItems({payloads: [params2]});
@@ -107,12 +113,12 @@ describe('app models', () => {
   });
 
   it('mapping an item twice shouldnt cause problems', async function() {
-    let modelManager = this.application.modelManager;
-    var payload = Factory.createNotePayload();
+    const modelManager = this.application.modelManager;
+    const payload = Factory.createNotePayload();
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {foo: "bar"}}
-    })
+    });
 
     let items = await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     let item = items[0];

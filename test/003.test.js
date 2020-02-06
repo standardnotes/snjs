@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -10,23 +12,23 @@ describe('003 protocol operations', () => {
 
   before(async () => {
     localStorage.clear();
-  })
+  });
 
   after(async () => {
     localStorage.clear();
-  })
+  });
 
-  let _identifier = "hello@test.com";
-  let _password = "password";
+  const _identifier = "hello@test.com";
+  const _password = "password";
   let _keyParams, _key;
 
   const sharedApplication = Factory.createApplication();
-  const protocol_003 = new SNProtocolOperator003(new SNWebCrypto());
+  const protocol003 = new SNProtocolOperator003(new SNWebCrypto());
 
   // runs once before all tests in this block
   before(async () => {
     await Factory.initializeApplication(sharedApplication);
-    const result = await protocol_003.createRootKey({
+    const result = await protocol003.createRootKey({
       identifier: _identifier,
       password: _password
     });
@@ -35,18 +37,17 @@ describe('003 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    let currentVersion = sharedApplication.protocolService.getLatestVersion();
     expect(sharedApplication.protocolService.costMinimumForVersion("003")).to.equal(110000);
   });
 
   it('generates random key', async () => {
     const length = 128;
-    const key = await protocol_003.crypto.generateRandomKey(length);
+    const key = await protocol003.crypto.generateRandomKey(length);
     expect(key.length).to.equal(length/4);
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol_003.createRootKey({
+    const result = await protocol003.createRootKey({
       identifier: _identifier,
       password: _password
     });
@@ -64,16 +65,18 @@ describe('003 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    let text = "hello world";
-    let rawKey = _key.masterKey;
-    let iv = await protocol_003.crypto.generateRandomKey(128);
-    let wc_encryptionResult = await protocol_003.encryptText(text, rawKey, iv);
-    let wc_decryptionResult = await protocol_003.decryptText({contentCiphertext: wc_encryptionResult, encryptionKey: rawKey, iv: iv})
-    expect(wc_decryptionResult).to.equal(text);
+    const text = "hello world";
+    const rawKey = _key.masterKey;
+    const iv = await protocol003.crypto.generateRandomKey(128);
+    const wcEncryptionResult = await protocol003.encryptText(text, rawKey, iv);
+    const wcDecryptionResult = await protocol003.decryptText({
+      contentCiphertext: wcEncryptionResult, encryptionKey: rawKey, iv: iv
+    });
+    expect(wcDecryptionResult).to.equal(text);
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol_003.computeRootKey({password: _password, keyParams: _keyParams});
+    const key = await protocol003.computeRootKey({password: _password, keyParams: _keyParams});
     expect(key.compare(_key)).to.be.true;
   });
 })

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
@@ -24,8 +26,8 @@ describe("duplication", () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -41,7 +43,7 @@ describe("duplication", () => {
 
   function createDirtyPayload(contentType) {
     const params = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: Uuid.GenerateUuidSynchronously(),
       content_type: contentType,
       content: {
         foo: 'bar'

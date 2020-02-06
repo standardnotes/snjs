@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../../node_modules/regenerator-runtime/runtime.js';
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
@@ -25,7 +27,7 @@ describe("mapping performance", () => {
     const tags = [], notes = [];
     for(let i = 0; i < tagCount; i++) {
       var tag = {
-        uuid: SFItem.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Tag",
         content: {
           title: `${Math.random()}`,
@@ -37,7 +39,7 @@ describe("mapping performance", () => {
 
     for(let i = 0; i < noteCount; i++) {
       const note = {
-        uuid: SFItem.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,
@@ -93,7 +95,7 @@ describe("mapping performance", () => {
     const notes = [];
 
     const tag = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: Uuid.GenerateUuidSynchronously(),
       content_type: "Tag",
       content: {
         title: `${Math.random()}`,
@@ -103,7 +105,7 @@ describe("mapping performance", () => {
 
     for(let i = 0; i < noteCount; i++) {
       const note = {
-        uuid: SFItem.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Note",
         content: {
           title: `${Math.random()}`,

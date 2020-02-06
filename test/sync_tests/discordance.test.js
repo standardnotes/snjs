@@ -23,8 +23,8 @@ describe('sync discordance', () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

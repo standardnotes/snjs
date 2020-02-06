@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -101,8 +103,8 @@ describe('device authentication', () => {
   it('handles application launch with passcode and account', async function() {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
-    const email = SFItem.GenerateUuidSynchronously();
-    const password = SFItem.GenerateUuidSynchronously();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: application,
       email, password

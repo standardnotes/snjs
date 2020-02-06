@@ -2,7 +2,7 @@
 - Modified core conflict handling logic, as documented by sync-log.md.
 - SFItemParams will now send up updated_at, as required by the server
 - setDirty signature has changed from setDirty(dirty, dontUpdateClientModified) to setDirty(dirty, updateClientModified). That is, we now default to not updating client_updated_at by default. It should only be updated when the user explicitly make a typing change.
-- modelManager.importItemsFromRaw properly freezes values before comparing during import.
+- this.application.importData properly freezes values before comparing during import.
 - Removed itemsPendingRemoval logic in modelManager. I'm not quite sure what purpose that served.
 - Transitioned to using modelManager.setItemDirty instead of item.setDirty. This is so that we immediately map the dirty values and propagate them throughout the UI without waiting for sync to complete. Items dirtied and mapped through this approach will have mapping type PayloadSources.LocalDirted, so consumers must be sure to check for that to avoid infinite recursion if dirtying from a itemSyncObserver.
 - Transitioned syncManager from saving dirty items locally while waiting for sync based on dirtyCount to based on dirtiedDate. The reason was that dirtyCount was used for something very particular, and we were overriding this behavior which caused items to reset their dirtyCount to 0, resulting in them not being synced up again after being dirtied after a high-latency sync request.

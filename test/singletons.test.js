@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -12,7 +14,7 @@ describe("singletons", () => {
 
   function createPrivsPayload() {
     const params = {
-      uuid: SFItem.GenerateUuidSynchronously(),
+      uuid: Uuid.GenerateUuidSynchronously(),
       content_type: 'SN|Privileges',
       content: {
         foo: 'bar'
@@ -34,8 +36,8 @@ describe("singletons", () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -8,7 +10,7 @@ const expect = chai.expect;
 
 const createItemParams = () => {
   const params = {
-    uuid: SFItem.GenerateUuidSynchronously(),
+    uuid: Uuid.GenerateUuidSynchronously(),
     content_type: "Item",
     content: {
       title: "Hello",
@@ -251,7 +253,7 @@ describe("predicates", () => {
     const modelManager = this.application.modelManager;
     const payload = CreateMaxPayloadFromAnyObject({
       object: {
-        uuid: SFItem.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Item",
         content: {
           tags: [

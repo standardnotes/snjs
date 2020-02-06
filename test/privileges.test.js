@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../node_modules/regenerator-runtime/runtime.js';
 import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
@@ -19,8 +21,8 @@ describe("privileges", () => {
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.privilegesManager = this.application.privilegesManager;
-    this.email = SFItem.GenerateUuidSynchronously();
-    this.password = SFItem.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
   })
 
   it("loads default actions and credentials", async function () {
