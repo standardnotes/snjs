@@ -136,7 +136,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
@@ -144,7 +144,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     const rootKey = await application.keyManager.getRootKey()
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
@@ -247,7 +247,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
@@ -255,7 +255,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     const rootKey = await application.keyManager.getRootKey()
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
@@ -363,14 +363,14 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
@@ -457,7 +457,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;

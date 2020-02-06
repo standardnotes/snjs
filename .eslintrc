@@ -4,7 +4,7 @@
   "rules": {
     "standard/no-callback-literal": 0, // Disable this as we have too many callbacks relying on literals
     "no-throw-literal": 0,
-    "no-console": 1,
+    // "no-console": 1,
     "semi": 1
   },
   "env": {

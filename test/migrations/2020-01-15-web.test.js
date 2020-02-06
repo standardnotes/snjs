@@ -125,7 +125,7 @@ describe('2020-01-15 web migration', () => {
     );
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
@@ -133,7 +133,7 @@ describe('2020-01-15 web migration', () => {
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
     const rootKey = await application.keyManager.getRootKey()
@@ -254,7 +254,7 @@ describe('2020-01-15 web migration', () => {
     );
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
@@ -262,7 +262,7 @@ describe('2020-01-15 web migration', () => {
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
     const rootKey = await application.keyManager.getRootKey()
@@ -350,7 +350,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
@@ -358,7 +358,7 @@ describe('2020-01-15 web migration', () => {
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
-      STORAGE_VALUE_MODE_NONWRAPPED
+      StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(accountResult.keyParams);
     const rootKey = await application.keyManager.getRootKey()
@@ -437,7 +437,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
-      STORAGE_VALUE_MODE_DEFAULT
+      StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;

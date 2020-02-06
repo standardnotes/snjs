@@ -99,7 +99,7 @@ describe("storage manager", () => {
     });
 
     await this.application.setStorageEncryptionPolicy(
-      STORAGE_ENCRYPTION_POLICY_DISABLED
+      StorageEncryptionPolicies.Disabled
     );
 
     const payloads = await this.application.storageManager.getAllRawPayloads();

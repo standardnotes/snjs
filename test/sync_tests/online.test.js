@@ -698,7 +698,7 @@ describe('online syncing', () => {
     this.expectedItemCount += largeItemCount;
 
     /** Download */
-    const downloadedItems = await this.application.syncManager.stateless_downloadAllItems();
+    const downloadedItems = await this.application.syncManager.statelessDownloadAllItems();
     expect(downloadedItems.length).to.equal(this.expectedItemCount);
     // ensure it's decrypted
     expect(downloadedItems[10].content.text.length).to.be.above(1);
