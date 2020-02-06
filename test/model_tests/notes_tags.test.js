@@ -218,7 +218,7 @@ describe("notes and tags", () => {
 
     const changedTagPayload = CreateSourcedPayloadFromObject({
       object: tagPayload,
-      source: PayloadSoures.RemoteSaved
+      source: PayloadSources.RemoteSaved
     })
 
     // simulate a save, which omits `content`

@@ -43,7 +43,7 @@ describe("model manager mapping", () => {
     expect(originalNote.content.title).to.equal(payload.content.title);
     const mutated = CreateSourcedPayloadFromObject({
       object: payload,
-      source: PayloadSoures.RemoteSaved
+      source: PayloadSources.RemoteSaved
     })
     await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     const sameNote = modelManager.notes[0];

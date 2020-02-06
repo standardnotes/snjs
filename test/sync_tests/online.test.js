@@ -87,7 +87,7 @@ describe('online syncing', () => {
 
     this.application.syncManager.ut_beginLatencySimulator(250);
     this.application.syncManager.addEventObserver((event, data) => {
-      if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
+      if(event === SyncEvents.FullSyncCompleted) {
         events++;
       }
     });
@@ -120,7 +120,7 @@ describe('online syncing', () => {
     this.application.syncManager.ut_beginLatencySimulator(250);
 
     this.application.syncManager.addEventObserver((event, data) => {
-      if(event === SYNC_EVENT_FULL_SYNC_COMPLETED) {
+      if(event === SyncEvents.FullSyncCompleted) {
         events++;
       }
     });
@@ -191,7 +191,7 @@ describe('online syncing', () => {
 
     const encrypted = await this.application.protocolService.payloadByEncryptingPayload({
       payload: note.payloadRepresentation(),
-      intent: ENCRYPTION_INTENT_SYNC
+      intent: EncryptionIntents.Sync
     });
     const errorred = CreateMaxPayloadFromAnyObject({
       object: encrypted,
@@ -955,7 +955,7 @@ describe('online syncing', () => {
     /** Create an item and sync it */
     const note = await Factory.createMappedNote(this.application);
     note.didCompleteMapping = (source) => {
-      if(source === PayloadSoures.RemoteSaved) {
+      if(source === PayloadSources.RemoteSaved) {
         actualSaveCount++;
       }
     }

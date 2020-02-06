@@ -76,7 +76,7 @@ describe('2020-01-15 mobile migration', () => {
     const encryptedKeyParams = await operator_003.generateEncryptionParameters({
       payload: keyPayload,
       key: passcodeKey,
-      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+      format: PayloadFormats.EncryptedString
     });
     const wrappedKey = CreateMaxPayloadFromAnyObject({
       object: keyPayload,
@@ -101,7 +101,7 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator_003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
-      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+      format: PayloadFormats.EncryptedString
     });
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
       object: notePayload,
@@ -143,7 +143,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
-      STORAGE_KEY_ROOT_KEY_PARAMS,
+      StorageKeys.RootKeyParams,
       STORAGE_VALUE_MODE_NONWRAPPED
     );
     const rootKey = await application.keyManager.getRootKey()
@@ -214,7 +214,7 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator_003.generateEncryptionParameters({
       payload: notePayload,
       key: passcodeKey,
-      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+      format: PayloadFormats.EncryptedString
     });
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
       object: notePayload,
@@ -254,7 +254,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
-      STORAGE_KEY_ROOT_KEY_PARAMS,
+      StorageKeys.RootKeyParams,
       STORAGE_VALUE_MODE_NONWRAPPED
     );
     const rootKey = await application.keyManager.getRootKey()
@@ -276,7 +276,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.storageManager.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
     expect(
-      await application.storageManager.getValue(STORAGE_KEY_MOBILE_PASSCODE_TIMING)
+      await application.storageManager.getValue(StorageKeys.MobilePasscodeTiming)
     ).to.eql(passcodeTiming);
   });
 
@@ -328,7 +328,7 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator_003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
-      format: PAYLOAD_CONTENT_FORMAT_ENCRYPTED_STRING
+      format: PayloadFormats.EncryptedString
     });
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
       object: notePayload,
@@ -369,7 +369,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(valueStore.content_type).to.not.be.ok;
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
-      STORAGE_KEY_ROOT_KEY_PARAMS,
+      StorageKeys.RootKeyParams,
       STORAGE_VALUE_MODE_NONWRAPPED
     );
     const rootKey = await application.keyManager.getRootKey();
@@ -422,7 +422,7 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteParams = await operator_003.generateEncryptionParameters({
       payload: notePayload,
-      format: PAYLOAD_CONTENT_FORMAT_DECRYPTED_BARE_OBJECT
+      format: PayloadFormats.DecryptedBareObject
     });
     const noteProcessedPayload = CreateMaxPayloadFromAnyObject({
       object: notePayload,

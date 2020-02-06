@@ -48,7 +48,7 @@ describe('payloads', () => {
 
     const encryptedPayload = await sharedApplication.protocolService.payloadByEncryptingPayload({
       payload: notePayload,
-      intent: ENCRYPTION_INTENT_SYNC
+      intent: EncryptionIntents.Sync
     });
 
     expect(encryptedPayload.dirty).to.not.be.ok;
@@ -140,7 +140,7 @@ describe('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
-      intent: ENCRYPTION_INTENT_SYNC
+      intent: EncryptionIntents.Sync
     });
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
@@ -157,7 +157,7 @@ describe('payloads', () => {
     const encodedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
-      intent: ENCRYPTION_INTENT_FILE_DECRYPTED
+      intent: EncryptionIntents.FileDecrypted
     })
 
     expect(encodedPayload.enc_item_key).to.not.be.ok;
@@ -175,7 +175,7 @@ describe('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
-      intent: ENCRYPTION_INTENT_LOCAL_STORAGE_ENCRYPTED
+      intent: EncryptionIntents.LocalStorageEncrypted
     })
 
     expect(encryptedPayload.enc_item_key).to.not.be.null;
@@ -196,7 +196,7 @@ describe('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,
-      intent: ENCRYPTION_INTENT_FILE_ENCRYPTED
+      intent: EncryptionIntents.FileEncrypted
     })
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
@@ -219,7 +219,7 @@ describe('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: mutatedPayload,
-      intent: ENCRYPTION_INTENT_SYNC
+      intent: EncryptionIntents.Sync
     })
     expect(encryptedPayload.content).to.eql(payload.content);
     expect(encryptedPayload.enc_item_key).to.not.be.null;
