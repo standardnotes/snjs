@@ -13,7 +13,11 @@ describe("model manager mapping", () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it('mapping nonexistent item creates it', async function () {
     const modelManager = this.application.modelManager;
@@ -46,11 +50,11 @@ describe("model manager mapping", () => {
     const mutated = CreateSourcedPayloadFromObject({
       object: payload,
       source: PayloadSources.RemoteSaved
-    })
+    });
     await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     const sameNote = modelManager.notes[0];
     expect(sameNote.content.title).to.equal(payload.content.title);
-  })
+  });
 
   it('mapping and deleting nonexistent item creates and deletes it', async function () {
     const modelManager = this.application.modelManager;
@@ -94,7 +98,7 @@ describe("model manager mapping", () => {
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {title: newTitle}}
-    })
+    });
     await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     const item = modelManager.notes[0];
 
@@ -144,12 +148,12 @@ describe("model manager mapping", () => {
     const payload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     const item = modelManager.allItems[0];
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve) => {
       modelManager.addMappingObserver("*", (items, validItems, deletedItems, source, sourceKey) => {
-        expect(items[0].uuid == item.uuid);
+        expect(items[0].uuid === item.uuid);
         resolve();
-      })
-      await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
-    })
+      });
+      modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    });
   });
-})
+});

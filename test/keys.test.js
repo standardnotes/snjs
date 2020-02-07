@@ -12,17 +12,21 @@ describe('keys', () => {
 
   before(async function () {
     localStorage.clear();
-  })
+  });
 
   after(async function () {
     localStorage.clear();
-  })
+  });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it('validate isLocalStorageIntent', async function () {
     expect(isLocalStorageIntent(EncryptionIntents.Sync)).to.equal(false);
@@ -31,7 +35,7 @@ describe('keys', () => {
     expect(isLocalStorageIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(true);
     expect(isLocalStorageIntent(EncryptionIntents.FileEncrypted)).to.equal(false);
     expect(isLocalStorageIntent(EncryptionIntents.FileDecrypted)).to.equal(false);
-  })
+  });
 
   it('validate isFileIntent', async function () {
     expect(isFileIntent(EncryptionIntents.Sync)).to.equal(false);
@@ -40,7 +44,7 @@ describe('keys', () => {
     expect(isFileIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
     expect(isFileIntent(EncryptionIntents.FileEncrypted)).to.equal(true);
     expect(isFileIntent(EncryptionIntents.FileDecrypted)).to.equal(true);
-  })
+  });
 
   it('validate isDecryptedIntent', async function () {
     expect(isDecryptedIntent(EncryptionIntents.Sync)).to.equal(false);
@@ -49,7 +53,7 @@ describe('keys', () => {
     expect(isDecryptedIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
     expect(isDecryptedIntent(EncryptionIntents.FileEncrypted)).to.equal(false);
     expect(isDecryptedIntent(EncryptionIntents.FileDecrypted)).to.equal(true);
-  })
+  });
 
   it('validate intentRequiresEncryption', async function () {
     expect(intentRequiresEncryption(EncryptionIntents.Sync)).to.equal(true);
@@ -58,57 +62,59 @@ describe('keys', () => {
     expect(intentRequiresEncryption(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
     expect(intentRequiresEncryption(EncryptionIntents.FileEncrypted)).to.equal(true);
     expect(intentRequiresEncryption(EncryptionIntents.FileDecrypted)).to.equal(false);
-  })
+  });
 
   it('should not have root key by default', async function () {
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
-  })
+  });
 
   it('validates content types requiring root encryption', async function () {
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.ItemsKey)).to.equal(true);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.EncryptedStorage)).to.equal(true);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('SF|Item')).to.equal(false);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
-  })
+  });
 
-  it('generating export params with no key should produce decrypted payload', async function () {
+  it('generating export params with no account or passcode should produce encrypted payload', 
+  async function () {
+    /** Items key available by default */
     const payload = Factory.createNotePayload();
-    const title = payload.content.title;
-    const encryptedPayload = await this.application.protocolService
-    .payloadByEncryptingPayload({
-      payload: payload,
-      intent: EncryptionIntents.LocalStoragePreferEncrypted
-    })
-    expect(payload.content.title).to.equal(title);
-  })
+    const processedPayload = await this.application.protocolService
+      .payloadByEncryptingPayload({
+        payload: payload,
+        intent: EncryptionIntents.LocalStoragePreferEncrypted
+      });
+    expect(processedPayload.isEncrypted).to.equal(true);
+  });
 
   it('has root key and one items key after registering user', async function () {
-    await Factory.registerUserToApplication({application: this.application});
+    await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.keyManager.getRootKey()).to.be.ok;
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
-  })
+  });
 
   it('should use root key for encryption of storage', async function () {
-    const email = 'foo', password = 'bar';
-    const result = await this.application.protocolService.createRootKey({identifier: email, password});
-    this.application.keyManager.setNewRootKey({key: result.key, keyParams: result.keyParams});
+    const email = 'foo';
+    const password = 'bar';
+    const result = await this.application.protocolService.createRootKey({ identifier: email, password });
+    this.application.keyManager.setNewRootKey({ key: result.key, keyParams: result.keyParams });
 
     const payload = CreateMaxPayloadFromAnyObject({
       object: {
-        content: {foo: 'bar'},
+        content: { foo: 'bar' },
         content_type: ContentTypes.EncryptedStorage
       }
     });
     const keyToUse = await this.application.keyManager.
-    keyToUseForEncryptionOfPayload({
-      payload: payload,
-      intent: EncryptionIntents.LocalStoragePreferEncrypted
-    })
+      keyToUseForEncryptionOfPayload({
+        payload: payload,
+        intent: EncryptionIntents.LocalStoragePreferEncrypted
+      });
     expect(keyToUse).to.equal(await this.application.keyManager.getRootKey());
-  })
+  });
 
-  it('items key should be encrypted with root key', async function() {
-    await Factory.registerUserToApplication({application: this.application});
+  it('items key should be encrypted with root key', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
     const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     /** Encrypt items key */
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload({
@@ -129,77 +135,77 @@ describe('keys', () => {
     expect(decryptedPayload.content.itemsKey).to.equal(itemsKey.content.itemsKey);
   });
 
-  it('should create random items key if no account and no passcode', async function() {
+  it('should create random items key if no account and no passcode', async function () {
     const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
-    await this.application.savePayload({payload: notePayload});
+    await this.application.savePayload({ payload: notePayload });
 
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     const rawNotePayload = rawPayloads.find((r) => r.content_type === 'Note');
     expect(typeof rawNotePayload.content).to.equal('string');
   });
 
-  it('should use items key for encryption of note', async function() {
+  it('should use items key for encryption of note', async function () {
     const note = Factory.createNotePayload();
     const keyToUse = await this.application.keyManager.
-    keyToUseForEncryptionOfPayload({
-      payload: note,
-      intent: EncryptionIntents.Sync
-    })
+      keyToUseForEncryptionOfPayload({
+        payload: note,
+        intent: EncryptionIntents.Sync
+      });
     expect(keyToUse.content_type).to.equal(ContentTypes.ItemsKey);
-  })
+  });
 
-  it('encrypting an item should associate an items key to it', async function() {
+  it('encrypting an item should associate an items key to it', async function () {
     const note = Factory.createNotePayload();
     const encryptedPayload = await this.application.protocolService
-    .payloadByEncryptingPayload({
-      payload: note,
-      intent: EncryptionIntents.Sync
-    });
+      .payloadByEncryptingPayload({
+        payload: note,
+        intent: EncryptionIntents.Sync
+      });
     const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
-  })
+  });
 
-  it('decrypt encrypted item with associated key', async function() {
+  it('decrypt encrypted item with associated key', async function () {
     const note = Factory.createNotePayload();
     const title = note.content.title;
     const encryptedPayload = await this.application.protocolService
-    .payloadByEncryptingPayload({
-      payload: note,
-      intent: EncryptionIntents.Sync
-    });
+      .payloadByEncryptingPayload({
+        payload: note,
+        intent: EncryptionIntents.Sync
+      });
 
     const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
 
     const decryptedPayload = await this.application.protocolService
-    .payloadByDecryptingPayload({
-      payload: encryptedPayload
-    });
+      .payloadByDecryptingPayload({
+        payload: encryptedPayload
+      });
 
     expect(decryptedPayload.content.title).to.equal(title);
-  })
+  });
 
-  it('decrypts items waiting for keys', async function() {
+  it('decrypts items waiting for keys', async function () {
     const notePayload = Factory.createNotePayload();
     const title = notePayload.content.title;
     const encryptedPayload = await this.application.protocolService
-    .payloadByEncryptingPayload({
-      payload: notePayload,
-      intent: EncryptionIntents.Sync
-    });
+      .payloadByEncryptingPayload({
+        payload: notePayload,
+        intent: EncryptionIntents.Sync
+      });
 
     const itemsKey = this.application.itemsKeyManager.itemsKeyForPayload(encryptedPayload);
     await this.application.modelManager.removeItemLocally(itemsKey);
 
     const decryptedPayload = await this.application.protocolService
-    .payloadByDecryptingPayload({
-      payload: encryptedPayload
-    })
+      .payloadByDecryptingPayload({
+        payload: encryptedPayload
+      });
     await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [decryptedPayload]
-    })
+    });
 
     const note = this.application.modelManager.notes[0];
     expect(note.uuid).to.equal(notePayload.uuid);
@@ -208,10 +214,10 @@ describe('keys', () => {
 
     const keyPayload = CreateMaxPayloadFromAnyObject({
       object: itemsKey
-    })
+    });
     await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [keyPayload]
-    })
+    });
 
     /**
      * Sleeping is required to trigger asyncronous protocolService.decryptItemsWaitingForKeys,
@@ -222,21 +228,21 @@ describe('keys', () => {
     expect(note.errorDecrypting).to.equal(false);
     expect(note.waitingForKey).to.equal(false);
     expect(note.content.title).to.equal(title);
-  })
+  });
 
   it('generating export params with logged in account should produce encrypted payload', async function () {
-    await Factory.registerUserToApplication({application: this.application});
+    await Factory.registerUserToApplication({ application: this.application });
     const payload = Factory.createNotePayload();
     const encryptedPayload = await this.application.protocolService
-    .payloadByEncryptingPayload({
-      payload: payload,
-      intent: EncryptionIntents.Sync
-    })
+      .payloadByEncryptingPayload({
+        payload: payload,
+        intent: EncryptionIntents.Sync
+      });
     expect(typeof encryptedPayload.content).to.equal('string');
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
       this.application.protocolService.getLatestVersion()
     );
-  })
+  });
 
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.setPasscode('foo');
@@ -289,15 +295,15 @@ describe('keys', () => {
       object: itemsKeyRawPayload2
     });
     const decrypted2 = await this.application.protocolService.payloadByDecryptingPayload({
-     payload: itemsKeyRawPayload2,
-     key: originalRootKey
+      payload: itemsKeyPayload2,
+      key: originalRootKey
     });
     expect(decrypted2.errorDecrypting).to.equal(true);
 
     /** Should be able to decrypt with new root key */
     const decrypted3 = await this.application.protocolService.payloadByDecryptingPayload({
-     payload: itemsKeyRawPayload2,
-     key: newRootKey
+      payload: itemsKeyRawPayload2,
+      key: newRootKey
     });
     expect(decrypted3.errorDecrypting).to.equal(false);
   });
@@ -320,14 +326,14 @@ describe('keys', () => {
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(2);
     const newDefaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
-  });
+  }).timeout(5000);
 
   it('protocol version should be upgraded on password change', async function () {
     /** Register with 003 version */
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = this.email;
     const password = this.password;
-    const result = await operator_003.createRootKey({
+    const result = await operator003.createRootKey({
       identifier,
       password
     });
@@ -390,7 +396,7 @@ describe('keys', () => {
     /** After change, note should now be encrypted with latest protocol version */
 
     const note = this.application.modelManager.notes[0];
-    await this.application.saveItem({item: note});
+    await this.application.saveItem({ item: note });
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,
@@ -399,4 +405,4 @@ describe('keys', () => {
     const refreshedNotePayload = refreshedNotePayloads[0];
     expect(refreshedNotePayload.version).to.equal(latestVersion);
   });
-})
+});

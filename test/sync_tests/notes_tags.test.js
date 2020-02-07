@@ -14,14 +14,21 @@ describe("notes + tags syncing", async function() {
     await Factory.initializeApplication(sharedApplication);
   });
 
-  let totalItemCount = 0;
+  after(async function () {
+    localStorage.clear();
+    await sharedApplication.deinit();
+  });
 
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({application: this.application, email, password});
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it('syncing an item then downloading it should include items_key_id', async function() {
     const note = await Factory.createMappedNote(this.application);

@@ -12,11 +12,11 @@ describe('migrations', () => {
 
   before(async () => {
     localStorage.clear();
-  })
+  });
 
   after(async () => {
     localStorage.clear();
-  })
+  });
 
   it('migration timestamp should be a number', async function () {
     const timestamp = BaseMigration.timestamp();
@@ -28,6 +28,7 @@ describe('migrations', () => {
     const timestamp = await application.migrationService
       .getLastMigrationTimestamp();
     expect(typeof timestamp).to.equal('number');
+    await application.deinit();
   });
 
   it('should run base migration', async function () {
@@ -36,6 +37,7 @@ describe('migrations', () => {
     const lastMigrationTimestamp = await application.migrationService
       .getLastMigrationTimestamp();
     expect(lastMigrationTimestamp).to.be.above(baseMigrationTimestamp);
+    await application.deinit();
   });
 
 });

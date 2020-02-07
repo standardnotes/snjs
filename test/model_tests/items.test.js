@@ -14,10 +14,14 @@ describe("items", () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it('setting an item as dirty should update its client updated at', async function () {
-    const modelManager = this.application.modelManager
+    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
     const item = modelManager.items[0];
@@ -29,7 +33,7 @@ describe("items", () => {
   });
 
   it('setting an item as dirty with option to skip client updated at', async function () {
-    const modelManager = this.application.modelManager
+    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
     const item = modelManager.items[0];
@@ -41,7 +45,7 @@ describe("items", () => {
   });
 
   it('properly pins, archives, and locks', async function () {
-    const modelManager = this.application.modelManager
+    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params]});
 
@@ -59,7 +63,7 @@ describe("items", () => {
   });
 
   it('properly compares item equality', async function () {
-    const modelManager = this.application.modelManager
+    const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
@@ -101,7 +105,7 @@ describe("items", () => {
   });
 
   it('content equality should not have side effects', async function () {
-    const modelManager = this.application.modelManager
+    const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [params1, params2]});
@@ -114,11 +118,11 @@ describe("items", () => {
 
     item1.contentKeysToIgnoreWhenCheckingEquality = () => {
       return ["foo"];
-    }
+    };
 
     item2.contentKeysToIgnoreWhenCheckingEquality = () => {
       return ["foo"];
-    }
+    };
 
     // calling isItemContentEqualWith should not have side effects
     // There was an issue where calling that function would modify values directly to omit keys
@@ -136,5 +140,5 @@ describe("items", () => {
     expect(item2.getAppDataItem("client_updated_at")).to.be.ok;
 
     expect(item1.content.foo).to.equal("bar");
-  })
-})
+  });
+});

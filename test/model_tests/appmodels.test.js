@@ -21,11 +21,16 @@ describe('app models', () => {
 
   after(async function () {
     localStorage.clear();
+    sharedApplication.deinit();
   });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
+  });
+
+  afterEach(async function () {
+    await  this.application.deinit();
   });
 
   it('modelManager should be defined', () => {
@@ -148,7 +153,7 @@ describe('app models', () => {
   });
 
   it('fixes relationship integrity', async function() {
-    let modelManager = this.application.modelManager;
+    const modelManager = this.application.modelManager;
     var item1 = await Factory.createMappedNote(this.application);
     var item2 = await Factory.createMappedNote(this.application);
 
@@ -168,7 +173,6 @@ describe('app models', () => {
   });
 
   it('creating and removing relationships between two items should have valid references', async function() {
-    let modelManager = this.application.modelManager;
     var item1 = await Factory.createMappedNote(this.application);
     var item2 = await Factory.createMappedNote(this.application);
     item1.addItemAsRelationship(item2);
@@ -248,7 +252,7 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
       payload: CreateMaxPayloadFromAnyObject({object: item1})
-    })
+    });
     expect(item2.referencingItemsCount).to.equal(1);
     await modelManager.mapPayloadToLocalItem({
       payload: item1.payloadRepresentation({
@@ -259,7 +263,7 @@ describe('app models', () => {
           }
         }
       })
-    })
+    });
     expect(item2.referencingItemsCount).to.equal(0);
     expect(item1.referencingItemsCount).to.equal(0);
     expect(item1.referencedItemsCount).to.equal(0);
@@ -273,7 +277,7 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
       payload: CreateMaxPayloadFromAnyObject({object: item1})
-    })
+    });
 
     expect(item1.content.references.length).to.equal(1);
     expect(item1.referencedItemsCount).to.equal(1);
@@ -311,7 +315,7 @@ describe('app models', () => {
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
       payload: CreateMaxPayloadFromAnyObject({object: item1})
-    })
+    });
 
     expect(item2.referencingItemsCount).to.equal(1);
 

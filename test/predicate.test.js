@@ -40,7 +40,7 @@ const createItem = () => {
     object: createItemParams()
   })
   return new SFItem(payload);
-}
+};
 
 describe("predicates", () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
@@ -50,12 +50,20 @@ describe("predicates", () => {
     await Factory.initializeApplication(application);
   });
 
+  after(async function () {
+    await application.deinit();
+  });
+
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it('test and operator', () => {
-    let item = createItem();
+    const item = createItem();
     expect(item.satisfiesPredicate(new SFPredicate( "this_field_ignored", "and", [
       ["content.title", "=", "Hello"],
       ["content_type", "=", "Item"]

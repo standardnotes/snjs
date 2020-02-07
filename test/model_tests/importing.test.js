@@ -16,6 +16,10 @@ describe("importing", () => {
     this.application = await Factory.createInitAppWithRandNamespace();
   });
 
+  afterEach(async function () {
+    await this.application.deinit();
+  });
+
   it('importing existing data should keep relationships valid', async function () {
     const modelManager = this.application.modelManager;
 
@@ -34,7 +38,7 @@ describe("importing", () => {
     expect(note.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(1);
 
-    this.application.importData({
+    await this.application.importData({
       data: {
         items: [notePayload, tagPayload]
       }

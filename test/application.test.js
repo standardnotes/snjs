@@ -28,6 +28,8 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1);
     expect(app1.modelManager.allItems.length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect(app2.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
+    app1.deinit();
+    app2.deinit();
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -45,5 +47,7 @@ describe('application instances', () => {
 
     expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    app1.deinit();
+    app2.deinit();
   });
-})
+});

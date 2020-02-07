@@ -49,7 +49,8 @@ describe("singletons", () => {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  })
+    await this.application.deinit();
+  });
 
   it("only resolves to 1 item", async function() {
     /** Privileges are an item we know to always return true for isSingleton */

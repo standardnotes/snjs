@@ -36,6 +36,10 @@ describe('003 protocol operations', () => {
     _key = result.key;
   });
 
+  after(() => {
+    sharedApplication.deinit();
+  });
+
   it('cost minimum', () => {
     expect(sharedApplication.protocolService.costMinimumForVersion("003")).to.equal(110000);
   });

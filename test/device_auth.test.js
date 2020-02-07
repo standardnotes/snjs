@@ -16,7 +16,7 @@ describe('device authentication', () => {
 
   after(async () => {
     localStorage.clear();
-  })
+  });
 
   it('handles application launch with passcode only', async function() {
     const namespace = Factory.randomString();
@@ -44,7 +44,7 @@ describe('device authentication', () => {
         }
       }
       return responses;
-    }
+    };
     await tmpApplication.prepareForLaunch({
       callbacks: {
         authChallengeResponses: handleChallenges
@@ -54,6 +54,7 @@ describe('device authentication', () => {
     await tmpApplication.launch();
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    tmpApplication.deinit();
   });
 
   it('handles application launch with passcode and biometrics', async function() {
@@ -87,7 +88,7 @@ describe('device authentication', () => {
         }
       }
       return responses;
-    }
+    };
     await tmpApplication.prepareForLaunch({
       callbacks: {
         authChallengeResponses: handleChallenges
@@ -98,6 +99,7 @@ describe('device authentication', () => {
     await tmpApplication.launch();
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    tmpApplication.deinit();
   });
 
   it('handles application launch with passcode and account', async function() {
@@ -146,5 +148,6 @@ describe('device authentication', () => {
     ).to.equal(sampleStorageValue);
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
+    tmpApplication.deinit();
   }).timeout(5000);
-})
+});

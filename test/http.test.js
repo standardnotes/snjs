@@ -11,18 +11,16 @@ const expect = chai.expect;
 describe('http manager', () => {
   const httpManager = Factory.globalHttpManager();
   it("formats urls properly 1", async () => {
-    let url = "http://example.org";
-    let params = {foo: "bar"};
-    let result = url + "?foo=bar";
-
+    const url = "http://example.org";
+    const params = {foo: "bar"};
+    const result = url + "?foo=bar";
     expect(httpManager.urlForUrlAndParams(url, params)).to.equal(result);
   });
 
   it("formats urls properly 2", async () => {
-    let url = "http://example.org?name=java";
-    let params = {foo: "bar"};
-    let result = url + "&foo=bar";
-
+    const url = "http://example.org?name=java";
+    const params = {foo: "bar"};
+    const result = url + "&foo=bar";
     expect(httpManager.urlForUrlAndParams(url, params)).to.equal(result);
   });
 });

@@ -12,11 +12,11 @@ describe('2020-01-15 web migration', () => {
 
   beforeEach(() => {
     localStorage.clear();
-  })
+  });
 
   afterEach(() => {
     localStorage.clear();
-  })
+  });
 
   it('2020-01-15 migration with passcode and account', async function () {
     const application = await Factory.createAppWithRandNamespace();
@@ -25,11 +25,11 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator_003.createRootKey({
+    const passcodeResult = await operator003.createRootKey({
       identifier: identifier,
       password: passcode
     });
@@ -37,14 +37,13 @@ describe('2020-01-15 web migration', () => {
       'offlineParams',
       JSON.stringify(passcodeResult.keyParams)
     );
-    const passcodeKey = passcodeResult.key;
 
     /** Create arbitrary storage values and make sure they're migrated */
     const arbitraryValues = {
       foo: 'bar',
       zar: 'tar',
       har: 'car'
-    }
+    };
     for(const key of Object.keys(arbitraryValues)) {
       await application.deviceInterface.setRawStorageValue(
         key,
@@ -53,7 +52,7 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator_003.createRootKey({
+    const accountResult = await operator003.createRootKey({
       identifier: identifier,
       password: password
     });
@@ -68,14 +67,14 @@ describe('2020-01-15 web migration', () => {
     };
     const storagePayload = CreateMaxPayloadFromAnyObject({
       object: {
-        uuid: await operator_003.crypto.generateUUID(),
+        uuid: await operator003.crypto.generateUUID(),
         content: {
           storage: embeddedStorage
         },
         content_type: ContentTypes.EncryptedStorage
       }
-    })
-    const encryptionParams = await operator_003.generateEncryptionParameters({
+    });
+    const encryptionParams = await operator003.generateEncryptionParameters({
       payload: storagePayload,
       key: passcodeResult.key,
       format: PayloadFormats.EncryptedString
@@ -83,7 +82,7 @@ describe('2020-01-15 web migration', () => {
     const persistPayload = CreateMaxPayloadFromAnyObject({
       object: storagePayload,
       override: encryptionParams
-    })
+    });
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload)
@@ -91,7 +90,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
       format: PayloadFormats.EncryptedString
@@ -138,7 +137,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
@@ -156,6 +155,8 @@ describe('2020-01-15 web migration', () => {
       const value = await application.storageManager.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
+
+    await application.deinit();
   });
 
   it('2020-01-15 migration with passcode only', async function () {
@@ -165,11 +166,11 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator_003.createRootKey({
+    const passcodeResult = await operator003.createRootKey({
       identifier: identifier,
       password: passcode
     });
@@ -184,7 +185,7 @@ describe('2020-01-15 web migration', () => {
       foo: 'bar',
       zar: 'tar',
       har: 'car'
-    }
+    };
     for(const key of Object.keys(arbitraryValues)) {
       await application.deviceInterface.setRawStorageValue(
         key,
@@ -197,14 +198,14 @@ describe('2020-01-15 web migration', () => {
     };
     const storagePayload = CreateMaxPayloadFromAnyObject({
       object: {
-        uuid: await operator_003.crypto.generateUUID(),
+        uuid: await operator003.crypto.generateUUID(),
         content: {
           storage: embeddedStorage
         },
         content_type: ContentTypes.EncryptedStorage
       }
-    })
-    const encryptionParams = await operator_003.generateEncryptionParameters({
+    });
+    const encryptionParams = await operator003.generateEncryptionParameters({
       payload: storagePayload,
       key: passcodeResult.key,
       format: PayloadFormats.EncryptedString
@@ -212,7 +213,7 @@ describe('2020-01-15 web migration', () => {
     const persistPayload = CreateMaxPayloadFromAnyObject({
       object: storagePayload,
       override: encryptionParams
-    })
+    });
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload)
@@ -220,7 +221,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
@@ -267,7 +268,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
@@ -285,6 +286,7 @@ describe('2020-01-15 web migration', () => {
       const value = await application.storageManager.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
+    await application.deinit();
   });
 
   it('2020-01-15 migration with account only', async function () {
@@ -294,12 +296,12 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator_003.createRootKey({
+    const accountResult = await operator003.createRootKey({
       identifier: identifier,
       password: password
     });
@@ -313,7 +315,7 @@ describe('2020-01-15 web migration', () => {
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
       auth_params: JSON.stringify(accountResult.keyParams)
-    }
+    };
     for(const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
         key,
@@ -323,7 +325,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
       format: PayloadFormats.EncryptedString
@@ -363,7 +365,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(accountResult.keyParams);
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey).to.be.ok;
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
@@ -386,6 +388,8 @@ describe('2020-01-15 web migration', () => {
       const value = await application.storageManager.getValue(key);
       expect(storage[key]).to.equal(value);
     }
+
+    await application.deinit();
   });
 
   it('2020-01-15 migration with no account and no passcode', async function () {
@@ -395,13 +399,13 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     /** Create arbitrary storage values and make sure they're migrated */
     const storage = {
       foo: 'bar',
       zar: 'tar',
       har: 'car',
-    }
+    };
     for(const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
         key,
@@ -411,7 +415,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteParams = await operator_003.generateEncryptionParameters({
+    const noteParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       format: PayloadFormats.DecryptedBareObject
     });
@@ -443,7 +447,7 @@ describe('2020-01-15 web migration', () => {
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey).to.not.be.ok;
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
 
@@ -458,5 +462,7 @@ describe('2020-01-15 web migration', () => {
       const value = await application.storageManager.getValue(key);
       expect(storage[key]).to.equal(value);
     }
+
+    await application.deinit();
   });
 });

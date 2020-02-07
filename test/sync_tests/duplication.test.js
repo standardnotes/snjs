@@ -11,17 +11,13 @@ const expect = chai.expect;
 describe("duplication", () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  const syncOptions = {
-    checkIntegrity: true
-  }
-
   before(async function() {
     localStorage.clear();
-  })
+  });
 
   after(async function() {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -33,13 +29,14 @@ describe("duplication", () => {
       email: this.email,
       password: this.password
     });
-  })
+  });
 
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  })
+    await this.application.deinit();
+  });
 
   function createDirtyPayload(contentType) {
     const params = {

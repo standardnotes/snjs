@@ -13,18 +13,22 @@ describe("basic auth", () => {
 
   before(async function () {
     localStorage.clear();
-  })
+  });
 
   after(async function () {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  })
+  });
+
+  afterEach(async function() {
+    this.application.deinit();
+  });
 
   it("successfully register new account",  async function () {
     const response = await this.application.register({

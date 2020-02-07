@@ -14,11 +14,12 @@ describe('offline syncing', () => {
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-  })
+  });
 
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
-  })
+    await this.application.deinit();
+  });
 
   before(async function() {
     localStorage.clear();
@@ -26,15 +27,15 @@ describe('offline syncing', () => {
 
   after(async function() {
     localStorage.clear();
-  })
+  });
 
   it("should sync item with no passcode", async function() {
-    const item = await Factory.createMappedNote(this.application);
+    await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncManager.sync()
+    await this.application.syncManager.sync();
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
@@ -56,12 +57,12 @@ describe('offline syncing', () => {
 
   it("should sync item encrypted with passcode", async function() {
     await this.application.setPasscode('foobar');
-    const item = await Factory.createMappedNote(this.application);
+    await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncManager.sync()
+    await this.application.syncManager.sync();
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);

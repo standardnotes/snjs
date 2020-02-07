@@ -1,4 +1,5 @@
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Mocha Tests</title>
@@ -8,16 +9,13 @@
       background-color: rgb(138, 138, 138);
     }
   </style>
-</head>
-<body>
-  <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
   <script src="../dist/snjs.js"></script>
   <script>
     Object.assign(window, SNLibrary);
-    mocha.setup('bdd')
+    mocha.setup('bdd');
   </script>
-
+  
   <script type="module" src="protocol.test.js"></script>
   <script type="module" src="utils.test.js"></script>
   <script type="module" src="001.test.js"></script>
@@ -53,5 +51,11 @@
     mocha.checkLeaks();
     mocha.run();
   </script>
+</head>
+
+<body>
+  <div id="mocha"></div>
+ 
 </body>
+
 </html>

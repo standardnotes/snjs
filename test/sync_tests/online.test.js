@@ -8,7 +8,7 @@ import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('online syncing', () => {
+describe('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -33,20 +33,17 @@ describe.only('online syncing', () => {
       email: this.email,
       password: this.password
     });
-  })
+  });
 
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    await this.application.deinit();
   })
 
   function noteObjectsFromObjects(items) {
     return items.filter((item) => item.content_type === 'Note');
-  }
-
-  const signin = async function() {
-    await Factory.globalSessionManager().login(Factory.serverURL(), email, password, true, null);
   }
 
   it("should register and sync basic model online", async function() {
@@ -143,13 +140,13 @@ describe.only('online syncing', () => {
     this.application.syncManager.ut_endLatencySimulator();
   }).timeout(10000);
 
-  it.only("allows me to save data after I've signed out", async function() {
+  it("allows me to save data after I've signed out", async function() {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     await this.application.signOut();
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.modelManager.setItemDirty(note, true);
+    await this.application.modelManager.setItemDirty(note);
     await this.application.syncManager.sync(syncOptions);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     const notePayload = noteObjectsFromObjects(rawPayloads);

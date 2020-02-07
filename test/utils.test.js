@@ -13,7 +13,7 @@ describe('utils', () => {
 
   it("findInArray", async () => {
     expect(findInArray).to.not.be.null;
-    let array = [{id: 1},{id: 2},{id: 3},{id: 4}]
+    const array = [{id: 1},{id: 2},{id: 3},{id: 4}]
     expect(findInArray(array, "id", 1)).to.be.ok;
     expect(findInArray(array, "id", "foo")).to.not.be.ok;
   })

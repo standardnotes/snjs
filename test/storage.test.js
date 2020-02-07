@@ -21,31 +21,37 @@ describe("storage manager", () => {
     await Factory.initializeApplication(sharedApplication);
   });
 
+  after(async function () {
+    localStorage.clear();
+    await sharedApplication.deinit();
+  });
+
   beforeEach(async function() {
     localStorage.clear();
     this.expectedKeyCount = BASE_KEY_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  })
+  });
 
   afterEach(async function() {
+    await this.application.deinit();
     localStorage.clear();
-  })
+  });
 
   it("should set and retrieve values", async function () {
     const key = "foo";
     const value = "bar";
     await sharedApplication.storageManager.setValue(key, value);
     expect(await sharedApplication.storageManager.getValue(key)).to.eql(value);
-  })
+  });
 
   it("should set and retrieve items", async function () {
     const payload = Factory.createNotePayload();
     await sharedApplication.storageManager.savePayload(payload);
     const payloads = await sharedApplication.storageManager.getAllRawPayloads();
     expect(payloads.length).to.equal(1);
-  })
+  });
 
   it("should clear values", async function () {
     const key = "foo";
@@ -53,7 +59,7 @@ describe("storage manager", () => {
     await sharedApplication.storageManager.setValue(key, value);
     await sharedApplication.storageManager.clearAllData();
     expect(await sharedApplication.storageManager.getValue(key)).to.not.be.ok;
-  })
+  });
 
   it("regular session should persist data", async function () {
     await Factory.registerUserToApplication({
@@ -72,7 +78,7 @@ describe("storage manager", () => {
     expect(Object.keys(localStorage).length).to.equal(this.expectedKeyCount);
     const retrievedValue = await this.application.storageManager.getValue(key);
     expect(retrievedValue).to.equal(value);
-  })
+  });
 
   it("ephemeral session should not persist data", async function () {
     await Factory.registerUserToApplication({
@@ -90,7 +96,7 @@ describe("storage manager", () => {
     expect(Object.keys(localStorage).length).to.equal(0);
     const retrievedValue = await this.application.storageManager.getValue(key);
     expect(retrievedValue).to.equal(value);
-  })
+  });
 
   it("disabling storage encryption should store items without encryption", async function () {
     await Factory.registerUserToApplication({

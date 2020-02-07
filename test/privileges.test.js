@@ -12,18 +12,22 @@ describe("privileges", () => {
 
   before(async function () {
     localStorage.clear();
-  })
+  });
 
   after(async function () {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.privilegesManager = this.application.privilegesManager;
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   it("loads default actions and credentials", async function () {
     expect(this.privilegesManager.getAvailableActions().length).to.be.above(0);

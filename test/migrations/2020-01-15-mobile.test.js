@@ -12,11 +12,11 @@ describe('2020-01-15 mobile migration', () => {
 
   beforeEach(() => {
     localStorage.clear();
-  })
+  });
 
   afterEach(() => {
     localStorage.clear();
-  })
+  });
 
   it('2020-01-15 migration with passcode and account', async function () {
     const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
@@ -25,11 +25,11 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator_003.createRootKey({
+    const passcodeResult = await operator003.createRootKey({
       identifier: identifier,
       password: passcode
     });
@@ -42,7 +42,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator_003.createRootKey({
+    const accountResult = await operator003.createRootKey({
       identifier: identifier,
       password: password
     });
@@ -55,6 +55,7 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
+      version: SNProtocolOperator003.versionString(),
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
@@ -74,8 +75,8 @@ describe('2020-01-15 mobile migration', () => {
           }
         }
       }
-    })
-    const encryptedKeyParams = await operator_003.generateEncryptionParameters({
+    });
+    const encryptedKeyParams = await operator003.generateEncryptionParameters({
       payload: keyPayload,
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
@@ -83,12 +84,12 @@ describe('2020-01-15 mobile migration', () => {
     const wrappedKey = CreateMaxPayloadFromAnyObject({
       object: keyPayload,
       override: encryptedKeyParams
-    })
+    });
     await application.deviceInterface.setRawStorageValue(
       'encrypted_account_keys',
       JSON.stringify(wrappedKey)
     );
-    const biometricPrefs = {enabled: true, timing: 'immediately'};
+    const biometricPrefs = { enabled: true, timing: 'immediately' };
     /** Create legacy storage. Storage in mobile was never wrapped. */
     await application.deviceInterface.setRawStorageValue(
       'biometrics_prefs',
@@ -100,7 +101,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
       format: PayloadFormats.EncryptedString
@@ -116,8 +117,8 @@ describe('2020-01-15 mobile migration', () => {
       callbacks: {
         authChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -143,12 +144,7 @@ describe('2020-01-15 mobile migration', () => {
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
-    /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
-      StorageKeys.RootKeyParams,
-      StorageValueModes.Nonwrapped
-    );
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
@@ -166,11 +162,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageManager.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
+
+    await application.deinit();
   });
-
-
-
-
 
 
   it('2020-01-15 migration with passcode only', async function () {
@@ -180,11 +174,11 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator_003.createRootKey({
+    const passcodeResult = await operator003.createRootKey({
       identifier: identifier,
       password: passcode
     });
@@ -201,7 +195,7 @@ describe('2020-01-15 mobile migration', () => {
       }
     });
 
-    const biometricPrefs = {enabled: true, timing: 'immediately'};
+    const biometricPrefs = { enabled: true, timing: 'immediately' };
     /** Create legacy storage. Storage in mobile was never wrapped. */
     await application.deviceInterface.setRawStorageValue(
       'biometrics_prefs',
@@ -213,7 +207,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
@@ -229,8 +223,8 @@ describe('2020-01-15 mobile migration', () => {
       callbacks: {
         authChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -254,12 +248,7 @@ describe('2020-01-15 mobile migration', () => {
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
-    /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
-      StorageKeys.RootKeyParams,
-      StorageValueModes.Nonwrapped
-    );
-    const rootKey = await application.keyManager.getRootKey()
+    const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
@@ -280,9 +269,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageManager.getValue(StorageKeys.MobilePasscodeTiming)
     ).to.eql(passcodeTiming);
+    await application.deinit();
   });
-
-
 
 
 
@@ -294,11 +282,11 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator_003.createRootKey({
+    const accountResult = await operator003.createRootKey({
       identifier: identifier,
       password: password
     });
@@ -307,10 +295,12 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(accountResult.keyParams)
     );
     const accountKey = accountResult.key;
+    expect(accountKey.version).to.equal(SNProtocolOperator003.versionString());
     await application.deviceInterface.setKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
-      ak: accountKey.dataAuthenticationKey
+      ak: accountKey.dataAuthenticationKey,
+      version: SNProtocolOperator003.versionString()
     });
     const biometricPrefs = {
       enabled: true,
@@ -327,7 +317,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator_003.generateEncryptionParameters({
+    const noteEncryptionParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       key: accountKey,
       format: PayloadFormats.EncryptedString
@@ -343,8 +333,8 @@ describe('2020-01-15 mobile migration', () => {
       callbacks: {
         authChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -358,7 +348,6 @@ describe('2020-01-15 mobile migration', () => {
     await application.launch({
       ut_awaitDatabaseLoad: true
     });
-    return;
 
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_ONLY
@@ -369,11 +358,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
-    /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
-      StorageKeys.RootKeyParams,
-      StorageValueModes.Nonwrapped
-    );
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
@@ -392,9 +376,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageManager.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
-  });
 
-
+    await application.deinit();
+  }).timeout(10000);
 
 
 
@@ -406,7 +390,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator_003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const biometricPrefs = {
       enabled: true,
       timing: 'immediately'
@@ -422,7 +406,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteParams = await operator_003.generateEncryptionParameters({
+    const noteParams = await operator003.generateEncryptionParameters({
       payload: notePayload,
       format: PayloadFormats.DecryptedBareObject
     });
@@ -437,8 +421,8 @@ describe('2020-01-15 mobile migration', () => {
       callbacks: {
         authChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new DeviceAuthResponse({
                 challenge,
                 value: passcode
@@ -452,7 +436,6 @@ describe('2020-01-15 mobile migration', () => {
     await application.launch({
       ut_awaitDatabaseLoad: true
     });
-    return;
 
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_NONE
@@ -479,6 +462,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageManager.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
+
+    await application.deinit();
   });
 
 });

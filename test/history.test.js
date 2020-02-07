@@ -13,11 +13,11 @@ describe('session history', () => {
 
   before(async function () {
     localStorage.clear();
-  })
+  });
 
   after(async function () {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -27,7 +27,11 @@ describe('session history', () => {
     this.historyManager.setSessionItemRevisionThreshold(0);
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  })
+  });
+
+  afterEach(async function () {
+    await this.application.deinit();
+  });
 
   async function setTextAndSync(application, item, text) {
     item.text = text;

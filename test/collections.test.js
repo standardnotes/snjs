@@ -18,10 +18,11 @@ describe('payload collections', () => {
 
   after(async () => {
     localStorage.clear();
-  })
+    sharedApplication.deinit();
+  });
 
   it('find', async () => {
-    const payload = Factory.createNotePayload()
+    const payload = Factory.createNotePayload();
     const collection = new PayloadCollection({
       payloads: [payload]
     });

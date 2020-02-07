@@ -6,26 +6,24 @@ import '../../node_modules/chai/chai.js';
 import './../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe("mapping performance", () => {
-  const createModelManager = async () => {
-    const isolatedApplication = await Factory.createInitAppWithRandNamespace();
-    return isolatedApplication.modelManager;
-  }
 
   it("shouldn't take a long time", async () => {
     /*
-      There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
-      which caused searching to be really expensive and caused a huge slowdown.
+    There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
+    which caused searching to be really expensive and caused a huge slowdown.
     */
-    const modelManager = await createModelManager();
+    const application = await Factory.createInitAppWithRandNamespace();
+    const modelManager = application.modelManager;
 
     // create a bunch of notes and tags, and make sure mapping doesn't take a long time
     const noteCount = 1500;
     const tagCount = 10;
-    const tags = [], notes = [];
-    for(let i = 0; i < tagCount; i++) {
+    const tags = [];
+    const notes = [];
+    for (let i = 0; i < tagCount; i++) {
       var tag = {
         uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Tag",
@@ -37,7 +35,7 @@ describe("mapping performance", () => {
       tags.push(tag);
     }
 
-    for(let i = 0; i < noteCount; i++) {
+    for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Note",
@@ -60,16 +58,16 @@ describe("mapping performance", () => {
     }
 
     const payloads = Factory.shuffleArray(tags.concat(notes)).map((item) => {
-      return CreateMaxPayloadFromAnyObject({object: item})
+      return CreateMaxPayloadFromAnyObject({ object: item })
     });
 
     const t0 = performance.now();
     // process items in separate batches, so as to trigger missed references
     let currentIndex = 0;
     const batchSize = 100;
-    for(let i = 0; i < payloads.length; i += batchSize) {
+    for (let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({payloads: subArray});
+      await modelManager.mapPayloadsToLocalItems({ payloads: subArray });
       currentIndex += batchSize;
     }
 
@@ -78,9 +76,10 @@ describe("mapping performance", () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for(let note of modelManager.validItemsForContentType("Note")) {
+    for (const note of modelManager.validItemsForContentType("Note")) {
       expect(note.referencingItemsCount).to.be.above(0);
     }
+    await application.deinit();
   }).timeout(20000);
 
   it("mapping a tag with thousands of notes should be quick", async () => {
@@ -89,7 +88,8 @@ describe("mapping performance", () => {
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
       so that things require less loops in modelManager, regarding missedReferences.
     */
-    const modelManager = await createModelManager();
+    const application = await Factory.createInitAppWithRandNamespace();
+    const modelManager = application.modelManager;
 
     const noteCount = 10000;
     const notes = [];
@@ -103,7 +103,7 @@ describe("mapping performance", () => {
       }
     }
 
-    for(let i = 0; i < noteCount; i++) {
+    for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
         content_type: "Note",
@@ -121,15 +121,15 @@ describe("mapping performance", () => {
       notes.push(note);
     }
 
-    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject({object: item}));
+    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject({ object: item }));
 
     const t0 = performance.now();
     // process items in separate batches, so as to trigger missed references
     let currentIndex = 0;
     const batchSize = 100;
-    for(let i = 0; i < payloads.length; i += batchSize) {
+    for (let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({payloads: subArray});
+      await modelManager.mapPayloadsToLocalItems({ payloads: subArray });
       currentIndex += batchSize;
     }
 
@@ -139,9 +139,10 @@ describe("mapping performance", () => {
     expect(seconds).to.be.at.most(expectedRunTime);
 
     const mappedTag = modelManager.validItemsForContentType("Tag")[0];
-    for(let note of modelManager.validItemsForContentType("Note")) {
+    for (const note of modelManager.validItemsForContentType("Note")) {
       expect(note.referencingItemsCount).to.equal(1);
       expect(note.allReferencingItems[0]).to.equal(mappedTag);
     }
+    await application.deinit();
   }).timeout(20000);
 })

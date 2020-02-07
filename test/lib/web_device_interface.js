@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export default class WebDeviceInterface extends DeviceInterface {
 
   async getRawStorageValue(key) {
@@ -10,7 +11,7 @@ export default class WebDeviceInterface extends DeviceInterface {
       results.push({
         key: key,
         value: localStorage[key]
-      })
+      });
     }
     return results;
   }
@@ -27,7 +28,6 @@ export default class WebDeviceInterface extends DeviceInterface {
     localStorage.clear();
   }
 
-
   /** @database */
 
   _getDatabaseKeyPrefix() {
@@ -43,14 +43,14 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   async getRawDatabasePayloadWithId(id) {
-    return localStorage.getItem(this._keyForPayloadId(id))
+    return localStorage.getItem(this._keyForPayloadId(id));
   }
 
   async getAllRawDatabasePayloads() {
     const models = [];
     for(const key in localStorage) {
       if(key.startsWith(this._getDatabaseKeyPrefix())) {
-        models.push(JSON.parse(localStorage[key]))
+        models.push(JSON.parse(localStorage[key]));
       }
     }
     return models;
@@ -84,21 +84,7 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   /** @keychian */
   async getRawKeychainValue() {
-    if(this.keychainValue) {
-      return this.keychainValue;
-    } else {
-      const authParams = localStorage.getItem('auth_params');
-      if(!authParams) {
-        return null;
-      }
-      const version = JSON.parse(authParams).version;
-      return {
-        mk: localStorage.getItem('mk'),
-        pw: localStorage.getItem('pw'),
-        ak: localStorage.getItem('ak'),
-        version: version
-      }
-    }
+    return this.keychainValue;
   }
 
   async setKeychainValue(value) {

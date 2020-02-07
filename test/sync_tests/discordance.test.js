@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
@@ -8,17 +10,13 @@ const expect = chai.expect;
 describe('sync discordance', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  const syncOptions = {
-    checkIntegrity: true
-  }
-
   before(async function() {
     localStorage.clear();
-  })
+  });
 
   after(async function() {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -30,13 +28,14 @@ describe('sync discordance', () => {
       email: this.email,
       password: this.password
     });
-  })
+  });
 
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  })
+    await this.application.deinit();
+  });
 
   it("should begin discordance upon instructions", async function () {
     await this.application.syncManager.sync({checkIntegrity: false});

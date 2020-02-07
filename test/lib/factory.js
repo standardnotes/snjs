@@ -100,8 +100,8 @@ export default class Factory {
     return rawPayloads.filter((rp) => rp.content_type === type).map((rp) => {
       return CreateMaxPayloadFromAnyObject({
         object: rp
-      })
-    })
+      });
+    });
   }
 
   static async createManyMappedNotes(application, count) {
@@ -111,18 +111,13 @@ export default class Factory {
     }
   }
 
-  static async loginToApplication({application, email, password, ephemeral}) {
+  static async loginToApplication({application, email, password, ephemeral, mergeLocal = true}) {
     return application.signIn({
       url: Factory.serverURL(),
       email: email,
       password: password,
-      ephemeral: ephemeral
-    });
-  }
-
-  static createNotePayload() {
-    return CreateMaxPayloadFromAnyObject({
-      object: this.createNoteParams()
+      ephemeral: ephemeral,
+      mergeLocal: mergeLocal
     });
   }
 

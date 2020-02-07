@@ -18,10 +18,15 @@ describe('002 protocol operations', () => {
 
   // runs once before all tests in this block
   before(async () => {
+    localStorage.clear();
     await Factory.initializeApplication(application);
     const result = await protocol002.createRootKey({identifier: _identifier, password: _password});
     _keyParams = result.keyParams;
     _key = result.key;
+  });
+
+  after(() => {
+    application.deinit();
   });
 
   it('cost minimum', () => {

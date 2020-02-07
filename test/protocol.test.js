@@ -11,7 +11,12 @@ const expect = chai.expect;
 describe('protocol', () => {
   const application = Factory.createApplication();
   before(async () => {
+    localStorage.clear();
     await Factory.initializeApplication(application);
+  });
+
+  after(() => {
+    application.deinit();
   });
 
   it('checks version to make sure its 004', () => {

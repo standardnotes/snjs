@@ -28,6 +28,10 @@ describe('004 protocol operations', () => {
     _key = result.key;
   });
 
+  after(() => {
+    application.deinit();
+  });
+
   it('cost minimum for 004 to be 500,000', () => {
     expect(application.protocolService.costMinimumForVersion("004")).to.equal(500000);
   });

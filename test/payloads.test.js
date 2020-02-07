@@ -18,6 +18,7 @@ describe('payloads', () => {
   });
 
   after(async () => {
+    sharedApplication.deinit();
     localStorage.clear();
   });
 
