@@ -1215,7 +1215,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /** How often to automatically sync, in milliseconds */
 
-var DEFAULT_AUTO_SYNC_INTERVAL = 3000;
+var DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 var SNApplication =
 /*#__PURE__*/
 function () {
@@ -1348,7 +1348,6 @@ function () {
      * @param awaitDatabaseLoad  Option to await database load before marking the app 
      *                           as ready. Used as far as we know only for unit tests.
      */
-    // eslint-disable-next-line camelcase
 
   }, {
     key: "launch",
@@ -1439,7 +1438,7 @@ function () {
                         _this.beginAutoSyncTimer();
 
                         return _context2.abrupt("return", _this.syncManager.sync({
-                          mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_INITIAL"]
+                          mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
                         }));
 
                       case 6:
@@ -1448,7 +1447,7 @@ function () {
                     }
                   }
                 });
-              }); // eslint-disable-next-line camelcase
+              });
 
               if (!awaitDatabaseLoad) {
                 _context3.next = 26;
@@ -1471,6 +1470,8 @@ function () {
       var _this2 = this;
 
       this.autoSyncInterval = this.deviceInterface.interval(function () {
+        _this2.syncManager.log('Syncing from autosync');
+
         _this2.sync();
       }, DEFAULT_AUTO_SYNC_INTERVAL);
     }
@@ -2672,7 +2673,7 @@ function () {
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
               _context34.next = 18;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_INITIAL"]
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
               }));
 
             case 18:
@@ -2750,7 +2751,7 @@ function () {
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
               _context35.next = 19;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_INITIAL"]
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
               }));
 
             case 19:
@@ -20511,7 +20512,7 @@ function (_PureService) {
 /*!*******************************!*\
   !*** ./lib/services/index.js ***!
   \*******************************/
-/*! exports provided: SNAlertManager, SNSessionManager, SNApiService, SNComponentManager, SNHttpManager, SNModelManager, SNSingletonManager, SNActionsManager, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SYNC_MODE_INITIAL, DeviceAuthService, SNStorageManager, StorageEncryptionPolicies, StoragePersistencePolicies */
+/*! exports provided: SNAlertManager, SNSessionManager, SNApiService, SNComponentManager, SNHttpManager, SNModelManager, SNSingletonManager, SNActionsManager, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SYNC_MODE_DOWNLOAD_FIRST, DeviceAuthService, SNStorageManager, StorageEncryptionPolicies, StoragePersistencePolicies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20566,7 +20567,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SNSyncManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_INITIAL", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SYNC_MODE_INITIAL"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DOWNLOAD_FIRST", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SYNC_MODE_DOWNLOAD_FIRST"]; });
 
 /* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
@@ -20671,7 +20672,7 @@ function (_PureService) {
     value: function registerSyncObserver() {
       var _this2 = this;
 
-      this.syncManager.addEventObserver(function _callee(eventName, data) {
+      this.syncManager.addEventObserver(function _callee(eventName) {
         return regeneratorRuntime.async(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -20685,13 +20686,13 @@ function (_PureService) {
                 return regeneratorRuntime.awrap(_this2.handleFullSyncCompletion());
 
               case 3:
-                if (!(eventName !== _Lib_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].InitialSyncCompleted)) {
+                if (!(eventName === _Lib_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].DownloadFirstSyncCompleted)) {
                   _context.next = 6;
                   break;
                 }
 
                 _context.next = 6;
-                return regeneratorRuntime.awrap(_this2.handleInitialSyncCompletion());
+                return regeneratorRuntime.awrap(_this2.handleDownloadFirstSyncCompletion());
 
               case 6:
               case "end":
@@ -20701,11 +20702,20 @@ function (_PureService) {
         });
       });
     }
+    /** 
+     * When a download-first sync completes, it means we've completed a (potentially multipage)
+     * sync where we only downloaded what the server had before uploading anything. We will be
+     * allowed to make local accomadations here before the server begins with the upload
+     * part of the sync (automatically runs after download-first sync completes).
+     * We use this to see if the server has any default itemsKeys, and if so, allows us to 
+     * delete any never-synced items keys we have here locally.
+     */
+
   }, {
-    key: "handleInitialSyncCompletion",
-    value: function handleInitialSyncCompletion() {
+    key: "handleDownloadFirstSyncCompletion",
+    value: function handleDownloadFirstSyncCompletion() {
       var allItemsKeys, neverSynced, defaultSyncedKey;
-      return regeneratorRuntime.async(function handleInitialSyncCompletion$(_context2) {
+      return regeneratorRuntime.async(function handleDownloadFirstSyncCompletion$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
@@ -28080,7 +28090,7 @@ var SyncEvents = {
 
   /** A single sync is just one round-trip to the server completion */
   SingleSyncCompleted: 'sync:single-completed',
-  InitialSyncCompleted: 'sync:initial-completed',
+  DownloadFirstSyncCompleted: 'sync:initial-completed',
   SyncTakingTooLong: 'sync:taking-too-long',
   SyncError: 'sync:error',
   SyncException: 'sync:sync-exception',
@@ -28188,7 +28198,7 @@ var SIGNAL_TYPE_STATUS_CHANGED = 2;
 /*!*******************************************!*\
   !*** ./lib/services/sync/sync_manager.js ***!
   \*******************************************/
-/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SYNC_MODE_DEFAULT, SYNC_MODE_INITIAL, SNSyncManager */
+/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SYNC_MODE_DEFAULT, SYNC_MODE_DOWNLOAD_FIRST, SNSyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28196,7 +28206,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return TIMING_STRATEGY_RESOLVE_ON_NEXT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return TIMING_STRATEGY_FORCE_SPAWN_NEW; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DEFAULT", function() { return SYNC_MODE_DEFAULT; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_INITIAL", function() { return SYNC_MODE_INITIAL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DOWNLOAD_FIRST", function() { return SYNC_MODE_DOWNLOAD_FIRST; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return SNSyncManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
@@ -28267,7 +28277,7 @@ var INVALID_SESSION_RESPONSE_STATUS = 401;
 var TIMING_STRATEGY_RESOLVE_ON_NEXT = 1;
 var TIMING_STRATEGY_FORCE_SPAWN_NEW = 2;
 var SYNC_MODE_DEFAULT = 1;
-var SYNC_MODE_INITIAL = 2;
+var SYNC_MODE_DOWNLOAD_FIRST = 2;
 var SNSyncManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -28868,7 +28878,7 @@ function (_PureService) {
      *
      * @param mode            SYNC_MODE_DEFAULT
      *                        Performs a standard sync, uploading any dirty items and retrieving items.
-     *                        SYNC_MODE_INITIAL
+     *                        SYNC_MODE_DOWNLOAD_FIRST
      *                        The first sync for an account, where we first want to download all remote items first
      *                        before uploading any dirty items. This allows a consumer, for example, to download
      *                        all data to see if user has an items key, and if not, only then create a new one.
@@ -29030,7 +29040,7 @@ function (_PureService) {
               break;
 
             case 46:
-              if (useMode === SYNC_MODE_INITIAL) {
+              if (useMode === SYNC_MODE_DOWNLOAD_FIRST) {
                 uploadPayloads = [];
               }
 
@@ -29134,14 +29144,14 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.handleNeverSyncedDeleted(neverSyncedDeleted));
 
             case 84:
-              if (!(useMode === SYNC_MODE_INITIAL)) {
+              if (!(useMode === SYNC_MODE_DOWNLOAD_FIRST)) {
                 _context12.next = 91;
                 break;
               }
 
               this.completedInitialSync = true;
               _context12.next = 88;
-              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_18__["SyncEvents"].InitialSyncCompleted));
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_18__["SyncEvents"].DownloadFirstSyncCompleted));
 
             case 88:
               return _context12.abrupt("return", this.sync());
@@ -29621,6 +29631,7 @@ function (_PureService) {
 
             case 84:
               if (this.state.needsSync && operation.done) {
+                this.log('Syncing again from integrity check');
                 this.sync({
                   checkIntegrity: true,
                   timingStrategy: TIMING_STRATEGY_FORCE_SPAWN_NEW

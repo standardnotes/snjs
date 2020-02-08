@@ -38,9 +38,9 @@ describe('online syncing', () => {
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
-  })
+    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+  });
 
   function noteObjectsFromObjects(items) {
     return items.filter((item) => item.content_type === 'Note');
@@ -663,7 +663,7 @@ describe('online syncing', () => {
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
 
-  it("should handle downloading with sync pagination", async function() {
+  it.only("should handle downloading with sync pagination", async function() {
     const largeItemCount = 160;
     for(let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application);
@@ -680,7 +680,7 @@ describe('online syncing', () => {
     expect(this.application.modelManager.allItems.length).to.equal(0);
 
     /** Download all data */
-    await this.application.syncManager.sync({syncOptions});
+    await this.application.syncManager.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
