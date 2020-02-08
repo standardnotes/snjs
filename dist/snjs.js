@@ -19544,7 +19544,9 @@ function (_PureService) {
             var item = _step.value;
 
             try {
-              _this2.addHistoryEntryForItem(item);
+              if (!item.deleted) {
+                _this2.addHistoryEntryForItem(item);
+              }
             } catch (e) {
               console.error('Unable to add item history entry:', e);
             }
