@@ -50,7 +50,7 @@ export default class Factory {
         }
       },
     });
-    await application.launch({ut_awaitDatabaseLoad: true});
+    await application.launch({awaitDatabaseLoad: true});
   }
 
   static async registerUserToApplication({application, email, password, ephemeral}) {

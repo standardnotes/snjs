@@ -51,10 +51,10 @@ describe('device authentication', () => {
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch();
+    await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
-    tmpApplication.deinit();
+    await tmpApplication.deinit();
   });
 
   it('handles application launch with passcode and biometrics', async function() {
@@ -96,7 +96,7 @@ describe('device authentication', () => {
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     expect((await tmpApplication.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
-    await tmpApplication.launch();
+    await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     tmpApplication.deinit();
@@ -142,7 +142,7 @@ describe('device authentication', () => {
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch();
+    await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(
       await tmpApplication.storageManager.getValue(sampleStorageKey)
     ).to.equal(sampleStorageValue);

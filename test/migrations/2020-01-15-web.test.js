@@ -119,7 +119,7 @@ describe('2020-01-15 web migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_PLUS_WRAPPER
@@ -250,7 +250,7 @@ describe('2020-01-15 web migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_WRAPPER_ONLY
@@ -322,7 +322,6 @@ describe('2020-01-15 web migration', () => {
         storage[key]
       );
     }
-
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptionParameters({
@@ -345,20 +344,17 @@ describe('2020-01-15 web migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
-
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_ONLY
     );
-
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
       StorageValueModes.Default
     );
     const valueStore = application.storageManager.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
-
     /** Embedded value should match */
     const migratedKeyParams = await application.storageManager.getValue(
       StorageKeys.RootKeyParams,
@@ -367,6 +363,7 @@ describe('2020-01-15 web migration', () => {
     expect(migratedKeyParams).to.eql(accountResult.keyParams);
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey).to.be.ok;
+    
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
@@ -434,7 +431,7 @@ describe('2020-01-15 web migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
 
     expect(application.keyManager.keyMode).to.equal(

@@ -130,7 +130,7 @@ describe('2020-01-15 mobile migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
 
     expect(application.keyManager.keyMode).to.equal(
@@ -239,7 +239,7 @@ describe('2020-01-15 mobile migration', () => {
       KEY_MODE_WRAPPER_ONLY
     );
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
     /** Should be decrypted */
     const storageMode = application.storageManager.domainKeyForMode(
@@ -271,9 +271,6 @@ describe('2020-01-15 mobile migration', () => {
     ).to.eql(passcodeTiming);
     await application.deinit();
   });
-
-
-
 
   it('2020-01-15 migration with account only', async function () {
     const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
@@ -346,7 +343,7 @@ describe('2020-01-15 mobile migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
 
     expect(application.keyManager.keyMode).to.equal(
@@ -379,8 +376,6 @@ describe('2020-01-15 mobile migration', () => {
 
     await application.deinit();
   }).timeout(10000);
-
-
 
 
   it('2020-01-15 migration with no account and no passcode', async function () {
@@ -434,7 +429,7 @@ describe('2020-01-15 mobile migration', () => {
       }
     });
     await application.launch({
-      ut_awaitDatabaseLoad: true
+      awaitDatabaseLoad: true
     });
 
     expect(application.keyManager.keyMode).to.equal(
