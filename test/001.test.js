@@ -66,8 +66,8 @@ describe('001 protocol operations', () => {
 
   it('generates existing keys for key params', async () => {
     const key = await protocol001.computeRootKey({ password: _password, keyParams: _keyParams });
-    expect(key.content).to.have.property("pw");
-    expect(key.content).to.have.property("mk");
+    expect(key.content).to.have.property("serverPassword");
+    expect(key.content).to.have.property("masterKey");
     expect(key.compare(_key)).to.be.true;
   });
 });

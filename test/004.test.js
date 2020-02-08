@@ -46,9 +46,10 @@ describe('004 protocol operations', () => {
     expect(result).to.have.property("keyParams");
 
     expect(result.key.masterKey).to.be.ok;
-    expect(() => result.key.dataAuthenticationKey).to.throw();
+
     expect(result.key.serverPassword).to.not.be.null;
     expect(result.key.mk).to.not.be.ok;
+    expect(result.key.dataAuthenticationKey).to.not.be.ok;
 
     expect(result.keyParams.seed).to.not.be.null;
     expect(result.keyParams.kdfIterations).to.not.be.null;
