@@ -61,7 +61,7 @@ describe("singletons", () => {
     this.expectedItemCount++;
     const items = await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [privs1, privs2, privs3]
-    })
+    });
     await this.application.modelManager.setItemsDirty(items);
     await this.application.syncManager.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
@@ -71,7 +71,7 @@ describe("singletons", () => {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
-    })
+    });
     this.expectedItemCount++;
     await this.application.syncManager.sync();
     /** Set after sync so that it syncs properly */
@@ -81,7 +81,7 @@ describe("singletons", () => {
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload
-    })
+    });
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;

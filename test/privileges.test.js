@@ -43,7 +43,7 @@ describe("privileges", () => {
     const privileges = await this.privilegesManager.getPrivileges();
     privileges.addCredentialForAction(
       ProtectedActions.ViewProtectedNotes,
-      PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE
+      PrivilegeCredentials.LocalPasscode
     );
     await this.application.setPasscode('foobar');
     const credentials = await this.privilegesManager.netCredentialsForAction(

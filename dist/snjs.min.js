@@ -3816,7 +3816,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNMfa, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, DeviceAuthResponse, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, Challenges, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD, PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNMfa, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, DeviceAuthResponse, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, Challenges, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4036,9 +4036,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_25__["ProtectedActions"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_25__["PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_25__["PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_25__["PrivilegeCredentials"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_25__["PRIVILEGE_SESSION_LENGTH_NONE"]; });
 
@@ -7158,7 +7156,8 @@ var ContentTypes = {
   ServerExtension: 'SF|Extension',
   FilesafeCredentials: 'SN|FileSafe|Credentials',
   FilesafeFileMetadata: 'SN|FileSafe|FileMetadata',
-  FilesafeIntegration: 'SN|FileSafe|Integration'
+  FilesafeIntegration: 'SN|FileSafe|Integration',
+  ExtensionRepo: 'SN|ExtensionRepo'
 };
 function displayStringForContentType(contentType) {
   var _ContentTypes$Note$Co;
@@ -7955,6 +7954,11 @@ function () {
   }
 
   _createClass(SFPredicate, null, [{
+    key: "CompoundPredicate",
+    value: function CompoundPredicate(predicates) {
+      return new SFPredicate('ignored', 'and', predicates);
+    }
+  }, {
     key: "FromArray",
     value: function FromArray(array) {
       return new SFPredicate(array[0], array[1], array[2]);
@@ -24433,14 +24437,13 @@ function (_PureService) {
 /*!*******************************************************!*\
   !*** ./lib/services/privileges/privileges_manager.js ***!
   \*******************************************************/
-/*! exports provided: ProtectedActions, PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD, PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesManager */
+/*! exports provided: ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return ProtectedActions; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD", function() { return PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE", function() { return PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return PrivilegeCredentials; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return PRIVILEGE_SESSION_LENGTH_NONE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return PRIVILEGE_SESSION_LENGTH_ONE_HOUR; });
@@ -24482,8 +24485,10 @@ var ProtectedActions = {
   ManagePasscode: 'ActionManagePasscode',
   DeleteNote: 'ActionDeleteNote'
 };
-var PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD = 'CredentialAccountPassword';
-var PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE = 'CredentialLocalPasscode';
+var PrivilegeCredentials = {
+  AccountPassword: 'CredentialAccountPassword',
+  LocalPasscode: 'CredentialLocalPasscode'
+};
 var PRIVILEGE_SESSION_LENGTH_NONE = 0;
 var PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
 var PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
@@ -24528,7 +24533,7 @@ function (_PureService) {
       this.availableActions = Object.keys(ProtectedActions).map(function (key) {
         return ProtectedActions[key];
       });
-      this.availableCredentials = [PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD, PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE];
+      this.availableCredentials = [PrivilegeCredentials.AccountPassword, PrivilegeCredentials.LocalPasscode];
       this.sessionLengths = [PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK];
     }
   }, {
@@ -24575,7 +24580,7 @@ function (_PureService) {
 
               credential = _step.value;
 
-              if (!(credential === PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD)) {
+              if (!(credential === PrivilegeCredentials.AccountPassword)) {
                 _context.next = 19;
                 break;
               }
@@ -24594,7 +24599,7 @@ function (_PureService) {
               break;
 
             case 19:
-              if (!(credential === PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE)) {
+              if (!(credential === PrivilegeCredentials.LocalPasscode)) {
                 _context.next = 24;
                 break;
               }
@@ -24980,7 +24985,7 @@ function (_PureService) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
-              if (!(credential === PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD)) {
+              if (!(credential === PrivilegeCredentials.AccountPassword)) {
                 _context11.next = 4;
                 break;
               }
@@ -24988,7 +24993,7 @@ function (_PureService) {
               return _context11.abrupt("return", this.keyManager.validateAccountPassword(value));
 
             case 4:
-              if (!(credential === PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE)) {
+              if (!(credential === PrivilegeCredentials.LocalPasscode)) {
                 _context11.next = 6;
                 break;
               }
@@ -25006,11 +25011,11 @@ function (_PureService) {
     key: "displayInfoForCredential",
     value: function displayInfoForCredential(credential) {
       var metadata = {};
-      metadata[PRIVILEGE_CREDENTIAL_ACCOUNT_PASSWORD] = {
+      metadata[PrivilegeCredentials.AccountPassword] = {
         label: "Account Password",
         prompt: "Please enter your account password."
       };
-      metadata[PRIVILEGE_CREDENTIAL_LOCAL_PASSCODE] = {
+      metadata[PrivilegeCredentials.LocalPasscode] = {
         label: "Local Passcode",
         prompt: "Please enter your local passcode."
       };
@@ -26236,6 +26241,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -26253,6 +26259,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -26501,7 +26508,7 @@ function (_PureService) {
               _context4.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"];
               _context4.t1 = createPayload;
               _context4.next = 17;
-              return regeneratorRuntime.awrap(Uuid.GenerateUuid());
+              return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_4__["Uuid"].GenerateUuid());
 
             case 17:
               _context4.t2 = _context4.sent;
@@ -26592,14 +26599,20 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+/** @public */
+
 var StoragePersistencePolicies = {
   Default: 1,
   Ephemeral: 2
 };
+/** @public */
+
 var StorageEncryptionPolicies = {
   Default: 1,
   Disabled: 2
 };
+/** @public */
+
 var StorageValueModes = {
   /** Stored inside wrapped encrpyed storage object */
   Default: 1,
@@ -26607,6 +26620,8 @@ var StorageValueModes = {
   /** Stored outside storage object, unencrypted */
   Nonwrapped: 2
 };
+/** @private */
+
 var ValueModesKeys = {
   /* Is encrypted */
   Wrapped: 'wrapped',
