@@ -38,7 +38,7 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new DeviceAuthResponse({challenge, value});
+          const response = new ChallengeResponse({challenge, value});
           responses.push(response);
           numPasscodeAttempts++;
         }
@@ -47,7 +47,7 @@ describe('device authentication', () => {
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: handleChallenges
+        requiresChallengeResponses: handleChallenges
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
@@ -77,11 +77,11 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new DeviceAuthResponse({challenge, value});
+          const response = new ChallengeResponse({challenge, value});
           responses.push(response);
           numPasscodeAttempts++;
         } else if(challenge === Challenges.Biometric) {
-          responses.push(new DeviceAuthResponse({
+          responses.push(new ChallengeResponse({
             challenge: challenge,
             value: true
           }));
@@ -91,7 +91,7 @@ describe('device authentication', () => {
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: handleChallenges
+        requiresChallengeResponses: handleChallenges
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
@@ -130,7 +130,7 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = passcode;
-          const response = new DeviceAuthResponse({challenge, value});
+          const response = new ChallengeResponse({challenge, value});
           responses.push(response);
         }
       }
@@ -138,7 +138,7 @@ describe('device authentication', () => {
     }
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: handleChallenges
+        requiresChallengeResponses: handleChallenges
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;

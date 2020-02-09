@@ -115,11 +115,11 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: (challenges) => {
+        requiresChallengeResponses: (challenges) => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new DeviceAuthResponse({
+              responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
               }));
@@ -221,11 +221,11 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: (challenges) => {
+        requiresChallengeResponses: (challenges) => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new DeviceAuthResponse({
+              responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
               }));
@@ -328,11 +328,11 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: (challenges) => {
+        requiresChallengeResponses: (challenges) => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new DeviceAuthResponse({
+              responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
               }));
@@ -414,11 +414,11 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: (challenges) => {
+        requiresChallengeResponses: (challenges) => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new DeviceAuthResponse({
+              responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
               }));

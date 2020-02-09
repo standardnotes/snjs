@@ -46,8 +46,11 @@ export default class Factory {
   static async initializeApplication(application) {
     await application.prepareForLaunch({
       callbacks: {
-        authChallengeResponses: (handleChallengeResponses) => {
+        requiresChallengeResponses: (handleChallengeResponses) => {
           throw 'Factory application shouldnt have challenges';
+        },
+        handleChallengeFailures: (responses) => {
+          
         }
       },
     });

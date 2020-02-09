@@ -1278,6 +1278,7 @@ function () {
     this.services = [];
     this.streamObservers = [];
     this.serviceObservers = [];
+    this.managedSubscribers = [];
     this.constructServices();
   }
   /**
@@ -1285,10 +1286,11 @@ function () {
    * The first thing consumers should call when starting their app.
    * This function will load all services in their correct order.
    * @param callbacks
-   *          async .authChallengeResponses(challenges)
+   *          async .requiresChallengeResponses(challenges)
    *            @param challenges
    *          async .onReady
    *             When the launching client can register app and service observers.
+   *          .handleChallengeFailures
    *          
    An array of DeviceAuthentication Challenges that require responses.
    */
@@ -1304,7 +1306,7 @@ function () {
             case 0:
               callbacks = _ref2.callbacks;
 
-              if (callbacks.authChallengeResponses) {
+              if (callbacks.requiresChallengeResponses) {
                 _context.next = 3;
                 break;
               }
@@ -1516,7 +1518,7 @@ function () {
   }, {
     key: "handleLaunchChallenge",
     value: function handleLaunchChallenge(challenges) {
-      var pendingChallenges, responses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, response, valid;
+      var pendingChallenges, response, responses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _response, valid;
 
       return regeneratorRuntime.async(function handleLaunchChallenge$(_context5) {
         while (1) {
@@ -1526,94 +1528,101 @@ function () {
 
             case 1:
               if (!(pendingChallenges.length > 0)) {
-                _context5.next = 38;
+                _context5.next = 43;
                 break;
               }
 
               _context5.next = 4;
-              return regeneratorRuntime.awrap(this.launchCallbacks.authChallengeResponses(pendingChallenges));
+              return regeneratorRuntime.awrap(this.launchCallbacks.requiresChallengeResponses(pendingChallenges));
 
             case 4:
-              responses = _context5.sent;
+              response = _context5.sent;
+              responses = Array.isArray(response) ? response : [response];
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context5.prev = 8;
+              _context5.prev = 9;
               _iterator = responses[Symbol.iterator]();
 
-            case 10:
+            case 11:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context5.next = 27;
+                break;
+              }
+
+              _response = _step.value;
+              _context5.next = 15;
+              return regeneratorRuntime.awrap(this.deviceAuthService.validateChallengeResponse(_response));
+
+            case 15:
+              valid = _context5.sent;
+
+              if (!valid) {
                 _context5.next = 22;
                 break;
               }
 
-              response = _step.value;
-              _context5.next = 14;
-              return regeneratorRuntime.awrap(this.deviceAuthService.validateChallengeResponse(response));
-
-            case 14:
-              valid = _context5.sent;
-
-              if (!valid) {
-                _context5.next = 19;
-                break;
-              }
-
-              _context5.next = 18;
-              return regeneratorRuntime.awrap(this.deviceAuthService.handleChallengeResponse(response));
-
-            case 18:
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(pendingChallenges, response.challenge);
+              _context5.next = 19;
+              return regeneratorRuntime.awrap(this.deviceAuthService.handleChallengeResponse(_response));
 
             case 19:
-              _iteratorNormalCompletion = true;
-              _context5.next = 10;
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(pendingChallenges, _response.challenge);
+              _context5.next = 24;
               break;
 
             case 22:
-              _context5.next = 28;
-              break;
+              _context5.next = 24;
+              return regeneratorRuntime.awrap(this.launchCallbacks.handleChallengeFailures([_response]));
 
             case 24:
-              _context5.prev = 24;
-              _context5.t0 = _context5["catch"](8);
+              _iteratorNormalCompletion = true;
+              _context5.next = 11;
+              break;
+
+            case 27:
+              _context5.next = 33;
+              break;
+
+            case 29:
+              _context5.prev = 29;
+              _context5.t0 = _context5["catch"](9);
               _didIteratorError = true;
               _iteratorError = _context5.t0;
 
-            case 28:
-              _context5.prev = 28;
-              _context5.prev = 29;
+            case 33:
+              _context5.prev = 33;
+              _context5.prev = 34;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
-            case 31:
-              _context5.prev = 31;
+            case 36:
+              _context5.prev = 36;
 
               if (!_didIteratorError) {
-                _context5.next = 34;
+                _context5.next = 39;
                 break;
               }
 
               throw _iteratorError;
 
-            case 34:
-              return _context5.finish(31);
+            case 39:
+              return _context5.finish(36);
 
-            case 35:
-              return _context5.finish(28);
+            case 40:
+              return _context5.finish(33);
 
-            case 36:
+            case 41:
               _context5.next = 1;
               break;
 
-            case 38:
+            case 43:
             case "end":
               return _context5.stop();
           }
         }
-      }, null, this, [[8, 24, 28, 36], [29,, 31, 35]]);
+      }, null, this, [[9, 29, 33, 41], [34,, 36, 40]]);
     }
     /** @private */
 
@@ -1629,7 +1638,7 @@ function () {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return regeneratorRuntime.awrap(_this3.launchCallbacks.authChallengeResponses([challenge]));
+                return regeneratorRuntime.awrap(_this3.launchCallbacks.requiresChallengeResponses([challenge]));
 
               case 2:
                 responses = _context6.sent;
@@ -1724,17 +1733,46 @@ function () {
 
   }, {
     key: "addEventObserver",
-    value: function addEventObserver(callback, singleEvent) {
+    value: function addEventObserver(callback, singleEvent, singleUse, autoUnsubscribe) {
       var _this4 = this;
 
       var observer = {
         callback: callback,
-        singleEvent: singleEvent
+        singleEvent: singleEvent,
+        singleUse: singleUse,
+        autoUnsubscribe: autoUnsubscribe
       };
       this.eventHandlers.push(observer);
       return function () {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(_this4.eventHandlers, observer);
       };
+    }
+    /** @public */
+
+  }, {
+    key: "onSync",
+    value: function onSync(callback) {
+      var event = _Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync;
+      var singleUse = false;
+      var autoUnsubscribe = true;
+      return this.addEventObserver(function (firedEvent) {
+        if (firedEvent === event) {
+          callback();
+        }
+      }, event, singleUse, autoUnsubscribe);
+    }
+    /** 
+     * @public 
+     * When the root key or root key wrapper changes. Includes events like account state
+     * changes (registering, signing in, changing pw, logging out) and passcode state 
+     * changes (adding, removing, changing).
+     */
+
+  }, {
+    key: "onCredentialChange",
+    value: function onCredentialChange(callback) {
+      var uninstall = this.keyManager.onStatusChange(callback);
+      this.managedSubscribers.push(uninstall);
     }
     /** @public */
 
@@ -1745,11 +1783,12 @@ function () {
         callback();
       } else {
         var event = _Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].ApplicationReady;
+        var singleUse = true;
         this.addEventObserver(function (firedEvent) {
           if (firedEvent === event) {
             callback();
           }
-        }, event);
+        }, event, singleUse);
       }
     }
     /** @private */
@@ -1771,64 +1810,82 @@ function () {
 
             case 5:
               if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                _context8.next = 13;
+                _context8.next = 19;
                 break;
               }
 
               observer = _step3.value;
-              _context8.next = 9;
+
+              if (!(observer.singleEvent && observer.singleEvent === event)) {
+                _context8.next = 13;
+                break;
+              }
+
+              _context8.next = 10;
               return regeneratorRuntime.awrap(observer.callback(event, data || {}));
 
-            case 9:
-              if (observer.singleEvent === event) {
+            case 10:
+              if (observer.singleUse) {
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.eventHandlers, observer);
               }
 
-            case 10:
+              _context8.next = 16;
+              break;
+
+            case 13:
+              if (observer.singleEvent) {
+                _context8.next = 16;
+                break;
+              }
+
+              _context8.next = 16;
+              return regeneratorRuntime.awrap(observer.callback(event, data || {}));
+
+            case 16:
               _iteratorNormalCompletion3 = true;
               _context8.next = 5;
               break;
 
-            case 13:
-              _context8.next = 19;
+            case 19:
+              _context8.next = 25;
               break;
 
-            case 15:
-              _context8.prev = 15;
+            case 21:
+              _context8.prev = 21;
               _context8.t0 = _context8["catch"](3);
               _didIteratorError3 = true;
               _iteratorError3 = _context8.t0;
 
-            case 19:
-              _context8.prev = 19;
-              _context8.prev = 20;
+            case 25:
+              _context8.prev = 25;
+              _context8.prev = 26;
 
               if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                 _iterator3.return();
               }
 
-            case 22:
-              _context8.prev = 22;
+            case 28:
+              _context8.prev = 28;
 
               if (!_didIteratorError3) {
-                _context8.next = 25;
+                _context8.next = 31;
                 break;
               }
 
               throw _iteratorError3;
 
-            case 25:
-              return _context8.finish(22);
+            case 31:
+              return _context8.finish(28);
 
-            case 26:
-              return _context8.finish(19);
+            case 32:
+              return _context8.finish(25);
 
-            case 27:
+            case 33:
             case "end":
               return _context8.stop();
           }
         }
-      }, null, this, [[3, 15, 19, 27], [20,, 22, 26]]);
+      }, null, this, [[3, 21, 25, 33], [26,, 28, 32]]);
     }
     /** @public */
 
@@ -1916,40 +1973,34 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** 
+     * @public 
+     * @param add  Whether to add the item to application state.
+     * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
+     */
 
   }, {
     key: "createItem",
     value: function createItem(_ref7) {
-      var contentType, content, needsSync, item;
+      var contentType, content, add, needsSync, item;
       return regeneratorRuntime.async(function createItem$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
-              contentType = _ref7.contentType, content = _ref7.content, needsSync = _ref7.needsSync;
+              contentType = _ref7.contentType, content = _ref7.content, add = _ref7.add, needsSync = _ref7.needsSync;
               _context12.next = 3;
               return regeneratorRuntime.awrap(this.modelManager.createItem({
                 contentType: contentType,
-                content: content
+                content: content,
+                add: add,
+                needsSync: needsSync
               }));
 
             case 3:
               item = _context12.sent;
-
-              if (!needsSync) {
-                _context12.next = 7;
-                break;
-              }
-
-              _context12.next = 7;
-              return regeneratorRuntime.awrap(this.setItemNeedsSync({
-                item: item
-              }));
-
-            case 7:
               return _context12.abrupt("return", item);
 
-            case 8:
+            case 5:
             case "end":
               return _context12.stop();
           }
@@ -2167,10 +2218,22 @@ function () {
   }, {
     key: "findOrCreateTag",
     value: function findOrCreateTag(_ref18) {
-      var title = _ref18.title;
-      return this.modelManager.findOrCreateTagByTitle({
-        title: title
-      });
+      var title;
+      return regeneratorRuntime.async(function findOrCreateTag$(_context20) {
+        while (1) {
+          switch (_context20.prev = _context20.next) {
+            case 0:
+              title = _ref18.title;
+              return _context20.abrupt("return", this.modelManager.findOrCreateTag({
+                title: title
+              }));
+
+            case 2:
+            case "end":
+              return _context20.stop();
+          }
+        }
+      }, null, this);
     }
     /** @public */
 
@@ -2215,15 +2278,15 @@ function () {
   }, {
     key: "setHost",
     value: function setHost(host) {
-      return regeneratorRuntime.async(function setHost$(_context20) {
+      return regeneratorRuntime.async(function setHost$(_context21) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
-              return _context20.abrupt("return", this.apiService.setHost(host));
+              return _context21.abrupt("return", this.apiService.setHost(host));
 
             case 1:
             case "end":
-              return _context20.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -2233,15 +2296,15 @@ function () {
   }, {
     key: "getHost",
     value: function getHost() {
-      return regeneratorRuntime.async(function getHost$(_context21) {
+      return regeneratorRuntime.async(function getHost$(_context22) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
-              return _context21.abrupt("return", this.apiService.getHost());
+              return _context22.abrupt("return", this.apiService.getHost());
 
             case 1:
             case "end":
-              return _context21.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -2262,15 +2325,15 @@ function () {
   }, {
     key: "getUserVersion",
     value: function getUserVersion() {
-      return regeneratorRuntime.async(function getUserVersion$(_context22) {
+      return regeneratorRuntime.async(function getUserVersion$(_context23) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context23.prev = _context23.next) {
             case 0:
-              return _context22.abrupt("return", this.protocolService.getUserVersion());
+              return _context23.abrupt("return", this.protocolService.getUserVersion());
 
             case 1:
             case "end":
-              return _context22.stop();
+              return _context23.stop();
           }
         }
       }, null, this);
@@ -2294,36 +2357,36 @@ function () {
     key: "importData",
     value: function importData(_ref20) {
       var data, password, decryptedPayloads, validPayloads, affectedItems;
-      return regeneratorRuntime.async(function importData$(_context23) {
+      return regeneratorRuntime.async(function importData$(_context24) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context24.prev = _context24.next) {
             case 0:
               data = _ref20.data, password = _ref20.password;
-              _context23.next = 3;
+              _context24.next = 3;
               return regeneratorRuntime.awrap(this.protocolService.payloadsByDecryptingBackupFile({
                 data: data,
                 password: password
               }));
 
             case 3:
-              decryptedPayloads = _context23.sent;
+              decryptedPayloads = _context24.sent;
               validPayloads = decryptedPayloads.filter(function (payload) {
                 return !payload.errorDecrypting;
               });
-              _context23.next = 7;
+              _context24.next = 7;
               return regeneratorRuntime.awrap(this.modelManager.importPayloads(validPayloads));
 
             case 7:
-              affectedItems = _context23.sent;
+              affectedItems = _context24.sent;
               this.sync();
-              return _context23.abrupt("return", {
+              return _context24.abrupt("return", {
                 affectedItems: affectedItems,
                 errorCount: decryptedPayloads.length - validPayloads.length
               });
 
             case 10:
             case "end":
-              return _context23.stop();
+              return _context24.stop();
           }
         }
       }, null, this);
@@ -2354,15 +2417,15 @@ function () {
   }, {
     key: "getSyncStatus",
     value: function getSyncStatus() {
-      return regeneratorRuntime.async(function getSyncStatus$(_context24) {
+      return regeneratorRuntime.async(function getSyncStatus$(_context25) {
         while (1) {
-          switch (_context24.prev = _context24.next) {
+          switch (_context25.prev = _context25.next) {
             case 0:
-              return _context24.abrupt("return", this.syncManager.status);
+              return _context25.abrupt("return", this.syncManager.status);
 
             case 1:
             case "end":
-              return _context24.stop();
+              return _context25.stop();
           }
         }
       }, null, this);
@@ -2374,36 +2437,18 @@ function () {
     value: function markAllItemsAsNeedingSync() {
       var _ref21,
           alternateUuids,
-          _args25 = arguments;
+          _args26 = arguments;
 
-      return regeneratorRuntime.async(function markAllItemsAsNeedingSync$(_context25) {
+      return regeneratorRuntime.async(function markAllItemsAsNeedingSync$(_context26) {
         while (1) {
-          switch (_context25.prev = _context25.next) {
+          switch (_context26.prev = _context26.next) {
             case 0:
-              _ref21 = _args25.length > 0 && _args25[0] !== undefined ? _args25[0] : {}, alternateUuids = _ref21.alternateUuids;
-              return _context25.abrupt("return", this.syncManager.markAllItemsAsNeedingSync({
+              _ref21 = _args26.length > 0 && _args26[0] !== undefined ? _args26[0] : {}, alternateUuids = _ref21.alternateUuids;
+              return _context26.abrupt("return", this.syncManager.markAllItemsAsNeedingSync({
                 alternateUuids: alternateUuids
               }));
 
             case 2:
-            case "end":
-              return _context25.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @public */
-
-  }, {
-    key: "sync",
-    value: function sync(options) {
-      return regeneratorRuntime.async(function sync$(_context26) {
-        while (1) {
-          switch (_context26.prev = _context26.next) {
-            case 0:
-              return _context26.abrupt("return", this.syncManager.sync(options));
-
-            case 1:
             case "end":
               return _context26.stop();
           }
@@ -2413,13 +2458,13 @@ function () {
     /** @public */
 
   }, {
-    key: "resolveOutOfSync",
-    value: function resolveOutOfSync() {
-      return regeneratorRuntime.async(function resolveOutOfSync$(_context27) {
+    key: "sync",
+    value: function sync(options) {
+      return regeneratorRuntime.async(function sync$(_context27) {
         while (1) {
           switch (_context27.prev = _context27.next) {
             case 0:
-              return _context27.abrupt("return", this.syncManager.resolveOutOfSync());
+              return _context27.abrupt("return", this.syncManager.sync(options));
 
             case 1:
             case "end":
@@ -2431,13 +2476,13 @@ function () {
     /** @public */
 
   }, {
-    key: "setValue",
-    value: function setValue(key, value, mode) {
-      return regeneratorRuntime.async(function setValue$(_context28) {
+    key: "resolveOutOfSync",
+    value: function resolveOutOfSync() {
+      return regeneratorRuntime.async(function resolveOutOfSync$(_context28) {
         while (1) {
           switch (_context28.prev = _context28.next) {
             case 0:
-              return _context28.abrupt("return", this.storageManager.setValue(key, value, mode));
+              return _context28.abrupt("return", this.syncManager.resolveOutOfSync());
 
             case 1:
             case "end":
@@ -2449,13 +2494,13 @@ function () {
     /** @public */
 
   }, {
-    key: "getValue",
-    value: function getValue(key, mode) {
-      return regeneratorRuntime.async(function getValue$(_context29) {
+    key: "setValue",
+    value: function setValue(key, value, mode) {
+      return regeneratorRuntime.async(function setValue$(_context29) {
         while (1) {
           switch (_context29.prev = _context29.next) {
             case 0:
-              return _context29.abrupt("return", this.storageManager.getValue(key, mode));
+              return _context29.abrupt("return", this.storageManager.setValue(key, value, mode));
 
             case 1:
             case "end":
@@ -2467,17 +2512,35 @@ function () {
     /** @public */
 
   }, {
-    key: "removeValue",
-    value: function removeValue(key, mode) {
-      return regeneratorRuntime.async(function removeValue$(_context30) {
+    key: "getValue",
+    value: function getValue(key, mode) {
+      return regeneratorRuntime.async(function getValue$(_context30) {
         while (1) {
           switch (_context30.prev = _context30.next) {
             case 0:
-              return _context30.abrupt("return", this.storageManager.removeValue(key, mode));
+              return _context30.abrupt("return", this.storageManager.getValue(key, mode));
 
             case 1:
             case "end":
               return _context30.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @public */
+
+  }, {
+    key: "removeValue",
+    value: function removeValue(key, mode) {
+      return regeneratorRuntime.async(function removeValue$(_context31) {
+        while (1) {
+          switch (_context31.prev = _context31.next) {
+            case 0:
+              return _context31.abrupt("return", this.storageManager.removeValue(key, mode));
+
+            case 1:
+            case "end":
+              return _context31.stop();
           }
         }
       }, null, this);
@@ -2490,15 +2553,15 @@ function () {
   }, {
     key: "destroyDatabase",
     value: function destroyDatabase() {
-      return regeneratorRuntime.async(function destroyDatabase$(_context31) {
+      return regeneratorRuntime.async(function destroyDatabase$(_context32) {
         while (1) {
-          switch (_context31.prev = _context31.next) {
+          switch (_context32.prev = _context32.next) {
             case 0:
-              return _context31.abrupt("return", this.application.storageManager.clearAllPayloads());
+              return _context32.abrupt("return", this.application.storageManager.clearAllPayloads());
 
             case 1:
             case "end":
-              return _context31.stop();
+              return _context32.stop();
           }
         }
       }, null, this);
@@ -2508,28 +2571,28 @@ function () {
   }, {
     key: "restart",
     value: function restart() {
-      return regeneratorRuntime.async(function restart$(_context32) {
+      return regeneratorRuntime.async(function restart$(_context33) {
         while (1) {
-          switch (_context32.prev = _context32.next) {
+          switch (_context33.prev = _context33.next) {
             case 0:
-              _context32.next = 2;
+              _context33.next = 2;
               return regeneratorRuntime.awrap(this.deinit());
 
             case 2:
               this.dealloced = false;
               this.constructServices();
-              _context32.next = 6;
+              _context33.next = 6;
               return regeneratorRuntime.awrap(this.prepareForLaunch({
                 callbacks: this.launchCallbacks
               }));
 
             case 6:
-              _context32.next = 8;
+              _context33.next = 8;
               return regeneratorRuntime.awrap(this.launch());
 
             case 8:
             case "end":
-              return _context32.stop();
+              return _context33.stop();
           }
         }
       }, null, this);
@@ -2542,128 +2605,219 @@ function () {
   }, {
     key: "deinit",
     value: function deinit() {
-      var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, uninstallObserver, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, service;
+      var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, uninstallObserver, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, observer, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, uninstallSubscriber, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, service;
 
-      return regeneratorRuntime.async(function deinit$(_context33) {
+      return regeneratorRuntime.async(function deinit$(_context34) {
         while (1) {
-          switch (_context33.prev = _context33.next) {
+          switch (_context34.prev = _context34.next) {
             case 0:
               clearInterval(this.autoSyncInterval);
               _iteratorNormalCompletion4 = true;
               _didIteratorError4 = false;
               _iteratorError4 = undefined;
-              _context33.prev = 4;
+              _context34.prev = 4;
 
               for (_iterator4 = this.serviceObservers[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                 uninstallObserver = _step4.value;
                 uninstallObserver();
               }
 
-              _context33.next = 12;
+              _context34.next = 12;
               break;
 
             case 8:
-              _context33.prev = 8;
-              _context33.t0 = _context33["catch"](4);
+              _context34.prev = 8;
+              _context34.t0 = _context34["catch"](4);
               _didIteratorError4 = true;
-              _iteratorError4 = _context33.t0;
+              _iteratorError4 = _context34.t0;
 
             case 12:
-              _context33.prev = 12;
-              _context33.prev = 13;
+              _context34.prev = 12;
+              _context34.prev = 13;
 
               if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                 _iterator4.return();
               }
 
             case 15:
-              _context33.prev = 15;
+              _context34.prev = 15;
 
               if (!_didIteratorError4) {
-                _context33.next = 18;
+                _context34.next = 18;
                 break;
               }
 
               throw _iteratorError4;
 
             case 18:
-              return _context33.finish(15);
+              return _context34.finish(15);
 
             case 19:
-              return _context33.finish(12);
+              return _context34.finish(12);
 
             case 20:
               _iteratorNormalCompletion5 = true;
               _didIteratorError5 = false;
               _iteratorError5 = undefined;
-              _context33.prev = 23;
-              _iterator5 = this.services[Symbol.iterator]();
+              _context34.prev = 23;
 
-            case 25:
-              if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                _context33.next = 33;
-                break;
+              for (_iterator5 = this.eventHandlers.slice()[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                observer = _step5.value;
+
+                if (observer.autoUnsubscribe) {
+                  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.eventHandlers, observer);
+                }
               }
 
-              service = _step5.value;
-
-              if (!service.deinit) {
-                _context33.next = 30;
-                break;
-              }
-
-              _context33.next = 30;
-              return regeneratorRuntime.awrap(service.deinit());
-
-            case 30:
-              _iteratorNormalCompletion5 = true;
-              _context33.next = 25;
+              _context34.next = 31;
               break;
 
-            case 33:
-              _context33.next = 39;
-              break;
-
-            case 35:
-              _context33.prev = 35;
-              _context33.t1 = _context33["catch"](23);
+            case 27:
+              _context34.prev = 27;
+              _context34.t1 = _context34["catch"](23);
               _didIteratorError5 = true;
-              _iteratorError5 = _context33.t1;
+              _iteratorError5 = _context34.t1;
 
-            case 39:
-              _context33.prev = 39;
-              _context33.prev = 40;
+            case 31:
+              _context34.prev = 31;
+              _context34.prev = 32;
 
               if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                 _iterator5.return();
               }
 
-            case 42:
-              _context33.prev = 42;
+            case 34:
+              _context34.prev = 34;
 
               if (!_didIteratorError5) {
-                _context33.next = 45;
+                _context34.next = 37;
                 break;
               }
 
               throw _iteratorError5;
 
-            case 45:
-              return _context33.finish(42);
+            case 37:
+              return _context34.finish(34);
+
+            case 38:
+              return _context34.finish(31);
+
+            case 39:
+              _iteratorNormalCompletion6 = true;
+              _didIteratorError6 = false;
+              _iteratorError6 = undefined;
+              _context34.prev = 42;
+
+              for (_iterator6 = this.managedSubscribers[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                uninstallSubscriber = _step6.value;
+                uninstallSubscriber();
+              }
+
+              _context34.next = 50;
+              break;
 
             case 46:
-              return _context33.finish(39);
+              _context34.prev = 46;
+              _context34.t2 = _context34["catch"](42);
+              _didIteratorError6 = true;
+              _iteratorError6 = _context34.t2;
 
-            case 47:
+            case 50:
+              _context34.prev = 50;
+              _context34.prev = 51;
+
+              if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                _iterator6.return();
+              }
+
+            case 53:
+              _context34.prev = 53;
+
+              if (!_didIteratorError6) {
+                _context34.next = 56;
+                break;
+              }
+
+              throw _iteratorError6;
+
+            case 56:
+              return _context34.finish(53);
+
+            case 57:
+              return _context34.finish(50);
+
+            case 58:
+              _iteratorNormalCompletion7 = true;
+              _didIteratorError7 = false;
+              _iteratorError7 = undefined;
+              _context34.prev = 61;
+              _iterator7 = this.services[Symbol.iterator]();
+
+            case 63:
+              if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                _context34.next = 71;
+                break;
+              }
+
+              service = _step7.value;
+
+              if (!service.deinit) {
+                _context34.next = 68;
+                break;
+              }
+
+              _context34.next = 68;
+              return regeneratorRuntime.awrap(service.deinit());
+
+            case 68:
+              _iteratorNormalCompletion7 = true;
+              _context34.next = 63;
+              break;
+
+            case 71:
+              _context34.next = 77;
+              break;
+
+            case 73:
+              _context34.prev = 73;
+              _context34.t3 = _context34["catch"](61);
+              _didIteratorError7 = true;
+              _iteratorError7 = _context34.t3;
+
+            case 77:
+              _context34.prev = 77;
+              _context34.prev = 78;
+
+              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                _iterator7.return();
+              }
+
+            case 80:
+              _context34.prev = 80;
+
+              if (!_didIteratorError7) {
+                _context34.next = 83;
+                break;
+              }
+
+              throw _iteratorError7;
+
+            case 83:
+              return _context34.finish(80);
+
+            case 84:
+              return _context34.finish(77);
+
+            case 85:
               this.clearServices();
               this.dealloced = true;
 
-            case 49:
+            case 87:
             case "end":
-              return _context33.stop();
+              return _context34.stop();
           }
         }
-      }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 35, 39, 47], [40,, 42, 46]]);
+      }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 46, 50, 58], [51,, 53, 57], [61, 73, 77, 85], [78,, 80, 84]]);
     }
     /**
      *  @public
@@ -2675,50 +2829,50 @@ function () {
     key: "register",
     value: function register(_ref22) {
       var email, password, ephemeral, mergeLocal, result;
-      return regeneratorRuntime.async(function register$(_context34) {
+      return regeneratorRuntime.async(function register$(_context35) {
         while (1) {
-          switch (_context34.prev = _context34.next) {
+          switch (_context35.prev = _context35.next) {
             case 0:
               email = _ref22.email, password = _ref22.password, ephemeral = _ref22.ephemeral, mergeLocal = _ref22.mergeLocal;
               this.lockSyncing();
-              _context34.next = 4;
+              _context35.next = 4;
               return regeneratorRuntime.awrap(this.sessionManager.register({
                 email: email,
                 password: password
               }));
 
             case 4:
-              result = _context34.sent;
+              result = _context35.sent;
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context34.next = 19;
+                _context35.next = 19;
                 break;
               }
 
-              _context34.next = 9;
+              _context35.next = 9;
               return regeneratorRuntime.awrap(this.keyManager.setNewRootKey({
                 key: result.rootKey,
                 keyParams: result.keyParams
               }));
 
             case 9:
-              _context34.next = 11;
+              _context35.next = 11;
               return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
 
             case 11:
               if (mergeLocal) {
-                _context34.next = 15;
+                _context35.next = 15;
                 break;
               }
 
               this.modelManager.removeAllItemsFromMemory();
-              _context34.next = 15;
+              _context35.next = 15;
               return regeneratorRuntime.awrap(this.storageManager.clearAllPayloads());
 
             case 15:
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
-              _context34.next = 18;
+              _context35.next = 18;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
               }));
@@ -2727,11 +2881,11 @@ function () {
               this.protocolService.decryptErroredItems();
 
             case 19:
-              return _context34.abrupt("return", result.response);
+              return _context35.abrupt("return", result.response);
 
             case 20:
             case "end":
-              return _context34.stop();
+              return _context35.stop();
           }
         }
       }, null, this);
@@ -2747,16 +2901,16 @@ function () {
     value: function signIn(_ref23) {
       var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref23$mergeLocal, mergeLocal, result;
 
-      return regeneratorRuntime.async(function signIn$(_context35) {
+      return regeneratorRuntime.async(function signIn$(_context36) {
         while (1) {
-          switch (_context35.prev = _context35.next) {
+          switch (_context36.prev = _context36.next) {
             case 0:
               email = _ref23.email, password = _ref23.password, strict = _ref23.strict, ephemeral = _ref23.ephemeral, mfaKeyPath = _ref23.mfaKeyPath, mfaCode = _ref23.mfaCode, _ref23$mergeLocal = _ref23.mergeLocal, mergeLocal = _ref23$mergeLocal === void 0 ? true : _ref23$mergeLocal;
 
               /** Prevent a timed sync from occuring while signing in. */
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].WillSignIn);
               this.lockSyncing();
-              _context35.next = 5;
+              _context36.next = 5;
               return regeneratorRuntime.awrap(this.sessionManager.signIn({
                 email: email,
                 password: password,
@@ -2766,37 +2920,37 @@ function () {
               }));
 
             case 5:
-              result = _context35.sent;
+              result = _context36.sent;
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context35.next = 20;
+                _context36.next = 20;
                 break;
               }
 
-              _context35.next = 10;
+              _context36.next = 10;
               return regeneratorRuntime.awrap(this.keyManager.setNewRootKey({
                 key: result.rootKey,
                 keyParams: result.keyParams
               }));
 
             case 10:
-              _context35.next = 12;
+              _context36.next = 12;
               return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
 
             case 12:
               if (mergeLocal) {
-                _context35.next = 16;
+                _context36.next = 16;
                 break;
               }
 
               this.modelManager.removeAllItemsFromMemory();
-              _context35.next = 16;
+              _context36.next = 16;
               return regeneratorRuntime.awrap(this.storageManager.clearAllPayloads());
 
             case 16:
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
-              _context35.next = 19;
+              _context36.next = 19;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
               }));
@@ -2805,11 +2959,11 @@ function () {
               this.protocolService.decryptErroredItems();
 
             case 20:
-              return _context35.abrupt("return", result.response);
+              return _context36.abrupt("return", result.response);
 
             case 21:
             case "end":
-              return _context35.stop();
+              return _context36.stop();
           }
         }
       }, null, this);
@@ -2820,18 +2974,18 @@ function () {
     key: "changePassword",
     value: function changePassword(_ref24) {
       var email, currentPassword, newPassword, rotateItemsKey, currentKeyParams, result, newKeyParams, versionUpgraded;
-      return regeneratorRuntime.async(function changePassword$(_context36) {
+      return regeneratorRuntime.async(function changePassword$(_context37) {
         while (1) {
-          switch (_context36.prev = _context36.next) {
+          switch (_context37.prev = _context37.next) {
             case 0:
               email = _ref24.email, currentPassword = _ref24.currentPassword, newPassword = _ref24.newPassword, rotateItemsKey = _ref24.rotateItemsKey;
-              _context36.next = 3;
+              _context37.next = 3;
               return regeneratorRuntime.awrap(this.keyManager.getRootKeyParams());
 
             case 3:
-              currentKeyParams = _context36.sent;
+              currentKeyParams = _context37.sent;
               this.lockSyncing();
-              _context36.next = 7;
+              _context37.next = 7;
               return regeneratorRuntime.awrap(this.sessionManager.changePassword({
                 email: email,
                 currentPassword: currentPassword,
@@ -2840,15 +2994,15 @@ function () {
               }));
 
             case 7:
-              result = _context36.sent;
+              result = _context37.sent;
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context36.next = 19;
+                _context37.next = 19;
                 break;
               }
 
-              _context36.next = 12;
+              _context37.next = 12;
               return regeneratorRuntime.awrap(this.keyManager.setNewRootKey({
                 key: result.rootKey,
                 keyParams: result.keyParams
@@ -2859,23 +3013,23 @@ function () {
               versionUpgraded = newKeyParams.version !== currentKeyParams.version;
 
               if (!(rotateItemsKey || versionUpgraded)) {
-                _context36.next = 17;
+                _context37.next = 17;
                 break;
               }
 
-              _context36.next = 17;
+              _context37.next = 17;
               return regeneratorRuntime.awrap(this.itemsKeyManager.createNewDefaultItemsKey());
 
             case 17:
-              _context36.next = 19;
+              _context37.next = 19;
               return regeneratorRuntime.awrap(this.syncManager.sync());
 
             case 19:
-              return _context36.abrupt("return", result.response);
+              return _context37.abrupt("return", result.response);
 
             case 20:
             case "end":
-              return _context36.stop();
+              return _context37.stop();
           }
         }
       }, null, this);
@@ -2887,39 +3041,39 @@ function () {
     value: function signOut() {
       var _ref25,
           dontClearData,
-          _args37 = arguments;
+          _args38 = arguments;
 
-      return regeneratorRuntime.async(function signOut$(_context37) {
+      return regeneratorRuntime.async(function signOut$(_context38) {
         while (1) {
-          switch (_context37.prev = _context37.next) {
+          switch (_context38.prev = _context38.next) {
             case 0:
-              _ref25 = _args37.length > 0 && _args37[0] !== undefined ? _args37[0] : {}, dontClearData = _ref25.dontClearData;
-              _context37.next = 3;
+              _ref25 = _args38.length > 0 && _args38[0] !== undefined ? _args38[0] : {}, dontClearData = _ref25.dontClearData;
+              _context38.next = 3;
               return regeneratorRuntime.awrap(this.sessionManager.signOut());
 
             case 3:
-              _context37.next = 5;
+              _context38.next = 5;
               return regeneratorRuntime.awrap(this.syncManager.handleSignOut());
 
             case 5:
-              _context37.next = 7;
+              _context38.next = 7;
               return regeneratorRuntime.awrap(this.modelManager.handleSignOut());
 
             case 7:
-              _context37.next = 9;
+              _context38.next = 9;
               return regeneratorRuntime.awrap(this.keyManager.clearLocalKeyState());
 
             case 9:
               if (dontClearData) {
-                _context37.next = 12;
+                _context38.next = 12;
                 break;
               }
 
-              _context37.next = 12;
+              _context38.next = 12;
               return regeneratorRuntime.awrap(this.storageManager.clearAllData());
 
             case 12:
-              _context37.next = 14;
+              _context38.next = 14;
               return regeneratorRuntime.awrap(this.syncManager.sync());
 
             case 14:
@@ -2927,7 +3081,7 @@ function () {
 
             case 15:
             case "end":
-              return _context37.stop();
+              return _context38.stop();
           }
         }
       }, null, this);
@@ -2938,32 +3092,14 @@ function () {
     key: "validateAccountPassword",
     value: function validateAccountPassword(_ref26) {
       var password;
-      return regeneratorRuntime.async(function validateAccountPassword$(_context38) {
-        while (1) {
-          switch (_context38.prev = _context38.next) {
-            case 0:
-              password = _ref26.password;
-              return _context38.abrupt("return", this.keyManager.validateAccountPassword(password));
-
-            case 2:
-            case "end":
-              return _context38.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @public */
-
-  }, {
-    key: "hasPasscode",
-    value: function hasPasscode() {
-      return regeneratorRuntime.async(function hasPasscode$(_context39) {
+      return regeneratorRuntime.async(function validateAccountPassword$(_context39) {
         while (1) {
           switch (_context39.prev = _context39.next) {
             case 0:
-              return _context39.abrupt("return", this.keyManager.hasRootKeyWrapper());
+              password = _ref26.password;
+              return _context39.abrupt("return", this.keyManager.validateAccountPassword(password));
 
-            case 1:
+            case 2:
             case "end":
               return _context39.stop();
           }
@@ -2973,13 +3109,13 @@ function () {
     /** @public */
 
   }, {
-    key: "isPasscodeLocked",
-    value: function isPasscodeLocked() {
-      return regeneratorRuntime.async(function isPasscodeLocked$(_context40) {
+    key: "hasPasscode",
+    value: function hasPasscode() {
+      return regeneratorRuntime.async(function hasPasscode$(_context40) {
         while (1) {
           switch (_context40.prev = _context40.next) {
             case 0:
-              return _context40.abrupt("return", this.keyManager.rootKeyNeedsUnwrapping());
+              return _context40.abrupt("return", this.keyManager.hasRootKeyWrapper());
 
             case 1:
             case "end":
@@ -2991,13 +3127,13 @@ function () {
     /** @public */
 
   }, {
-    key: "passcodeLock",
-    value: function passcodeLock() {
-      return regeneratorRuntime.async(function passcodeLock$(_context41) {
+    key: "isPasscodeLocked",
+    value: function isPasscodeLocked() {
+      return regeneratorRuntime.async(function isPasscodeLocked$(_context41) {
         while (1) {
           switch (_context41.prev = _context41.next) {
             case 0:
-              return _context41.abrupt("return", this.restart());
+              return _context41.abrupt("return", this.keyManager.rootKeyNeedsUnwrapping());
 
             case 1:
             case "end":
@@ -3009,40 +3145,15 @@ function () {
     /** @public */
 
   }, {
-    key: "setPasscode",
-    value: function setPasscode(passcode) {
-      var identifier, _ref27, key, keyParams;
-
-      return regeneratorRuntime.async(function setPasscode$(_context42) {
+    key: "passcodeLock",
+    value: function passcodeLock() {
+      return regeneratorRuntime.async(function passcodeLock$(_context42) {
         while (1) {
           switch (_context42.prev = _context42.next) {
             case 0:
-              _context42.next = 2;
-              return regeneratorRuntime.awrap(this.protocolService.crypto.generateUUID());
+              return _context42.abrupt("return", this.restart());
 
-            case 2:
-              identifier = _context42.sent;
-              _context42.next = 5;
-              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
-                identifier: identifier,
-                password: passcode
-              }));
-
-            case 5:
-              _ref27 = _context42.sent;
-              key = _ref27.key;
-              keyParams = _ref27.keyParams;
-              _context42.next = 10;
-              return regeneratorRuntime.awrap(this.keyManager.setNewRootKeyWrapper({
-                wrappingKey: key,
-                keyParams: keyParams
-              }));
-
-            case 10:
-              _context42.next = 12;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
-
-            case 12:
+            case 1:
             case "end":
               return _context42.stop();
           }
@@ -3052,16 +3163,40 @@ function () {
     /** @public */
 
   }, {
-    key: "removePasscode",
-    value: function removePasscode() {
-      return regeneratorRuntime.async(function removePasscode$(_context43) {
+    key: "setPasscode",
+    value: function setPasscode(passcode) {
+      var identifier, _ref27, key, keyParams;
+
+      return regeneratorRuntime.async(function setPasscode$(_context43) {
         while (1) {
           switch (_context43.prev = _context43.next) {
             case 0:
               _context43.next = 2;
-              return regeneratorRuntime.awrap(this.keyManager.removeRootKeyWrapper());
+              return regeneratorRuntime.awrap(this.protocolService.crypto.generateUUID());
 
             case 2:
+              identifier = _context43.sent;
+              _context43.next = 5;
+              return regeneratorRuntime.awrap(this.protocolService.createRootKey({
+                identifier: identifier,
+                password: passcode
+              }));
+
+            case 5:
+              _ref27 = _context43.sent;
+              key = _ref27.key;
+              keyParams = _ref27.keyParams;
+              _context43.next = 10;
+              return regeneratorRuntime.awrap(this.keyManager.setNewRootKeyWrapper({
+                wrappingKey: key,
+                keyParams: keyParams
+              }));
+
+            case 10:
+              _context43.next = 12;
+              return regeneratorRuntime.awrap(this.syncManager.sync());
+
+            case 12:
             case "end":
               return _context43.stop();
           }
@@ -3071,19 +3206,16 @@ function () {
     /** @public */
 
   }, {
-    key: "changePasscode",
-    value: function changePasscode(passcode) {
-      return regeneratorRuntime.async(function changePasscode$(_context44) {
+    key: "removePasscode",
+    value: function removePasscode() {
+      return regeneratorRuntime.async(function removePasscode$(_context44) {
         while (1) {
           switch (_context44.prev = _context44.next) {
             case 0:
               _context44.next = 2;
-              return regeneratorRuntime.awrap(this.removePasscode());
+              return regeneratorRuntime.awrap(this.keyManager.removeRootKeyWrapper());
 
             case 2:
-              return _context44.abrupt("return", this.setPasscode(passcode));
-
-            case 3:
             case "end":
               return _context44.stop();
           }
@@ -3093,17 +3225,17 @@ function () {
     /** @public */
 
   }, {
-    key: "setStorageEncryptionPolicy",
-    value: function setStorageEncryptionPolicy(encryptionPolicy) {
-      return regeneratorRuntime.async(function setStorageEncryptionPolicy$(_context45) {
+    key: "changePasscode",
+    value: function changePasscode(passcode) {
+      return regeneratorRuntime.async(function changePasscode$(_context45) {
         while (1) {
           switch (_context45.prev = _context45.next) {
             case 0:
               _context45.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
+              return regeneratorRuntime.awrap(this.removePasscode());
 
             case 2:
-              return _context45.abrupt("return", this.syncManager.repersistAllItems());
+              return _context45.abrupt("return", this.setPasscode(passcode));
 
             case 3:
             case "end":
@@ -3115,17 +3247,39 @@ function () {
     /** @public */
 
   }, {
-    key: "generateUuid",
-    value: function generateUuid() {
-      return regeneratorRuntime.async(function generateUuid$(_context46) {
+    key: "setStorageEncryptionPolicy",
+    value: function setStorageEncryptionPolicy(encryptionPolicy) {
+      return regeneratorRuntime.async(function setStorageEncryptionPolicy$(_context46) {
         while (1) {
           switch (_context46.prev = _context46.next) {
             case 0:
-              return _context46.abrupt("return", this.protocolService.crypto.generateUUID());
+              _context46.next = 2;
+              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
+
+            case 2:
+              return _context46.abrupt("return", this.syncManager.repersistAllItems());
+
+            case 3:
+            case "end":
+              return _context46.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @public */
+
+  }, {
+    key: "generateUuid",
+    value: function generateUuid() {
+      return regeneratorRuntime.async(function generateUuid$(_context47) {
+        while (1) {
+          switch (_context47.prev = _context47.next) {
+            case 0:
+              return _context47.abrupt("return", this.protocolService.crypto.generateUUID());
 
             case 1:
             case "end":
-              return _context46.stop();
+              return _context47.stop();
           }
         }
       }, null, this);
@@ -3139,16 +3293,16 @@ function () {
   }, {
     key: "changeDeviceInterface",
     value: function changeDeviceInterface(deviceInterface) {
-      return regeneratorRuntime.async(function changeDeviceInterface$(_context47) {
+      return regeneratorRuntime.async(function changeDeviceInterface$(_context48) {
         while (1) {
-          switch (_context47.prev = _context47.next) {
+          switch (_context48.prev = _context48.next) {
             case 0:
               this.deviceInterface = deviceInterface;
               this.keyManager.setDeviceInterface(this.deviceInterface);
 
             case 2:
             case "end":
-              return _context47.stop();
+              return _context48.stop();
           }
         }
       }, null, this);
@@ -3174,6 +3328,7 @@ function () {
       this.createItemsKeyManager();
       this.createKeyManager();
       this.protocolService.setKeyManager(this.keyManager);
+      this.protocolService.setItemsKeyManager(this.itemsKeyManager);
       this.itemsKeyManager.setKeyManager(this.keyManager);
       this.keyManager.setDeviceInterface(this.deviceInterface);
       this.createDeviceAuthService();
@@ -3221,7 +3376,9 @@ function () {
         return;
       }
 
-      this.alertManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertManager"]))();
+      this.alertManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertManager"]))({
+        deviceInterface: this.deviceInterface
+      });
       this.services.push(this.alertManager);
     }
   }, {
@@ -3340,60 +3497,60 @@ function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncManager.addEventObserver(function _callee3(eventName) {
-        return regeneratorRuntime.async(function _callee3$(_context48) {
+        return regeneratorRuntime.async(function _callee3$(_context49) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context49.prev = _context49.next) {
               case 0:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].FullSyncCompleted)) {
-                  _context48.next = 5;
+                  _context49.next = 5;
                   break;
                 }
 
-                _context48.next = 3;
+                _context49.next = 3;
                 return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync));
 
               case 3:
-                _context48.next = 18;
+                _context49.next = 18;
                 break;
 
               case 5:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].LocalDataLoaded)) {
-                  _context48.next = 10;
+                  _context49.next = 10;
                   break;
                 }
 
-                _context48.next = 8;
+                _context49.next = 8;
                 return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].LoadedLocalData));
 
               case 8:
-                _context48.next = 18;
+                _context49.next = 18;
                 break;
 
               case 10:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncTakingTooLong)) {
-                  _context48.next = 15;
+                  _context49.next = 15;
                   break;
                 }
 
-                _context48.next = 13;
+                _context49.next = 13;
                 return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].HighLatencySync));
 
               case 13:
-                _context48.next = 18;
+                _context49.next = 18;
                 break;
 
               case 15:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncError)) {
-                  _context48.next = 18;
+                  _context49.next = 18;
                   break;
                 }
 
-                _context48.next = 18;
+                _context49.next = 18;
                 return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].FailedSync));
 
               case 18:
               case "end":
-                return _context48.stop();
+                return _context49.stop();
             }
           }
         });
@@ -3819,7 +3976,8 @@ var ApplicationEvents = {
   HighLatencySync: 7,
   EnteredOutOfSync: 8,
   ExitedOutOfSync: 9,
-  ApplicationReady: 10
+  ApplicationReady: 10,
+  PasscodeStatusChanged: 11
 };
 
 
@@ -3875,7 +4033,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNMfa, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, DeviceAuthResponse, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, Challenges, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNMfa, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, ChallengeResponse, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, Challenges, SNSyncManager, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3961,7 +4119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
 
 /* harmony import */ var _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/device_auth/response */ "./lib/services/device_auth/response.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthResponse", function() { return _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__["DeviceAuthResponse"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__["ChallengeResponse"]; });
 
 /* harmony import */ var _services_storage_manager__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./services/storage_manager */ "./lib/services/storage_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_18__["SNStorageManager"]; });
@@ -14694,19 +14852,23 @@ function (_PureService) {
     _classCallCheck(this, SNActionsManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNActionsManager).call(this));
+    _this.deviceInterface = deviceInterface;
     _this.httpManager = httpManager;
     _this.modelManager = modelManager;
     _this.syncManager = syncManager;
-    _this.deviceInterface = deviceInterface;
     _this.previousPasswords = [];
     return _this;
   }
 
   _createClass(SNActionsManager, [{
+    key: "getExtensions",
+    value: function getExtensions() {
+      return this.modelManager.validItemsForContentType(_Models__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ActionsExtension);
+    }
+  }, {
     key: "extensionsInContextOfItem",
     value: function extensionsInContextOfItem(item) {
-      var extensions = this.modelManager.validItemsForContentType('Extension');
-      return extensions.filter(function (ext) {
+      return this.getExtensions().filter(function (ext) {
         return ext.supported_types.includes(item.content_type) || ext.actionsWithContextForItem(item).length > 0;
       });
     }
@@ -15331,10 +15493,16 @@ var SNAlertManager =
 function (_PureService) {
   _inherits(SNAlertManager, _PureService);
 
-  function SNAlertManager() {
+  function SNAlertManager(_ref) {
+    var _this;
+
+    var deviceInterface = _ref.deviceInterface;
+
     _classCallCheck(this, SNAlertManager);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNAlertManager).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNAlertManager).call(this));
+    _this.deviceInterface = deviceInterface;
+    return _this;
   }
 
   _createClass(SNAlertManager, [{
@@ -19311,19 +19479,19 @@ function (_PureService) {
 /*!**********************************************!*\
   !*** ./lib/services/device_auth/response.js ***!
   \**********************************************/
-/*! exports provided: DeviceAuthResponse */
+/*! exports provided: ChallengeResponse */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthResponse", function() { return DeviceAuthResponse; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var DeviceAuthResponse = function DeviceAuthResponse(_ref) {
+var ChallengeResponse = function ChallengeResponse(_ref) {
   var challenge = _ref.challenge,
       value = _ref.value;
 
-  _classCallCheck(this, DeviceAuthResponse);
+  _classCallCheck(this, ChallengeResponse);
 
   this.challenge = challenge;
   this.value = value;
@@ -20760,6 +20928,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20777,6 +20947,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
 
 
 
@@ -20799,8 +20971,25 @@ function (_PureService) {
     _this.syncManager = syncManager;
     _this.modelManager = modelManager;
     _this.protocolService = protocolService;
+    _this.keyObservers = [];
 
     _this.registerSyncObserver();
+
+    _this.modelManager.addMappingObserver([_Models__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ItemsKey], function _callee() {
+      return regeneratorRuntime.async(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return regeneratorRuntime.awrap(_this.notifyObserversOfChange());
+
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    });
 
     return _this;
   }
@@ -20812,38 +21001,121 @@ function (_PureService) {
     value: function setKeyManager(keyManager) {
       this.keyManager = keyManager;
     }
+    /** @public */
+
+  }, {
+    key: "addItemsKeyChangeObserver",
+    value: function addItemsKeyChangeObserver(callback) {
+      var _this2 = this;
+
+      this.keyObservers.push(callback);
+      return function () {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["removeFromArray"])(_this2.keyObservers, callback);
+      };
+    }
+  }, {
+    key: "notifyObserversOfChange",
+    value: function notifyObserversOfChange() {
+      var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, observer;
+
+      return regeneratorRuntime.async(function notifyObserversOfChange$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context2.prev = 3;
+              _iterator = this.keyObservers[Symbol.iterator]();
+
+            case 5:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context2.next = 12;
+                break;
+              }
+
+              observer = _step.value;
+              _context2.next = 9;
+              return regeneratorRuntime.awrap(observer());
+
+            case 9:
+              _iteratorNormalCompletion = true;
+              _context2.next = 5;
+              break;
+
+            case 12:
+              _context2.next = 18;
+              break;
+
+            case 14:
+              _context2.prev = 14;
+              _context2.t0 = _context2["catch"](3);
+              _didIteratorError = true;
+              _iteratorError = _context2.t0;
+
+            case 18:
+              _context2.prev = 18;
+              _context2.prev = 19;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 21:
+              _context2.prev = 21;
+
+              if (!_didIteratorError) {
+                _context2.next = 24;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 24:
+              return _context2.finish(21);
+
+            case 25:
+              return _context2.finish(18);
+
+            case 26:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+    }
     /** @private */
 
   }, {
     key: "registerSyncObserver",
     value: function registerSyncObserver() {
-      var _this2 = this;
+      var _this3 = this;
 
-      this.syncManager.addEventObserver(function _callee(eventName) {
-        return regeneratorRuntime.async(function _callee$(_context) {
+      this.syncManager.addEventObserver(function _callee2(eventName) {
+        return regeneratorRuntime.async(function _callee2$(_context3) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (!(eventName === _Lib_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].FullSyncCompleted)) {
-                  _context.next = 3;
+                  _context3.next = 3;
                   break;
                 }
 
-                _context.next = 3;
-                return regeneratorRuntime.awrap(_this2.handleFullSyncCompletion());
+                _context3.next = 3;
+                return regeneratorRuntime.awrap(_this3.handleFullSyncCompletion());
 
               case 3:
                 if (!(eventName === _Lib_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].DownloadFirstSyncCompleted)) {
-                  _context.next = 6;
+                  _context3.next = 6;
                   break;
                 }
 
-                _context.next = 6;
-                return regeneratorRuntime.awrap(_this2.handleDownloadFirstSyncCompletion());
+                _context3.next = 6;
+                return regeneratorRuntime.awrap(_this3.handleDownloadFirstSyncCompletion());
 
               case 6:
               case "end":
-                return _context.stop();
+                return _context3.stop();
             }
           }
         });
@@ -20862,9 +21134,9 @@ function (_PureService) {
     key: "handleDownloadFirstSyncCompletion",
     value: function handleDownloadFirstSyncCompletion() {
       var allItemsKeys, neverSynced, defaultSyncedKey;
-      return regeneratorRuntime.async(function handleDownloadFirstSyncCompletion$(_context2) {
+      return regeneratorRuntime.async(function handleDownloadFirstSyncCompletion$(_context4) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               /**
               * Find items keys with null or epoch updated_at value, indicating
@@ -20884,16 +21156,16 @@ function (_PureService) {
               });
 
               if (!defaultSyncedKey) {
-                _context2.next = 6;
+                _context4.next = 6;
                 break;
               }
 
-              _context2.next = 6;
+              _context4.next = 6;
               return regeneratorRuntime.awrap(this.modelManager.setItemsToBeDeleted(neverSynced));
 
             case 6:
             case "end":
-              return _context2.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -20902,32 +21174,32 @@ function (_PureService) {
     key: "handleFullSyncCompletion",
     value: function handleFullSyncCompletion() {
       var currentItemsKey;
-      return regeneratorRuntime.async(function handleFullSyncCompletion$(_context3) {
+      return regeneratorRuntime.async(function handleFullSyncCompletion$(_context5) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
               /** Always create a new items key after full sync, if no items key is found */
               currentItemsKey = this.getDefaultItemsKey();
 
               if (currentItemsKey) {
-                _context3.next = 6;
+                _context5.next = 6;
                 break;
               }
 
-              _context3.next = 4;
+              _context5.next = 4;
               return regeneratorRuntime.awrap(this.createNewDefaultItemsKey());
 
             case 4:
               if (!(this.keyManager.keyMode === _Services_key_manager__WEBPACK_IMPORTED_MODULE_2__["KEY_MODE_WRAPPER_ONLY"])) {
-                _context3.next = 6;
+                _context5.next = 6;
                 break;
               }
 
-              return _context3.abrupt("return", this.syncManager.repersistAllItems());
+              return _context5.abrupt("return", this.syncManager.repersistAllItems());
 
             case 6:
             case "end":
-              return _context3.stop();
+              return _context5.stop();
           }
         }
       }, null, this);
@@ -20968,23 +21240,23 @@ function (_PureService) {
     key: "reencryptItemsKeys",
     value: function reencryptItemsKeys() {
       var itemsKeys;
-      return regeneratorRuntime.async(function reencryptItemsKeys$(_context4) {
+      return regeneratorRuntime.async(function reencryptItemsKeys$(_context6) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               itemsKeys = this.allItemsKeys;
 
               if (!(itemsKeys.length > 0)) {
-                _context4.next = 4;
+                _context6.next = 4;
                 break;
               }
 
-              _context4.next = 4;
+              _context6.next = 4;
               return regeneratorRuntime.awrap(this.modelManager.setItemsDirty(itemsKeys));
 
             case 4:
             case "end":
-              return _context4.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -20998,17 +21270,17 @@ function (_PureService) {
   }, {
     key: "defaultItemsKeyForItemVersion",
     value: function defaultItemsKeyForItemVersion(version) {
-      return regeneratorRuntime.async(function defaultItemsKeyForItemVersion$(_context5) {
+      return regeneratorRuntime.async(function defaultItemsKeyForItemVersion$(_context7) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              return _context5.abrupt("return", this.allItemsKeys.find(function (key) {
+              return _context7.abrupt("return", this.allItemsKeys.find(function (key) {
                 return key.version === version;
               }));
 
             case 1:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -21022,30 +21294,30 @@ function (_PureService) {
     key: "createNewDefaultItemsKey",
     value: function createNewDefaultItemsKey() {
       var rootKey, operatorVersion, itemsKey, currentDefault, payload;
-      return regeneratorRuntime.async(function createNewDefaultItemsKey$(_context6) {
+      return regeneratorRuntime.async(function createNewDefaultItemsKey$(_context8) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
-              _context6.next = 2;
+              _context8.next = 2;
               return regeneratorRuntime.awrap(this.keyManager.getRootKey());
 
             case 2:
-              rootKey = _context6.sent;
+              rootKey = _context8.sent;
               operatorVersion = rootKey ? rootKey.version : this.protocolService.getLatestVersion();
-              _context6.next = 6;
+              _context8.next = 6;
               return regeneratorRuntime.awrap(this.protocolService.operatorForVersion(operatorVersion).createItemsKey());
 
             case 6:
-              itemsKey = _context6.sent;
+              itemsKey = _context8.sent;
               currentDefault = this.getDefaultItemsKey();
 
               if (!currentDefault) {
-                _context6.next = 12;
+                _context8.next = 12;
                 break;
               }
 
               currentDefault.content.isDefault = false;
-              _context6.next = 12;
+              _context8.next = 12;
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(currentDefault));
 
             case 12:
@@ -21055,14 +21327,14 @@ function (_PureService) {
                   dirty: true
                 }
               });
-              _context6.next = 16;
+              _context8.next = 16;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadToLocalItem({
                 payload: payload
               }));
 
             case 16:
             case "end":
-              return _context6.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -21163,24 +21435,7 @@ function (_PureService) {
     _this.storageManager = storageManager;
     _this.itemsKeyManager = itemsKeyManager;
     _this.keyObservers = [];
-
-    _this.modelManager.addMappingObserver([_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ItemsKey], function _callee(allItems) {
-      return regeneratorRuntime.async(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return regeneratorRuntime.awrap(_this.notifyKeyObserversOfKeyChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ItemsKey));
-
-            case 2:
-            case "end":
-              return _context.stop();
-          }
-        }
-      });
-    });
     /** Hide rootKey enumeration */
-
 
     Object.defineProperty(_assertThisInitialized(_this), 'rootKey', {
       enumerable: false,
@@ -21193,64 +21448,64 @@ function (_PureService) {
     key: "initialize",
     value: function initialize() {
       var wrappedRootKey, accountKeyParams, hasWrapper, hasRootKey;
-      return regeneratorRuntime.async(function initialize$(_context2) {
+      return regeneratorRuntime.async(function initialize$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
-              _context2.next = 2;
+              _context.next = 2;
               return regeneratorRuntime.awrap(this.getWrappedRootKeyFromStorage());
 
             case 2:
-              wrappedRootKey = _context2.sent;
-              _context2.next = 5;
+              wrappedRootKey = _context.sent;
+              _context.next = 5;
               return regeneratorRuntime.awrap(this.getAccountKeyParams());
 
             case 5:
-              accountKeyParams = _context2.sent;
-              _context2.next = 8;
+              accountKeyParams = _context.sent;
+              _context.next = 8;
               return regeneratorRuntime.awrap(this.hasRootKeyWrapper());
 
             case 8:
-              hasWrapper = _context2.sent;
+              hasWrapper = _context.sent;
               hasRootKey = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(wrappedRootKey) || !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(accountKeyParams);
 
               if (!(hasWrapper && hasRootKey)) {
-                _context2.next = 14;
+                _context.next = 14;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
-              _context2.next = 27;
+              _context.next = 27;
               break;
 
             case 14:
               if (!(hasWrapper && !hasRootKey)) {
-                _context2.next = 18;
+                _context.next = 18;
                 break;
               }
 
               this.keyMode = KEY_MODE_WRAPPER_ONLY;
-              _context2.next = 27;
+              _context.next = 27;
               break;
 
             case 18:
               if (!(!hasWrapper && hasRootKey)) {
-                _context2.next = 22;
+                _context.next = 22;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_ONLY;
-              _context2.next = 27;
+              _context.next = 27;
               break;
 
             case 22:
               if (!(!hasWrapper && !hasRootKey)) {
-                _context2.next = 26;
+                _context.next = 26;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_NONE;
-              _context2.next = 27;
+              _context.next = 27;
               break;
 
             case 26:
@@ -21258,104 +21513,107 @@ function (_PureService) {
 
             case 27:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
-                _context2.next = 33;
+                _context.next = 33;
                 break;
               }
 
-              _context2.next = 30;
+              _context.next = 30;
               return regeneratorRuntime.awrap(this.getRootKeyFromKeychain());
 
             case 30:
-              this.rootKey = _context2.sent;
-              _context2.next = 33;
-              return regeneratorRuntime.awrap(this.notifyKeyObserversOfKeyChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].RootKey));
+              this.rootKey = _context.sent;
+              _context.next = 33;
+              return regeneratorRuntime.awrap(this.notifyObserversOfChange());
 
             case 33:
             case "end":
-              return _context2.stop();
+              return _context.stop();
           }
         }
       }, null, this);
     }
     /**
-     * When a root key is available, or an item key is created or downloaded,
-     * observers can listen and act accordingly.  For example, to decrypt items that were waiting on a key.
-     * @param name  A unique identifier for this observer
-     * @param callback  A function that takes in a content type to call back when keys have changed.
+     * @param callback  A function that takes in a content type to call back when root
+     *                  key or wrapper status has changed.
      */
 
   }, {
-    key: "addKeyChangeObserver",
-    value: function addKeyChangeObserver(callback) {
+    key: "onStatusChange",
+    value: function onStatusChange(callback) {
+      var _this2 = this;
+
       this.keyObservers.push(callback);
+      return function () {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this2.keyObservers, callback);
+      };
     }
   }, {
-    key: "notifyKeyObserversOfKeyChange",
-    value: function notifyKeyObserversOfKeyChange(contentType) {
+    key: "notifyObserversOfChange",
+    value: function notifyObserversOfChange() {
       var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, observer;
 
-      return regeneratorRuntime.async(function notifyKeyObserversOfKeyChange$(_context3) {
+      return regeneratorRuntime.async(function notifyObserversOfChange$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context3.prev = 3;
+              _context2.prev = 3;
               _iterator = this.keyObservers[Symbol.iterator]();
 
             case 5:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context3.next = 12;
+                _context2.next = 12;
                 break;
               }
 
               observer = _step.value;
-              _context3.next = 9;
-              return regeneratorRuntime.awrap(observer(contentType));
+              _context2.next = 9;
+              return regeneratorRuntime.awrap(observer());
 
             case 9:
               _iteratorNormalCompletion = true;
-              _context3.next = 5;
+              _context2.next = 5;
               break;
 
             case 12:
-              _context3.next = 18;
+              _context2.next = 18;
               break;
 
             case 14:
-              _context3.prev = 14;
-              _context3.t0 = _context3["catch"](3);
+              _context2.prev = 14;
+              _context2.t0 = _context2["catch"](3);
               _didIteratorError = true;
-              _iteratorError = _context3.t0;
+              _iteratorError = _context2.t0;
 
             case 18:
-              _context3.prev = 18;
-              _context3.prev = 19;
+              _context2.prev = 18;
+              _context2.prev = 19;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
             case 21:
-              _context3.prev = 21;
+              _context2.prev = 21;
 
               if (!_didIteratorError) {
-                _context3.next = 24;
+                _context2.next = 24;
                 break;
               }
 
               throw _iteratorError;
 
             case 24:
-              return _context3.finish(21);
+              return _context2.finish(21);
 
             case 25:
-              return _context3.finish(18);
+              return _context2.finish(18);
 
             case 26:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
@@ -21375,36 +21633,36 @@ function (_PureService) {
     key: "getRootKeyFromKeychain",
     value: function getRootKeyFromKeychain() {
       var rawKey, rootKey;
-      return regeneratorRuntime.async(function getRootKeyFromKeychain$(_context4) {
+      return regeneratorRuntime.async(function getRootKeyFromKeychain$(_context3) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              _context4.next = 2;
+              _context3.next = 2;
               return regeneratorRuntime.awrap(this.deviceInterface.getRawKeychainValue());
 
             case 2:
-              rawKey = _context4.sent;
+              rawKey = _context3.sent;
 
               if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(rawKey)) {
-                _context4.next = 5;
+                _context3.next = 5;
                 break;
               }
 
-              return _context4.abrupt("return", null);
+              return _context3.abrupt("return", null);
 
             case 5:
-              _context4.next = 7;
+              _context3.next = 7;
               return regeneratorRuntime.awrap(_Protocol__WEBPACK_IMPORTED_MODULE_5__["SNRootKey"].Create({
                 content: rawKey
               }));
 
             case 7:
-              rootKey = _context4.sent;
-              return _context4.abrupt("return", rootKey);
+              rootKey = _context3.sent;
+              return _context3.abrupt("return", rootKey);
 
             case 9:
             case "end":
-              return _context4.stop();
+              return _context3.stop();
           }
         }
       }, null, this);
@@ -21415,12 +21673,12 @@ function (_PureService) {
     key: "saveRootKeyToKeychain",
     value: function saveRootKeyToKeychain() {
       var rawKey;
-      return regeneratorRuntime.async(function saveRootKeyToKeychain$(_context5) {
+      return regeneratorRuntime.async(function saveRootKeyToKeychain$(_context4) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(this.rootKey)) {
-                _context5.next = 2;
+                _context4.next = 2;
                 break;
               }
 
@@ -21428,7 +21686,7 @@ function (_PureService) {
 
             case 2:
               if (!(this.keyMode !== KEY_MODE_ROOT_KEY_ONLY)) {
-                _context5.next = 4;
+                _context4.next = 4;
                 break;
               }
 
@@ -21436,12 +21694,12 @@ function (_PureService) {
 
             case 4:
               rawKey = this.rootKey.getRootValues();
-              _context5.next = 7;
+              _context4.next = 7;
               return regeneratorRuntime.awrap(this.deviceInterface.setKeychainValue(rawKey));
 
             case 7:
             case "end":
-              return _context5.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -21455,20 +21713,20 @@ function (_PureService) {
     key: "hasRootKeyWrapper",
     value: function hasRootKeyWrapper() {
       var wrapper;
-      return regeneratorRuntime.async(function hasRootKeyWrapper$(_context6) {
+      return regeneratorRuntime.async(function hasRootKeyWrapper$(_context5) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              _context6.next = 2;
+              _context5.next = 2;
               return regeneratorRuntime.awrap(this.getRootKeyWrapperKeyParams());
 
             case 2:
-              wrapper = _context6.sent;
-              return _context6.abrupt("return", !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(wrapper));
+              wrapper = _context5.sent;
+              return _context5.abrupt("return", !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(wrapper));
 
             case 4:
             case "end":
-              return _context6.stop();
+              return _context5.stop();
           }
         }
       }, null, this);
@@ -21481,29 +21739,29 @@ function (_PureService) {
   }, {
     key: "rootKeyNeedsUnwrapping",
     value: function rootKeyNeedsUnwrapping() {
-      return regeneratorRuntime.async(function rootKeyNeedsUnwrapping$(_context7) {
+      return regeneratorRuntime.async(function rootKeyNeedsUnwrapping$(_context6) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
-              _context7.next = 2;
+              _context6.next = 2;
               return regeneratorRuntime.awrap(this.hasRootKeyWrapper());
 
             case 2:
-              _context7.t0 = _context7.sent;
+              _context6.t0 = _context6.sent;
 
-              if (!_context7.t0) {
-                _context7.next = 5;
+              if (!_context6.t0) {
+                _context6.next = 5;
                 break;
               }
 
-              _context7.t0 = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(this.rootKey);
+              _context6.t0 = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(this.rootKey);
 
             case 5:
-              return _context7.abrupt("return", _context7.t0);
+              return _context6.abrupt("return", _context6.t0);
 
             case 6:
             case "end":
-              return _context7.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -21517,29 +21775,29 @@ function (_PureService) {
     key: "getRootKeyWrapperKeyParams",
     value: function getRootKeyWrapperKeyParams() {
       var rawKeyParams;
-      return regeneratorRuntime.async(function getRootKeyWrapperKeyParams$(_context8) {
+      return regeneratorRuntime.async(function getRootKeyWrapperKeyParams$(_context7) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              _context8.next = 2;
+              _context7.next = 2;
               return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 2:
-              rawKeyParams = _context8.sent;
+              rawKeyParams = _context7.sent;
 
               if (rawKeyParams) {
-                _context8.next = 5;
+                _context7.next = 5;
                 break;
               }
 
-              return _context8.abrupt("return", null);
+              return _context7.abrupt("return", null);
 
             case 5:
-              return _context8.abrupt("return", this.protocolService.createVersionedRootKeyParams(rawKeyParams));
+              return _context7.abrupt("return", this.protocolService.createVersionedRootKeyParams(rawKeyParams));
 
             case 6:
             case "end":
-              return _context8.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -21552,15 +21810,15 @@ function (_PureService) {
   }, {
     key: "getWrappedRootKeyFromStorage",
     value: function getWrappedRootKeyFromStorage() {
-      return regeneratorRuntime.async(function getWrappedRootKeyFromStorage$(_context9) {
+      return regeneratorRuntime.async(function getWrappedRootKeyFromStorage$(_context8) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
-              return _context9.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return _context8.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 1:
             case "end":
-              return _context9.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -21573,31 +21831,31 @@ function (_PureService) {
   }, {
     key: "getRootKeyParams",
     value: function getRootKeyParams() {
-      return regeneratorRuntime.async(function getRootKeyParams$(_context10) {
+      return regeneratorRuntime.async(function getRootKeyParams$(_context9) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY)) {
-                _context10.next = 4;
+                _context9.next = 4;
                 break;
               }
 
-              return _context10.abrupt("return", this.getRootKeyWrapperKeyParams());
+              return _context9.abrupt("return", this.getRootKeyWrapperKeyParams());
 
             case 4:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context10.next = 8;
+                _context9.next = 8;
                 break;
               }
 
-              return _context10.abrupt("return", this.getAccountKeyParams());
+              return _context9.abrupt("return", this.getAccountKeyParams());
 
             case 8:
               throw "Unhandled key mode for getRootKeyParams ".concat(this.keyMode);
 
             case 9:
             case "end":
-              return _context10.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -21611,15 +21869,15 @@ function (_PureService) {
   }, {
     key: "getAccountKeyParams",
     value: function getAccountKeyParams() {
-      return regeneratorRuntime.async(function getAccountKeyParams$(_context11) {
+      return regeneratorRuntime.async(function getAccountKeyParams$(_context10) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
-              return _context11.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return _context10.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 1:
             case "end":
-              return _context11.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -21634,26 +21892,26 @@ function (_PureService) {
     key: "validateWrappingKey",
     value: function validateWrappingKey(wrappingKey) {
       var wrappedRootKey, wrappedKeyPayload, decrypted;
-      return regeneratorRuntime.async(function validateWrappingKey$(_context12) {
+      return regeneratorRuntime.async(function validateWrappingKey$(_context11) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
-              _context12.next = 2;
+              _context11.next = 2;
               return regeneratorRuntime.awrap(this.getWrappedRootKeyFromStorage());
 
             case 2:
-              wrappedRootKey = _context12.sent;
+              wrappedRootKey = _context11.sent;
 
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY)) {
-                _context12.next = 7;
+                _context11.next = 7;
                 break;
               }
 
-              return _context12.abrupt("return", this.storageManager.canDecryptWithKey(wrappingKey));
+              return _context11.abrupt("return", this.storageManager.canDecryptWithKey(wrappingKey));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context12.next = 15;
+                _context11.next = 15;
                 break;
               }
 
@@ -21665,22 +21923,22 @@ function (_PureService) {
               wrappedKeyPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
                 object: wrappedRootKey
               });
-              _context12.next = 11;
+              _context11.next = 11;
               return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: wrappedKeyPayload,
                 key: wrappingKey
               }));
 
             case 11:
-              decrypted = _context12.sent;
-              return _context12.abrupt("return", !decrypted.errorDecrypting);
+              decrypted = _context11.sent;
+              return _context11.abrupt("return", !decrypted.errorDecrypting);
 
             case 15:
               throw 'Unhandled case in validateWrappingKey';
 
             case 16:
             case "end":
-              return _context12.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -21696,66 +21954,66 @@ function (_PureService) {
     key: "unwrapRootKey",
     value: function unwrapRootKey(_ref2) {
       var wrappingKey, wrappedKey, payload, decrypted;
-      return regeneratorRuntime.async(function unwrapRootKey$(_context13) {
+      return regeneratorRuntime.async(function unwrapRootKey$(_context12) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               wrappingKey = _ref2.wrappingKey;
 
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY)) {
-                _context13.next = 4;
+                _context12.next = 4;
                 break;
               }
 
               this.rootKey = wrappingKey;
-              return _context13.abrupt("return");
+              return _context12.abrupt("return");
 
             case 4:
               if (!(this.keyMode !== KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context13.next = 6;
+                _context12.next = 6;
                 break;
               }
 
               throw 'Invalid key mode condition for unwrapping.';
 
             case 6:
-              _context13.next = 8;
+              _context12.next = 8;
               return regeneratorRuntime.awrap(this.getWrappedRootKeyFromStorage());
 
             case 8:
-              wrappedKey = _context13.sent;
+              wrappedKey = _context12.sent;
               payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
                 object: wrappedKey
               });
-              _context13.next = 12;
+              _context12.next = 12;
               return regeneratorRuntime.awrap(this.protocolService.payloadByDecryptingPayload({
                 payload: payload,
                 key: wrappingKey
               }));
 
             case 12:
-              decrypted = _context13.sent;
+              decrypted = _context12.sent;
 
               if (!decrypted.errorDecrypting) {
-                _context13.next = 17;
+                _context12.next = 17;
                 break;
               }
 
               throw 'Unable to decrypt root key with provided wrapping key.';
 
             case 17:
-              _context13.next = 19;
+              _context12.next = 19;
               return regeneratorRuntime.awrap(_Protocol__WEBPACK_IMPORTED_MODULE_5__["SNRootKey"].Create({
                 uuid: decrypted.uuid,
                 content: decrypted.content
               }));
 
             case 19:
-              this.rootKey = _context13.sent;
+              this.rootKey = _context12.sent;
 
             case 20:
             case "end":
-              return _context13.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -21772,76 +22030,76 @@ function (_PureService) {
     key: "setNewRootKeyWrapper",
     value: function setNewRootKeyWrapper(_ref3) {
       var wrappingKey, keyParams;
-      return regeneratorRuntime.async(function setNewRootKeyWrapper$(_context14) {
+      return regeneratorRuntime.async(function setNewRootKeyWrapper$(_context13) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               wrappingKey = _ref3.wrappingKey, keyParams = _ref3.keyParams;
 
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_NONE)) {
-                _context14.next = 5;
+                _context13.next = 5;
                 break;
               }
 
               this.keyMode = KEY_MODE_WRAPPER_ONLY;
-              _context14.next = 10;
+              _context13.next = 10;
               break;
 
             case 5:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
-                _context14.next = 9;
+                _context13.next = 9;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
-              _context14.next = 10;
+              _context13.next = 10;
               break;
 
             case 9:
               throw 'Attempting to set wrapper on already wrapped key.';
 
             case 10:
-              _context14.next = 12;
+              _context13.next = 12;
               return regeneratorRuntime.awrap(this.deviceInterface.clearKeychainValue());
 
             case 12:
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context14.next = 24;
+                _context13.next = 24;
                 break;
               }
 
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY)) {
-                _context14.next = 19;
+                _context13.next = 19;
                 break;
               }
 
               this.rootKey = wrappingKey;
-              _context14.next = 17;
+              _context13.next = 17;
               return regeneratorRuntime.awrap(this.itemsKeyManager.reencryptItemsKeys());
 
             case 17:
-              _context14.next = 21;
+              _context13.next = 21;
               break;
 
             case 19:
-              _context14.next = 21;
+              _context13.next = 21;
               return regeneratorRuntime.awrap(this.persistWrappedRootKey({
                 wrappingKey: wrappingKey
               }));
 
             case 21:
-              _context14.next = 23;
+              _context13.next = 23;
               return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 23:
-              return _context14.abrupt("return");
+              return _context13.abrupt("return");
 
             case 24:
               throw 'Invalid keyMode on setNewRootKeyWrapper';
 
             case 25:
             case "end":
-              return _context14.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -21852,9 +22110,9 @@ function (_PureService) {
     key: "persistWrappedRootKey",
     value: function persistWrappedRootKey(_ref4) {
       var wrappingKey, payload, wrappedKey;
-      return regeneratorRuntime.async(function persistWrappedRootKey$(_context15) {
+      return regeneratorRuntime.async(function persistWrappedRootKey$(_context14) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               wrappingKey = _ref4.wrappingKey;
               payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
@@ -21863,7 +22121,7 @@ function (_PureService) {
                   content: this.rootKey.getRootValues()
                 }
               });
-              _context15.next = 4;
+              _context14.next = 4;
               return regeneratorRuntime.awrap(this.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 key: wrappingKey,
@@ -21871,13 +22129,13 @@ function (_PureService) {
               }));
 
             case 4:
-              wrappedKey = _context15.sent;
-              _context15.next = 7;
+              wrappedKey = _context14.sent;
+              _context14.next = 7;
               return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 7:
             case "end":
-              return _context15.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -21890,12 +22148,12 @@ function (_PureService) {
   }, {
     key: "removeRootKeyWrapper",
     value: function removeRootKeyWrapper() {
-      return regeneratorRuntime.async(function removeRootKeyWrapper$(_context16) {
+      return regeneratorRuntime.async(function removeRootKeyWrapper$(_context15) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               if (!(this.keyMode !== KEY_MODE_WRAPPER_ONLY && this.keyMode !== KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context16.next = 2;
+                _context15.next = 2;
                 break;
               }
 
@@ -21909,25 +22167,25 @@ function (_PureService) {
                 this.keyMode = KEY_MODE_ROOT_KEY_ONLY;
               }
 
-              _context16.next = 5;
+              _context15.next = 5;
               return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 5:
-              _context16.next = 7;
+              _context15.next = 7;
               return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context16.next = 10;
+                _context15.next = 10;
                 break;
               }
 
-              _context16.next = 10;
+              _context15.next = 10;
               return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
 
             case 10:
             case "end":
-              return _context16.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -21943,14 +22201,14 @@ function (_PureService) {
     key: "setNewRootKey",
     value: function setNewRootKey(_ref5) {
       var key, keyParams, previousRootKey;
-      return regeneratorRuntime.async(function setNewRootKey$(_context17) {
+      return regeneratorRuntime.async(function setNewRootKey$(_context16) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
               key = _ref5.key, keyParams = _ref5.keyParams;
 
               if (key.isRootKey) {
-                _context17.next = 3;
+                _context16.next = 3;
                 break;
               }
 
@@ -21958,7 +22216,7 @@ function (_PureService) {
 
             case 3:
               if (keyParams) {
-                _context17.next = 5;
+                _context16.next = 5;
                 break;
               }
 
@@ -21966,31 +22224,31 @@ function (_PureService) {
 
             case 5:
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY)) {
-                _context17.next = 9;
+                _context16.next = 9;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
-              _context17.next = 17;
+              _context16.next = 17;
               break;
 
             case 9:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_NONE)) {
-                _context17.next = 13;
+                _context16.next = 13;
                 break;
               }
 
               this.keyMode = KEY_MODE_ROOT_KEY_ONLY;
-              _context17.next = 17;
+              _context16.next = 17;
               break;
 
             case 13:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context17.next = 16;
+                _context16.next = 16;
                 break;
               }
 
-              _context17.next = 17;
+              _context16.next = 17;
               break;
 
             case 16:
@@ -22001,51 +22259,51 @@ function (_PureService) {
               this.rootKey = key;
 
               if (!(previousRootKey === key)) {
-                _context17.next = 21;
+                _context16.next = 21;
                 break;
               }
 
               throw 'Attempting to set root key as same current value.';
 
             case 21:
-              _context17.next = 23;
+              _context16.next = 23;
               return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, keyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 23:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
-                _context17.next = 28;
+                _context16.next = 28;
                 break;
               }
 
-              _context17.next = 26;
+              _context16.next = 26;
               return regeneratorRuntime.awrap(this.saveRootKeyToKeychain());
 
             case 26:
-              _context17.next = 31;
+              _context16.next = 31;
               break;
 
             case 28:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context17.next = 31;
+                _context16.next = 31;
                 break;
               }
 
-              _context17.next = 31;
+              _context16.next = 31;
               return regeneratorRuntime.awrap(this.persistWrappedRootKey({
                 wrappingKey: previousRootKey
               }));
 
             case 31:
-              _context17.next = 33;
+              _context16.next = 33;
               return regeneratorRuntime.awrap(this.itemsKeyManager.reencryptItemsKeys());
 
             case 33:
-              _context17.next = 35;
-              return regeneratorRuntime.awrap(this.notifyKeyObserversOfKeyChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].RootKey));
+              _context16.next = 35;
+              return regeneratorRuntime.awrap(this.notifyObserversOfChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].RootKey));
 
             case 35:
             case "end":
-              return _context17.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -22058,15 +22316,15 @@ function (_PureService) {
   }, {
     key: "getRootKey",
     value: function getRootKey() {
-      return regeneratorRuntime.async(function getRootKey$(_context18) {
+      return regeneratorRuntime.async(function getRootKey$(_context17) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
-              return _context18.abrupt("return", this.rootKey);
+              return _context17.abrupt("return", this.rootKey);
 
             case 1:
             case "end":
-              return _context18.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -22079,23 +22337,23 @@ function (_PureService) {
   }, {
     key: "clearLocalKeyState",
     value: function clearLocalKeyState() {
-      return regeneratorRuntime.async(function clearLocalKeyState$(_context19) {
+      return regeneratorRuntime.async(function clearLocalKeyState$(_context18) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
-              _context19.next = 2;
+              _context18.next = 2;
               return regeneratorRuntime.awrap(this.deviceInterface.clearKeychainValue());
 
             case 2:
-              _context19.next = 4;
+              _context18.next = 4;
               return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 4:
-              _context19.next = 6;
+              _context18.next = 6;
               return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 6:
-              _context19.next = 8;
+              _context18.next = 8;
               return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 8:
@@ -22104,7 +22362,7 @@ function (_PureService) {
 
             case 10:
             case "end":
-              return _context19.stop();
+              return _context18.stop();
           }
         }
       }, null, this);
@@ -22118,33 +22376,33 @@ function (_PureService) {
     key: "validateAccountPassword",
     value: function validateAccountPassword(password) {
       var keyParams, key, success;
-      return regeneratorRuntime.async(function validateAccountPassword$(_context20) {
+      return regeneratorRuntime.async(function validateAccountPassword$(_context19) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
-              _context20.next = 2;
+              _context19.next = 2;
               return regeneratorRuntime.awrap(this.getRootKeyParams());
 
             case 2:
-              keyParams = _context20.sent;
-              _context20.next = 5;
+              keyParams = _context19.sent;
+              _context19.next = 5;
               return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }));
 
             case 5:
-              key = _context20.sent;
-              _context20.next = 8;
+              key = _context19.sent;
+              _context19.next = 8;
               return regeneratorRuntime.awrap(this.protocolService.compareRootKeys(key, this.rootKey));
 
             case 8:
-              success = _context20.sent;
-              return _context20.abrupt("return", success ? key : null);
+              success = _context19.sent;
+              return _context19.abrupt("return", success ? key : null);
 
             case 10:
             case "end":
-              return _context20.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
@@ -22159,28 +22417,28 @@ function (_PureService) {
     key: "validateLocalPasscode",
     value: function validateLocalPasscode(passcode) {
       var keyParams, key;
-      return regeneratorRuntime.async(function validateLocalPasscode$(_context21) {
+      return regeneratorRuntime.async(function validateLocalPasscode$(_context20) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
-              _context21.next = 2;
+              _context20.next = 2;
               return regeneratorRuntime.awrap(this.getRootKeyWrapperKeyParams());
 
             case 2:
-              keyParams = _context21.sent;
-              _context21.next = 5;
+              keyParams = _context20.sent;
+              _context20.next = 5;
               return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 passcode: passcode,
                 keyParams: keyParams
               }));
 
             case 5:
-              key = _context21.sent;
-              return _context21.abrupt("return", this.validateWrappingKey(key));
+              key = _context20.sent;
+              return _context20.abrupt("return", this.validateWrappingKey(key));
 
             case 7:
             case "end":
-              return _context21.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -22206,14 +22464,14 @@ function (_PureService) {
     key: "keyToUseForEncryptionOfPayload",
     value: function keyToUseForEncryptionOfPayload(_ref6) {
       var payload, intent, rootKey;
-      return regeneratorRuntime.async(function keyToUseForEncryptionOfPayload$(_context22) {
+      return regeneratorRuntime.async(function keyToUseForEncryptionOfPayload$(_context21) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
               payload = _ref6.payload, intent = _ref6.intent;
 
               if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(intent)) {
-                _context22.next = 3;
+                _context21.next = 3;
                 break;
               }
 
@@ -22221,40 +22479,40 @@ function (_PureService) {
 
             case 3:
               if (!this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
-                _context22.next = 16;
+                _context21.next = 16;
                 break;
               }
 
-              _context22.next = 6;
+              _context21.next = 6;
               return regeneratorRuntime.awrap(this.getRootKey());
 
             case 6:
-              rootKey = _context22.sent;
+              rootKey = _context21.sent;
 
               if (rootKey) {
-                _context22.next = 13;
+                _context21.next = 13;
                 break;
               }
 
               if (!Object(_Protocol__WEBPACK_IMPORTED_MODULE_5__["intentRequiresEncryption"])(intent)) {
-                _context22.next = 12;
+                _context21.next = 12;
                 break;
               }
 
               throw 'Root key encryption is required but no root key is available.';
 
             case 12:
-              return _context22.abrupt("return", null);
+              return _context21.abrupt("return", null);
 
             case 13:
-              return _context22.abrupt("return", rootKey);
+              return _context21.abrupt("return", rootKey);
 
             case 16:
-              return _context22.abrupt("return", this.itemsKeyManager.getDefaultItemsKey());
+              return _context21.abrupt("return", this.itemsKeyManager.getDefaultItemsKey());
 
             case 17:
             case "end":
-              return _context22.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -22273,44 +22531,44 @@ function (_PureService) {
     key: "keyToUseForDecryptionOfPayload",
     value: function keyToUseForDecryptionOfPayload(_ref7) {
       var payload, itemsKey, payloadVersion;
-      return regeneratorRuntime.async(function keyToUseForDecryptionOfPayload$(_context23) {
+      return regeneratorRuntime.async(function keyToUseForDecryptionOfPayload$(_context22) {
         while (1) {
-          switch (_context23.prev = _context23.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
               payload = _ref7.payload;
 
               if (!this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
-                _context23.next = 3;
+                _context22.next = 3;
                 break;
               }
 
-              return _context23.abrupt("return", this.getRootKey());
+              return _context22.abrupt("return", this.getRootKey());
 
             case 3:
               if (!payload.items_key_id) {
-                _context23.next = 6;
+                _context22.next = 6;
                 break;
               }
 
               itemsKey = this.itemsKeyManager.itemsKeyForPayload(payload);
-              return _context23.abrupt("return", itemsKey);
+              return _context22.abrupt("return", itemsKey);
 
             case 6:
               payloadVersion = this.protocolService.versionForPayload(payload);
 
               if (!(payloadVersion === this.protocolService.getLatestVersion())) {
-                _context23.next = 9;
+                _context22.next = 9;
                 break;
               }
 
               throw 'No associated key found for item encrypted with latest protocol version.';
 
             case 9:
-              return _context23.abrupt("return", this.itemsKeyManager.defaultItemsKeyForItemVersion(payloadVersion));
+              return _context22.abrupt("return", this.itemsKeyManager.defaultItemsKeyForItemVersion(payloadVersion));
 
             case 10:
             case "end":
-              return _context23.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -22342,6 +22600,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
@@ -22367,6 +22626,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -22822,9 +23082,6 @@ function (_PureService) {
             case 34:
               if (item) {
                 item.updateFromPayload(payload);
-                /** If an item goes through mapping, it can no longer be a dummy. */
-
-                item.dummy = false;
               } else {
                 item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
                 this.insertItems({
@@ -22989,11 +23246,23 @@ function (_PureService) {
         }
       }, null, this, [[7, 42, 46, 54], [47,, 49, 53], [69, 73, 77, 85], [78,, 80, 84]]);
     }
+    /** @public */
+
+  }, {
+    key: "insertItem",
+    value: function insertItem(_ref11) {
+      var item = _ref11.item;
+      this.insertItems({
+        items: [item]
+      });
+    }
+    /** @public */
+
   }, {
     key: "insertItems",
-    value: function insertItems(_ref11) {
-      var items = _ref11.items,
-          globalOnly = _ref11.globalOnly;
+    value: function insertItems(_ref12) {
+      var items = _ref12.items,
+          globalOnly = _ref12.globalOnly;
       var _iteratorNormalCompletion5 = true;
       var _didIteratorError5 = false;
       var _iteratorError5 = undefined;
@@ -23052,17 +23321,17 @@ function (_PureService) {
     }
   }, {
     key: "resolveRelationshipWhenItemAvailable",
-    value: function resolveRelationshipWhenItemAvailable(_ref12) {
-      var interestedItem = _ref12.interestedItem,
-          missingItemId = _ref12.missingItemId;
+    value: function resolveRelationshipWhenItemAvailable(_ref13) {
+      var interestedItem = _ref13.interestedItem,
+          missingItemId = _ref13.missingItemId;
       var interestedItems = this.resolveQueue[missingItemId] || [];
       interestedItems.push(interestedItem);
       this.resolveQueue[missingItemId] = interestedItems;
     }
   }, {
     key: "popItemsInterestedInMissingItem",
-    value: function popItemsInterestedInMissingItem(_ref13) {
-      var item = _ref13.item;
+    value: function popItemsInterestedInMissingItem(_ref14) {
+      var item = _ref14.item;
       var interestedItems = this.resolveQueue[item.uuid];
       delete this.resolveQueue[item.uuid];
       return interestedItems || [];
@@ -23316,12 +23585,12 @@ function (_PureService) {
     }
   }, {
     key: "addMappingObserverWithPriority",
-    value: function addMappingObserverWithPriority(_ref14) {
+    value: function addMappingObserverWithPriority(_ref15) {
       var _this2 = this;
 
-      var priority = _ref14.priority,
-          types = _ref14.types,
-          callback = _ref14.callback;
+      var priority = _ref15.priority,
+          types = _ref15.types,
+          callback = _ref15.callback;
 
       if (!Array.isArray(types)) {
         types = [types];
@@ -23605,89 +23874,88 @@ function (_PureService) {
 
             case 9:
               if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
-                _context17.next = 18;
+                _context17.next = 17;
                 break;
               }
 
               item = _step10.value;
 
               if (item.isItem) {
-                _context17.next = 14;
+                _context17.next = 13;
                 break;
               }
 
-              debugger;
               throw 'Attempting to dirty non-item object.';
 
-            case 14:
+            case 13:
               item.setDirty({
                 dirty: dirty,
                 updateClientDate: updateClientDate,
                 authorized: true
               });
 
-            case 15:
+            case 14:
               _iteratorNormalCompletion10 = true;
               _context17.next = 9;
               break;
 
-            case 18:
-              _context17.next = 24;
+            case 17:
+              _context17.next = 23;
               break;
 
-            case 20:
-              _context17.prev = 20;
+            case 19:
+              _context17.prev = 19;
               _context17.t0 = _context17["catch"](7);
               _didIteratorError10 = true;
               _iteratorError10 = _context17.t0;
 
-            case 24:
+            case 23:
+              _context17.prev = 23;
               _context17.prev = 24;
-              _context17.prev = 25;
 
               if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
                 _iterator10.return();
               }
 
-            case 27:
-              _context17.prev = 27;
+            case 26:
+              _context17.prev = 26;
 
               if (!_didIteratorError10) {
-                _context17.next = 30;
+                _context17.next = 29;
                 break;
               }
 
               throw _iteratorError10;
 
+            case 29:
+              return _context17.finish(26);
+
             case 30:
-              return _context17.finish(27);
+              return _context17.finish(23);
 
             case 31:
-              return _context17.finish(24);
-
-            case 32:
               return _context17.abrupt("return", this.mapItems({
                 items: items,
                 source: source || _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].LocalDirted,
                 sourceKey: sourceKey
               }));
 
-            case 33:
+            case 32:
             case "end":
               return _context17.stop();
           }
         }
-      }, null, this, [[7, 20, 24, 32], [25,, 27, 31]]);
+      }, null, this, [[7, 19, 23, 31], [24,, 26, 30]]);
     }
   }, {
     key: "duplicateItem",
-    value: function duplicateItem(_ref15) {
+    value: function duplicateItem(_ref16) {
       var item, isConflict, payload, payloads, results, copy;
       return regeneratorRuntime.async(function duplicateItem$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
-              item = _ref15.item, isConflict = _ref15.isConflict;
+              item = _ref16.item, isConflict = _ref16.isConflict;
 
               if (item.isItem) {
                 _context18.next = 3;
@@ -23732,13 +24000,13 @@ function (_PureService) {
 
   }, {
     key: "createItem",
-    value: function createItem(_ref16) {
-      var contentType, content, payload, item;
+    value: function createItem(_ref17) {
+      var contentType, content, add, needsSync, payload, item;
       return regeneratorRuntime.async(function createItem$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
-              contentType = _ref16.contentType, content = _ref16.content;
+              contentType = _ref17.contentType, content = _ref17.content, add = _ref17.add, needsSync = _ref17.needsSync;
 
               if (contentType) {
                 _context19.next = 3;
@@ -23748,21 +24016,53 @@ function (_PureService) {
               throw 'Attempting to create item with no contentType';
 
             case 3:
-              payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])({
-                object: {
-                  content_type: contentType,
-                  content: content
-                }
-              });
-              item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
-              return _context19.abrupt("return", item);
+              _context19.t0 = _Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"];
+              _context19.next = 6;
+              return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid());
 
             case 6:
+              _context19.t1 = _context19.sent;
+              _context19.t2 = contentType;
+              _context19.t3 = content;
+              _context19.t4 = {
+                uuid: _context19.t1,
+                content_type: _context19.t2,
+                content: _context19.t3
+              };
+              _context19.t5 = {
+                object: _context19.t4
+              };
+              payload = (0, _context19.t0)(_context19.t5);
+              item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
+
+              if (!add) {
+                _context19.next = 19;
+                break;
+              }
+
+              _context19.next = 16;
+              return regeneratorRuntime.awrap(this.insertItem({
+                item: item
+              }));
+
+            case 16:
+              if (!needsSync) {
+                _context19.next = 19;
+                break;
+              }
+
+              _context19.next = 19;
+              return regeneratorRuntime.awrap(this.setItemDirty(item));
+
+            case 19:
+              return _context19.abrupt("return", item);
+
+            case 20:
             case "end":
               return _context19.stop();
           }
         }
-      });
+      }, null, this);
     }
     /**
      * Adds items to model management.
@@ -24469,30 +24769,50 @@ function (_PureService) {
     }
   }, {
     key: "findTag",
-    value: function findTag(_ref17) {
-      var title = _ref17.title;
-      return find(this.tags, {
-        title: title
-      });
+    value: function findTag(_ref18) {
+      var title = _ref18.title;
+      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["findInArray"])(this.tags, 'title', title);
     }
   }, {
-    key: "findOrCreateTagByTitle",
-    value: function findOrCreateTagByTitle(title) {
-      var tag = this.findTag({
-        title: title
-      });
+    key: "findOrCreateTag",
+    value: function findOrCreateTag(_ref19) {
+      var title, tag;
+      return regeneratorRuntime.async(function findOrCreateTag$(_context30) {
+        while (1) {
+          switch (_context30.prev = _context30.next) {
+            case 0:
+              title = _ref19.title;
+              tag = this.findTag({
+                title: title
+              });
 
-      if (!tag) {
-        tag = this.createItem({
-          contentType: 'Tag',
-          content: {
-            title: title
+              if (tag) {
+                _context30.next = 6;
+                break;
+              }
+
+              _context30.next = 5;
+              return regeneratorRuntime.awrap(this.createItem({
+                contentType: 'Tag',
+                content: {
+                  title: title
+                },
+                add: true,
+                needsSync: true
+              }));
+
+            case 5:
+              tag = _context30.sent;
+
+            case 6:
+              return _context30.abrupt("return", tag);
+
+            case 7:
+            case "end":
+              return _context30.stop();
           }
-        });
-        this.setItemDirty(tag);
-      }
-
-      return tag;
+        }
+      }, null, this);
     }
   }, {
     key: "reorderTagLocation",
@@ -25270,6 +25590,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -25326,29 +25650,45 @@ function (_PureService) {
   _createClass(SNProtocolService, [{
     key: "setKeyManager",
     value: function setKeyManager(keyManager) {
+      this.keyManager = keyManager;
+    }
+  }, {
+    key: "setItemsKeyManager",
+    value: function setItemsKeyManager(itemsKeyManager) {
       var _this2 = this;
 
-      this.keyManager = keyManager;
-      this.keyManager.addKeyChangeObserver(function _callee(contentType) {
+      this.keyObsUnsubscribe = itemsKeyManager.addItemsKeyChangeObserver(function _callee() {
         return regeneratorRuntime.async(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].ItemsKey)) {
-                  _context.next = 3;
-                  break;
-                }
-
-                _context.next = 3;
+                _context.next = 2;
                 return regeneratorRuntime.awrap(_this2.decryptErroredItems());
 
-              case 3:
+              case 2:
               case "end":
                 return _context.stop();
             }
           }
         });
       });
+    }
+  }, {
+    key: "deinit",
+    value: function deinit() {
+      return regeneratorRuntime.async(function deinit$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              this.keyObsUnsubscribe();
+              return _context2.abrupt("return", _get(_getPrototypeOf(SNProtocolService.prototype), "deinit", this).call(this));
+
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "getLatestVersion",
@@ -25359,16 +25699,38 @@ function (_PureService) {
     key: "getUserVersion",
     value: function getUserVersion() {
       var keyParams;
-      return regeneratorRuntime.async(function getUserVersion$(_context2) {
+      return regeneratorRuntime.async(function getUserVersion$(_context3) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
               keyParams = this.keyManager.getRootKeyParams();
-              return _context2.abrupt("return", keyParams && keyParams.version);
+              return _context3.abrupt("return", keyParams && keyParams.version);
 
             case 2:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "upgradeAvailable",
+    value: function upgradeAvailable() {
+      return regeneratorRuntime.async(function upgradeAvailable$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return regeneratorRuntime.awrap(this.getUserVersion());
+
+            case 2:
+              _context4.t0 = _context4.sent;
+              _context4.t1 = this.getLatestVersion();
+              return _context4.abrupt("return", _context4.t0 !== _context4.t1);
+
+            case 5:
+            case "end":
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -25486,21 +25848,21 @@ function (_PureService) {
     key: "computeRootKey",
     value: function computeRootKey(_ref2) {
       var password, keyParams, version, operator;
-      return regeneratorRuntime.async(function computeRootKey$(_context3) {
+      return regeneratorRuntime.async(function computeRootKey$(_context5) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
               password = _ref2.password, keyParams = _ref2.keyParams;
               version = keyParams.version;
               operator = this.operatorForVersion(version);
-              return _context3.abrupt("return", operator.computeRootKey({
+              return _context5.abrupt("return", operator.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }));
 
             case 4:
             case "end":
-              return _context3.stop();
+              return _context5.stop();
           }
         }
       }, null, this);
@@ -25509,20 +25871,20 @@ function (_PureService) {
     key: "createRootKey",
     value: function createRootKey(_ref3) {
       var identifier, password, operator;
-      return regeneratorRuntime.async(function createRootKey$(_context4) {
+      return regeneratorRuntime.async(function createRootKey$(_context6) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               identifier = _ref3.identifier, password = _ref3.password;
               operator = this.defaultOperator();
-              return _context4.abrupt("return", operator.createRootKey({
+              return _context6.abrupt("return", operator.createRootKey({
                 identifier: identifier,
                 password: password
               }));
 
             case 3:
             case "end":
-              return _context4.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -25530,15 +25892,15 @@ function (_PureService) {
   }, {
     key: "getRootKeyParams",
     value: function getRootKeyParams() {
-      return regeneratorRuntime.async(function getRootKeyParams$(_context5) {
+      return regeneratorRuntime.async(function getRootKeyParams$(_context7) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              return _context5.abrupt("return", this.keyManager.getRootKeyParams());
+              return _context7.abrupt("return", this.keyManager.getRootKeyParams());
 
             case 1:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -25576,37 +25938,37 @@ function (_PureService) {
     key: "payloadByEncryptingPayload",
     value: function payloadByEncryptingPayload(_ref5) {
       var payload, key, intent, version, format, operator, encryptionParameters;
-      return regeneratorRuntime.async(function payloadByEncryptingPayload$(_context6) {
+      return regeneratorRuntime.async(function payloadByEncryptingPayload$(_context8) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               payload = _ref5.payload, key = _ref5.key, intent = _ref5.intent;
 
               if (!payload.errorDecrypting) {
-                _context6.next = 3;
+                _context8.next = 3;
                 break;
               }
 
-              return _context6.abrupt("return", payload);
+              return _context8.abrupt("return", payload);
 
             case 3:
               if (!(!key && !Object(_Protocol__WEBPACK_IMPORTED_MODULE_6__["isDecryptedIntent"])(intent))) {
-                _context6.next = 7;
+                _context8.next = 7;
                 break;
               }
 
-              _context6.next = 6;
+              _context8.next = 6;
               return regeneratorRuntime.awrap(this.keyManager.keyToUseForEncryptionOfPayload({
                 payload: payload,
                 intent: intent
               }));
 
             case 6:
-              key = _context6.sent;
+              key = _context8.sent;
 
             case 7:
               if (!(!key && Object(_Protocol__WEBPACK_IMPORTED_MODULE_6__["intentRequiresEncryption"])(intent))) {
-                _context6.next = 9;
+                _context8.next = 9;
                 break;
               }
 
@@ -25614,7 +25976,7 @@ function (_PureService) {
 
             case 9:
               if (!payload.isEncrypted) {
-                _context6.next = 11;
+                _context8.next = 11;
                 break;
               }
 
@@ -25622,7 +25984,7 @@ function (_PureService) {
 
             case 11:
               if (payload.content) {
-                _context6.next = 13;
+                _context8.next = 13;
                 break;
               }
 
@@ -25630,7 +25992,7 @@ function (_PureService) {
 
             case 13:
               if (payload.uuid) {
-                _context6.next = 15;
+                _context8.next = 15;
                 break;
               }
 
@@ -25643,7 +26005,7 @@ function (_PureService) {
                 intent: intent
               });
               operator = this.operatorForVersion(version);
-              _context6.next = 20;
+              _context8.next = 20;
               return regeneratorRuntime.awrap(operator.generateEncryptionParameters({
                 payload: payload,
                 key: key,
@@ -25651,17 +26013,17 @@ function (_PureService) {
               }));
 
             case 20:
-              encryptionParameters = _context6.sent;
+              encryptionParameters = _context8.sent;
 
               if (encryptionParameters) {
-                _context6.next = 23;
+                _context8.next = 23;
                 break;
               }
 
               throw 'Unable to generate encryption parameters';
 
             case 23:
-              return _context6.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateIntentPayloadFromObject"])({
+              return _context8.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateIntentPayloadFromObject"])({
                 object: payload,
                 override: encryptionParameters,
                 intent: intent
@@ -25669,7 +26031,7 @@ function (_PureService) {
 
             case 24:
             case "end":
-              return _context6.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -25679,80 +26041,80 @@ function (_PureService) {
     value: function payloadsByEncryptingPayloads(_ref6) {
       var payloads, intent, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, encryptedPayload;
 
-      return regeneratorRuntime.async(function payloadsByEncryptingPayloads$(_context7) {
+      return regeneratorRuntime.async(function payloadsByEncryptingPayloads$(_context9) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               payloads = _ref6.payloads, intent = _ref6.intent;
               results = [];
               _iteratorNormalCompletion = true;
               _didIteratorError = false;
               _iteratorError = undefined;
-              _context7.prev = 5;
+              _context9.prev = 5;
               _iterator = payloads[Symbol.iterator]();
 
             case 7:
               if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context7.next = 16;
+                _context9.next = 16;
                 break;
               }
 
               payload = _step.value;
-              _context7.next = 11;
+              _context9.next = 11;
               return regeneratorRuntime.awrap(this.payloadByEncryptingPayload({
                 payload: payload,
                 intent: intent
               }));
 
             case 11:
-              encryptedPayload = _context7.sent;
+              encryptedPayload = _context9.sent;
               results.push(encryptedPayload);
 
             case 13:
               _iteratorNormalCompletion = true;
-              _context7.next = 7;
+              _context9.next = 7;
               break;
 
             case 16:
-              _context7.next = 22;
+              _context9.next = 22;
               break;
 
             case 18:
-              _context7.prev = 18;
-              _context7.t0 = _context7["catch"](5);
+              _context9.prev = 18;
+              _context9.t0 = _context9["catch"](5);
               _didIteratorError = true;
-              _iteratorError = _context7.t0;
+              _iteratorError = _context9.t0;
 
             case 22:
-              _context7.prev = 22;
-              _context7.prev = 23;
+              _context9.prev = 22;
+              _context9.prev = 23;
 
               if (!_iteratorNormalCompletion && _iterator.return != null) {
                 _iterator.return();
               }
 
             case 25:
-              _context7.prev = 25;
+              _context9.prev = 25;
 
               if (!_didIteratorError) {
-                _context7.next = 28;
+                _context9.next = 28;
                 break;
               }
 
               throw _iteratorError;
 
             case 28:
-              return _context7.finish(25);
+              return _context9.finish(25);
 
             case 29:
-              return _context7.finish(22);
+              return _context9.finish(22);
 
             case 30:
-              return _context7.abrupt("return", results);
+              return _context9.abrupt("return", results);
 
             case 31:
             case "end":
-              return _context7.stop();
+              return _context9.stop();
           }
         }
       }, null, this, [[5, 18, 22, 30], [23,, 25, 29]]);
@@ -25767,14 +26129,14 @@ function (_PureService) {
     key: "payloadByDecryptingPayload",
     value: function payloadByDecryptingPayload(_ref7) {
       var payload, key, version, operator, encryptionParameters, decryptedParameters;
-      return regeneratorRuntime.async(function payloadByDecryptingPayload$(_context8) {
+      return regeneratorRuntime.async(function payloadByDecryptingPayload$(_context10) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               payload = _ref7.payload, key = _ref7.key;
 
               if (payload.content) {
-                _context8.next = 3;
+                _context10.next = 3;
                 break;
               }
 
@@ -25782,25 +26144,25 @@ function (_PureService) {
 
             case 3:
               if (key) {
-                _context8.next = 7;
+                _context10.next = 7;
                 break;
               }
 
-              _context8.next = 6;
+              _context10.next = 6;
               return regeneratorRuntime.awrap(this.keyManager.keyToUseForDecryptionOfPayload({
                 payload: payload
               }));
 
             case 6:
-              key = _context8.sent;
+              key = _context10.sent;
 
             case 7:
               if (key) {
-                _context8.next = 9;
+                _context10.next = 9;
                 break;
               }
 
-              return _context8.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
+              return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
                 object: payload,
                 override: {
                   waitingForKey: true,
@@ -25812,22 +26174,22 @@ function (_PureService) {
               version = this.versionForPayload(payload);
               operator = this.operatorForVersion(version);
               encryptionParameters = Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])(payload);
-              _context8.next = 14;
+              _context10.next = 14;
               return regeneratorRuntime.awrap(operator.generateDecryptedParameters({
                 encryptedParameters: encryptionParameters,
                 key: key
               }));
 
             case 14:
-              decryptedParameters = _context8.sent;
-              return _context8.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
+              decryptedParameters = _context10.sent;
+              return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
                 object: payload,
                 override: decryptedParameters
               }));
 
             case 16:
             case "end":
-              return _context8.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -25837,38 +26199,38 @@ function (_PureService) {
     value: function payloadsByDecryptingPayloads(_ref8) {
       var payloads, throws, decryptedPayloads, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, encryptedPayload, isDecryptable, decryptedPayload, _override;
 
-      return regeneratorRuntime.async(function payloadsByDecryptingPayloads$(_context9) {
+      return regeneratorRuntime.async(function payloadsByDecryptingPayloads$(_context11) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               payloads = _ref8.payloads, throws = _ref8.throws;
               decryptedPayloads = [];
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context9.prev = 5;
+              _context11.prev = 5;
               _iterator2 = payloads[Symbol.iterator]();
 
             case 7:
               if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context9.next = 37;
+                _context11.next = 37;
                 break;
               }
 
               encryptedPayload = _step2.value;
 
               if (encryptedPayload) {
-                _context9.next = 12;
+                _context11.next = 12;
                 break;
               }
 
               /** Keep in counts similar to out counts */
               decryptedPayloads.push(encryptedPayload);
-              return _context9.abrupt("continue", 34);
+              return _context11.abrupt("continue", 34);
 
             case 12:
               if (encryptedPayload.isPayload) {
-                _context9.next = 14;
+                _context11.next = 14;
                 break;
               }
 
@@ -25876,100 +26238,100 @@ function (_PureService) {
 
             case 14:
               if (!(encryptedPayload.deleted === true && Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(encryptedPayload.content))) {
-                _context9.next = 17;
+                _context11.next = 17;
                 break;
               }
 
               decryptedPayloads.push(encryptedPayload);
-              return _context9.abrupt("continue", 34);
+              return _context11.abrupt("continue", 34);
 
             case 17:
               isDecryptable = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isString"])(encryptedPayload.content);
 
               if (isDecryptable) {
-                _context9.next = 21;
+                _context11.next = 21;
                 break;
               }
 
               decryptedPayloads.push(encryptedPayload);
-              return _context9.abrupt("continue", 34);
+              return _context11.abrupt("continue", 34);
 
             case 21:
-              _context9.prev = 21;
-              _context9.next = 24;
+              _context11.prev = 21;
+              _context11.next = 24;
               return regeneratorRuntime.awrap(this.payloadByDecryptingPayload({
                 payload: encryptedPayload
               }));
 
             case 24:
-              decryptedPayload = _context9.sent;
+              decryptedPayload = _context11.sent;
               decryptedPayloads.push(decryptedPayload);
-              _context9.next = 34;
+              _context11.next = 34;
               break;
 
             case 28:
-              _context9.prev = 28;
-              _context9.t0 = _context9["catch"](21);
+              _context11.prev = 28;
+              _context11.t0 = _context11["catch"](21);
               decryptedPayloads.push(Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
                 object: encryptedPayload,
                 override: (_override = {}, _defineProperty(_override, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecryptingChanged, !encryptedPayload.errorDecrypting), _override)
               }));
 
               if (!throws) {
-                _context9.next = 33;
+                _context11.next = 33;
                 break;
               }
 
-              throw _context9.t0;
+              throw _context11.t0;
 
             case 33:
-              console.error("Error decrypting payload", encryptedPayload, _context9.t0);
+              console.error("Error decrypting payload", encryptedPayload, _context11.t0);
 
             case 34:
               _iteratorNormalCompletion2 = true;
-              _context9.next = 7;
+              _context11.next = 7;
               break;
 
             case 37:
-              _context9.next = 43;
+              _context11.next = 43;
               break;
 
             case 39:
-              _context9.prev = 39;
-              _context9.t1 = _context9["catch"](5);
+              _context11.prev = 39;
+              _context11.t1 = _context11["catch"](5);
               _didIteratorError2 = true;
-              _iteratorError2 = _context9.t1;
+              _iteratorError2 = _context11.t1;
 
             case 43:
-              _context9.prev = 43;
-              _context9.prev = 44;
+              _context11.prev = 43;
+              _context11.prev = 44;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
             case 46:
-              _context9.prev = 46;
+              _context11.prev = 46;
 
               if (!_didIteratorError2) {
-                _context9.next = 49;
+                _context11.next = 49;
                 break;
               }
 
               throw _iteratorError2;
 
             case 49:
-              return _context9.finish(46);
+              return _context11.finish(46);
 
             case 50:
-              return _context9.finish(43);
+              return _context11.finish(43);
 
             case 51:
-              return _context9.abrupt("return", decryptedPayloads);
+              return _context11.abrupt("return", decryptedPayloads);
 
             case 52:
             case "end":
-              return _context9.stop();
+              return _context11.stop();
           }
         }
       }, null, this, [[5, 39, 43, 51], [21, 28], [44,, 46, 50]]);
@@ -25985,20 +26347,20 @@ function (_PureService) {
     key: "decryptErroredItems",
     value: function decryptErroredItems() {
       var items, payloads, decrypted;
-      return regeneratorRuntime.async(function decryptErroredItems$(_context10) {
+      return regeneratorRuntime.async(function decryptErroredItems$(_context12) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               items = this.modelManager.allItems.filter(function (item) {
                 return item.waitingForKey || item.errorDecrypting;
               });
 
               if (!(items.length === 0)) {
-                _context10.next = 3;
+                _context12.next = 3;
                 break;
               }
 
-              return _context10.abrupt("return");
+              return _context12.abrupt("return");
 
             case 3:
               payloads = items.map(function (item) {
@@ -26006,21 +26368,21 @@ function (_PureService) {
                   object: item
                 });
               });
-              _context10.next = 6;
+              _context12.next = 6;
               return regeneratorRuntime.awrap(this.payloadsByDecryptingPayloads({
                 payloads: payloads
               }));
 
             case 6:
-              decrypted = _context10.sent;
-              _context10.next = 9;
+              decrypted = _context12.sent;
+              _context12.next = 9;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: decrypted
               }));
 
             case 9:
             case "end":
-              return _context10.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -26029,9 +26391,9 @@ function (_PureService) {
     key: "payloadsByDecryptingBackupFile",
     value: function payloadsByDecryptingBackupFile(_ref9) {
       var data, password, keyParams, rawItems, encryptedPayloads, decryptedPayloads, key;
-      return regeneratorRuntime.async(function payloadsByDecryptingBackupFile$(_context11) {
+      return regeneratorRuntime.async(function payloadsByDecryptingBackupFile$(_context13) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               data = _ref9.data, password = _ref9.password;
               keyParams = data.keyParams || data.auth_params;
@@ -26044,38 +26406,38 @@ function (_PureService) {
               });
 
               if (!keyParams) {
-                _context11.next = 13;
+                _context13.next = 13;
                 break;
               }
 
-              _context11.next = 7;
+              _context13.next = 7;
               return regeneratorRuntime.awrap(this.computeRootKey({
                 password: password,
                 keyParams: keyParams
               }));
 
             case 7:
-              key = _context11.sent;
-              _context11.next = 10;
+              key = _context13.sent;
+              _context13.next = 10;
               return regeneratorRuntime.awrap(this.payloadsByDecryptingPayloads({
                 payloads: encryptedPayloads,
                 key: key
               }));
 
             case 10:
-              decryptedPayloads = _context11.sent;
-              _context11.next = 14;
+              decryptedPayloads = _context13.sent;
+              _context13.next = 14;
               break;
 
             case 13:
               decryptedPayloads = encryptedPayloads;
 
             case 14:
-              return _context11.abrupt("return", decryptedPayloads);
+              return _context13.abrupt("return", decryptedPayloads);
 
             case 15:
             case "end":
-              return _context11.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -26084,21 +26446,21 @@ function (_PureService) {
     key: "payloadsByDecryptingRawPayload",
     value: function payloadsByDecryptingRawPayload(_ref10) {
       var rawPayload, encryptedPayload;
-      return regeneratorRuntime.async(function payloadsByDecryptingRawPayload$(_context12) {
+      return regeneratorRuntime.async(function payloadsByDecryptingRawPayload$(_context14) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               rawPayload = _ref10.rawPayload;
               encryptedPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])({
                 object: rawPayload
               });
-              return _context12.abrupt("return", this.payloadByDecryptingPayload({
+              return _context14.abrupt("return", this.payloadByDecryptingPayload({
                 payload: encryptedPayload
               }));
 
             case 3:
             case "end":
-              return _context12.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -26111,15 +26473,15 @@ function (_PureService) {
   }, {
     key: "compareRootKeys",
     value: function compareRootKeys(keyA, keyB) {
-      return regeneratorRuntime.async(function compareRootKeys$(_context13) {
+      return regeneratorRuntime.async(function compareRootKeys$(_context15) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
-              return _context13.abrupt("return", keyA.compare(keyB));
+              return _context15.abrupt("return", keyA.compare(keyB));
 
             case 1:
             case "end":
-              return _context13.stop();
+              return _context15.stop();
           }
         }
       });
@@ -26167,21 +26529,21 @@ function (_PureService) {
           data,
           keyParams,
           prettyPrint,
-          _args14 = arguments;
+          _args16 = arguments;
 
-      return regeneratorRuntime.async(function createBackupFile$(_context14) {
+      return regeneratorRuntime.async(function createBackupFile$(_context16) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
-              _ref11 = _args14.length > 0 && _args14[0] !== undefined ? _args14[0] : {}, subItems = _ref11.subItems, intent = _ref11.intent, returnIfEmpty = _ref11.returnIfEmpty;
+              _ref11 = _args16.length > 0 && _args16[0] !== undefined ? _args16[0] : {}, subItems = _ref11.subItems, intent = _ref11.intent, returnIfEmpty = _ref11.returnIfEmpty;
               items = subItems || this.modelManager.allItems;
 
               if (!(returnIfEmpty && items.length === 0)) {
-                _context14.next = 4;
+                _context16.next = 4;
                 break;
               }
 
-              return _context14.abrupt("return", null);
+              return _context16.abrupt("return", null);
 
             case 4:
               if (!intent) {
@@ -26193,33 +26555,33 @@ function (_PureService) {
                   object: item
                 });
               });
-              _context14.next = 8;
+              _context16.next = 8;
               return regeneratorRuntime.awrap(this.payloadsByEncryptingPayloads({
                 payloads: payloads,
                 intent: intent
               }));
 
             case 8:
-              encryptedPayloads = _context14.sent;
+              encryptedPayloads = _context16.sent;
               data = {
                 items: encryptedPayloads
               };
-              _context14.next = 12;
+              _context16.next = 12;
               return regeneratorRuntime.awrap(this.keyManager.getRootKeyParams());
 
             case 12:
-              keyParams = _context14.sent;
+              keyParams = _context16.sent;
 
               if (keyParams && intent !== _Protocol__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntents"].FileDecrypted) {
                 data.keyParams = keyParams;
               }
 
               prettyPrint = 2;
-              return _context14.abrupt("return", JSON.stringify(data, null, prettyPrint));
+              return _context16.abrupt("return", JSON.stringify(data, null, prettyPrint));
 
             case 16:
             case "end":
-              return _context14.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
