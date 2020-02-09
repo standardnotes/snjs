@@ -3170,9 +3170,9 @@ function () {
     /** @public */
 
   }, {
-    key: "passcodeLock",
-    value: function passcodeLock() {
-      return regeneratorRuntime.async(function passcodeLock$(_context42) {
+    key: "lock",
+    value: function lock() {
+      return regeneratorRuntime.async(function lock$(_context42) {
         while (1) {
           switch (_context42.prev = _context42.next) {
             case 0:
@@ -3384,6 +3384,7 @@ function () {
       this.componentManager = null;
       this.privilegesManager = null;
       this.actionsManager = null;
+      this.services = [];
     }
   }, {
     key: "createMigrationService",
@@ -14546,7 +14547,8 @@ function () {
         return false;
       }
 
-      return this.masterKey === otherKey.masterKey && this.itemsKey === otherKey.itemsKey && this.serverPassword === otherKey.serverPassword;
+      var hasServerPassword = this.serverPassword && otherKey.serverPassword;
+      return this.masterKey === otherKey.masterKey && (!hasServerPassword || this.serverPassword === otherKey.serverPassword);
     }
     /**
      * @returns Object containg key/values that should be extracted from key for local saving.
@@ -16475,11 +16477,17 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -16509,6 +16517,55 @@ function (_PureService) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNComponentManager).call(this));
     /* This domain will be used to save context item client data */
+
+    _defineProperty(_assertThisInitialized(_this), "detectFocusChange", function () {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        var _loop = function _loop() {
+          var component = _step.value;
+
+          if (document.activeElement === _this.iframeForComponent(component)) {
+            _this.timeout(function () {
+              _this.focusChangedForComponent(component);
+            });
+
+            return "break";
+          }
+        };
+
+        for (var _iterator = _this.activeComponents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _ret = _loop();
+
+          if (_ret === "break") break;
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "onWindowMessage", function (event) {
+      _this.log('Web app: received message', event);
+      /* Make sure this message is for us */
+
+
+      if (event.data.sessionKey) {
+        _this.handleMessage(_this.componentForSessionKey(event.data.sessionKey), event.data);
+      }
+    });
 
     SNComponentManager.ClientDataDomain = "org.standardnotes.sn.components";
     _this.timeout = timeout || setTimeout.bind(window);
@@ -16546,7 +16603,7 @@ function (_PureService) {
       var _this2 = this;
 
       this.modelManager.addMappingObserver("*", function _callee(allItems, validItems, deletedItems, source, sourceKey) {
-        var syncedComponents, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, component, activeComponent, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _loop, _iterator2, _step2, _ret, requiredContextPermissions, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _loop2, _iterator3, _step3, _ret2;
+        var syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, component, activeComponent, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _loop2, _iterator3, _step3, _ret2, requiredContextPermissions, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _loop3, _iterator4, _step4, _ret3;
 
         return regeneratorRuntime.async(function _callee$(_context) {
           while (1) {
@@ -16566,19 +16623,19 @@ function (_PureService) {
                   }
                 }
 
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
                 _context.prev = 5;
-                _iterator = syncedComponents[Symbol.iterator]();
+                _iterator2 = syncedComponents[Symbol.iterator]();
 
               case 7:
-                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
                   _context.next = 21;
                   break;
                 }
 
-                component = _step.value;
+                component = _step2.value;
                 activeComponent = lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this2.activeComponents, {
                   uuid: component.uuid
                 });
@@ -16605,7 +16662,7 @@ function (_PureService) {
                 return regeneratorRuntime.awrap(_this2.deactivateComponent(component));
 
               case 18:
-                _iteratorNormalCompletion = true;
+                _iteratorNormalCompletion2 = true;
                 _context.next = 7;
                 break;
 
@@ -16616,26 +16673,26 @@ function (_PureService) {
               case 23:
                 _context.prev = 23;
                 _context.t0 = _context["catch"](5);
-                _didIteratorError = true;
-                _iteratorError = _context.t0;
+                _didIteratorError2 = true;
+                _iteratorError2 = _context.t0;
 
               case 27:
                 _context.prev = 27;
                 _context.prev = 28;
 
-                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                  _iterator.return();
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
                 }
 
               case 30:
                 _context.prev = 30;
 
-                if (!_didIteratorError) {
+                if (!_didIteratorError2) {
                   _context.next = 33;
                   break;
                 }
 
-                throw _iteratorError;
+                throw _iteratorError2;
 
               case 33:
                 return _context.finish(30);
@@ -16644,13 +16701,13 @@ function (_PureService) {
                 return _context.finish(27);
 
               case 35:
-                _iteratorNormalCompletion2 = true;
-                _didIteratorError2 = false;
-                _iteratorError2 = undefined;
+                _iteratorNormalCompletion3 = true;
+                _didIteratorError3 = false;
+                _iteratorError3 = undefined;
                 _context.prev = 38;
 
-                _loop = function _loop() {
-                  var observer = _step2.value;
+                _loop2 = function _loop2() {
+                  var observer = _step3.value;
 
                   if (sourceKey && sourceKey === observer.component.uuid) {
                     // Don't notify source of change, as it is the originator, doesn't need duplicate event.
@@ -16675,17 +16732,17 @@ function (_PureService) {
                   });
                 };
 
-                _iterator2 = _this2.streamObservers[Symbol.iterator]();
+                _iterator3 = _this2.streamObservers[Symbol.iterator]();
 
               case 41:
-                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
                   _context.next = 48;
                   break;
                 }
 
-                _ret = _loop();
+                _ret2 = _loop2();
 
-                if (!(_ret === "continue")) {
+                if (!(_ret2 === "continue")) {
                   _context.next = 45;
                   break;
                 }
@@ -16693,7 +16750,7 @@ function (_PureService) {
                 return _context.abrupt("continue", 45);
 
               case 45:
-                _iteratorNormalCompletion2 = true;
+                _iteratorNormalCompletion3 = true;
                 _context.next = 41;
                 break;
 
@@ -16704,26 +16761,26 @@ function (_PureService) {
               case 50:
                 _context.prev = 50;
                 _context.t1 = _context["catch"](38);
-                _didIteratorError2 = true;
-                _iteratorError2 = _context.t1;
+                _didIteratorError3 = true;
+                _iteratorError3 = _context.t1;
 
               case 54:
                 _context.prev = 54;
                 _context.prev = 55;
 
-                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                  _iterator2.return();
+                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                  _iterator3.return();
                 }
 
               case 57:
                 _context.prev = 57;
 
-                if (!_didIteratorError2) {
+                if (!_didIteratorError3) {
                   _context.next = 60;
                   break;
                 }
 
-                throw _iteratorError2;
+                throw _iteratorError3;
 
               case 60:
                 return _context.finish(57);
@@ -16735,26 +16792,26 @@ function (_PureService) {
                 requiredContextPermissions = [{
                   name: "stream-context-item"
                 }];
-                _iteratorNormalCompletion3 = true;
-                _didIteratorError3 = false;
-                _iteratorError3 = undefined;
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
                 _context.prev = 66;
 
-                _loop2 = function _loop2() {
-                  var observer = _step3.value;
+                _loop3 = function _loop3() {
+                  var observer = _step4.value;
 
                   if (sourceKey && sourceKey === observer.component.uuid) {
                     // Don't notify source of change, as it is the originator, doesn't need duplicate event.
                     return "continue";
                   }
 
-                  var _iteratorNormalCompletion4 = true;
-                  var _didIteratorError4 = false;
-                  var _iteratorError4 = undefined;
+                  var _iteratorNormalCompletion5 = true;
+                  var _didIteratorError5 = false;
+                  var _iteratorError5 = undefined;
 
                   try {
-                    for (var _iterator4 = _this2.handlers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                      var handler = _step4.value;
+                    for (var _iterator5 = _this2.handlers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                      var handler = _step5.value;
 
                       if (!handler.areas.includes(observer.component.area) && !handler.areas.includes("*")) {
                         continue;
@@ -16779,32 +16836,32 @@ function (_PureService) {
                       }
                     }
                   } catch (err) {
-                    _didIteratorError4 = true;
-                    _iteratorError4 = err;
+                    _didIteratorError5 = true;
+                    _iteratorError5 = err;
                   } finally {
                     try {
-                      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                        _iterator4.return();
+                      if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                        _iterator5.return();
                       }
                     } finally {
-                      if (_didIteratorError4) {
-                        throw _iteratorError4;
+                      if (_didIteratorError5) {
+                        throw _iteratorError5;
                       }
                     }
                   }
                 };
 
-                _iterator3 = _this2.contextStreamObservers[Symbol.iterator]();
+                _iterator4 = _this2.contextStreamObservers[Symbol.iterator]();
 
               case 69:
-                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
                   _context.next = 76;
                   break;
                 }
 
-                _ret2 = _loop2();
+                _ret3 = _loop3();
 
-                if (!(_ret2 === "continue")) {
+                if (!(_ret3 === "continue")) {
                   _context.next = 73;
                   break;
                 }
@@ -16812,7 +16869,7 @@ function (_PureService) {
                 return _context.abrupt("continue", 73);
 
               case 73:
-                _iteratorNormalCompletion3 = true;
+                _iteratorNormalCompletion4 = true;
                 _context.next = 69;
                 break;
 
@@ -16823,26 +16880,26 @@ function (_PureService) {
               case 78:
                 _context.prev = 78;
                 _context.t2 = _context["catch"](66);
-                _didIteratorError3 = true;
-                _iteratorError3 = _context.t2;
+                _didIteratorError4 = true;
+                _iteratorError4 = _context.t2;
 
               case 82:
                 _context.prev = 82;
                 _context.prev = 83;
 
-                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                  _iterator3.return();
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
                 }
 
               case 85:
                 _context.prev = 85;
 
-                if (!_didIteratorError3) {
+                if (!_didIteratorError4) {
                   _context.next = 88;
                   break;
                 }
 
-                throw _iteratorError3;
+                throw _iteratorError4;
 
               case 88:
                 return _context.finish(85);
@@ -16858,71 +16915,48 @@ function (_PureService) {
         }, null, null, [[5, 23, 27, 35], [28,, 30, 34], [38, 50, 54, 62], [55,, 57, 61], [66, 78, 82, 90], [83,, 85, 89]]);
       });
     }
+    /** @override */
+
+  }, {
+    key: "deinit",
+    value: function deinit() {
+      return regeneratorRuntime.async(function deinit$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _get(_getPrototypeOf(SNComponentManager.prototype), "deinit", this).call(this);
+
+              if (window) {
+                window.removeEventListener('focus', this.detectFocusChange, true);
+                window.removeEventListener('blur', this.detectFocusChange, true);
+                window.removeEventListener('message', this.onWindowMessage);
+              }
+
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
   }, {
     key: "configureForNonMobileUsage",
     value: function configureForNonMobileUsage() {
-      var _this3 = this;
+      window.addEventListener ? window.addEventListener('focus', this.detectFocusChange, true) : window.attachEvent('onfocusout', this.detectFocusChange);
+      window.addEventListener ? window.addEventListener('blur', this.detectFocusChange, true) : window.attachEvent('onblur', this.detectFocusChange);
+      /* On mobile, events listeners are handled by a respective component */
 
-      var detectFocusChange = function detectFocusChange(event) {
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
-
-        try {
-          var _loop3 = function _loop3() {
-            var component = _step5.value;
-
-            if (document.activeElement === _this3.iframeForComponent(component)) {
-              _this3.timeout(function () {
-                _this3.focusChangedForComponent(component);
-              });
-
-              return "break";
-            }
-          };
-
-          for (var _iterator5 = _this3.activeComponents[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var _ret3 = _loop3();
-
-            if (_ret3 === "break") break;
-          }
-        } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-              _iterator5.return();
-            }
-          } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
-            }
-          }
-        }
-      };
-
-      window.addEventListener ? window.addEventListener('focus', detectFocusChange, true) : window.attachEvent('onfocusout', detectFocusChange);
-      window.addEventListener ? window.addEventListener('blur', detectFocusChange, true) : window.attachEvent('onblur', detectFocusChange); // On mobile, events listeners are handled by a respective component
-
-      window.addEventListener("message", function (event) {
-        _this3.log("Web app: received message", event); // Make sure this message is for us
-
-
-        if (event.data.sessionKey) {
-          _this3.handleMessage(_this3.componentForSessionKey(event.data.sessionKey), event.data);
-        }
-      }, false);
+      window.addEventListener('message', this.onWindowMessage);
     }
   }, {
     key: "configureForDesktop",
     value: function configureForDesktop() {
-      var _this4 = this;
+      var _this3 = this;
 
       this.desktopManager.registerUpdateObserver(function (component) {
         // Reload theme if active
         if (component.active && component.isTheme()) {
-          _this4.postActiveThemesToAllComponents();
+          _this3.postActiveThemesToAllComponents();
         }
       });
     }
@@ -16970,11 +17004,11 @@ function (_PureService) {
   }, {
     key: "urlsForActiveThemes",
     value: function urlsForActiveThemes() {
-      var _this5 = this;
+      var _this4 = this;
 
       var themes = this.getActiveThemes();
       return themes.map(function (theme) {
-        return _this5.urlForComponent(theme);
+        return _this4.urlForComponent(theme);
       });
     }
   }, {
@@ -17113,14 +17147,14 @@ function (_PureService) {
   }, {
     key: "sendItemsInReply",
     value: function sendItemsInReply(component, items, message, source) {
-      var _this6 = this;
+      var _this5 = this;
 
       this.log("Web|componentManager|sendItemsInReply", component, items, message);
       var response = {
         items: {}
       };
       var mapped = items.map(function (item) {
-        return _this6.jsonForItem(item, component, source);
+        return _this5.jsonForItem(item, component, source);
       });
       response.items = mapped;
       this.replyToMessage(component, message, response);
@@ -17255,7 +17289,7 @@ function (_PureService) {
   }, {
     key: "handleMessage",
     value: function handleMessage(component, message) {
-      var _this7 = this;
+      var _this6 = this;
 
       if (!component) {
         this.log("Component not defined for message, returning", message);
@@ -17330,7 +17364,7 @@ function (_PureService) {
           var handler = _step10.value;
 
           if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes("*"))) {
-            _this7.timeout(function () {
+            _this6.timeout(function () {
               handler.actionHandler(component, message.action, message.data);
             });
           }
@@ -17489,18 +17523,18 @@ function (_PureService) {
   }, {
     key: "handleStreamItemsMessage",
     value: function handleStreamItemsMessage(component, message) {
-      var _this8 = this;
+      var _this7 = this;
 
       var requiredPermissions = [{
         name: "stream-items",
         content_types: message.data.content_types.sort()
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
-        if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this8.streamObservers, {
+        if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this7.streamObservers, {
           identifier: component.uuid
         })) {
           // for pushing laster as changes come in
-          _this8.streamObservers.push({
+          _this7.streamObservers.push({
             identifier: component.uuid,
             component: component,
             originalMessage: message,
@@ -17517,7 +17551,7 @@ function (_PureService) {
         try {
           for (var _iterator15 = message.data.content_types[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
             var contentType = _step15.value;
-            items = items.concat(_this8.modelManager.validItemsForContentType(contentType));
+            items = items.concat(_this7.modelManager.validItemsForContentType(contentType));
           }
         } catch (err) {
           _didIteratorError15 = true;
@@ -17534,23 +17568,23 @@ function (_PureService) {
           }
         }
 
-        _this8.sendItemsInReply(component, items, message);
+        _this7.sendItemsInReply(component, items, message);
       });
     }
   }, {
     key: "handleStreamContextItemMessage",
     value: function handleStreamContextItemMessage(component, message) {
-      var _this9 = this;
+      var _this8 = this;
 
       var requiredPermissions = [{
         name: "stream-context-item"
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
-        if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this9.contextStreamObservers, {
+        if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this8.contextStreamObservers, {
           identifier: component.uuid
         })) {
           // for pushing laster as changes come in
-          _this9.contextStreamObservers.push({
+          _this8.contextStreamObservers.push({
             identifier: component.uuid,
             component: component,
             originalMessage: message
@@ -17563,14 +17597,14 @@ function (_PureService) {
         var _iteratorError16 = undefined;
 
         try {
-          for (var _iterator16 = _this9.handlersForArea(component.area)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+          for (var _iterator16 = _this8.handlersForArea(component.area)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
             var handler = _step16.value;
 
             if (handler.contextRequestHandler) {
               var itemInContext = handler.contextRequestHandler(component);
 
               if (itemInContext) {
-                _this9.sendContextItemInReply(component, itemInContext, message);
+                _this8.sendContextItemInReply(component, itemInContext, message);
               }
             }
           }
@@ -17645,13 +17679,13 @@ function (_PureService) {
   }, {
     key: "handleSaveItemsMessage",
     value: function handleSaveItemsMessage(component, message) {
-      var _this10 = this;
+      var _this9 = this;
 
       var responseItems, requiredPermissions, itemIdsInContextJurisdiction, pendingResponseItems, _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, responseItem, requiredContentTypes;
 
-      return regeneratorRuntime.async(function handleSaveItemsMessage$(_context3) {
+      return regeneratorRuntime.async(function handleSaveItemsMessage$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               responseItems = message.data.items;
               requiredPermissions = [];
@@ -17661,19 +17695,19 @@ function (_PureService) {
               _iteratorNormalCompletion18 = true;
               _didIteratorError18 = false;
               _iteratorError18 = undefined;
-              _context3.prev = 7;
+              _context4.prev = 7;
               _iterator18 = responseItems.slice()[Symbol.iterator]();
 
             case 9:
               if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
-                _context3.next = 18;
+                _context4.next = 18;
                 break;
               }
 
               responseItem = _step18.value;
 
               if (!itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
-                _context3.next = 15;
+                _context4.next = 15;
                 break;
               }
 
@@ -17682,46 +17716,46 @@ function (_PureService) {
               });
               lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(pendingResponseItems, responseItem); // We break because there can only be one context item
 
-              return _context3.abrupt("break", 18);
+              return _context4.abrupt("break", 18);
 
             case 15:
               _iteratorNormalCompletion18 = true;
-              _context3.next = 9;
+              _context4.next = 9;
               break;
 
             case 18:
-              _context3.next = 24;
+              _context4.next = 24;
               break;
 
             case 20:
-              _context3.prev = 20;
-              _context3.t0 = _context3["catch"](7);
+              _context4.prev = 20;
+              _context4.t0 = _context4["catch"](7);
               _didIteratorError18 = true;
-              _iteratorError18 = _context3.t0;
+              _iteratorError18 = _context4.t0;
 
             case 24:
-              _context3.prev = 24;
-              _context3.prev = 25;
+              _context4.prev = 24;
+              _context4.prev = 25;
 
               if (!_iteratorNormalCompletion18 && _iterator18.return != null) {
                 _iterator18.return();
               }
 
             case 27:
-              _context3.prev = 27;
+              _context4.prev = 27;
 
               if (!_didIteratorError18) {
-                _context3.next = 30;
+                _context4.next = 30;
                 break;
               }
 
               throw _iteratorError18;
 
             case 30:
-              return _context3.finish(27);
+              return _context4.finish(27);
 
             case 31:
-              return _context3.finish(24);
+              return _context4.finish(24);
 
             case 32:
               // Check to see if additional privileges are required
@@ -17738,11 +17772,11 @@ function (_PureService) {
               this.runWithPermissions(component, requiredPermissions, function _callee2() {
                 var ids, items, lockedCount, _iteratorNormalCompletion19, _didIteratorError19, _iteratorError19, _iterator19, _step19, item, itemNoun, auxVerb, payloads, localItems, _iteratorNormalCompletion20, _didIteratorError20, _iteratorError20, _iterator20, _step20, responseItem, _item;
 
-                return regeneratorRuntime.async(function _callee2$(_context2) {
+                return regeneratorRuntime.async(function _callee2$(_context3) {
                   while (1) {
-                    switch (_context2.prev = _context2.next) {
+                    switch (_context3.prev = _context3.next) {
                       case 0:
-                        _this10.removePrivatePropertiesFromResponseItems(responseItems, component, {
+                        _this9.removePrivatePropertiesFromResponseItems(responseItems, component, {
                           includeUrls: true,
                           type: "incoming"
                         });
@@ -17756,12 +17790,12 @@ function (_PureService) {
                         ids = responseItems.map(function (i) {
                           return i.uuid;
                         });
-                        items = _this10.modelManager.findItems(ids);
+                        items = _this9.modelManager.findItems(ids);
                         lockedCount = 0;
                         _iteratorNormalCompletion19 = true;
                         _didIteratorError19 = false;
                         _iteratorError19 = undefined;
-                        _context2.prev = 7;
+                        _context3.prev = 7;
 
                         for (_iterator19 = items[Symbol.iterator](); !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
                           item = _step19.value;
@@ -17774,45 +17808,45 @@ function (_PureService) {
                           }
                         }
 
-                        _context2.next = 15;
+                        _context3.next = 15;
                         break;
 
                       case 11:
-                        _context2.prev = 11;
-                        _context2.t0 = _context2["catch"](7);
+                        _context3.prev = 11;
+                        _context3.t0 = _context3["catch"](7);
                         _didIteratorError19 = true;
-                        _iteratorError19 = _context2.t0;
+                        _iteratorError19 = _context3.t0;
 
                       case 15:
-                        _context2.prev = 15;
-                        _context2.prev = 16;
+                        _context3.prev = 15;
+                        _context3.prev = 16;
 
                         if (!_iteratorNormalCompletion19 && _iterator19.return != null) {
                           _iterator19.return();
                         }
 
                       case 18:
-                        _context2.prev = 18;
+                        _context3.prev = 18;
 
                         if (!_didIteratorError19) {
-                          _context2.next = 21;
+                          _context3.next = 21;
                           break;
                         }
 
                         throw _iteratorError19;
 
                       case 21:
-                        return _context2.finish(18);
+                        return _context3.finish(18);
 
                       case 22:
-                        return _context2.finish(15);
+                        return _context3.finish(15);
 
                       case 23:
                         if (lockedCount > 0) {
                           itemNoun = lockedCount === 1 ? "item" : "items";
                           auxVerb = lockedCount === 1 ? "is" : "are";
 
-                          _this10.alertManager.alert({
+                          _this9.alertManager.alert({
                             title: 'Items Locked',
                             text: "".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited.")
                           });
@@ -17823,24 +17857,24 @@ function (_PureService) {
                             object: responseItem
                           });
                         });
-                        _context2.next = 27;
-                        return regeneratorRuntime.awrap(_this10.modelManager.mapPayloadsToLocalItems({
+                        _context3.next = 27;
+                        return regeneratorRuntime.awrap(_this9.modelManager.mapPayloadsToLocalItems({
                           paylods: payloads,
                           source: _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved,
                           sourceKey: component.uuid
                         }));
 
                       case 27:
-                        localItems = _context2.sent;
+                        localItems = _context3.sent;
                         _iteratorNormalCompletion20 = true;
                         _didIteratorError20 = false;
                         _iteratorError20 = undefined;
-                        _context2.prev = 31;
+                        _context3.prev = 31;
                         _iterator20 = responseItems[Symbol.iterator]();
 
                       case 33:
                         if (_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done) {
-                          _context2.next = 46;
+                          _context3.next = 46;
                           break;
                         }
 
@@ -17850,20 +17884,20 @@ function (_PureService) {
                         });
 
                         if (_item) {
-                          _context2.next = 39;
+                          _context3.next = 39;
                           break;
                         }
 
                         // An item this extension is trying to save was possibly removed locally, notify user
-                        _this10.alertManager.alert({
+                        _this9.alertManager.alert({
                           text: "The extension ".concat(component.name, " is trying to save an item with type ").concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again.")
                         });
 
-                        return _context2.abrupt("continue", 43);
+                        return _context3.abrupt("continue", 43);
 
                       case 39:
                         if (_item.locked) {
-                          _context2.next = 43;
+                          _context3.next = 43;
                           break;
                         }
 
@@ -17871,64 +17905,64 @@ function (_PureService) {
                           _item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
                         }
 
-                        _context2.next = 43;
-                        return regeneratorRuntime.awrap(_this10.modelManager.setItemDirty(_item, true, true, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid));
+                        _context3.next = 43;
+                        return regeneratorRuntime.awrap(_this9.modelManager.setItemDirty(_item, true, true, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid));
 
                       case 43:
                         _iteratorNormalCompletion20 = true;
-                        _context2.next = 33;
+                        _context3.next = 33;
                         break;
 
                       case 46:
-                        _context2.next = 52;
+                        _context3.next = 52;
                         break;
 
                       case 48:
-                        _context2.prev = 48;
-                        _context2.t1 = _context2["catch"](31);
+                        _context3.prev = 48;
+                        _context3.t1 = _context3["catch"](31);
                         _didIteratorError20 = true;
-                        _iteratorError20 = _context2.t1;
+                        _iteratorError20 = _context3.t1;
 
                       case 52:
-                        _context2.prev = 52;
-                        _context2.prev = 53;
+                        _context3.prev = 52;
+                        _context3.prev = 53;
 
                         if (!_iteratorNormalCompletion20 && _iterator20.return != null) {
                           _iterator20.return();
                         }
 
                       case 55:
-                        _context2.prev = 55;
+                        _context3.prev = 55;
 
                         if (!_didIteratorError20) {
-                          _context2.next = 58;
+                          _context3.next = 58;
                           break;
                         }
 
                         throw _iteratorError20;
 
                       case 58:
-                        return _context2.finish(55);
+                        return _context3.finish(55);
 
                       case 59:
-                        return _context2.finish(52);
+                        return _context3.finish(52);
 
                       case 60:
-                        _this10.syncManager.sync().then(function (response) {
+                        _this9.syncManager.sync().then(function (response) {
                           // Allow handlers to be notified when a save begins and ends, to update the UI
                           var saveMessage = Object.assign({}, message);
                           saveMessage.action = response && response.error ? "save-error" : "save-success";
 
-                          _this10.replyToMessage(component, message, {
+                          _this9.replyToMessage(component, message, {
                             error: response && response.error
                           });
 
-                          _this10.handleMessage(component, saveMessage);
+                          _this9.handleMessage(component, saveMessage);
                         });
 
                       case 61:
                       case "end":
-                        return _context2.stop();
+                        return _context3.stop();
                     }
                   }
                 }, null, null, [[7, 11, 15, 23], [16,, 18, 22], [31, 48, 52, 60], [53,, 55, 59]]);
@@ -17936,7 +17970,7 @@ function (_PureService) {
 
             case 34:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this, [[7, 20, 24, 32], [25,, 27, 31]]);
@@ -17944,7 +17978,7 @@ function (_PureService) {
   }, {
     key: "handleDuplicateItemMessage",
     value: function handleDuplicateItemMessage(component, message) {
-      var _this11 = this;
+      var _this10 = this;
 
       var itemParams = message.data.item;
       var item = this.modelManager.findItem(itemParams.uuid);
@@ -17954,27 +17988,27 @@ function (_PureService) {
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee3() {
         var duplicate;
-        return regeneratorRuntime.async(function _callee3$(_context4) {
+        return regeneratorRuntime.async(function _callee3$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context4.next = 2;
-                return regeneratorRuntime.awrap(_this11.modelManager.duplicateItem({
+                _context5.next = 2;
+                return regeneratorRuntime.awrap(_this10.modelManager.duplicateItem({
                   item: item
                 }));
 
               case 2:
-                duplicate = _context4.sent;
+                duplicate = _context5.sent;
 
-                _this11.syncManager.sync();
+                _this10.syncManager.sync();
 
-                _this11.replyToMessage(component, message, {
-                  item: _this11.jsonForItem(duplicate, component)
+                _this10.replyToMessage(component, message, {
+                  item: _this10.jsonForItem(duplicate, component)
                 });
 
               case 5:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
         });
@@ -17983,7 +18017,7 @@ function (_PureService) {
   }, {
     key: "handleCreateItemsMessage",
     value: function handleCreateItemsMessage(component, message) {
-      var _this12 = this;
+      var _this11 = this;
 
       var responseItems = message.data.item ? [message.data.item] : message.data.items;
       var uniqueContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(responseItems.map(function (item) {
@@ -17996,11 +18030,11 @@ function (_PureService) {
       this.runWithPermissions(component, requiredPermissions, function _callee4() {
         var processedItems, _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, responseItem, payload, item, reply;
 
-        return regeneratorRuntime.async(function _callee4$(_context5) {
+        return regeneratorRuntime.async(function _callee4$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _this12.removePrivatePropertiesFromResponseItems(responseItems, component, {
+                _this11.removePrivatePropertiesFromResponseItems(responseItems, component, {
                   type: "incoming"
                 });
 
@@ -18008,12 +18042,12 @@ function (_PureService) {
                 _iteratorNormalCompletion21 = true;
                 _didIteratorError21 = false;
                 _iteratorError21 = undefined;
-                _context5.prev = 5;
+                _context6.prev = 5;
                 _iterator21 = responseItems[Symbol.iterator]();
 
               case 7:
                 if (_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done) {
-                  _context5.next = 21;
+                  _context6.next = 21;
                   break;
                 }
 
@@ -18028,74 +18062,74 @@ function (_PureService) {
                   item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
                 }
 
-                _this12.modelManager.addItem(item);
+                _this11.modelManager.addItem(item);
 
-                _context5.next = 15;
-                return regeneratorRuntime.awrap(_this12.modelManager.resolveReferencesForItem(item, true));
+                _context6.next = 15;
+                return regeneratorRuntime.awrap(_this11.modelManager.resolveReferencesForItem(item, true));
 
               case 15:
-                _context5.next = 17;
-                return regeneratorRuntime.awrap(_this12.modelManager.setItemDirty(item, true));
+                _context6.next = 17;
+                return regeneratorRuntime.awrap(_this11.modelManager.setItemDirty(item, true));
 
               case 17:
                 processedItems.push(item);
 
               case 18:
                 _iteratorNormalCompletion21 = true;
-                _context5.next = 7;
+                _context6.next = 7;
                 break;
 
               case 21:
-                _context5.next = 27;
+                _context6.next = 27;
                 break;
 
               case 23:
-                _context5.prev = 23;
-                _context5.t0 = _context5["catch"](5);
+                _context6.prev = 23;
+                _context6.t0 = _context6["catch"](5);
                 _didIteratorError21 = true;
-                _iteratorError21 = _context5.t0;
+                _iteratorError21 = _context6.t0;
 
               case 27:
-                _context5.prev = 27;
-                _context5.prev = 28;
+                _context6.prev = 27;
+                _context6.prev = 28;
 
                 if (!_iteratorNormalCompletion21 && _iterator21.return != null) {
                   _iterator21.return();
                 }
 
               case 30:
-                _context5.prev = 30;
+                _context6.prev = 30;
 
                 if (!_didIteratorError21) {
-                  _context5.next = 33;
+                  _context6.next = 33;
                   break;
                 }
 
                 throw _iteratorError21;
 
               case 33:
-                return _context5.finish(30);
+                return _context6.finish(30);
 
               case 34:
-                return _context5.finish(27);
+                return _context6.finish(27);
 
               case 35:
-                _this12.syncManager.sync(); // "create-item" or "create-items" are possible messages handled here
+                _this11.syncManager.sync(); // "create-item" or "create-items" are possible messages handled here
 
 
                 reply = message.action === "create-item" ? {
-                  item: _this12.jsonForItem(processedItems[0], component)
+                  item: _this11.jsonForItem(processedItems[0], component)
                 } : {
                   items: processedItems.map(function (item) {
-                    return _this12.jsonForItem(item, component);
+                    return _this11.jsonForItem(item, component);
                   })
                 };
 
-                _this12.replyToMessage(component, message, reply);
+                _this11.replyToMessage(component, message, reply);
 
               case 38:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
         }, null, null, [[5, 23, 27, 35], [28,, 30, 34]]);
@@ -18104,7 +18138,7 @@ function (_PureService) {
   }, {
     key: "handleDeleteItemsMessage",
     value: function handleDeleteItemsMessage(component, message) {
-      var _this13 = this;
+      var _this12 = this;
 
       var requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(message.data.items.map(function (i) {
         return i.content_type;
@@ -18116,16 +18150,16 @@ function (_PureService) {
       this.runWithPermissions(component, requiredPermissions, function _callee5() {
         var itemsData, noun, reply, didConfirm, _iteratorNormalCompletion22, _didIteratorError22, _iteratorError22, _iterator22, _step22, itemData, model;
 
-        return regeneratorRuntime.async(function _callee5$(_context6) {
+        return regeneratorRuntime.async(function _callee5$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 itemsData = message.data.items;
                 noun = itemsData.length === 1 ? "item" : "items";
                 reply = null;
                 didConfirm = true;
-                _context6.next = 6;
-                return regeneratorRuntime.awrap(_this13.alertManager.confirm({
+                _context7.next = 6;
+                return regeneratorRuntime.awrap(_this12.alertManager.confirm({
                   text: "Are you sure you want to delete ".concat(itemsData.length, " ").concat(noun, "?")
                 }).catch(function () {
                   didConfirm = false;
@@ -18133,7 +18167,7 @@ function (_PureService) {
 
               case 6:
                 if (!didConfirm) {
-                  _context6.next = 45;
+                  _context7.next = 45;
                   break;
                 }
 
@@ -18141,93 +18175,93 @@ function (_PureService) {
                 _iteratorNormalCompletion22 = true;
                 _didIteratorError22 = false;
                 _iteratorError22 = undefined;
-                _context6.prev = 10;
+                _context7.prev = 10;
                 _iterator22 = itemsData[Symbol.iterator]();
 
               case 12:
                 if (_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done) {
-                  _context6.next = 27;
+                  _context7.next = 27;
                   break;
                 }
 
                 itemData = _step22.value;
-                model = _this13.modelManager.findItem(itemData.uuid);
+                model = _this12.modelManager.findItem(itemData.uuid);
 
                 if (model) {
-                  _context6.next = 18;
+                  _context7.next = 18;
                   break;
                 }
 
-                _this13.alertManager.alert({
+                _this12.alertManager.alert({
                   text: "The item you are trying to delete cannot be found."
                 });
 
-                return _context6.abrupt("continue", 24);
+                return _context7.abrupt("continue", 24);
 
               case 18:
                 if (![_Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme].includes(model.content_type)) {
-                  _context6.next = 21;
+                  _context7.next = 21;
                   break;
                 }
 
-                _context6.next = 21;
-                return regeneratorRuntime.awrap(_this13.deactivateComponent(model, true));
+                _context7.next = 21;
+                return regeneratorRuntime.awrap(_this12.deactivateComponent(model, true));
 
               case 21:
-                _context6.next = 23;
-                return regeneratorRuntime.awrap(_this13.modelManager.setItemToBeDeleted(model));
+                _context7.next = 23;
+                return regeneratorRuntime.awrap(_this12.modelManager.setItemToBeDeleted(model));
 
               case 23:
                 // Currently extensions are not notified of association until a full server sync completes.
                 // We manually notify observers.
-                _this13.modelManager.notifyMappingObservers([model], _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved);
+                _this12.modelManager.notifyMappingObservers([model], _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved);
 
               case 24:
                 _iteratorNormalCompletion22 = true;
-                _context6.next = 12;
+                _context7.next = 12;
                 break;
 
               case 27:
-                _context6.next = 33;
+                _context7.next = 33;
                 break;
 
               case 29:
-                _context6.prev = 29;
-                _context6.t0 = _context6["catch"](10);
+                _context7.prev = 29;
+                _context7.t0 = _context7["catch"](10);
                 _didIteratorError22 = true;
-                _iteratorError22 = _context6.t0;
+                _iteratorError22 = _context7.t0;
 
               case 33:
-                _context6.prev = 33;
-                _context6.prev = 34;
+                _context7.prev = 33;
+                _context7.prev = 34;
 
                 if (!_iteratorNormalCompletion22 && _iterator22.return != null) {
                   _iterator22.return();
                 }
 
               case 36:
-                _context6.prev = 36;
+                _context7.prev = 36;
 
                 if (!_didIteratorError22) {
-                  _context6.next = 39;
+                  _context7.next = 39;
                   break;
                 }
 
                 throw _iteratorError22;
 
               case 39:
-                return _context6.finish(36);
+                return _context7.finish(36);
 
               case 40:
-                return _context6.finish(33);
+                return _context7.finish(33);
 
               case 41:
-                _this13.syncManager.sync();
+                _this12.syncManager.sync();
 
                 reply = {
                   deleted: true
                 };
-                _context6.next = 46;
+                _context7.next = 46;
                 break;
 
               case 45:
@@ -18237,11 +18271,11 @@ function (_PureService) {
                 };
 
               case 46:
-                _this13.replyToMessage(component, message, reply);
+                _this12.replyToMessage(component, message, reply);
 
               case 47:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
         }, null, null, [[10, 29, 33, 41], [34,, 36, 40]]);
@@ -18250,10 +18284,10 @@ function (_PureService) {
   }, {
     key: "handleRequestPermissionsMessage",
     value: function handleRequestPermissionsMessage(component, message) {
-      var _this14 = this;
+      var _this13 = this;
 
       this.runWithPermissions(component, message.data.permissions, function () {
-        _this14.replyToMessage(component, message, {
+        _this13.replyToMessage(component, message, {
           approved: true
         });
       });
@@ -18261,24 +18295,24 @@ function (_PureService) {
   }, {
     key: "handleSetComponentDataMessage",
     value: function handleSetComponentDataMessage(component, message) {
-      var _this15 = this;
+      var _this14 = this;
 
       // A component setting its own data does not require special permissions
       this.runWithPermissions(component, [], function _callee6() {
-        return regeneratorRuntime.async(function _callee6$(_context7) {
+        return regeneratorRuntime.async(function _callee6$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 component.componentData = message.data.componentData;
-                _context7.next = 3;
-                return regeneratorRuntime.awrap(_this15.modelManager.setItemDirty(component, true));
+                _context8.next = 3;
+                return regeneratorRuntime.awrap(_this14.modelManager.setItemDirty(component, true));
 
               case 3:
-                _this15.syncManager.sync();
+                _this14.syncManager.sync();
 
               case 4:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
         });
@@ -18292,45 +18326,45 @@ function (_PureService) {
   }, {
     key: "toggleComponent",
     value: function toggleComponent(component) {
-      var _this16 = this;
+      var _this15 = this;
 
       var activeThemes;
-      return regeneratorRuntime.async(function toggleComponent$(_context9) {
+      return regeneratorRuntime.async(function toggleComponent$(_context10) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               if (!(component.area === 'modal')) {
-                _context9.next = 4;
+                _context10.next = 4;
                 break;
               }
 
               this.openModalComponent(component);
-              _context9.next = 18;
+              _context10.next = 18;
               break;
 
             case 4:
               if (!component.active) {
-                _context9.next = 9;
+                _context10.next = 9;
                 break;
               }
 
-              _context9.next = 7;
+              _context10.next = 7;
               return regeneratorRuntime.awrap(this.deactivateComponent(component));
 
             case 7:
-              _context9.next = 18;
+              _context10.next = 18;
               break;
 
             case 9:
               if (!(component.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme)) {
-                _context9.next = 16;
+                _context10.next = 16;
                 break;
               }
 
               // Deactive currently active theme if new theme is not layerable
               activeThemes = this.getActiveThemes(); // Activate current before deactivating others, so as not to flicker
 
-              _context9.next = 13;
+              _context10.next = 13;
               return regeneratorRuntime.awrap(this.activateComponent(component));
 
             case 13:
@@ -18338,90 +18372,90 @@ function (_PureService) {
                 setTimeout(function _callee7() {
                   var _iteratorNormalCompletion23, _didIteratorError23, _iteratorError23, _iterator23, _step23, theme;
 
-                  return regeneratorRuntime.async(function _callee7$(_context8) {
+                  return regeneratorRuntime.async(function _callee7$(_context9) {
                     while (1) {
-                      switch (_context8.prev = _context8.next) {
+                      switch (_context9.prev = _context9.next) {
                         case 0:
                           _iteratorNormalCompletion23 = true;
                           _didIteratorError23 = false;
                           _iteratorError23 = undefined;
-                          _context8.prev = 3;
+                          _context9.prev = 3;
                           _iterator23 = activeThemes[Symbol.iterator]();
 
                         case 5:
                           if (_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done) {
-                            _context8.next = 13;
+                            _context9.next = 13;
                             break;
                           }
 
                           theme = _step23.value;
 
                           if (!(theme && !theme.isLayerable())) {
-                            _context8.next = 10;
+                            _context9.next = 10;
                             break;
                           }
 
-                          _context8.next = 10;
-                          return regeneratorRuntime.awrap(_this16.deactivateComponent(theme));
+                          _context9.next = 10;
+                          return regeneratorRuntime.awrap(_this15.deactivateComponent(theme));
 
                         case 10:
                           _iteratorNormalCompletion23 = true;
-                          _context8.next = 5;
+                          _context9.next = 5;
                           break;
 
                         case 13:
-                          _context8.next = 19;
+                          _context9.next = 19;
                           break;
 
                         case 15:
-                          _context8.prev = 15;
-                          _context8.t0 = _context8["catch"](3);
+                          _context9.prev = 15;
+                          _context9.t0 = _context9["catch"](3);
                           _didIteratorError23 = true;
-                          _iteratorError23 = _context8.t0;
+                          _iteratorError23 = _context9.t0;
 
                         case 19:
-                          _context8.prev = 19;
-                          _context8.prev = 20;
+                          _context9.prev = 19;
+                          _context9.prev = 20;
 
                           if (!_iteratorNormalCompletion23 && _iterator23.return != null) {
                             _iterator23.return();
                           }
 
                         case 22:
-                          _context8.prev = 22;
+                          _context9.prev = 22;
 
                           if (!_didIteratorError23) {
-                            _context8.next = 25;
+                            _context9.next = 25;
                             break;
                           }
 
                           throw _iteratorError23;
 
                         case 25:
-                          return _context8.finish(22);
+                          return _context9.finish(22);
 
                         case 26:
-                          return _context8.finish(19);
+                          return _context9.finish(19);
 
                         case 27:
                         case "end":
-                          return _context8.stop();
+                          return _context9.stop();
                       }
                     }
                   }, null, null, [[3, 15, 19, 27], [20,, 22, 26]]);
                 }, 10);
               }
 
-              _context9.next = 18;
+              _context10.next = 18;
               break;
 
             case 16:
-              _context9.next = 18;
+              _context10.next = 18;
               return regeneratorRuntime.awrap(this.activateComponent(component));
 
             case 18:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -18536,7 +18570,7 @@ function (_PureService) {
   }, {
     key: "promptForPermissions",
     value: function promptForPermissions(component, permissions, callback) {
-      var _this17 = this;
+      var _this16 = this;
 
       var params = {};
       params.component = component;
@@ -18547,19 +18581,19 @@ function (_PureService) {
       params.callback = function _callee8(approved) {
         var _iteratorNormalCompletion26, _didIteratorError26, _iteratorError26, _loop6, _iterator26, _step26;
 
-        return regeneratorRuntime.async(function _callee8$(_context10) {
+        return regeneratorRuntime.async(function _callee8$(_context11) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
                 if (!approved) {
-                  _context10.next = 24;
+                  _context11.next = 24;
                   break;
                 }
 
                 _iteratorNormalCompletion26 = true;
                 _didIteratorError26 = false;
                 _iteratorError26 = undefined;
-                _context10.prev = 4;
+                _context11.prev = 4;
 
                 _loop6 = function _loop6() {
                   var permission = _step26.value;
@@ -18580,48 +18614,48 @@ function (_PureService) {
                   _loop6();
                 }
 
-                _context10.next = 13;
+                _context11.next = 13;
                 break;
 
               case 9:
-                _context10.prev = 9;
-                _context10.t0 = _context10["catch"](4);
+                _context11.prev = 9;
+                _context11.t0 = _context11["catch"](4);
                 _didIteratorError26 = true;
-                _iteratorError26 = _context10.t0;
+                _iteratorError26 = _context11.t0;
 
               case 13:
-                _context10.prev = 13;
-                _context10.prev = 14;
+                _context11.prev = 13;
+                _context11.prev = 14;
 
                 if (!_iteratorNormalCompletion26 && _iterator26.return != null) {
                   _iterator26.return();
                 }
 
               case 16:
-                _context10.prev = 16;
+                _context11.prev = 16;
 
                 if (!_didIteratorError26) {
-                  _context10.next = 19;
+                  _context11.next = 19;
                   break;
                 }
 
                 throw _iteratorError26;
 
               case 19:
-                return _context10.finish(16);
+                return _context11.finish(16);
 
               case 20:
-                return _context10.finish(13);
+                return _context11.finish(13);
 
               case 21:
-                _context10.next = 23;
-                return regeneratorRuntime.awrap(_this17.modelManager.setItemDirty(component, true));
+                _context11.next = 23;
+                return regeneratorRuntime.awrap(_this16.modelManager.setItemDirty(component, true));
 
               case 23:
-                _this17.syncManager.sync();
+                _this16.syncManager.sync();
 
               case 24:
-                _this17.permissionDialogs = _this17.permissionDialogs.filter(function (pendingDialog) {
+                _this16.permissionDialogs = _this16.permissionDialogs.filter(function (pendingDialog) {
                   // Remove self
                   if (pendingDialog === params) {
                     pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
@@ -18652,13 +18686,13 @@ function (_PureService) {
                   return true;
                 });
 
-                if (_this17.permissionDialogs.length > 0) {
-                  _this17.presentPermissionsDialog(_this17.permissionDialogs[0]);
+                if (_this16.permissionDialogs.length > 0) {
+                  _this16.presentPermissionsDialog(_this16.permissionDialogs[0]);
                 }
 
               case 26:
               case "end":
-                return _context10.stop();
+                return _context11.stop();
             }
           }
         }, null, null, [[4, 9, 13, 21], [14,, 16, 20]]);
@@ -18679,12 +18713,12 @@ function (_PureService) {
   }, {
     key: "presentPermissionsDialog",
     value: function presentPermissionsDialog(dialog) {
-      console.error("Must override SNComponentManager.presentPermissionsDialog");
+      throw 'Must override SNComponentManager.presentPermissionsDialog';
     }
   }, {
     key: "openModalComponent",
     value: function openModalComponent(component) {
-      console.error("Must override SNComponentManager.presentPermissionsDialog");
+      throw 'Must override SNComponentManager.presentPermissionsDialog';
     }
   }, {
     key: "registerHandler",
@@ -18709,9 +18743,9 @@ function (_PureService) {
   }, {
     key: "registerComponentWindow",
     value: function registerComponentWindow(component, componentWindow) {
-      return regeneratorRuntime.async(function registerComponentWindow$(_context11) {
+      return regeneratorRuntime.async(function registerComponentWindow$(_context12) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               if (component.window === componentWindow) {
                 this.log("Web|componentManager", "attempting to re-register same component window.");
@@ -18719,11 +18753,11 @@ function (_PureService) {
 
               this.log("Web|componentManager|registerComponentWindow", component);
               component.window = componentWindow;
-              _context11.next = 5;
+              _context12.next = 5;
               return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid());
 
             case 5:
-              component.sessionKey = _context11.sent;
+              component.sessionKey = _context12.sent;
               this.sendMessageToComponent(component, {
                 action: "component-registered",
                 sessionKey: component.sessionKey,
@@ -18743,7 +18777,7 @@ function (_PureService) {
 
             case 9:
             case "end":
-              return _context11.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -18759,19 +18793,19 @@ function (_PureService) {
           _iterator27,
           _step27,
           handler,
-          _args12 = arguments;
+          _args13 = arguments;
 
-      return regeneratorRuntime.async(function activateComponent$(_context12) {
+      return regeneratorRuntime.async(function activateComponent$(_context13) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
-              dontSync = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : false;
+              dontSync = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : false;
               didChange = component.active !== true;
               component.active = true;
               _iteratorNormalCompletion27 = true;
               _didIteratorError27 = false;
               _iteratorError27 = undefined;
-              _context12.prev = 6;
+              _context13.prev = 6;
 
               for (_iterator27 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
                 handler = _step27.value;
@@ -18781,46 +18815,46 @@ function (_PureService) {
                 }
               }
 
-              _context12.next = 14;
+              _context13.next = 14;
               break;
 
             case 10:
-              _context12.prev = 10;
-              _context12.t0 = _context12["catch"](6);
+              _context13.prev = 10;
+              _context13.t0 = _context13["catch"](6);
               _didIteratorError27 = true;
-              _iteratorError27 = _context12.t0;
+              _iteratorError27 = _context13.t0;
 
             case 14:
-              _context12.prev = 14;
-              _context12.prev = 15;
+              _context13.prev = 14;
+              _context13.prev = 15;
 
               if (!_iteratorNormalCompletion27 && _iterator27.return != null) {
                 _iterator27.return();
               }
 
             case 17:
-              _context12.prev = 17;
+              _context13.prev = 17;
 
               if (!_didIteratorError27) {
-                _context12.next = 20;
+                _context13.next = 20;
                 break;
               }
 
               throw _iteratorError27;
 
             case 20:
-              return _context12.finish(17);
+              return _context13.finish(17);
 
             case 21:
-              return _context12.finish(14);
+              return _context13.finish(14);
 
             case 22:
               if (!(didChange && !dontSync)) {
-                _context12.next = 26;
+                _context13.next = 26;
                 break;
               }
 
-              _context12.next = 25;
+              _context13.next = 25;
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(component, true));
 
             case 25:
@@ -18837,7 +18871,7 @@ function (_PureService) {
 
             case 28:
             case "end":
-              return _context12.stop();
+              return _context13.stop();
           }
         }
       }, null, this, [[6, 10, 14, 22], [15,, 17, 21]]);
@@ -18853,20 +18887,20 @@ function (_PureService) {
           _iterator28,
           _step28,
           handler,
-          _args13 = arguments;
+          _args14 = arguments;
 
-      return regeneratorRuntime.async(function deactivateComponent$(_context13) {
+      return regeneratorRuntime.async(function deactivateComponent$(_context14) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
-              dontSync = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : false;
+              dontSync = _args14.length > 1 && _args14[1] !== undefined ? _args14[1] : false;
               didChange = component.active !== false;
               component.active = false;
               component.sessionKey = null;
               _iteratorNormalCompletion28 = true;
               _didIteratorError28 = false;
               _iteratorError28 = undefined;
-              _context13.prev = 7;
+              _context14.prev = 7;
 
               for (_iterator28 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
                 handler = _step28.value;
@@ -18876,46 +18910,46 @@ function (_PureService) {
                 }
               }
 
-              _context13.next = 15;
+              _context14.next = 15;
               break;
 
             case 11:
-              _context13.prev = 11;
-              _context13.t0 = _context13["catch"](7);
+              _context14.prev = 11;
+              _context14.t0 = _context14["catch"](7);
               _didIteratorError28 = true;
-              _iteratorError28 = _context13.t0;
+              _iteratorError28 = _context14.t0;
 
             case 15:
-              _context13.prev = 15;
-              _context13.prev = 16;
+              _context14.prev = 15;
+              _context14.prev = 16;
 
               if (!_iteratorNormalCompletion28 && _iterator28.return != null) {
                 _iterator28.return();
               }
 
             case 18:
-              _context13.prev = 18;
+              _context14.prev = 18;
 
               if (!_didIteratorError28) {
-                _context13.next = 21;
+                _context14.next = 21;
                 break;
               }
 
               throw _iteratorError28;
 
             case 21:
-              return _context13.finish(18);
+              return _context14.finish(18);
 
             case 22:
-              return _context13.finish(15);
+              return _context14.finish(15);
 
             case 23:
               if (!(didChange && !dontSync)) {
-                _context13.next = 27;
+                _context14.next = 27;
                 break;
               }
 
-              _context13.next = 26;
+              _context14.next = 26;
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(component, true));
 
             case 26:
@@ -18936,7 +18970,7 @@ function (_PureService) {
 
             case 31:
             case "end":
-              return _context13.stop();
+              return _context14.stop();
           }
         }
       }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
@@ -18944,13 +18978,13 @@ function (_PureService) {
   }, {
     key: "reloadComponent",
     value: function reloadComponent(component) {
-      var _this18 = this;
+      var _this17 = this;
 
       var _iteratorNormalCompletion29, _didIteratorError29, _iteratorError29, _iterator29, _step29, handler;
 
-      return regeneratorRuntime.async(function reloadComponent$(_context14) {
+      return regeneratorRuntime.async(function reloadComponent$(_context15) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               //
               // Do soft deactivate
@@ -18959,7 +18993,7 @@ function (_PureService) {
               _iteratorNormalCompletion29 = true;
               _didIteratorError29 = false;
               _iteratorError29 = undefined;
-              _context14.prev = 4;
+              _context15.prev = 4;
 
               for (_iterator29 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
                 handler = _step29.value;
@@ -18969,38 +19003,38 @@ function (_PureService) {
                 }
               }
 
-              _context14.next = 12;
+              _context15.next = 12;
               break;
 
             case 8:
-              _context14.prev = 8;
-              _context14.t0 = _context14["catch"](4);
+              _context15.prev = 8;
+              _context15.t0 = _context15["catch"](4);
               _didIteratorError29 = true;
-              _iteratorError29 = _context14.t0;
+              _iteratorError29 = _context15.t0;
 
             case 12:
-              _context14.prev = 12;
-              _context14.prev = 13;
+              _context15.prev = 12;
+              _context15.prev = 13;
 
               if (!_iteratorNormalCompletion29 && _iterator29.return != null) {
                 _iterator29.return();
               }
 
             case 15:
-              _context14.prev = 15;
+              _context15.prev = 15;
 
               if (!_didIteratorError29) {
-                _context14.next = 18;
+                _context15.next = 18;
                 break;
               }
 
               throw _iteratorError29;
 
             case 18:
-              return _context14.finish(15);
+              return _context15.finish(15);
 
             case 19:
-              return _context14.finish(12);
+              return _context15.finish(12);
 
             case 20:
               this.streamObservers = this.streamObservers.filter(function (o) {
@@ -19017,15 +19051,15 @@ function (_PureService) {
               //
 
 
-              return _context14.abrupt("return", new Promise(function (resolve, reject) {
-                _this18.timeout(function () {
+              return _context15.abrupt("return", new Promise(function (resolve, reject) {
+                _this17.timeout(function () {
                   component.active = true;
                   var _iteratorNormalCompletion30 = true;
                   var _didIteratorError30 = false;
                   var _iteratorError30 = undefined;
 
                   try {
-                    for (var _iterator30 = _this18.handlers[Symbol.iterator](), _step30; !(_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done); _iteratorNormalCompletion30 = true) {
+                    for (var _iterator30 = _this17.handlers[Symbol.iterator](), _step30; !(_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done); _iteratorNormalCompletion30 = true) {
                       var handler = _step30.value;
 
                       if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
@@ -19048,12 +19082,12 @@ function (_PureService) {
                     }
                   }
 
-                  if (!_this18.activeComponents.includes(component)) {
-                    _this18.activeComponents.push(component);
+                  if (!_this17.activeComponents.includes(component)) {
+                    _this17.activeComponents.push(component);
                   }
 
                   if (component.area === "themes") {
-                    _this18.postActiveThemesToAllComponents();
+                    _this17.postActiveThemesToAllComponents();
                   } // Resolve again in case first resolve in for loop isn't reached.
                   // Should be no effect if resolved twice, only first will be used.
 
@@ -19064,7 +19098,7 @@ function (_PureService) {
 
             case 24:
             case "end":
-              return _context14.stop();
+              return _context15.stop();
           }
         }
       }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
@@ -19072,11 +19106,11 @@ function (_PureService) {
   }, {
     key: "deleteComponent",
     value: function deleteComponent(component) {
-      return regeneratorRuntime.async(function deleteComponent$(_context15) {
+      return regeneratorRuntime.async(function deleteComponent$(_context16) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
-              _context15.next = 2;
+              _context16.next = 2;
               return regeneratorRuntime.awrap(this.modelManager.setItemToBeDeleted(component));
 
             case 2:
@@ -19084,7 +19118,7 @@ function (_PureService) {
 
             case 3:
             case "end":
-              return _context15.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
