@@ -5,7 +5,7 @@ import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 import WebDeviceInterface from './web_device_interface.js';
-import { Environments } from '../../lib/platforms.js';
+import { Environments, Platforms } from '../../lib/platforms.js';
 
 export default class Factory {
   static createApplication(namespace, platform) {
@@ -18,7 +18,8 @@ export default class Factory {
     return new SNApplication({
       namespace: namespace,
       deviceInterface: deviceInterface,
-      platform: platform || Environments.Web,
+      environment: Environments.Web,
+      platform: platform || Platforms.MacWeb,
       host: url,
       skipClasses: [
         SNComponentManager

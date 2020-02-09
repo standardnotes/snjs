@@ -30,6 +30,10 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   /** @database */
 
+  async openDatabase() {
+    /** no-op */
+  }
+
   _getDatabaseKeyPrefix() {
     if(this.namespace) {
       return `${this.namespace}-item-`;
@@ -40,10 +44,6 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   _keyForPayloadId(id) {
     return `${this._getDatabaseKeyPrefix()}${id}`;
-  }
-
-  async getRawDatabasePayloadWithId(id) {
-    return localStorage.getItem(this._keyForPayloadId(id));
   }
 
   async getAllRawDatabasePayloads() {

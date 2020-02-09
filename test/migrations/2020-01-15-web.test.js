@@ -15,7 +15,7 @@ describe('2020-01-15 web migration', () => {
   });
 
   afterEach(() => {
-    localStorage.clear();
+    // localStorage.clear();
   });
 
   it('2020-01-15 migration with passcode and account', async function () {
