@@ -80,7 +80,10 @@ describe('003 protocol operations', () => {
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol003.computeRootKey({password: _password, keyParams: _keyParams});
+    const key = await protocol003.computeRootKey({
+      password: _password, 
+      keyParams: _keyParams
+    });
     expect(key.compare(_key)).to.be.true;
   });
-})
+});

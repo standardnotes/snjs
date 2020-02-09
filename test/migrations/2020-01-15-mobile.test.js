@@ -5,6 +5,7 @@ import '../../dist/snjs.js';
 import '../../node_modules/chai/chai.js';
 import '../vendor/chai-as-promised-built.js';
 import Factory from '../lib/factory.js';
+import { Platforms } from '../../lib/platforms.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -19,7 +20,10 @@ describe('2020-01-15 mobile migration', () => {
   });
 
   it('2020-01-15 migration with passcode and account', async function () {
-    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
+    const application = await Factory.createAppWithRandNamespace(
+      Environments.Mobile, 
+      Platforms.Ios
+    );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -35,7 +39,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams)
+      JSON.stringify(passcodeResult.keyParams.getPortableValue())
     );
     const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
@@ -48,7 +52,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams)
+      JSON.stringify(accountResult.keyParams.getPortableValue())
     );
     const accountKey = accountResult.key;
     await application.deviceInterface.setKeychainValue({
@@ -168,7 +172,10 @@ describe('2020-01-15 mobile migration', () => {
 
 
   it('2020-01-15 migration with passcode only', async function () {
-    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
+    const application = await Factory.createAppWithRandNamespace(
+      Environments.Mobile,
+      Platforms.Ios
+    );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -184,7 +191,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams)
+      JSON.stringify(passcodeResult.keyParams.getPortableValue())
     );
     const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
@@ -273,7 +280,10 @@ describe('2020-01-15 mobile migration', () => {
   });
 
   it('2020-01-15 migration with account only', async function () {
-    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
+    const application = await Factory.createAppWithRandNamespace(
+      Environments.Mobile,
+      Platforms.Ios
+    );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -289,7 +299,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams)
+      JSON.stringify(accountResult.keyParams.getPortableValue())
     );
     const accountKey = accountResult.key;
     expect(accountKey.version).to.equal(SNProtocolOperator003.versionString());
@@ -379,7 +389,10 @@ describe('2020-01-15 mobile migration', () => {
 
 
   it('2020-01-15 migration with no account and no passcode', async function () {
-    const application = await Factory.createAppWithRandNamespace(Environments.Mobile);
+    const application = await Factory.createAppWithRandNamespace(
+      Environments.Mobile,
+      Platforms.Ios
+    );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',

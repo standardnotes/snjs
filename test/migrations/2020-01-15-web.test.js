@@ -15,7 +15,7 @@ describe('2020-01-15 web migration', () => {
   });
 
   afterEach(() => {
-    // localStorage.clear();
+    localStorage.clear();
   });
 
   it('2020-01-15 migration with passcode and account', async function () {
@@ -35,7 +35,7 @@ describe('2020-01-15 web migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams)
+      JSON.stringify(passcodeResult.keyParams.getPortableValue())
     );
 
     /** Create arbitrary storage values and make sure they're migrated */
@@ -63,7 +63,7 @@ describe('2020-01-15 web migration', () => {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
-      auth_params: accountResult.keyParams
+      auth_params: accountResult.keyParams.getPortableValue()
     };
     const storagePayload = CreateMaxPayloadFromAnyObject({
       object: {
@@ -176,7 +176,7 @@ describe('2020-01-15 web migration', () => {
     });
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams)
+      JSON.stringify(passcodeResult.keyParams.getPortableValue())
     );
     const passcodeKey = passcodeResult.key;
 
@@ -314,7 +314,7 @@ describe('2020-01-15 web migration', () => {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
-      auth_params: JSON.stringify(accountResult.keyParams)
+      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
     };
     for(const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
@@ -360,7 +360,7 @@ describe('2020-01-15 web migration', () => {
       StorageKeys.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(migratedKeyParams).to.eql(accountResult.keyParams);
+    expect(migratedKeyParams).to.eql(accountResult.keyParams.getPortableValue());
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey).to.be.ok;
     

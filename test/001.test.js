@@ -21,7 +21,9 @@ describe('001 protocol operations', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(application);
-    const result = await protocol001.createRootKey({ identifier: _identifier, password: _password });
+    const result = await protocol001.createRootKey({
+      identifier: _identifier, password: _password
+    });
     _keyParams = result.keyParams;
     _key = result.key;
   });

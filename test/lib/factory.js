@@ -8,7 +8,7 @@ import WebDeviceInterface from './web_device_interface.js';
 import { Environments, Platforms } from '../../lib/platforms.js';
 
 export default class Factory {
-  static createApplication(namespace, platform) {
+  static createApplication(namespace, environment, platform) {
     const url = this.serverURL();
     const deviceInterface = new WebDeviceInterface({
       namespace,
@@ -18,7 +18,7 @@ export default class Factory {
     return new SNApplication({
       namespace: namespace,
       deviceInterface: deviceInterface,
-      environment: Environments.Web,
+      environment: environment || Environments.Web,
       platform: platform || Platforms.MacWeb,
       host: url,
       skipClasses: [
@@ -27,18 +27,18 @@ export default class Factory {
     });
   }
 
-  static async createAppWithRandNamespace(platform) {
+  static async createAppWithRandNamespace(environment, platform) {
     const namespace = Math.random().toString(36).substring(2, 15);
-    return this.createApplication(namespace, platform);
+    return this.createApplication(namespace, environment, platform);
   }
 
-  static async createInitAppWithRandNamespace(platform) {
+  static async createInitAppWithRandNamespace(environment, platform) {
     const namespace = Math.random().toString(36).substring(2, 15);
-    return this.createAndInitializeApplication(namespace, platform);
+    return this.createAndInitializeApplication(namespace, environment, platform);
   }
 
-  static async createAndInitializeApplication(namespace, platform) {
-    const application = this.createApplication(namespace, platform);
+  static async createAndInitializeApplication(namespace, environment, platform) {
+    const application = this.createApplication(namespace, environment, platform);
     await this.initializeApplication(application);
     return application;
   }
