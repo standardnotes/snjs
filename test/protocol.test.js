@@ -17,6 +17,11 @@ describe('protocol', () => {
 
   after(() => {
     application.deinit();
+    localStorage.clear();
+  });
+
+  beforeEach(async function () {
+    // this.application = await Factory.createInitAppWithRandNamespace();
   });
 
   it('checks version to make sure its 004', () => {
@@ -44,8 +49,10 @@ describe('protocol', () => {
     expect(application.protocolService.isProtocolVersionOutdated(currentVersion)).to.equal(false);
   });
 
-  it('cost minimum for 003 to be 110,000', () => {
-    var currentVersion = application.protocolService.getLatestVersion();
-    expect(application.protocolService.costMinimumForVersion("003")).to.equal(110000);
+  it('decrypting already decrypted payload should return same payload', async function() {
+    const payload = Factory.createNotePayload();
+    const result = await application.protocolService.payloadByDecryptingPayload({ payload });
+    expect(payload).to.equal(result);
+    expect(result.errorDecrypting).to.not.be.ok;
   });
 });

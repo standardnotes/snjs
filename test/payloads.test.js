@@ -47,7 +47,7 @@ describe('payloads', () => {
         dummy: true,
         errorDecrypting: false
       }
-    })
+    });
 
     const encryptedPayload = await sharedApplication.protocolService.payloadByEncryptingPayload({
       payload: notePayload,

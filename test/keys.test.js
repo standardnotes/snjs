@@ -305,7 +305,7 @@ describe('keys', () => {
       payload: itemsKeyRawPayload2,
       key: newRootKey
     });
-    expect(decrypted3.errorDecrypting).to.equal(false);
+    expect(decrypted3.errorDecrypting).to.not.be.ok;
   });
 
   it('changing account password with key rotation option should create new items key', async function () {

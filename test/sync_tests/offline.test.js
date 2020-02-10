@@ -30,12 +30,13 @@ describe('offline syncing', () => {
   });
 
   it("should sync item with no passcode", async function() {
-    await Factory.createMappedNote(this.application);
+    const note = await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncManager.sync();
+    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);

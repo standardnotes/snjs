@@ -903,6 +903,41 @@ describe('online syncing', () => {
     expect(tag.content.references.length).to.equal(2);
   }).timeout(10000);
 
+  it('valid sync date tracking', async function () {
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(note, true);
+    this.expectedItemCount++;
+
+    expect(note.dirty).to.equal(true);
+    expect(note.dirtiedDate).to.be.below(new Date());
+
+    note.text = `${Math.random()}`;
+    await this.application.modelManager.setItemDirty(note);
+    const sync = this.application.sync();
+    await Factory.sleep(0.1);
+    expect(note.lastSyncBegan).to.be.below(new Date());
+    await sync;
+    expect(note.dirty).to.equal(false);
+    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
+
+  }).timeout(10000);
+
+  it('syncing twice without waiting should only execute 1 online sync', async function () {
+    const expectedEvents = 1;
+    let actualEvents = 0;
+    this.application.syncManager.addEventObserver((event, data) => {
+      if (event === SyncEvents.FullSyncCompleted && data.source === SyncSources.External) {
+        actualEvents++;
+      }
+    });
+    const first = this.application.sync();
+    const second = this.application.sync();
+    await Promise.all([first, second]);
+    /** Sleep so that any automatic syncs that are triggered are also sent to handler above */
+    await Factory.sleep(0.5);
+    expect(actualEvents).to.equal(expectedEvents);
+  });
+
   it('should keep an item dirty thats been modified after low latency sync request began', async function () {
     /**
      * If you begin a sync request that takes 20s to complete, then begin modifying an item
@@ -915,7 +950,7 @@ describe('online syncing', () => {
     this.expectedItemCount++;
 
     // client A. Don't await, we want to do other stuff.
-    this.application.syncManager.ut_beginLatencySimulator(2000);
+    this.application.syncManager.ut_beginLatencySimulator(1500);
     const slowSync = this.application.syncManager.sync(syncOptions);
     await Factory.sleep(0.1);
     expect(note.dirty).to.equal(true);
@@ -931,8 +966,11 @@ describe('online syncing', () => {
     // Now do a regular sync with no latency.
     this.application.syncManager.ut_endLatencySimulator();
     const midSync = this.application.syncManager.sync(syncOptions);
-
     await Promise.all([slowSync, midSync]);
+
+    expect(note.dirty).to.equal(false);
+    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
+    expect(note.content.text).to.equal(text);
 
     // client B
     await this.application.syncManager.handleSignOut();

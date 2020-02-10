@@ -134,7 +134,11 @@ describe("mapping performance", () => {
 
     const t1 = performance.now();
     const seconds = (t1 - t0) / 1000;
-    const EXPECTED_RUN_TIME = 4.0; // seconds
+    /** Expected run time depends on many different factors, 
+     * like how many other tests you're running and overall system capacity.
+     * Best case should be around 3.3s and worst case should be 5s.
+    */
+    const EXPECTED_RUN_TIME = 6.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
     const mappedTag = modelManager.validItemsForContentType("Tag")[0];

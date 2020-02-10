@@ -114,5 +114,18 @@ describe("storage manager", () => {
     const payload = payloads[0];
     expect(typeof payload.content).to.not.equal('string');
     expect(payload.content.references).to.be.ok;
-  })
-})
+  });
+
+  it("signing out should clear unwrapped value store", async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: false
+    });
+
+    await this.application.signOut();
+    const values = this.application.storageManager.values[ValueModesKeys.Unwrapped];
+    expect(Object.keys(values).length).to.equal(0);
+  });
+});
