@@ -1438,7 +1438,7 @@ function () {
                         _this.beginAutoSyncTimer();
 
                         return _context2.abrupt("return", _this.syncManager.sync({
-                          mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
+                          mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
                         }));
 
                       case 6:
@@ -2901,7 +2901,7 @@ function () {
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
               _context35.next = 18;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
             case 18:
@@ -2979,7 +2979,7 @@ function () {
               this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
               _context36.next = 19;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SYNC_MODE_DOWNLOAD_FIRST"]
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
             case 19:
@@ -4031,7 +4031,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, ChallengeResponse, PureService, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncManager, SyncSources, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, ChallengeResponse, PureService, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncManager, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4138,6 +4138,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SNSyncManager"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SyncSources"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SyncModes"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["TIMING_STRATEGY_RESOLVE_ON_NEXT"]; });
 
@@ -4249,14 +4251,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["isPayloadSourceRetrieved"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_42__["PayloadFormats"]; });
+/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__["ProtocolVersions"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_43__["StorageKeys"]; });
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__["PayloadFormats"]; });
 
-/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_44__["BaseMigration"]; });
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__["StorageKeys"]; });
+
+/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["ProtectedActions"]; });
 
@@ -4308,6 +4313,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /** Payloads */
+
 
 
 
@@ -20521,7 +20527,7 @@ function (_PureService) {
 /*!*******************************!*\
   !*** ./lib/services/index.js ***!
   \*******************************/
-/*! exports provided: SNAlertManager, SNSessionManager, SNApiService, SNComponentManager, SNHttpManager, SNModelManager, SNSingletonManager, SNActionsManager, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SYNC_MODE_DOWNLOAD_FIRST, DeviceAuthService, SNStorageManager, StorageEncryptionPolicies, StoragePersistencePolicies */
+/*! exports provided: SNAlertManager, SNSessionManager, SNApiService, SNComponentManager, SNHttpManager, SNModelManager, SNSingletonManager, SNActionsManager, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SyncModes, DeviceAuthService, SNStorageManager, StorageEncryptionPolicies, StoragePersistencePolicies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20576,7 +20582,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SNSyncManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DOWNLOAD_FIRST", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SYNC_MODE_DOWNLOAD_FIRST"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SyncModes"]; });
 
 /* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
@@ -20827,7 +20833,7 @@ function (_PureService) {
   }, {
     key: "handleDownloadFirstSyncCompletion",
     value: function handleDownloadFirstSyncCompletion() {
-      var allItemsKeys, neverSynced, defaultSyncedKey;
+      var allItemsKeys, neverSynced, defaultSyncedKey, hasSyncedItemsKey, rootKey, toDelete;
       return regeneratorRuntime.async(function handleDownloadFirstSyncCompletion$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -20848,16 +20854,55 @@ function (_PureService) {
               defaultSyncedKey = allItemsKeys.find(function (key) {
                 return !key.neverSynced && key.isDefault;
               });
+              hasSyncedItemsKey = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(defaultSyncedKey);
 
-              if (!defaultSyncedKey) {
-                _context4.next = 6;
+              if (!hasSyncedItemsKey) {
+                _context4.next = 9;
                 break;
               }
 
-              _context4.next = 6;
+              _context4.next = 7;
               return regeneratorRuntime.awrap(this.modelManager.setItemsToBeDeleted(neverSynced));
 
-            case 6:
+            case 7:
+              _context4.next = 20;
+              break;
+
+            case 9:
+              _context4.next = 11;
+              return regeneratorRuntime.awrap(this.keyManager.getRootKey());
+
+            case 11:
+              rootKey = _context4.sent;
+
+              if (!rootKey) {
+                _context4.next = 20;
+                break;
+              }
+
+              /** If neverSynced.version != rootKey.version, delete. */
+              toDelete = neverSynced.filter(function (itemsKey) {
+                return itemsKey.version !== rootKey.version;
+              });
+
+              if (!(toDelete.length > 0)) {
+                _context4.next = 17;
+                break;
+              }
+
+              _context4.next = 17;
+              return regeneratorRuntime.awrap(this.modelManager.setItemsToBeDeleted(toDelete));
+
+            case 17:
+              if (!(allItemsKeys.length === 0)) {
+                _context4.next = 20;
+                break;
+              }
+
+              _context4.next = 20;
+              return regeneratorRuntime.awrap(this.createNewDefaultItemsKey());
+
+            case 20:
             case "end":
               return _context4.stop();
           }
@@ -26101,9 +26146,7 @@ function (_PureService) {
 
             case 3:
               payloads = items.map(function (item) {
-                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: item
-                });
+                return item.payloadRepresentation();
               });
               _context12.next = 6;
               return regeneratorRuntime.awrap(this.payloadsByDecryptingPayloads({
@@ -28495,15 +28538,14 @@ var SIGNAL_TYPE_STATUS_CHANGED = 2;
 /*!*******************************************!*\
   !*** ./lib/services/sync/sync_manager.js ***!
   \*******************************************/
-/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SYNC_MODE_DEFAULT, SYNC_MODE_DOWNLOAD_FIRST, SyncSources, SNSyncManager */
+/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SyncModes, SyncSources, SNSyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return TIMING_STRATEGY_RESOLVE_ON_NEXT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return TIMING_STRATEGY_FORCE_SPAWN_NEW; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DEFAULT", function() { return SYNC_MODE_DEFAULT; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SYNC_MODE_DOWNLOAD_FIRST", function() { return SYNC_MODE_DOWNLOAD_FIRST; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return SyncModes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return SyncSources; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return SNSyncManager; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -28574,8 +28616,10 @@ var DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
 var INVALID_SESSION_RESPONSE_STATUS = 401;
 var TIMING_STRATEGY_RESOLVE_ON_NEXT = 1;
 var TIMING_STRATEGY_FORCE_SPAWN_NEW = 2;
-var SYNC_MODE_DEFAULT = 1;
-var SYNC_MODE_DOWNLOAD_FIRST = 2;
+var SyncModes = {
+  Default: 1,
+  DownloadFirst: 2
+};
 var SyncSources = {
   External: 1,
   SpawnQueue: 2,
@@ -29201,9 +29245,9 @@ function (_PureService) {
      *                        A new sync request is guarenteed to be generated for your request, no matter how long it takes.
      *                        Promise will be resolved whenever this sync request is processed in the serial queue.
      *
-     * @param mode            SYNC_MODE_DEFAULT
+     * @param mode            SyncModes.Default
      *                        Performs a standard sync, uploading any dirty items and retrieving items.
-     *                        SYNC_MODE_DOWNLOAD_FIRST
+     *                        SyncModes.DownloadFirst
      *                        The first sync for an account, where we first want to download all remote items first
      *                        before uploading any dirty items. This allows a consumer, for example, to download
      *                        all data to see if user has an items key, and if not, only then create a new one.
@@ -29368,14 +29412,14 @@ function (_PureService) {
               }));
 
             case 40:
-              useMode = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isNullOrUndefined"])(mode) ? mode : SYNC_MODE_DEFAULT;
+              useMode = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isNullOrUndefined"])(mode) ? mode : SyncModes.Default;
               _context12.next = 43;
               return regeneratorRuntime.awrap(this.sessionManager.online());
 
             case 43:
               online = _context12.sent;
 
-              if (!(useMode === SYNC_MODE_DEFAULT)) {
+              if (!(useMode === SyncModes.Default)) {
                 _context12.next = 56;
                 break;
               }
@@ -29409,7 +29453,7 @@ function (_PureService) {
               break;
 
             case 56:
-              if (useMode === SYNC_MODE_DOWNLOAD_FIRST) {
+              if (useMode === SyncModes.DownloadFirst) {
                 uploadPayloads = [];
               }
 
@@ -29523,7 +29567,7 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.handleNeverSyncedDeleted(neverSyncedDeleted));
 
             case 98:
-              if (!(useMode === SYNC_MODE_DOWNLOAD_FIRST)) {
+              if (!(useMode === SyncModes.DownloadFirst)) {
                 _context12.next = 105;
                 break;
               }

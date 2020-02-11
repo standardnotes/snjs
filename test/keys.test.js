@@ -75,17 +75,17 @@ describe('keys', () => {
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
   });
 
-  it('generating export params with no account or passcode should produce encrypted payload', 
-  async function () {
-    /** Items key available by default */
-    const payload = Factory.createNotePayload();
-    const processedPayload = await this.application.protocolService
-      .payloadByEncryptingPayload({
-        payload: payload,
-        intent: EncryptionIntents.LocalStoragePreferEncrypted
-      });
-    expect(processedPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
-  });
+  it('generating export params with no account or passcode should produce encrypted payload',
+    async function () {
+      /** Items key available by default */
+      const payload = Factory.createNotePayload();
+      const processedPayload = await this.application.protocolService
+        .payloadByEncryptingPayload({
+          payload: payload,
+          intent: EncryptionIntents.LocalStoragePreferEncrypted
+        });
+      expect(processedPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+    });
 
   it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({ application: this.application });
@@ -255,6 +255,31 @@ describe('keys', () => {
     expect(itemsKeyPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
+  it('signing into 003 account should delete latest offline items key and create 003 items key', 
+  async function () {
+    /** 
+     * When starting the application it will create an items key with the latest protocol version (004).
+     * Upon signing into an 003 account, the application should delete any neverSynced items keys,
+     * and create a new default items key with version that matches root key
+     */
+    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
+    const latestVersion = this.application.protocolService.getLatestVersion();
+    expect(defaultItemsKey.version).to.equal(latestVersion);
+
+    /** Register with 003 version */
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersions.V003
+    });
+
+    const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
+    expect(itemsKeys.length).to.equal(1);
+    const newestItemsKey = itemsKeys[0];
+    expect(newestItemsKey.version).to.equal(SNProtocolOperator003.versionString());
+  });
+
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');
     await Factory.createSyncedNote(this.application);
@@ -273,7 +298,7 @@ describe('keys', () => {
       payload: itemsKeyPayload,
       key: originalRootKey
     });
-  
+
     expect(decrypted.errorDecrypting).to.equal(false);
     expect(decrypted.content).to.eql(originalItemsKey.content);
 
@@ -330,34 +355,19 @@ describe('keys', () => {
   }).timeout(5000);
 
   it('protocol version should be upgraded on password change', async function () {
-    /** Register with 003 version */
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
-    const identifier = this.email;
-    const password = this.password;
-    const result = await operator003.createRootKey({
-      identifier,
-      password
-    });
-    const accountKey = result.key;
-    const accountKeyParams = result.keyParams;
     /** Delete default items key that is created on launch */
     const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     await this.application.modelManager.setItemToBeDeleted(itemsKey);
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(0);
+    
+    /** Register with 003 version */
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersions.V003
+    });
 
-    /** We must manually hook into API, otherwise using wrapper methods
-    always registers with latest version */
-    const response = await this.application.apiService.register({
-      email: identifier,
-      serverPassword: accountKey.serverPassword,
-      keyParams: accountKeyParams
-    });
-    await this.application.sessionManager.handleAuthResponse(response);
-    await this.application.keyManager.setNewRootKey({
-      key: accountKey,
-      keyParams: accountKeyParams
-    });
-    await this.application.syncManager.sync();
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
 
     expect(

@@ -63,6 +63,38 @@ export default class Factory {
     return application.register({email, password, ephemeral});
   }
 
+  /**
+   * Using application.register will always use latest version of protocol.
+   * To use older version, use this method.
+   */
+  static async registerOldUser({ application, email, password, version }) {
+    if (!email) email = this.generateUuid();
+    if (!password) password = this.generateUuid();
+    const operator = application.protocolService.operatorForVersion(version);
+    const result = await operator.createRootKey({
+      identifier: email,
+      password
+    });
+    const accountKey = result.key;
+    const accountKeyParams = result.keyParams;
+
+    const response = await application.apiService.register({
+      email: email,
+      serverPassword: accountKey.serverPassword,
+      keyParams: accountKeyParams
+    });
+    await application.sessionManager.handleAuthResponse(response);
+    await application.keyManager.setNewRootKey({
+      key: accountKey,
+      keyParams: accountKeyParams
+    });
+    application.notifyEvent(ApplicationEvents.SignedIn);
+    await application.syncManager.sync({
+      mode: SyncModes.DownloadFirst
+    });
+    application.protocolService.decryptErroredItems();
+  }
+
   static createStorageItemPayload(contentType) {
     return CreateMaxPayloadFromAnyObject({
       object: this.createItemParams(contentType)
@@ -174,8 +206,8 @@ export default class Factory {
     tagParams.content.references = [{
       uuid: noteParams.uuid,
       content_type: noteParams.content_type
-    }]
-    noteParams.content.references = []
+    }];
+    noteParams.content.references = [];
     return [
       CreateMaxPayloadFromAnyObject({object: noteParams}),
       CreateMaxPayloadFromAnyObject({object: tagParams})
@@ -195,7 +227,7 @@ export default class Factory {
       setTimeout(function () {
         resolve();
       }, seconds * 1000);
-    })
+    });
   }
 
   static shuffleArray(a) {
