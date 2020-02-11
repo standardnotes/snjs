@@ -5,6 +5,7 @@ import '../dist/snjs.js';
 import '../node_modules/chai/chai.js';
 import './vendor/chai-as-promised-built.js';
 import Factory from './lib/factory.js';
+import { EncryptionIntents } from '../lib/protocol/intents.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -54,5 +55,27 @@ describe('protocol', () => {
     const result = await application.protocolService.payloadByDecryptingPayload({ payload });
     expect(payload).to.equal(result);
     expect(result.errorDecrypting).to.not.be.ok;
+  });
+
+  it('decrypting 000 payload should succeed', async function () {
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: {
+        uuid: await Uuid.GenerateUuid(),
+        content_type: ContentTypes.Mfa,
+        content: {
+          secret: '123'
+        }
+      }
+    });
+    const encrypted = await application.protocolService.payloadByEncryptingPayload({
+      payload,
+      intent: EncryptionIntents.SyncDecrypted
+    });
+    expect(encrypted.content.startsWith('000')).to.equal(true);
+    const decrypted = await application.protocolService.payloadByDecryptingPayload({ 
+      payload: encrypted
+    });
+    expect(decrypted.errorDecrypting).to.not.be.ok;
+    expect(decrypted.content.secret).to.equal(payload.content.secret);
   });
 });

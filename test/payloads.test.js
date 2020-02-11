@@ -128,11 +128,10 @@ describe('payloads', () => {
   it('creating payload with omit fields', async () => {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
-    const changedUuid = 'foo';
     const changedPayload = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {uuid: null}
-    })
+    });
 
     expect(payload.uuid).to.equal(uuid);
     expect(changedPayload.uuid).to.not.be.ok;
@@ -161,7 +160,7 @@ describe('payloads', () => {
     .payloadByEncryptingPayload({
       payload: payload,
       intent: EncryptionIntents.FileDecrypted
-    })
+    });
 
     expect(encodedPayload.enc_item_key).to.not.be.ok;
     expect(encodedPayload.auth_hash).to.not.be.ok;

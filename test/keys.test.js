@@ -84,7 +84,7 @@ describe('keys', () => {
         payload: payload,
         intent: EncryptionIntents.LocalStoragePreferEncrypted
       });
-    expect(processedPayload.isEncrypted).to.equal(true);
+    expect(processedPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
   it('has root key and one items key after registering user', async function () {
@@ -252,7 +252,7 @@ describe('keys', () => {
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
       object: itemsKeyRawPayload
     });
-    expect(itemsKeyPayload.isEncrypted).to.equal(true);
+    expect(itemsKeyPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
@@ -273,6 +273,7 @@ describe('keys', () => {
       payload: itemsKeyPayload,
       key: originalRootKey
     });
+  
     expect(decrypted.errorDecrypting).to.equal(false);
     expect(decrypted.content).to.eql(originalItemsKey.content);
 
@@ -302,7 +303,7 @@ describe('keys', () => {
 
     /** Should be able to decrypt with new root key */
     const decrypted3 = await this.application.protocolService.payloadByDecryptingPayload({
-      payload: itemsKeyRawPayload2,
+      payload: itemsKeyPayload2,
       key: newRootKey
     });
     expect(decrypted3.errorDecrypting).to.not.be.ok;

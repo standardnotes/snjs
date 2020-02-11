@@ -79,6 +79,21 @@ describe('online syncing', () => {
     expect(notes[0].title).to.equal(note.title);
   }).timeout(10000);
 
+  it("server extensions should not be encrypted for sync", async function () {
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: {
+        uuid: await Uuid.GenerateUuid(),
+        content_type: ContentTypes.Mfa,
+        content: {
+          secret: '123'
+        }
+      }
+    });
+    const results = await this.application.syncManager.payloadsByPreparingForServer([payload]);
+    const processed = results[0];
+    expect(processed.getFormat()).to.equal(PayloadFormats.DecryptedBase64String);
+  }).timeout(10000);
+
   it("resolve on next timing strategy", async function () {
     const syncCount = 7;
     let successes = 0;
