@@ -14,6 +14,7 @@ describe("storage manager", () => {
    * Base keys are `storage` and `last_migration_timestamp`
    */
   const BASE_KEY_COUNT = 2;
+  const BASE_ITEM_COUNT = 1; /** Default items key */
   const sharedApplication = Factory.createApplication();
 
   before(async function () {
@@ -127,5 +128,19 @@ describe("storage manager", () => {
     await this.application.signOut();
     const values = this.application.storageManager.values[ValueModesKeys.Unwrapped];
     expect(Object.keys(values).length).to.equal(0);
+  });
+
+  it.only("signing out should clear payloads", async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: false
+    });
+
+    await Factory.createSyncedNote(this.application);
+    expect(await Factory.storagePayloadCount(this.application)).to.equal(BASE_ITEM_COUNT + 1);
+    await this.application.signOut();
+    expect(await Factory.storagePayloadCount(this.application)).to.equal(BASE_ITEM_COUNT);
   });
 });

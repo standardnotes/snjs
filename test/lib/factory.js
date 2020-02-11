@@ -214,6 +214,11 @@ export default class Factory {
     ];
   }
 
+  static async storagePayloadCount(application) {
+    const payloads = await application.storageManager.getAllRawPayloads();
+    return payloads.length;
+  }
+
   static serverURL() {
     return "http://localhost:3000";
   }

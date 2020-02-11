@@ -260,7 +260,7 @@ describe('keys', () => {
     /** 
      * When starting the application it will create an items key with the latest protocol version (004).
      * Upon signing into an 003 account, the application should delete any neverSynced items keys,
-     * and create a new default items key with version that matches root key
+     * and create a new default items key that is the default for a given protocol version.
      */
     const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     const latestVersion = this.application.protocolService.getLatestVersion();
@@ -278,6 +278,9 @@ describe('keys', () => {
     expect(itemsKeys.length).to.equal(1);
     const newestItemsKey = itemsKeys[0];
     expect(newestItemsKey.version).to.equal(SNProtocolOperator003.versionString());
+    const rootKey = await this.application.keyManager.getRootKey();
+    expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
+    expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
   });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {

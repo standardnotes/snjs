@@ -11934,12 +11934,13 @@ function (_SNPureItemPayload) {
 /*!**********************************!*\
   !*** ./lib/protocol/versions.js ***!
   \**********************************/
-/*! exports provided: ProtocolVersions */
+/*! exports provided: ProtocolVersions, compareVersions */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return ProtocolVersions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return compareVersions; });
 var ProtocolVersions = {
   V000Base64Decrypted: '000',
   V001: '001',
@@ -11948,6 +11949,17 @@ var ProtocolVersions = {
   V004: '004',
   VersionLength: 3
 };
+/** 
+ * -1 if a < b
+ * 0 if a == b
+ * 1 is a > b
+ */
+
+function compareVersions(a, b) {
+  var aNum = Number(a);
+  var bNum = Number(b);
+  return aNum - bNum;
+}
 
 /***/ }),
 
@@ -20630,6 +20642,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20653,6 +20666,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/** The last protocol version to not use root-key based items keys */
+
+var LAST_NONROOT_ITEMS_KEY_VERSION = _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].V003;
 var ItemsKeyManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -21026,7 +21043,8 @@ function (_PureService) {
     }
     /**
      * Creates a new random SNItemsKey to use for item encryption, and adds it to model management.
-     * Consumer must call sync.
+     * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
+     * and its .itemsKey value should be equal to the root key masterKey value.
      */
 
   }, {
@@ -21043,35 +21061,57 @@ function (_PureService) {
             case 2:
               rootKey = _context8.sent;
               operatorVersion = rootKey ? rootKey.version : this.protocolService.getLatestVersion();
-              _context8.next = 6;
+
+              if (!(Object(_Protocol_versions__WEBPACK_IMPORTED_MODULE_5__["compareVersions"])(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0)) {
+                _context8.next = 10;
+                break;
+              }
+
+              /** Create root key based items key */
+              itemsKey = _Models__WEBPACK_IMPORTED_MODULE_3__["SNItemsKey"].FromRaw({
+                itemsKey: rootKey.masterKey,
+                dataAuthenticationKey: rootKey.dataAuthenticationKey,
+                version: operatorVersion
+              });
+              _context8.next = 8;
+              return regeneratorRuntime.awrap(itemsKey.initUUID());
+
+            case 8:
+              _context8.next = 13;
+              break;
+
+            case 10:
+              _context8.next = 12;
               return regeneratorRuntime.awrap(this.protocolService.operatorForVersion(operatorVersion).createItemsKey());
 
-            case 6:
+            case 12:
               itemsKey = _context8.sent;
+
+            case 13:
               currentDefault = this.getDefaultItemsKey();
 
               if (!currentDefault) {
-                _context8.next = 12;
+                _context8.next = 18;
                 break;
               }
 
               currentDefault.content.isDefault = false;
-              _context8.next = 12;
+              _context8.next = 18;
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(currentDefault));
 
-            case 12:
+            case 18:
               itemsKey.content.isDefault = true;
               payload = itemsKey.payloadRepresentation({
                 override: {
                   dirty: true
                 }
               });
-              _context8.next = 16;
+              _context8.next = 22;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadToLocalItem({
                 payload: payload
               }));
 
-            case 16:
+            case 22:
             case "end":
               return _context8.stop();
           }
