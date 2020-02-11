@@ -58,18 +58,48 @@ describe('001 protocol operations', () => {
   it('properly encrypts and decrypts', async () => {
     const text = "hello world";
     const key = _key.masterKey;
-    const iv = await protocol001.crypto.generateRandomKey(128);
-    const wcEncryptionResult = await protocol001.encryptText(text, key, iv);
-    const wcDecryptionResult = await protocol001.decryptText({
-      contentCiphertext: wcEncryptionResult, encryptionKey: key, iv: iv
-    });
-    expect(wcDecryptionResult).to.equal(text);
+    const encString = await protocol001.encryptString(text, key);
+    const decString = await protocol001.decryptString(encString, key);
+    expect(decString).to.equal(text);
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol001.computeRootKey({ password: _password, keyParams: _keyParams });
+    const key = await protocol001.computeRootKey({
+      password: _password,
+      keyParams: _keyParams
+    });
     expect(key.content).to.have.property("serverPassword");
     expect(key.content).to.have.property("masterKey");
     expect(key.compare(_key)).to.be.true;
+  });
+
+  it('generating encryption params includes items_key_id', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol001.createItemsKey();
+    const params = await protocol001.generateEncryptionParameters({
+      payload,
+      key,
+      format: PayloadFormats.EncryptedString
+    });
+    expect(params.content).to.be.ok;
+    expect(params.enc_item_key).to.be.ok;
+    expect(params.auth_hash).to.be.ok;
+    expect(params.items_key_id).to.equal(key.uuid);
+  });
+
+  it('can decrypt encrypted params', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol001.createItemsKey();
+    const params = await protocol001.generateEncryptionParameters({
+      payload,
+      key,
+      format: PayloadFormats.EncryptedString
+    });
+
+    const decrypted = await protocol001.generateDecryptedParameters({
+      encryptedParameters: params,
+      key: key
+    });
+    expect(decrypted.content).to.eql(payload.content);
   });
 });

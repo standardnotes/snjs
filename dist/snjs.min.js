@@ -9114,6 +9114,11 @@ function () {
       for (var _i = 0, _Object$keys = Object.keys(this.payloadMap); _i < _Object$keys.length; _i++) {
         var uuid = _Object$keys[_i];
         var candidate = this.findPayload(uuid);
+
+        if (candidate.errorDecrypting) {
+          continue;
+        }
+
         var references = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(candidate.content.references, 'uuid', payload.uuid);
 
         if (references) {
@@ -10685,7 +10690,7 @@ function (_PurePayload) {
   }], [{
     key: "fields",
     value: function fields() {
-      return [_Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey];
+      return [_Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey];
     }
   }]);
 
@@ -12125,41 +12130,22 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "decryptText",
-    value: function decryptText() {
-      var _ref3,
-          ciphertextToAuth,
-          contentCiphertext,
-          encryptionKey,
-          iv,
-          keyData,
-          ivData,
-          _args4 = arguments;
-
-      return regeneratorRuntime.async(function decryptText$(_context4) {
+    key: "decryptString",
+    value: function decryptString(ciphertext, key) {
+      var keyData, ivData;
+      return regeneratorRuntime.async(function decryptString$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              _ref3 = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {}, ciphertextToAuth = _ref3.ciphertextToAuth, contentCiphertext = _ref3.contentCiphertext, encryptionKey = _ref3.encryptionKey, iv = _ref3.iv;
-              _context4.next = 3;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(encryptionKey));
+              _context4.next = 2;
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
 
-            case 3:
+            case 2:
               keyData = _context4.sent;
-              _context4.next = 6;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv || ''));
+              ivData = new ArrayBuffer(16);
+              return _context4.abrupt("return", this.crypto.aes256CbcDecrypt(ciphertext, keyData, ivData));
 
-            case 6:
-              ivData = _context4.sent;
-
-              if (!ivData) {
-                // in 001, iv can be null, so we'll initialize to an empty array buffer instead
-                ivData = new ArrayBuffer(16);
-              }
-
-              return _context4.abrupt("return", this.crypto.aes256CbcDecrypt(contentCiphertext, keyData, ivData));
-
-            case 9:
+            case 5:
             case "end":
               return _context4.stop();
           }
@@ -12167,32 +12153,22 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "encryptText",
-    value: function encryptText(text, rawKey, iv) {
+    key: "encryptString",
+    value: function encryptString(text, key) {
       var keyData, ivData;
-      return regeneratorRuntime.async(function encryptText$(_context5) {
+      return regeneratorRuntime.async(function encryptString$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(key));
 
             case 2:
               keyData = _context5.sent;
-              _context5.next = 5;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv || ''));
-
-            case 5:
-              ivData = _context5.sent;
-
-              if (!ivData) {
-                // in 001, iv can be null, so we'll initialize to an empty array buffer instead
-                ivData = new ArrayBuffer(16);
-              }
-
+              ivData = new ArrayBuffer(16);
               return _context5.abrupt("return", this.crypto.aes256CbcEncrypt(text, keyData, ivData));
 
-            case 8:
+            case 5:
             case "end":
               return _context5.stop();
           }
@@ -12201,13 +12177,15 @@ function (_SNProtocolOperator) {
     }
   }, {
     key: "generateEncryptionParameters",
-    value: function generateEncryptionParameters(_ref4) {
-      var payload, key, format, itemKey, encItemKey, ek, ak, ciphertext, authHash;
+    value: function generateEncryptionParameters(_ref3) {
+      var _CreateEncryptionPara;
+
+      var payload, key, format, itemKey, encItemKey, ek, ak, contentCiphertext, ciphertext, authHash;
       return regeneratorRuntime.async(function generateEncryptionParameters$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              payload = _ref4.payload, key = _ref4.key, format = _ref4.format;
+              payload = _ref3.payload, key = _ref3.key, format = _ref3.format;
 
               if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
                 _context6.next = 3;
@@ -12243,7 +12221,7 @@ function (_SNProtocolOperator) {
             case 9:
               itemKey = _context6.sent;
               _context6.next = 12;
-              return regeneratorRuntime.awrap(this.encryptText(itemKey, key.itemsKey, null));
+              return regeneratorRuntime.awrap(this.encryptString(itemKey, key.itemsKey));
 
             case 12:
               encItemKey = _context6.sent;
@@ -12258,22 +12236,19 @@ function (_SNProtocolOperator) {
             case 18:
               ak = _context6.sent;
               _context6.next = 21;
-              return regeneratorRuntime.awrap(this.privateEncryptString(JSON.stringify(payload.content), ek, ak, payload.uuid, key.version));
+              return regeneratorRuntime.awrap(this.encryptString(JSON.stringify(payload.content), ek));
 
             case 21:
-              ciphertext = _context6.sent;
-              _context6.next = 24;
+              contentCiphertext = _context6.sent;
+              ciphertext = key.version + contentCiphertext;
+              _context6.next = 25;
               return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertext, ak));
 
-            case 24:
+            case 25:
               authHash = _context6.sent;
-              return _context6.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])({
-                enc_item_key: encItemKey,
-                content: ciphertext,
-                auth_hash: authHash
-              }));
+              return _context6.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, ciphertext), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, encItemKey), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Legacy003AuthHash, authHash), _CreateEncryptionPara)));
 
-            case 26:
+            case 27:
             case "end":
               return _context6.stop();
           }
@@ -12282,14 +12257,14 @@ function (_SNProtocolOperator) {
     }
   }, {
     key: "generateDecryptedParameters",
-    value: function generateDecryptedParameters(_ref5) {
-      var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, _override, itemKey, _override2, itemParams, _override3, content, _override4, _override5;
+    value: function generateDecryptedParameters(_ref4) {
+      var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, _override, itemKey, _override2, ek, itemParams, _override3, content, _override4, _override5;
 
       return regeneratorRuntime.async(function generateDecryptedParameters$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              encryptedParameters = _ref5.encryptedParameters, key = _ref5.key;
+              encryptedParameters = _ref4.encryptedParameters, key = _ref4.key;
               format = encryptedParameters.getContentFormat();
 
               if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
@@ -12330,7 +12305,7 @@ function (_SNProtocolOperator) {
 
             case 13:
               _context7.next = 15;
-              return regeneratorRuntime.awrap(this.decryptText(itemKeyComponents));
+              return regeneratorRuntime.awrap(this.decryptString(itemKeyComponents.contentCiphertext, itemKeyComponents.encryptionKey));
 
             case 15:
               itemKey = _context7.sent;
@@ -12347,10 +12322,15 @@ function (_SNProtocolOperator) {
               }));
 
             case 19:
-              itemParams = this.encryptionComponentsFromString(encryptedParameters.content, itemKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
+              _context7.next = 21;
+              return regeneratorRuntime.awrap(this.firstHalfOfKey(itemKey));
+
+            case 21:
+              ek = _context7.sent;
+              itemParams = this.encryptionComponentsFromString(encryptedParameters.content, ek); // return if uuid in auth hash does not match item uuid. Signs of tampering.
 
               if (!(itemParams.uuid && itemParams.uuid !== encryptedParameters.uuid)) {
-                _context7.next = 22;
+                _context7.next = 25;
                 break;
               }
 
@@ -12359,15 +12339,15 @@ function (_SNProtocolOperator) {
                 override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override3)
               }));
 
-            case 22:
-              _context7.next = 24;
-              return regeneratorRuntime.awrap(this.decryptText(itemParams, true));
+            case 25:
+              _context7.next = 27;
+              return regeneratorRuntime.awrap(this.decryptString(itemParams.contentCiphertext, itemParams.encryptionKey));
 
-            case 24:
+            case 27:
               content = _context7.sent;
 
               if (content) {
-                _context7.next = 29;
+                _context7.next = 32;
                 break;
               }
 
@@ -12376,13 +12356,13 @@ function (_SNProtocolOperator) {
                 override: (_override4 = {}, _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override4)
               }));
 
-            case 29:
+            case 32:
               return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override5 = {}, _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey, false), _override5)
               }));
 
-            case 30:
+            case 33:
             case "end":
               return _context7.stop();
           }
@@ -12400,14 +12380,13 @@ function (_SNProtocolOperator) {
       return {
         contentCiphertext: string.substring(_Protocol_versions__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].VersionLength, string.length),
         encryptionVersion: encryptionVersion,
-        encryptionKey: encryptionKey,
-        iv: null
+        encryptionKey: encryptionKey
       };
     }
   }, {
     key: "deriveKey",
     value: function deriveKey() {
-      var _ref6,
+      var _ref5,
           password,
           pwSalt,
           pwCost,
@@ -12420,7 +12399,7 @@ function (_SNProtocolOperator) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              _ref6 = _args8.length > 0 && _args8[0] !== undefined ? _args8[0] : {}, password = _ref6.password, pwSalt = _ref6.pwSalt, pwCost = _ref6.pwCost;
+              _ref5 = _args8.length > 0 && _args8[0] !== undefined ? _args8[0] : {}, password = _ref5.password, pwSalt = _ref5.pwSalt, pwCost = _ref5.pwCost;
               _context8.next = 3;
               return regeneratorRuntime.awrap(this.crypto.pbkdf2({
                 password: password,
@@ -12455,31 +12434,6 @@ function (_SNProtocolOperator) {
             case 11:
             case "end":
               return _context8.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @private */
-
-  }, {
-    key: "privateEncryptString",
-    value: function privateEncryptString(string, encryptionKey, authKey, uuid, version) {
-      var contentCiphertext, fullCiphertext;
-      return regeneratorRuntime.async(function privateEncryptString$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              _context9.next = 2;
-              return regeneratorRuntime.awrap(this.encryptText(string, encryptionKey, null));
-
-            case 2:
-              contentCiphertext = _context9.sent;
-              fullCiphertext = version + contentCiphertext;
-              return _context9.abrupt("return", fullCiphertext);
-
-            case 5:
-            case "end":
-              return _context9.stop();
           }
         }
       }, null, this);
@@ -12698,78 +12652,26 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "decryptText",
-    value: function decryptText() {
-      var _ref3,
-          ciphertextToAuth,
-          contentCiphertext,
-          encryptionKey,
-          iv,
-          authHash,
-          authKey,
-          requiresAuth,
-          localAuthHash,
-          keyData,
-          ivData,
-          _args4 = arguments;
-
-      return regeneratorRuntime.async(function decryptText$(_context4) {
+    key: "decryptString",
+    value: function decryptString(text, rawKey, iv) {
+      var keyData, ivData;
+      return regeneratorRuntime.async(function decryptString$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              _ref3 = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : {}, ciphertextToAuth = _ref3.ciphertextToAuth, contentCiphertext = _ref3.contentCiphertext, encryptionKey = _ref3.encryptionKey, iv = _ref3.iv, authHash = _ref3.authHash, authKey = _ref3.authKey;
-              requiresAuth = _args4.length > 1 ? _args4[1] : undefined;
+              _context4.next = 2;
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(rawKey));
 
-              if (encryptionKey) {
-                _context4.next = 4;
-                break;
-              }
+            case 2:
+              keyData = _context4.sent;
+              _context4.next = 5;
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv));
 
-              throw 'Attempting to decryptText with null encryptionKey';
-
-            case 4:
-              if (!(requiresAuth && !authHash)) {
-                _context4.next = 7;
-                break;
-              }
-
-              console.error("Auth hash is required.");
-              return _context4.abrupt("return");
+            case 5:
+              ivData = _context4.sent;
+              return _context4.abrupt("return", this.crypto.aes256CbcDecrypt(text, keyData, ivData));
 
             case 7:
-              if (!authHash) {
-                _context4.next = 14;
-                break;
-              }
-
-              _context4.next = 10;
-              return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertextToAuth, authKey));
-
-            case 10:
-              localAuthHash = _context4.sent;
-
-              if (!(this.crypto.timingSafeEqual(authHash, localAuthHash) === false)) {
-                _context4.next = 14;
-                break;
-              }
-
-              console.error("Auth hash does not match, returning null.");
-              return _context4.abrupt("return", null);
-
-            case 14:
-              _context4.next = 16;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(encryptionKey));
-
-            case 16:
-              keyData = _context4.sent;
-              _context4.next = 19;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv || ""));
-
-            case 19:
-              ivData = _context4.sent;
-              return _context4.abrupt("return", this.crypto.aes256CbcDecrypt(contentCiphertext, keyData, ivData));
-
-            case 21:
             case "end":
               return _context4.stop();
           }
@@ -12777,10 +12679,10 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "encryptText",
-    value: function encryptText(text, rawKey, iv) {
+    key: "encryptString",
+    value: function encryptString(text, rawKey, iv) {
       var keyData, ivData;
-      return regeneratorRuntime.async(function encryptText$(_context5) {
+      return regeneratorRuntime.async(function encryptString$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
@@ -12790,7 +12692,7 @@ function (_SNProtocolOperator) {
             case 2:
               keyData = _context5.sent;
               _context5.next = 5;
-              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv || ""));
+              return regeneratorRuntime.awrap(this.crypto.hexStringToArrayBuffer(iv));
 
             case 5:
               ivData = _context5.sent;
@@ -12804,74 +12706,33 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "generateEncryptionParameters",
-    value: function generateEncryptionParameters(_ref4) {
-      var payload, key, format, itemKey, encItemKey, ek, ak, ciphertext;
-      return regeneratorRuntime.async(function generateEncryptionParameters$(_context6) {
+    key: "encryptTextParams",
+    value: function encryptTextParams(string, encryptionKey, authKey, uuid, version) {
+      var iv, contentCiphertext, ciphertextToAuth, authHash, fullCiphertext;
+      return regeneratorRuntime.async(function encryptTextParams$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              payload = _ref4.payload, key = _ref4.key, format = _ref4.format;
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_IV_LENGTH));
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
-                _context6.next = 3;
-                break;
-              }
-
-              return _context6.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator002.prototype), "generateEncryptionParameters", this).call(this, {
-                payload: payload,
-                key: key,
-                format: format
-              }));
-
-            case 3:
-              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].EncryptedString)) {
-                _context6.next = 5;
-                break;
-              }
-
-              throw "Unsupport format for generateEncryptionParameters ".concat(format);
+            case 2:
+              iv = _context6.sent;
+              _context6.next = 5;
+              return regeneratorRuntime.awrap(this.encryptString(string, encryptionKey, iv));
 
             case 5:
-              if (!(!key || !key.itemsKey)) {
-                _context6.next = 7;
-                break;
-              }
-
-              throw 'Attempting to generateEncryptionParameters with no itemsKey.';
-
-            case 7:
+              contentCiphertext = _context6.sent;
+              ciphertextToAuth = [version, uuid, iv, contentCiphertext].join(':');
               _context6.next = 9;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_KEY_LENGTH * 2));
+              return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertextToAuth, authKey));
 
             case 9:
-              itemKey = _context6.sent;
-              _context6.next = 12;
-              return regeneratorRuntime.awrap(this.privateEncryptString(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.version));
+              authHash = _context6.sent;
+              fullCiphertext = [version, authHash, uuid, iv, contentCiphertext].join(':');
+              return _context6.abrupt("return", fullCiphertext);
 
             case 12:
-              encItemKey = _context6.sent;
-              _context6.next = 15;
-              return regeneratorRuntime.awrap(this.firstHalfOfKey(itemKey));
-
-            case 15:
-              ek = _context6.sent;
-              _context6.next = 18;
-              return regeneratorRuntime.awrap(this.secondHalfOfKey(itemKey));
-
-            case 18:
-              ak = _context6.sent;
-              _context6.next = 21;
-              return regeneratorRuntime.awrap(this.privateEncryptString(JSON.stringify(payload.content), ek, ak, payload.uuid, key.version));
-
-            case 21:
-              ciphertext = _context6.sent;
-              return _context6.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])({
-                content: ciphertext,
-                enc_item_key: encItemKey
-              }));
-
-            case 23:
             case "end":
               return _context6.stop();
           }
@@ -12879,39 +12740,155 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "generateDecryptedParameters",
-    value: function generateDecryptedParameters(_ref5) {
-      var encryptedParameters, key, format, encryptedItemKey, requiresAuth, itemKeyComponents, _override, itemKey, _override2, ek, ak, itemParams, _override3, content, _override4, _override5, authParams;
-
-      return regeneratorRuntime.async(function generateDecryptedParameters$(_context7) {
+    key: "decryptTextParams",
+    value: function decryptTextParams(_ref3) {
+      var ciphertextToAuth, contentCiphertext, encryptionKey, iv, authHash, authKey, localAuthHash;
+      return regeneratorRuntime.async(function decryptTextParams$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
+            case 0:
+              ciphertextToAuth = _ref3.ciphertextToAuth, contentCiphertext = _ref3.contentCiphertext, encryptionKey = _ref3.encryptionKey, iv = _ref3.iv, authHash = _ref3.authHash, authKey = _ref3.authKey;
+
+              if (encryptionKey) {
+                _context7.next = 3;
+                break;
+              }
+
+              throw 'Attempting to decryptTextParams with null encryptionKey';
+
+            case 3:
+              _context7.next = 5;
+              return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertextToAuth, authKey));
+
+            case 5:
+              localAuthHash = _context7.sent;
+
+              if (!(this.crypto.timingSafeEqual(authHash, localAuthHash) === false)) {
+                _context7.next = 9;
+                break;
+              }
+
+              console.error("Auth hash does not match, returning null.");
+              return _context7.abrupt("return", null);
+
+            case 9:
+              return _context7.abrupt("return", this.decryptString(contentCiphertext, encryptionKey, iv));
+
+            case 10:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "generateEncryptionParameters",
+    value: function generateEncryptionParameters(_ref4) {
+      var _CreateEncryptionPara;
+
+      var payload, key, format, itemKey, encItemKey, ek, ak, ciphertext;
+      return regeneratorRuntime.async(function generateEncryptionParameters$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              payload = _ref4.payload, key = _ref4.key, format = _ref4.format;
+
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
+                _context8.next = 3;
+                break;
+              }
+
+              return _context8.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator002.prototype), "generateEncryptionParameters", this).call(this, {
+                payload: payload,
+                key: key,
+                format: format
+              }));
+
+            case 3:
+              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].EncryptedString)) {
+                _context8.next = 5;
+                break;
+              }
+
+              throw "Unsupport format for generateEncryptionParameters ".concat(format);
+
+            case 5:
+              if (!(!key || !key.itemsKey)) {
+                _context8.next = 7;
+                break;
+              }
+
+              throw 'Attempting to generateEncryptionParameters with no itemsKey.';
+
+            case 7:
+              _context8.next = 9;
+              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_KEY_LENGTH * 2));
+
+            case 9:
+              itemKey = _context8.sent;
+              _context8.next = 12;
+              return regeneratorRuntime.awrap(this.encryptTextParams(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.version));
+
+            case 12:
+              encItemKey = _context8.sent;
+              _context8.next = 15;
+              return regeneratorRuntime.awrap(this.firstHalfOfKey(itemKey));
+
+            case 15:
+              ek = _context8.sent;
+              _context8.next = 18;
+              return regeneratorRuntime.awrap(this.secondHalfOfKey(itemKey));
+
+            case 18:
+              ak = _context8.sent;
+              _context8.next = 21;
+              return regeneratorRuntime.awrap(this.encryptTextParams(JSON.stringify(payload.content), ek, ak, payload.uuid, key.version));
+
+            case 21:
+              ciphertext = _context8.sent;
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, ciphertext), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, encItemKey), _CreateEncryptionPara)));
+
+            case 23:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "generateDecryptedParameters",
+    value: function generateDecryptedParameters(_ref5) {
+      var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, itemKey, _override, ek, ak, itemParams, content, _override2, _override3, authParams;
+
+      return regeneratorRuntime.async(function generateDecryptedParameters$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               encryptedParameters = _ref5.encryptedParameters, key = _ref5.key;
               format = encryptedParameters.getContentFormat();
 
               if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
-                _context7.next = 4;
+                _context9.next = 4;
                 break;
               }
 
-              return _context7.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator002.prototype), "generateDecryptedParameters", this).call(this, {
+              return _context9.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator002.prototype), "generateDecryptedParameters", this).call(this, {
                 encryptedParameters: encryptedParameters,
                 key: key
               }));
 
             case 4:
               if (encryptedParameters.enc_item_key) {
-                _context7.next = 7;
+                _context9.next = 7;
                 break;
               }
 
               console.error("Missing item encryption key, skipping decryption.");
-              return _context7.abrupt("return", encryptedParameters);
+              return _context9.abrupt("return", encryptedParameters);
 
             case 7:
               if (!(!key || !key.itemsKey)) {
-                _context7.next = 9;
+                _context9.next = 9;
                 break;
               }
 
@@ -12920,106 +12897,80 @@ function (_SNProtocolOperator) {
             case 9:
               // decrypt encrypted key
               encryptedItemKey = encryptedParameters.enc_item_key;
-              requiresAuth = true;
-              itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey, key.dataAuthenticationKey); // return if uuid in auth hash does not match item uuid. Signs of tampering.
+              itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey, key.dataAuthenticationKey);
+              _context9.next = 13;
+              return regeneratorRuntime.awrap(this.decryptTextParams(itemKeyComponents));
 
-              if (!(itemKeyComponents.uuid && itemKeyComponents.uuid !== encryptedParameters.uuid)) {
-                _context7.next = 15;
+            case 13:
+              itemKey = _context9.sent;
+
+              if (itemKey) {
+                _context9.next = 17;
                 break;
               }
 
-              console.error("Item key params UUID does not match item UUID");
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              console.error("Error decrypting item_key parameters", encryptedParameters);
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
               }));
 
-            case 15:
-              _context7.next = 17;
-              return regeneratorRuntime.awrap(this.decryptText(itemKeyComponents, requiresAuth));
-
             case 17:
-              itemKey = _context7.sent;
+              _context9.next = 19;
+              return regeneratorRuntime.awrap(this.firstHalfOfKey(itemKey));
 
-              if (itemKey) {
-                _context7.next = 21;
+            case 19:
+              ek = _context9.sent;
+              _context9.next = 22;
+              return regeneratorRuntime.awrap(this.secondHalfOfKey(itemKey));
+
+            case 22:
+              ak = _context9.sent;
+              itemParams = this.encryptionComponentsFromString(encryptedParameters.content, ek, ak);
+              _context9.next = 26;
+              return regeneratorRuntime.awrap(this.decryptTextParams(itemParams));
+
+            case 26:
+              content = _context9.sent;
+
+              if (content) {
+                _context9.next = 31;
                 break;
               }
 
-              itemKey.error("Error decrypting item_key parameters", encryptedParameters);
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
               }));
 
-            case 21:
-              _context7.next = 23;
-              return regeneratorRuntime.awrap(this.firstHalfOfKey(itemKey));
-
-            case 23:
-              ek = _context7.sent;
-              _context7.next = 26;
-              return regeneratorRuntime.awrap(this.secondHalfOfKey(itemKey));
-
-            case 26:
-              ak = _context7.sent;
-              itemParams = this.encryptionComponentsFromString(encryptedParameters.content, ek, ak); // return if uuid in auth hash does not match item uuid. Signs of tampering.
-
-              if (!(itemParams.uuid && itemParams.uuid !== encryptedParameters.uuid)) {
-                _context7.next = 30;
-                break;
-              }
-
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
-                encryptionParameters: encryptedParameters,
-                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override3)
-              }));
-
-            case 30:
-              _context7.next = 32;
-              return regeneratorRuntime.awrap(this.decryptText(itemParams, true));
-
-            case 32:
-              content = _context7.sent;
-
-              if (content) {
-                _context7.next = 37;
-                break;
-              }
-
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
-                encryptionParameters: encryptedParameters,
-                override: (_override4 = {}, _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override4)
-              }));
-
-            case 37:
-              _context7.prev = 37;
-              _context7.t0 = JSON;
-              _context7.next = 41;
+            case 31:
+              _context9.prev = 31;
+              _context9.t0 = JSON;
+              _context9.next = 35;
               return regeneratorRuntime.awrap(this.crypto.base64Decode(itemParams.authParams));
 
-            case 41:
-              _context7.t1 = _context7.sent;
-              authParams = _context7.t0.parse.call(_context7.t0, _context7.t1);
-              _context7.next = 47;
+            case 35:
+              _context9.t1 = _context9.sent;
+              authParams = _context9.t0.parse.call(_context9.t0, _context9.t1);
+              _context9.next = 41;
               break;
 
-            case 45:
-              _context7.prev = 45;
-              _context7.t2 = _context7["catch"](37);
+            case 39:
+              _context9.prev = 39;
+              _context9.t2 = _context9["catch"](31);
 
-            case 47:
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+            case 41:
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
-                override: (_override5 = {}, _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Legacy003AuthParams, authParams), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey, false), _override5)
+                override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Legacy003AuthParams, authParams), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey, false), _override3)
               }));
 
-            case 48:
+            case 42:
             case "end":
-              return _context7.stop();
+              return _context9.stop();
           }
         }
-      }, null, this, [[37, 45]]);
+      }, null, this, [[31, 39]]);
     }
     /** @protected */
 
@@ -13033,23 +12984,23 @@ function (_SNProtocolOperator) {
           derivedKey,
           partitions,
           key,
-          _args8 = arguments;
+          _args10 = arguments;
 
-      return regeneratorRuntime.async(function deriveKey$(_context8) {
+      return regeneratorRuntime.async(function deriveKey$(_context10) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
-              _ref6 = _args8.length > 0 && _args8[0] !== undefined ? _args8[0] : {}, password = _ref6.password, pwSalt = _ref6.pwSalt, pwCost = _ref6.pwCost;
+              _ref6 = _args10.length > 0 && _args10[0] !== undefined ? _args10[0] : {}, password = _ref6.password, pwSalt = _ref6.pwSalt, pwCost = _ref6.pwCost;
 
               if (!(!pwCost || !pwSalt || !password)) {
-                _context8.next = 3;
+                _context10.next = 3;
                 break;
               }
 
               throw 'Attempting to 003.deriveKey with invalid parameters';
 
             case 3:
-              _context8.next = 5;
+              _context10.next = 5;
               return regeneratorRuntime.awrap(this.crypto.pbkdf2({
                 password: password,
                 salt: pwSalt,
@@ -13058,16 +13009,16 @@ function (_SNProtocolOperator) {
               }));
 
             case 5:
-              derivedKey = _context8.sent;
-              _context8.next = 8;
+              derivedKey = _context10.sent;
+              _context10.next = 8;
               return regeneratorRuntime.awrap(this.splitKey({
                 key: derivedKey,
                 numParts: 3
               }));
 
             case 8:
-              partitions = _context8.sent;
-              _context8.next = 11;
+              partitions = _context10.sent;
+              _context10.next = 11;
               return regeneratorRuntime.awrap(_Protocol_versions_root_key__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
                 content: {
                   serverPassword: partitions[0],
@@ -13078,48 +13029,12 @@ function (_SNProtocolOperator) {
               }));
 
             case 11:
-              key = _context8.sent;
-              return _context8.abrupt("return", key);
+              key = _context10.sent;
+              return _context10.abrupt("return", key);
 
             case 13:
             case "end":
-              return _context8.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @private */
-
-  }, {
-    key: "privateEncryptString",
-    value: function privateEncryptString(string, encryptionKey, authKey, uuid, version) {
-      var iv, contentCiphertext, ciphertextToAuth, authHash, fullCiphertext;
-      return regeneratorRuntime.async(function privateEncryptString$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              _context9.next = 2;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_IV_LENGTH));
-
-            case 2:
-              iv = _context9.sent;
-              _context9.next = 5;
-              return regeneratorRuntime.awrap(this.encryptText(string, encryptionKey, iv));
-
-            case 5:
-              contentCiphertext = _context9.sent;
-              ciphertextToAuth = [version, uuid, iv, contentCiphertext].join(':');
-              _context9.next = 9;
-              return regeneratorRuntime.awrap(this.crypto.hmac256(ciphertextToAuth, authKey));
-
-            case 9:
-              authHash = _context9.sent;
-              fullCiphertext = [version, authHash, uuid, iv, contentCiphertext].join(':');
-              return _context9.abrupt("return", fullCiphertext);
-
-            case 12:
-            case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -13577,10 +13492,10 @@ function (_SNProtocolOperator) {
      */
 
   }, {
-    key: "encryptText",
-    value: function encryptText(_ref4) {
+    key: "encryptString",
+    value: function encryptString(_ref4) {
       var plaintext, rawKey, iv, aad, keyData, ivData, aadData;
-      return regeneratorRuntime.async(function encryptText$(_context5) {
+      return regeneratorRuntime.async(function encryptString$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
@@ -13632,10 +13547,10 @@ function (_SNProtocolOperator) {
      */
 
   }, {
-    key: "decryptText",
-    value: function decryptText(_ref5) {
+    key: "decryptString",
+    value: function decryptString(_ref5) {
       var ciphertext, rawKey, iv, aad, keyData, ivData, aadData;
-      return regeneratorRuntime.async(function decryptText$(_context6) {
+      return regeneratorRuntime.async(function decryptString$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
@@ -13679,74 +13594,37 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "generateEncryptionParameters",
-    value: function generateEncryptionParameters(_ref6) {
-      var _CreateEncryptionPara;
-
-      var payload, key, format, itemKey, contentPlaintext, encryptedContentString, encryptedItemKey;
-      return regeneratorRuntime.async(function generateEncryptionParameters$(_context7) {
+    key: "generateEncryptedProtocolString",
+    value: function generateEncryptedProtocolString(_ref6) {
+      var plaintext, rawKey, itemUuid, version, iv, ciphertext, payload;
+      return regeneratorRuntime.async(function generateEncryptedProtocolString$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              payload = _ref6.payload, key = _ref6.key, format = _ref6.format;
+              plaintext = _ref6.plaintext, rawKey = _ref6.rawKey, itemUuid = _ref6.itemUuid;
+              version = this.constructor.versionString();
+              _context7.next = 4;
+              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_IV_LENGTH));
 
-              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
-                _context7.next = 3;
-                break;
-              }
-
-              return _context7.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator004.prototype), "generateEncryptionParameters", this).call(this, {
-                payload: payload,
-                key: key,
-                format: format
+            case 4:
+              iv = _context7.sent;
+              _context7.next = 7;
+              return regeneratorRuntime.awrap(this.encryptString({
+                plaintext: plaintext,
+                rawKey: rawKey,
+                iv: iv,
+                aad: {
+                  u: itemUuid,
+                  v: version
+                }
               }));
-
-            case 3:
-              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].EncryptedString)) {
-                _context7.next = 5;
-                break;
-              }
-
-              throw "Unsupport format for generateEncryptionParameters ".concat(format);
-
-            case 5:
-              if (!(!key || !key.itemsKey)) {
-                _context7.next = 7;
-                break;
-              }
-
-              throw 'Attempting to generateEncryptionParameters with no itemsKey.';
 
             case 7:
-              _context7.next = 9;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_KEY_LENGTH));
+              ciphertext = _context7.sent;
+              payload = [version, itemUuid, iv, ciphertext].join(':');
+              return _context7.abrupt("return", payload);
 
-            case 9:
-              itemKey = _context7.sent;
-
-              /** Encrypt content with item_key */
-              contentPlaintext = JSON.stringify(payload.content);
-              _context7.next = 13;
-              return regeneratorRuntime.awrap(this.generateEncryptedString({
-                plaintext: contentPlaintext,
-                rawKey: itemKey,
-                itemUuid: payload.uuid
-              }));
-
-            case 13:
-              encryptedContentString = _context7.sent;
-              _context7.next = 16;
-              return regeneratorRuntime.awrap(this.generateEncryptedString({
-                plaintext: itemKey,
-                rawKey: key.itemsKey,
-                itemUuid: payload.uuid
-              }));
-
-            case 16:
-              encryptedItemKey = _context7.sent;
-              return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, encryptedItemKey), _CreateEncryptionPara)));
-
-            case 18:
+            case 10:
             case "end":
               return _context7.stop();
           }
@@ -13754,30 +13632,105 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
   }, {
-    key: "generateDecryptedParameters",
-    value: function generateDecryptedParameters(_ref7) {
-      var encryptedParameters, key, format, itemKeyComponents, itemKey, _override, contentComponents, content, _override2, _override3;
+    key: "generateEncryptionParameters",
+    value: function generateEncryptionParameters(_ref7) {
+      var _CreateEncryptionPara;
 
-      return regeneratorRuntime.async(function generateDecryptedParameters$(_context8) {
+      var payload, key, format, itemKey, contentPlaintext, encryptedContentString, encryptedItemKey;
+      return regeneratorRuntime.async(function generateEncryptionParameters$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              encryptedParameters = _ref7.encryptedParameters, key = _ref7.key;
-              format = encryptedParameters.getContentFormat();
+              payload = _ref7.payload, key = _ref7.key, format = _ref7.format;
 
               if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
-                _context8.next = 4;
+                _context8.next = 3;
                 break;
               }
 
-              return _context8.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator004.prototype), "generateDecryptedParameters", this).call(this, {
+              return _context8.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator004.prototype), "generateEncryptionParameters", this).call(this, {
+                payload: payload,
+                key: key,
+                format: format
+              }));
+
+            case 3:
+              if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].EncryptedString)) {
+                _context8.next = 5;
+                break;
+              }
+
+              throw "Unsupport format for generateEncryptionParameters ".concat(format);
+
+            case 5:
+              if (!(!key || !key.itemsKey)) {
+                _context8.next = 7;
+                break;
+              }
+
+              throw 'Attempting to generateEncryptionParameters with no itemsKey.';
+
+            case 7:
+              _context8.next = 9;
+              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_KEY_LENGTH));
+
+            case 9:
+              itemKey = _context8.sent;
+
+              /** Encrypt content with item_key */
+              contentPlaintext = JSON.stringify(payload.content);
+              _context8.next = 13;
+              return regeneratorRuntime.awrap(this.generateEncryptedProtocolString({
+                plaintext: contentPlaintext,
+                rawKey: itemKey,
+                itemUuid: payload.uuid
+              }));
+
+            case 13:
+              encryptedContentString = _context8.sent;
+              _context8.next = 16;
+              return regeneratorRuntime.awrap(this.generateEncryptedProtocolString({
+                plaintext: itemKey,
+                rawKey: key.itemsKey,
+                itemUuid: payload.uuid
+              }));
+
+            case 16:
+              encryptedItemKey = _context8.sent;
+              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateEncryptionParameters"])((_CreateEncryptionPara = {}, _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ItemsKeyId, key.isItemsKey ? key.uuid : null), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, encryptedContentString), _defineProperty(_CreateEncryptionPara, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].EncItemKey, encryptedItemKey), _CreateEncryptionPara)));
+
+            case 18:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "generateDecryptedParameters",
+    value: function generateDecryptedParameters(_ref8) {
+      var encryptedParameters, key, format, itemKeyComponents, itemKey, _override, contentComponents, content, _override2, _override3;
+
+      return regeneratorRuntime.async(function generateDecryptedParameters$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              encryptedParameters = _ref8.encryptedParameters, key = _ref8.key;
+              format = encryptedParameters.getContentFormat();
+
+              if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String)) {
+                _context9.next = 4;
+                break;
+              }
+
+              return _context9.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator004.prototype), "generateDecryptedParameters", this).call(this, {
                 encryptedParameters: encryptedParameters,
                 key: key
               }));
 
             case 4:
               if (!(!key || !key.itemsKey)) {
-                _context8.next = 6;
+                _context9.next = 6;
                 break;
               }
 
@@ -13786,27 +13739,27 @@ function (_SNProtocolOperator) {
             case 6:
               /** Decrypt item_key payload. */
               itemKeyComponents = this.deconstructEncryptedPayloadString(encryptedParameters.enc_item_key);
-              _context8.next = 9;
-              return regeneratorRuntime.awrap(this.decryptText({
+              _context9.next = 9;
+              return regeneratorRuntime.awrap(this.decryptString({
                 ciphertext: itemKeyComponents.ciphertext,
                 rawKey: key.itemsKey,
                 iv: itemKeyComponents.iv,
                 aad: {
-                  u: encryptedParameters.uuid,
+                  u: itemKeyComponents.uuid,
                   v: itemKeyComponents.version
                 }
               }));
 
             case 9:
-              itemKey = _context8.sent;
+              itemKey = _context9.sent;
 
               if (itemKey) {
-                _context8.next = 13;
+                _context9.next = 13;
                 break;
               }
 
-              console.error('Error decrypting parameters', encryptedParameters);
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              console.error('Error decrypting itemKey parameters', encryptedParameters);
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
               }));
@@ -13814,39 +13767,39 @@ function (_SNProtocolOperator) {
             case 13:
               /** Decrypt content payload. */
               contentComponents = this.deconstructEncryptedPayloadString(encryptedParameters.content);
-              _context8.next = 16;
-              return regeneratorRuntime.awrap(this.decryptText({
+              _context9.next = 16;
+              return regeneratorRuntime.awrap(this.decryptString({
                 ciphertext: contentComponents.ciphertext,
                 rawKey: itemKey,
                 iv: contentComponents.iv,
                 aad: {
-                  u: encryptedParameters.uuid,
+                  u: contentComponents.uuid,
                   v: contentComponents.version
                 }
               }));
 
             case 16:
-              content = _context8.sent;
+              content = _context9.sent;
 
               if (content) {
-                _context8.next = 21;
+                _context9.next = 21;
                 break;
               }
 
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
               }));
 
             case 21:
-              return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
+              return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].WaitingForKey, false), _override3)
               }));
 
             case 22:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -13865,44 +13818,6 @@ function (_SNProtocolOperator) {
         iv: components[2],
         ciphertext: components[3]
       };
-    }
-  }, {
-    key: "generateEncryptedString",
-    value: function generateEncryptedString(_ref8) {
-      var plaintext, rawKey, itemUuid, version, iv, ciphertext, payload;
-      return regeneratorRuntime.async(function generateEncryptedString$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              plaintext = _ref8.plaintext, rawKey = _ref8.rawKey, itemUuid = _ref8.itemUuid;
-              version = this.constructor.versionString();
-              _context9.next = 4;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ENCRYPTION_IV_LENGTH));
-
-            case 4:
-              iv = _context9.sent;
-              _context9.next = 7;
-              return regeneratorRuntime.awrap(this.encryptText({
-                plaintext: plaintext,
-                rawKey: rawKey,
-                iv: iv,
-                aad: {
-                  u: itemUuid,
-                  v: version
-                }
-              }));
-
-            case 7:
-              ciphertext = _context9.sent;
-              payload = [version, itemUuid, iv, ciphertext].join(':');
-              return _context9.abrupt("return", payload);
-
-            case 10:
-            case "end":
-              return _context9.stop();
-          }
-        }
-      }, null, this);
     }
   }, {
     key: "deriveKey",
@@ -14111,15 +14026,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
 
 
 

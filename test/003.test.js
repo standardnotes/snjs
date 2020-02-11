@@ -72,11 +72,9 @@ describe('003 protocol operations', () => {
     const text = "hello world";
     const rawKey = _key.masterKey;
     const iv = await protocol003.crypto.generateRandomKey(128);
-    const wcEncryptionResult = await protocol003.encryptText(text, rawKey, iv);
-    const wcDecryptionResult = await protocol003.decryptText({
-      contentCiphertext: wcEncryptionResult, encryptionKey: rawKey, iv: iv
-    });
-    expect(wcDecryptionResult).to.equal(text);
+    const encString = await protocol003.encryptString(text, rawKey, iv);
+    const decString = await protocol003.decryptString(encString, rawKey, iv);
+    expect(decString).to.equal(text);
   });
 
   it('generates existing keys for key params', async () => {
@@ -85,5 +83,34 @@ describe('003 protocol operations', () => {
       keyParams: _keyParams
     });
     expect(key.compare(_key)).to.be.true;
+  });
+
+  it('generating encryption params includes items_key_id', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol003.createItemsKey();
+    const params = await protocol003.generateEncryptionParameters({ 
+      payload, 
+      key, 
+      format: PayloadFormats.EncryptedString
+    });
+    expect(params.content).to.be.ok;
+    expect(params.enc_item_key).to.be.ok;
+    expect(params.items_key_id).to.equal(key.uuid);
+  });
+
+  it('can decrypt encrypted params', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol003.createItemsKey();
+    const params = await protocol003.generateEncryptionParameters({
+      payload,
+      key,
+      format: PayloadFormats.EncryptedString
+    });
+
+    const decrypted = await protocol003.generateDecryptedParameters({
+      encryptedParameters: params,
+      key: key
+    });
+    expect(decrypted.content).to.eql(payload.content);
   });
 });

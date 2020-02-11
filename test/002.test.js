@@ -20,7 +20,7 @@ describe('002 protocol operations', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(application);
-    const result = await protocol002.createRootKey({identifier: _identifier, password: _password});
+    const result = await protocol002.createRootKey({ identifier: _identifier, password: _password });
     _keyParams = result.keyParams;
     _key = result.key;
   });
@@ -36,11 +36,11 @@ describe('002 protocol operations', () => {
   it('generates random key', async () => {
     const length = 128;
     const key = await protocol002.crypto.generateRandomKey(length);
-    expect(key.length).to.equal(length/4);
+    expect(key.length).to.equal(length / 4);
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol002.createRootKey({identifier: _identifier, password: _password});
+    const result = await protocol002.createRootKey({ identifier: _identifier, password: _password });
     expect(result).to.have.property("key");
     expect(result).to.have.property("keyParams");
 
@@ -53,20 +53,46 @@ describe('002 protocol operations', () => {
     expect(result.keyParams.salt).to.not.be.null;
   });
 
-  it('properly encrypts and decrypts', async () => {
-    var text = "hello world";
-    var key = _key.masterKey;
-    var iv = await protocol002.crypto.generateRandomKey(128);
-    let wcEncryptionResult = await protocol002.encryptText(text, key, iv);
-    let wcDecryptionResult = await protocol002.decryptText({
-      contentCiphertext: wcEncryptionResult, encryptionKey: key, iv: iv
-    });
-    expect(wcDecryptionResult).to.equal(text);
+  it('properly encrypts and decrypts strings', async () => {
+    const text = "hello world";
+    const key = _key.masterKey;
+    const iv = await protocol002.crypto.generateRandomKey(128);
+    const encString = await protocol002.encryptString(text, key, iv);
+    const decString = await protocol002.decryptString(encString, key, iv);
+    expect(decString).to.equal(text);
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol002.computeRootKey({password: _password, keyParams: _keyParams});
+    const key = await protocol002.computeRootKey({ password: _password, keyParams: _keyParams });
     expect(key.compare(_key)).to.be.true;
   });
 
-})
+  it('generating encryption params includes items_key_id', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol002.createItemsKey();
+    const params = await protocol002.generateEncryptionParameters({
+      payload,
+      key,
+      format: PayloadFormats.EncryptedString
+    });
+    expect(params.content).to.be.ok;
+    expect(params.enc_item_key).to.be.ok;
+    expect(params.items_key_id).to.equal(key.uuid);
+  });
+
+  it('can decrypt encrypted params', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol002.createItemsKey();
+    const params = await protocol002.generateEncryptionParameters({
+      payload,
+      key,
+      format: PayloadFormats.EncryptedString
+    });
+
+    const decrypted = await protocol002.generateDecryptedParameters({
+      encryptedParameters: params,
+      key: key
+    });
+    expect(decrypted.content).to.eql(payload.content);
+  });
+});
