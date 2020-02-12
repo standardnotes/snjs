@@ -8,7 +8,7 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("storage manager", () => {
+describe.only("storage manager", () => {
   /**
    * Items are saved in localStorage in tests.
    * Base keys are `storage` and `last_migration_timestamp`
@@ -23,7 +23,7 @@ describe("storage manager", () => {
   });
 
   after(async function () {
-    localStorage.clear();
+    // localStorage.clear();
     await sharedApplication.deinit();
   });
 
@@ -37,7 +37,7 @@ describe("storage manager", () => {
 
   afterEach(async function() {
     await this.application.deinit();
-    localStorage.clear();
+    // localStorage.clear();
   });
 
   it("should set and retrieve values", async function () {
@@ -60,6 +60,18 @@ describe("storage manager", () => {
     await sharedApplication.storageManager.setValue(key, value);
     await sharedApplication.storageManager.clearAllData();
     expect(await sharedApplication.storageManager.getValue(key)).to.not.be.ok;
+  });
+
+  it("serverPassword should not be saved to keychain", async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: false
+    });
+    const keychainValue = await this.application.deviceInterface.getKeychainValue();
+    expect(keychainValue.masterKey).to.be.ok;
+    expect(keychainValue.serverPassword).to.not.be.ok;
   });
 
   it("regular session should persist data", async function () {
@@ -97,6 +109,128 @@ describe("storage manager", () => {
     expect(Object.keys(localStorage).length).to.equal(0);
     const retrievedValue = await this.application.storageManager.getValue(key);
     expect(retrievedValue).to.equal(value);
+  });
+
+  it("storage with no account and no passcode should not be encrypted", async function () {
+    await this.application.setValue('foo', 'bar');
+    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: wrappedValue
+    });
+    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+  });
+
+  it("storage aftering adding passcode should be encrypted", async function () {
+    await this.application.setValue('foo', 'bar');
+    await this.application.setPasscode('123');
+    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: wrappedValue
+    });
+    expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+  });
+
+  it("storage aftering adding passcode then removing passcode should not be encrypted", async function () {
+    await this.application.setValue('foo', 'bar');
+    await this.application.setPasscode('123');
+    await this.application.setValue('bar', 'foo');
+    await this.application.removePasscode();
+    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: wrappedValue
+    });
+    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+  });
+
+  it("storage aftering adding passcode/removing passcode w/account should be encrypted", async function () {
+    /** 
+     * After setting passcode, we expect that the keychain has been cleared, as the account keys 
+     * are now wrapped in storage with the passcode. Once the passcode is removed, we expect
+     * the account keys to be moved to the keychain.
+     * */
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+    expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
+    await this.application.setValue('foo', 'bar');
+    await this.application.setPasscode('123');
+    expect(await this.application.deviceInterface.getKeychainValue()).to.not.be.ok;
+    await this.application.setValue('bar', 'foo');
+    await this.application.removePasscode();
+    expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
+
+    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: wrappedValue
+    });
+    expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+  });
+
+  it("adding account should encrypt storage with account keys", async function () {
+    await this.application.setValue('foo', 'bar');
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: true
+    });
+    const accountKey = await this.application.keyManager.getRootKey();
+    expect(await this.application.storageManager.canDecryptWithKey(accountKey)).to.equal(true);
+  });
+
+  it("signing out of account should decrypt storage", async function () {
+    await this.application.setValue('foo', 'bar');
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: true
+    });
+    await this.application.signOut();
+    await this.application.setValue('bar', 'foo');
+    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const payload = CreateMaxPayloadFromAnyObject({
+      object: wrappedValue
+    });
+    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+  });
+  
+  it("adding account then passcode should encrypt storage with account keys", async function () {
+    /** Should encrypt storage with account keys and encrypt account keys with passcode */
+    await this.application.setValue('foo', 'bar');
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: true
+    });
+
+    /** Should not be wrapped root key yet */
+    expect(await this.application.keyManager.getWrappedRootKeyFromStorage()).to.not.be.ok;
+    
+    const passcode = '123';
+    await this.application.setPasscode(passcode);
+    await this.application.setValue('bar', 'foo');
+    
+    /** Root key should now be wrapped */
+    expect(await this.application.keyManager.getWrappedRootKeyFromStorage()).to.be.ok;
+  
+    const accountKey = await this.application.keyManager.getRootKey();
+    expect(await this.application.storageManager.canDecryptWithKey(accountKey)).to.equal(true);
+    const passcodeKey = await this.application.keyManager.computeWrappingKey({
+      passcode: passcode
+    });
+    const wrappedRootKey = await this.application.keyManager.getWrappedRootKeyFromStorage();
+    /** Expect that we can decrypt wrapped root key with passcode key */
+    const payload = CreateMaxPayloadFromAnyObject({object: wrappedRootKey});
+    const decrypted = await this.application.protocolService.payloadByDecryptingPayload({
+      payload: payload,
+      key: passcodeKey
+    });
+    expect(decrypted.errorDecrypting).to.equal(false);
+    expect(decrypted.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   });
 
   it("disabling storage encryption should store items without encryption", async function () {

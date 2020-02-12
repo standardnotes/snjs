@@ -8,7 +8,7 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('application instances', () => {
+describe('application instances', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   before(async () => {

@@ -83,7 +83,7 @@ export default class WebDeviceInterface extends DeviceInterface {
 
 
   /** @keychian */
-  async getRawKeychainValue() {
+  async getKeychainValue() {
     return this.keychainValue;
   }
 

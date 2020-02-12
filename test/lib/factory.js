@@ -57,6 +57,30 @@ export default class Factory {
     await application.launch({awaitDatabaseLoad: true});
   }
 
+  static async createInitAppWithPasscode(passcode) {
+    const namespace = Factory.randomString();
+    const application = await Factory.createAndInitializeApplication(namespace);
+    await application.setPasscode(passcode);
+    const handleChallenges = async (challenges) => {
+      const responses = [];
+      for (const challenge of challenges) {
+        if (challenge === Challenges.LocalPasscode) {
+          const value = passcode;
+          const response = new ChallengeResponse({ challenge, value });
+          responses.push(response);
+        }
+      }
+      return responses;
+    };
+    await application.prepareForLaunch({
+      callbacks: {
+        requiresChallengeResponses: handleChallenges,
+        handleChallengeFailures: () => { }
+      }
+    });
+    await application.launch();
+  }
+
   static async registerUserToApplication({application, email, password, ephemeral, mergeLocal = true}) {
     if(!email) email = this.generateUuid();
     if(!password) password = this.generateUuid();
