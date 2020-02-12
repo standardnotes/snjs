@@ -1338,9 +1338,10 @@ function () {
 
             case 16:
               this.started = true;
-              this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].ApplicationStarted);
+              _context.next = 19;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].Started));
 
-            case 18:
+            case 19:
             case "end":
               return _context.stop();
           }
@@ -1395,24 +1396,27 @@ function () {
             case 10:
               this.historyManager.initializeFromDisk();
               this.unlocked = true;
-              this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].ApplicationUnlocked);
-              _context3.next = 15;
+              _context3.next = 14;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].Unlocked));
+
+            case 14:
+              _context3.next = 16;
               return regeneratorRuntime.awrap(this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].StorageDecrypted_09));
 
-            case 15:
-              _context3.next = 17;
+            case 16:
+              _context3.next = 18;
               return regeneratorRuntime.awrap(this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].Launched_10));
 
-            case 17:
-              _context3.next = 19;
+            case 18:
+              _context3.next = 20;
               return regeneratorRuntime.awrap(this.syncManager.getDatabasePayloads());
 
-            case 19:
+            case 20:
               databasePayloads = _context3.sent;
-              _context3.next = 22;
+              _context3.next = 23;
               return regeneratorRuntime.awrap(this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].LoadingDatabase_11));
 
-            case 22:
+            case 23:
               /**
               * We don't want to await this, as we want to begin allowing the app to function
               * before local data has been loaded fully. We await only initial
@@ -1450,14 +1454,14 @@ function () {
               });
 
               if (!awaitDatabaseLoad) {
-                _context3.next = 26;
+                _context3.next = 27;
                 break;
               }
 
-              _context3.next = 26;
+              _context3.next = 27;
               return regeneratorRuntime.awrap(loadPromise);
 
-            case 26:
+            case 27:
             case "end":
               return _context3.stop();
           }
@@ -1724,87 +1728,26 @@ function () {
 
   }, {
     key: "addEventObserver",
-    value: function addEventObserver(callback, singleEvent, singleUse, autoUnsubscribe) {
+    value: function addEventObserver(callback, singleEvent) {
       var _this4 = this;
 
       var observer = {
         callback: callback,
-        singleEvent: singleEvent,
-        singleUse: singleUse,
-        autoUnsubscribe: autoUnsubscribe
+        singleEvent: singleEvent
       };
       this.eventHandlers.push(observer);
       return function () {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(_this4.eventHandlers, observer);
       };
     }
-    /** @public */
-
   }, {
-    key: "onSync",
-    value: function onSync(callback) {
-      var event = _Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync;
-      var singleUse = false;
-      var autoUnsubscribe = true;
+    key: "addSingleEventObserver",
+    value: function addSingleEventObserver(event, callback) {
       return this.addEventObserver(function (firedEvent) {
         if (firedEvent === event) {
           callback();
         }
-      }, event, singleUse, autoUnsubscribe);
-    }
-    /** 
-     * @public 
-     * When the root key or root key wrapper changes. Includes events like account state
-     * changes (registering, signing in, changing pw, logging out) and passcode state 
-     * changes (adding, removing, changing).
-     */
-
-  }, {
-    key: "onCredentialChange",
-    value: function onCredentialChange(callback) {
-      var uninstall = this.keyManager.onStatusChange(callback);
-      this.managedSubscribers.push(uninstall);
-    }
-    /** 
-     * @public 
-     * Called when the application has initialized and is ready for launch, but before
-     * the application has been unlocked, if applicable. Use this to do pre-launch
-     * configuration, but do not attempt to access user data like notes or tags.
-     */
-
-  }, {
-    key: "onStart",
-    value: function onStart(callback) {
-      if (this.started) {
-        callback();
-      } else {
-        this.addSingleUseObserver(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].ApplicationStarted, callback);
-      }
-    }
-    /**
-     * @public
-     * Called when the application has been fully decrypted and unlocked. Use this to
-     * to begin streaming data like notes and tags.
-     */
-
-  }, {
-    key: "onUnlock",
-    value: function onUnlock(callback) {
-      if (this.unlocked) {
-        callback();
-      } else {
-        this.addSingleUseObserver(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].ApplicationUnlocked, callback);
-      }
-    }
-  }, {
-    key: "addSingleUseObserver",
-    value: function addSingleUseObserver(eventName, callback) {
-      var singleUse = true;
-      this.addEventObserver(function (firedEvent) {
-        if (firedEvent === eventName) {
-          callback();
-        }
-      }, eventName, singleUse);
+      }, event);
     }
     /** @private */
 
@@ -1825,14 +1768,14 @@ function () {
 
             case 5:
               if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                _context8.next = 19;
+                _context8.next = 18;
                 break;
               }
 
               observer = _step3.value;
 
               if (!(observer.singleEvent && observer.singleEvent === event)) {
-                _context8.next = 13;
+                _context8.next = 12;
                 break;
               }
 
@@ -1840,67 +1783,63 @@ function () {
               return regeneratorRuntime.awrap(observer.callback(event, data || {}));
 
             case 10:
-              if (observer.singleUse) {
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.eventHandlers, observer);
-              }
-
-              _context8.next = 16;
+              _context8.next = 15;
               break;
 
-            case 13:
+            case 12:
               if (observer.singleEvent) {
-                _context8.next = 16;
+                _context8.next = 15;
                 break;
               }
 
-              _context8.next = 16;
+              _context8.next = 15;
               return regeneratorRuntime.awrap(observer.callback(event, data || {}));
 
-            case 16:
+            case 15:
               _iteratorNormalCompletion3 = true;
               _context8.next = 5;
               break;
 
-            case 19:
-              _context8.next = 25;
+            case 18:
+              _context8.next = 24;
               break;
 
-            case 21:
-              _context8.prev = 21;
+            case 20:
+              _context8.prev = 20;
               _context8.t0 = _context8["catch"](3);
               _didIteratorError3 = true;
               _iteratorError3 = _context8.t0;
 
-            case 25:
+            case 24:
+              _context8.prev = 24;
               _context8.prev = 25;
-              _context8.prev = 26;
 
               if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                 _iterator3.return();
               }
 
-            case 28:
-              _context8.prev = 28;
+            case 27:
+              _context8.prev = 27;
 
               if (!_didIteratorError3) {
-                _context8.next = 31;
+                _context8.next = 30;
                 break;
               }
 
               throw _iteratorError3;
 
+            case 30:
+              return _context8.finish(27);
+
             case 31:
-              return _context8.finish(28);
+              return _context8.finish(24);
 
             case 32:
-              return _context8.finish(25);
-
-            case 33:
             case "end":
               return _context8.stop();
           }
         }
-      }, null, this, [[3, 21, 25, 33], [26,, 28, 32]]);
+      }, null, this, [[3, 20, 24, 32], [25,, 27, 31]]);
     }
     /** @public */
 
@@ -2261,6 +2200,8 @@ function () {
   }, {
     key: "streamItems",
     value: function streamItems(_ref19) {
+      var _this5 = this;
+
       var contentType = _ref19.contentType,
           stream = _ref19.stream;
       var observer = this.modelManager.addMappingObserver(contentType, function (allItems, validItems, deletedItems, source, sourceKey) {
@@ -2275,6 +2216,9 @@ function () {
         });
       });
       this.streamObservers.push(observer);
+      return function () {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(_this5.streamObservers, observer);
+      };
     }
     /** @public */
 
@@ -2611,7 +2555,7 @@ function () {
   }, {
     key: "deinit",
     value: function deinit() {
-      var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, uninstallObserver, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, observer, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, uninstallSubscriber, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, service;
+      var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, uninstallObserver, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, uninstallSubscriber, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, service;
 
       return regeneratorRuntime.async(function deinit$(_context33) {
         while (1) {
@@ -2667,12 +2611,9 @@ function () {
               _iteratorError5 = undefined;
               _context33.prev = 23;
 
-              for (_iterator5 = this.eventHandlers.slice()[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                observer = _step5.value;
-
-                if (observer.autoUnsubscribe) {
-                  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.eventHandlers, observer);
-                }
+              for (_iterator5 = this.managedSubscribers[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                uninstallSubscriber = _step5.value;
+                uninstallSubscriber();
               }
 
               _context33.next = 31;
@@ -2713,117 +2654,75 @@ function () {
               _didIteratorError6 = false;
               _iteratorError6 = undefined;
               _context33.prev = 42;
+              _iterator6 = this.services[Symbol.iterator]();
 
-              for (_iterator6 = this.managedSubscribers[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                uninstallSubscriber = _step6.value;
-                uninstallSubscriber();
+            case 44:
+              if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+                _context33.next = 52;
+                break;
               }
 
-              _context33.next = 50;
+              service = _step6.value;
+
+              if (!service.deinit) {
+                _context33.next = 49;
+                break;
+              }
+
+              _context33.next = 49;
+              return regeneratorRuntime.awrap(service.deinit());
+
+            case 49:
+              _iteratorNormalCompletion6 = true;
+              _context33.next = 44;
               break;
 
-            case 46:
-              _context33.prev = 46;
+            case 52:
+              _context33.next = 58;
+              break;
+
+            case 54:
+              _context33.prev = 54;
               _context33.t2 = _context33["catch"](42);
               _didIteratorError6 = true;
               _iteratorError6 = _context33.t2;
 
-            case 50:
-              _context33.prev = 50;
-              _context33.prev = 51;
+            case 58:
+              _context33.prev = 58;
+              _context33.prev = 59;
 
               if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
                 _iterator6.return();
               }
 
-            case 53:
-              _context33.prev = 53;
+            case 61:
+              _context33.prev = 61;
 
               if (!_didIteratorError6) {
-                _context33.next = 56;
+                _context33.next = 64;
                 break;
               }
 
               throw _iteratorError6;
 
-            case 56:
-              return _context33.finish(53);
+            case 64:
+              return _context33.finish(61);
 
-            case 57:
-              return _context33.finish(50);
+            case 65:
+              return _context33.finish(58);
 
-            case 58:
-              _iteratorNormalCompletion7 = true;
-              _didIteratorError7 = false;
-              _iteratorError7 = undefined;
-              _context33.prev = 61;
-              _iterator7 = this.services[Symbol.iterator]();
-
-            case 63:
-              if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                _context33.next = 71;
-                break;
-              }
-
-              service = _step7.value;
-
-              if (!service.deinit) {
-                _context33.next = 68;
-                break;
-              }
-
-              _context33.next = 68;
-              return regeneratorRuntime.awrap(service.deinit());
-
-            case 68:
-              _iteratorNormalCompletion7 = true;
-              _context33.next = 63;
-              break;
-
-            case 71:
-              _context33.next = 77;
-              break;
-
-            case 73:
-              _context33.prev = 73;
-              _context33.t3 = _context33["catch"](61);
-              _didIteratorError7 = true;
-              _iteratorError7 = _context33.t3;
-
-            case 77:
-              _context33.prev = 77;
-              _context33.prev = 78;
-
-              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                _iterator7.return();
-              }
-
-            case 80:
-              _context33.prev = 80;
-
-              if (!_didIteratorError7) {
-                _context33.next = 83;
-                break;
-              }
-
-              throw _iteratorError7;
-
-            case 83:
-              return _context33.finish(80);
-
-            case 84:
-              return _context33.finish(77);
-
-            case 85:
+            case 66:
+              this.streamObservers = [];
               this.clearServices();
               this.dealloced = true;
+              this.started = false;
 
-            case 87:
+            case 70:
             case "end":
               return _context33.stop();
           }
         }
-      }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 46, 50, 58], [51,, 53, 57], [61, 73, 77, 85], [78,, 80, 84]]);
+      }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
     }
     /**
      * @public
@@ -2862,7 +2761,7 @@ function () {
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context34.next = 25;
+                _context34.next = 26;
                 break;
               }
 
@@ -2901,19 +2800,22 @@ function () {
               return regeneratorRuntime.awrap(this.clearDatabase());
 
             case 21:
-              this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
-              _context34.next = 24;
+              _context34.next = 23;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
+
+            case 23:
+              _context34.next = 25;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
-            case 24:
+            case 25:
               this.protocolService.decryptErroredItems();
 
-            case 25:
+            case 26:
               return _context34.abrupt("return", result.response);
 
-            case 26:
+            case 27:
             case "end":
               return _context34.stop();
           }
@@ -2938,9 +2840,8 @@ function () {
               email = _ref22.email, password = _ref22.password, strict = _ref22.strict, ephemeral = _ref22.ephemeral, mfaKeyPath = _ref22.mfaKeyPath, mfaCode = _ref22.mfaCode, _ref22$mergeLocal = _ref22.mergeLocal, mergeLocal = _ref22$mergeLocal === void 0 ? true : _ref22$mergeLocal;
 
               /** Prevent a timed sync from occuring while signing in. */
-              this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].WillSignIn);
               this.lockSyncing();
-              _context35.next = 5;
+              _context35.next = 4;
               return regeneratorRuntime.awrap(this.sessionManager.signIn({
                 email: email,
                 password: password,
@@ -2949,7 +2850,7 @@ function () {
                 mfaCode: mfaCode
               }));
 
-            case 5:
+            case 4:
               result = _context35.sent;
               this.unlockSyncing();
 
@@ -2958,42 +2859,45 @@ function () {
                 break;
               }
 
-              _context35.next = 10;
+              _context35.next = 9;
               return regeneratorRuntime.awrap(this.keyManager.setNewRootKey({
                 key: result.rootKey,
                 keyParams: result.keyParams
               }));
 
-            case 10:
-              _context35.next = 12;
+            case 9:
+              _context35.next = 11;
               return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
 
-            case 12:
+            case 11:
               if (!mergeLocal) {
-                _context35.next = 19;
+                _context35.next = 18;
                 break;
               }
 
-              _context35.next = 15;
+              _context35.next = 14;
               return regeneratorRuntime.awrap(this.storageManager.clearDesktopDatabase());
 
-            case 15:
-              _context35.next = 17;
+            case 14:
+              _context35.next = 16;
               return regeneratorRuntime.awrap(this.syncManager.markAllItemsAsNeedingSync({
                 alternateUuids: true
               }));
 
-            case 17:
-              _context35.next = 22;
+            case 16:
+              _context35.next = 21;
               break;
 
-            case 19:
+            case 18:
               this.modelManager.removeAllItemsFromMemory();
-              _context35.next = 22;
+              _context35.next = 21;
               return regeneratorRuntime.awrap(this.clearDatabase());
 
-            case 22:
-              this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn);
+            case 21:
+              _context35.next = 23;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
+
+            case 23:
               _context35.next = 25;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
@@ -3100,9 +3004,13 @@ function () {
 
             case 6:
               _context37.next = 8;
-              return regeneratorRuntime.awrap(this.restart());
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedOut));
 
             case 8:
+              _context37.next = 10;
+              return regeneratorRuntime.awrap(this.restart());
+
+            case 10:
             case "end":
               return _context37.stop();
           }
@@ -3132,13 +3040,20 @@ function () {
     /** @public */
 
   }, {
+    key: "isStarted",
+    value: function isStarted() {
+      return this.started;
+    }
+    /** @public */
+
+  }, {
     key: "hasPasscode",
     value: function hasPasscode() {
       return regeneratorRuntime.async(function hasPasscode$(_context39) {
         while (1) {
           switch (_context39.prev = _context39.next) {
             case 0:
-              return _context39.abrupt("return", this.keyManager.hasRootKeyWrapper());
+              return _context39.abrupt("return", this.deviceAuthService.hasPasscode());
 
             case 1:
             case "end":
@@ -3150,15 +3065,23 @@ function () {
     /** @public */
 
   }, {
-    key: "isPasscodeLocked",
-    value: function isPasscodeLocked() {
-      return regeneratorRuntime.async(function isPasscodeLocked$(_context40) {
+    key: "isLocked",
+    value: function isLocked() {
+      return regeneratorRuntime.async(function isLocked$(_context40) {
         while (1) {
           switch (_context40.prev = _context40.next) {
             case 0:
-              return _context40.abrupt("return", this.keyManager.rootKeyNeedsUnwrapping());
+              if (this.started) {
+                _context40.next = 2;
+                break;
+              }
 
-            case 1:
+              return _context40.abrupt("return", true);
+
+            case 2:
+              return _context40.abrupt("return", this.deviceAuthService.isPasscodeLocked());
+
+            case 3:
             case "end":
               return _context40.stop();
           }
@@ -3449,11 +3372,28 @@ function () {
   }, {
     key: "createKeyManager",
     value: function createKeyManager() {
+      var _this6 = this;
+
       this.keyManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNKeyManager"]))({
         modelManager: this.modelManager,
         storageManager: this.storageManager,
         protocolService: this.protocolService,
         itemsKeyManager: this.itemsKeyManager
+      });
+      this.keyManager.onStatusChange(function _callee3() {
+        return regeneratorRuntime.async(function _callee3$(_context48) {
+          while (1) {
+            switch (_context48.prev = _context48.next) {
+              case 0:
+                _context48.next = 2;
+                return regeneratorRuntime.awrap(_this6.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].KeyStatusChanged));
+
+              case 2:
+              case "end":
+                return _context48.stop();
+            }
+          }
+        });
       });
       this.services.push(this.keyManager);
     }
@@ -3518,7 +3458,7 @@ function () {
   }, {
     key: "createSyncManager",
     value: function createSyncManager() {
-      var _this5 = this;
+      var _this7 = this;
 
       this.syncManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSyncManager"]))({
         modelManager: this.modelManager,
@@ -3528,48 +3468,48 @@ function () {
         apiService: this.apiService,
         interval: this.deviceInterface.interval
       });
-      var uninstall = this.syncManager.addEventObserver(function _callee3(eventName) {
-        return regeneratorRuntime.async(function _callee3$(_context48) {
+      var uninstall = this.syncManager.addEventObserver(function _callee4(eventName) {
+        return regeneratorRuntime.async(function _callee4$(_context49) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context49.prev = _context49.next) {
               case 0:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].FullSyncCompleted)) {
-                  _context48.next = 5;
+                  _context49.next = 5;
                   break;
                 }
 
-                _context48.next = 3;
-                return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync));
+                _context49.next = 3;
+                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync));
 
               case 3:
-                _context48.next = 13;
+                _context49.next = 13;
                 break;
 
               case 5:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncTakingTooLong)) {
-                  _context48.next = 10;
+                  _context49.next = 10;
                   break;
                 }
 
-                _context48.next = 8;
-                return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].HighLatencySync));
+                _context49.next = 8;
+                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].HighLatencySync));
 
               case 8:
-                _context48.next = 13;
+                _context49.next = 13;
                 break;
 
               case 10:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncError)) {
-                  _context48.next = 13;
+                  _context49.next = 13;
                   break;
                 }
 
-                _context48.next = 13;
-                return regeneratorRuntime.awrap(_this5.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].FailedSync));
+                _context49.next = 13;
+                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].FailedSync));
 
               case 13:
               case "end":
-                return _context48.stop();
+                return _context49.stop();
             }
           }
         });
@@ -3995,12 +3935,27 @@ var ApplicationEvents = {
   EnteredOutOfSync: 8,
   ExitedOutOfSync: 9,
 
-  /** The application has finished it `prepareForLaunch` state and is now ready for unlock */
-  ApplicationStarted: 10,
+  /** 
+   * The application has finished it `prepareForLaunch` state and is now ready for unlock 
+   * Called when the application has initialized and is ready for launch, but before
+   * the application has been unlocked, if applicable. Use this to do pre-launch
+   * configuration, but do not attempt to access user data like notes or tags.
+   */
+  Started: 10,
 
-  /** The applicaiton is fully unlocked and ready for i/o */
-  ApplicationUnlocked: 11,
-  PasscodeStatusChanged: 12
+  /** 
+   * The applicaiton is fully unlocked and ready for i/o 
+   * Called when the application has been fully decrypted and unlocked. Use this to
+   * to begin streaming data like notes and tags.
+   */
+  Unlocked: 11,
+
+  /**
+   * When the root key or root key wrapper changes. Includes events like account state
+   * changes (registering, signing in, changing pw, logging out) and passcode state
+   * changes (adding, removing, changing).
+   */
+  KeyStatusChanged: 12
 };
 
 
@@ -27402,7 +27357,7 @@ function (_PureService) {
                 break;
               }
 
-              throw 'Attempting to set storage value before loading local storage.';
+              throw "Attempting to set storage key ".concat(key, " before loading local storage.");
 
             case 3:
               this.values[this.domainKeyForMode(mode)][key] = value;
@@ -27431,7 +27386,7 @@ function (_PureService) {
                 break;
               }
 
-              throw 'Attempting to access storage value before loading local storage.';
+              throw "Attempting to get storage key ".concat(key, " before loading local storage.");
 
             case 3:
               if (this.values[this.domainKeyForMode(mode)]) {
@@ -27467,7 +27422,7 @@ function (_PureService) {
                 break;
               }
 
-              throw 'Attempting to access storage value before loading local storage.';
+              throw "Attempting to remove storage key ".concat(key, " before loading local storage.");
 
             case 3:
               delete this.values[this.domainKeyForMode(mode)][key];
