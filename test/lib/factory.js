@@ -57,10 +57,10 @@ export default class Factory {
     await application.launch({awaitDatabaseLoad: true});
   }
 
-  static async registerUserToApplication({application, email, password, ephemeral}) {
+  static async registerUserToApplication({application, email, password, ephemeral, mergeLocal = true}) {
     if(!email) email = this.generateUuid();
     if(!password) password = this.generateUuid();
-    return application.register({email, password, ephemeral});
+    return application.register({email, password, ephemeral, mergeLocal});
   }
 
   /**

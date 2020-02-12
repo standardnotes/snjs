@@ -130,7 +130,7 @@ describe("storage manager", () => {
     expect(Object.keys(values).length).to.equal(0);
   });
 
-  it.only("signing out should clear payloads", async function () {
+  it("signing out should clear payloads", async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

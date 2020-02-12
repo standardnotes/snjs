@@ -194,20 +194,6 @@ describe('app models', () => {
     expect(item2.referencingItemsCount).to.equal(0);
   });
 
-  // it('notifies observers of item uuid alternation', async function() {
-  //   const modelManager = this.application.modelManager;
-  //   const item = await Factory.createMappedNote(this.application);
-  //
-  //   return new Promise((resolve, reject) => {
-  //     modelManager.addModelUuidChangeObserver("test", (oldItem, newItem) => {
-  //       expect(oldItem.uuid).to.not.equal(newItem.uuid);
-  //       resolve();
-  //     })
-  //
-  //     modelManager.alternateUuidForItem(item);
-  //   })
-  // });
-
   it('properly duplicates item with no relationships', async function() {
     const modelManager = this.application.modelManager;
     const item = await Factory.createMappedNote(this.application);
@@ -283,7 +269,7 @@ describe('app models', () => {
     expect(item1.referencedItemsCount).to.equal(1);
     expect(item2.referencingItemsCount).to.equal(1);
 
-    const alternatedItem = await modelManager.alternateUuidForItem(item1);
+    const alternatedItem = await this.application.syncManager.alternateUuidForItem(item1);
     expect(alternatedItem.isItem).to.equal(true);
     expect(item1.deleted).to.equal(true);
     // they should not be same reference
@@ -319,8 +305,8 @@ describe('app models', () => {
 
     expect(item2.referencingItemsCount).to.equal(1);
 
-    const alternatedItem1 = await modelManager.alternateUuidForItem(item1);
-    const alternatedItem2 = await modelManager.alternateUuidForItem(item2);
+    const alternatedItem1 = await this.application.syncManager.alternateUuidForItem(item1);
+    const alternatedItem2 = await this.application.syncManager.alternateUuidForItem(item2);
 
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 

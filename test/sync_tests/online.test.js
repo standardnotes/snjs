@@ -8,7 +8,7 @@ import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online syncing', () => {
+describe.only('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -38,6 +38,8 @@ describe('online syncing', () => {
   afterEach(async function () {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const items = this.application.modelManager.allItems;
+    expect(items.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
   });
@@ -47,10 +49,8 @@ describe('online syncing', () => {
   }
 
   it("should register and sync basic model online", async function () {
-    const note = await Factory.createMappedNote(this.application);
+    const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
-    await this.application.modelManager.setItemDirty(note);
-    await this.application.syncManager.sync(syncOptions);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
     expect(note.dirty).to.not.be.ok;
 
@@ -73,10 +73,62 @@ describe('online syncing', () => {
       password: this.password
     });
 
-    await this.application.syncManager.sync(syncOptions);
     const notes = this.application.modelManager.notes;
     expect(notes.length).to.equal(1);
     expect(notes[0].title).to.equal(note.title);
+  }).timeout(10000);
+
+  it("can complete multipage sync on sign in", async function () {
+    const count = 10;
+    await Factory.createManyMappedNotes(this.application, count);
+    this.expectedItemCount += count;
+    await this.application.sync();
+    await this.application.signOut();
+    expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
+    const promise = Factory.loginToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+    /** Throw in some random syncs to cause trouble */
+    const syncCount = 10;
+    for(let i = 0; i < syncCount; i++) {
+      this.application.sync();
+      await Factory.sleep(0.1);
+    }
+    await promise;
+    expect(promise).to.be.fulfilled;
+  }).timeout(20000);
+
+  it("marking all items as needing sync with alternation should delete original payload", async function () {
+    await this.application.signOut();
+    const note = await Factory.createMappedNote(this.application);
+    this.expectedItemCount++;
+    await this.application.syncManager.markAllItemsAsNeedingSync({
+      alternateUuids: true
+    });
+    await this.application.sync();
+
+    const notes = this.application.modelManager.notes;
+    expect(notes.length).to.equal(1);
+    expect(notes[0].uuid).to.not.equal(note.uuid);
+  }).timeout(10000);
+
+  it("having offline data then signing in should alternate uuid and merge with account", async function () {
+    await this.application.signOut();
+    const note = await Factory.createMappedNote(this.application);
+    this.expectedItemCount++;
+    await Factory.loginToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      mergeLocal: true
+    });
+
+    const notes = this.application.modelManager.notes;
+    expect(notes.length).to.equal(1);
+    /** uuid should have been alternated */
+    expect(notes[0].uuid).to.not.equal(note.uuid);
   }).timeout(10000);
 
   it("server extensions should not be encrypted for sync", async function () {
@@ -153,6 +205,22 @@ describe('online syncing', () => {
     expect(successes).to.equal(syncCount);
     expect(events).to.equal(syncCount);
     this.application.syncManager.ut_endLatencySimulator();
+  }).timeout(10000);
+
+  it("retrieving new items should not mark them as dirty", async function () {
+    const originalNote = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+    await this.application.signOut();
+    this.application.syncManager.addEventObserver((event, data) => {
+      if (event === SyncEvents.SingleSyncCompleted) {
+        const note = this.application.findItem({ uuid: originalNote.uuid });
+        expect(note.dirty).to.not.be.ok;
+      }
+    });
+    await this.application.signIn({
+      email: this.email,
+      password: this.password
+    });
   }).timeout(10000);
 
   it("allows me to save data after I've signed out", async function () {
@@ -520,6 +588,28 @@ describe('online syncing', () => {
 
     // We expect that this item maintained.
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  }).timeout(10000);
+
+  it('deleting an item while it is being synced should keep deletion state', async function () {
+    console.warn("beginning test");
+    const note = await Factory.createMappedNote(this.application);
+    this.expectedItemCount++;
+
+    /** Begin syncing it with server but introduce latency so we can sneak in a delete */
+    this.application.syncManager.ut_beginLatencySimulator(500);
+    const sync = this.application.sync();
+    /** Sleep so sync call can begin preparations but not fully begin */
+    await Factory.sleep(0.1);
+    await this.application.modelManager.setItemToBeDeleted(note);
+    this.expectedItemCount--;
+    await sync;
+    this.application.syncManager.ut_endLatencySimulator();
+    await this.application.sync();
+
+    /** We expect that item has been deleted */
+    // expect(note.deleted).to.equal(true);
+    const allItems = this.application.modelManager.allItems;
+    expect(allItems.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
 
   it("should create conflict if syncing an item that is stale", async function () {

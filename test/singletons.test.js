@@ -27,11 +27,11 @@ describe("singletons", () => {
 
   before(async function() {
     localStorage.clear();
-  })
+  });
 
   after(async function() {
     localStorage.clear();
-  })
+  });
 
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -43,7 +43,7 @@ describe("singletons", () => {
       email: this.email,
       password: this.password
     });
-  })
+  });
 
   afterEach(async function() {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
@@ -65,6 +65,26 @@ describe("singletons", () => {
     await this.application.modelManager.setItemsDirty(items);
     await this.application.syncManager.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  });
+
+  it("signing into account and retrieving singleton shouldn't put us in deadlock", async function () {
+   /** Create privs */
+    const ogPrivs = await this.application.privilegesManager.getPrivileges();
+    this.expectedItemCount++;
+    await this.application.sync();
+    await this.application.signOut();
+    /** Create another instance while signed out */
+    await this.application.privilegesManager.getPrivileges();
+    await Factory.loginToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+    /** After signing in, the instance retrieved from the server should be the one kept */
+    const latestPrivs = await this.application.privilegesManager.getPrivileges();
+    expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
+    const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
+    expect(allPrivs.length).to.equal(1);
   });
 
   it("if only result is errorDecrypting, create new item", async function() {
@@ -91,7 +111,7 @@ describe("singletons", () => {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
-    })
+    });
     this.expectedItemCount++;
     await this.application.syncManager.sync();
     const predicate = new SFPredicate("content_type", "=", item.content_type);
@@ -99,7 +119,7 @@ describe("singletons", () => {
       predicate: predicate,
       createPayload: payload
     });
-    await this.application.modelManager.alternateUuidForItem(resolvedItem);
+    await this.application.syncManager.alternateUuidForItem(resolvedItem);
     await this.application.syncManager.sync();
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
@@ -110,4 +130,4 @@ describe("singletons", () => {
     expect(resolvedItem.deleted).to.equal(true);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
-})
+});
