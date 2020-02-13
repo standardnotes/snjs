@@ -112,8 +112,6 @@ describe('sync discordance', () => {
     const item = await this.application.modelManager.mapPayloadToLocalItem({payload});
     this.expectedItemCount++;
 
-    // this.application.syncManager.loggingEnabled = true;
-
     await this.application.syncManager.sync();
 
     // Delete item locally only without notifying server. We should then be in discordance.

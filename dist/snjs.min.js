@@ -22090,11 +22090,11 @@ function (_PureService) {
 
             case 31:
               _context17.next = 33;
-              return regeneratorRuntime.awrap(this.itemsKeyManager.reencryptItemsKeys());
+              return regeneratorRuntime.awrap(this.notifyObserversOfChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].RootKey));
 
             case 33:
               _context17.next = 35;
-              return regeneratorRuntime.awrap(this.notifyObserversOfChange(_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].RootKey));
+              return regeneratorRuntime.awrap(this.itemsKeyManager.reencryptItemsKeys());
 
             case 35:
             case "end":
@@ -22418,6 +22418,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -22474,16 +22478,23 @@ function (_PureService) {
       return this.masterCollection;
     }
   }, {
-    key: "handleSignOut",
-    value: function handleSignOut() {
+    key: "deinit",
+    value: function deinit() {
+      _get(_getPrototypeOf(SNModelManager.prototype), "deinit", this).call(this);
+
+      this.resetState();
+    }
+  }, {
+    key: "resetState",
+    value: function resetState() {
       this.items.length = 0;
-      this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]();
       this.itemsKeys.length = 0;
       this.notes.length = 0;
       this.tags.length = 0;
       this.components.length = 0;
       this.itemsHash = {};
       this.resolveQueue = {};
+      this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]();
     }
     /**
      * Consumers wanting to modify an item should run it through this block,
@@ -24518,7 +24529,7 @@ function (_PureService) {
       }
 
       this.notifyMappingObservers(this.items);
-      this.handleSignOut();
+      this.resetState();
     }
   }, {
     key: "findTag",
@@ -28618,6 +28629,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -30284,20 +30299,22 @@ function (_PureService) {
       }, null, this, [[0, 7]]);
     }
   }, {
-    key: "handleSignOut",
-    value: function handleSignOut() {
-      return regeneratorRuntime.async(function handleSignOut$(_context25) {
+    key: "deinit",
+    value: function deinit() {
+      return regeneratorRuntime.async(function deinit$(_context25) {
         while (1) {
           switch (_context25.prev = _context25.next) {
             case 0:
+              _get(_getPrototypeOf(SNSyncManager.prototype), "deinit", this).call(this);
+
               this.state.reset();
               this.opStatus.reset();
               this.resolveQueue = [];
               this.spawnQueue = [];
-              _context25.next = 6;
+              _context25.next = 7;
               return regeneratorRuntime.awrap(this.clearSyncPositionTokens());
 
-            case 6:
+            case 7:
             case "end":
               return _context25.stop();
           }

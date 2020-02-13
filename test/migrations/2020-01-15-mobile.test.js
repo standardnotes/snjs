@@ -368,7 +368,7 @@ describe('2020-01-15 mobile migration', () => {
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
 

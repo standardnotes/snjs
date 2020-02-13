@@ -382,7 +382,7 @@ describe('online syncing', () => {
     // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
     await this.application.syncManager.clearSyncPositionTokens();
     await this.application.storageManager.clearAllPayloads();
-    await this.application.modelManager.handleSignOut();
+    await this.application.modelManager.resetState();
     await this.application.syncManager.sync();
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
@@ -661,8 +661,8 @@ describe('online syncing', () => {
       alternateUuids: false
     });
 
-    this.application.modelManager.handleSignOut();
-    await this.application.syncManager.handleSignOut();
+    this.application.modelManager.resetState();
+    await this.application.syncManager.deinit();
 
     expect(this.application.modelManager.allItems.length).to.equal(0);
 
@@ -779,8 +779,8 @@ describe('online syncing', () => {
     this.expectedItemCount += largeItemCount;
 
     /** Clear local data */
-    await this.application.modelManager.handleSignOut();
-    await this.application.syncManager.handleSignOut();
+    await this.application.modelManager.resetState();
+    await this.application.syncManager.deinit();
     await this.application.storageManager.clearAllPayloads();
     expect(this.application.modelManager.allItems.length).to.equal(0);
 
@@ -825,7 +825,7 @@ describe('online syncing', () => {
     this.expectedItemCount++;
 
     /** Simulate database not loaded */
-    await this.application.syncManager.handleSignOut();
+    await this.application.syncManager.deinit();
     this.application.syncManager.ut_setDatabaseLoaded(false);
     this.application.syncManager.sync(syncOptions);
     await Factory.sleep(0.3);
@@ -852,8 +852,8 @@ describe('online syncing', () => {
     async function () {
       this.application.syncManager.ut_setDatabaseLoaded(false);
       /** You don't want to clear model manager state as we'll lose encrypting items key */
-      // await this.application.modelManager.handleSignOut();
-      await this.application.syncManager.handleSignOut();
+      // await this.application.modelManager.resetState();
+      await this.application.syncManager.deinit();
       expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
 
       const note = await Factory.createMappedNote(this.application);
@@ -877,8 +877,8 @@ describe('online syncing', () => {
       expect(typeof rawPayload.content).to.equal('string');
 
       /** Clear state data and upload item from storage to server */
-      await this.application.syncManager.handleSignOut();
-      await this.application.modelManager.handleSignOut();
+      await this.application.syncManager.deinit();
+      await this.application.modelManager.resetState();
       const databasePayloads = await this.application.storageManager.getAllRawPayloads();
       await this.application.syncManager.loadDatabasePayloads(databasePayloads);
       await this.application.syncManager.sync(syncOptions);
@@ -907,8 +907,8 @@ describe('online syncing', () => {
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
     this.application.syncManager.ut_setDatabaseLoaded(false);
-    this.application.syncManager.handleSignOut();
-    this.application.modelManager.handleSignOut();
+    this.application.syncManager.deinit();
+    this.application.modelManager.resetState();
 
     this.application.syncManager.localLoadPriorty = ['C', 'A', 'B'];
     const databasePayloads = await this.application.storageManager.getAllRawPayloads();
@@ -1078,8 +1078,8 @@ describe('online syncing', () => {
     expect(note.content.text).to.equal(text);
 
     // client B
-    await this.application.syncManager.handleSignOut();
-    await this.application.modelManager.handleSignOut();
+    await this.application.syncManager.deinit();
+    await this.application.modelManager.resetState();
     await this.application.syncManager.clearSyncPositionTokens();
     await this.application.syncManager.sync(syncOptions);
 

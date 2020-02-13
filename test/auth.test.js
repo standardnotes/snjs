@@ -103,44 +103,37 @@ describe("basic auth", () => {
       newPassword: newPassword
     });
 
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    
     expect(response.error).to.not.be.ok;
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(this.application.modelManager.invalidItems().length).to.equal(0);
-
+    
     await this.application.modelManager.setAllItemsDirty();
     await this.application.syncManager.sync();
-
+    
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-
+    
     /** Create conflict for a note */
     const note = this.application.modelManager.notes[0];
-    note.title = `${Math.random()}`
+    note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
     await this.application.saveItem({item: note});
     this.expectedItemCount++;
-
-    // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-    await this.application.syncManager.clearSyncPositionTokens();
-    await this.application.storageManager.clearAllPayloads();
-    await this.application.modelManager.handleSignOut();
-
-    expect(this.application.modelManager.allItems.length).to.equal(0);
-
-    await this.application.syncManager.sync();
-
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-    expect(this.application.modelManager.invalidItems().length).to.equal(0);
-
+  
     await this.application.signOut();
-
     /** Should login with new password */
     const signinResponse = await this.application.signIn({
       email: this.email,
       password: newPassword
     });
+
+    // await Factory.sleep(0.5);
     expect(signinResponse).to.be.ok;
     expect(signinResponse.error).to.not.be.ok;
     expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.modelManager.invalidItems().length).to.equal(0);
   }).timeout(20000);
 
   it("changes password many times", async function () {
@@ -158,7 +151,7 @@ describe("basic auth", () => {
     let newPassword = Factory.randomString();
     let currentPassword = this.password;
     for(let i = 0; i < numTimesToChangePw; i++) {
-      const response = await this.application.changePassword({
+      await this.application.changePassword({
         email: this.email,
         currentPassword: currentPassword,
         newPassword: newPassword
@@ -172,17 +165,8 @@ describe("basic auth", () => {
 
       await this.application.modelManager.setAllItemsDirty();
       await this.application.syncManager.sync();
-
-      // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-      await this.application.syncManager.clearSyncPositionTokens();
-      await this.application.storageManager.clearAllPayloads();
-      this.application.modelManager.handleSignOut();
-
-      expect(this.application.modelManager.allItems.length).to.equal(0);
-
-      await this.application.syncManager.sync();
-
-      expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+      await this.application.signOut();
+      expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
       /** Should login with new password */
@@ -195,5 +179,4 @@ describe("basic auth", () => {
       expect(await this.application.keyManager.getRootKey()).to.be.ok;
     }
   }).timeout(30000);
-
-})
+});
