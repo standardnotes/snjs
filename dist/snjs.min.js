@@ -2489,25 +2489,37 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
-     * Allows database to be rewritten on local credential status change,
+     * @private 
+     * Allows items keys to be rewritten to local db on local credential status change,
      * such as if passcode is added, changed, or removed.
+     * This allows IndexedDB unencrypted logs to be deleted
+     * `deletePayloads` will remove data from backing store,
+     * but not from working memory See:
+     * https://github.com/standardnotes/desktop/issues/131
      */
 
   }, {
-    key: "rewriteDatabase",
-    value: function rewriteDatabase() {
-      return regeneratorRuntime.async(function rewriteDatabase$(_context31) {
+    key: "rewriteItemsKeys",
+    value: function rewriteItemsKeys() {
+      var itemsKeys, payloads;
+      return regeneratorRuntime.async(function rewriteItemsKeys$(_context31) {
         while (1) {
           switch (_context31.prev = _context31.next) {
             case 0:
-              _context31.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.clearAllPayloads());
+              itemsKeys = this.itemsKeyManager.allItemsKeys;
+              payloads = itemsKeys.map(function (key) {
+                return key.payloadRepresentation();
+              });
+              _context31.next = 4;
+              return regeneratorRuntime.awrap(this.storageManager.deletePayloads(payloads));
 
-            case 2:
-              return _context31.abrupt("return", this.syncManager.repersistAllItems());
+            case 4:
+              _context31.next = 6;
+              return regeneratorRuntime.awrap(this.syncManager.persistPayloads({
+                decryptedPayloads: payloads
+              }));
 
-            case 3:
+            case 6:
             case "end":
               return _context31.stop();
           }
@@ -2761,7 +2773,7 @@ function () {
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context34.next = 26;
+                _context34.next = 24;
                 break;
               }
 
@@ -2777,45 +2789,41 @@ function () {
 
             case 11:
               if (!mergeLocal) {
-                _context34.next = 18;
+                _context34.next = 16;
                 break;
               }
 
               _context34.next = 14;
-              return regeneratorRuntime.awrap(this.storageManager.clearDesktopDatabase());
-
-            case 14:
-              _context34.next = 16;
               return regeneratorRuntime.awrap(this.syncManager.markAllItemsAsNeedingSync({
                 alternateUuids: true
               }));
 
-            case 16:
-              _context34.next = 21;
+            case 14:
+              _context34.next = 19;
               break;
 
-            case 18:
+            case 16:
               this.modelManager.removeAllItemsFromMemory();
-              _context34.next = 21;
+              _context34.next = 19;
               return regeneratorRuntime.awrap(this.clearDatabase());
+
+            case 19:
+              _context34.next = 21;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
 
             case 21:
               _context34.next = 23;
-              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
-
-            case 23:
-              _context34.next = 25;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
-            case 25:
+            case 23:
               this.protocolService.decryptErroredItems();
 
-            case 26:
+            case 24:
               return _context34.abrupt("return", result.response);
 
-            case 27:
+            case 25:
             case "end":
               return _context34.stop();
           }
@@ -2855,7 +2863,7 @@ function () {
               this.unlockSyncing();
 
               if (result.response.error) {
-                _context35.next = 26;
+                _context35.next = 24;
                 break;
               }
 
@@ -2871,45 +2879,41 @@ function () {
 
             case 11:
               if (!mergeLocal) {
-                _context35.next = 18;
+                _context35.next = 16;
                 break;
               }
 
               _context35.next = 14;
-              return regeneratorRuntime.awrap(this.storageManager.clearDesktopDatabase());
-
-            case 14:
-              _context35.next = 16;
               return regeneratorRuntime.awrap(this.syncManager.markAllItemsAsNeedingSync({
                 alternateUuids: true
               }));
 
-            case 16:
-              _context35.next = 21;
+            case 14:
+              _context35.next = 19;
               break;
 
-            case 18:
+            case 16:
               this.modelManager.removeAllItemsFromMemory();
-              _context35.next = 21;
+              _context35.next = 19;
               return regeneratorRuntime.awrap(this.clearDatabase());
+
+            case 19:
+              _context35.next = 21;
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
 
             case 21:
               _context35.next = 23;
-              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].SignedIn));
-
-            case 23:
-              _context35.next = 25;
               return regeneratorRuntime.awrap(this.syncManager.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
-            case 25:
+            case 23:
               this.protocolService.decryptErroredItems();
 
-            case 26:
+            case 24:
               return _context35.abrupt("return", result.response);
 
-            case 27:
+            case 25:
             case "end":
               return _context35.stop();
           }
@@ -3049,13 +3053,28 @@ function () {
   }, {
     key: "hasPasscode",
     value: function hasPasscode() {
-      return regeneratorRuntime.async(function hasPasscode$(_context39) {
+      return this.keyManager.hasPasscode();
+    }
+    /** @public */
+
+  }, {
+    key: "isLocked",
+    value: function isLocked() {
+      return regeneratorRuntime.async(function isLocked$(_context39) {
         while (1) {
           switch (_context39.prev = _context39.next) {
             case 0:
-              return _context39.abrupt("return", this.deviceAuthService.hasPasscode());
+              if (this.started) {
+                _context39.next = 2;
+                break;
+              }
 
-            case 1:
+              return _context39.abrupt("return", true);
+
+            case 2:
+              return _context39.abrupt("return", this.deviceAuthService.isPasscodeLocked());
+
+            case 3:
             case "end":
               return _context39.stop();
           }
@@ -3065,43 +3084,17 @@ function () {
     /** @public */
 
   }, {
-    key: "isLocked",
-    value: function isLocked() {
-      return regeneratorRuntime.async(function isLocked$(_context40) {
+    key: "lock",
+    value: function lock() {
+      return regeneratorRuntime.async(function lock$(_context40) {
         while (1) {
           switch (_context40.prev = _context40.next) {
             case 0:
-              if (this.started) {
-                _context40.next = 2;
-                break;
-              }
-
-              return _context40.abrupt("return", true);
-
-            case 2:
-              return _context40.abrupt("return", this.deviceAuthService.isPasscodeLocked());
-
-            case 3:
-            case "end":
-              return _context40.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @public */
-
-  }, {
-    key: "lock",
-    value: function lock() {
-      return regeneratorRuntime.async(function lock$(_context41) {
-        while (1) {
-          switch (_context41.prev = _context41.next) {
-            case 0:
-              return _context41.abrupt("return", this.restart());
+              return _context40.abrupt("return", this.restart());
 
             case 1:
             case "end":
-              return _context41.stop();
+              return _context40.stop();
           }
         }
       }, null, this);
@@ -3113,42 +3106,42 @@ function () {
     value: function setPasscode(passcode) {
       var identifier, _ref25, key, keyParams;
 
-      return regeneratorRuntime.async(function setPasscode$(_context42) {
+      return regeneratorRuntime.async(function setPasscode$(_context41) {
         while (1) {
-          switch (_context42.prev = _context42.next) {
+          switch (_context41.prev = _context41.next) {
             case 0:
-              _context42.next = 2;
+              _context41.next = 2;
               return regeneratorRuntime.awrap(this.protocolService.crypto.generateUUID());
 
             case 2:
-              identifier = _context42.sent;
-              _context42.next = 5;
+              identifier = _context41.sent;
+              _context41.next = 5;
               return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: identifier,
                 password: passcode
               }));
 
             case 5:
-              _ref25 = _context42.sent;
+              _ref25 = _context41.sent;
               key = _ref25.key;
               keyParams = _ref25.keyParams;
-              _context42.next = 10;
+              _context41.next = 10;
               return regeneratorRuntime.awrap(this.keyManager.setNewRootKeyWrapper({
                 wrappingKey: key,
                 keyParams: keyParams
               }));
 
             case 10:
-              _context42.next = 12;
-              return regeneratorRuntime.awrap(this.rewriteDatabase());
+              _context41.next = 12;
+              return regeneratorRuntime.awrap(this.rewriteItemsKeys());
 
             case 12:
-              _context42.next = 14;
+              _context41.next = 14;
               return regeneratorRuntime.awrap(this.syncManager.sync());
 
             case 14:
             case "end":
-              return _context42.stop();
+              return _context41.stop();
           }
         }
       }, null, this);
@@ -3158,20 +3151,20 @@ function () {
   }, {
     key: "removePasscode",
     value: function removePasscode() {
-      return regeneratorRuntime.async(function removePasscode$(_context43) {
+      return regeneratorRuntime.async(function removePasscode$(_context42) {
         while (1) {
-          switch (_context43.prev = _context43.next) {
+          switch (_context42.prev = _context42.next) {
             case 0:
-              _context43.next = 2;
+              _context42.next = 2;
               return regeneratorRuntime.awrap(this.keyManager.removeRootKeyWrapper());
 
             case 2:
-              _context43.next = 4;
-              return regeneratorRuntime.awrap(this.rewriteDatabase());
+              _context42.next = 4;
+              return regeneratorRuntime.awrap(this.rewriteItemsKeys());
 
             case 4:
             case "end":
-              return _context43.stop();
+              return _context42.stop();
           }
         }
       }, null, this);
@@ -3181,15 +3174,37 @@ function () {
   }, {
     key: "changePasscode",
     value: function changePasscode(passcode) {
-      return regeneratorRuntime.async(function changePasscode$(_context44) {
+      return regeneratorRuntime.async(function changePasscode$(_context43) {
+        while (1) {
+          switch (_context43.prev = _context43.next) {
+            case 0:
+              _context43.next = 2;
+              return regeneratorRuntime.awrap(this.removePasscode());
+
+            case 2:
+              return _context43.abrupt("return", this.setPasscode(passcode));
+
+            case 3:
+            case "end":
+              return _context43.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @public */
+
+  }, {
+    key: "setStorageEncryptionPolicy",
+    value: function setStorageEncryptionPolicy(encryptionPolicy) {
+      return regeneratorRuntime.async(function setStorageEncryptionPolicy$(_context44) {
         while (1) {
           switch (_context44.prev = _context44.next) {
             case 0:
               _context44.next = 2;
-              return regeneratorRuntime.awrap(this.removePasscode());
+              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
 
             case 2:
-              return _context44.abrupt("return", this.setPasscode(passcode));
+              return _context44.abrupt("return", this.syncManager.repersistAllItems());
 
             case 3:
             case "end":
@@ -3201,39 +3216,17 @@ function () {
     /** @public */
 
   }, {
-    key: "setStorageEncryptionPolicy",
-    value: function setStorageEncryptionPolicy(encryptionPolicy) {
-      return regeneratorRuntime.async(function setStorageEncryptionPolicy$(_context45) {
+    key: "generateUuid",
+    value: function generateUuid() {
+      return regeneratorRuntime.async(function generateUuid$(_context45) {
         while (1) {
           switch (_context45.prev = _context45.next) {
             case 0:
-              _context45.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
-
-            case 2:
-              return _context45.abrupt("return", this.syncManager.repersistAllItems());
-
-            case 3:
-            case "end":
-              return _context45.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @public */
-
-  }, {
-    key: "generateUuid",
-    value: function generateUuid() {
-      return regeneratorRuntime.async(function generateUuid$(_context46) {
-        while (1) {
-          switch (_context46.prev = _context46.next) {
-            case 0:
-              return _context46.abrupt("return", this.protocolService.crypto.generateUUID());
+              return _context45.abrupt("return", this.protocolService.crypto.generateUUID());
 
             case 1:
             case "end":
-              return _context46.stop();
+              return _context45.stop();
           }
         }
       }, null, this);
@@ -3247,16 +3240,16 @@ function () {
   }, {
     key: "changeDeviceInterface",
     value: function changeDeviceInterface(deviceInterface) {
-      return regeneratorRuntime.async(function changeDeviceInterface$(_context47) {
+      return regeneratorRuntime.async(function changeDeviceInterface$(_context46) {
         while (1) {
-          switch (_context47.prev = _context47.next) {
+          switch (_context46.prev = _context46.next) {
             case 0:
               this.deviceInterface = deviceInterface;
               this.keyManager.setDeviceInterface(this.deviceInterface);
 
             case 2:
             case "end":
-              return _context47.stop();
+              return _context46.stop();
           }
         }
       }, null, this);
@@ -3381,16 +3374,16 @@ function () {
         itemsKeyManager: this.itemsKeyManager
       });
       this.keyManager.onStatusChange(function _callee3() {
-        return regeneratorRuntime.async(function _callee3$(_context48) {
+        return regeneratorRuntime.async(function _callee3$(_context47) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context47.prev = _context47.next) {
               case 0:
-                _context48.next = 2;
+                _context47.next = 2;
                 return regeneratorRuntime.awrap(_this6.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].KeyStatusChanged));
 
               case 2:
               case "end":
-                return _context48.stop();
+                return _context47.stop();
             }
           }
         });
@@ -3469,47 +3462,47 @@ function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncManager.addEventObserver(function _callee4(eventName) {
-        return regeneratorRuntime.async(function _callee4$(_context49) {
+        return regeneratorRuntime.async(function _callee4$(_context48) {
           while (1) {
-            switch (_context49.prev = _context49.next) {
+            switch (_context48.prev = _context48.next) {
               case 0:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].FullSyncCompleted)) {
-                  _context49.next = 5;
+                  _context48.next = 5;
                   break;
                 }
 
-                _context49.next = 3;
+                _context48.next = 3;
                 return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync));
 
               case 3:
-                _context49.next = 13;
+                _context48.next = 13;
                 break;
 
               case 5:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncTakingTooLong)) {
-                  _context49.next = 10;
+                  _context48.next = 10;
                   break;
                 }
 
-                _context49.next = 8;
+                _context48.next = 8;
                 return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].HighLatencySync));
 
               case 8:
-                _context49.next = 13;
+                _context48.next = 13;
                 break;
 
               case 10:
                 if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncError)) {
-                  _context49.next = 13;
+                  _context48.next = 13;
                   break;
                 }
 
-                _context49.next = 13;
+                _context48.next = 13;
                 return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].FailedSync));
 
               case 13:
               case "end":
-                return _context49.stop();
+                return _context48.stop();
             }
           }
         });
@@ -19271,24 +19264,6 @@ function (_PureService) {
 
 
   _createClass(DeviceAuthService, [{
-    key: "hasPasscode",
-    value: function hasPasscode() {
-      return regeneratorRuntime.async(function hasPasscode$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              return _context.abrupt("return", this.keyManager.hasRootKeyWrapper());
-
-            case 1:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @public */
-
-  }, {
     key: "isPasscodeLocked",
     value: function isPasscodeLocked() {
       return this.keyManager.rootKeyNeedsUnwrapping();
@@ -19297,37 +19272,37 @@ function (_PureService) {
     key: "getLaunchChallenges",
     value: function getLaunchChallenges() {
       var challenges, hasPasscode, biometricPrefs, biometricEnabled;
-      return regeneratorRuntime.async(function getLaunchChallenges$(_context2) {
+      return regeneratorRuntime.async(function getLaunchChallenges$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
               challenges = [];
-              _context2.next = 3;
-              return regeneratorRuntime.awrap(this.hasPasscode());
+              _context.next = 3;
+              return regeneratorRuntime.awrap(this.keyManager.hasPasscode());
 
             case 3:
-              hasPasscode = _context2.sent;
+              hasPasscode = _context.sent;
 
               if (hasPasscode) {
                 challenges.push(_Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].LocalPasscode);
               }
 
-              _context2.next = 7;
+              _context.next = 7;
               return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
 
             case 7:
-              biometricPrefs = _context2.sent;
+              biometricPrefs = _context.sent;
               biometricEnabled = biometricPrefs && biometricPrefs.enabled;
 
               if (biometricEnabled) {
                 challenges.push(_Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].Biometric);
               }
 
-              return _context2.abrupt("return", challenges);
+              return _context.abrupt("return", challenges);
 
             case 11:
             case "end":
-              return _context2.stop();
+              return _context.stop();
           }
         }
       }, null, this);
@@ -19335,18 +19310,18 @@ function (_PureService) {
   }, {
     key: "enableBiometrics",
     value: function enableBiometrics() {
-      return regeneratorRuntime.async(function enableBiometrics$(_context3) {
+      return regeneratorRuntime.async(function enableBiometrics$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
-              _context3.next = 2;
+              _context2.next = 2;
               return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, {
                 enabled: true
               }, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
 
             case 2:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
       }, null, this);
@@ -19354,8 +19329,48 @@ function (_PureService) {
   }, {
     key: "validateChallengeResponse",
     value: function validateChallengeResponse(response) {
-      var keyParams, key;
-      return regeneratorRuntime.async(function validateChallengeResponse$(_context4) {
+      return regeneratorRuntime.async(function validateChallengeResponse$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].LocalPasscode)) {
+                _context3.next = 4;
+                break;
+              }
+
+              return _context3.abrupt("return", this.keyManager.validatePasscode(response.value));
+
+            case 4:
+              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].AccountPassword)) {
+                _context3.next = 8;
+                break;
+              }
+
+              return _context3.abrupt("return", this.keyManager.validateAccountPassword(response.value));
+
+            case 8:
+              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].Biometric)) {
+                _context3.next = 10;
+                break;
+              }
+
+              return _context3.abrupt("return", response.value === true);
+
+            case 10:
+              throw "Cannot validate challenge type ".concat(response.challenge);
+
+            case 11:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "handleChallengeResponse",
+    value: function handleChallengeResponse(response) {
+      var key;
+      return regeneratorRuntime.async(function handleChallengeResponse$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
@@ -19365,78 +19380,24 @@ function (_PureService) {
               }
 
               _context4.next = 3;
-              return regeneratorRuntime.awrap(this.keyManager.getRootKeyWrapperKeyParams());
-
-            case 3:
-              keyParams = _context4.sent;
-              _context4.next = 6;
-              return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
-                password: response.value,
-                keyParams: keyParams
-              }));
-
-            case 6:
-              key = _context4.sent;
-              return _context4.abrupt("return", this.keyManager.validateWrappingKey(key));
-
-            case 8:
-              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].AccountPassword)) {
-                _context4.next = 10;
-                break;
-              }
-
-              return _context4.abrupt("return", this.keyManager.validateAccountPassword(response.value));
-
-            case 10:
-              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].Biometric)) {
-                _context4.next = 12;
-                break;
-              }
-
-              return _context4.abrupt("return", response.value === true);
-
-            case 12:
-              throw "Cannot validate challenge type ".concat(response.challenge);
-
-            case 13:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "handleChallengeResponse",
-    value: function handleChallengeResponse(response) {
-      var key;
-      return regeneratorRuntime.async(function handleChallengeResponse$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"].LocalPasscode)) {
-                _context5.next = 8;
-                break;
-              }
-
-              _context5.next = 3;
               return regeneratorRuntime.awrap(this.keyManager.computeWrappingKey({
                 passcode: response.value
               }));
 
             case 3:
-              key = _context5.sent;
-              _context5.next = 6;
+              key = _context4.sent;
+              _context4.next = 6;
               return regeneratorRuntime.awrap(this.keyManager.unwrapRootKey({
                 wrappingKey: key
               }));
 
             case 6:
-              _context5.next = 8;
+              _context4.next = 8;
               break;
 
             case 8:
             case "end":
-              return _context5.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -21305,6 +21266,11 @@ function (_PureService) {
         }
       }, null, this);
     }
+  }, {
+    key: "hasPasscode",
+    value: function hasPasscode() {
+      return this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
+    }
     /**
      * @param callback  A function that takes in a content type to call back when root
      *                  key or wrapper status has changed.
@@ -22245,10 +22211,10 @@ function (_PureService) {
      */
 
   }, {
-    key: "validateLocalPasscode",
-    value: function validateLocalPasscode(passcode) {
+    key: "validatePasscode",
+    value: function validatePasscode(passcode) {
       var keyParams, key;
-      return regeneratorRuntime.async(function validateLocalPasscode$(_context21) {
+      return regeneratorRuntime.async(function validatePasscode$(_context21) {
         while (1) {
           switch (_context21.prev = _context21.next) {
             case 0:
@@ -22259,7 +22225,7 @@ function (_PureService) {
               keyParams = _context21.sent;
               _context21.next = 5;
               return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
-                passcode: passcode,
+                password: passcode,
                 keyParams: keyParams
               }));
 
@@ -25274,7 +25240,7 @@ function (_PureService) {
                 break;
               }
 
-              return _context11.abrupt("return", this.keyManager.validateLocalPasscode(value));
+              return _context11.abrupt("return", this.keyManager.validatePasscode(value));
 
             case 6:
             case "end":
@@ -27775,49 +27741,21 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * Allows IndexedDB unencrypted logs to be deleted
-     * `clearAllPayloads` will remove data from backing store,
-     * but not from working memory See:
-     * https://github.com/standardnotes/desktop/issues/131
-     */
-
-  }, {
-    key: "clearDesktopDatabase",
-    value: function clearDesktopDatabase() {
-      return regeneratorRuntime.async(function clearDesktopDatabase$(_context21) {
-        while (1) {
-          switch (_context21.prev = _context21.next) {
-            case 0:
-              if (!(this.deviceInterface.environment === _Lib__WEBPACK_IMPORTED_MODULE_2__["Environments"].Desktop)) {
-                _context21.next = 2;
-                break;
-              }
-
-              return _context21.abrupt("return", this.clearAllPayloads());
-
-            case 2:
-            case "end":
-              return _context21.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
      * General
      */
 
   }, {
     key: "clearAllData",
     value: function clearAllData() {
-      return regeneratorRuntime.async(function clearAllData$(_context22) {
+      return regeneratorRuntime.async(function clearAllData$(_context21) {
         while (1) {
-          switch (_context22.prev = _context22.next) {
+          switch (_context21.prev = _context21.next) {
             case 0:
-              return _context22.abrupt("return", Promise.all([this.clearValues(), this.clearAllPayloads()]));
+              return _context21.abrupt("return", Promise.all([this.clearValues(), this.clearAllPayloads()]));
 
             case 1:
             case "end":
-              return _context22.stop();
+              return _context21.stop();
           }
         }
       }, null, this);

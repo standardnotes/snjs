@@ -8,7 +8,7 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only("storage manager", () => {
+describe("storage manager", () => {
   /**
    * Items are saved in localStorage in tests.
    * Base keys are `storage` and `last_migration_timestamp`

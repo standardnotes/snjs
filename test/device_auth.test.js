@@ -25,7 +25,7 @@ describe('device authentication', () => {
     const wrongPasscode = 'barfoo';
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(0);
     await application.setPasscode(passcode);
-    expect(await application.deviceAuthService.hasPasscode()).to.equal(true);
+    expect(await application.hasPasscode()).to.equal(true);
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(1);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
@@ -65,7 +65,7 @@ describe('device authentication', () => {
     const wrongPasscode = 'barfoo';
     await application.setPasscode(passcode);
     await application.deviceAuthService.enableBiometrics();
-    expect(await application.deviceAuthService.hasPasscode()).to.equal(true);
+    expect(await application.hasPasscode()).to.equal(true);
     expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
@@ -121,7 +121,7 @@ describe('device authentication', () => {
     await application.setPasscode(passcode);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
     expect(
-      await application.deviceAuthService.hasPasscode()
+      await application.hasPasscode()
     ).to.equal(true);
     await application.deinit();
 

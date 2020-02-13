@@ -255,6 +255,13 @@ describe('keys', () => {
     expect(itemsKeyPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
+  it('correctly validates local passcode', async function () {
+    const passcode = 'foo';
+    await this.application.setPasscode('foo');
+    expect(await this.application.keyManager.validatePasscode('wrong')).to.equal(false);
+    expect(await this.application.keyManager.validatePasscode(passcode)).to.equal(true);
+  });
+
   it('signing into 003 account should delete latest offline items key and create 003 items key', 
   async function () {
     /** 
