@@ -8,7 +8,7 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("singletons", () => {
+describe.only("singletons", () => {
 
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
@@ -25,15 +25,15 @@ describe("singletons", () => {
     });
   }
 
-  before(async function() {
+  before(async function () {
     localStorage.clear();
   });
 
-  after(async function() {
+  after(async function () {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -45,14 +45,14 @@ describe("singletons", () => {
     });
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
   });
 
-  it("only resolves to 1 item", async function() {
+  it("only resolves to 1 item", async function () {
     /** Privileges are an item we know to always return true for isSingleton */
     const privs1 = createPrivsPayload();
     const privs2 = createPrivsPayload();
@@ -67,8 +67,42 @@ describe("singletons", () => {
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
+  it.only("resolves registered predicate", async function () {
+    const extManagerId = 'org.standardnotes.extensions-manager';
+    const extPred = SFPredicate.CompoundPredicate([
+      new SFPredicate('content_type', '=', ContentTypes.Component),
+      new SFPredicate('package_info.identifier', '=', extManagerId)
+    ]);
+    this.application.singletonManager.registerPredicate(extPred);
+    const createExtMgr = async () => {
+      return this.application.createItem({
+        add: true,
+        needsSync: true,
+        contentType: ContentTypes.Component,
+        content: {
+          package_info: {
+            name: 'Extensions',
+            identifier: extManagerId
+          }
+        }
+      });
+    };
+    const extManager = await createExtMgr();
+    this.expectedItemCount += 1;
+
+    /** Call needlessly */
+    await createExtMgr();
+    await createExtMgr();
+
+    expect(extManager).to.be.ok;
+    const refreshedExtMgr = this.application.findItem({ uuid: extManager.uuid });
+    expect(refreshedExtMgr).to.be.ok;
+    await this.application.sync();
+    expect(this.application.modelManager.itemsMatchingPredicate(extPred).length).to.equal(1);
+  });
+
   it("signing into account and retrieving singleton shouldn't put us in deadlock", async function () {
-   /** Create privs */
+    /** Create privs */
     const ogPrivs = await this.application.privilegesManager.getPrivileges();
     this.expectedItemCount++;
     await this.application.sync();
@@ -87,7 +121,7 @@ describe("singletons", () => {
     expect(allPrivs.length).to.equal(1);
   });
 
-  it("if only result is errorDecrypting, create new item", async function() {
+  it("if only result is errorDecrypting, create new item", async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
@@ -107,7 +141,7 @@ describe("singletons", () => {
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
 
-  it("alternating the uuid of a singleton should return correct result", async function() {
+  it("alternating the uuid of a singleton should return correct result", async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
