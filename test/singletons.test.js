@@ -8,7 +8,11 @@ import Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only("singletons", () => {
+describe("singletons", () => {
+
+  const syncOptions = {
+    checkIntegrity: true
+  };
 
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
@@ -43,10 +47,38 @@ describe.only("singletons", () => {
       email: this.email,
       password: this.password
     });
+    this.signOut = async () => {
+      await this.application.signOut();
+    };
+    this.signIn = async () => {
+      await this.application.signIn({
+        email: this.email,
+        password: this.password
+      });
+    };
+    this.extManagerId = 'org.standardnotes.extensions-manager';
+    this.extPred = SFPredicate.CompoundPredicate([
+      new SFPredicate('content_type', '=', ContentTypes.Component),
+      new SFPredicate('package_info.identifier', '=', this.extManagerId)
+    ]);
+    this.createExtMgr = async () => {
+      return this.application.createItem({
+        add: true,
+        needsSync: true,
+        contentType: ContentTypes.Component,
+        content: {
+          package_info: {
+            name: 'Extensions',
+            identifier: this.extManagerId
+          }
+        }
+      });
+    };
   });
 
   afterEach(async function () {
     expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     const rawPayloads = await this.application.storageManager.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
@@ -63,49 +95,81 @@ describe.only("singletons", () => {
       payloads: [privs1, privs2, privs3]
     });
     await this.application.modelManager.setItemsDirty(items);
-    await this.application.syncManager.sync();
+    await this.application.syncManager.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
-  it.only("resolves registered predicate", async function () {
-    const extManagerId = 'org.standardnotes.extensions-manager';
-    const extPred = SFPredicate.CompoundPredicate([
-      new SFPredicate('content_type', '=', ContentTypes.Component),
-      new SFPredicate('package_info.identifier', '=', extManagerId)
-    ]);
-    this.application.singletonManager.registerPredicate(extPred);
-    const createExtMgr = async () => {
-      return this.application.createItem({
-        add: true,
-        needsSync: true,
-        contentType: ContentTypes.Component,
-        content: {
-          package_info: {
-            name: 'Extensions',
-            identifier: extManagerId
-          }
-        }
-      });
-    };
-    const extManager = await createExtMgr();
+  it("resolves registered predicate", async function () {
+    this.application.singletonManager.registerPredicate(this.extPred);
+    const extManager = await this.createExtMgr();
     this.expectedItemCount += 1;
 
     /** Call needlessly */
-    await createExtMgr();
-    await createExtMgr();
+    await this.createExtMgr();
+    await this.createExtMgr();
+    await this.createExtMgr();
 
     expect(extManager).to.be.ok;
     const refreshedExtMgr = this.application.findItem({ uuid: extManager.uuid });
     expect(refreshedExtMgr).to.be.ok;
-    await this.application.sync();
-    expect(this.application.modelManager.itemsMatchingPredicate(extPred).length).to.equal(1);
+    await this.application.sync(syncOptions);
+    expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
   });
+
+  it("resolves registered predicate with signing in/out", async function () {
+    await this.signOut();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
+    this.application.singletonManager.registerPredicate(this.extPred);
+    await this.createExtMgr();
+    this.expectedItemCount += 1;
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+    await this.signOut();
+    this.application.singletonManager.registerPredicate(this.extPred);
+    await this.createExtMgr();
+    await this.application.sync(syncOptions);
+    this.application.sync(syncOptions);
+    await this.signIn();
+    await Factory.sleep(0.5);
+  });
+
+  it('singletons that are deleted after download first sync should not sync to server', async function () {
+    this.application.singletonManager.registerPredicate(this.extPred);
+    await this.createExtMgr();
+    await this.createExtMgr();
+    await this.createExtMgr();
+    this.expectedItemCount++;
+
+    let didCompleteRelevantSync = false;
+    let beginCheckingResponse = false;
+    this.application.syncManager.addEventObserver(async (eventName, data) => {
+      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+        beginCheckingResponse = true;
+      }
+      if (!beginCheckingResponse) {
+        return;
+      }
+      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+        didCompleteRelevantSync = true;
+        const saved = data.savedPayloads;
+        expect(saved.length).to.equal(1);
+        const matching = saved.find((p) => p.content_type === ContentTypes.Component && p.deleted);
+        expect(matching).to.not.be.ok;
+      }
+    });
+    await this.application.syncManager.sync({ mode: SyncModes.DownloadFirst });
+    expect(didCompleteRelevantSync).to.equal(true);
+  }).timeout(10000);
 
   it("signing into account and retrieving singleton shouldn't put us in deadlock", async function () {
     /** Create privs */
     const ogPrivs = await this.application.privilegesManager.getPrivileges();
     this.expectedItemCount++;
-    await this.application.sync();
+    await this.application.sync(syncOptions);
     await this.application.signOut();
     /** Create another instance while signed out */
     await this.application.privilegesManager.getPrivileges();
@@ -127,7 +191,7 @@ describe.only("singletons", () => {
       payload: payload
     });
     this.expectedItemCount++;
-    await this.application.syncManager.sync();
+    await this.application.syncManager.sync(syncOptions);
     /** Set after sync so that it syncs properly */
     item.errorDecrypting = true;
 
@@ -147,14 +211,14 @@ describe.only("singletons", () => {
       payload: payload
     });
     this.expectedItemCount++;
-    await this.application.syncManager.sync();
+    await this.application.syncManager.sync(syncOptions);
     const predicate = new SFPredicate("content_type", "=", item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload
     });
     await this.application.syncManager.alternateUuidForItem(resolvedItem);
-    await this.application.syncManager.sync();
+    await this.application.syncManager.sync(syncOptions);
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload

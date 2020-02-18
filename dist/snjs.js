@@ -2917,7 +2917,8 @@ function () {
             case 22:
               _context35.next = 24;
               return regeneratorRuntime.awrap(this.syncManager.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst,
+                checkIntegrity: true
               }));
 
             case 24:
@@ -3475,45 +3476,22 @@ function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncManager.addEventObserver(function _callee4(eventName) {
+        var appEvent;
         return regeneratorRuntime.async(function _callee4$(_context48) {
           while (1) {
             switch (_context48.prev = _context48.next) {
               case 0:
-                if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].FullSyncCompleted)) {
-                  _context48.next = 5;
+                appEvent = Object(_Lib__WEBPACK_IMPORTED_MODULE_3__["applicationEventForSyncEvent"])(eventName);
+
+                if (!appEvent) {
+                  _context48.next = 4;
                   break;
                 }
 
-                _context48.next = 3;
-                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].CompletedSync));
+                _context48.next = 4;
+                return regeneratorRuntime.awrap(_this7.notifyEvent(appEvent));
 
-              case 3:
-                _context48.next = 13;
-                break;
-
-              case 5:
-                if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncTakingTooLong)) {
-                  _context48.next = 10;
-                  break;
-                }
-
-                _context48.next = 8;
-                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].HighLatencySync));
-
-              case 8:
-                _context48.next = 13;
-                break;
-
-              case 10:
-                if (!(eventName === _Lib__WEBPACK_IMPORTED_MODULE_3__["SyncEvents"].SyncError)) {
-                  _context48.next = 13;
-                  break;
-                }
-
-                _context48.next = 13;
-                return regeneratorRuntime.awrap(_this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].FailedSync));
-
-              case 13:
+              case 4:
               case "end":
                 return _context48.stop();
             }
@@ -3924,14 +3902,19 @@ function () {
 /*!***********************!*\
   !*** ./lib/events.js ***!
   \***********************/
-/*! exports provided: ApplicationEvents, SyncEvents */
+/*! exports provided: SyncEvents, ApplicationEvents, applicationEventForSyncEvent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return ApplicationEvents; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "applicationEventForSyncEvent", function() { return applicationEventForSyncEvent; });
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"]; });
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 var ApplicationEvents = {
   SignedIn: 2,
@@ -3964,7 +3947,11 @@ var ApplicationEvents = {
    */
   KeyStatusChanged: 12
 };
+function applicationEventForSyncEvent(syncEvent) {
+  var _SyncEvents$FullSyncC;
 
+  return (_SyncEvents$FullSyncC = {}, _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].FullSyncCompleted, ApplicationEvents.CompletedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncError, ApplicationEvents.FailedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong, ApplicationEvents.HighLatencySync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].EnterOutOfSync, ApplicationEvents.EnteredOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].ExitOutOfSync, ApplicationEvents.ExitedOutOfSync), _SyncEvents$FullSyncC)[syncEvent];
+}
 
 /***/ }),
 
@@ -3972,7 +3959,7 @@ var ApplicationEvents = {
 /*!**********************!*\
   !*** ./lib/index.js ***!
   \**********************/
-/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, StorageKeys, namespacedKey, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP */
+/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, StorageKeys, namespacedKey, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3982,6 +3969,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_0__["ApplicationEvents"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "applicationEventForSyncEvent", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_0__["applicationEventForSyncEvent"]; });
 
 /* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationStages", function() { return _Lib_stages__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"]; });
@@ -24393,6 +24382,10 @@ function (_PureService) {
     key: "filterItemsWithPredicates",
     value: function filterItemsWithPredicates(items, predicates) {
       var results = items.filter(function (item) {
+        if (item.deleted) {
+          return false;
+        }
+
         var _iteratorNormalCompletion15 = true;
         var _didIteratorError15 = false;
         var _iteratorError15 = undefined;
@@ -26669,26 +26662,29 @@ function (_PureService) {
 
       this.modelManager.addCreationObserver({
         callback: function callback(_ref2) {
-          var items;
-          return regeneratorRuntime.async(function callback$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  items = _ref2.items;
-                  _this2.resolveQueue = _this2.resolveQueue.concat(items);
-
-                case 2:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          });
+          var items = _ref2.items;
+          _this2.resolveQueue = _this2.resolveQueue.concat(items);
         }
       });
-      this.syncManager.addEventObserver(function (eventName) {
-        if (eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_5__["SyncEvents"].FullSyncCompleted) {
-          _this2.resolveSingletonsForItems(_this2.popResolveQueue());
-        }
+      this.syncManager.addEventObserver(function _callee(eventName) {
+        return regeneratorRuntime.async(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_5__["SyncEvents"].DownloadFirstSyncCompleted || eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_5__["SyncEvents"].FullSyncCompleted)) {
+                  _context.next = 3;
+                  break;
+                }
+
+                _context.next = 3;
+                return regeneratorRuntime.awrap(_this2.resolveSingletonsForItems(_this2.popResolveQueue(), eventName));
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        });
       });
     }
   }, {
@@ -26705,10 +26701,10 @@ function (_PureService) {
     }
   }, {
     key: "resolveSingletonsForItems",
-    value: function resolveSingletonsForItems(items) {
+    value: function resolveSingletonsForItems(items, eventSource) {
       var _this3 = this;
 
-      var matchesForRegisteredPredicate, matchesForSelfPredicate, matches, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, matchingItems;
+      var matchesForRegisteredPredicate, matchesForSelfPredicate, matches, handled, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, matchingItems;
 
       return regeneratorRuntime.async(function resolveSingletonsForItems$(_context2) {
         while (1) {
@@ -26761,80 +26757,109 @@ function (_PureService) {
                 return matchesForRegisteredPredicate(item);
               };
 
+              handled = [];
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context2.prev = 6;
+              _context2.prev = 7;
               _iterator2 = items[Symbol.iterator]();
 
-            case 8:
+            case 9:
               if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context2.next = 18;
+                _context2.next = 22;
                 break;
               }
 
               item = _step2.value;
-              matchingItems = matches(item);
 
-              if (!(!matchingItems || matchingItems.length <= 1)) {
+              if (!handled.includes(item)) {
                 _context2.next = 13;
                 break;
               }
 
-              return _context2.abrupt("continue", 15);
+              return _context2.abrupt("continue", 19);
 
             case 13:
-              _context2.next = 15;
+              matchingItems = matches(item);
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["extendArray"])(handled, matchingItems || []);
+
+              if (!(!matchingItems || matchingItems.length <= 1)) {
+                _context2.next = 17;
+                break;
+              }
+
+              return _context2.abrupt("continue", 19);
+
+            case 17:
+              _context2.next = 19;
               return regeneratorRuntime.awrap(this.handleStrategy({
                 items: matchingItems,
                 strategy: item.singletonStrategy
               }));
 
-            case 15:
+            case 19:
               _iteratorNormalCompletion2 = true;
-              _context2.next = 8;
+              _context2.next = 9;
               break;
 
-            case 18:
-              _context2.next = 24;
+            case 22:
+              _context2.next = 28;
               break;
-
-            case 20:
-              _context2.prev = 20;
-              _context2.t0 = _context2["catch"](6);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context2.t0;
 
             case 24:
               _context2.prev = 24;
-              _context2.prev = 25;
+              _context2.t0 = _context2["catch"](7);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context2.t0;
+
+            case 28:
+              _context2.prev = 28;
+              _context2.prev = 29;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
-            case 27:
-              _context2.prev = 27;
+            case 31:
+              _context2.prev = 31;
 
               if (!_didIteratorError2) {
-                _context2.next = 30;
+                _context2.next = 34;
                 break;
               }
 
               throw _iteratorError2;
 
-            case 30:
-              return _context2.finish(27);
+            case 34:
+              return _context2.finish(31);
 
-            case 31:
-              return _context2.finish(24);
+            case 35:
+              return _context2.finish(28);
 
-            case 32:
+            case 36:
+              /** 
+               * Only sync if event source is FullSyncCompleted.
+               * If it is on DownloadFirstSyncCompleted, we don't need to sync,
+               * as a sync request will automatically be made as part of the second phase
+               * of a download-first request.
+               */
+              if (handled.length > 0 && eventSource === _Services_sync_events__WEBPACK_IMPORTED_MODULE_5__["SyncEvents"].FullSyncCompleted) {
+                /** 
+                 * Do not await. We want any local-side changes to 
+                 * be awaited but the actual sync shouldn't be since it's non-essential
+                 * Perform after timeout so that we can yield to event notifier that triggered us 
+                 */
+                setTimeout(function () {
+                  _this3.syncManager.sync();
+                });
+              }
+
+            case 37:
             case "end":
               return _context2.stop();
           }
         }
-      }, null, this, [[6, 20, 24, 32], [25,, 27, 31]]);
+      }, null, this, [[7, 24, 28, 36], [29,, 31, 35]]);
     }
   }, {
     key: "handleStrategy",
@@ -26871,10 +26896,6 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.modelManager.setItemsToBeDeleted(deleteItems));
 
             case 7:
-              _context3.next = 9;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
-
-            case 9:
             case "end":
               return _context3.stop();
           }
@@ -28038,6 +28059,8 @@ function () {
     this.checkIntegrity = checkIntegrity;
     this.apiService = apiService;
     this.receiver = receiver;
+    /** @private */
+
     this.responses = [];
   }
   /**
@@ -28776,8 +28799,7 @@ function (_PureService) {
     _this.modelManager = modelManager;
     _this.storageManager = storageManager;
     _this.apiService = apiService;
-    _this.interval = interval; // this.loggingEnabled = true;
-
+    _this.interval = interval;
     _this.statusObservers = [];
     _this.resolveQueue = [];
     _this.spawnQueue = [];
@@ -29653,7 +29675,8 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.syncOnlineOperation({
                 payloads: uploadPayloads,
                 checkIntegrity: checkIntegrity,
-                source: source
+                source: source,
+                mode: useMode
               }));
 
             case 60:
@@ -29735,32 +29758,38 @@ function (_PureService) {
               }
 
               _context13.next = 95;
+              return regeneratorRuntime.awrap(this.handleNeverSyncedDeleted(neverSyncedDeleted));
+
+            case 95:
+              if (!(useMode !== SyncModes.DownloadFirst)) {
+                _context13.next = 98;
+                break;
+              }
+
+              _context13.next = 98;
               return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].FullSyncCompleted, {
                 source: source
               }));
 
-            case 95:
-              _context13.next = 97;
-              return regeneratorRuntime.awrap(this.handleNeverSyncedDeleted(neverSyncedDeleted));
-
-            case 97:
+            case 98:
               if (!(useMode === SyncModes.DownloadFirst)) {
-                _context13.next = 104;
+                _context13.next = 105;
                 break;
               }
 
               this.completedInitialSync = true;
-              _context13.next = 101;
+              _context13.next = 102;
               return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].DownloadFirstSyncCompleted));
 
-            case 101:
+            case 102:
               return _context13.abrupt("return", this.sync({
-                source: SyncSources.AfterDownloadFirst
+                source: SyncSources.AfterDownloadFirst,
+                checkIntegrity: true
               }));
 
-            case 104:
+            case 105:
               if (!(!this.popSpawnQueue() && this.resolveQueue.length > 0)) {
-                _context13.next = 109;
+                _context13.next = 110;
                 break;
               }
 
@@ -29770,18 +29799,18 @@ function (_PureService) {
               this.sync({
                 source: SyncSources.ResolveQueue
               });
-              _context13.next = 122;
+              _context13.next = 123;
               break;
 
-            case 109:
-              _context13.next = 111;
+            case 110:
+              _context13.next = 112;
               return regeneratorRuntime.awrap(this.itemsNeedingSync());
 
-            case 111:
+            case 112:
               _context13.t1 = _context13.sent.length;
 
               if (!(_context13.t1 > 0)) {
-                _context13.next = 116;
+                _context13.next = 117;
                 break;
               }
 
@@ -29789,9 +29818,9 @@ function (_PureService) {
                 source: SyncSources.MoreDirtyItems
               }));
 
-            case 116:
+            case 117:
               if (!operation.checkIntegrity) {
-                _context13.next = 120;
+                _context13.next = 121;
                 break;
               }
 
@@ -29804,14 +29833,14 @@ function (_PureService) {
                 });
               }
 
-              _context13.next = 122;
+              _context13.next = 123;
               break;
 
-            case 120:
-              _context13.next = 122;
+            case 121:
+              _context13.next = 123;
               return regeneratorRuntime.awrap(this.state.clearIntegrityHashes());
 
-            case 122:
+            case 123:
             case "end":
               return _context13.stop();
           }
@@ -29827,13 +29856,13 @@ function (_PureService) {
     value: function syncOnlineOperation(_ref4) {
       var _this8 = this;
 
-      var payloads, checkIntegrity, source, operation;
+      var payloads, checkIntegrity, source, mode, operation;
       return regeneratorRuntime.async(function syncOnlineOperation$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
-              payloads = _ref4.payloads, checkIntegrity = _ref4.checkIntegrity, source = _ref4.source;
-              this.log('Syncing online user', source, payloads);
+              payloads = _ref4.payloads, checkIntegrity = _ref4.checkIntegrity, source = _ref4.source, mode = _ref4.mode;
+              this.log('Syncing online user', "source:", source, "mode:", mode, "payloads:", payloads);
               _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_7__["AccountSyncOperation"];
               _context15.t1 = this.apiService;
               _context15.t2 = payloads;
@@ -30258,7 +30287,7 @@ function (_PureService) {
 
             case 76:
               _context21.next = 78;
-              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].SingleSyncCompleted));
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].SingleSyncCompleted, response));
 
             case 78:
               if (!response.checkIntegrity) {

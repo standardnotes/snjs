@@ -33,6 +33,15 @@ describe('online syncing', () => {
       email: this.email,
       password: this.password
     });
+    this.signOut = async () => {
+      await this.application.signOut();
+    };
+    this.signIn = async () => {
+      await this.application.signIn({
+        email: this.email,
+        password: this.password
+      });
+    };
   });
 
   afterEach(async function () {
@@ -652,6 +661,65 @@ describe('online syncing', () => {
     await this.application.syncManager.sync(syncOptions);
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  }).timeout(10000);
+
+  it('items that are never synced and deleted should not be uploaded to server', async function () {
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(note, true);
+    await this.application.modelManager.setItemToBeDeleted(note);
+
+    let success = true;
+    let didCompleteRelevantSync = false;
+    let beginCheckingResponse = false;
+    this.application.syncManager.addEventObserver((eventName, data) => {
+      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+        beginCheckingResponse = true;
+      }
+      if (!beginCheckingResponse) {
+        return;
+      }
+      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+        didCompleteRelevantSync = true;
+        const response = data;
+        const matching = response.savedPayloads.find((p) => p.uuid === note.uuid);
+        if(matching) {
+          success = false;
+        }
+      }
+    });
+    await this.application.syncManager.sync({ mode: SyncModes.DownloadFirst});
+    expect(didCompleteRelevantSync).to.equal(true);
+    expect(success).to.equal(true);
+  }).timeout(10000);
+
+  it('items that are deleted after download first sync complete should not be uploaded to server', async function () {
+    /** The singleton manager may delete items are download first. We dont want those uploaded to server. */
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.modelManager.setItemDirty(note, true);
+    
+    let success = true;
+    let didCompleteRelevantSync = false;
+    let beginCheckingResponse = false;
+    this.application.syncManager.addEventObserver(async (eventName, data) => {
+      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+        await this.application.modelManager.setItemToBeDeleted(note);
+        beginCheckingResponse = true;
+      }
+      if (!beginCheckingResponse) {
+        return;
+      }
+      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+        didCompleteRelevantSync = true;
+        const response = data;
+        const matching = response.savedPayloads.find((p) => p.uuid === note.uuid);
+        if (matching) {
+          success = false;
+        }
+      }
+    });
+    await this.application.syncManager.sync({ mode: SyncModes.DownloadFirst });
+    expect(didCompleteRelevantSync).to.equal(true);
+    expect(success).to.equal(true);
   }).timeout(10000);
 
   it("marking an item dirty then saving to disk should retain that dirty state when restored", async function () {
