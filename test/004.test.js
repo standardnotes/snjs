@@ -9,7 +9,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('004 protocol operations', () => {
-
   const _identifier = "hello@test.com";
   const _password = "password";
   let _keyParams;
@@ -32,8 +31,8 @@ describe('004 protocol operations', () => {
     application.deinit();
   });
 
-  it('cost minimum for 004 to be 500,000', () => {
-    expect(application.protocolService.costMinimumForVersion("004")).to.equal(500000);
+  it('cost minimum', () => {
+    expect(application.protocolService.costMinimumForVersion("004")).to.equal(5);
   });
 
   it('generates valid keys for registration', async () => {
@@ -64,41 +63,41 @@ describe('004 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    var text = "hello world";
-    var rawKey = _key.masterKey;
-    var iv = await application.protocolService.crypto.generateRandomKey(96);
+    const text = "hello world";
+    const rawKey = _key.masterKey;
+    const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const additionalData = {foo: "bar"};
     const encString = await application.protocolService.defaultOperator().encryptString({
       plaintext: text,
       rawKey: rawKey,
-      iv: iv,
+      nonce: nonce,
       aad: additionalData
     });
     const decString = await application.protocolService.defaultOperator().decryptString({
       ciphertext: encString,
       rawKey: rawKey,
-      iv: iv,
+      nonce: nonce,
       aad: additionalData
     });
     expect(decString).to.equal(text);
   });
 
-  it('fails to decrypt non-matching aad', async () => {
+  it.skip('fails to decrypt non-matching aad', async () => {
     const text = "hello world";
     const rawKey = _key.masterKey;
-    const iv = await application.protocolService.crypto.generateRandomKey(96);
+    const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const aad = {foo: "bar"};
     const nonmatchingAad = {foo: "rab"};
     const encString = await application.protocolService.defaultOperator().encryptString({
       plaintext: text,
       rawKey: rawKey,
-      iv,
+      nonce,
       aad: aad
     });
     const decString = await application.protocolService.defaultOperator().decryptString({
       ciphertext: encString,
       rawKey: rawKey,
-      iv: iv,
+      nonce: nonce,
       aad: nonmatchingAad
     });
     expect(decString).to.not.equal(text);

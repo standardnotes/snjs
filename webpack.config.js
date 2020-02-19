@@ -1,12 +1,10 @@
 const path = require('path');
-const webpack = require('webpack');
-
+const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
     entry: {
       "snjs.js": "./lib/main.js",
       "snjs.min.js": "./lib/main.js"
     },
-    mode: 'production',
     resolve: {
       alias: {
         "@Root": path.resolve(__dirname, "."),
@@ -22,7 +20,8 @@ module.exports = {
       filename: './[name]',
       library: 'SNLibrary',
       libraryTarget: 'umd',
-      umdNamedDefine: true
+      umdNamedDefine: true,
+      publicPath: '/dist/'
     },
     module: {
       rules: [
@@ -32,6 +31,12 @@ module.exports = {
         }
       ]
     },
+    plugins: [
+      new CopyPlugin([
+        { from: 'node_modules/sncrypto/dist/libsodium.bundle.js', to: 'libsodium.bundle.js' },
+        { from: 'node_modules/sncrypto/dist/vendors~libsodium.bundle.js', to: 'vendors~libsodium.bundle.js' },
+      ]),
+    ],
     stats: {
       colors: true
     },

@@ -8,7 +8,7 @@ import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("importing", () => {
+describe.only("importing", () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -20,7 +20,7 @@ describe("importing", () => {
     await this.application.deinit();
   });
 
-  it('importing existing data should keep relationships valid', async function () {
+  it.only('importing existing data should keep relationships valid', async function () {
     const modelManager = this.application.modelManager;
 
     const pair = Factory.createRelatedNoteTagPairPayload();

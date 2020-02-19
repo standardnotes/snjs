@@ -140,7 +140,7 @@ describe("storage manager", () => {
       object: wrappedValue
     });
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
-  });
+  }).timeout(5000);
 
   it("storage aftering adding passcode/removing passcode w/account should be encrypted", async function () {
     /** 
@@ -166,7 +166,7 @@ describe("storage manager", () => {
       object: wrappedValue
     });
     expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
-  });
+  }).timeout(5000);
 
   it("adding account should encrypt storage with account keys", async function () {
     await this.application.setValue('foo', 'bar');
@@ -231,7 +231,7 @@ describe("storage manager", () => {
     });
     expect(decrypted.errorDecrypting).to.equal(false);
     expect(decrypted.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
-  });
+  }).timeout(5000);
 
   it("disabling storage encryption should store items without encryption", async function () {
     await Factory.registerUserToApplication({
