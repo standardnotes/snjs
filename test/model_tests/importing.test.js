@@ -8,7 +8,7 @@ import Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only("importing", () => {
+describe("importing", () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -20,7 +20,7 @@ describe.only("importing", () => {
     await this.application.deinit();
   });
 
-  it.only('importing existing data should keep relationships valid', async function () {
+  it('importing existing data should keep relationships valid', async function () {
     const modelManager = this.application.modelManager;
 
     const pair = Factory.createRelatedNoteTagPairPayload();
@@ -39,6 +39,7 @@ describe.only("importing", () => {
     expect(note.tags.length).to.equal(1);
 
     await this.application.importData({
+      awaitSync: true,
       data: {
         items: [notePayload, tagPayload]
       }
@@ -68,6 +69,7 @@ describe.only("importing", () => {
       override: { content: { title: `${Math.random()}` } }
     });
     await this.application.importData({
+      awaitSync: true,
       data: {
         items: [
           mutatedNote,
@@ -92,6 +94,7 @@ describe.only("importing", () => {
       override: { content: { references: [] } }
     });
     await this.application.importData({
+      awaitSync: true,
       data: {
         items: [
           mutatedTag
@@ -120,6 +123,7 @@ describe.only("importing", () => {
       override: { content: { title: `${Math.random()}` } }
     });
     await this.application.importData({
+      awaitSync: true,
       data: {
         items: [
           mutatedNote,
@@ -189,6 +193,7 @@ describe.only("importing", () => {
       );
 
       await this.application.importData({
+        awaitSync: true,
         data: {
           items: [
             externalNote,

@@ -1702,7 +1702,7 @@ return /******/ (function(modules) { // webpackBootstrap
              *
              * @param {String|Buffer} ciphertext
              * @param {String} nonce  In hex format
-             * @param {String} key   In hex format
+             * @param {String} key  In hex format
              * @param {String|Buffer} assocData
              */
 
@@ -5725,12 +5725,12 @@ function () {
   }, {
     key: "importData",
     value: function importData(_ref21) {
-      var data, password, decryptedPayloads, validPayloads, affectedItems;
+      var data, password, awaitSync, decryptedPayloads, validPayloads, affectedItems, promise;
       return regeneratorRuntime.async(function importData$(_context23) {
         while (1) {
           switch (_context23.prev = _context23.next) {
             case 0:
-              data = _ref21.data, password = _ref21.password;
+              data = _ref21.data, password = _ref21.password, awaitSync = _ref21.awaitSync;
               _context23.next = 3;
               return regeneratorRuntime.awrap(this.protocolService.payloadsByDecryptingBackupFile({
                 data: data,
@@ -5747,13 +5747,23 @@ function () {
 
             case 7:
               affectedItems = _context23.sent;
-              this.sync();
+              promise = this.sync();
+
+              if (!awaitSync) {
+                _context23.next = 12;
+                break;
+              }
+
+              _context23.next = 12;
+              return regeneratorRuntime.awrap(promise);
+
+            case 12:
               return _context23.abrupt("return", {
                 affectedItems: affectedItems,
                 errorCount: decryptedPayloads.length - validPayloads.length
               });
 
-            case 10:
+            case 13:
             case "end":
               return _context23.stop();
           }
@@ -13833,7 +13843,6 @@ function (_SNProtocolOperator) {
      * This way, a comprimised server cannot benefit from sending the same seed value for every user.
      * We mix a client-controlled value that is globally unique (their identifier), with a server controlled value
      * to produce a salt for our KDF.
-     *
     */
 
   }, {
@@ -33347,7 +33356,6 @@ function (_PureService) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
-              this.log('Offline Sync Response', response);
               payloadsToMap = response.payloads;
               /** Before persisting, merge with current base value that has content field */
 
@@ -33356,19 +33364,19 @@ function (_PureService) {
                 var base = masterCollection.findPayload(payload.uuid);
                 return base.mergedWith(payload);
               });
-              _context19.next = 6;
+              _context19.next = 5;
               return regeneratorRuntime.awrap(this.persistPayloads({
                 decryptedPayloads: payloadsToPersist
               }));
 
-            case 6:
-              _context19.next = 8;
+            case 5:
+              _context19.next = 7;
               return regeneratorRuntime.awrap(this.modelManager.mapPayloadsToLocalItems({
                 payloads: payloadsToMap,
                 source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_11__["PayloadSources"].LocalSaved
               }));
 
-            case 8:
+            case 7:
             case "end":
               return _context19.stop();
           }
