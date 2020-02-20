@@ -37,16 +37,16 @@ describe('application instances', () => {
     const app2 = await Factory.createAndInitializeApplication('app2');
 
     await Factory.createMappedNote(app1);
-    await app1.syncManager.sync();
+    await app1.syncService.sync();
 
-    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
-    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT);
+    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT);
 
     await Factory.createMappedNote(app2);
-    await app2.syncManager.sync();
+    await app2.syncService.sync();
 
-    expect((await app1.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
-    expect((await app2.storageManager.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
     await app1.deinit();
     await app2.deinit();
   });

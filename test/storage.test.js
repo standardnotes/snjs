@@ -43,23 +43,23 @@ describe("storage manager", () => {
   it("should set and retrieve values", async function () {
     const key = "foo";
     const value = "bar";
-    await sharedApplication.storageManager.setValue(key, value);
-    expect(await sharedApplication.storageManager.getValue(key)).to.eql(value);
+    await sharedApplication.storageService.setValue(key, value);
+    expect(await sharedApplication.storageService.getValue(key)).to.eql(value);
   });
 
   it("should set and retrieve items", async function () {
     const payload = Factory.createNotePayload();
-    await sharedApplication.storageManager.savePayload(payload);
-    const payloads = await sharedApplication.storageManager.getAllRawPayloads();
+    await sharedApplication.storageService.savePayload(payload);
+    const payloads = await sharedApplication.storageService.getAllRawPayloads();
     expect(payloads.length).to.equal(1);
   });
 
   it("should clear values", async function () {
     const key = "foo";
     const value = "bar";
-    await sharedApplication.storageManager.setValue(key, value);
-    await sharedApplication.storageManager.clearAllData();
-    expect(await sharedApplication.storageManager.getValue(key)).to.not.be.ok;
+    await sharedApplication.storageService.setValue(key, value);
+    await sharedApplication.storageService.clearAllData();
+    expect(await sharedApplication.storageService.getValue(key)).to.not.be.ok;
   });
 
   it("serverPassword should not be saved to keychain", async function () {
@@ -84,12 +84,12 @@ describe("storage manager", () => {
     this.expectedKeyCount++;
     const key = 'foo';
     const value = 'bar';
-    await this.application.storageManager.setValue(
+    await this.application.storageService.setValue(
       key,
       value
     );
     expect(Object.keys(localStorage).length).to.equal(this.expectedKeyCount);
-    const retrievedValue = await this.application.storageManager.getValue(key);
+    const retrievedValue = await this.application.storageService.getValue(key);
     expect(retrievedValue).to.equal(value);
   });
 
@@ -102,18 +102,18 @@ describe("storage manager", () => {
     });
     const key = 'foo';
     const value = 'bar';
-    await this.application.storageManager.setValue(
+    await this.application.storageService.setValue(
       key,
       value
     );
     expect(Object.keys(localStorage).length).to.equal(0);
-    const retrievedValue = await this.application.storageManager.getValue(key);
+    const retrievedValue = await this.application.storageService.getValue(key);
     expect(retrievedValue).to.equal(value);
   });
 
   it("storage with no account and no passcode should not be encrypted", async function () {
     await this.application.setValue('foo', 'bar');
-    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
       object: wrappedValue
     });
@@ -123,7 +123,7 @@ describe("storage manager", () => {
   it("storage aftering adding passcode should be encrypted", async function () {
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
-    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
       object: wrappedValue
     });
@@ -135,7 +135,7 @@ describe("storage manager", () => {
     await this.application.setPasscode('123');
     await this.application.setValue('bar', 'foo');
     await this.application.removePasscode();
-    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
       object: wrappedValue
     });
@@ -161,7 +161,7 @@ describe("storage manager", () => {
     await this.application.removePasscode();
     expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
 
-    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
       object: wrappedValue
     });
@@ -177,7 +177,7 @@ describe("storage manager", () => {
       ephemeral: true
     });
     const accountKey = await this.application.keyManager.getRootKey();
-    expect(await this.application.storageManager.canDecryptWithKey(accountKey)).to.equal(true);
+    expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
   });
 
   it("signing out of account should decrypt storage", async function () {
@@ -190,7 +190,7 @@ describe("storage manager", () => {
     });
     await this.application.signOut();
     await this.application.setValue('bar', 'foo');
-    const wrappedValue = this.application.storageManager.values[ValueModesKeys.Wrapped];
+    const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
       object: wrappedValue
     });
@@ -218,7 +218,7 @@ describe("storage manager", () => {
     expect(await this.application.keyManager.getWrappedRootKeyFromStorage()).to.be.ok;
   
     const accountKey = await this.application.keyManager.getRootKey();
-    expect(await this.application.storageManager.canDecryptWithKey(accountKey)).to.equal(true);
+    expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
     const passcodeKey = await this.application.keyManager.computeWrappingKey({
       passcode: passcode
     });
@@ -245,7 +245,7 @@ describe("storage manager", () => {
       StorageEncryptionPolicies.Disabled
     );
 
-    const payloads = await this.application.storageManager.getAllRawPayloads();
+    const payloads = await this.application.storageService.getAllRawPayloads();
     const payload = payloads[0];
     expect(typeof payload.content).to.not.equal('string');
     expect(payload.content.references).to.be.ok;
@@ -260,7 +260,7 @@ describe("storage manager", () => {
     });
 
     await this.application.signOut();
-    const values = this.application.storageManager.values[ValueModesKeys.Unwrapped];
+    const values = this.application.storageService.values[ValueModesKeys.Unwrapped];
     expect(Object.keys(values).length).to.equal(0);
   });
 

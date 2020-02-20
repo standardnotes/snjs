@@ -125,14 +125,14 @@ describe('2020-01-15 web migration', () => {
       KEY_MODE_ROOT_KEY_PLUS_WRAPPER
     );
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
+    const migratedKeyParams = await application.storageService.getValue(
       StorageKeys.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -152,7 +152,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Ensure arbitrary values have been migrated */
     for(const key of Object.keys(arbitraryValues)) {
-      const value = await application.storageManager.getValue(key);
+      const value = await application.storageService.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
 
@@ -256,14 +256,14 @@ describe('2020-01-15 web migration', () => {
       KEY_MODE_WRAPPER_ONLY
     );
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
+    const migratedKeyParams = await application.storageService.getValue(
       StorageKeys.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -283,7 +283,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Ensure arbitrary values have been migrated */
     for(const key of Object.keys(arbitraryValues)) {
-      const value = await application.storageManager.getValue(key);
+      const value = await application.storageService.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
     await application.deinit();
@@ -350,13 +350,13 @@ describe('2020-01-15 web migration', () => {
       KEY_MODE_ROOT_KEY_ONLY
     );
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageManager.getValue(
+    const migratedKeyParams = await application.storageService.getValue(
       StorageKeys.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -378,11 +378,11 @@ describe('2020-01-15 web migration', () => {
 
     /** Ensure arbitrary values have been migrated */
     for(const key of Object.keys(storage)) {
-      /** Is stringified in storage, but parsed in storageManager */
+      /** Is stringified in storage, but parsed in storageService */
       if(key === 'auth_params') {
         continue;
       }
-      const value = await application.storageManager.getValue(key);
+      const value = await application.storageService.getValue(key);
       expect(storage[key]).to.equal(value);
     }
 
@@ -439,10 +439,10 @@ describe('2020-01-15 web migration', () => {
     );
 
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey).to.not.be.ok;
@@ -456,7 +456,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Ensure arbitrary values have been migrated */
     for(const key of Object.keys(storage)) {
-      const value = await application.storageManager.getValue(key);
+      const value = await application.storageService.getValue(key);
       expect(storage[key]).to.equal(value);
     }
 

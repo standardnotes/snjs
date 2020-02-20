@@ -4737,7 +4737,7 @@ function () {
 
             case 10:
               _context.next = 12;
-              return regeneratorRuntime.awrap(this.storageManager.initializeFromDisk());
+              return regeneratorRuntime.awrap(this.storageService.initializeFromDisk());
 
             case 12:
               _context.next = 14;
@@ -4789,7 +4789,7 @@ function () {
 
             case 3:
               _context3.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.isStorageWrapped());
+              return regeneratorRuntime.awrap(this.storageService.isStorageWrapped());
 
             case 5:
               if (!_context3.sent) {
@@ -4798,7 +4798,7 @@ function () {
               }
 
               _context3.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.decryptStorage());
+              return regeneratorRuntime.awrap(this.storageService.decryptStorage());
 
             case 8:
               _context3.next = 10;
@@ -4820,7 +4820,7 @@ function () {
 
             case 18:
               _context3.next = 20;
-              return regeneratorRuntime.awrap(this.syncManager.getDatabasePayloads());
+              return regeneratorRuntime.awrap(this.syncService.getDatabasePayloads());
 
             case 20:
               databasePayloads = _context3.sent;
@@ -4833,7 +4833,7 @@ function () {
               * before local data has been loaded fully. We await only initial
               * `getDatabasePayloads` to lock in on database state.
               */
-              loadPromise = this.syncManager.loadDatabasePayloads(databasePayloads).then(function _callee() {
+              loadPromise = this.syncService.loadDatabasePayloads(databasePayloads).then(function _callee() {
                 return regeneratorRuntime.async(function _callee$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -4852,7 +4852,7 @@ function () {
                       case 4:
                         _this.beginAutoSyncTimer();
 
-                        return _context2.abrupt("return", _this.syncManager.sync({
+                        return _context2.abrupt("return", _this.syncService.sync({
                           mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
                         }));
 
@@ -4885,7 +4885,7 @@ function () {
       var _this2 = this;
 
       this.autoSyncInterval = this.deviceInterface.interval(function () {
-        _this2.syncManager.log('Syncing from autosync');
+        _this2.syncService.log('Syncing from autosync');
 
         _this2.sync();
       }, DEFAULT_AUTO_SYNC_INTERVAL);
@@ -5257,7 +5257,7 @@ function () {
   }, {
     key: "isDatabaseLoaded",
     value: function isDatabaseLoaded() {
-      return this.syncManager.isDatabaseLoaded();
+      return this.syncService.isDatabaseLoaded();
     }
     /** @public */
 
@@ -5283,7 +5283,7 @@ function () {
 
             case 4:
               _context9.next = 6;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 6:
             case "end":
@@ -5387,7 +5387,7 @@ function () {
 
             case 3:
               _context12.next = 5;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 5:
               if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag) {
@@ -5417,7 +5417,7 @@ function () {
 
             case 3:
               _context13.next = 5;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 5:
             case "end":
@@ -5775,21 +5775,21 @@ function () {
   }, {
     key: "isEphemeralSession",
     value: function isEphemeralSession() {
-      return this.storageManager.isEphemeralSession();
+      return this.storageService.isEphemeralSession();
     }
     /** @private */
 
   }, {
     key: "lockSyncing",
     value: function lockSyncing() {
-      this.syncManager.lockSyncing();
+      this.syncService.lockSyncing();
     }
     /** @private */
 
   }, {
     key: "unlockSyncing",
     value: function unlockSyncing() {
-      this.syncManager.unlockSyncing();
+      this.syncService.unlockSyncing();
     }
     /** @public */
 
@@ -5800,7 +5800,7 @@ function () {
         while (1) {
           switch (_context24.prev = _context24.next) {
             case 0:
-              return _context24.abrupt("return", this.syncManager.status);
+              return _context24.abrupt("return", this.syncService.status);
 
             case 1:
             case "end":
@@ -5818,7 +5818,7 @@ function () {
         while (1) {
           switch (_context25.prev = _context25.next) {
             case 0:
-              return _context25.abrupt("return", this.syncManager.sync(options));
+              return _context25.abrupt("return", this.syncService.sync(options));
 
             case 1:
             case "end":
@@ -5836,7 +5836,7 @@ function () {
         while (1) {
           switch (_context26.prev = _context26.next) {
             case 0:
-              return _context26.abrupt("return", this.syncManager.resolveOutOfSync());
+              return _context26.abrupt("return", this.syncService.resolveOutOfSync());
 
             case 1:
             case "end":
@@ -5854,7 +5854,7 @@ function () {
         while (1) {
           switch (_context27.prev = _context27.next) {
             case 0:
-              return _context27.abrupt("return", this.storageManager.setValue(key, value, mode));
+              return _context27.abrupt("return", this.storageService.setValue(key, value, mode));
 
             case 1:
             case "end":
@@ -5872,7 +5872,7 @@ function () {
         while (1) {
           switch (_context28.prev = _context28.next) {
             case 0:
-              return _context28.abrupt("return", this.storageManager.getValue(key, mode));
+              return _context28.abrupt("return", this.storageService.getValue(key, mode));
 
             case 1:
             case "end":
@@ -5890,7 +5890,7 @@ function () {
         while (1) {
           switch (_context29.prev = _context29.next) {
             case 0:
-              return _context29.abrupt("return", this.storageManager.removeValue(key, mode));
+              return _context29.abrupt("return", this.storageService.removeValue(key, mode));
 
             case 1:
             case "end":
@@ -5911,7 +5911,7 @@ function () {
         while (1) {
           switch (_context30.prev = _context30.next) {
             case 0:
-              return _context30.abrupt("return", this.storageManager.clearAllPayloads());
+              return _context30.abrupt("return", this.storageService.clearAllPayloads());
 
             case 1:
             case "end":
@@ -5943,11 +5943,11 @@ function () {
                 return key.payloadRepresentation();
               });
               _context31.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.deletePayloads(payloads));
+              return regeneratorRuntime.awrap(this.storageService.deletePayloads(payloads));
 
             case 4:
               _context31.next = 6;
-              return regeneratorRuntime.awrap(this.syncManager.persistPayloads({
+              return regeneratorRuntime.awrap(this.syncService.persistPayloads({
                 decryptedPayloads: payloads
               }));
 
@@ -6216,9 +6216,9 @@ function () {
               }));
 
             case 9:
-              this.syncManager.resetSyncState();
+              this.syncService.resetSyncState();
               _context34.next = 12;
-              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
+              return regeneratorRuntime.awrap(this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
 
             case 12:
               if (!mergeLocal) {
@@ -6227,7 +6227,7 @@ function () {
               }
 
               _context34.next = 15;
-              return regeneratorRuntime.awrap(this.syncManager.markAllItemsAsNeedingSync({
+              return regeneratorRuntime.awrap(this.syncService.markAllItemsAsNeedingSync({
                 alternateUuids: true
               }));
 
@@ -6246,7 +6246,7 @@ function () {
 
             case 22:
               _context34.next = 24;
-              return regeneratorRuntime.awrap(this.syncManager.sync({
+              return regeneratorRuntime.awrap(this.syncService.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
               }));
 
@@ -6307,9 +6307,9 @@ function () {
               }));
 
             case 9:
-              this.syncManager.resetSyncState();
+              this.syncService.resetSyncState();
               _context35.next = 12;
-              return regeneratorRuntime.awrap(this.storageManager.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
+              return regeneratorRuntime.awrap(this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_4__["StoragePersistencePolicies"].Default));
 
             case 12:
               if (!mergeLocal) {
@@ -6318,7 +6318,7 @@ function () {
               }
 
               _context35.next = 15;
-              return regeneratorRuntime.awrap(this.syncManager.markAllItemsAsNeedingSync({
+              return regeneratorRuntime.awrap(this.syncService.markAllItemsAsNeedingSync({
                 alternateUuids: true
               }));
 
@@ -6337,7 +6337,7 @@ function () {
 
             case 22:
               _context35.next = 24;
-              return regeneratorRuntime.awrap(this.syncManager.sync({
+              return regeneratorRuntime.awrap(this.syncService.sync({
                 mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst,
                 checkIntegrity: true
               }));
@@ -6409,7 +6409,7 @@ function () {
 
             case 17:
               _context36.next = 19;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 19:
               return _context36.abrupt("return", result.response);
@@ -6439,7 +6439,7 @@ function () {
 
             case 4:
               _context37.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.clearAllData());
+              return regeneratorRuntime.awrap(this.storageService.clearAllData());
 
             case 6:
               _context37.next = 8;
@@ -6572,7 +6572,7 @@ function () {
 
             case 12:
               _context41.next = 14;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 14:
             case "end":
@@ -6636,10 +6636,10 @@ function () {
           switch (_context44.prev = _context44.next) {
             case 0:
               _context44.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.setEncryptionPolicy(encryptionPolicy));
+              return regeneratorRuntime.awrap(this.storageService.setEncryptionPolicy(encryptionPolicy));
 
             case 2:
-              return _context44.abrupt("return", this.syncManager.repersistAllItems());
+              return _context44.abrupt("return", this.syncService.repersistAllItems());
 
             case 3:
             case "end":
@@ -6726,20 +6726,20 @@ function () {
     key: "clearServices",
     value: function clearServices() {
       this.migrationService = null;
-      this.alertManager = null;
-      this.httpManager = null;
+      this.alertService = null;
+      this.httpService = null;
       this.modelManager = null;
       this.protocolService = null;
-      this.storageManager = null;
+      this.storageService = null;
       this.apiService = null;
       this.sessionManager = null;
-      this.syncManager = null;
+      this.syncService = null;
       this.keyManager = null;
       this.itemsKeyManager = null;
       this.deviceAuthService = null;
       this.singletonManager = null;
       this.componentManager = null;
-      this.privilegesManager = null;
+      this.privilegesService = null;
       this.actionsManager = null;
       this.services = [];
     }
@@ -6755,21 +6755,21 @@ function () {
   }, {
     key: "createAlertManager",
     value: function createAlertManager() {
-      if (this.shouldSkipClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertManager"])) {
+      if (this.shouldSkipClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertService"])) {
         return;
       }
 
-      this.alertManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertManager"]))({
+      this.alertService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNAlertService"]))({
         deviceInterface: this.deviceInterface
       });
-      this.services.push(this.alertManager);
+      this.services.push(this.alertService);
     }
   }, {
     key: "createApiService",
     value: function createApiService() {
       this.apiService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNApiService"]))({
-        storageManager: this.storageManager,
-        httpManager: this.httpManager,
+        storageService: this.storageService,
+        httpService: this.httpService,
         host: this.host
       });
       this.services.push(this.apiService);
@@ -6783,8 +6783,8 @@ function () {
 
       this.componentManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNComponentManager"]))({
         modelManager: this.modelManager,
-        syncManager: this.syncManager,
-        alertManager: this.alertManager,
+        syncService: this.syncService,
+        alertService: this.alertService,
         timeout: this.deviceInterface.timeout,
         environment: this.environment,
         platform: this.platform
@@ -6794,8 +6794,8 @@ function () {
   }, {
     key: "createHttpManager",
     value: function createHttpManager() {
-      this.httpManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNHttpManager"]))();
-      this.services.push(this.httpManager);
+      this.httpService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNHttpService"]))();
+      this.services.push(this.httpService);
     }
   }, {
     key: "createKeyManager",
@@ -6804,7 +6804,7 @@ function () {
 
       this.keyManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNKeyManager"]))({
         modelManager: this.modelManager,
-        storageManager: this.storageManager,
+        storageService: this.storageService,
         protocolService: this.protocolService,
         itemsKeyManager: this.itemsKeyManager
       });
@@ -6830,7 +6830,7 @@ function () {
     value: function createItemsKeyManager() {
       this.itemsKeyManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["ItemsKeyManager"]))({
         modelManager: this.modelManager,
-        syncManager: this.syncManager,
+        syncService: this.syncService,
         protocolService: this.protocolService
       });
       this.services.push(this.itemsKeyManager);
@@ -6848,19 +6848,19 @@ function () {
     value: function createSingletonManager() {
       this.singletonManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSingletonManager"]))({
         modelManager: this.modelManager,
-        syncManager: this.syncManager
+        syncService: this.syncService
       });
       this.services.push(this.singletonManager);
     }
   }, {
     key: "createStorageManager",
     value: function createStorageManager() {
-      this.storageManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNStorageManager"]))({
+      this.storageService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNStorageService"]))({
         protocolService: this.protocolService,
         namespace: this.namespace,
         deviceInterface: this.deviceInterface
       });
-      this.services.push(this.storageManager);
+      this.services.push(this.storageService);
     }
   }, {
     key: "createProtocolService",
@@ -6875,8 +6875,8 @@ function () {
     key: "createSessionManager",
     value: function createSessionManager() {
       this.sessionManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSessionManager"]))({
-        storageManager: this.storageManager,
-        alertManager: this.alertManager,
+        storageService: this.storageService,
+        alertService: this.alertService,
         protocolService: this.protocolService,
         apiService: this.apiService,
         timeout: this.deviceInterface.timeout
@@ -6888,15 +6888,15 @@ function () {
     value: function createSyncManager() {
       var _this7 = this;
 
-      this.syncManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSyncManager"]))({
+      this.syncService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSyncManager"]))({
         modelManager: this.modelManager,
-        storageManager: this.storageManager,
+        storageService: this.storageService,
         sessionManager: this.sessionManager,
         protocolService: this.protocolService,
         apiService: this.apiService,
         interval: this.deviceInterface.interval
       });
-      var uninstall = this.syncManager.addEventObserver(function _callee4(eventName) {
+      var uninstall = this.syncService.addEventObserver(function _callee4(eventName) {
         var appEvent;
         return regeneratorRuntime.async(function _callee4$(_context48) {
           while (1) {
@@ -6920,13 +6920,13 @@ function () {
         });
       });
       this.serviceObservers.push(uninstall);
-      this.services.push(this.syncManager);
+      this.services.push(this.syncService);
     }
   }, {
     key: "createDeviceAuthService",
     value: function createDeviceAuthService() {
       this.deviceAuthService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["DeviceAuthService"]))({
-        storageManager: this.storageManager,
+        storageService: this.storageService,
         protocolService: this.protocolService,
         keyManager: this.keyManager
       });
@@ -6935,21 +6935,21 @@ function () {
   }, {
     key: "createPrivilegesManager",
     value: function createPrivilegesManager() {
-      this.privilegesManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNPrivilegesManager"]))({
-        storageManager: this.storageManager,
+      this.privilegesService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNPrivilegesService"]))({
+        storageService: this.storageService,
         keyManager: this.keyManager,
         modelManager: this.modelManager,
-        syncManager: this.syncManager,
+        syncService: this.syncService,
         sessionManager: this.sessionManager,
         singletonManager: this.singletonManager
       });
-      this.services.push(this.privilegesManager);
+      this.services.push(this.privilegesService);
     }
   }, {
     key: "createHistoryManager",
     value: function createHistoryManager() {
       this.historyManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNHistoryManager"]))({
-        storageManager: this.storageManager,
+        storageService: this.storageService,
         modelManager: this.modelManager,
         contentTypes: [_Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note],
         timeout: this.deviceInterface.timeout
@@ -6959,13 +6959,13 @@ function () {
   }, {
     key: "createActionsManager",
     value: function createActionsManager() {
-      this.actionsManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNActionsManager"]))({
-        alertManager: this.alertManager,
+      this.actionsManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNActionsService"]))({
+        alertService: this.alertService,
         deviceInterface: this.deviceInterface,
-        httpManager: this.httpManager,
+        httpService: this.httpService,
         modelManager: this.modelManager,
         protocolService: this.protocolService,
-        syncManager: this.syncManager
+        syncService: this.syncService
       });
       this.services.push(this.actionsManager);
     }
@@ -7428,7 +7428,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpManager, DeviceAuthService, ChallengeResponse, PureService, SNStorageManager, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncManager, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertManager, SNHistoryManager, SNPrivilegesManager, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncManager, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7505,11 +7505,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_model_manager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/model_manager */ "./lib/services/model_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_model_manager__WEBPACK_IMPORTED_MODULE_14__["SNModelManager"]; });
 
-/* harmony import */ var _services_http_manager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/http_manager */ "./lib/services/http_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _services_http_manager__WEBPACK_IMPORTED_MODULE_15__["SNHttpManager"]; });
+/* harmony import */ var _services_http_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/http_service */ "./lib/services/http_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _services_http_service__WEBPACK_IMPORTED_MODULE_15__["SNHttpService"]; });
 
-/* harmony import */ var _services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/device_auth/service */ "./lib/services/device_auth/service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
+/* harmony import */ var _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_46__["DeviceAuthService"]; });
 
 /* harmony import */ var _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/device_auth/response */ "./lib/services/device_auth/response.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__["ChallengeResponse"]; });
@@ -7517,45 +7517,45 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureService", function() { return _Services_pure_service__WEBPACK_IMPORTED_MODULE_18__["PureService"]; });
 
-/* harmony import */ var _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./services/storage_manager */ "./lib/services/storage_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__["SNStorageManager"]; });
+/* harmony import */ var _services_storage_service__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./services/storage_service */ "./lib/services/storage_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageService", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["SNStorageService"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StoragePersistencePolicies", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__["StoragePersistencePolicies"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StoragePersistencePolicies", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["StoragePersistencePolicies"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__["StorageEncryptionPolicies"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["StorageEncryptionPolicies"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageValueModes", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__["StorageValueModes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageValueModes", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["StorageValueModes"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ValueModesKeys", function() { return _services_storage_manager__WEBPACK_IMPORTED_MODULE_19__["ValueModesKeys"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ValueModesKeys", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["ValueModesKeys"]; });
 
 /* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenges", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["Challenges"]; });
 
-/* harmony import */ var _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SNSyncManager"]; });
+/* harmony import */ var _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./services/sync/sync_service */ "./lib/services/sync/sync_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SNSyncManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SyncSources"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SyncSources"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["SyncModes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SyncModes"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["TIMING_STRATEGY_RESOLVE_ON_NEXT"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_RESOLVE_ON_NEXT", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["TIMING_STRATEGY_RESOLVE_ON_NEXT"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return _services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_21__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]; });
 
 /* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__["SNSessionManager"]; });
 
-/* harmony import */ var _migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./migration/service */ "./lib/migration/service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _migration_service__WEBPACK_IMPORTED_MODULE_23__["SNMigrationService"]; });
+/* harmony import */ var _migration_migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./migration/migration_service */ "./lib/migration/migration_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _migration_migration_service__WEBPACK_IMPORTED_MODULE_23__["SNMigrationService"]; });
 
-/* harmony import */ var _services_alert_manager__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/alert_manager */ "./lib/services/alert_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _services_alert_manager__WEBPACK_IMPORTED_MODULE_24__["SNAlertManager"]; });
+/* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _services_alert_service__WEBPACK_IMPORTED_MODULE_24__["SNAlertService"]; });
 
 /* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_25__["SNHistoryManager"]; });
 
-/* harmony import */ var _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/privileges/privileges_manager */ "./lib/services/privileges/privileges_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesManager", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["SNPrivilegesManager"]; });
+/* harmony import */ var _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/privileges/privileges_service */ "./lib/services/privileges/privileges_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["SNPrivilegesService"]; });
 
 /* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__["SNSingletonManager"]; });
@@ -7660,17 +7660,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["ProtectedActions"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["ProtectedActions"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["PrivilegeCredentials"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PrivilegeCredentials"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_NONE"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_NONE"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_HOUR"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_HOUR"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return _services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_WEEK"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_WEEK"]; });
 
 
 
@@ -7725,6 +7725,445 @@ __webpack_require__.r(__webpack_exports__);
 /** Privileges */
 
 
+
+/***/ }),
+
+/***/ "./lib/migration/migration_service.js":
+/*!********************************************!*\
+  !*** ./lib/migration/migration_service.js ***!
+  \********************************************/
+/*! exports provided: SNMigrationService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
+/* harmony import */ var _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations */ "./lib/migration/migrations/index.js");
+/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
+/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+
+
+var SNMigrationService =
+/*#__PURE__*/
+function (_PureService) {
+  _inherits(SNMigrationService, _PureService);
+
+  function SNMigrationService(_ref) {
+    var _this;
+
+    var application = _ref.application,
+        challengeResponder = _ref.challengeResponder;
+
+    _classCallCheck(this, SNMigrationService);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNMigrationService).call(this));
+    _this.application = application;
+    _this.challengeResponder = challengeResponder;
+    return _this;
+  }
+
+  _createClass(SNMigrationService, [{
+    key: "initialize",
+    value: function initialize() {
+      var _this2 = this;
+
+      var lastMigration;
+      return regeneratorRuntime.async(function initialize$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return regeneratorRuntime.awrap(this.runBaseMigration());
+
+            case 2:
+              _context2.next = 4;
+              return regeneratorRuntime.awrap(this.getRequiredMigrations());
+
+            case 4:
+              this.activeMigrations = _context2.sent;
+
+              if (this.activeMigrations.length > 0) {
+                lastMigration = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["lastElement"])(this.activeMigrations);
+                lastMigration.onDone(function _callee() {
+                  return regeneratorRuntime.async(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.next = 2;
+                          return regeneratorRuntime.awrap(_this2.saveLastMigrationTimestamp(lastMigration.constructor.timestamp()));
+
+                        case 2:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  });
+                });
+              }
+
+            case 6:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+    * @public
+    * Application instances will call this function directly when they arrive
+    * at a certain migratory state.
+    */
+
+  }, {
+    key: "handleApplicationStage",
+    value: function handleApplicationStage(stage) {
+      return regeneratorRuntime.async(function handleApplicationStage$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNMigrationService.prototype), "handleApplicationStage", this).call(this, stage));
+
+            case 2:
+              if (stage === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].ReadyForLaunch_05) {
+                this.addLoginObserver();
+                this.addSyncObserver();
+              }
+
+              _context3.next = 5;
+              return regeneratorRuntime.awrap(this.handleStage(stage));
+
+            case 5:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "runBaseMigration",
+    value: function runBaseMigration() {
+      var baseMigration;
+      return regeneratorRuntime.async(function runBaseMigration$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              baseMigration = new _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__["BaseMigration"]({
+                application: this.application
+              });
+              _context4.next = 3;
+              return regeneratorRuntime.awrap(baseMigration.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].PreparingForLaunch_0));
+
+            case 3:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "getRequiredMigrations",
+    value: function getRequiredMigrations() {
+      var lastMigrationTimestamp, activeMigrations, migrationClasses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationClass, migrationTimestamp;
+
+      return regeneratorRuntime.async(function getRequiredMigrations$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return regeneratorRuntime.awrap(this.getLastMigrationTimestamp());
+
+            case 2:
+              lastMigrationTimestamp = _context5.sent;
+              activeMigrations = [];
+              migrationClasses = Object.keys(_Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__).map(function (key) {
+                return _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__[key];
+              }).sort(function (a, b) {
+                var aTimestamp = a.timestamp();
+                var bTimestamp = b.timestamp();
+
+                if (aTimestamp < bTimestamp) {
+                  return -1;
+                } else if (aTimestamp > bTimestamp) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              });
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context5.prev = 8;
+
+              for (_iterator = migrationClasses[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                migrationClass = _step.value;
+                migrationTimestamp = migrationClass.timestamp();
+
+                if (migrationTimestamp > lastMigrationTimestamp) {
+                  // eslint-disable-next-line new-cap
+                  activeMigrations.push(new migrationClass({
+                    application: this.application,
+                    challengeResponder: this.challengeResponder
+                  }));
+                }
+              }
+
+              _context5.next = 16;
+              break;
+
+            case 12:
+              _context5.prev = 12;
+              _context5.t0 = _context5["catch"](8);
+              _didIteratorError = true;
+              _iteratorError = _context5.t0;
+
+            case 16:
+              _context5.prev = 16;
+              _context5.prev = 17;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 19:
+              _context5.prev = 19;
+
+              if (!_didIteratorError) {
+                _context5.next = 22;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 22:
+              return _context5.finish(19);
+
+            case 23:
+              return _context5.finish(16);
+
+            case 24:
+              return _context5.abrupt("return", activeMigrations);
+
+            case 25:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this, [[8, 12, 16, 24], [17,, 19, 23]]);
+    }
+  }, {
+    key: "getTimeStampKey",
+    value: function getTimeStampKey() {
+      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
+    }
+  }, {
+    key: "getLastMigrationTimestamp",
+    value: function getLastMigrationTimestamp() {
+      var timestamp;
+      return regeneratorRuntime.async(function getLastMigrationTimestamp$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawStorageValue(this.getTimeStampKey()));
+
+            case 2:
+              timestamp = _context6.sent;
+
+              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(timestamp)) {
+                _context6.next = 5;
+                break;
+              }
+
+              throw 'Timestamp should not be null. Be sure to run base migration first.';
+
+            case 5:
+              return _context6.abrupt("return", JSON.parse(timestamp));
+
+            case 6:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "saveLastMigrationTimestamp",
+    value: function saveLastMigrationTimestamp(timestamp) {
+      return regeneratorRuntime.async(function saveLastMigrationTimestamp$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _context7.next = 2;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(this.getTimeStampKey(), JSON.stringify(timestamp)));
+
+            case 2:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * @private
+     */
+
+  }, {
+    key: "addLoginObserver",
+    value: function addLoginObserver() {
+      var _this3 = this;
+
+      this.application.addEventObserver(function _callee2(event, data) {
+        return regeneratorRuntime.async(function _callee2$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvents"].SignedIn)) {
+                  _context8.next = 3;
+                  break;
+                }
+
+                _context8.next = 3;
+                return regeneratorRuntime.awrap(_this3.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].SignedIn_30));
+
+              case 3:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        });
+      });
+    }
+  }, {
+    key: "addSyncObserver",
+    value: function addSyncObserver() {
+      var _this4 = this;
+
+      this.application.syncService.addEventObserver(function _callee3(event, data) {
+        return regeneratorRuntime.async(function _callee3$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].FullSyncCompleted)) {
+                  _context9.next = 3;
+                  break;
+                }
+
+                _context9.next = 3;
+                return regeneratorRuntime.awrap(_this4.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].FullSyncCompleted_13));
+
+              case 3:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        });
+      });
+    }
+  }, {
+    key: "handleStage",
+    value: function handleStage(stage) {
+      var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migration;
+
+      return regeneratorRuntime.async(function handleStage$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context10.prev = 3;
+              _iterator2 = this.activeMigrations[Symbol.iterator]();
+
+            case 5:
+              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                _context10.next = 12;
+                break;
+              }
+
+              migration = _step2.value;
+              _context10.next = 9;
+              return regeneratorRuntime.awrap(migration.handleStage(stage));
+
+            case 9:
+              _iteratorNormalCompletion2 = true;
+              _context10.next = 5;
+              break;
+
+            case 12:
+              _context10.next = 18;
+              break;
+
+            case 14:
+              _context10.prev = 14;
+              _context10.t0 = _context10["catch"](3);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context10.t0;
+
+            case 18:
+              _context10.prev = 18;
+              _context10.prev = 19;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 21:
+              _context10.prev = 21;
+
+              if (!_didIteratorError2) {
+                _context10.next = 24;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 24:
+              return _context10.finish(21);
+
+            case 25:
+              return _context10.finish(18);
+
+            case 26:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+    }
+  }]);
+
+  return SNMigrationService;
+}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
 
 /***/ }),
 
@@ -7940,7 +8379,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
-/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -8078,7 +8517,7 @@ function (_Migration) {
           switch (_context4.prev = _context4.next) {
             case 0:
               deviceInterface = this.application.deviceInterface;
-              newStorageRawStructure = (_newStorageRawStructu = {}, _defineProperty(_newStorageRawStructu, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Wrapped, null), _defineProperty(_newStorageRawStructu, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Unwrapped, {}), _defineProperty(_newStorageRawStructu, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Nonwrapped, {}), _newStorageRawStructu);
+              newStorageRawStructure = (_newStorageRawStructu = {}, _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Wrapped, null), _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Unwrapped, {}), _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Nonwrapped, {}), _newStorageRawStructu);
               _context4.next = 4;
               return regeneratorRuntime.awrap(deviceInterface.getJsonParsedStorageValue(LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY));
 
@@ -8209,8 +8648,8 @@ function (_Migration) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              newStructure = _Services__WEBPACK_IMPORTED_MODULE_6__["SNStorageManager"].defaultValuesObject(rawStructure);
-              newStructure[_Services_storage_manager__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Unwrapped] = null;
+              newStructure = _Services__WEBPACK_IMPORTED_MODULE_6__["SNStorageService"].defaultValuesObject(rawStructure);
+              newStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_8__["ValueModesKeys"].Unwrapped] = null;
               _context5.next = 4;
               return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(Object(_Lib__WEBPACK_IMPORTED_MODULE_1__["namespacedKey"])(this.application.namespace, _Lib__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].StorageObject), JSON.stringify(newStructure)));
 
@@ -8700,7 +9139,7 @@ function (_Migration) {
               */
               newValue = tryJsonParse(value);
               _context11.next = 20;
-              return regeneratorRuntime.awrap(this.application.storageManager.setValue(key, newValue));
+              return regeneratorRuntime.awrap(this.application.storageService.setValue(key, newValue));
 
             case 20:
               _iteratorNormalCompletion = true;
@@ -8951,445 +9390,6 @@ function () {
 
   return Migration;
 }();
-
-/***/ }),
-
-/***/ "./lib/migration/service.js":
-/*!**********************************!*\
-  !*** ./lib/migration/service.js ***!
-  \**********************************/
-/*! exports provided: SNMigrationService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
-/* harmony import */ var _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations */ "./lib/migration/migrations/index.js");
-/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
-/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-
-
-
-
-var SNMigrationService =
-/*#__PURE__*/
-function (_PureService) {
-  _inherits(SNMigrationService, _PureService);
-
-  function SNMigrationService(_ref) {
-    var _this;
-
-    var application = _ref.application,
-        challengeResponder = _ref.challengeResponder;
-
-    _classCallCheck(this, SNMigrationService);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNMigrationService).call(this));
-    _this.application = application;
-    _this.challengeResponder = challengeResponder;
-    return _this;
-  }
-
-  _createClass(SNMigrationService, [{
-    key: "initialize",
-    value: function initialize() {
-      var _this2 = this;
-
-      var lastMigration;
-      return regeneratorRuntime.async(function initialize$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return regeneratorRuntime.awrap(this.runBaseMigration());
-
-            case 2:
-              _context2.next = 4;
-              return regeneratorRuntime.awrap(this.getRequiredMigrations());
-
-            case 4:
-              this.activeMigrations = _context2.sent;
-
-              if (this.activeMigrations.length > 0) {
-                lastMigration = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["lastElement"])(this.activeMigrations);
-                lastMigration.onDone(function _callee() {
-                  return regeneratorRuntime.async(function _callee$(_context) {
-                    while (1) {
-                      switch (_context.prev = _context.next) {
-                        case 0:
-                          _context.next = 2;
-                          return regeneratorRuntime.awrap(_this2.saveLastMigrationTimestamp(lastMigration.constructor.timestamp()));
-
-                        case 2:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }
-                  });
-                });
-              }
-
-            case 6:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
-    * @public
-    * Application instances will call this function directly when they arrive
-    * at a certain migratory state.
-    */
-
-  }, {
-    key: "handleApplicationStage",
-    value: function handleApplicationStage(stage) {
-      return regeneratorRuntime.async(function handleApplicationStage$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNMigrationService.prototype), "handleApplicationStage", this).call(this, stage));
-
-            case 2:
-              if (stage === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].ReadyForLaunch_05) {
-                this.addLoginObserver();
-                this.addSyncObserver();
-              }
-
-              _context3.next = 5;
-              return regeneratorRuntime.awrap(this.handleStage(stage));
-
-            case 5:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "runBaseMigration",
-    value: function runBaseMigration() {
-      var baseMigration;
-      return regeneratorRuntime.async(function runBaseMigration$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              baseMigration = new _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__["BaseMigration"]({
-                application: this.application
-              });
-              _context4.next = 3;
-              return regeneratorRuntime.awrap(baseMigration.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].PreparingForLaunch_0));
-
-            case 3:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "getRequiredMigrations",
-    value: function getRequiredMigrations() {
-      var lastMigrationTimestamp, activeMigrations, migrationClasses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationClass, migrationTimestamp;
-
-      return regeneratorRuntime.async(function getRequiredMigrations$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              _context5.next = 2;
-              return regeneratorRuntime.awrap(this.getLastMigrationTimestamp());
-
-            case 2:
-              lastMigrationTimestamp = _context5.sent;
-              activeMigrations = [];
-              migrationClasses = Object.keys(_Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__).map(function (key) {
-                return _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__[key];
-              }).sort(function (a, b) {
-                var aTimestamp = a.timestamp();
-                var bTimestamp = b.timestamp();
-
-                if (aTimestamp < bTimestamp) {
-                  return -1;
-                } else if (aTimestamp > bTimestamp) {
-                  return 1;
-                } else {
-                  return 0;
-                }
-              });
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context5.prev = 8;
-
-              for (_iterator = migrationClasses[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                migrationClass = _step.value;
-                migrationTimestamp = migrationClass.timestamp();
-
-                if (migrationTimestamp > lastMigrationTimestamp) {
-                  // eslint-disable-next-line new-cap
-                  activeMigrations.push(new migrationClass({
-                    application: this.application,
-                    challengeResponder: this.challengeResponder
-                  }));
-                }
-              }
-
-              _context5.next = 16;
-              break;
-
-            case 12:
-              _context5.prev = 12;
-              _context5.t0 = _context5["catch"](8);
-              _didIteratorError = true;
-              _iteratorError = _context5.t0;
-
-            case 16:
-              _context5.prev = 16;
-              _context5.prev = 17;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 19:
-              _context5.prev = 19;
-
-              if (!_didIteratorError) {
-                _context5.next = 22;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 22:
-              return _context5.finish(19);
-
-            case 23:
-              return _context5.finish(16);
-
-            case 24:
-              return _context5.abrupt("return", activeMigrations);
-
-            case 25:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, null, this, [[8, 12, 16, 24], [17,, 19, 23]]);
-    }
-  }, {
-    key: "getTimeStampKey",
-    value: function getTimeStampKey() {
-      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
-    }
-  }, {
-    key: "getLastMigrationTimestamp",
-    value: function getLastMigrationTimestamp() {
-      var timestamp;
-      return regeneratorRuntime.async(function getLastMigrationTimestamp$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              _context6.next = 2;
-              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawStorageValue(this.getTimeStampKey()));
-
-            case 2:
-              timestamp = _context6.sent;
-
-              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(timestamp)) {
-                _context6.next = 5;
-                break;
-              }
-
-              throw 'Timestamp should not be null. Be sure to run base migration first.';
-
-            case 5:
-              return _context6.abrupt("return", JSON.parse(timestamp));
-
-            case 6:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "saveLastMigrationTimestamp",
-    value: function saveLastMigrationTimestamp(timestamp) {
-      return regeneratorRuntime.async(function saveLastMigrationTimestamp$(_context7) {
-        while (1) {
-          switch (_context7.prev = _context7.next) {
-            case 0:
-              _context7.next = 2;
-              return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(this.getTimeStampKey(), JSON.stringify(timestamp)));
-
-            case 2:
-            case "end":
-              return _context7.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
-     * @private
-     */
-
-  }, {
-    key: "addLoginObserver",
-    value: function addLoginObserver() {
-      var _this3 = this;
-
-      this.application.addEventObserver(function _callee2(event, data) {
-        return regeneratorRuntime.async(function _callee2$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvents"].SignedIn)) {
-                  _context8.next = 3;
-                  break;
-                }
-
-                _context8.next = 3;
-                return regeneratorRuntime.awrap(_this3.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].SignedIn_30));
-
-              case 3:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        });
-      });
-    }
-  }, {
-    key: "addSyncObserver",
-    value: function addSyncObserver() {
-      var _this4 = this;
-
-      this.application.syncManager.addEventObserver(function _callee3(event, data) {
-        return regeneratorRuntime.async(function _callee3$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].FullSyncCompleted)) {
-                  _context9.next = 3;
-                  break;
-                }
-
-                _context9.next = 3;
-                return regeneratorRuntime.awrap(_this4.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].FullSyncCompleted_13));
-
-              case 3:
-              case "end":
-                return _context9.stop();
-            }
-          }
-        });
-      });
-    }
-  }, {
-    key: "handleStage",
-    value: function handleStage(stage) {
-      var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migration;
-
-      return regeneratorRuntime.async(function handleStage$(_context10) {
-        while (1) {
-          switch (_context10.prev = _context10.next) {
-            case 0:
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context10.prev = 3;
-              _iterator2 = this.activeMigrations[Symbol.iterator]();
-
-            case 5:
-              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context10.next = 12;
-                break;
-              }
-
-              migration = _step2.value;
-              _context10.next = 9;
-              return regeneratorRuntime.awrap(migration.handleStage(stage));
-
-            case 9:
-              _iteratorNormalCompletion2 = true;
-              _context10.next = 5;
-              break;
-
-            case 12:
-              _context10.next = 18;
-              break;
-
-            case 14:
-              _context10.prev = 14;
-              _context10.t0 = _context10["catch"](3);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context10.t0;
-
-            case 18:
-              _context10.prev = 18;
-              _context10.prev = 19;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 21:
-              _context10.prev = 21;
-
-              if (!_didIteratorError2) {
-                _context10.next = 24;
-                break;
-              }
-
-              throw _iteratorError2;
-
-            case 24:
-              return _context10.finish(21);
-
-            case 25:
-              return _context10.finish(18);
-
-            case 26:
-            case "end":
-              return _context10.stop();
-          }
-        }
-      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-    }
-  }]);
-
-  return SNMigrationService;
-}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
 
 /***/ }),
 
@@ -17766,16 +17766,16 @@ function compareVersions(a, b) {
 
 /***/ }),
 
-/***/ "./lib/services/actions_manager.js":
+/***/ "./lib/services/actions_service.js":
 /*!*****************************************!*\
-  !*** ./lib/services/actions_manager.js ***!
+  !*** ./lib/services/actions_service.js ***!
   \*****************************************/
-/*! exports provided: SNActionsManager */
+/*! exports provided: SNActionsService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNActionsManager", function() { return SNActionsManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return SNActionsService; });
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
@@ -17802,35 +17802,35 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var SNActionsManager =
+var SNActionsService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNActionsManager, _PureService);
+  _inherits(SNActionsService, _PureService);
 
-  function SNActionsManager(_ref) {
+  function SNActionsService(_ref) {
     var _this;
 
-    var alertManager = _ref.alertManager,
+    var alertService = _ref.alertService,
         deviceInterface = _ref.deviceInterface,
-        httpManager = _ref.httpManager,
+        httpService = _ref.httpService,
         modelManager = _ref.modelManager,
         protocolService = _ref.protocolService,
-        syncManager = _ref.syncManager;
+        syncService = _ref.syncService;
 
-    _classCallCheck(this, SNActionsManager);
+    _classCallCheck(this, SNActionsService);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNActionsManager).call(this));
-    _this.alertManager = alertManager;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNActionsService).call(this));
+    _this.alertService = alertService;
     _this.deviceInterface = deviceInterface;
-    _this.httpManager = httpManager;
+    _this.httpService = httpService;
     _this.modelManager = modelManager;
     _this.protocolService = protocolService;
-    _this.syncManager = syncManager;
+    _this.syncService = syncService;
     _this.previousPasswords = [];
     return _this;
   }
 
-  _createClass(SNActionsManager, [{
+  _createClass(SNActionsService, [{
     key: "getExtensions",
     value: function getExtensions() {
       return this.modelManager.validItemsForContentType(_Models__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ActionsExtension);
@@ -17861,7 +17861,7 @@ function (_PureService) {
                 content_type: item.content_type,
                 item_uuid: item.uuid
               };
-              return _context.abrupt("return", this.httpManager.getAbsolute({
+              return _context.abrupt("return", this.httpService.getAbsolute({
                 url: extension.url,
                 params: params
               }).then(function (response) {
@@ -17973,7 +17973,7 @@ function (_PureService) {
             case 0:
               action = _ref3.action, passwordRequestHandler = _ref3.passwordRequestHandler;
               return _context3.abrupt("return", new Promise(function (resolve, reject) {
-                _this2.alertManager.confirm({
+                _this2.alertService.confirm({
                   text: "Are you sure you want to replace the current note contents with this action's results?",
                   onConfirm: function onConfirm() {
                     _this2.runConfirmedGetAction({
@@ -18004,14 +18004,14 @@ function (_PureService) {
             case 0:
               action = _ref4.action, passwordRequestHandler = _ref4.passwordRequestHandler;
               _context4.next = 3;
-              return regeneratorRuntime.awrap(this.httpManager.getAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.getAbsolute({
                 url: action.url
               }).catch(function (response) {
                 var error = response && response.error || {
                   message: "An issue occurred while processing this action. Please try again."
                 };
 
-                _this3.alertManager.alert({
+                _this3.alertService.alert({
                   text: error.message
                 });
 
@@ -18093,7 +18093,7 @@ function (_PureService) {
               return _context4.finish(24);
 
             case 32:
-              this.syncManager.sync();
+              this.syncService.sync();
               return _context4.abrupt("return", {
                 response: response,
                 item: response.item
@@ -18117,7 +18117,7 @@ function (_PureService) {
           switch (_context6.prev = _context6.next) {
             case 0:
               action = _ref5.action, passwordRequestHandler = _ref5.passwordRequestHandler;
-              return _context6.abrupt("return", this.httpManager.getAbsolute({
+              return _context6.abrupt("return", this.httpService.getAbsolute({
                 url: action.url
               }).then(function _callee(response) {
                 var payload, item;
@@ -18159,7 +18159,7 @@ function (_PureService) {
                   message: "An issue occurred while processing this action. Please try again."
                 };
 
-                _this4.alertManager.alert({
+                _this4.alertService.alert({
                   text: error.message
                 });
 
@@ -18212,7 +18212,7 @@ function (_PureService) {
                * In some cases revisions were missing auth params. 
                * Instruct the user to email us to get this remedied. 
                */
-              this.alertManager.alert({
+              this.alertService.alert({
                 text: "We were unable to decrypt this revision using your current keys, \n            and this revision is missing metadata that would allow us to try different \n            keys to decrypt it. This can likely be fixed with some manual intervention. \n            Please email hello@standardnotes.org for assistance."
               });
               return _context7.abrupt("return", null);
@@ -18358,7 +18358,7 @@ function (_PureService) {
               params = {
                 items: [itemParams]
               };
-              return _context8.abrupt("return", this.httpManager.postAbsolute({
+              return _context8.abrupt("return", this.httpService.postAbsolute({
                 url: action.url,
                 params: params
               }).then(function (response) {
@@ -18370,7 +18370,7 @@ function (_PureService) {
                 action.error = true;
                 console.error("Action error response:", response);
 
-                _this5.alertManager.alert({
+                _this5.alertService.alert({
                   text: "An issue occurred while processing this action. Please try again."
                 });
 
@@ -18430,21 +18430,21 @@ function (_PureService) {
     }
   }]);
 
-  return SNActionsManager;
+  return SNActionsService;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__["PureService"]);
 
 /***/ }),
 
-/***/ "./lib/services/alert_manager.js":
+/***/ "./lib/services/alert_service.js":
 /*!***************************************!*\
-  !*** ./lib/services/alert_manager.js ***!
+  !*** ./lib/services/alert_service.js ***!
   \***************************************/
-/*! exports provided: SNAlertManager */
+/*! exports provided: SNAlertService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return SNAlertManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return SNAlertService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -18465,24 +18465,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
-var SNAlertManager =
+var SNAlertService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNAlertManager, _PureService);
+  _inherits(SNAlertService, _PureService);
 
-  function SNAlertManager(_ref) {
+  function SNAlertService(_ref) {
     var _this;
 
     var deviceInterface = _ref.deviceInterface;
 
-    _classCallCheck(this, SNAlertManager);
+    _classCallCheck(this, SNAlertService);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNAlertManager).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNAlertService).call(this));
     _this.deviceInterface = deviceInterface;
     return _this;
   }
 
-  _createClass(SNAlertManager, [{
+  _createClass(SNAlertService, [{
     key: "alert",
     value: function alert(params) {
       return regeneratorRuntime.async(function alert$(_context) {
@@ -18526,7 +18526,7 @@ function (_PureService) {
     }
   }]);
 
-  return SNAlertManager;
+  return SNAlertService;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
 
 /***/ }),
@@ -18592,15 +18592,15 @@ function (_PureService) {
   function SNApiService(_ref) {
     var _this;
 
-    var httpManager = _ref.httpManager,
-        storageManager = _ref.storageManager,
+    var httpService = _ref.httpService,
+        storageService = _ref.storageService,
         host = _ref.host;
 
     _classCallCheck(this, SNApiService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNApiService).call(this));
-    _this.httpManager = httpManager;
-    _this.storageManager = storageManager;
+    _this.httpService = httpService;
+    _this.storageService = storageService;
     _this.host = host;
     return _this;
   }
@@ -18614,7 +18614,7 @@ function (_PureService) {
             case 0:
               this.host = host;
               _context.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].ServerHost, host));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].ServerHost, host));
 
             case 3:
             case "end":
@@ -18637,7 +18637,7 @@ function (_PureService) {
               }
 
               _context2.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].ServerHost));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].ServerHost));
 
             case 3:
               storedValue = _context2.sent;
@@ -18765,7 +18765,7 @@ function (_PureService) {
                 email: email
               }, mfaKeyPath, mfaCode));
               _context5.next = 7;
-              return regeneratorRuntime.awrap(this.httpManager.getAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.getAbsolute({
                 url: url,
                 params: params,
                 authentication: this.sessionToken
@@ -18815,7 +18815,7 @@ function (_PureService) {
                 email: email
               }, keyParams.getPortableValue()));
               _context6.next = 10;
-              return regeneratorRuntime.awrap(this.httpManager.postAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
                 authentication: this.sessionToken
@@ -18866,7 +18866,7 @@ function (_PureService) {
                 password: serverPassword
               }, mfaKeyPath, mfaCode));
               _context7.next = 10;
-              return regeneratorRuntime.awrap(this.httpManager.postAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
                 authentication: this.sessionToken
@@ -18917,7 +18917,7 @@ function (_PureService) {
                 new_password: newServerPassword
               }, newKeyParams.getPortableValue());
               _context8.next = 10;
-              return regeneratorRuntime.awrap(this.httpManager.postAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
                 authentication: this.sessionToken
@@ -18960,7 +18960,7 @@ function (_PureService) {
               url = _context9.sent;
               params = this.params((_this$params3 = {}, _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].SyncPayloads, payloads), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].LastSyncToken, lastSyncToken), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].PaginationToken, paginationToken), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].SyncDlLimit, limit), _defineProperty(_this$params3, "content_type", contentType), _defineProperty(_this$params3, "event", customEvent), _this$params3));
               _context9.next = 7;
-              return regeneratorRuntime.awrap(this.httpManager.postAbsolute({
+              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
                 authentication: this.sessionToken
@@ -19070,7 +19070,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return SNSessionManager; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_alert_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/alert_manager */ "./lib/services/alert_manager.js");
+/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -19105,23 +19105,23 @@ function (_PureService) {
   function SNSessionManager(_ref) {
     var _this;
 
-    var storageManager = _ref.storageManager,
+    var storageService = _ref.storageService,
         apiService = _ref.apiService,
-        alertManager = _ref.alertManager,
+        alertService = _ref.alertService,
         protocolService = _ref.protocolService,
         timeout = _ref.timeout;
 
     _classCallCheck(this, SNSessionManager);
 
-    if (!storageManager || !protocolService) {
+    if (!storageService || !protocolService) {
       throw 'Invalid SessionManager construction';
     }
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSessionManager).call(this));
     _this.protocolService = protocolService;
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.apiService = apiService;
-    _this.alertManager = alertManager || new _Services_alert_manager__WEBPACK_IMPORTED_MODULE_2__["SNAlertManager"]();
+    _this.alertService = alertService || new _Services_alert_service__WEBPACK_IMPORTED_MODULE_2__["SNAlertService"]();
     _this.timeout = timeout || setTimeout.bind(window);
     return _this;
   }
@@ -19135,7 +19135,7 @@ function (_PureService) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User));
 
             case 2:
               this.user = _context.sent;
@@ -19146,7 +19146,7 @@ function (_PureService) {
               }
 
               _context.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].LegacyUuid));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].LegacyUuid));
 
             case 6:
               uuid = _context.sent;
@@ -19159,7 +19159,7 @@ function (_PureService) {
 
             case 8:
               _context.next = 10;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt));
 
             case 10:
               token = _context.sent;
@@ -19364,7 +19364,7 @@ function (_PureService) {
 
               message = _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_VERSION"];
               _context7.next = 19;
-              return regeneratorRuntime.awrap(this.alertManager.confirm({
+              return regeneratorRuntime.awrap(this.alertService.confirm({
                 title: _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_ALERT_TITLE"],
                 text: message,
                 confirmButtonText: _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_ALERT_IGNORE"] // eslint-disable-next-line handle-callback-err
@@ -19550,7 +19550,7 @@ function (_PureService) {
               user = response.user;
               this.user = user;
               _context10.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user));
 
             case 4:
               _context10.next = 6;
@@ -19575,7 +19575,7 @@ function (_PureService) {
             case 0:
               token = _ref7.token;
               _context11.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt, token));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt, token));
 
             case 3:
               this.apiService.setSessionAuthentication({
@@ -19662,8 +19662,8 @@ function (_PureService) {
     var _this;
 
     var modelManager = _ref.modelManager,
-        syncManager = _ref.syncManager,
-        alertManager = _ref.alertManager,
+        syncService = _ref.syncService,
+        alertService = _ref.alertService,
         timeout = _ref.timeout,
         environment = _ref.environment,
         platform = _ref.platform;
@@ -19725,8 +19725,8 @@ function (_PureService) {
     SNComponentManager.ClientDataDomain = "org.standardnotes.sn.components";
     _this.timeout = timeout || setTimeout.bind(window);
     _this.modelManager = modelManager;
-    _this.syncManager = syncManager;
-    _this.alertManager = alertManager;
+    _this.syncService = syncService;
+    _this.alertService = alertService;
     _this.environment = environment;
     _this.platform = platform;
     _this.isDesktop = _this.environment === _platforms__WEBPACK_IMPORTED_MODULE_8__["Environments"].Desktop;
@@ -20360,7 +20360,7 @@ function (_PureService) {
       }
 
       if (!component.window) {
-        this.alertManager.alert({
+        this.alertService.alert({
           text: "Standard Notes is trying to communicate with ".concat(component.name, ", but an error is occurring. Please restart this extension and try again.")
         });
       } // Mobile messaging requires json
@@ -20456,7 +20456,7 @@ function (_PureService) {
 
       if (!component) {
         this.log("Component not defined for message, returning", message);
-        this.alertManager.alert({
+        this.alertService.alert({
           text: "An extension is trying to communicate with Standard Notes, but there is an error establishing a bridge. Please restart the app and try again."
         });
         return;
@@ -20468,7 +20468,7 @@ function (_PureService) {
       if (component.readonly && readwriteActions.includes(message.action)) {
         // A component can be marked readonly if changes should not be saved.
         // Particullary used for revision preview windows where the notes should not be savable.
-        this.alertManager.alert({
+        this.alertService.alert({
           text: "The extension ".concat(component.name, " is trying to save, but it is in a locked state and cannot accept changes.")
         });
         return;
@@ -21009,7 +21009,7 @@ function (_PureService) {
                           itemNoun = lockedCount === 1 ? "item" : "items";
                           auxVerb = lockedCount === 1 ? "is" : "are";
 
-                          _this9.alertManager.alert({
+                          _this9.alertService.alert({
                             title: 'Items Locked',
                             text: "".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited.")
                           });
@@ -21052,7 +21052,7 @@ function (_PureService) {
                         }
 
                         // An item this extension is trying to save was possibly removed locally, notify user
-                        _this9.alertManager.alert({
+                        _this9.alertService.alert({
                           text: "The extension ".concat(component.name, " is trying to save an item with type ").concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again.")
                         });
 
@@ -21111,7 +21111,7 @@ function (_PureService) {
                         return _context3.finish(52);
 
                       case 60:
-                        _this9.syncManager.sync().then(function (response) {
+                        _this9.syncService.sync().then(function (response) {
                           // Allow handlers to be notified when a save begins and ends, to update the UI
                           var saveMessage = Object.assign({}, message);
                           saveMessage.action = response && response.error ? "save-error" : "save-success";
@@ -21163,7 +21163,7 @@ function (_PureService) {
               case 2:
                 duplicate = _context5.sent;
 
-                _this10.syncManager.sync();
+                _this10.syncService.sync();
 
                 _this10.replyToMessage(component, message, {
                   item: _this10.jsonForItem(duplicate, component)
@@ -21277,7 +21277,7 @@ function (_PureService) {
                 return _context6.finish(27);
 
               case 35:
-                _this11.syncManager.sync(); // "create-item" or "create-items" are possible messages handled here
+                _this11.syncService.sync(); // "create-item" or "create-items" are possible messages handled here
 
 
                 reply = message.action === "create-item" ? {
@@ -21322,7 +21322,7 @@ function (_PureService) {
                 reply = null;
                 didConfirm = true;
                 _context7.next = 6;
-                return regeneratorRuntime.awrap(_this12.alertManager.confirm({
+                return regeneratorRuntime.awrap(_this12.alertService.confirm({
                   text: "Are you sure you want to delete ".concat(itemsData.length, " ").concat(noun, "?")
                 }).catch(function () {
                   didConfirm = false;
@@ -21355,7 +21355,7 @@ function (_PureService) {
                   break;
                 }
 
-                _this12.alertManager.alert({
+                _this12.alertService.alert({
                   text: "The item you are trying to delete cannot be found."
                 });
 
@@ -21419,7 +21419,7 @@ function (_PureService) {
                 return _context7.finish(33);
 
               case 41:
-                _this12.syncManager.sync();
+                _this12.syncService.sync();
 
                 reply = {
                   deleted: true
@@ -21471,7 +21471,7 @@ function (_PureService) {
                 return regeneratorRuntime.awrap(_this14.modelManager.setItemDirty(component, true));
 
               case 3:
-                _this14.syncManager.sync();
+                _this14.syncService.sync();
 
               case 4:
               case "end":
@@ -21815,7 +21815,7 @@ function (_PureService) {
                 return regeneratorRuntime.awrap(_this16.modelManager.setItemDirty(component, true));
 
               case 23:
-                _this16.syncManager.sync();
+                _this16.syncService.sync();
 
               case 24:
                 _this16.permissionDialogs = _this16.permissionDialogs.filter(function (pendingDialog) {
@@ -22021,7 +22021,7 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(component, true));
 
             case 25:
-              this.syncManager.sync();
+              this.syncService.sync();
 
             case 26:
               if (!this.activeComponents.includes(component)) {
@@ -22116,7 +22116,7 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(component, true));
 
             case 26:
-              this.syncManager.sync();
+              this.syncService.sync();
 
             case 27:
               lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(this.activeComponents, component);
@@ -22277,7 +22277,7 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.modelManager.setItemToBeDeleted(component));
 
             case 2:
-              this.syncManager.sync();
+              this.syncService.sync();
 
             case 3:
             case "end":
@@ -22493,35 +22493,10 @@ function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/device_auth/response.js":
-/*!**********************************************!*\
-  !*** ./lib/services/device_auth/response.js ***!
-  \**********************************************/
-/*! exports provided: ChallengeResponse */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ChallengeResponse = function ChallengeResponse(_ref) {
-  var challenge = _ref.challenge,
-      value = _ref.value;
-
-  _classCallCheck(this, ChallengeResponse);
-
-  this.challenge = challenge;
-  this.value = value;
-  Object.freeze(this);
-};
-
-/***/ }),
-
-/***/ "./lib/services/device_auth/service.js":
-/*!*********************************************!*\
-  !*** ./lib/services/device_auth/service.js ***!
-  \*********************************************/
+/***/ "./lib/services/device_auth/device_auth_service.js":
+/*!*********************************************************!*\
+  !*** ./lib/services/device_auth/device_auth_service.js ***!
+  \*********************************************************/
 /*! exports provided: DeviceAuthService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -22530,7 +22505,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return DeviceAuthService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
 /* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -22562,14 +22537,14 @@ function (_PureService) {
   function DeviceAuthService(_ref) {
     var _this;
 
-    var storageManager = _ref.storageManager,
+    var storageService = _ref.storageService,
         keyManager = _ref.keyManager,
         protocolService = _ref.protocolService;
 
     _classCallCheck(this, DeviceAuthService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(DeviceAuthService).call(this));
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.keyManager = keyManager;
     _this.protocolService = protocolService;
     return _this;
@@ -22602,7 +22577,7 @@ function (_PureService) {
               }
 
               _context.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, _Services_storage_service__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
 
             case 7:
               biometricPrefs = _context.sent;
@@ -22629,9 +22604,9 @@ function (_PureService) {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, {
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].BiometricPrefs, {
                 enabled: true
-              }, _Services_storage_manager__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
+              }, _Services_storage_service__WEBPACK_IMPORTED_MODULE_2__["StorageValueModes"].Nonwrapped));
 
             case 2:
             case "end":
@@ -22723,6 +22698,31 @@ function (_PureService) {
 
 /***/ }),
 
+/***/ "./lib/services/device_auth/response.js":
+/*!**********************************************!*\
+  !*** ./lib/services/device_auth/response.js ***!
+  \**********************************************/
+/*! exports provided: ChallengeResponse */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChallengeResponse = function ChallengeResponse(_ref) {
+  var challenge = _ref.challenge,
+      value = _ref.value;
+
+  _classCallCheck(this, ChallengeResponse);
+
+  this.challenge = challenge;
+  this.value = value;
+  Object.freeze(this);
+};
+
+/***/ }),
+
 /***/ "./lib/services/history/functions.js":
 /*!*******************************************!*\
   !*** ./lib/services/history/functions.js ***!
@@ -22802,7 +22802,7 @@ function (_PureService) {
     var _this;
 
     var modelManager = _ref.modelManager,
-        storageManager = _ref.storageManager,
+        storageService = _ref.storageService,
         contentTypes = _ref.contentTypes,
         timeout = _ref.timeout;
 
@@ -22810,7 +22810,7 @@ function (_PureService) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNHistoryManager).call(this));
     _this.modelManager = modelManager;
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.contentTypes = contentTypes;
     _this.timeout = timeout;
     return _this;
@@ -22825,19 +22825,19 @@ function (_PureService) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable));
 
             case 2:
               this.persistable = _context.sent;
               _context.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions).then(function (historyValue) {
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions).then(function (historyValue) {
                 return new _Services_history_history_session__WEBPACK_IMPORTED_MODULE_1__["HistorySession"](historyValue);
               }));
 
             case 5:
               this.historySession = _context.sent;
               _context.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize));
 
             case 8:
               autoOptimize = _context.sent;
@@ -22925,7 +22925,7 @@ function (_PureService) {
               return _context2.abrupt("return");
 
             case 2:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions, this.historySession);
+              this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions, this.historySession);
 
             case 3:
             case "end":
@@ -23016,7 +23016,7 @@ function (_PureService) {
           switch (_context5.prev = _context5.next) {
             case 0:
               this.historySession.clearAllHistory();
-              return _context5.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions));
+              return _context5.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions));
 
             case 2:
             case "end":
@@ -23039,14 +23039,14 @@ function (_PureService) {
                 break;
               }
 
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable, true);
+              this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable, true);
               this.saveToDisk();
               _context6.next = 8;
               break;
 
             case 6:
-              this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable, false);
-              return _context6.abrupt("return", this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions));
+              this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryPersistable, false);
+              return _context6.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryRevisions));
 
             case 8:
             case "end":
@@ -23065,9 +23065,9 @@ function (_PureService) {
               this.autoOptimize = !this.autoOptimize;
 
               if (this.autoOptimize) {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize, true);
+                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize, true);
               } else {
-                this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize, false);
+                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].SessionHistoryOptimize, false);
               }
 
             case 2:
@@ -23550,16 +23550,16 @@ function (_ItemHistoryEntry) {
 
 /***/ }),
 
-/***/ "./lib/services/http_manager.js":
+/***/ "./lib/services/http_service.js":
 /*!**************************************!*\
-  !*** ./lib/services/http_manager.js ***!
+  !*** ./lib/services/http_service.js ***!
   \**************************************/
-/*! exports provided: SNHttpManager */
+/*! exports provided: SNHttpService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return SNHttpManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return SNHttpService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -23588,18 +23588,18 @@ var HTTP_VERB_PATCH = 'patch';
 var REQUEST_READY_STATE_COMPLETED = 4;
 var HTTP_STATUS_MIN_SUCCESS = 200;
 var HTTP_STATUS_MAX_SUCCESS = 299;
-var SNHttpManager =
+var SNHttpService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNHttpManager, _PureService);
+  _inherits(SNHttpService, _PureService);
 
-  function SNHttpManager() {
-    _classCallCheck(this, SNHttpManager);
+  function SNHttpService() {
+    _classCallCheck(this, SNHttpService);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNHttpManager).apply(this, arguments));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNHttpService).apply(this, arguments));
   }
 
-  _createClass(SNHttpManager, [{
+  _createClass(SNHttpService, [{
     key: "getAbsolute",
     value: function getAbsolute(_ref) {
       var url, params, authentication;
@@ -23802,7 +23802,7 @@ function (_PureService) {
     }
   }]);
 
-  return SNHttpManager;
+  return SNHttpService;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
 
 /***/ }),
@@ -23811,13 +23811,13 @@ function (_PureService) {
 /*!*******************************!*\
   !*** ./lib/services/index.js ***!
   \*******************************/
-/*! exports provided: SNAlertManager, SNSessionManager, SNApiService, SNComponentManager, SNHttpManager, SNModelManager, SNSingletonManager, SNActionsManager, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SyncModes, DeviceAuthService, SNStorageManager, StorageEncryptionPolicies, StoragePersistencePolicies */
+/*! exports provided: SNAlertService, SNSessionManager, SNApiService, SNComponentManager, SNHttpService, SNModelManager, SNSingletonManager, SNActionsService, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesService, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SyncModes, DeviceAuthService, SNStorageService, StorageEncryptionPolicies, StoragePersistencePolicies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Services_alert_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/alert_manager */ "./lib/services/alert_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertManager", function() { return _Services_alert_manager__WEBPACK_IMPORTED_MODULE_0__["SNAlertManager"]; });
+/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__["SNAlertService"]; });
 
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__["SNSessionManager"]; });
@@ -23828,8 +23828,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__["SNComponentManager"]; });
 
-/* harmony import */ var _Services_http_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/http_manager */ "./lib/services/http_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpManager", function() { return _Services_http_manager__WEBPACK_IMPORTED_MODULE_4__["SNHttpManager"]; });
+/* harmony import */ var _Services_http_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/http_service */ "./lib/services/http_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _Services_http_service__WEBPACK_IMPORTED_MODULE_4__["SNHttpService"]; });
 
 /* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__["SNModelManager"]; });
@@ -23837,11 +23837,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__["SNSingletonManager"]; });
 
-/* harmony import */ var _Services_actions_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_manager */ "./lib/services/actions_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNActionsManager", function() { return _Services_actions_manager__WEBPACK_IMPORTED_MODULE_7__["SNActionsManager"]; });
+/* harmony import */ var _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_service */ "./lib/services/actions_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__["SNActionsService"]; });
 
-/* harmony import */ var _Lib_migration_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/migration/service */ "./lib/migration/service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _Lib_migration_service__WEBPACK_IMPORTED_MODULE_8__["SNMigrationService"]; });
+/* harmony import */ var _Lib_migration_migration_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/migration/migration_service */ "./lib/migration/migration_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _Lib_migration_migration_service__WEBPACK_IMPORTED_MODULE_8__["SNMigrationService"]; });
 
 /* harmony import */ var _Services_protocol_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/protocol_service */ "./lib/services/protocol_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return _Services_protocol_service__WEBPACK_IMPORTED_MODULE_9__["SNProtocolService"]; });
@@ -23849,8 +23849,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_history_history_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/history/history_manager */ "./lib/services/history/history_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _Services_history_history_manager__WEBPACK_IMPORTED_MODULE_10__["SNHistoryManager"]; });
 
-/* harmony import */ var _Services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/privileges/privileges_manager */ "./lib/services/privileges/privileges_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesManager", function() { return _Services_privileges_privileges_manager__WEBPACK_IMPORTED_MODULE_11__["SNPrivilegesManager"]; });
+/* harmony import */ var _Services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/privileges/privileges_service */ "./lib/services/privileges/privileges_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _Services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_11__["SNPrivilegesService"]; });
 
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return _Services_key_manager__WEBPACK_IMPORTED_MODULE_12__["SNKeyManager"]; });
@@ -23863,20 +23863,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_14__["SyncEvents"]; });
 
-/* harmony import */ var _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Services/sync/sync_manager */ "./lib/services/sync/sync_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SNSyncManager"]; });
+/* harmony import */ var _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Services/sync/sync_service */ "./lib/services/sync/sync_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SNSyncManager"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _Services_sync_sync_manager__WEBPACK_IMPORTED_MODULE_15__["SyncModes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SyncModes"]; });
 
-/* harmony import */ var _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/device_auth/service */ "./lib/services/device_auth/service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
+/* harmony import */ var _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_18__["DeviceAuthService"]; });
 
-/* harmony import */ var _Services_storage_manager__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/storage_manager */ "./lib/services/storage_manager.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return _Services_storage_manager__WEBPACK_IMPORTED_MODULE_17__["SNStorageManager"]; });
+/* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageService", function() { return _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__["SNStorageService"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return _Services_storage_manager__WEBPACK_IMPORTED_MODULE_17__["StorageEncryptionPolicies"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__["StorageEncryptionPolicies"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StoragePersistencePolicies", function() { return _Services_storage_manager__WEBPACK_IMPORTED_MODULE_17__["StoragePersistencePolicies"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StoragePersistencePolicies", function() { return _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__["StoragePersistencePolicies"]; });
 
 
 
@@ -23950,14 +23950,14 @@ function (_PureService) {
   function ItemsKeyManager(_ref) {
     var _this;
 
-    var syncManager = _ref.syncManager,
+    var syncService = _ref.syncService,
         modelManager = _ref.modelManager,
         protocolService = _ref.protocolService;
 
     _classCallCheck(this, ItemsKeyManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(ItemsKeyManager).call(this));
-    _this.syncManager = syncManager;
+    _this.syncService = syncService;
     _this.modelManager = modelManager;
     _this.protocolService = protocolService;
     _this.keyObservers = [];
@@ -24080,7 +24080,7 @@ function (_PureService) {
     value: function registerSyncObserver() {
       var _this3 = this;
 
-      this.syncManager.addEventObserver(function _callee2(eventName) {
+      this.syncService.addEventObserver(function _callee2(eventName) {
         return regeneratorRuntime.async(function _callee2$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -24223,7 +24223,7 @@ function (_PureService) {
                 break;
               }
 
-              return _context5.abrupt("return", this.syncManager.repersistAllItems());
+              return _context5.abrupt("return", this.syncService.repersistAllItems());
 
             case 6:
             case "end":
@@ -24423,7 +24423,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
-/* harmony import */ var _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/storage_manager */ "./lib/services/storage_manager.js");
+/* harmony import */ var _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/storage_service */ "./lib/services/storage_service.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -24470,13 +24470,13 @@ function (_PureService) {
     var _this;
 
     var modelManager = _ref.modelManager,
-        storageManager = _ref.storageManager,
+        storageService = _ref.storageService,
         protocolService = _ref.protocolService,
         itemsKeyManager = _ref.itemsKeyManager;
 
     _classCallCheck(this, SNKeyManager);
 
-    if (!modelManager || !storageManager || !protocolService || !itemsKeyManager) {
+    if (!modelManager || !storageService || !protocolService || !itemsKeyManager) {
       throw 'Invalid KeyManager construction';
     }
 
@@ -24484,7 +24484,7 @@ function (_PureService) {
     _this.keyMode = KEY_MODE_ROOT_KEY_NONE;
     _this.protocolService = protocolService;
     _this.modelManager = modelManager;
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.itemsKeyManager = itemsKeyManager;
     _this.keyObservers = [];
     /** Hide rootKey enumeration */
@@ -24837,7 +24837,7 @@ function (_PureService) {
           switch (_context7.prev = _context7.next) {
             case 0:
               _context7.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 2:
               rawKeyParams = _context7.sent;
@@ -24871,7 +24871,7 @@ function (_PureService) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
-              return _context8.abrupt("return", this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return _context8.abrupt("return", this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 1:
             case "end":
@@ -24932,7 +24932,7 @@ function (_PureService) {
           switch (_context10.prev = _context10.next) {
             case 0:
               _context10.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 2:
               rawKeyParams = _context10.sent;
@@ -24979,7 +24979,7 @@ function (_PureService) {
                 break;
               }
 
-              return _context11.abrupt("return", this.storageManager.canDecryptWithKey(wrappingKey));
+              return _context11.abrupt("return", this.storageService.canDecryptWithKey(wrappingKey));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
@@ -25194,7 +25194,7 @@ function (_PureService) {
 
             case 21:
               _context14.next = 23;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, keyParams.getPortableValue(), _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 23:
               _context14.next = 25;
@@ -25240,7 +25240,7 @@ function (_PureService) {
             case 4:
               wrappedKey = _context15.sent;
               _context15.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, wrappedKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, wrappedKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 7:
             case "end":
@@ -25277,11 +25277,11 @@ function (_PureService) {
               }
 
               _context16.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 5:
               _context16.next = 7;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 7:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
@@ -25380,7 +25380,7 @@ function (_PureService) {
 
             case 21:
               _context17.next = 23;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, keyParams.getPortableValue(), _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 23:
               if (!(this.keyMode === KEY_MODE_ROOT_KEY_ONLY)) {
@@ -25459,15 +25459,15 @@ function (_PureService) {
 
             case 2:
               _context19.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 4:
               _context19.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 6:
               _context19.next = 8;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_manager__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_6__["StorageValueModes"].Nonwrapped));
 
             case 8:
               this.keyMode = KEY_MODE_ROOT_KEY_NONE;
@@ -28016,11 +28016,11 @@ function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/privileges/privileges_manager.js":
+/***/ "./lib/services/privileges/privileges_service.js":
 /*!*******************************************************!*\
-  !*** ./lib/services/privileges/privileges_manager.js ***!
+  !*** ./lib/services/privileges/privileges_service.js ***!
   \*******************************************************/
-/*! exports provided: ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesManager */
+/*! exports provided: ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28031,7 +28031,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return PRIVILEGE_SESSION_LENGTH_ONE_HOUR; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return PRIVILEGE_SESSION_LENGTH_ONE_WEEK; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesManager", function() { return SNPrivilegesManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return SNPrivilegesService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
@@ -28076,33 +28076,33 @@ var PRIVILEGE_SESSION_LENGTH_NONE = 0;
 var PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
 var PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
 var PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
-var SNPrivilegesManager =
+var SNPrivilegesService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNPrivilegesManager, _PureService);
+  _inherits(SNPrivilegesService, _PureService);
 
-  function SNPrivilegesManager(_ref) {
+  function SNPrivilegesService(_ref) {
     var _this;
 
     var modelManager = _ref.modelManager,
-        syncManager = _ref.syncManager,
+        syncService = _ref.syncService,
         singletonManager = _ref.singletonManager,
         keyManager = _ref.keyManager,
-        storageManager = _ref.storageManager,
+        storageService = _ref.storageService,
         sessionManager = _ref.sessionManager;
 
-    _classCallCheck(this, SNPrivilegesManager);
+    _classCallCheck(this, SNPrivilegesService);
 
-    if (!modelManager || !syncManager || !singletonManager || !keyManager) {
+    if (!modelManager || !syncService || !singletonManager || !keyManager) {
       throw 'Invalid privileges manager construction.';
     }
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNPrivilegesManager).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNPrivilegesService).call(this));
     _this.modelManager = modelManager;
-    _this.syncManager = syncManager;
+    _this.syncService = syncService;
     _this.singletonManager = singletonManager;
     _this.keyManager = keyManager;
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.sessionManager = sessionManager;
 
     _this.loadDefaults();
@@ -28110,7 +28110,7 @@ function (_PureService) {
     return _this;
   }
 
-  _createClass(SNPrivilegesManager, [{
+  _createClass(SNPrivilegesService, [{
     key: "loadDefaults",
     value: function loadDefaults() {
       this.availableActions = Object.keys(ProtectedActions).map(function (key) {
@@ -28290,7 +28290,7 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.modelManager.setItemDirty(privileges));
 
             case 5:
-              return _context3.abrupt("return", this.syncManager.sync());
+              return _context3.abrupt("return", this.syncService.sync());
 
             case 6:
             case "end":
@@ -28315,11 +28315,11 @@ function (_PureService) {
 
               expiresAt = addSecondsToNow(length);
               _context4.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey, expiresAt));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey, expiresAt));
 
             case 4:
               _context4.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength, length));
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength, length));
 
             case 6:
             case "end":
@@ -28353,7 +28353,7 @@ function (_PureService) {
           switch (_context6.prev = _context6.next) {
             case 0:
               _context6.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength));
 
             case 2:
               length = _context6.sent;
@@ -28384,7 +28384,7 @@ function (_PureService) {
           switch (_context7.prev = _context7.next) {
             case 0:
               _context7.next = 2;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey));
 
             case 2:
               expiresAt = _context7.sent;
@@ -28647,7 +28647,7 @@ function (_PureService) {
     }
   }]);
 
-  return SNPrivilegesManager;
+  return SNPrivilegesService;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
 
 /***/ }),
@@ -29934,12 +29934,12 @@ function (_PureService) {
     var _this;
 
     var modelManager = _ref.modelManager,
-        syncManager = _ref.syncManager;
+        syncService = _ref.syncService;
 
     _classCallCheck(this, SNSingletonManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSingletonManager).call(this));
-    _this.syncManager = syncManager;
+    _this.syncService = syncService;
     _this.modelManager = modelManager;
 
     _this.addObservers();
@@ -29977,7 +29977,7 @@ function (_PureService) {
           _this2.resolveQueue = _this2.resolveQueue.concat(items);
         }
       });
-      this.syncManager.addEventObserver(function _callee(eventName) {
+      this.syncService.addEventObserver(function _callee(eventName) {
         return regeneratorRuntime.async(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -30161,7 +30161,7 @@ function (_PureService) {
                  * Perform after timeout so that we can yield to event notifier that triggered us 
                  */
                 setTimeout(function () {
-                  _this3.syncManager.sync();
+                  _this3.syncService.sync();
                 });
               }
 
@@ -30232,13 +30232,13 @@ function (_PureService) {
               return _context4.abrupt("return", items[0]);
 
             case 4:
-              if (this.syncManager.getLastSyncDate()) {
+              if (this.syncService.getLastSyncDate()) {
                 _context4.next = 7;
                 break;
               }
 
               _context4.next = 7;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 7:
               /** Check again */
@@ -30284,7 +30284,7 @@ function (_PureService) {
             case 23:
               item = _context4.sent;
               _context4.next = 26;
-              return regeneratorRuntime.awrap(this.syncManager.sync());
+              return regeneratorRuntime.awrap(this.syncService.sync());
 
             case 26:
               return _context4.abrupt("return", item);
@@ -30303,11 +30303,11 @@ function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/storage_manager.js":
+/***/ "./lib/services/storage_service.js":
 /*!*****************************************!*\
-  !*** ./lib/services/storage_manager.js ***!
+  !*** ./lib/services/storage_service.js ***!
   \*****************************************/
-/*! exports provided: StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, SNStorageManager */
+/*! exports provided: StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, SNStorageService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -30316,7 +30316,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return StorageEncryptionPolicies; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageValueModes", function() { return StorageValueModes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ValueModesKeys", function() { return ValueModesKeys; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageManager", function() { return SNStorageManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageService", function() { return SNStorageService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
@@ -30388,21 +30388,21 @@ var ValueModesKeys = {
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped: 'nonwrapped'
 };
-var SNStorageManager =
+var SNStorageService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNStorageManager, _PureService);
+  _inherits(SNStorageService, _PureService);
 
-  function SNStorageManager(_ref) {
+  function SNStorageService(_ref) {
     var _this;
 
     var protocolService = _ref.protocolService,
         deviceInterface = _ref.deviceInterface,
         namespace = _ref.namespace;
 
-    _classCallCheck(this, SNStorageManager);
+    _classCallCheck(this, SNStorageService);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNStorageManager).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNStorageService).call(this));
     _this.deviceInterface = deviceInterface;
     _this.protocolService = protocolService;
     _this.namespace = namespace;
@@ -30421,7 +30421,7 @@ function (_PureService) {
    */
 
 
-  _createClass(SNStorageManager, [{
+  _createClass(SNStorageService, [{
     key: "handleApplicationStage",
     value: function handleApplicationStage(stage) {
       return regeneratorRuntime.async(function handleApplicationStage$(_context) {
@@ -30429,7 +30429,7 @@ function (_PureService) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNStorageManager.prototype), "handleApplicationStage", this).call(this, stage));
+              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNStorageService.prototype), "handleApplicationStage", this).call(this, stage));
 
             case 2:
               if (stage === _Lib__WEBPACK_IMPORTED_MODULE_2__["ApplicationStages"].Launched_10) {
@@ -31208,7 +31208,7 @@ function (_PureService) {
     }
   }]);
 
-  return SNStorageManager;
+  return SNStorageService;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
 
 /***/ }),
@@ -31986,9 +31986,151 @@ var SIGNAL_TYPE_STATUS_CHANGED = 2;
 
 /***/ }),
 
-/***/ "./lib/services/sync/sync_manager.js":
+/***/ "./lib/services/sync/sync_op_status.js":
+/*!*********************************************!*\
+  !*** ./lib/services/sync/sync_op_status.js ***!
+  \*********************************************/
+/*! exports provided: SyncOpStatus */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncOpStatus", function() { return SyncOpStatus; });
+/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var HEALTHY_SYNC_DURATION_THRESHOLD_S = 5;
+var TIMING_MONITOR_POLL_FREQUENCY_MS = 500;
+var SyncOpStatus =
+/*#__PURE__*/
+function () {
+  function SyncOpStatus(_ref) {
+    var interval = _ref.interval,
+        receiver = _ref.receiver;
+
+    _classCallCheck(this, SyncOpStatus);
+
+    this.interval = interval;
+    this.receiver = receiver;
+  }
+
+  _createClass(SyncOpStatus, [{
+    key: "setSyncInProgress",
+    value: function setSyncInProgress(inProgress) {
+      this.inProgress = true;
+    }
+  }, {
+    key: "setUploadStatus",
+    value: function setUploadStatus(_ref2) {
+      var completed = _ref2.completed,
+          total = _ref2.total;
+      this.completedUpload = completed;
+      this.totalUpload = total;
+    }
+  }, {
+    key: "setDownloadStatus",
+    value: function setDownloadStatus(_ref3) {
+      var downloaded = _ref3.downloaded;
+      this.downloaded = downloaded;
+    }
+  }, {
+    key: "setDatabaseLoadStatus",
+    value: function setDatabaseLoadStatus(_ref4) {
+      var current = _ref4.current,
+          total = _ref4.total,
+          done = _ref4.done;
+      this.databaseLoadCurrent = current;
+      this.databaseLoadTotal = total;
+      this.databaseLoadDone = done;
+    }
+  }, {
+    key: "setDidBegin",
+    value: function setDidBegin() {
+      this.syncing = true;
+      this.syncStart = new Date();
+    }
+  }, {
+    key: "setDidEnd",
+    value: function setDidEnd() {
+      this.syncing = false;
+      this.syncEnd = new Date();
+    }
+  }, {
+    key: "startTimingMonitor",
+
+    /**
+     * Notifies receiver if current sync request is taking too long to complete.
+     */
+    value: function startTimingMonitor() {
+      var _this = this;
+
+      if (this.timingMonitor) {
+        this.this.stopTimingMonitor();
+      }
+
+      this.timingMonitor = this.interval(function () {
+        if (_this.secondsSinceSyncStart > HEALTHY_SYNC_DURATION_THRESHOLD_S) {
+          _this.receiver(_Lib__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong);
+
+          _this.stopTimingMonitor();
+        }
+      }, TIMING_MONITOR_POLL_FREQUENCY_MS);
+    }
+  }, {
+    key: "stopTimingMonitor",
+    value: function stopTimingMonitor() {
+      if (this.interval.hasOwnProperty('cancel')) {
+        this.interval.cancel(this.timingMonitor);
+      } else {
+        clearInterval(this.timingMonitor);
+      }
+
+      this.timingMonitor = null;
+    }
+  }, {
+    key: "setError",
+    value: function setError(error) {
+      this.error = error;
+    }
+  }, {
+    key: "clearError",
+    value: function clearError() {
+      this.error = null;
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      this.downloaded = 0;
+      this.completedUpload = 0;
+      this.totalUpload = 0;
+      this.inProgress = false;
+      this.syncing = false;
+    }
+  }, {
+    key: "syncInProgress",
+    get: function get() {
+      return this.syncing === true;
+    }
+  }, {
+    key: "secondsSinceSyncStart",
+    get: function get() {
+      return (new Date() - this.syncStart) / 1000;
+    }
+  }]);
+
+  return SyncOpStatus;
+}();
+
+/***/ }),
+
+/***/ "./lib/services/sync/sync_service.js":
 /*!*******************************************!*\
-  !*** ./lib/services/sync/sync_manager.js ***!
+  !*** ./lib/services/sync/sync_service.js ***!
   \*******************************************/
 /*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SyncModes, SyncSources, SNSyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -32097,7 +32239,7 @@ function (_PureService) {
 
     var sessionManager = _ref.sessionManager,
         protocolService = _ref.protocolService,
-        storageManager = _ref.storageManager,
+        storageService = _ref.storageService,
         modelManager = _ref.modelManager,
         apiService = _ref.apiService,
         interval = _ref.interval;
@@ -32108,7 +32250,7 @@ function (_PureService) {
     _this.sessionManager = sessionManager;
     _this.protocolService = protocolService;
     _this.modelManager = modelManager;
-    _this.storageManager = storageManager;
+    _this.storageService = storageService;
     _this.apiService = apiService;
     _this.interval = interval;
     _this.statusObservers = [];
@@ -32195,7 +32337,7 @@ function (_PureService) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              return _context.abrupt("return", this.storageManager.getAllRawPayloads());
+              return _context.abrupt("return", this.storageService.getAllRawPayloads());
 
             case 1:
             case "end":
@@ -32315,7 +32457,7 @@ function (_PureService) {
           switch (_context3.prev = _context3.next) {
             case 0:
               this.syncToken = token;
-              return _context3.abrupt("return", this.storageManager.setValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken, token));
+              return _context3.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken, token));
 
             case 2:
             case "end":
@@ -32338,10 +32480,10 @@ function (_PureService) {
                 break;
               }
 
-              return _context4.abrupt("return", this.storageManager.setValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken, token));
+              return _context4.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken, token));
 
             case 5:
-              return _context4.abrupt("return", this.storageManager.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
+              return _context4.abrupt("return", this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
 
             case 6:
             case "end":
@@ -32363,7 +32505,7 @@ function (_PureService) {
               }
 
               _context5.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken));
 
             case 3:
               this.syncToken = _context5.sent;
@@ -32391,7 +32533,7 @@ function (_PureService) {
               }
 
               _context6.next = 3;
-              return regeneratorRuntime.awrap(this.storageManager.getValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
 
             case 3:
               this.cursorToken = _context6.sent;
@@ -32416,11 +32558,11 @@ function (_PureService) {
               this.syncToken = null;
               this.cursorToken = null;
               _context7.next = 4;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].LastSyncToken));
 
             case 4:
               _context7.next = 6;
-              return regeneratorRuntime.awrap(this.storageManager.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
+              return regeneratorRuntime.awrap(this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_19__["StorageKeys"].PaginationToken));
 
             case 6:
             case "end":
@@ -33682,7 +33824,7 @@ function (_PureService) {
 
             case 3:
               _context23.next = 5;
-              return regeneratorRuntime.awrap(this.storageManager.savePayloads(decryptedPayloads));
+              return regeneratorRuntime.awrap(this.storageService.savePayloads(decryptedPayloads));
 
             case 5:
             case "end":
@@ -33875,148 +34017,6 @@ function (_PureService) {
 
   return SNSyncManager;
 }(_Services_pure_service__WEBPACK_IMPORTED_MODULE_1__["PureService"]);
-
-/***/ }),
-
-/***/ "./lib/services/sync/sync_op_status.js":
-/*!*********************************************!*\
-  !*** ./lib/services/sync/sync_op_status.js ***!
-  \*********************************************/
-/*! exports provided: SyncOpStatus */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncOpStatus", function() { return SyncOpStatus; });
-/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-var HEALTHY_SYNC_DURATION_THRESHOLD_S = 5;
-var TIMING_MONITOR_POLL_FREQUENCY_MS = 500;
-var SyncOpStatus =
-/*#__PURE__*/
-function () {
-  function SyncOpStatus(_ref) {
-    var interval = _ref.interval,
-        receiver = _ref.receiver;
-
-    _classCallCheck(this, SyncOpStatus);
-
-    this.interval = interval;
-    this.receiver = receiver;
-  }
-
-  _createClass(SyncOpStatus, [{
-    key: "setSyncInProgress",
-    value: function setSyncInProgress(inProgress) {
-      this.inProgress = true;
-    }
-  }, {
-    key: "setUploadStatus",
-    value: function setUploadStatus(_ref2) {
-      var completed = _ref2.completed,
-          total = _ref2.total;
-      this.completedUpload = completed;
-      this.totalUpload = total;
-    }
-  }, {
-    key: "setDownloadStatus",
-    value: function setDownloadStatus(_ref3) {
-      var downloaded = _ref3.downloaded;
-      this.downloaded = downloaded;
-    }
-  }, {
-    key: "setDatabaseLoadStatus",
-    value: function setDatabaseLoadStatus(_ref4) {
-      var current = _ref4.current,
-          total = _ref4.total,
-          done = _ref4.done;
-      this.databaseLoadCurrent = current;
-      this.databaseLoadTotal = total;
-      this.databaseLoadDone = done;
-    }
-  }, {
-    key: "setDidBegin",
-    value: function setDidBegin() {
-      this.syncing = true;
-      this.syncStart = new Date();
-    }
-  }, {
-    key: "setDidEnd",
-    value: function setDidEnd() {
-      this.syncing = false;
-      this.syncEnd = new Date();
-    }
-  }, {
-    key: "startTimingMonitor",
-
-    /**
-     * Notifies receiver if current sync request is taking too long to complete.
-     */
-    value: function startTimingMonitor() {
-      var _this = this;
-
-      if (this.timingMonitor) {
-        this.this.stopTimingMonitor();
-      }
-
-      this.timingMonitor = this.interval(function () {
-        if (_this.secondsSinceSyncStart > HEALTHY_SYNC_DURATION_THRESHOLD_S) {
-          _this.receiver(_Lib__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong);
-
-          _this.stopTimingMonitor();
-        }
-      }, TIMING_MONITOR_POLL_FREQUENCY_MS);
-    }
-  }, {
-    key: "stopTimingMonitor",
-    value: function stopTimingMonitor() {
-      if (this.interval.hasOwnProperty('cancel')) {
-        this.interval.cancel(this.timingMonitor);
-      } else {
-        clearInterval(this.timingMonitor);
-      }
-
-      this.timingMonitor = null;
-    }
-  }, {
-    key: "setError",
-    value: function setError(error) {
-      this.error = error;
-    }
-  }, {
-    key: "clearError",
-    value: function clearError() {
-      this.error = null;
-    }
-  }, {
-    key: "reset",
-    value: function reset() {
-      this.downloaded = 0;
-      this.completedUpload = 0;
-      this.totalUpload = 0;
-      this.inProgress = false;
-      this.syncing = false;
-    }
-  }, {
-    key: "syncInProgress",
-    get: function get() {
-      return this.syncing === true;
-    }
-  }, {
-    key: "secondsSinceSyncStart",
-    get: function get() {
-      return (new Date() - this.syncStart) / 1000;
-    }
-  }]);
-
-  return SyncOpStatus;
-}();
 
 /***/ }),
 

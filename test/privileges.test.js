@@ -20,7 +20,7 @@ describe("privileges", () => {
 
   beforeEach(async function() {
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.privilegesManager = this.application.privilegesManager;
+    this.privilegesService = this.application.privilegesService;
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });
@@ -30,39 +30,39 @@ describe("privileges", () => {
   });
 
   it("loads default actions and credentials", async function () {
-    expect(this.privilegesManager.getAvailableActions().length).to.be.above(0);
-    expect(this.privilegesManager.getAvailableCredentials().length).to.be.above(0);
+    expect(this.privilegesService.getAvailableActions().length).to.be.above(0);
+    expect(this.privilegesService.getAvailableCredentials().length).to.be.above(0);
   });
 
   it('successfully loads privileges', async function () {
-    const privileges = await this.privilegesManager.getPrivileges();
+    const privileges = await this.privilegesService.getPrivileges();
     expect(privileges).to.be.ok;
   });
 
   it("adds credentials for actions", async function () {
-    const privileges = await this.privilegesManager.getPrivileges();
+    const privileges = await this.privilegesService.getPrivileges();
     privileges.addCredentialForAction(
       ProtectedActions.ViewProtectedNotes,
       PrivilegeCredentials.LocalPasscode
     );
     await this.application.setPasscode('foobar');
-    const credentials = await this.privilegesManager.netCredentialsForAction(
+    const credentials = await this.privilegesService.netCredentialsForAction(
       ProtectedActions.ViewProtectedNotes
     );
     expect(credentials.length).to.equal(1);
-    const requiresCredentials = await this.privilegesManager.actionRequiresPrivilege(
+    const requiresCredentials = await this.privilegesService.actionRequiresPrivilege(
       ProtectedActions.ViewProtectedNotes
     );
     expect(requiresCredentials).to.equal(true);
   });
 
   it("handles session length", async function () {
-    await this.privilegesManager.setSessionLength(
+    await this.privilegesService.setSessionLength(
       PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES
     );
-    const length = await this.privilegesManager.getSelectedSessionLength();
+    const length = await this.privilegesService.getSelectedSessionLength();
     expect(length).to.equal(PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES);
-    const expirey = await this.privilegesManager.getSessionExpirey();
+    const expirey = await this.privilegesService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });
 })

@@ -113,7 +113,7 @@ export default class Factory {
       keyParams: accountKeyParams
     });
     application.notifyEvent(ApplicationEvents.SignedIn);
-    await application.syncManager.sync({
+    await application.syncService.sync({
       mode: SyncModes.DownloadFirst
     });
     application.protocolService.decryptErroredItems();
@@ -151,12 +151,12 @@ export default class Factory {
     const payload = this.createNotePayload();
     const note = await application.modelManager.mapPayloadToLocalItem({payload});
     await application.modelManager.setItemDirty(note, true);
-    await application.syncManager.sync();
+    await application.syncService.sync();
     return note;
   }
 
   static async getStoragePayloadsOfType(application, type) {
-    const rawPayloads = await application.storageManager.getAllRawPayloads();
+    const rawPayloads = await application.storageService.getAllRawPayloads();
     return rawPayloads.filter((rp) => rp.content_type === type).map((rp) => {
       return CreateMaxPayloadFromAnyObject({
         object: rp
@@ -239,7 +239,7 @@ export default class Factory {
   }
 
   static async storagePayloadCount(application) {
-    const payloads = await application.storageManager.getAllRawPayloads();
+    const payloads = await application.storageService.getAllRawPayloads();
     return payloads.length;
   }
 

@@ -104,7 +104,7 @@ describe("notes and tags", () => {
     await modelManager.setItemToBeDeleted(note);
     expect(note.dirty).to.be.true;
     expect(tag.dirty).to.be.true;
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
@@ -127,7 +127,7 @@ describe("notes and tags", () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     const mutatedTag = CreateMaxPayloadFromAnyObject({
       object: tagPayload,
@@ -274,7 +274,7 @@ describe("notes and tags", () => {
       isConflict: true
     });
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(tag.uuid).to.not.equal(duplicateTag.uuid);
     expect(tag.content.references.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -389,7 +389,7 @@ describe("notes and tags", () => {
     const note = modelManager.getItems(["Note"])[0];
     const tag = modelManager.getItems(["Tag"])[0];
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     await modelManager.setItemToBeDeleted(tag);
 

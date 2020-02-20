@@ -141,7 +141,7 @@ describe('keys', () => {
     const notePayload = Factory.createNotePayload();
     await this.application.savePayload({ payload: notePayload });
 
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const rawNotePayload = rawPayloads.find((r) => r.content_type === 'Note');
     expect(typeof rawNotePayload.content).to.equal('string');
   });
@@ -247,7 +247,7 @@ describe('keys', () => {
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.setPasscode('foo');
     const itemsKey = this.application.itemsKeyManager.allItemsKeys[0];
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
       object: itemsKeyRawPayload
@@ -299,7 +299,7 @@ describe('keys', () => {
 
     const originalRootKey = await this.application.keyManager.getRootKey();
     /** Expect that we can decrypt raw payload with current root key */
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === originalItemsKey.uuid);
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject({
       object: itemsKeyRawPayload
@@ -323,7 +323,7 @@ describe('keys', () => {
      * Expect that originalRootKey can no longer decrypt originalItemsKey
      * as items key has been re-encrypted with new root key
      */
-    const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload2 = rawPayloads2.find((p) => p.uuid === originalItemsKey.uuid);
     expect(itemsKeyRawPayload2.content).to.not.equal(itemsKeyRawPayload.content);
 

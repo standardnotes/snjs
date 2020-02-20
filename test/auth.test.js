@@ -49,7 +49,7 @@ describe("basic auth", () => {
     await this.application.signOut();
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
     expect(this.application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
   });
 
@@ -92,7 +92,7 @@ describe("basic auth", () => {
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
@@ -110,7 +110,7 @@ describe("basic auth", () => {
     expect(this.application.modelManager.invalidItems().length).to.equal(0);
     
     await this.application.modelManager.setAllItemsDirty();
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     
@@ -145,7 +145,7 @@ describe("basic auth", () => {
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     const numTimesToChangePw = 5;
     let newPassword = Factory.randomString();
@@ -164,7 +164,7 @@ describe("basic auth", () => {
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
       await this.application.modelManager.setAllItemsDirty();
-      await this.application.syncManager.sync();
+      await this.application.syncService.sync();
       await this.application.signOut();
       expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
       expect(this.application.modelManager.invalidItems().length).to.equal(0);

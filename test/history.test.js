@@ -151,7 +151,7 @@ describe('session history', () => {
     });
     const item = await this.modelManager.mapPayloadToLocalItem({payload});
     await this.application.modelManager.setItemDirty(item);
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     const itemHistory = this.historyManager.historyForItem(item);
     /** It should keep the first and last by default */
     await setTextAndSync(

@@ -32,8 +32,8 @@ describe("duplication", () => {
   });
 
   afterEach(async function() {
-    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    expect(this.application.syncService.isOutOfSync()).to.equal(false);
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
   });
@@ -61,13 +61,13 @@ describe("duplication", () => {
       payload: payload
     })
     this.expectedItemCount++;
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
     await this.application.modelManager.setItemDirty(item);
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
@@ -77,13 +77,13 @@ describe("duplication", () => {
       payload: payload
     })
     this.expectedItemCount++;
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
     await this.application.modelManager.setItemDirty(item);
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 });

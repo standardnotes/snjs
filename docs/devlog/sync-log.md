@@ -116,11 +116,11 @@ This is handled by the fact that every time you mark an item as dirty, it's dirt
 
 Local data must be fully loaded before we accept anything from the server. This is because if we retrieve items from the server before local data has loaded, then their values will be overwritten by the local data values immediately on load. Instead, we must wait until local data has fully loaded before talking to the server.
 
-The interface allows users to create new notes while their data is loading, and also edit any notes that may have already loaded. In this case, we need to make sure that while any pending changes will not be synced to the server yet, dirty values should be saved to local disk upon someone calling syncManager.sync(). The previous behavior was that we would lock syncing, including saving dirty items to disk, until all local data has loaded. This would mean that if a user made a new note, typed a sentence, all while their 10,000 items have not yet fully loaded, and then suddenly quit the app, their changes may be unsaved.
+The interface allows users to create new notes while their data is loading, and also edit any notes that may have already loaded. In this case, we need to make sure that while any pending changes will not be synced to the server yet, dirty values should be saved to local disk upon someone calling syncService.sync(). The previous behavior was that we would lock syncing, including saving dirty items to disk, until all local data has loaded. This would mean that if a user made a new note, typed a sentence, all while their 10,000 items have not yet fully loaded, and then suddenly quit the app, their changes may be unsaved.
 
 - What if a user makes a change to a note, then gets it saved locally, before local data load has even started. Then, upon local data load, this item appears 5,000 items later, by which time, you modified the in memory copy several times. This would then overwrite the changes you've made. To handle this, we'll persist dirtiedDate to local storage. Upon local data load, we check if the saved value's dirtiedDate is less than the current item (if it exists in modelManager) dirtiedDate. If it is, we'll ignore this local value.
 
-- Clients **must** call syncManager.loadDataFromDatabase and wait for that to complete before calling syncManager.sync. Ideally these two would be combined into one, but for now, they remain separate and up to the consumer to ensure proper order. Calling syncManager.sync before loadDataFromDatabase has completed will save dirty items to disk, but will not proceed with online sync.
+- Clients **must** call syncService.loadDataFromDatabase and wait for that to complete before calling syncService.sync. Ideally these two would be combined into one, but for now, they remain separate and up to the consumer to ensure proper order. Calling syncService.sync before loadDataFromDatabase has completed will save dirty items to disk, but will not proceed with online sync.
 
 - When a user signs out, assuming we don't reload the interface (we do reload on web but not mobile), then we will keep the flag that indicates that local data has loaded. The client is not required to call loadDataFromDatabase after a sign out.
 
@@ -134,7 +134,7 @@ Since updated_at is such an important field, we need to handle the case when it 
 
 ### 1.9 Syncing while syncing
 
-Let's say a client wants to await a sync request and do something when it completes. Let's say there's an automatic timer than syncs every 10 seconds, but each sync request takes 20 seconds to complete. In this case, if we always await when syncManager.performSyncAgainOnCompletion is true, then the client's initial await will never resolve, as it will continue looping. We can pass an option to sync called 'chainWithCurrentResolveCycle', and if true, then
+Let's say a client wants to await a sync request and do something when it completes. Let's say there's an automatic timer than syncs every 10 seconds, but each sync request takes 20 seconds to complete. In this case, if we always await when syncService.performSyncAgainOnCompletion is true, then the client's initial await will never resolve, as it will continue looping. We can pass an option to sync called 'chainWithCurrentResolveCycle', and if true, then
 
 ### 1.10 Retrieving an item that is locally dirty
 
@@ -150,4 +150,4 @@ We need to put in place checks where if a remote item is received and the local 
 
 # Known Issues
 
-- #1 Calling syncManager.sync() 5 times won't actually sync 5 times. It will instead sync likely only 2 times. This means that if we are awaiting on 5 unique sync promises to resolve, they may all resolve at once, as a consequence of all queued callbacks resolving indiscriminately on any sync completion.
+- #1 Calling syncService.sync() 5 times won't actually sync 5 times. It will instead sync likely only 2 times. This means that if we are awaiting on 5 unique sync promises to resolve, they may all resolve at once, as a consequence of all queued callbacks resolving indiscriminately on any sync completion.

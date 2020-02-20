@@ -269,7 +269,7 @@ describe('app models', () => {
     expect(item1.referencedItemsCount).to.equal(1);
     expect(item2.referencingItemsCount).to.equal(1);
 
-    const alternatedItem = await this.application.syncManager.alternateUuidForItem(item1);
+    const alternatedItem = await this.application.syncService.alternateUuidForItem(item1);
     expect(alternatedItem.isItem).to.equal(true);
     expect(item1.deleted).to.equal(true);
     // they should not be same reference
@@ -305,8 +305,8 @@ describe('app models', () => {
 
     expect(item2.referencingItemsCount).to.equal(1);
 
-    const alternatedItem1 = await this.application.syncManager.alternateUuidForItem(item1);
-    const alternatedItem2 = await this.application.syncManager.alternateUuidForItem(item2);
+    const alternatedItem1 = await this.application.syncService.alternateUuidForItem(item1);
+    const alternatedItem2 = await this.application.syncService.alternateUuidForItem(item2);
 
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 

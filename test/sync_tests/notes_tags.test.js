@@ -33,10 +33,10 @@ describe("notes + tags syncing", async function() {
   it('syncing an item then downloading it should include items_key_id', async function() {
     const note = await Factory.createMappedNote(this.application);
     await this.application.modelManager.setItemDirty(note);
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     await this.application.modelManager.resetState();
-    await this.application.syncManager.clearSyncPositionTokens();
-    await this.application.syncManager.sync();
+    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.sync();
     const downloadedNote = this.application.modelManager.notes[0];
     expect(downloadedNote.items_key_id).to.be.ok;
     // Allow time for waitingForKey
@@ -57,8 +57,8 @@ describe("notes + tags syncing", async function() {
 
     for(let i = 0; i < 9; i++) {
       await this.application.modelManager.setItemsDirty([note, tag]);
-      await this.application.syncManager.sync();
-      this.application.syncManager.clearSyncPositionTokens();
+      await this.application.syncService.sync();
+      this.application.syncService.clearSyncPositionTokens();
       expect(tag.content.references.length).to.equal(1);
       expect(note.tags.length).to.equal(1);
       expect(tag.notes.length).to.equal(1);
@@ -80,7 +80,7 @@ describe("notes + tags syncing", async function() {
     const originalTag = this.application.modelManager.tags[0];
     await this.application.modelManager.setItemsDirty([originalNote, originalTag]);
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
 
     expect(originalTag.content.references.length).to.equal(1);
     expect(originalTag.notes.length).to.equal(1);
@@ -88,8 +88,8 @@ describe("notes + tags syncing", async function() {
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
-    await this.application.storageManager.clearAllPayloads();
-    await this.application.syncManager.markAllItemsAsNeedingSync({
+    await this.application.storageService.clearAllPayloads();
+    await this.application.syncService.markAllItemsAsNeedingSync({
       alternateUuids: true
     })
 
@@ -122,8 +122,8 @@ describe("notes + tags syncing", async function() {
     expect(note.referencingItemsCount).to.equal(1);
 
     await this.application.modelManager.setItemsDirty([note, tag]);
-    await this.application.syncManager.sync();
-    await this.application.syncManager.clearSyncPositionTokens();
+    await this.application.syncService.sync();
+    await this.application.syncService.clearSyncPositionTokens();
 
     expect(note.dirty).to.equal(false);
     expect(tag.dirty).to.equal(false);

@@ -142,10 +142,10 @@ describe('2020-01-15 mobile migration', () => {
     );
 
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
     const rootKey = await application.keyManager.getRootKey();
@@ -161,10 +161,10 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageManager.getValue('first_run')
+      await application.storageService.getValue('first_run')
     ).to.equal(false);
     expect(
-      await application.storageManager.getValue('biometrics_prefs')
+      await application.storageService.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
 
     await application.deinit();
@@ -249,10 +249,10 @@ describe('2020-01-15 mobile migration', () => {
       awaitDatabaseLoad: true
     });
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
     const rootKey = await application.keyManager.getRootKey();
@@ -268,13 +268,13 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageManager.getValue('first_run')
+      await application.storageService.getValue('first_run')
     ).to.equal(false);
     expect(
-      await application.storageManager.getValue('biometrics_prefs')
+      await application.storageService.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
     expect(
-      await application.storageManager.getValue(StorageKeys.MobilePasscodeTiming)
+      await application.storageService.getValue(StorageKeys.MobilePasscodeTiming)
     ).to.eql(passcodeTiming);
     await application.deinit();
   });
@@ -360,10 +360,10 @@ describe('2020-01-15 mobile migration', () => {
       KEY_MODE_ROOT_KEY_ONLY
     );
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
@@ -378,10 +378,10 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageManager.getValue('first_run')
+      await application.storageService.getValue('first_run')
     ).to.equal(false);
     expect(
-      await application.storageManager.getValue('biometrics_prefs')
+      await application.storageService.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
 
     await application.deinit();
@@ -449,10 +449,10 @@ describe('2020-01-15 mobile migration', () => {
       KEY_MODE_ROOT_KEY_NONE
     );
     /** Should be decrypted */
-    const storageMode = application.storageManager.domainKeyForMode(
+    const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
-    const valueStore = application.storageManager.values[storageMode];
+    const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
     const rootKey = await application.keyManager.getRootKey();
@@ -465,10 +465,10 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageManager.getValue('first_run')
+      await application.storageService.getValue('first_run')
     ).to.equal(false);
     expect(
-      await application.storageManager.getValue('biometrics_prefs')
+      await application.storageService.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
 
     await application.deinit();

@@ -77,9 +77,9 @@ describe("singletons", () => {
   });
 
   afterEach(async function () {
-    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-    const rawPayloads = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
   });
@@ -95,7 +95,7 @@ describe("singletons", () => {
       payloads: [privs1, privs2, privs3]
     });
     await this.application.modelManager.setItemsDirty(items);
-    await this.application.syncManager.sync(syncOptions);
+    await this.application.syncService.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
@@ -146,7 +146,7 @@ describe("singletons", () => {
 
     let didCompleteRelevantSync = false;
     let beginCheckingResponse = false;
-    this.application.syncManager.addEventObserver(async (eventName, data) => {
+    this.application.syncService.addEventObserver(async (eventName, data) => {
       if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
         beginCheckingResponse = true;
       }
@@ -161,25 +161,25 @@ describe("singletons", () => {
         expect(matching).to.not.be.ok;
       }
     });
-    await this.application.syncManager.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
   }).timeout(10000);
 
   it("signing into account and retrieving singleton shouldn't put us in deadlock", async function () {
     /** Create privs */
-    const ogPrivs = await this.application.privilegesManager.getPrivileges();
+    const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
     await this.application.sync(syncOptions);
     await this.application.signOut();
     /** Create another instance while signed out */
-    await this.application.privilegesManager.getPrivileges();
+    await this.application.privilegesService.getPrivileges();
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
-    const latestPrivs = await this.application.privilegesManager.getPrivileges();
+    const latestPrivs = await this.application.privilegesService.getPrivileges();
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
     const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
@@ -191,7 +191,7 @@ describe("singletons", () => {
       payload: payload
     });
     this.expectedItemCount++;
-    await this.application.syncManager.sync(syncOptions);
+    await this.application.syncService.sync(syncOptions);
     /** Set after sync so that it syncs properly */
     item.errorDecrypting = true;
 
@@ -211,14 +211,14 @@ describe("singletons", () => {
       payload: payload
     });
     this.expectedItemCount++;
-    await this.application.syncManager.sync(syncOptions);
+    await this.application.syncService.sync(syncOptions);
     const predicate = new SFPredicate("content_type", "=", item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload
     });
-    await this.application.syncManager.alternateUuidForItem(resolvedItem);
-    await this.application.syncManager.sync(syncOptions);
+    await this.application.syncService.alternateUuidForItem(resolvedItem);
+    await this.application.syncService.sync(syncOptions);
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload

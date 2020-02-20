@@ -17,7 +17,7 @@ describe('offline syncing', () => {
   });
 
   afterEach(async function() {
-    expect(this.application.syncManager.isOutOfSync()).to.equal(false);
+    expect(this.application.syncService.isOutOfSync()).to.equal(false);
     await this.application.deinit();
   });
 
@@ -32,15 +32,15 @@ describe('offline syncing', () => {
   it("should sync item with no passcode", async function() {
     const note = await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
-    const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
-    const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
     const itemsKeyRP = (await Factory.getStoragePayloadsOfType(
@@ -60,14 +60,14 @@ describe('offline syncing', () => {
     await this.application.setPasscode('foobar');
     await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
-    const rawPayloads1 = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
-    const rawPayloads2 = await this.application.storageManager.getAllRawPayloads();
+    const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
     const payload = rawPayloads2[0];
@@ -99,12 +99,12 @@ describe.skip('offline deprecated', () => {
     // This test is to ensure that when that mapping happens, it doesn't overwrite any pending changes we may have made
     // since the load.
     const latency = 1000;
-    this.application.syncManager.ut_beginLatencySimulator(latency);
-    await this.application.syncManager.sync();
-    this.application.syncManager.ut_endLatencySimulator();
+    this.application.syncService.ut_beginLatencySimulator(latency);
+    await this.application.syncService.sync();
+    this.application.syncService.ut_endLatencySimulator();
 
     // This item should be saved to disk at this point.
-    const models = await this.application.storageManager.getAllRawPayloads()
+    const models = await this.application.storageService.getAllRawPayloads()
     expect(models.length).to.equal(1);
 
     let text = `${Math.random()}`;
@@ -114,11 +114,11 @@ describe.skip('offline deprecated', () => {
     // wait ~latency, then check to make sure that the local data load hasn't overwritten our dirty values.
 
     await Factory.sleep((latency/1000) + 0.1);
-    await this.application.syncManager.sync();
+    await this.application.syncService.sync();
     expect(this.application.modelManager.findItem(item.uuid).text).to.equal(text);
     expect(this.application.modelManager.findItem(item.uuid).content.text).to.equal(text);
 
-    const updatedModels = await this.application.storageManager.getAllRawPayloads()
+    const updatedModels = await this.application.storageService.getAllRawPayloads()
     expect(updatedModels.length).to.equal(1);
     expect(this.application.modelManager.allItems.length).to.equal(1);
   }).timeout(5000);

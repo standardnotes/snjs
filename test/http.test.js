@@ -9,18 +9,18 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('http manager', () => {
-  const httpManager = Factory.globalHttpManager();
+  const httpService = Factory.globalHttpManager();
   it("formats urls properly 1", async () => {
     const url = "http://example.org";
     const params = {foo: "bar"};
     const result = url + "?foo=bar";
-    expect(httpManager.urlForUrlAndParams(url, params)).to.equal(result);
+    expect(httpService.urlForUrlAndParams(url, params)).to.equal(result);
   });
 
   it("formats urls properly 2", async () => {
     const url = "http://example.org?name=java";
     const params = {foo: "bar"};
     const result = url + "&foo=bar";
-    expect(httpManager.urlForUrlAndParams(url, params)).to.equal(result);
+    expect(httpService.urlForUrlAndParams(url, params)).to.equal(result);
   });
 });

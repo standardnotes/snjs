@@ -115,7 +115,7 @@ describe('device authentication', () => {
     });
     const sampleStorageKey = 'foo';
     const sampleStorageValue = 'bar';
-    await application.storageManager.setValue(sampleStorageKey, sampleStorageValue);
+    await application.storageService.setValue(sampleStorageKey, sampleStorageValue);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
     const passcode = 'foobar';
     await application.setPasscode(passcode);
@@ -147,7 +147,7 @@ describe('device authentication', () => {
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(
-      await tmpApplication.storageManager.getValue(sampleStorageKey)
+      await tmpApplication.storageService.getValue(sampleStorageKey)
     ).to.equal(sampleStorageValue);
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
