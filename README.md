@@ -1,84 +1,110 @@
 # SNJS
 
-SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared JavaScript logic for mobile, web, and desktop.
-
-This library can be used in any JavaScript environment, including web, desktop, native, and mobile (via [React Native](https://github.com/standardnotes/mobile/blob/master/src/lib/snjs.js)).
+SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared logic for all Standard Notes clients.
 
 ## Installation
 
 `npm install --save snjs`
 
-## Integrating in a web app
+## Integrating in module environment
 
-1. Import these two files in your page, either via a packager like Grunt or Webpack, or via regular HTML script tags:
+```javascript
+import { SNApplication } from 'snjs';
+```
+
+## Integrating in non-module web environment
 
 ```javascript
 <script src="snjs.js"></script>
+Object.assign(window, SNLibrary);
 ```
 
 ## Usage
 
-On the web, SNJS objects will be available as on the global window, such as `window.protocolService`.
-
-If in a module environment, you can import it via:
+1. Initialize an application:
 
 ```javascript
-import { protocolService } from 'snjs';
-```
-
-### Generating keys for user
-
-#### New user (registration):
-
-```javascript
-protocolService.createRootKey({identifier: email, password: password}).then((results) => {
-  const keys = results.keys;
-  const keyParams = results.keyParams;
-
-  const serverPassword = keys.serverPassword;
-  const masterKey = keys.masterKey;
-  const itemsKey = keys.itemsKey;
+const serverUrl = getServerURL();
+const deviceInterface = new DeviceInterfaceSubclass();
+const app = new SNApplication({
+   deviceInterface: deviceInterface,
+   environment: Environments.Web,
+   platform: Platforms.MacWeb,
+   host: serverUrl
 });
 ```
 
-#### Existing user (sign in):
+2. Launch the application:
 
 ```javascript
-let keyParams = getPreviouslyCreatedKeyParams();
-protocolService.computeRootKey({password, keyParams}).then((keys) => {
-  const serverPassword = keys.serverPassword;
-  const masterKey = keys.masterKey;
-  // itemKey is generated once then uploaded to server in encrypted form.
+ await app.prepareForLaunch({
+   callbacks: {
+     requiresChallengeResponses: (handleChallengeResponses) => {
+
+     },
+     handleChallengeFailures: (responses) => {
+       
+     }
+   },
+ });
+ await application.launch();
+```
+
+Once the app is launched, you may perform any app-related functions, including:
+
+### Signing into an account
+
+```javascript
+app.signIn({
+  email, 
+  password
+}).then((response) => {
+
 });
 ```
 
-#### Key descriptions:
-`serverPassword`: sent to the server for authentication.
-
-`masterKey`: encrypts and decrypts keys. Not sent to server plainly.
-
-`itemKey`: encrypts and decrypts items. Not sent to server plainly.
-
-### Encrypting and decrypting items
-
-Use `protocolService` to encrypt and decrypt items. Use the `SFItemParams` as a wrapper over the item transformer. The `SFItemParams` class allows you to pass an `SFItem` object, encryption keys, and auth params, and will return the encrypted result.
-
-#### Encrypt:
+### Registering a new account
 
 ```javascript
-let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolService.generateEncryptionParameters({item, keys, keyParams}).then(() => {
- // item.content is now encrypted
-})
+app.register({
+  email, 
+  password
+}).then((response) => {
+
+});
 ```
 
-#### Decrypt:
+### Lock the app with a passcode
 
 ```javascript
-let keys = getKeys(); // keys is a hash which should have properties mk and ak.
-protocolService.payloadByDecryptingPayload({payload: item, keys}).then(() => {
- // item.content is now decrypted
-})
+app.setPasscode(somePasscode).then(() => {
+
+});
+```
+
+### Create a note
+
+```javascript
+const item = await app.createItem({
+  contentType: ContentTypes.Note, 
+  content: {
+    title: 'Ideas',
+    text: 'Coming soon.'
+  }
+});
+/** Save the item both locally and sync with server */
+await app.saveItem({ item: item });
+```
+
+### Stream notes
+
+```javascript
+app.streamItems({
+  contentType: ContentTypes.Note, 
+  stream: ({ notes }) => {
+    reloadUI(notes);
+  }
+});
 ```
 
 ## Notes

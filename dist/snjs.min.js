@@ -4627,28 +4627,31 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 /** How often to automatically sync, in milliseconds */
 
 var DEFAULT_AUTO_SYNC_INTERVAL = 30000;
+/** The main entrypoint of an application. */
+
 var SNApplication =
 /*#__PURE__*/
 function () {
   /**
-   * @param environment
+   * @param {object} params
+   * @param {Environments} params.environment
       Required - The Environment that identifies your application.
-   * @param platform
+   * @param {Platforms} params.platform
       Required - The Platform that identifies your application.
-   * @param namespace
+   * @param {string} params.namespace
       Optional - a unique identifier to namespace storage and
       other persistent properties. Defaults to empty string.
-   * @param deviceInterface
+   * @param {DeviceInterface} params.deviceInterface
       A DeviceInterface object.
-   * @param swapClasses
+   * @param {array} params.swapClasses
       Gives consumers the ability to provide their own custom
       subclass for a service. swapClasses should be an array
       of key/value pairs consisting of keys 'swap' and 'with'.
       'swap' is the base class you wish to replace, and 'with'
       is the custom subclass to use.
-   * @param skipClasses
+   * @param {array} params.skipClasses
       An optional array of classes to skip making services for.
-   * @param crypto
+   * @param {SNCrypto} params.crypto
       The platform-dependent instance of SNCrypto to use.
       Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    */
@@ -4693,15 +4696,18 @@ function () {
     this.constructServices();
   }
   /**
-   * @publilc
    * The first thing consumers should call when starting their app.
    * This function will load all services in their correct order.
-   * @param callbacks
-   *          async .requiresChallengeResponses(challenges)
-   *            @param challenges
-   *          .handleChallengeFailures
-   *          
-   An array of DeviceAuthentication Challenges that require responses.
+   * @access public
+   * @param {object} params
+   * @param {object} params.callbacks
+   * @param {async|function} params.callbacks.requiresChallengeResponses
+   * Return an array of ChallengeResponse for each Challenge.
+   * @param {Array.<Challenge>} params.callbacks.requiresChallengeResponses.challenges  
+   * An array of challenges that need a ChallengeResponse.
+   * @param {async|function} params.callbacks.handleChallengeFailures
+   * @param {Array.<ChallengeResponse>} params.callbacks.handleChallengeFailures.failedResponses
+   * An array of ChallengeResponse that have failed.
    */
 
 
@@ -4760,11 +4766,11 @@ function () {
       }, null, this);
     }
     /**
-     * @publilc
      * Runs migrations, handles device authentication, unlocks application, and
      * issues a callback if a device activation requires user input
      * (i.e local passcode or fingerprint).
-     * @param awaitDatabaseLoad  Option to await database load before marking the app 
+     * @access public
+     * @param {bool} params.awaitDatabaseLoad  Option to await database load before marking the app 
      *                           as ready. Used as far as we know for .restart and unit tests.
      */
 
@@ -4879,6 +4885,10 @@ function () {
         }
       }, null, this);
     }
+    /**
+     * @access private
+     */
+
   }, {
     key: "beginAutoSyncTimer",
     value: function beginAutoSyncTimer() {
@@ -4891,7 +4901,7 @@ function () {
       }, DEFAULT_AUTO_SYNC_INTERVAL);
     }
     /**
-     * @private
+     * @access private
      * @param previousResponses Applications may require authetnication earlier than launch
      *                          in the case of migrations. We can reuse their valid responses.
      */
@@ -4919,7 +4929,7 @@ function () {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "handleLaunchChallenge",
@@ -5030,7 +5040,7 @@ function () {
         }
       }, null, this, [[9, 29, 33, 41], [34,, 36, 40]]);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "getMigrationChallengeResponder",
@@ -5058,7 +5068,7 @@ function () {
         });
       };
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "handleStage",
@@ -5132,9 +5142,9 @@ function () {
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }
     /** 
-     * @public 
-     * @param singleEvent  A private param used to destroy observer after it is called once
-     *                     for this event.
+     * @access public
+     * @param {function} callback
+     * @param {ApplicationEvent} [singleEvent]  Whether to only listen for a particular event.
      */
 
   }, {
@@ -5151,6 +5161,12 @@ function () {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(_this4.eventHandlers, observer);
       };
     }
+    /**
+    * @access public
+    * @param {ApplicationEvent} singleEvent  Event to listen for.
+    * @param {function} callback
+    */
+
   }, {
     key: "addSingleEventObserver",
     value: function addSingleEventObserver(event, callback) {
@@ -5160,7 +5176,7 @@ function () {
         }
       }, event);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "notifyEvent",
@@ -5252,14 +5268,17 @@ function () {
         }
       }, null, this, [[3, 20, 24, 32], [25,, 27, 31]]);
     }
-    /** @public */
+    /** 
+     * Whether the local database has completed loading local items.
+     * @access public 
+     */
 
   }, {
     key: "isDatabaseLoaded",
     value: function isDatabaseLoaded() {
       return this.syncService.isDatabaseLoaded();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "savePayload",
@@ -5293,8 +5312,9 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
      * Finds an item by UUID.
+     * @access public 
+     * @param uuid  The uuid of the item to find.
      */
 
   }, {
@@ -5304,8 +5324,8 @@ function () {
       return this.modelManager.findItem(uuid);
     }
     /** 
-    * @public 
-    * Finds an item by predicate.
+     * Finds an item by predicate.
+    * @access public 
     */
 
   }, {
@@ -5314,7 +5334,7 @@ function () {
       var predicate = _ref6.predicate;
       return this.modelManager.itemsMatchingPredicate(predicate);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "mergeItem",
@@ -5338,7 +5358,7 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
+     * @access public 
      * @param add  Whether to add the item to application state.
      * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
      */
@@ -5371,7 +5391,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "saveItem",
@@ -5401,7 +5421,10 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** 
+     * @access public 
+     * @param {Array.<SFItem>} params.items
+     */
 
   }, {
     key: "saveItems",
@@ -5427,9 +5450,10 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
-     * @param updateUserModifiedDate  
-     *  Whether to change the modified date the user sees of the item.
+     * @access public 
+     * @param {SFItem} params.item
+     * @param {bool} params.updateUserModifiedDate  Whether to change the modified date the user 
+     * sees of the item.
      */
 
   }, {
@@ -5451,7 +5475,7 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
+     * @access public 
      * @param updateUserModifiedDate  
      *  Whether to change the modified date the user sees of the item.
      */
@@ -5474,7 +5498,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "deleteItem",
@@ -5495,7 +5519,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "deleteItemLocally",
@@ -5515,7 +5539,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "emptyTrash",
@@ -5533,7 +5557,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getTrashedItems",
@@ -5541,8 +5565,8 @@ function () {
       return this.modelManager.trashedItems();
     }
     /** 
-     * @public 
-     * @param contentType  A string, array of strings, or '*'
+     * @access public 
+     * @param {string|ContentType} contentType  A string, array of strings, or '*'
      */
 
   }, {
@@ -5551,7 +5575,7 @@ function () {
       var contentType = _ref15.contentType;
       return this.modelManager.getItems(contentType);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getDisplayableItems",
@@ -5559,7 +5583,7 @@ function () {
       var contentType = _ref16.contentType;
       return this.modelManager.validItemsForContentType(contentType);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getNotesMatchingSmartTag",
@@ -5567,7 +5591,7 @@ function () {
       var smartTag = _ref17.smartTag;
       return this.modelManager.notesMatchingSmartTag(smartTag);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "findTag",
@@ -5577,7 +5601,7 @@ function () {
         title: title
       });
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "findOrCreateTag",
@@ -5599,14 +5623,14 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getSmartTags",
     value: function getSmartTags() {
       return this.modelManager.getSmartTags();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getNoteCount",
@@ -5614,8 +5638,8 @@ function () {
       return this.modelManager.noteCount();
     }
     /** 
-     * @public 
      * Begin streaming items to display in the UI.
+     * @access public 
      * @param contentType  Can be string, '*', or array of types.
      */
 
@@ -5642,7 +5666,7 @@ function () {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(_this5.streamObservers, observer);
       };
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "setHost",
@@ -5660,7 +5684,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getHost",
@@ -5678,7 +5702,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getUser",
@@ -5689,7 +5713,7 @@ function () {
 
       return this.sessionManager.getUser();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getUserVersion",
@@ -5707,7 +5731,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "noAccount",
@@ -5716,9 +5740,14 @@ function () {
       return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isNullOrUndefined"])(user);
     }
     /** 
-     * @public 
-     * @return  A dictionary with `affectedItems` as the items that were either created 
-     *          or dirtied by this import and `errorCount`, which is the number of items
+     * @access public 
+     * @param {object} params.data
+     * @param {string} params.password
+     * @param {bool} [params.awaitSync = false]
+     * @returns {Object}  result
+     * @returns {Array.<SFItem>} result.affectedItems  Items that were either created
+     *          or dirtied by this import
+     * @returns {int} result.errorCount  The number of items
      *          that were not imported due to failure to decrypt.
      */
 
@@ -5770,28 +5799,28 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "isEphemeralSession",
     value: function isEphemeralSession() {
       return this.storageService.isEphemeralSession();
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "lockSyncing",
     value: function lockSyncing() {
       this.syncService.lockSyncing();
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "unlockSyncing",
     value: function unlockSyncing() {
       this.syncService.unlockSyncing();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getSyncStatus",
@@ -5809,7 +5838,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "sync",
@@ -5827,7 +5856,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "resolveOutOfSync",
@@ -5845,7 +5874,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "setValue",
@@ -5863,7 +5892,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getValue",
@@ -5881,7 +5910,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "removeValue",
@@ -5900,8 +5929,8 @@ function () {
       }, null, this);
     }
     /** 
-     * @public 
      * Deletes all payloads from storage.
+     * @access public 
      */
 
   }, {
@@ -5921,13 +5950,13 @@ function () {
       }, null, this);
     }
     /** 
-     * @private 
      * Allows items keys to be rewritten to local db on local credential status change,
      * such as if passcode is added, changed, or removed.
      * This allows IndexedDB unencrypted logs to be deleted
      * `deletePayloads` will remove data from backing store,
      * but not from working memory See:
      * https://github.com/standardnotes/desktop/issues/131
+     * @access private 
      */
 
   }, {
@@ -5958,7 +5987,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "restart",
@@ -5992,7 +6021,7 @@ function () {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Destroys the application instance.
      */
 
@@ -6169,7 +6198,7 @@ function () {
       }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
     }
     /**
-     * @public
+     * @access public
      * Allows your PureService subclass to receive `deinit` event to unload observers.
      */
 
@@ -6179,7 +6208,7 @@ function () {
       this.services.push(service);
     }
     /**
-     *  @public
+     *  @access public
      *  @param mergeLocal  Whether to merge existing offline data into account. If false,
      *                     any pre-existing data will be fully deleted upon success.
      */
@@ -6264,7 +6293,7 @@ function () {
       }, null, this);
     }
     /**
-     *  @public 
+     *  @access public 
      *  @param mergeLocal  Whether to merge existing offline data into account. If false, 
      *                     any pre-existing data will be fully deleted upon success.
      */
@@ -6355,7 +6384,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "changePassword",
@@ -6421,7 +6450,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "signOut",
@@ -6456,7 +6485,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "validateAccountPassword",
@@ -6476,21 +6505,21 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "isStarted",
     value: function isStarted() {
       return this.started;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "hasPasscode",
     value: function hasPasscode() {
       return this.keyManager.hasPasscode();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "isLocked",
@@ -6516,7 +6545,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "lock",
@@ -6534,7 +6563,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "setPasscode",
@@ -6581,7 +6610,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "removePasscode",
@@ -6604,7 +6633,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "changePasscode",
@@ -6626,7 +6655,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "setStorageEncryptionPolicy",
@@ -6648,7 +6677,7 @@ function () {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "generateUuid",
@@ -6667,7 +6696,7 @@ function () {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Dynamically change the device interface, i.e when Desktop wants to override
      * default web interface.
      */
@@ -6690,10 +6719,10 @@ function () {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      */
 
-    /** @private */
+    /** @access private */
 
   }, {
     key: "constructServices",
@@ -6720,7 +6749,7 @@ function () {
       this.createHistoryManager();
       this.createActionsManager();
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "clearServices",
@@ -7508,8 +7537,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_http_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/http_service */ "./lib/services/http_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _services_http_service__WEBPACK_IMPORTED_MODULE_15__["SNHttpService"]; });
 
-/* harmony import */ var _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_46__["DeviceAuthService"]; });
+/* harmony import */ var _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
 
 /* harmony import */ var _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/device_auth/response */ "./lib/services/device_auth/response.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__["ChallengeResponse"]; });
@@ -7838,7 +7867,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-    * @public
+    * @access public
     * Application instances will call this function directly when they arrive
     * at a certain migratory state.
     */
@@ -8034,7 +8063,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      */
 
   }, {
@@ -8217,7 +8246,7 @@ function (_Migration) {
   _createClass(BaseMigration, [{
     key: "registerStageHandlers",
 
-    /** @protected */
+    /** @access protected */
     value: function registerStageHandlers() {
       var _this = this;
 
@@ -8241,7 +8270,7 @@ function (_Migration) {
       });
     }
     /**
-    * @private
+    * @access private
      * Establish last_migration_date.
      * We need to determine if this is a new application download,
      * or if we're coming from an older, non-current client.
@@ -8350,7 +8379,7 @@ function (_Migration) {
   }], [{
     key: "timestamp",
 
-    /** @public */
+    /** @access public */
     value: function timestamp() {
       return new Date('2020-01-01').getTime();
     }
@@ -8428,7 +8457,7 @@ function (_Migration) {
   _createClass(Migration20200115, [{
     key: "registerStageHandlers",
 
-    /** @protected */
+    /** @access protected */
     value: function registerStageHandlers() {
       var _this = this;
 
@@ -8494,7 +8523,7 @@ function (_Migration) {
       });
     }
     /**
-     * @private
+     * @access private
      * @web
      * Migrates legacy storage strucutre into new managed format.
      * If encrypted storage exists, we need to first decrypt it with the passcode.
@@ -8830,7 +8859,7 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      * @mobile
      * On mobile legacy structure is mostly similar to new structure,
      * in that the account key is encrypted with the passcode. But mobile did
@@ -9074,7 +9103,7 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      * @allplatform
      * Migrate all previously independently stored storage keys into new
      * managed approach. These keys are ones that do not need to be renamed.
@@ -9188,7 +9217,7 @@ function (_Migration) {
       }, null, this, [[8, 25, 29, 37], [30,, 32, 36]]);
     }
     /**
-     * @private
+     * @access private
      * @allplatform
      * Create new default SNItemsKey from root key.
      * Otherwise, when data is loaded, we won't be able to decrypt it
@@ -9305,24 +9334,24 @@ function () {
     this.stageHandlers = {};
     this.registerStageHandlers();
   }
-  /** @public */
+  /** @access public */
 
 
   _createClass(Migration, [{
     key: "registerStageHandlers",
 
-    /** @protected */
+    /** @access protected */
     value: function registerStageHandlers() {
       throw 'Must override Migration.registerStageHandlers';
     }
-    /** @protected */
+    /** @access protected */
 
   }, {
     key: "registerStageHandler",
     value: function registerStageHandler(stage, handler) {
       this.stageHandlers[stage] = handler;
     }
-    /** @protected */
+    /** @access protected */
 
   }, {
     key: "markDone",
@@ -9336,7 +9365,7 @@ function () {
     value: function onDone(callback) {
       this.onDoneHandler = callback;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "handleStage",
@@ -9363,7 +9392,7 @@ function () {
         }
       }, null, this);
     }
-    /** @protected */
+    /** @access protected */
 
   }, {
     key: "requestChallengeResponse",
@@ -10158,6 +10187,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+/** 
+ * A note item
+ * @extends SFItem
+ */
+
 var SNNote =
 /*#__PURE__*/
 function (_SFItem) {
@@ -10939,6 +10973,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var SingletonStrategies = {
   KeepEarliest: 1
 };
+/**
+ * The most abstract item that any syncable item needs to extend from.
+ */
+
 var SFItem =
 /*#__PURE__*/
 function () {
@@ -12429,7 +12467,7 @@ function () {
     key: "getPortableValue",
 
     /** 
-     * @public 
+     * @access public 
      * When saving in a file or communicating with server, 
      * use the original values.
      */
@@ -12879,7 +12917,7 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      */
 
   }, {
@@ -13073,7 +13111,7 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "createRootKey",
@@ -13458,7 +13496,7 @@ function (_SNProtocolOperator) {
         }
       }, null, this, [[31, 39]]);
     }
-    /** @protected */
+    /** @access protected */
 
   }, {
     key: "deriveKey",
@@ -13613,7 +13651,7 @@ function (_SNProtocolOperator) {
     key: "computeRootKey",
 
     /**
-     * @public
+     * @access public
      */
     value: function computeRootKey(_ref) {
       var password, keyParams, salt, key;
@@ -13702,7 +13740,7 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "generateSalt",
@@ -14241,7 +14279,7 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "deconstructEncryptedPayloadString",
@@ -14253,7 +14291,7 @@ function (_SNProtocolOperator) {
         ciphertext: components[2]
       };
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "deriveKey",
@@ -14451,7 +14489,7 @@ function () {
       });
     }
     /**
-     * @protected
+     * @access protected
      */
 
   }, {
@@ -14471,7 +14509,7 @@ function () {
       });
     }
     /**
-     * @public
+     * @access public
      * Creates a new random SNItemsKey to use for item encryption.
      * The consumer must save/sync this item.
      * @returns  A new SNItemsKey
@@ -22549,7 +22587,7 @@ function (_PureService) {
     _this.protocolService = protocolService;
     return _this;
   }
-  /** @public */
+  /** @access public */
 
 
   _createClass(DeviceAuthService, [{
@@ -23868,8 +23906,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SyncModes"]; });
 
-/* harmony import */ var _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_18__["DeviceAuthService"]; });
+/* harmony import */ var _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _Services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
 
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageService", function() { return _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__["SNStorageService"]; });
@@ -23982,7 +24020,7 @@ function (_PureService) {
 
     return _this;
   }
-  /** @public */
+  /** @access public */
 
 
   _createClass(ItemsKeyManager, [{
@@ -23990,7 +24028,7 @@ function (_PureService) {
     value: function setKeyManager(keyManager) {
       this.keyManager = keyManager;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "addItemsKeyChangeObserver",
@@ -24073,7 +24111,7 @@ function (_PureService) {
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "registerSyncObserver",
@@ -24259,7 +24297,7 @@ function (_PureService) {
       });
     }
     /**
-     * @public
+     * @access public
      * When the root key changes (non-null only), we must re-encrypt all items
      * keys with this new root key (by simply re-syncing).
      */
@@ -24314,7 +24352,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Creates a new random SNItemsKey to use for item encryption, and adds it to model management.
      * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
      * and its .itemsKey value should be equal to the root key masterKey value.
@@ -24684,7 +24722,7 @@ function (_PureService) {
     value: function setDeviceInterface(deviceInterface) {
       this.deviceInterface = deviceInterface;
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "getRootKeyFromKeychain",
@@ -24724,7 +24762,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "saveRootKeyToKeychain",
@@ -24762,7 +24800,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Returns true if a root key wrapper (passcode) is configured.
      */
 
@@ -24789,7 +24827,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-    * @public
+    * @access public
     * Returns true if the root key has not yet been unwrapped (passcode locked).
     */
 
@@ -24824,7 +24862,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * @returns  Key params object containing root key wrapper key params
     */
 
@@ -24860,7 +24898,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @private
+     * @access private
      * @returns  Plain object containing persisted wrapped (encrypted) root key
     */
 
@@ -24881,7 +24919,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * @returns  The keyParams saved to disk for root key.
      */
 
@@ -24918,7 +24956,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * @returns  getRootKeyParams may return different params based on different
      *           keyMode. This function however strictly returns only account params.
      */
@@ -24955,7 +24993,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * We know a wrappingKey is correct if it correctly decrypts
      * wrapped root key.
      */
@@ -25047,7 +25085,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Application interfaces must check to see if the root key requires unwrapping on load.
      * If so, they must generate the unwrapping key by getting our saved wrapping key keyParams.
      * After unwrapping, the root key is automatically loaded.
@@ -25124,7 +25162,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Encrypts rootKey and saves it in storage instead of keychain, and then
      * clears keychain. This is because we don't want to store large encrypted
      * payloads in the keychain. If the root key is not wrapped, it is stored
@@ -25213,7 +25251,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "persistWrappedRootKey",
@@ -25250,7 +25288,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Removes root key wrapper from local storage and stores root keys bare in secure keychain.
      */
 
@@ -25304,7 +25342,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * The root key is distinct from regular keys and are only saved locally in the keychain,
      * in non-item form. Applications set root key on sign in, register, or password change.
      * @param key  A SNRootKey object.
@@ -25422,7 +25460,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * @returns  SNRootKey object
      */
 
@@ -25443,7 +25481,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @public
+     * @access public
      * Deletes root key and wrapper from keychain. Used when signing out of application.
      */
 
@@ -26378,7 +26416,7 @@ function (_PureService) {
         }
       }, null, this, [[7, 42, 46, 54], [47,, 49, 53], [69, 73, 77, 85], [78,, 80, 84]]);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "insertItem",
@@ -26388,7 +26426,7 @@ function (_PureService) {
         items: [item]
       });
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "insertItems",
@@ -27128,7 +27166,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "createItem",
@@ -29820,7 +29858,7 @@ function () {
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }
     /** 
-     * @public
+     * @access public
      * Called by application before restart. 
      * Subclasses should deregister any observers/timers 
      */
@@ -29842,7 +29880,7 @@ function () {
     key: "handleApplicationStage",
 
     /**
-    * @public
+    * @access public
     * Application instances will call this function directly when they arrive
     * at a certain migratory state.
     */
@@ -30355,19 +30393,19 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-/** @public */
+/** @access public */
 
 var StoragePersistencePolicies = {
   Default: 1,
   Ephemeral: 2
 };
-/** @public */
+/** @access public */
 
 var StorageEncryptionPolicies = {
   Default: 1,
   Disabled: 2
 };
-/** @public */
+/** @access public */
 
 var StorageValueModes = {
   /** Stored inside wrapped encrpyed storage object */
@@ -30376,7 +30414,7 @@ var StorageValueModes = {
   /** Stored outside storage object, unencrypted */
   Nonwrapped: 2
 };
-/** @public */
+/** @access public */
 
 var ValueModesKeys = {
   /* Is encrypted */
@@ -30417,7 +30455,7 @@ function (_PureService) {
     return _this;
   }
   /**
-   * @protected
+   * @access protected
    */
 
 
@@ -30533,7 +30571,7 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @protected
+     * @access protected
      * Called by platforms with the value they load from disk,
      * after they handle initializeFromDisk
      */
@@ -30551,7 +30589,7 @@ function (_PureService) {
 
       this.values = values;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "isStorageWrapped",
@@ -30559,7 +30597,7 @@ function (_PureService) {
       var wrappedValue = this.values[ValueModesKeys.Wrapped];
       return !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(wrappedValue) && Object.keys(wrappedValue).length > 0;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "canDecryptWithKey",
@@ -30588,7 +30626,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "decryptWrappedValue",
@@ -30631,7 +30669,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "decryptStorage",
@@ -30880,7 +30918,7 @@ function (_PureService) {
   }, {
     key: "domainKeyForMode",
 
-    /** @private */
+    /** @access private */
     value: function domainKeyForMode(mode) {
       return this.constructor.domainKeyForMode(mode);
     }
@@ -31193,7 +31231,7 @@ function (_PureService) {
 
       return _ref5 = {}, _defineProperty(_ref5, ValueModesKeys.Wrapped, wrapped), _defineProperty(_ref5, ValueModesKeys.Unwrapped, unwrapped), _defineProperty(_ref5, ValueModesKeys.Nonwrapped, nonwrapped), _ref5;
     }
-    /** @private */
+    /** @access private */
 
   }, {
     key: "domainKeyForMode",
@@ -31370,7 +31408,7 @@ function () {
     this.checkIntegrity = checkIntegrity;
     this.apiService = apiService;
     this.receiver = receiver;
-    /** @private */
+    /** @access private */
 
     this.responses = [];
   }
@@ -32319,7 +32357,7 @@ function (_PureService) {
       return this.state.lastSyncDate;
     }
     /** 
-     * @public 
+     * @access public 
      * Called by application when sign in or registration occurs.
      */
 
@@ -32328,7 +32366,7 @@ function (_PureService) {
     value: function resetSyncState() {
       this.state.reset();
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "getDatabasePayloads",
@@ -32346,14 +32384,14 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "isDatabaseLoaded",
     value: function isDatabaseLoaded() {
       return this.databaseLoaded;
     }
-    /** @public */
+    /** @access public */
 
   }, {
     key: "loadDatabasePayloads",
@@ -32762,7 +32800,7 @@ function (_PureService) {
       }, null, this, [[7, 18, 22, 30], [23,, 25, 29]]);
     }
     /**
-     * @public
+     * @access public
      * If encryption status changes (esp. on mobile, where local storage encryption
      * can be disabled), consumers may call this function to repersist all items to
      * disk using latest encryption status.
@@ -33301,7 +33339,7 @@ function (_PureService) {
       }, null, this, [[73, 77, 81, 89], [82,, 84, 88]]);
     }
     /**
-     * @private
+     * @access private
      */
 
   }, {
@@ -33766,7 +33804,7 @@ function (_PureService) {
       }, null, this, [[13, 28, 32, 40], [33,, 35, 39], [48, 64, 68, 76], [69,, 71, 75]]);
     }
     /**
-     * @private
+     * @access private
      * Items that have never been synced and marked as deleted should be cleared
      * as dirty, mapped, then removed from storage.
      */
