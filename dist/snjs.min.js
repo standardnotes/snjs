@@ -9463,11 +9463,12 @@ var Action = function Action(json) {
 /*!*************************************!*\
   !*** ./lib/models/app/component.js ***!
   \*************************************/
-/*! exports provided: SNComponent */
+/*! exports provided: ComponentAreas, SNComponent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentAreas", function() { return ComponentAreas; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return SNComponent; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
@@ -9497,8 +9498,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var COMPONENT_AREA_EDITOR = 'editor-editor';
-var COMPONENT_AREA_THEMES = 'themes';
+var ComponentAreas = {
+  Editor: 'editor-editor',
+  Themes: 'themes',
+  EditorStack: 'editor-stack',
+  NoteTags: 'note-tags',
+  Rooms: 'rooms',
+  Modal: 'modal'
+};
 var SNComponent =
 /*#__PURE__*/
 function (_SFItem) {
@@ -9622,12 +9629,12 @@ function (_SFItem) {
   }, {
     key: "isEditor",
     value: function isEditor() {
-      return this.area === COMPONENT_AREA_EDITOR;
+      return this.area === ComponentAreas.Editor;
     }
   }, {
     key: "isTheme",
     value: function isTheme() {
-      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme || this.area === COMPONENT_AREA_THEMES;
+      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme || this.area === ComponentAreas.Themes;
     }
   }, {
     key: "isDefaultEditor",
@@ -9711,7 +9718,7 @@ function (_SFItem) {
   }], [{
     key: "associativeAreas",
     value: function associativeAreas() {
-      return [COMPONENT_AREA_EDITOR];
+      return [ComponentAreas.Editor];
     }
   }]);
 
@@ -12276,7 +12283,7 @@ function (_SFItem) {
 /*!**************************!*\
   !*** ./lib/platforms.js ***!
   \**************************/
-/*! exports provided: Environments, Platforms, platformFromString, isEnvironmentWebOrDesktop, isEnvironmentMobile */
+/*! exports provided: Environments, Platforms, platformFromString, platformToString, environmentToString, isEnvironmentWebOrDesktop, isEnvironmentMobile */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12284,8 +12291,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return Environments; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return Platforms; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return platformFromString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "platformToString", function() { return platformToString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environmentToString", function() { return environmentToString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return isEnvironmentWebOrDesktop; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return isEnvironmentMobile; });
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var Environments = {
   Web: 1,
   Desktop: 2,
@@ -12308,9 +12319,23 @@ function platformFromString(string) {
     'linux-web': Platforms.LinuxWeb,
     'linux-desktop': Platforms.LinuxDesktop,
     'windows-web': Platforms.WindowsWeb,
-    'windows-desktop': Platforms.WindowsDesktop
+    'windows-desktop': Platforms.WindowsDesktop,
+    'ios': Platforms.Ios,
+    'android': Platforms.Android
   };
   return map[string];
+}
+function platformToString(platform) {
+  var _map;
+
+  var map = (_map = {}, _defineProperty(_map, Platforms.MacWeb, 'mac-web'), _defineProperty(_map, Platforms.MacDesktop, 'mac-desktop'), _defineProperty(_map, Platforms.LinuxWeb, 'linux-web'), _defineProperty(_map, Platforms.LinuxDesktop, 'linux-desktop'), _defineProperty(_map, Platforms.WindowsWeb, 'windows-web'), _defineProperty(_map, Platforms.WindowsDesktop, 'windows-desktop'), _defineProperty(_map, Platforms.Ios, 'ios'), _defineProperty(_map, Platforms.Android, 'android'), _map);
+  return map[platform];
+}
+function environmentToString(environment) {
+  var _map2;
+
+  var map = (_map2 = {}, _defineProperty(_map2, Environments.Web, 'web'), _defineProperty(_map2, Environments.Desktop, 'desktop'), _defineProperty(_map2, Environments.Mobile, 'mobile'), _map2);
+  return map[environment];
 }
 function isEnvironmentWebOrDesktop(environment) {
   return environment === Environments.Web || environment === Environments.Desktop;
@@ -19694,11 +19719,12 @@ function (_PureService) {
 /*!*******************************************!*\
   !*** ./lib/services/component_manager.js ***!
   \*******************************************/
-/*! exports provided: SNComponentManager */
+/*! exports provided: ComponentActions, SNComponentManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentActions", function() { return ComponentActions; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return SNComponentManager; });
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_0__);
@@ -19711,8 +19737,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
-/* harmony import */ var _platforms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../platforms */ "./lib/platforms.js");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19746,7 +19774,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+
 var DESKTOP_URL_PREFIX = 'sn://';
+var LOCAL_HOST = 'localhost';
+var CUSTOM_LOCAL_HOST = 'sn.local';
+var ANDROID_LOCAL_HOST = '10.0.2.2';
+var ComponentActions = {
+  SetSize: 'set-size',
+  StreamItems: 'stream-items',
+  StreamContextItem: 'stream-context-item',
+  SaveItems: 'save-items',
+  SelectItem: 'select-item',
+  AssociateItem: 'associate-item',
+  DeassociateItem: 'deassociate-item',
+  ClearSelection: 'clear-selection',
+  CreateItem: 'create-item',
+  CreateItems: 'create-items',
+  DeleteItems: 'delete-items',
+  SetComponentData: 'set-component-data',
+  InstallLocalComponent: 'install-local-component',
+  ToggleActivateComponent: 'toggle-activate-component',
+  RequestPermissions: 'request-permissions',
+  PresentConflictResolution: 'present-conflict-resolution',
+  DuplicateItem: 'duplicate-item',
+  ComponentRegistered: 'component-registered',
+  ActivateThemes: 'themes',
+  Reply: 'reply'
+};
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
  * and other components. The component manager primarily deals with iframes, and orchestrates
@@ -19814,7 +19869,7 @@ function (_PureService) {
 
     _defineProperty(_assertThisInitialized(_this), "onWindowMessage", function (event) {
       _this.log('Web app: received message', event);
-      /* Make sure this message is for us */
+      /** Make sure this message is for us */
 
 
       if (event.data.sessionKey) {
@@ -19829,8 +19884,8 @@ function (_PureService) {
     _this.alertService = alertService;
     _this.environment = environment;
     _this.platform = platform;
-    _this.isDesktop = _this.environment === _platforms__WEBPACK_IMPORTED_MODULE_8__["Environments"].Desktop;
-    _this.isMobile = _this.environment === _platforms__WEBPACK_IMPORTED_MODULE_8__["Environments"].Mobile;
+    _this.isDesktop = _this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Desktop;
+    _this.isMobile = _this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile;
     _this.streamObservers = [];
     _this.contextStreamObservers = [];
     _this.activeComponents = [];
@@ -19839,7 +19894,7 @@ function (_PureService) {
 
     _this.configureForGeneralUsage();
 
-    if (environment !== _platforms__WEBPACK_IMPORTED_MODULE_8__["Environments"].Mobile) {
+    if (environment !== _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile) {
       _this.configureForNonMobileUsage();
     }
 
@@ -19867,12 +19922,13 @@ function (_PureService) {
                 syncedComponents = allItems.filter(function (item) {
                   return item.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component || item.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme;
                 });
-                /* We only want to sync if the item source is Retrieved, not PayloadSourceRemoteSaved to avoid
-                  recursion caused by the component being modified and saved after it is updated.
+                /**
+                 * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid 
+                 * recursion caused by the component being modified and saved after it is updated.
                 */
 
                 if (syncedComponents.length > 0 && source !== _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved) {
-                  // Ensure any component in our data is installed by the system
+                  /* Ensure any component in our data is installed by the system */
                   if (_this2.isDesktop) {
                     _this2.desktopManager.syncComponentsInstallation(syncedComponents);
                   }
@@ -19965,7 +20021,7 @@ function (_PureService) {
                   var observer = _step3.value;
 
                   if (sourceKey && sourceKey === observer.component.uuid) {
-                    // Don't notify source of change, as it is the originator, doesn't need duplicate event.
+                    /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
                     return "continue";
                   }
 
@@ -19978,7 +20034,7 @@ function (_PureService) {
                   }
 
                   var requiredPermissions = [{
-                    name: 'stream-items',
+                    name: ComponentActions.StreamItems,
                     content_types: observer.contentTypes.sort()
                   }];
 
@@ -20045,7 +20101,7 @@ function (_PureService) {
 
               case 62:
                 requiredContextPermissions = [{
-                  name: 'stream-context-item'
+                  name: ComponentActions.StreamContextItem
                 }];
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
@@ -20056,7 +20112,7 @@ function (_PureService) {
                   var observer = _step4.value;
 
                   if (sourceKey && sourceKey === observer.component.uuid) {
-                    // Don't notify source of change, as it is the originator, doesn't need duplicate event.
+                    /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
                     return "continue";
                   }
 
@@ -20217,7 +20273,7 @@ function (_PureService) {
       var _this3 = this;
 
       this.desktopManager.registerUpdateObserver(function (component) {
-        // Reload theme if active
+        /* Reload theme if active */
         if (component.active && component.isTheme()) {
           _this3.postActiveThemesToAllComponents();
         }
@@ -20234,8 +20290,8 @@ function (_PureService) {
         for (var _iterator6 = this.components[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
           var component = _step6.value;
 
-          // Skip over components that are themes themselves,
-          // or components that are not active, or components that don't have a window
+          /* Skip over components that are themes themselves,
+            or components that are not active, or components that don't have a window */
           if (component.isTheme() || !component.active || !component.window) {
             continue;
           }
@@ -20260,7 +20316,7 @@ function (_PureService) {
   }, {
     key: "getActiveThemes",
     value: function getActiveThemes() {
-      return this.componentsForArea('themes').filter(function (theme) {
+      return this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Themes).filter(function (theme) {
         return theme.active;
       });
     }
@@ -20282,7 +20338,7 @@ function (_PureService) {
         themes: urls
       };
       this.sendMessageToComponent(component, {
-        action: 'themes',
+        action: ComponentActions.ActivateThemes,
         data: data
       });
     }
@@ -20353,25 +20409,21 @@ function (_PureService) {
   }, {
     key: "setComponentHidden",
     value: function setComponentHidden(component, hidden) {
-      /*
-        A hidden component will not receive messages.
-        However, when a component is unhidden, we need to send it any items it may have
-        registered streaming for.
-      */
+      /** 
+       * A hidden component will not receive messages. However, when a component is unhidden, 
+       * we need to send it any items it may have registered streaming for.
+       */
       if (hidden) {
         component.hidden = true;
       } else if (component.hidden) {
-        // Only enter this condition if component is hidden to make this note have double side effects.
-        component.hidden = false; // streamContextItem
-
+        component.hidden = false;
         var contextObserver = lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(this.contextStreamObservers, {
           identifier: component.uuid
         });
 
         if (contextObserver) {
           this.handleStreamContextItemMessage(component, contextObserver.originalMessage);
-        } // streamItems
-
+        }
 
         var streamObserver = lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(this.streamObservers, {
           identifier: component.uuid
@@ -20405,9 +20457,7 @@ function (_PureService) {
         params.isMetadataUpdate = true;
       }
 
-      this.removePrivatePropertiesFromResponseItems([params], component, {
-        type: 'outgoing'
-      });
+      this.removePrivatePropertiesFromResponseItems([params], component);
       return params;
     }
   }, {
@@ -20438,7 +20488,7 @@ function (_PureService) {
     key: "replyToMessage",
     value: function replyToMessage(component, originalMessage, replyData) {
       var reply = {
-        action: 'reply',
+        action: ComponentActions.Reply,
         original: originalMessage,
         data: replyData
       };
@@ -20447,10 +20497,10 @@ function (_PureService) {
   }, {
     key: "sendMessageToComponent",
     value: function sendMessageToComponent(component, message) {
-      var permissibleActionsWhileHidden = ['component-registered', 'themes'];
+      var permissibleActionsWhileHidden = [ComponentActions.ComponentRegistered, ComponentActions.ActivateThemes];
 
       if (component.hidden && !permissibleActionsWhileHidden.includes(message.action)) {
-        this.log('Component disabled for current item, not sending any messages.', component.name);
+        this.log('Component disabled for current item, ignoring messages.', component.name);
         return;
       }
 
@@ -20458,15 +20508,16 @@ function (_PureService) {
       var origin = this.urlForComponent(component);
 
       if (!origin.startsWith('http') && !origin.startsWith('file')) {
-        // Native extension running in web, prefix current host
+        /* Native extension running in web, prefix current host */
         origin = window.location.href + origin;
       }
 
       if (!component.window) {
         this.alertService.alert({
-          text: "Standard Notes is trying to communicate with ".concat(component.name, ", but an error is occurring. Please restart this extension and try again.")
+          text: "Standard Notes is trying to communicate with ".concat(component.name, ", \n        but an error is occurring. Please restart this extension and try again.")
         });
-      } // Mobile messaging requires json
+      }
+      /* Mobile messaging requires json */
 
 
       if (this.isMobile) {
@@ -20485,7 +20536,7 @@ function (_PureService) {
   }, {
     key: "urlForComponent",
     value: function urlForComponent(component) {
-      // offlineOnly is available only on desktop, and not on web or mobile.
+      /* offlineOnly is available only on desktop, and not on web or mobile. */
       if (component.offlineOnly && !this.isDesktop) {
         return null;
       }
@@ -20496,8 +20547,8 @@ function (_PureService) {
         var url = component.hosted_url || component.legacy_url;
 
         if (this.isMobile) {
-          var localReplacement = this.platform === 'ios' ? 'localhost' : '10.0.2.2';
-          url = url.replace('localhost', localReplacement).replace('sn.local', localReplacement);
+          var localReplacement = this.platform === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Platforms"].Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+          url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement);
         }
 
         return url;
@@ -20560,66 +20611,42 @@ function (_PureService) {
       if (!component) {
         this.log('Component not defined for message, returning', message);
         this.alertService.alert({
-          text: 'An extension is trying to communicate with Standard Notes, but there is an error establishing a bridge. Please restart the app and try again.'
+          text: 'An extension is trying to communicate with Standard Notes,' + 'but there is an error establishing a bridge. Please restart the app and try again.'
         });
         return;
-      } // Actions that won't succeeed with readonly mode
+      }
 
-
-      var readwriteActions = ['save-items', 'associate-item', 'deassociate-item', 'create-item', 'create-items', 'delete-items', 'set-component-data'];
+      var readwriteActions = [ComponentActions.SaveItems, ComponentActions.AssociateItem, ComponentActions.DeassociateItem, ComponentActions.CreateItem, ComponentActions.CreateItems, ComponentActions.DeleteItems, ComponentActions.SetComponentData];
 
       if (component.readonly && readwriteActions.includes(message.action)) {
-        // A component can be marked readonly if changes should not be saved.
-        // Particullary used for revision preview windows where the notes should not be savable.
         this.alertService.alert({
           text: "The extension ".concat(component.name, " is trying to save, but it is in a locked state and cannot accept changes.")
         });
         return;
       }
-      /**
-      Possible Messages:
-        set-size
-        stream-items
-        stream-context-item
-        save-items
-        select-item
-        associate-item
-        deassociate-item
-        clear-selection
-        create-item
-        create-items
-        delete-items
-        set-component-data
-        install-local-component
-        toggle-activate-component
-        request-permissions
-        present-conflict-resolution
-      */
 
-
-      if (message.action === 'stream-items') {
+      if (message.action === ComponentActions.StreamItems) {
         this.handleStreamItemsMessage(component, message);
-      } else if (message.action === 'stream-context-item') {
+      } else if (message.action === ComponentActions.StreamContextItem) {
         this.handleStreamContextItemMessage(component, message);
-      } else if (message.action === 'set-component-data') {
+      } else if (message.action === ComponentActions.SetComponentData) {
         this.handleSetComponentDataMessage(component, message);
-      } else if (message.action === 'delete-items') {
+      } else if (message.action === ComponentActions.DeleteItems) {
         this.handleDeleteItemsMessage(component, message);
-      } else if (message.action === 'create-items' || message.action === 'create-item') {
+      } else if (message.action === ComponentActions.CreateItems || message.action === ComponentActions.CreateItem) {
         this.handleCreateItemsMessage(component, message);
-      } else if (message.action === 'save-items') {
+      } else if (message.action === ComponentActions.SaveItems) {
         this.handleSaveItemsMessage(component, message);
-      } else if (message.action === 'toggle-activate-component') {
+      } else if (message.action === ComponentActions.ToggleActivateComponent) {
         var componentToToggle = this.modelManager.findItem(message.data.uuid);
         this.handleToggleComponentMessage(component, componentToToggle, message);
-      } else if (message.action === 'request-permissions') {
+      } else if (message.action === ComponentActions.RequestPermissions) {
         this.handleRequestPermissionsMessage(component, message);
-      } else if (message.action === 'install-local-component') {
+      } else if (message.action === ComponentActions.InstallLocalComponent) {
         this.handleInstallLocalComponentMessage(component, message);
-      } else if (message.action === 'duplicate-item') {
+      } else if (message.action === ComponentActions.DuplicateItem) {
         this.handleDuplicateItemMessage(component, message);
-      } // Notify observers
-
+      }
 
       var _iteratorNormalCompletion10 = true;
       var _didIteratorError10 = false;
@@ -20659,10 +20686,11 @@ function (_PureService) {
     value: function removePrivatePropertiesFromResponseItems(responseItems, component) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      // can be 'incoming' or 'outgoing'. We want to remove updated_at if incoming, but keep it if outgoing
-      if (options.type === 'incoming') {
-        var privateTopLevelProperties = ['updated_at']; // Maintaining our own updated_at value is imperative for sync to work properly, we ignore any incoming value.
-
+      /* We want to remove updated_at if incoming, but keep otherwise */
+      if (options.incoming) {
+        /* Maintaining our own updated_at value is imperative for sync to work properly, 
+          we ignore any incoming value. */
+        var privateTopLevelProperties = ['updated_at'];
         var _iteratorNormalCompletion11 = true;
         var _didIteratorError11 = false;
         var _iteratorError11 = undefined;
@@ -20717,11 +20745,12 @@ function (_PureService) {
       }
 
       if (component) {
-        // System extensions can bypass this step
+        /* System extensions can bypass this step */
         if (this.isNativeExtension(component)) {
           return;
         }
-      } // Don't allow component to overwrite these properties.
+      }
+      /* Don't allow component to overwrite these properties. */
 
 
       var privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
@@ -20740,8 +20769,8 @@ function (_PureService) {
         for (var _iterator13 = responseItems[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
           var _responseItem = _step13.value;
 
-          // Do not pass in actual items here, otherwise that would be destructive.
-          // Instead, generic JS/JSON objects should be passed.
+          /* Do not pass in actual items here, otherwise that would be destructive.
+             Instead, generic JS/JSON objects should be passed. */
           if (_responseItem.isItem) {
             console.error('Attempting to pass object. Use JSON.');
             continue;
@@ -20792,21 +20821,22 @@ function (_PureService) {
       var _this7 = this;
 
       var requiredPermissions = [{
-        name: 'stream-items',
+        name: ComponentActions.StreamItems,
         content_types: message.data.content_types.sort()
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
         if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this7.streamObservers, {
           identifier: component.uuid
         })) {
-          // for pushing laster as changes come in
+          /* For pushing laster as changes come in */
           _this7.streamObservers.push({
             identifier: component.uuid,
             component: component,
             originalMessage: message,
             contentTypes: message.data.content_types
           });
-        } // push immediately now
+        }
+        /* Push immediately now */
 
 
         var items = [];
@@ -20843,20 +20873,18 @@ function (_PureService) {
       var _this8 = this;
 
       var requiredPermissions = [{
-        name: 'stream-context-item'
+        name: ComponentActions.StreamContextItem
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
         if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this8.contextStreamObservers, {
           identifier: component.uuid
         })) {
-          // for pushing laster as changes come in
           _this8.contextStreamObservers.push({
             identifier: component.uuid,
             component: component,
             originalMessage: message
           });
-        } // push immediately now
-
+        }
 
         var _iteratorNormalCompletion16 = true;
         var _didIteratorError16 = false;
@@ -20955,7 +20983,8 @@ function (_PureService) {
             case 0:
               responseItems = message.data.items;
               requiredPermissions = [];
-              itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component); // Pending as in needed to be accounted for in permissions.
+              itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
+              /* Pending as in needed to be accounted for in permissions. */
 
               pendingResponseItems = responseItems.slice();
               _iteratorNormalCompletion18 = true;
@@ -20978,9 +21007,10 @@ function (_PureService) {
               }
 
               requiredPermissions.push({
-                name: 'stream-context-item'
+                name: ComponentActions.StreamContextItem
               });
-              lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(pendingResponseItems, responseItem); // We break because there can only be one context item
+              lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(pendingResponseItems, responseItem);
+              /* We break because there can only be one context item */
 
               return _context4.abrupt("break", 18);
 
@@ -21024,13 +21054,13 @@ function (_PureService) {
               return _context4.finish(24);
 
             case 32:
-              // Check to see if additional privileges are required
+              /* Check to see if additional privileges are required */
               if (pendingResponseItems.length > 0) {
                 requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(pendingResponseItems.map(function (i) {
                   return i.content_type;
                 })).sort();
                 requiredPermissions.push({
-                  name: 'stream-items',
+                  name: ComponentActions.StreamItems,
                   content_types: requiredContentTypes
                 });
               }
@@ -21044,13 +21074,9 @@ function (_PureService) {
                       case 0:
                         _this9.removePrivatePropertiesFromResponseItems(responseItems, component, {
                           includeUrls: true,
-                          type: 'incoming'
+                          incoming: true
                         });
-                        /*
-                        We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
-                        this would update them server side via sync, but would never make its way back to the UI.
-                        */
-                        // Filter locked items
+                        /* Filter locked items */
 
 
                         ids = responseItems.map(function (i) {
@@ -21156,7 +21182,7 @@ function (_PureService) {
 
                         // An item this extension is trying to save was possibly removed locally, notify user
                         _this9.alertService.alert({
-                          text: "The extension ".concat(component.name, " is trying to save an item with type ").concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again.")
+                          text: "The extension ".concat(component.name, " is trying to save an item with type") + "".concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again.")
                         });
 
                         return _context3.abrupt("continue", 43);
@@ -21215,7 +21241,7 @@ function (_PureService) {
 
                       case 60:
                         _this9.syncService.sync().then(function (response) {
-                          // Allow handlers to be notified when a save begins and ends, to update the UI
+                          /* Allow handlers to be notified when a save begins and ends, to update the UI */
                           var saveMessage = Object.assign({}, message);
                           saveMessage.action = response && response.error ? 'save-error' : 'save-success';
 
@@ -21249,7 +21275,7 @@ function (_PureService) {
       var itemParams = message.data.item;
       var item = this.modelManager.findItem(itemParams.uuid);
       var requiredPermissions = [{
-        name: 'stream-items',
+        name: ComponentActions.StreamItems,
         content_types: [item.content_type]
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee3() {
@@ -21290,7 +21316,7 @@ function (_PureService) {
         return item.content_type;
       }));
       var requiredPermissions = [{
-        name: 'stream-items',
+        name: ComponentActions.StreamItems,
         content_types: uniqueContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee4() {
@@ -21301,7 +21327,7 @@ function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _this11.removePrivatePropertiesFromResponseItems(responseItems, component, {
-                  type: 'incoming'
+                  incoming: true
                 });
 
                 processedItems = [];
@@ -21380,10 +21406,9 @@ function (_PureService) {
                 return _context6.finish(27);
 
               case 35:
-                _this11.syncService.sync(); // 'create-item' or 'create-items' are possible messages handled here
+                _this11.syncService.sync();
 
-
-                reply = message.action === 'create-item' ? {
+                reply = message.action === ComponentActions.CreateItem ? {
                   item: _this11.jsonForItem(processedItems[0], component)
                 } : {
                   items: processedItems.map(function (item) {
@@ -21410,7 +21435,7 @@ function (_PureService) {
         return i.content_type;
       })).sort();
       var requiredPermissions = [{
-        name: 'stream-items',
+        name: ComponentActions.StreamItems,
         content_types: requiredContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee5() {
@@ -21437,7 +21462,7 @@ function (_PureService) {
                   break;
                 }
 
-                // Filter for any components and deactivate before deleting
+                /* Filter for any components and deactivate before deleting */
                 _iteratorNormalCompletion22 = true;
                 _didIteratorError22 = false;
                 _iteratorError22 = undefined;
@@ -21459,7 +21484,7 @@ function (_PureService) {
                 }
 
                 _this12.alertService.alert({
-                  text: "The item you are trying to delete cannot be found."
+                  text: 'The item you are trying to delete cannot be found.'
                 });
 
                 return _context7.abrupt("continue", 24);
@@ -21478,8 +21503,8 @@ function (_PureService) {
                 return regeneratorRuntime.awrap(_this12.modelManager.setItemToBeDeleted(model));
 
               case 23:
-                // Currently extensions are not notified of association until a full server sync completes.
-                // We manually notify observers.
+                /* Currently extensions are not notified of association until a full server sync completes.
+                   We manually notify observers. */
                 _this12.modelManager.notifyMappingObservers([model], _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved);
 
               case 24:
@@ -21531,7 +21556,7 @@ function (_PureService) {
                 break;
 
               case 45:
-                // Rejected by user
+                /* Rejected by user */
                 reply = {
                   deleted: false
                 };
@@ -21563,7 +21588,7 @@ function (_PureService) {
     value: function handleSetComponentDataMessage(component, message) {
       var _this14 = this;
 
-      // A component setting its own data does not require special permissions
+      /* A component setting its own data does not require special permissions */
       this.runWithPermissions(component, [], function _callee6() {
         return regeneratorRuntime.async(function _callee6$(_context8) {
           while (1) {
@@ -21599,7 +21624,7 @@ function (_PureService) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
-              if (!(component.area === 'modal')) {
+              if (!(component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Modal)) {
                 _context10.next = 4;
                 break;
               }
@@ -21627,8 +21652,9 @@ function (_PureService) {
                 break;
               }
 
-              // Deactive currently active theme if new theme is not layerable
-              activeThemes = this.getActiveThemes(); // Activate current before deactivating others, so as not to flicker
+              /* Deactive currently active theme if new theme is not layerable */
+              activeThemes = this.getActiveThemes();
+              /* Activate current before deactivating others, so as not to flicker */
 
               _context10.next = 13;
               return regeneratorRuntime.awrap(this.activateComponent(component));
@@ -21729,7 +21755,7 @@ function (_PureService) {
   }, {
     key: "handleInstallLocalComponentMessage",
     value: function handleInstallLocalComponentMessage(sourceComponent, message) {
-      // Only extensions manager has this permission
+      /* Only native extensions have this permission */
       if (!this.isNativeExtension(sourceComponent)) {
         return;
       }
@@ -21742,10 +21768,11 @@ function (_PureService) {
     value: function runWithPermissions(component, requiredPermissions, runFunction) {
       if (!component.permissions) {
         component.permissions = [];
-      } // Make copy as not to mutate input values
+      }
+      /* Make copy as not to mutate input values */
 
 
-      requiredPermissions = JSON.parse(JSON.stringify(requiredPermissions));
+      requiredPermissions = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_9__["Copy"])(requiredPermissions);
       var acquiredPermissions = component.permissions;
       var _iteratorNormalCompletion24 = true;
       var _didIteratorError24 = false;
@@ -21754,21 +21781,23 @@ function (_PureService) {
       try {
         var _loop5 = function _loop5() {
           var required = _step24.value;
-          // Remove anything we already have
+
+          /* Remove anything we already have */
           var respectiveAcquired = acquiredPermissions.find(function (candidate) {
             return candidate.name === required.name;
           });
 
           if (!respectiveAcquired) {
             return "continue";
-          } // We now match on name, lets substract from required.content_types anything we have in acquired.
+          }
+          /* We now match on name, lets substract from required.content_types anything we have in acquired. */
 
 
           var requiredContentTypes = required.content_types;
 
           if (!requiredContentTypes) {
-            // If this permission does not require any content types (i.e stream-context-item)
-            // then we can remove this from required since we match by name (respectiveAcquired.name === required.name)
+            /* If this permission does not require any content types (i.e stream-context-item)
+              then we can remove this from required since we match by name (respectiveAcquired.name === required.name) */
             lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(requiredPermissions, required);
             return "continue";
           }
@@ -21798,7 +21827,7 @@ function (_PureService) {
           }
 
           if (requiredContentTypes.length === 0) {
-            // We've removed all acquired and end up with zero, means we already have all these permissions
+            /* We've removed all acquired and end up with zero, means we already have all these permissions */
             lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(requiredPermissions, required);
           }
         };
@@ -21870,7 +21899,7 @@ function (_PureService) {
                   if (!matchingPermission) {
                     component.permissions.push(permission);
                   } else {
-                    // Permission already exists, but content_types may have been expanded
+                    /* Permission already exists, but content_types may have been expanded */
                     var contentTypes = matchingPermission.content_types || [];
                     matchingPermission.content_types = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(contentTypes.concat(permission.content_types));
                   }
@@ -21922,7 +21951,7 @@ function (_PureService) {
 
               case 24:
                 _this16.permissionDialogs = _this16.permissionDialogs.filter(function (pendingDialog) {
-                  // Remove self
+                  /* Remove self */
                   if (pendingDialog === params) {
                     pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
                     return false;
@@ -21937,10 +21966,10 @@ function (_PureService) {
                   };
 
                   if (pendingDialog.component === component) {
-                    // remove pending dialogs that are encapsulated by already approved permissions, and run its function
+                    /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
                     if (pendingDialog.permissions === permissions || containsObjectSubset(permissions, pendingDialog.permissions)) {
-                      // If approved, run the action block. Otherwise, if canceled, cancel any pending ones as well, since the user was
-                      // explicit in their intentions
+                      /* If approved, run the action block. Otherwise, if canceled, cancel any 
+                      pending ones as well, since the user was explicit in their intentions */
                       if (approved) {
                         pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
                       }
@@ -21962,7 +21991,11 @@ function (_PureService) {
             }
           }
         }, null, null, [[4, 9, 13, 21], [14,, 16, 20]]);
-      }; // since these calls are asyncronous, multiple dialogs may be requested at the same time. We only want to present one and trigger all callbacks based on one modal result
+      };
+      /** 
+       * Since these calls are asyncronous, multiple dialogs may be requested at the same time. 
+       * We only want to present one and trigger all callbacks based on one modal result
+       */
 
 
       var existingDialog = lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(this.permissionDialogs, {
@@ -22004,7 +22037,8 @@ function (_PureService) {
       }
 
       this.handlers.splice(this.handlers.indexOf(handler), 1);
-    } // Called by other views when the iframe is ready
+    }
+    /** Called by other views when the iframe is ready */
 
   }, {
     key: "registerComponentWindow",
@@ -22020,18 +22054,18 @@ function (_PureService) {
               this.log('Web|componentManager|registerComponentWindow', component);
               component.window = componentWindow;
               _context12.next = 5;
-              return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid());
+              return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid());
 
             case 5:
               component.sessionKey = _context12.sent;
               this.sendMessageToComponent(component, {
-                action: 'component-registered',
+                action: ComponentActions.ComponentRegistered,
                 sessionKey: component.sessionKey,
                 componentData: component.componentData,
                 data: {
                   uuid: component.uuid,
-                  environment: this.environment,
-                  platform: this.platform,
+                  environment: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["environmentToString"])(this.environment),
+                  platform: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["platformToString"])(this.platform),
                   activeThemeUrls: this.urlsForActiveThemes()
                 }
               });
@@ -22131,7 +22165,7 @@ function (_PureService) {
                 this.activeComponents.push(component);
               }
 
-              if (component.area === 'themes') {
+              if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Themes) {
                 this.postActiveThemesToAllComponents();
               }
 
@@ -22230,7 +22264,7 @@ function (_PureService) {
                 return o.component !== component;
               });
 
-              if (component.area === 'themes') {
+              if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Themes) {
                 this.postActiveThemesToAllComponents();
               }
 
@@ -22252,9 +22286,7 @@ function (_PureService) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
-              //
-              // Do soft deactivate
-              //
+              /* Do soft deactivate */
               component.active = false;
               _iteratorNormalCompletion29 = true;
               _didIteratorError29 = false;
@@ -22310,11 +22342,10 @@ function (_PureService) {
                 return o.component !== component;
               });
 
-              if (component.area === 'themes') {
+              if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Themes) {
                 this.postActiveThemesToAllComponents();
-              } //
-              // Do soft activate
-              //
+              }
+              /* Do soft activate */
 
 
               return _context15.abrupt("return", new Promise(function (resolve, reject) {
@@ -22352,10 +22383,11 @@ function (_PureService) {
                     _this17.activeComponents.push(component);
                   }
 
-                  if (component.area === 'themes') {
+                  if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Themes) {
                     _this17.postActiveThemesToAllComponents();
-                  } // Resolve again in case first resolve in for loop isn't reached.
-                  // Should be no effect if resolved twice, only first will be used.
+                  }
+                  /* Resolve again in case first resolve in for loop isn't reached.
+                    Should be no effect if resolved twice, only first will be used. */
 
 
                   resolve();
@@ -22417,7 +22449,8 @@ function (_PureService) {
       try {
         for (var _iterator31 = this.handlers[Symbol.iterator](), _step31; !(_iteratorNormalCompletion31 = (_step31 = _iterator31.next()).done); _iteratorNormalCompletion31 = true) {
           var handler = _step31.value;
-          // Notify all handlers, and not just ones that match this component type
+
+          /* Notify all handlers, and not just ones that match this component type */
           handler.focusHandler && handler.focusHandler(component, focused);
         }
       } catch (err) {
@@ -22439,16 +22472,16 @@ function (_PureService) {
     key: "handleSetSizeEvent",
     value: function handleSetSizeEvent(component, data) {
       var setSize = function setSize(element, size) {
-        var widthString = typeof size.width === 'string' ? size.width : "".concat(data.width, "px");
-        var heightString = typeof size.height === 'string' ? size.height : "".concat(data.height, "px");
+        var widthString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_9__["isString"])(size.width) ? size.width : "".concat(data.width, "px");
+        var heightString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_9__["isString"])(size.height) ? size.height : "".concat(data.height, "px");
 
         if (element) {
           element.setAttribute('style', "width:".concat(widthString, "; height:").concat(heightString, ";"));
         }
       };
 
-      if (component.area === 'rooms' || component.area === 'modal') {
-        var selector = component.area === 'rooms' ? 'inner' : 'outer';
+      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Rooms || component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Modal) {
+        var selector = component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Rooms ? 'inner' : 'outer';
         var content = document.getElementById("component-content-".concat(selector, "-").concat(component.uuid));
 
         if (content) {
@@ -22461,29 +22494,27 @@ function (_PureService) {
           return;
         }
 
-        setSize(iframe, data); // On Firefox, resizing a component iframe does not seem to have an effect with editor-stack extensions.
-        // Sizing the parent does the trick, however, we can't do this globally, otherwise, areas like the note-tags will
-        // not be able to expand outside of the bounds (to display autocomplete, for example).
+        setSize(iframe, data);
+        /** 
+         * On Firefox, resizing a component iframe does not seem to have an effect with 
+         * editor-stack extensions. Sizing the parent does the trick, however, we can't do 
+         * this globally, otherwise, areas like the note-tags will not be able to expand 
+         * outside of the bounds (to display autocomplete, for example).
+         */
 
-        if (component.area === 'editor-stack') {
+        if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].EditorStack) {
           var parent = iframe.parentElement;
 
           if (parent) {
             setSize(parent, data);
           }
-        } // content object in this case is === to the iframe object above. This is probably
-        // legacy code from when we would size content and container individually, which we no longer do.
-        // const content = document.getElementById(`component-iframe-${component.uuid}`);
-        // if(content) {
-        //   setSize(content, data);
-        // }
-
+        }
       }
     }
   }, {
     key: "editorForNote",
     value: function editorForNote(note) {
-      var editors = this.componentsForArea('editor-editor');
+      var editors = this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Editor);
       var _iteratorNormalCompletion32 = true;
       var _didIteratorError32 = false;
       var _iteratorError32 = undefined;
@@ -22495,7 +22526,8 @@ function (_PureService) {
           if (editor.isExplicitlyEnabledForItem(note)) {
             return editor;
           }
-        } // No editor found for note. Use default editor, if note does not prefer system editor
+        }
+        /* No editor found for note. Use default editor, if note does not prefer system editor */
 
       } catch (err) {
         _didIteratorError32 = true;
@@ -22547,7 +22579,7 @@ function (_PureService) {
       };
 
       permissions.forEach(function (permission, index) {
-        if (permission.name === 'stream-items') {
+        if (permission.name === ComponentActions.StreamItems) {
           var types = permission.content_types.map(function (type) {
             var desc = Object(_Models__WEBPACK_IMPORTED_MODULE_6__["displayStringForContentType"])(type);
 
@@ -22569,15 +22601,14 @@ function (_PureService) {
           finalString += typesString;
 
           if (types.length >= 2 && index < permissionsCount - 1) {
-            // If you have a list of types, and still an additional root-level permission coming up, add a comma
+            /* If you have a list of types, and still an additional root-level 
+               permission coming up, add a comma */
             finalString += ', ';
           }
-        } else if (permission.name === 'stream-context-item') {
-          var mapping = {
-            'editor-stack': 'working note',
-            'note-tags': 'working note',
-            'editor-editor': 'working note'
-          };
+        } else if (permission.name === ComponentActions.StreamContextItem) {
+          var _mapping;
+
+          var mapping = (_mapping = {}, _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].EditorStack, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].NoteTags, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Editor, 'working note'), _mapping);
           finalString += addSeparator(index, permissionsCount, true);
           finalString += mapping[component.area];
         }
