@@ -118,6 +118,7 @@ Root key storage: not applicable
 
 **Key Derivation:**
 
+| Name               | Value    |
 |--------------------|----------|
 | Algorithm          | Argon2id |
 | Memory (Bytes)     | 67108864 |
@@ -128,6 +129,7 @@ Root key storage: not applicable
 
 **Encryption:**
 
+| Name               | Value              |
 |--------------------|--------------------|
 | Algorithm          | XChaCha20+Poly1305 |
 | Key Length (Bits)  | 256                |
