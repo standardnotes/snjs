@@ -186,8 +186,8 @@ export default class Factory {
       uuid: this.generateUuid(),
       content_type: contentType,
       content: {
-        title: "hello",
-        text: "world"
+        title: 'hello',
+        text: 'world'
       }
     };
     return params;
@@ -201,11 +201,11 @@ export default class Factory {
   static createNoteParams({title, text, dirty = true} = {}) {
     const params = {
       uuid: this.generateUuid(),
-      content_type: "Note",
+      content_type: 'Note',
       dirty: dirty,
       content: {
-        title: title || "hello",
-        text: text || "world",
+        title: title || 'hello',
+        text: text || 'world',
         references: []
       }
     };
@@ -215,9 +215,9 @@ export default class Factory {
   static createTagParams({dirty = true} = {}) {
     const params = {
       uuid: this.generateUuid(),
-      content_type: "Tag",
+      content_type: 'Tag',
       content: {
-        title: "thoughts",
+        title: 'thoughts',
         references: []
       }
     };
@@ -244,7 +244,7 @@ export default class Factory {
   }
 
   static serverURL() {
-    return "http://localhost:3000";
+    return 'http://localhost:3000';
   }
 
   static yesterday() {

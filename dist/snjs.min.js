@@ -6021,8 +6021,8 @@ function () {
       }, null, this);
     }
     /**
-     * @access public
      * Destroys the application instance.
+     * @access public
      */
 
   }, {
@@ -6198,8 +6198,8 @@ function () {
       }, null, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
     }
     /**
-     * @access public
      * Allows your PureService subclass to receive `deinit` event to unload observers.
+     * @access public
      */
 
   }, {
@@ -6696,9 +6696,9 @@ function () {
       }, null, this);
     }
     /**
-     * @access public
      * Dynamically change the device interface, i.e when Desktop wants to override
      * default web interface.
+     * @access public
      */
 
   }, {
@@ -6718,10 +6718,6 @@ function () {
         }
       }, null, this);
     }
-    /**
-     * @access private
-     */
-
     /** @access private */
 
   }, {
@@ -6917,7 +6913,7 @@ function () {
     value: function createSyncManager() {
       var _this7 = this;
 
-      this.syncService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSyncManager"]))({
+      this.syncService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_4__["SNSyncService"]))({
         modelManager: this.modelManager,
         storageService: this.storageService,
         sessionManager: this.sessionManager,
@@ -7457,7 +7453,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncManager, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7540,8 +7536,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/device_auth/device_auth_service */ "./lib/services/device_auth/device_auth_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceAuthService", function() { return _services_device_auth_device_auth_service__WEBPACK_IMPORTED_MODULE_16__["DeviceAuthService"]; });
 
-/* harmony import */ var _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/device_auth/response */ "./lib/services/device_auth/response.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Services_device_auth_response__WEBPACK_IMPORTED_MODULE_17__["ChallengeResponse"]; });
+/* harmony import */ var _Services_device_auth_challenge_response__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/device_auth/challenge_response */ "./lib/services/device_auth/challenge_response.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Services_device_auth_challenge_response__WEBPACK_IMPORTED_MODULE_17__["ChallengeResponse"]; });
 
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureService", function() { return _Services_pure_service__WEBPACK_IMPORTED_MODULE_18__["PureService"]; });
@@ -7561,7 +7557,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenges", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["Challenges"]; });
 
 /* harmony import */ var _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./services/sync/sync_service */ "./lib/services/sync/sync_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SNSyncManager"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SNSyncService"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SyncSources"]; });
 
@@ -7800,6 +7796,15 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * The migration service orchestrates the execution of multi-stage migrations.
+ * Migrations are registered during initial application launch, and listen for application
+ * life-cycle events, and act accordingly. For example, a single migration may perform
+ * a unique set of steps when the application first launches, and also other steps after the 
+ * application is unlocked, or after the first sync completes. Migrations live under /migrations
+ * and inherit from the base Migration class.
+ */
 
 var SNMigrationService =
 /*#__PURE__*/
@@ -8270,17 +8275,19 @@ function (_Migration) {
       });
     }
     /**
-    * @access private
      * Establish last_migration_date.
      * We need to determine if this is a new application download,
      * or if we're coming from an older, non-current client.
-      * If new application download, we expect last_migration_date
+     *
+     * If new application download, we expect last_migration_date
      * to be null. However, last_migration_date can also be null if you
      * haven't yet migration to using this system.
-      * So in addition to this date being null, we check if deviceInterface
+     *
+     * So in addition to this date being null, we check if deviceInterface
      * has pre-existing storage values for old migration system.
      * If so, this means this is a legacy client making its first jump to
      * this new migration system.
+     * @access private
      */
 
   }, {
@@ -8523,15 +8530,15 @@ function (_Migration) {
       });
     }
     /**
-     * @access private
-     * @web
+     * Web
      * Migrates legacy storage strucutre into new managed format.
      * If encrypted storage exists, we need to first decrypt it with the passcode.
      * Then extract the account key from it. Then, encrypt storage with the
      * account key. Then encrypt the account key with the passcode and store it
      * within the new storage format.
-     
+     *
      * Generate note: We do not use the keychain if passcode is available.
+     * @access private
      */
 
   }, {
@@ -8665,8 +8672,8 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @helper
-     * @allplatform
+     * Helper
+     * All platforms
      */
 
   }, {
@@ -8690,8 +8697,8 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @helper
-     * @webdesktop
+     * Helper
+     * Web/desktop only
      */
 
   }, {
@@ -8760,8 +8767,8 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @helper
-     * @webdesktop
+     * Helper
+     * Web/desktop only
      */
 
   }, {
@@ -8821,8 +8828,8 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @helper
-     * @webdesktop
+     * Helper
+     * Web/desktop only
      * Encrypt storage with account key
      */
 
@@ -8859,22 +8866,23 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @access private
-     * @mobile
+     * Mobile
      * On mobile legacy structure is mostly similar to new structure,
      * in that the account key is encrypted with the passcode. But mobile did
      * not have encrypted storage, so we simply need to transfer all existing
      * storage values into new managed structure.
-       * If no account but passcode only, the only thing we stored on mobile
-      * previously was keys.offline.pw and keys.offline.timing in the keychain
-      * that we compared against for valid decryption.
-      * In the new version, we know a passcode is correct if it can decrypt storage.
-      * As part of the migration, we’ll need to request the raw passcode from user,
-      * compare it against the keychain offline.pw value, and if correct,
-      * migrate storage to new structure, and encrypt with passcode key.
-      * 
-      * If account only, take the value in the keychain, and rename the values
-      * (i.e mk > masterKey).
+     *
+     * If no account but passcode only, the only thing we stored on mobile
+     * previously was keys.offline.pw and keys.offline.timing in the keychain
+     * that we compared against for valid decryption.
+     * In the new version, we know a passcode is correct if it can decrypt storage.
+     * As part of the migration, we’ll need to request the raw passcode from user,
+     * compare it against the keychain offline.pw value, and if correct,
+     * migrate storage to new structure, and encrypt with passcode key.
+     * 
+     * If account only, take the value in the keychain, and rename the values
+     * (i.e mk > masterKey).
+     * @access private
      */
 
   }, {
@@ -9103,10 +9111,10 @@ function (_Migration) {
       }, null, this);
     }
     /**
-     * @access private
-     * @allplatform
+     * All platforms
      * Migrate all previously independently stored storage keys into new
      * managed approach. These keys are ones that do not need to be renamed.
+     * @access private
      */
 
   }, {
@@ -9217,14 +9225,14 @@ function (_Migration) {
       }, null, this, [[8, 25, 29, 37], [30,, 32, 36]]);
     }
     /**
-     * @access private
-     * @allplatform
+     * All platforms
      * Create new default SNItemsKey from root key.
      * Otherwise, when data is loaded, we won't be able to decrypt it
      * without existence of an item key. This will mean that if this migration
      * is run on two different platforms for the same user, they will create
      * two new items keys. Which one they use to decrypt past items and encrypt
      * future items doesn't really matter.
+     * @access private
      */
 
   }, {
@@ -10374,9 +10382,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var SYSTEM_TAG_ALL_NOTES = "all-notes";
-var SYSTEM_TAG_ARCHIVED_NOTES = "archived-notes";
-var SYSTEM_TAG_TRASHED_NOTES = "trashed-notes";
+var SYSTEM_TAG_ALL_NOTES = 'all-notes';
+var SYSTEM_TAG_ARCHIVED_NOTES = 'archived-notes';
+var SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
 var SNSmartTag =
 /*#__PURE__*/
 function (_SNTag) {
@@ -10400,7 +10408,7 @@ function (_SNTag) {
           uuid: SYSTEM_TAG_ALL_NOTES,
           dummy: true,
           content: {
-            title: "All notes",
+            title: 'All notes',
             isSystemTag: true,
             isAllTag: true,
             predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
@@ -10412,7 +10420,7 @@ function (_SNTag) {
           uuid: SYSTEM_TAG_ARCHIVED_NOTES,
           dummy: true,
           content: {
-            title: "Archived",
+            title: 'Archived',
             isSystemTag: true,
             isArchiveTag: true,
             predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['archived', '=', true])
@@ -10424,7 +10432,7 @@ function (_SNTag) {
           uuid: SYSTEM_TAG_TRASHED_NOTES,
           dummy: true,
           content: {
-            title: "Trash",
+            title: 'Trash',
             isSystemTag: true,
             isTrashTag: true,
             predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['content.trashed', '=', true])
@@ -10859,7 +10867,7 @@ var ContentTypes = {
 function displayStringForContentType(contentType) {
   var _ContentTypes$Note$Co;
 
-  return (_ContentTypes$Note$Co = {}, _defineProperty(_ContentTypes$Note$Co, ContentTypes.Note, "note"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Tag, "tag"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.SmartTag, "smart tag"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ActionsExtension, "action-based extension"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Component, "component"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Editor, "editor"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Theme, "theme"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ServerExtension, "server extension"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Mfa, "two-factor authentication setting"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeCredentials, "FileSafe credential"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeFileMetadata, "FileSafe file"), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeIntegration, "FileSafe integration"), _ContentTypes$Note$Co)[contentType];
+  return (_ContentTypes$Note$Co = {}, _defineProperty(_ContentTypes$Note$Co, ContentTypes.Note, 'note'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Tag, 'tag'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.SmartTag, 'smart tag'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ActionsExtension, 'action-based extension'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Component, 'component'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Editor, 'editor'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Theme, 'theme'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ServerExtension, 'server extension'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Mfa, 'two-factor authentication setting'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeCredentials, 'FileSafe credential'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeFileMetadata, 'FileSafe file'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeIntegration, 'FileSafe integration'), _ContentTypes$Note$Co)[contentType];
 }
 
 /***/ }),
@@ -11319,9 +11327,7 @@ function () {
     value: function didCompleteMapping(source) {}
     /** Optional override */
 
-    /*
-    App Data
-    */
+    /* App Data */
 
   }, {
     key: "setDomainDataItem",
@@ -11391,14 +11397,16 @@ function () {
   }, {
     key: "contentKeysToIgnoreWhenCheckingEquality",
 
-    /*
-      During sync conflicts, when determing whether to create a duplicate for an item, we can omit keys that have no
-      meaningful weight and can be ignored. For example, if one component has active = true and another component has active = false,
-      it would be silly to duplicate them, so instead we ignore this.
+    /**
+     * During sync conflicts, when determing whether to create a duplicate for an item, 
+     * we can omit keys that have no meaningful weight and can be ignored. For example, 
+     * if one component has active = true and another component has active = false, 
+     * it would be needless to duplicate them, so instead we ignore that value.
      */
     value: function contentKeysToIgnoreWhenCheckingEquality() {
       return ['conflict_of'];
-    } // Same as above, but keys inside appData[Item.AppDomain]
+    }
+    /** Same as `contentKeysToIgnoreWhenCheckingEquality`, but keys inside appData[Item.AppDomain] */
 
   }, {
     key: "appDatacontentKeysToIgnoreWhenCheckingEquality",
@@ -11436,19 +11444,6 @@ function () {
       if (this.isSingleton) {
         return _Payloads__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeft;
       }
-      /**
-        * The number of seconds in between changes to constitue a
-        * subjective measure of what we think is active editing of an item
-        */
-      // const IS_ACTIVELY_EDITING_THRESHOLD = 10;
-      // function ItemIsBeingActivelyEdited(item) {
-      //   const isEpoch = item.client_updated_at.getTime() === 0;
-      //   if (!item.client_updated_at) {
-      //     return false;
-      //   }
-      //   return (new Date() - item.client_updated_at) / 1000 < IS_ACTIVELY_EDITING_THRESHOLD;
-      // }
-
 
       if (this.deleted || item.deleted) {
         return _Payloads__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepRight;
@@ -11484,9 +11479,7 @@ function () {
     value: function satisfiesPredicate(predicate) {
       return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].ItemSatisfiesPredicate(this, predicate);
     }
-    /*
-    Dates
-    */
+    /** Dates */
 
   }, {
     key: "createdAtString",
@@ -12445,6 +12438,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function CreateKeyParams(keyParams) {
   return new SNRootKeyParams(keyParams);
 }
+/**
+ * Key params are public data that contain information about how a root key was created.
+ * Given a keyParams object and a password, clients can compute a root key that was created
+ * previously.
+ */
+
 var SNRootKeyParams =
 /*#__PURE__*/
 function () {
@@ -12830,7 +12829,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Missing item encryption key, skipping decryption.");
+              console.error('Missing item encryption key, skipping decryption.');
               return _context7.abrupt("return", encryptedParameters);
 
             case 7:
@@ -12844,7 +12843,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Item key params UUID does not match item UUID");
+              console.error('Item key params UUID does not match item UUID');
               return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
@@ -12862,7 +12861,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Error decrypting parameters", encryptedParameters);
+              console.error('Error decrypting parameters', encryptedParameters);
               return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
@@ -13292,7 +13291,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Auth hash does not match, returning null.");
+              console.error('Auth hash does not match, returning null.');
               return _context7.abrupt("return", null);
 
             case 9:
@@ -13407,7 +13406,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Missing item encryption key, skipping decryption.");
+              console.error('Missing item encryption key, skipping decryption.');
               return _context9.abrupt("return", encryptedParameters);
 
             case 7:
@@ -13433,7 +13432,7 @@ function (_SNProtocolOperator) {
                 break;
               }
 
-              console.error("Error decrypting item_key parameters", encryptedParameters);
+              console.error('Error decrypting item_key parameters', encryptedParameters);
               return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyEncryptionParameters"])({
                 encryptionParameters: encryptedParameters,
                 override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
@@ -13650,9 +13649,7 @@ function (_SNProtocolOperator) {
   _createClass(SNProtocolOperator003, [{
     key: "computeRootKey",
 
-    /**
-     * @access public
-     */
+    /** @access public */
     value: function computeRootKey(_ref) {
       var password, keyParams, salt, key;
       return regeneratorRuntime.async(function computeRootKey$(_context) {
@@ -13692,6 +13689,8 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /** @access public */
+
   }, {
     key: "createRootKey",
     value: function createRootKey(_ref2) {
@@ -13751,7 +13750,7 @@ function (_SNProtocolOperator) {
           switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, 'SF', version, cost, nonce].join(":")));
+              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, 'SF', version, cost, nonce].join(':')));
 
             case 2:
               result = _context3.sent;
@@ -13832,11 +13831,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var ARGON2_MEMLIMIT = 67108864;
 var ARGON2_OUTPUT_KEY_BYTES = 64;
 var ARGON2_ITERATIONS = 5;
+var ARGON2_SALT_SEED_LENGTH = 256;
+var ARGON2_SALT_LENGTH = 128;
 var ENCRYPTION_ALGORITHM = 'Xchacha20+Poly1305';
 var ENCRYPTION_KEY_LENGTH = 256;
 var ENCRYPTION_NONCE_LENGTH = 192;
-var SALT_SEED_LENGTH = 256;
-var SALT_LENGTH = 128;
 var SNProtocolOperator004 =
 /*#__PURE__*/
 function (_SNProtocolOperator) {
@@ -13893,11 +13892,11 @@ function (_SNProtocolOperator) {
             case 0:
               identifier = _ref.identifier, seed = _ref.seed;
               _context2.next = 3;
-              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, seed].join(":")));
+              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, seed].join(':')));
 
             case 3:
               result = _context2.sent;
-              return _context2.abrupt("return", result.substring(result, SALT_LENGTH / 2 / 2));
+              return _context2.abrupt("return", result.substring(0, ARGON2_SALT_LENGTH / 2 / 2));
 
             case 5:
             case "end":
@@ -13962,7 +13961,7 @@ function (_SNProtocolOperator) {
               version = this.constructor.versionString();
               iterations = this.constructor.kdfIterations();
               _context4.next = 5;
-              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(SALT_SEED_LENGTH));
+              return regeneratorRuntime.awrap(this.crypto.generateRandomKey(ARGON2_SALT_SEED_LENGTH));
 
             case 5:
               seed = _context4.sent;
@@ -14364,10 +14363,6 @@ function (_SNProtocolOperator) {
     }
   }], [{
     key: "versionString",
-
-    /**
-     * The protocol version. Will be prefixed to encrypted payloads.
-     */
     value: function versionString() {
       return _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].V004;
     }
@@ -14419,6 +14414,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
+/**
+ * An operator is responsible for performing crypto operations, such as generating keys
+ * and encrypting/decrypting payloads. Operators interact directly with the 'sncrypto' lib
+ * to directly access cryptographic primitives.
+ * Each operator is versioned according to the protocol version. Functions that are common
+ * across all versions appear in this generic parent class.
+ */
 
 var SNProtocolOperator =
 /*#__PURE__*/
@@ -14684,6 +14687,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+
+/**
+ * A collection of payloads coming from a single source.
+ */
 
 var PayloadCollection =
 /*#__PURE__*/
@@ -15064,6 +15071,22 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+/**
+ * A payload delta is a class that defines instructions that process an incoming collection
+ * of payloads, applies some set of operations on those payloads wrt to the current base state, 
+ * and returns the resulting collection. Deltas are purely functional and do not modify 
+ * input data, instead returning what the collection would look like after its been 
+ * transformed. The consumer may choose to act as they wish with this end result.
+ * 
+ * A delta object takes a baseCollection (the current state of the data) and an applyCollection
+ * (the data another source is attempting to merge on top of our base data). The delta will
+ * then iterate over this data and return a `resultingCollection` object that includes the final
+ * state of the data after the class-specific operations have been applied.
+ * 
+ * For example, the RemoteRetrieved delta will take the current state of local data as 
+ * baseCollection, the data the server is sending as applyCollection, and determine what 
+ * the end state of the data should look like.
+ */
 var PayloadsDelta =
 /*#__PURE__*/
 function () {
@@ -17258,6 +17281,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+/**
+ * A payload is a vehicle in which item data is transported or persisted.
+ * This class represents an abstract PurePayload which does not have any fields. Instead,
+ * subclasses must override the `fields` static method to return which fields this particular
+ * class of payload contains. For example, a ServerItemPayload is a transmission vehicle for 
+ * transporting an item to the server, and does not contain fields like PayloadFields.Dirty.
+ * However, a StorageItemPayload is a persistence vehicle for saving payloads to disk, and does contain
+ * PayloadsFields.Dirty.
+ * 
+ * Payloads are completely immutable and may not be modified after creation. Payloads should
+ * not be created directly using the constructor, but instead created using the generators avaiable
+ * in generator.js.
+ * 
+ * Payloads also have a content format. Formats can either be 
+ * DecryptedBase64String, EncryptedString, or DecryptedBareObject.
+ */
+
 var PurePayload =
 /*#__PURE__*/
 function () {
@@ -17287,21 +17327,6 @@ function () {
           this[field] = value;
         }
       }
-      /** Keep unmodified values as existing on item */
-
-      /**
-      if(item.errorDecrypting) {
-        if(encryptionPayload) {
-          throw 'Should not feed custom encryption payload if the object was not decrypted.';
-        }
-        this.content = item.content;
-        this.enc_item_key = item.enc_item_key;
-        if(item.auth_hash) {
-          this.auth_hash = item.auth_hash;
-        }
-      }
-      */
-
     } catch (err) {
       _didIteratorError = true;
       _iteratorError = err;
@@ -17620,6 +17645,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+/**
+ * A root key is a local only construct that houses the key used for the encryption
+ * and decryption of items keys.
+ */
+
 var SNRootKey =
 /*#__PURE__*/
 function () {
@@ -17840,6 +17870,21 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+/**
+ * The Actions Service allows clients to interact with action-based extensions.
+ * Action-based extensions are mostly RESTful actions that can push a local value or 
+ * retrieve a remote value and act on it accordingly.
+ * There are 4 action types:
+ * `get`: performs a GET request on an endpoint to retrieve an item value, and merges the
+ *      value onto the local item value. For example, you can GET an item's older revision
+ *      value and replace the current value with the revision.
+ * `render`: performs a GET request, and displays the result in the UI. This action does not
+ *         affect data unless action is taken explicitely in the UI after the data is presented.
+ * `show`: opens the action's URL in a browser.
+ * `post`: sends an item's data to a remote service. This is used for example by Listed
+ *       to allow publishing a note to a user's blog.
+ */
+
 var SNActionsService =
 /*#__PURE__*/
 function (_PureService) {
@@ -17921,7 +17966,7 @@ function (_PureService) {
 
                 return extension;
               }).catch(function (response) {
-                console.error("Error loading extension", response);
+                console.error('Error loading extension', response);
                 return null;
               }));
 
@@ -18046,7 +18091,7 @@ function (_PureService) {
                 url: action.url
               }).catch(function (response) {
                 var error = response && response.error || {
-                  message: "An issue occurred while processing this action. Please try again."
+                  message: 'An issue occurred while processing this action. Please try again.'
                 };
 
                 _this3.alertService.alert({
@@ -18194,7 +18239,7 @@ function (_PureService) {
                 });
               }).catch(function (response) {
                 var error = response && response.error || {
-                  message: "An issue occurred while processing this action. Please try again."
+                  message: 'An issue occurred while processing this action. Please try again.'
                 };
 
                 _this4.alertService.alert({
@@ -18406,10 +18451,10 @@ function (_PureService) {
                 };
               }).catch(function (response) {
                 action.error = true;
-                console.error("Action error response:", response);
+                console.error('Action error response:', response);
 
                 _this5.alertService.alert({
-                  text: "An issue occurred while processing this action. Please try again."
+                  text: 'An issue occurred while processing this action. Please try again.'
                 });
 
                 return {
@@ -18502,6 +18547,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+
+/**
+ * Can be subclassed to provide custom alert/confirm implementation.
+ * Defaults to using browser alert() and confirm().
+ */
 
 var SNAlertService =
 /*#__PURE__*/
@@ -19072,21 +19122,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OUTDATED_PROTOCOL_ALERT_IGNORE", function() { return OUTDATED_PROTOCOL_ALERT_IGNORE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsufficientPasswordMessage", function() { return InsufficientPasswordMessage; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StrictSignInFailed", function() { return StrictSignInFailed; });
-var API_MESSAGE_GENERIC_INVALID_LOGIN = "A server error occurred while trying to sign in. Please try again.";
-var API_MESSAGE_GENERIC_REGISTRATION_FAIL = "A server error occurred while trying to register. Please try again.";
+var API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
+var API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
 var API_MESSAGE_GENERIC_CHANGE_PW_FAIL = "Something went wrong while changing your password.\n                                                      Your password was not changed. Please try again.";
-var API_MESSAGE_GENERIC_SYNC_FAIL = "Could not connect to server.";
-var API_MESSAGE_REGISTRATION_IN_PROGRESS = "An existing registration request is already in progress.";
-var API_MESSAGE_LOGIN_IN_PROGRESS = "An existing sign in request is already in progress.";
-var API_MESSAGE_CHANGE_PW_IN_PROGRESS = "An existing change password request is already in progress.";
-var API_MESSAGE_FAILBACK_LOGIN_FAIL = "Invalid email or password.";
+var API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
+var API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.';
+var API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.';
+var API_MESSAGE_CHANGE_PW_IN_PROGRESS = 'An existing change password request is already in progress.';
+var API_MESSAGE_FAILBACK_LOGIN_FAIL = 'Invalid email or password.';
 var UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not support your\n                                                      newer account type. Please upgrade to the latest version\n                                                      of Standard Notes to sign in.";
 var EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is\n                                                      outdated and no longer supported by this application.\n                                                      Please visit standardnotes.org/help/security for more\n                                                      information.";
 var OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and\n                                                      requires upgrade. You may proceed with login, but are\n                                                      advised to perform a security update using the web or\n                                                      desktop application. Please visit\n                                                      standardnotes.org/help/security for more information.";
 var UNSUPPORTED_PASSWORD_COST = "Your account was created on a platform with higher security\n                                                      capabilities than this browser supports. If we attempted\n                                                      to generate your login keys here, it would take hours. Please\n                                                      use a browser with more up to date security capabilities,\n                                                      like Google Chrome or Firefox, to log in.";
 var INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters.\n                                                      Please visit standardnotes.org/help/security for\n                                                      more information.";
-var OUTDATED_PROTOCOL_ALERT_TITLE = "Update Recommended";
-var OUTDATED_PROTOCOL_ALERT_IGNORE = "Sign In";
+var OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
+var OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
 function InsufficientPasswordMessage(minimum) {
   return "\n          Your password must be at least ".concat(minimum, " characters in length.\n          For your security, please choose a longer password or,\n          ideally, a passphrase, and try again.\n         ");
 }
@@ -19135,6 +19185,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 var MINIMUM_PASSWORD_LENGTH = 8;
+/**
+ * The session manager is responsible for loading initial user state, and any relevant
+ * server credentials, such as the session token. It also exposes methods for registering
+ * for a new account, signing into an existing one, or changing an account password.
+ */
+
 var SNSessionManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -19691,6 +19747,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 var DESKTOP_URL_PREFIX = 'sn://';
+/**
+ * Responsible for orchestrating component functionality, including editors, themes,
+ * and other components. The component manager primarily deals with iframes, and orchestrates
+ * sending and receiving messages to and from frames via the postMessage API.
+ */
+
 var SNComponentManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -19760,7 +19822,7 @@ function (_PureService) {
       }
     });
 
-    SNComponentManager.ClientDataDomain = "org.standardnotes.sn.components";
+    SNComponentManager.ClientDataDomain = 'org.standardnotes.sn.components';
     _this.timeout = timeout || setTimeout.bind(window);
     _this.modelManager = modelManager;
     _this.syncService = syncService;
@@ -19795,7 +19857,7 @@ function (_PureService) {
     value: function configureForGeneralUsage() {
       var _this2 = this;
 
-      this.modelManager.addMappingObserver("*", function _callee(allItems, validItems, deletedItems, source, sourceKey) {
+      this.modelManager.addMappingObserver('*', function _callee(allItems, validItems, deletedItems, source, sourceKey) {
         var syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, component, activeComponent, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _loop2, _iterator3, _step3, _ret2, requiredContextPermissions, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _loop3, _iterator4, _step4, _ret3;
 
         return regeneratorRuntime.async(function _callee$(_context) {
@@ -19916,7 +19978,7 @@ function (_PureService) {
                   }
 
                   var requiredPermissions = [{
-                    name: "stream-items",
+                    name: 'stream-items',
                     content_types: observer.contentTypes.sort()
                   }];
 
@@ -19983,7 +20045,7 @@ function (_PureService) {
 
               case 62:
                 requiredContextPermissions = [{
-                  name: "stream-context-item"
+                  name: 'stream-context-item'
                 }];
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
@@ -20006,7 +20068,7 @@ function (_PureService) {
                     for (var _iterator5 = _this2.handlers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                       var handler = _step5.value;
 
-                      if (!handler.areas.includes(observer.component.area) && !handler.areas.includes("*")) {
+                      if (!handler.areas.includes(observer.component.area) && !handler.areas.includes('*')) {
                         continue;
                       }
 
@@ -20198,7 +20260,7 @@ function (_PureService) {
   }, {
     key: "getActiveThemes",
     value: function getActiveThemes() {
-      return this.componentsForArea("themes").filter(function (theme) {
+      return this.componentsForArea('themes').filter(function (theme) {
         return theme.active;
       });
     }
@@ -20220,7 +20282,7 @@ function (_PureService) {
         themes: urls
       };
       this.sendMessageToComponent(component, {
-        action: "themes",
+        action: 'themes',
         data: data
       });
     }
@@ -20235,7 +20297,7 @@ function (_PureService) {
         for (var _iterator7 = this.handlers[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
           var handler = _step7.value;
 
-          if (handler.areas.includes(area) === false && !handler.areas.includes("*")) {
+          if (handler.areas.includes(area) === false && !handler.areas.includes('*')) {
             continue;
           }
 
@@ -20331,17 +20393,20 @@ function (_PureService) {
         deleted: item.deleted
       };
       params.content = item.collapseContent();
-      params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {}; // isMetadataUpdate implies that the extension should make reference of updated metadata,
-      // but not update content values as they may be stale relative to what the extension currently has
-      // Changes are always metadata updates if the mapping source is PayloadSources.RemoteSaved || source === PayloadSources.LocalSaved.
-      //
+      params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {};
+      /** 
+       * isMetadataUpdate implies that the extension should make reference of updated 
+       * metadata, but not update content values as they may be stale relative to what the 
+       * extension currently has Changes are always metadata updates if the mapping source 
+       * is PayloadSources.RemoteSaved || source === PayloadSources.LocalSaved.
+      */
 
       if (source && (source === _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved || source === _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalSaved)) {
         params.isMetadataUpdate = true;
       }
 
       this.removePrivatePropertiesFromResponseItems([params], component, {
-        type: "outgoing"
+        type: 'outgoing'
       });
       return params;
     }
@@ -20350,7 +20415,7 @@ function (_PureService) {
     value: function sendItemsInReply(component, items, message, source) {
       var _this5 = this;
 
-      this.log("Web|componentManager|sendItemsInReply", component, items, message);
+      this.log('Web|componentManager|sendItemsInReply', component, items, message);
       var response = {
         items: {}
       };
@@ -20363,7 +20428,7 @@ function (_PureService) {
   }, {
     key: "sendContextItemInReply",
     value: function sendContextItemInReply(component, item, originalMessage, source) {
-      this.log("Web|componentManager|sendContextItemInReply", component, item, originalMessage);
+      this.log('Web|componentManager|sendContextItemInReply', component, item, originalMessage);
       var response = {
         item: this.jsonForItem(item, component, source)
       };
@@ -20373,7 +20438,7 @@ function (_PureService) {
     key: "replyToMessage",
     value: function replyToMessage(component, originalMessage, replyData) {
       var reply = {
-        action: "reply",
+        action: 'reply',
         original: originalMessage,
         data: replyData
       };
@@ -20382,17 +20447,17 @@ function (_PureService) {
   }, {
     key: "sendMessageToComponent",
     value: function sendMessageToComponent(component, message) {
-      var permissibleActionsWhileHidden = ["component-registered", "themes"];
+      var permissibleActionsWhileHidden = ['component-registered', 'themes'];
 
       if (component.hidden && !permissibleActionsWhileHidden.includes(message.action)) {
-        this.log("Component disabled for current item, not sending any messages.", component.name);
+        this.log('Component disabled for current item, not sending any messages.', component.name);
         return;
       }
 
-      this.log("Web|sendMessageToComponent", component, message);
+      this.log('Web|sendMessageToComponent', component, message);
       var origin = this.urlForComponent(component);
 
-      if (!origin.startsWith("http") && !origin.startsWith("file")) {
+      if (!origin.startsWith('http') && !origin.startsWith('file')) {
         // Native extension running in web, prefix current host
         origin = window.location.href + origin;
       }
@@ -20431,8 +20496,8 @@ function (_PureService) {
         var url = component.hosted_url || component.legacy_url;
 
         if (this.isMobile) {
-          var localReplacement = this.platform === "ios" ? "localhost" : "10.0.2.2";
-          url = url.replace("localhost", localReplacement).replace("sn.local", localReplacement);
+          var localReplacement = this.platform === 'ios' ? 'localhost' : '10.0.2.2';
+          url = url.replace('localhost', localReplacement).replace('sn.local', localReplacement);
         }
 
         return url;
@@ -20493,15 +20558,15 @@ function (_PureService) {
       var _this6 = this;
 
       if (!component) {
-        this.log("Component not defined for message, returning", message);
+        this.log('Component not defined for message, returning', message);
         this.alertService.alert({
-          text: "An extension is trying to communicate with Standard Notes, but there is an error establishing a bridge. Please restart the app and try again."
+          text: 'An extension is trying to communicate with Standard Notes, but there is an error establishing a bridge. Please restart the app and try again.'
         });
         return;
       } // Actions that won't succeeed with readonly mode
 
 
-      var readwriteActions = ["save-items", "associate-item", "deassociate-item", "create-item", "create-items", "delete-items", "set-component-data"];
+      var readwriteActions = ['save-items', 'associate-item', 'deassociate-item', 'create-item', 'create-items', 'delete-items', 'set-component-data'];
 
       if (component.readonly && readwriteActions.includes(message.action)) {
         // A component can be marked readonly if changes should not be saved.
@@ -20532,26 +20597,26 @@ function (_PureService) {
       */
 
 
-      if (message.action === "stream-items") {
+      if (message.action === 'stream-items') {
         this.handleStreamItemsMessage(component, message);
-      } else if (message.action === "stream-context-item") {
+      } else if (message.action === 'stream-context-item') {
         this.handleStreamContextItemMessage(component, message);
-      } else if (message.action === "set-component-data") {
+      } else if (message.action === 'set-component-data') {
         this.handleSetComponentDataMessage(component, message);
-      } else if (message.action === "delete-items") {
+      } else if (message.action === 'delete-items') {
         this.handleDeleteItemsMessage(component, message);
-      } else if (message.action === "create-items" || message.action === "create-item") {
+      } else if (message.action === 'create-items' || message.action === 'create-item') {
         this.handleCreateItemsMessage(component, message);
-      } else if (message.action === "save-items") {
+      } else if (message.action === 'save-items') {
         this.handleSaveItemsMessage(component, message);
-      } else if (message.action === "toggle-activate-component") {
+      } else if (message.action === 'toggle-activate-component') {
         var componentToToggle = this.modelManager.findItem(message.data.uuid);
         this.handleToggleComponentMessage(component, componentToToggle, message);
-      } else if (message.action === "request-permissions") {
+      } else if (message.action === 'request-permissions') {
         this.handleRequestPermissionsMessage(component, message);
-      } else if (message.action === "install-local-component") {
+      } else if (message.action === 'install-local-component') {
         this.handleInstallLocalComponentMessage(component, message);
-      } else if (message.action === "duplicate-item") {
+      } else if (message.action === 'duplicate-item') {
         this.handleDuplicateItemMessage(component, message);
       } // Notify observers
 
@@ -20564,7 +20629,7 @@ function (_PureService) {
         var _loop4 = function _loop4() {
           var handler = _step10.value;
 
-          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes("*"))) {
+          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes('*'))) {
             _this6.timeout(function () {
               handler.actionHandler(component, message.action, message.data);
             });
@@ -20595,8 +20660,8 @@ function (_PureService) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       // can be 'incoming' or 'outgoing'. We want to remove updated_at if incoming, but keep it if outgoing
-      if (options.type === "incoming") {
-        var privateTopLevelProperties = ["updated_at"]; // Maintaining our own updated_at value is imperative for sync to work properly, we ignore any incoming value.
+      if (options.type === 'incoming') {
+        var privateTopLevelProperties = ['updated_at']; // Maintaining our own updated_at value is imperative for sync to work properly, we ignore any incoming value.
 
         var _iteratorNormalCompletion11 = true;
         var _didIteratorError11 = false;
@@ -20607,7 +20672,7 @@ function (_PureService) {
             var responseItem = _step11.value;
 
             if (responseItem.isItem) {
-              console.error("Attempting to pass object. Use JSON.");
+              console.error('Attempting to pass object. Use JSON.');
               continue;
             }
 
@@ -20659,11 +20724,11 @@ function (_PureService) {
       } // Don't allow component to overwrite these properties.
 
 
-      var privateContentProperties = ["autoupdateDisabled", "permissions", "active"];
+      var privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
 
       if (options) {
         if (options.includeUrls) {
-          privateContentProperties = privateContentProperties.concat(["url", "hosted_url", "local_url"]);
+          privateContentProperties = privateContentProperties.concat(['url', 'hosted_url', 'local_url']);
         }
       }
 
@@ -20678,7 +20743,7 @@ function (_PureService) {
           // Do not pass in actual items here, otherwise that would be destructive.
           // Instead, generic JS/JSON objects should be passed.
           if (_responseItem.isItem) {
-            console.error("Attempting to pass object. Use JSON.");
+            console.error('Attempting to pass object. Use JSON.');
             continue;
           }
 
@@ -20727,7 +20792,7 @@ function (_PureService) {
       var _this7 = this;
 
       var requiredPermissions = [{
-        name: "stream-items",
+        name: 'stream-items',
         content_types: message.data.content_types.sort()
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
@@ -20778,7 +20843,7 @@ function (_PureService) {
       var _this8 = this;
 
       var requiredPermissions = [{
-        name: "stream-context-item"
+        name: 'stream-context-item'
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
         if (!lodash_find__WEBPACK_IMPORTED_MODULE_0___default()(_this8.contextStreamObservers, {
@@ -20913,7 +20978,7 @@ function (_PureService) {
               }
 
               requiredPermissions.push({
-                name: "stream-context-item"
+                name: 'stream-context-item'
               });
               lodash_pull__WEBPACK_IMPORTED_MODULE_1___default()(pendingResponseItems, responseItem); // We break because there can only be one context item
 
@@ -20965,7 +21030,7 @@ function (_PureService) {
                   return i.content_type;
                 })).sort();
                 requiredPermissions.push({
-                  name: "stream-items",
+                  name: 'stream-items',
                   content_types: requiredContentTypes
                 });
               }
@@ -20979,7 +21044,7 @@ function (_PureService) {
                       case 0:
                         _this9.removePrivatePropertiesFromResponseItems(responseItems, component, {
                           includeUrls: true,
-                          type: "incoming"
+                          type: 'incoming'
                         });
                         /*
                         We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
@@ -21044,8 +21109,8 @@ function (_PureService) {
 
                       case 23:
                         if (lockedCount > 0) {
-                          itemNoun = lockedCount === 1 ? "item" : "items";
-                          auxVerb = lockedCount === 1 ? "is" : "are";
+                          itemNoun = lockedCount === 1 ? 'item' : 'items';
+                          auxVerb = lockedCount === 1 ? 'is' : 'are';
 
                           _this9.alertService.alert({
                             title: 'Items Locked',
@@ -21152,7 +21217,7 @@ function (_PureService) {
                         _this9.syncService.sync().then(function (response) {
                           // Allow handlers to be notified when a save begins and ends, to update the UI
                           var saveMessage = Object.assign({}, message);
-                          saveMessage.action = response && response.error ? "save-error" : "save-success";
+                          saveMessage.action = response && response.error ? 'save-error' : 'save-success';
 
                           _this9.replyToMessage(component, message, {
                             error: response && response.error
@@ -21184,7 +21249,7 @@ function (_PureService) {
       var itemParams = message.data.item;
       var item = this.modelManager.findItem(itemParams.uuid);
       var requiredPermissions = [{
-        name: "stream-items",
+        name: 'stream-items',
         content_types: [item.content_type]
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee3() {
@@ -21225,7 +21290,7 @@ function (_PureService) {
         return item.content_type;
       }));
       var requiredPermissions = [{
-        name: "stream-items",
+        name: 'stream-items',
         content_types: uniqueContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee4() {
@@ -21236,7 +21301,7 @@ function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _this11.removePrivatePropertiesFromResponseItems(responseItems, component, {
-                  type: "incoming"
+                  type: 'incoming'
                 });
 
                 processedItems = [];
@@ -21315,10 +21380,10 @@ function (_PureService) {
                 return _context6.finish(27);
 
               case 35:
-                _this11.syncService.sync(); // "create-item" or "create-items" are possible messages handled here
+                _this11.syncService.sync(); // 'create-item' or 'create-items' are possible messages handled here
 
 
-                reply = message.action === "create-item" ? {
+                reply = message.action === 'create-item' ? {
                   item: _this11.jsonForItem(processedItems[0], component)
                 } : {
                   items: processedItems.map(function (item) {
@@ -21345,7 +21410,7 @@ function (_PureService) {
         return i.content_type;
       })).sort();
       var requiredPermissions = [{
-        name: "stream-items",
+        name: 'stream-items',
         content_types: requiredContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, function _callee5() {
@@ -21356,7 +21421,7 @@ function (_PureService) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 itemsData = message.data.items;
-                noun = itemsData.length === 1 ? "item" : "items";
+                noun = itemsData.length === 1 ? 'item' : 'items';
                 reply = null;
                 didConfirm = true;
                 _context7.next = 6;
@@ -21908,7 +21973,7 @@ function (_PureService) {
       if (!existingDialog) {
         this.presentPermissionsDialog(params);
       } else {
-        this.log("Existing dialog, not presenting.");
+        this.log('Existing dialog, not presenting.');
       }
     }
   }, {
@@ -21934,7 +21999,7 @@ function (_PureService) {
       });
 
       if (!handler) {
-        this.log("Attempting to deregister non-existing handler");
+        this.log('Attempting to deregister non-existing handler');
         return;
       }
 
@@ -21949,10 +22014,10 @@ function (_PureService) {
           switch (_context12.prev = _context12.next) {
             case 0:
               if (component.window === componentWindow) {
-                this.log("Web|componentManager", "attempting to re-register same component window.");
+                this.log('Web|componentManager', 'attempting to re-register same component window.');
               }
 
-              this.log("Web|componentManager|registerComponentWindow", component);
+              this.log('Web|componentManager|registerComponentWindow', component);
               component.window = componentWindow;
               _context12.next = 5;
               return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid());
@@ -21960,7 +22025,7 @@ function (_PureService) {
             case 5:
               component.sessionKey = _context12.sent;
               this.sendMessageToComponent(component, {
-                action: "component-registered",
+                action: 'component-registered',
                 sessionKey: component.sessionKey,
                 componentData: component.componentData,
                 data: {
@@ -22011,7 +22076,7 @@ function (_PureService) {
               for (_iterator27 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
                 handler = _step27.value;
 
-                if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
                   handler.activationHandler && handler.activationHandler(component);
                 }
               }
@@ -22066,7 +22131,7 @@ function (_PureService) {
                 this.activeComponents.push(component);
               }
 
-              if (component.area === "themes") {
+              if (component.area === 'themes') {
                 this.postActiveThemesToAllComponents();
               }
 
@@ -22106,7 +22171,7 @@ function (_PureService) {
               for (_iterator28 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
                 handler = _step28.value;
 
-                if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
                   handler.activationHandler && handler.activationHandler(component);
                 }
               }
@@ -22165,7 +22230,7 @@ function (_PureService) {
                 return o.component !== component;
               });
 
-              if (component.area === "themes") {
+              if (component.area === 'themes') {
                 this.postActiveThemesToAllComponents();
               }
 
@@ -22199,7 +22264,7 @@ function (_PureService) {
               for (_iterator29 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion29 = (_step29 = _iterator29.next()).done); _iteratorNormalCompletion29 = true) {
                 handler = _step29.value;
 
-                if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
                   handler.activationHandler && handler.activationHandler(component);
                 }
               }
@@ -22245,7 +22310,7 @@ function (_PureService) {
                 return o.component !== component;
               });
 
-              if (component.area === "themes") {
+              if (component.area === 'themes') {
                 this.postActiveThemesToAllComponents();
               } //
               // Do soft activate
@@ -22263,7 +22328,7 @@ function (_PureService) {
                     for (var _iterator30 = _this17.handlers[Symbol.iterator](), _step30; !(_iteratorNormalCompletion30 = (_step30 = _iterator30.next()).done); _iteratorNormalCompletion30 = true) {
                       var handler = _step30.value;
 
-                      if (handler.areas.includes(component.area) || handler.areas.includes("*")) {
+                      if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
                         handler.activationHandler && handler.activationHandler(component);
                         resolve();
                       }
@@ -22287,7 +22352,7 @@ function (_PureService) {
                     _this17.activeComponents.push(component);
                   }
 
-                  if (component.area === "themes") {
+                  if (component.area === 'themes') {
                     _this17.postActiveThemesToAllComponents();
                   } // Resolve again in case first resolve in for loop isn't reached.
                   // Should be no effect if resolved twice, only first will be used.
@@ -22332,7 +22397,7 @@ function (_PureService) {
   }, {
     key: "iframeForComponent",
     value: function iframeForComponent(component) {
-      for (var _i = 0, _Array$from = Array.from(document.getElementsByTagName("iframe")); _i < _Array$from.length; _i++) {
+      for (var _i = 0, _Array$from = Array.from(document.getElementsByTagName('iframe')); _i < _Array$from.length; _i++) {
         var frame = _Array$from[_i];
         var componentId = frame.dataset.componentId;
 
@@ -22378,12 +22443,12 @@ function (_PureService) {
         var heightString = typeof size.height === 'string' ? size.height : "".concat(data.height, "px");
 
         if (element) {
-          element.setAttribute("style", "width:".concat(widthString, "; height:").concat(heightString, ";"));
+          element.setAttribute('style', "width:".concat(widthString, "; height:").concat(heightString, ";"));
         }
       };
 
-      if (component.area === "rooms" || component.area === "modal") {
-        var selector = component.area === "rooms" ? "inner" : "outer";
+      if (component.area === 'rooms' || component.area === 'modal') {
+        var selector = component.area === 'rooms' ? 'inner' : 'outer';
         var content = document.getElementById("component-content-".concat(selector, "-").concat(component.uuid));
 
         if (content) {
@@ -22400,7 +22465,7 @@ function (_PureService) {
         // Sizing the parent does the trick, however, we can't do this globally, otherwise, areas like the note-tags will
         // not be able to expand outside of the bounds (to display autocomplete, for example).
 
-        if (component.area === "editor-stack") {
+        if (component.area === 'editor-stack') {
           var parent = iframe.parentElement;
 
           if (parent) {
@@ -22418,7 +22483,7 @@ function (_PureService) {
   }, {
     key: "editorForNote",
     value: function editorForNote(note) {
-      var editors = this.componentsForArea("editor-editor");
+      var editors = this.componentsForArea('editor-editor');
       var _iteratorNormalCompletion32 = true;
       var _didIteratorError32 = false;
       var _iteratorError32 = undefined;
@@ -22452,7 +22517,7 @@ function (_PureService) {
           return this.getDefaultEditor();
         }
       } else {
-        if (!note.getAppDataItem("prefersPlainEditor")) {
+        if (!note.getAppDataItem('prefersPlainEditor')) {
           return editors.filter(function (e) {
             return e.isDefaultEditor();
           })[0];
@@ -22462,37 +22527,37 @@ function (_PureService) {
   }, {
     key: "permissionsStringForPermissions",
     value: function permissionsStringForPermissions(permissions, component) {
-      var finalString = "";
+      var finalString = '';
       var permissionsCount = permissions.length;
 
       var addSeparator = function addSeparator(index, length) {
         if (index > 0) {
           if (index === length - 1) {
             if (length === 2) {
-              return " and ";
+              return ' and ';
             } else {
-              return ", and ";
+              return ', and ';
             }
           } else {
-            return ", ";
+            return ', ';
           }
         }
 
-        return "";
+        return '';
       };
 
       permissions.forEach(function (permission, index) {
-        if (permission.name === "stream-items") {
+        if (permission.name === 'stream-items') {
           var types = permission.content_types.map(function (type) {
             var desc = Object(_Models__WEBPACK_IMPORTED_MODULE_6__["displayStringForContentType"])(type);
 
             if (desc) {
-              return desc + "s";
+              return desc + 's';
             } else {
-              return "items of type " + type;
+              return 'items of type ' + type;
             }
           });
-          var typesString = "";
+          var typesString = '';
 
           for (var i = 0; i < types.length; i++) {
             var type = types[i];
@@ -22505,19 +22570,19 @@ function (_PureService) {
 
           if (types.length >= 2 && index < permissionsCount - 1) {
             // If you have a list of types, and still an additional root-level permission coming up, add a comma
-            finalString += ", ";
+            finalString += ', ';
           }
-        } else if (permission.name === "stream-context-item") {
+        } else if (permission.name === 'stream-context-item') {
           var mapping = {
-            "editor-stack": "working note",
-            "note-tags": "working note",
-            "editor-editor": "working note"
+            'editor-stack': 'working note',
+            'note-tags': 'working note',
+            'editor-editor': 'working note'
           };
           finalString += addSeparator(index, permissionsCount, true);
           finalString += mapping[component.area];
         }
       });
-      return finalString + ".";
+      return finalString + '.';
     }
   }, {
     key: "components",
@@ -22528,6 +22593,31 @@ function (_PureService) {
 
   return SNComponentManager;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__["PureService"]);
+
+/***/ }),
+
+/***/ "./lib/services/device_auth/challenge_response.js":
+/*!********************************************************!*\
+  !*** ./lib/services/device_auth/challenge_response.js ***!
+  \********************************************************/
+/*! exports provided: ChallengeResponse */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChallengeResponse = function ChallengeResponse(_ref) {
+  var challenge = _ref.challenge,
+      value = _ref.value;
+
+  _classCallCheck(this, ChallengeResponse);
+
+  this.challenge = challenge;
+  this.value = value;
+  Object.freeze(this);
+};
 
 /***/ }),
 
@@ -22736,31 +22826,6 @@ function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/device_auth/response.js":
-/*!**********************************************!*\
-  !*** ./lib/services/device_auth/response.js ***!
-  \**********************************************/
-/*! exports provided: ChallengeResponse */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ChallengeResponse = function ChallengeResponse(_ref) {
-  var challenge = _ref.challenge,
-      value = _ref.value;
-
-  _classCallCheck(this, ChallengeResponse);
-
-  this.challenge = challenge;
-  this.value = value;
-  Object.freeze(this);
-};
-
-/***/ }),
-
 /***/ "./lib/services/history/functions.js":
 /*!*******************************************!*\
   !*** ./lib/services/history/functions.js ***!
@@ -22830,6 +22895,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * The history manager is presently responsible for transient 'session history',
+ * which include keeping track of changes made in the current application session.
+ * These change logs (unless otherwise configured) are ephemeral and do not persist
+ * past application restart.
+ * In the future the history manager will also be responsible for remote server history.
+ */
 
 var SNHistoryManager =
 /*#__PURE__*/
@@ -23578,7 +23651,7 @@ function (_ItemHistoryEntry) {
       } else if (this.textCharDiffLength > 0) {
         return "".concat(this.textCharDiffLength, " characters added");
       } else {
-        return "Title or metadata changed";
+        return 'Title or metadata changed';
       }
     }
   }]);
@@ -23626,6 +23699,10 @@ var HTTP_VERB_PATCH = 'patch';
 var REQUEST_READY_STATE_COMPLETED = 4;
 var HTTP_STATUS_MIN_SUCCESS = 200;
 var HTTP_STATUS_MAX_SUCCESS = 299;
+/**
+ * A framework-agnostic wrapper for XMLHttpRequests
+ */
+
 var SNHttpService =
 /*#__PURE__*/
 function (_PureService) {
@@ -23849,7 +23926,7 @@ function (_PureService) {
 /*!*******************************!*\
   !*** ./lib/services/index.js ***!
   \*******************************/
-/*! exports provided: SNAlertService, SNSessionManager, SNApiService, SNComponentManager, SNHttpService, SNModelManager, SNSingletonManager, SNActionsService, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesService, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncManager, SyncModes, DeviceAuthService, SNStorageService, StorageEncryptionPolicies, StoragePersistencePolicies */
+/*! exports provided: SNAlertService, SNSessionManager, SNApiService, SNComponentManager, SNHttpService, SNModelManager, SNSingletonManager, SNActionsService, SNMigrationService, SNProtocolService, SNHistoryManager, SNPrivilegesService, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, ItemsKeyManager, SyncEvents, SNSyncService, SyncModes, DeviceAuthService, SNStorageService, StorageEncryptionPolicies, StoragePersistencePolicies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23902,7 +23979,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_14__["SyncEvents"]; });
 
 /* harmony import */ var _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Services/sync/sync_service */ "./lib/services/sync/sync_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SNSyncManager"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SNSyncService"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["SyncModes"]; });
 
@@ -23980,6 +24057,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 /** The last protocol version to not use root-key based items keys */
 
 var LAST_NONROOT_ITEMS_KEY_VERSION = _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].V003;
+/**
+ * The items key manager manages the lifecycle of items keys.
+ * It is responsible for creating the default items key when conditions call for it
+ * (such as after the first sync completes and no key exists).
+ * It also exposes public methods that allows consumers to retrieve an items key
+ * for a particular payload, and also retrieve all available items keys.
+ */
+
 var ItemsKeyManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -24499,6 +24584,19 @@ var KEY_MODE_ROOT_KEY_PLUS_WRAPPER = 2;
 /** i.e No account, but passcode */
 
 var KEY_MODE_WRAPPER_ONLY = 3;
+/** 
+ * The key manager is responsible for managing root key and root key wrapper states.
+ * When the key manager is initialized, it initiates itself with a keyMode, which 
+ * dictates the entire flow of key management. The key manager's responsibilities include:
+ * - interacting with the device keychain to save or clear the root key
+ * - interacting with storage to save root key params or wrapper params, or the wrapped root key.
+ * - exposing methods that allow the application to unwrap the root key (unlock the application)
+ * 
+ * It also exposes two primary methods for determing what key should be used to encrypt
+ * or decrypt a particular payload. Some payloads are encrypted directly with the rootKey
+ * (such as itemsKeys and encryptedStorage). Others are encrypted with itemsKeys (notes, tags, etc).
+ */
+
 var SNKeyManager =
 /*#__PURE__*/
 function (_PureService) {
@@ -24621,11 +24719,6 @@ function (_PureService) {
           }
         }
       }, null, this);
-    }
-  }, {
-    key: "hasPasscode",
-    value: function hasPasscode() {
-      return this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
     }
     /**
      * @param callback  A function that takes in a content type to call back when root
@@ -24827,9 +24920,20 @@ function (_PureService) {
       }, null, this);
     }
     /**
-    * @access public
-    * Returns true if the root key has not yet been unwrapped (passcode locked).
-    */
+     * @access public
+     * A non-async alternative to `hasRootKeyWrapper` which uses pre-loaded state
+     * to determine if a passcode is configured.
+     */
+
+  }, {
+    key: "hasPasscode",
+    value: function hasPasscode() {
+      return this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER;
+    }
+    /**
+     * @access public
+     * Returns true if the root key has not yet been unwrapped (passcode locked).
+     */
 
   }, {
     key: "rootKeyNeedsUnwrapping",
@@ -24864,7 +24968,7 @@ function (_PureService) {
     /**
      * @access public
      * @returns  Key params object containing root key wrapper key params
-    */
+     */
 
   }, {
     key: "getRootKeyWrapperKeyParams",
@@ -24900,7 +25004,7 @@ function (_PureService) {
     /**
      * @access private
      * @returns  Plain object containing persisted wrapped (encrypted) root key
-    */
+     */
 
   }, {
     key: "getWrappedRootKeyFromStorage",
@@ -25791,6 +25895,17 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * The model manager is responsible for keeping state regarding what items exist in the
+ * global application state. It does so by exposing functions that allow consumers to 'map'
+ * a detached payload into global application state. Whenever a change is made or retrieved
+ * from any source, it must be mapped in order to be properly reflected in global application state.
+ * The model manager deals only with in-memory state, and does not deal directly with storage.
+ * It also serves as a query store, and can be queried for current notes, tags, etc.
+ * It exposes methods that allow consumers to listen to mapping events. This is how
+ * applications 'stream' items to display in the interface.
+ */
 
 var SNModelManager =
 /*#__PURE__*/
@@ -28114,6 +28229,16 @@ var PRIVILEGE_SESSION_LENGTH_NONE = 0;
 var PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
 var PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
 var PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
+/** 
+ * Privileges allows certain actions within the application to require extra authentication.
+ * For example, the privileges service exposes functions that allow the action of deleting
+ * a note or viewing a note to require extra authentication.
+ * Privileges are a superficial-level locking feature; they do not deal at all with underlying
+ * data state. For example, viewing a protected note may require extra authentication,
+ * but the underlying note data may already be decrypted in application memory, whether or not
+ * the user has yet authenticated this action.
+ */
+
 var SNPrivilegesService =
 /*#__PURE__*/
 function (_PureService) {
@@ -28633,12 +28758,12 @@ function (_PureService) {
     value: function displayInfoForCredential(credential) {
       var metadata = {};
       metadata[PrivilegeCredentials.AccountPassword] = {
-        label: "Account Password",
-        prompt: "Please enter your account password."
+        label: 'Account Password',
+        prompt: 'Please enter your account password.'
       };
       metadata[PrivilegeCredentials.LocalPasscode] = {
-        label: "Local Passcode",
-        prompt: "Please enter your local passcode."
+        label: 'Local Passcode',
+        prompt: 'Please enter your local passcode.'
       };
       return metadata[credential];
     }
@@ -28647,22 +28772,22 @@ function (_PureService) {
     value: function displayInfoForAction(action) {
       var metadata = {};
       metadata[ProtectedActions.ManageExtensions] = {
-        label: "Manage Extensions"
+        label: 'Manage Extensions'
       };
       metadata[ProtectedActions.ManageBackups] = {
-        label: "Download/Import Backups"
+        label: 'Download/Import Backups'
       };
       metadata[ProtectedActions.ViewProtectedNotes] = {
-        label: "View Protected Notes"
+        label: 'View Protected Notes'
       };
       metadata[ProtectedActions.ManagePrivileges] = {
-        label: "Manage Privileges"
+        label: 'Manage Privileges'
       };
       metadata[ProtectedActions.ManagePasscode] = {
-        label: "Manage Passcode"
+        label: 'Manage Passcode'
       };
       metadata[ProtectedActions.DeleteNote] = {
-        label: "Delete Notes"
+        label: 'Delete Notes'
       };
       return metadata[action];
     }
@@ -28674,13 +28799,13 @@ function (_PureService) {
         label: "Don't Remember"
       }, {
         value: PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES,
-        label: "5 Minutes"
+        label: '5 Minutes'
       }, {
         value: PRIVILEGE_SESSION_LENGTH_ONE_HOUR,
-        label: "1 Hour"
+        label: '1 Hour'
       }, {
         value: PRIVILEGE_SESSION_LENGTH_ONE_WEEK,
-        label: "1 Week"
+        label: '1 Week'
       }];
     }
   }]);
@@ -28736,6 +28861,17 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * The protocol service is responsible for the encryption and decryption of payloads, and
+ * handles delegation of a task to the respective protocol operator. Each version of the protocol
+ * (001, 002, 003, 004, etc) uses a respective operator version to perform encryption operations.
+ * Operators are located in /protocol/operator.
+ * The protocol service depends on the keyManager for determining which key to use for the 
+ * encryption and decryption of a particular payload.
+ * The protocol service is also responsible for dictating which protocol versions are valid,
+ * and which are no longer valid or not supported.
+ */
 
 var SNProtocolService =
 /*#__PURE__*/
@@ -28872,9 +29008,11 @@ function (_PureService) {
   }, {
     key: "supportsPasswordDerivationCost",
     value: function supportsPasswordDerivationCost(cost) {
-      // Some passwords are created on platforms with stronger pbkdf2 capabilities, like iOS or WebCrypto,
-      // if user has high password cost and is using browser that doesn't support WebCrypto,
-      // we want to tell them that they can't login with this browser.
+      /** 
+       * Some passwords are created on platforms with stronger pbkdf2 capabilities, like 
+       * iOS or WebCrypto, if user has high password cost and is using browser that doesn't 
+       * support WebCrypto, we want to tell them that they can't login with this browser.
+       */
       if (cost > 5000) {
         return this.crypto instanceof sncrypto__WEBPACK_IMPORTED_MODULE_1__["SNWebCrypto"];
       } else {
@@ -29449,7 +29587,7 @@ function (_PureService) {
               throw _context11.t0;
 
             case 33:
-              console.error("Error decrypting payload", encryptedPayload, _context11.t0);
+              console.error('Error decrypting payload', encryptedPayload, _context11.t0);
 
             case 34:
               _iteratorNormalCompletion2 = true;
@@ -29900,7 +30038,7 @@ function () {
     value: function log(message) {
       if (this.loggingEnabled) {
         var date = new Date();
-        var timeString = date.toLocaleTimeString().replace(" PM", "").replace(" AM", "");
+        var timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');
         var string = "".concat(timeString, ".").concat(date.getMilliseconds());
 
         for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -29962,6 +30100,20 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * The singleton manager allow consumers to ensure that only 1 item exists of a certain
+ * predicate. For example, consumers may want to ensure that only one item of contentType
+ * UserPreferences exist. The singleton manager allows consumers to do this via 2 methods:
+ * 1. Consumers may use `findOrCreateSingleton` to retrieve an item if it exists, or create
+ *    it otherwise. While this method may serve most cases, it does not allow the consumer 
+ *    to subscribe to changes, such as if after this method is called, a UserPreferences object
+ *    is downloaded from a remote source.
+ * 2. Consumers may use `registerPredicate` in order to constantly monitor a particular
+ *    predicate and ensure that only 1 value exists for that predicate. This may be used in
+ *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we 
+ *    intitially create the item.
+ */
 
 var SNSingletonManager =
 /*#__PURE__*/
@@ -30036,6 +30188,12 @@ function (_PureService) {
         });
       });
     }
+    /**
+     * Predicates registered are automatically observed. If global item state changes
+     * such that the item(s) match the predicate, procedures will be followed such that
+     * the end result is that only 1 item remains, and the others are deleted.
+     */
+
   }, {
     key: "registerPredicate",
     value: function registerPredicate(predicate) {
@@ -30426,6 +30584,17 @@ var ValueModesKeys = {
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped: 'nonwrapped'
 };
+/**
+ * The storage service is responsible for persistence of both simple key-values, and payload
+ * storage. It does so by relying on deviceInterface to save and retrieve raw values and payloads.
+ * For simple key/values, items are grouped together in an in-memory hash, and persisted to disk
+ * as a single object (encrypted, when possible). It handles persisting payloads in the local 
+ * database by encrypting the payloads when possible.
+ * The storage service also exposes methods that allow the application to initially
+ * decrypt the persisted key/values, and also a method to determine whether a particular
+ * key can decrypt wrapped storage.
+ */
+
 var SNStorageService =
 /*#__PURE__*/
 function (_PureService) {
@@ -30923,7 +31092,7 @@ function (_PureService) {
       return this.constructor.domainKeyForMode(mode);
     }
     /**
-     *  Clears simple values from storage only. Does not affect payloads.
+     * Clears simple values from storage only. Does not affect payloads.
      */
 
   }, {
@@ -30944,9 +31113,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /**
-     * Payload Storage
-     */
+    /** Payload Storage */
 
   }, {
     key: "getAllRawPayloads",
@@ -31196,10 +31363,6 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /**
-     * General
-     */
-
   }, {
     key: "clearAllData",
     value: function clearAllData() {
@@ -31381,12 +31544,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var DEFAULT_UP_DOWN_LIMIT = 150;
+/**
+ * A long running operation that handles multiple roundtrips from a server,
+ * emitting a stream of values that should be acted upon in real time.
+ */
+
 var AccountSyncOperation =
 /*#__PURE__*/
 function () {
   /**
-   * A long running operation that handles multiple roundtrips from a server,
-   * emitting a stream of values that should be acted upon in real time.
    * @param payloads   An array of payloads to send to the server
    * @param receiver   A function that recieves callback multiple times during the operation
    *                   and takes two parameters: (payloads, actions)
@@ -31432,17 +31598,8 @@ function () {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (!this.cancleled) {
-                _context.next = 2;
-                break;
-              }
-
-              return _context.abrupt("return");
-
-            case 2:
               payloads = this.popPayloads(this.upLimit);
-              this.lockCancelation();
-              _context.next = 6;
+              _context.next = 3;
               return regeneratorRuntime.awrap(this.apiService.sync({
                 payloads: payloads,
                 lastSyncToken: this.lastSyncToken,
@@ -31451,50 +31608,29 @@ function () {
                 checkIntegrity: this.checkIntegrity
               }));
 
-            case 6:
+            case 3:
               rawResponse = _context.sent;
               response = new _Services_sync_account_response__WEBPACK_IMPORTED_MODULE_1__["AccountSyncResponse"](rawResponse);
-              this.unlockCancelation();
               this.responses.push(response);
               this.lastSyncToken = response.lastSyncToken;
               this.paginationToken = response.paginationToken;
-              _context.next = 14;
+              _context.next = 10;
               return regeneratorRuntime.awrap(this.receiver(response, _Services_sync_signals__WEBPACK_IMPORTED_MODULE_2__["SIGNAL_TYPE_RESPONSE"]));
 
-            case 14:
+            case 10:
               if (this.done) {
-                _context.next = 16;
+                _context.next = 12;
                 break;
               }
 
               return _context.abrupt("return", this.run());
 
-            case 16:
+            case 12:
             case "end":
               return _context.stop();
           }
         }
       }, null, this);
-    }
-  }, {
-    key: "lockCancelation",
-    value: function lockCancelation() {
-      this.cancelable = false;
-    }
-  }, {
-    key: "unlockCancelation",
-    value: function unlockCancelation() {
-      this.cancelable = true;
-    }
-  }, {
-    key: "tryCancel",
-    value: function tryCancel() {
-      if (!this.cancelable) {
-        this.cancleled = true;
-        return true;
-      } else {
-        return false;
-      }
     }
   }, {
     key: "payloadsSavedOrSaving",
@@ -31738,6 +31874,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
+/**
+ * Given a remote sync response, the resolver applies the incoming changes on top
+ * of the current base state, and returns what the new global state should look like.
+ * The response resolver is purely functional and does not modify global state, but instead
+ * offers the 'recommended' new global state given a sync response and a current base state.
+ */
 
 var AccountSyncResponseResolver =
 /*#__PURE__*/
@@ -32170,7 +32313,7 @@ function () {
 /*!*******************************************!*\
   !*** ./lib/services/sync/sync_service.js ***!
   \*******************************************/
-/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SyncModes, SyncSources, SNSyncManager */
+/*! exports provided: TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SyncModes, SyncSources, SNSyncService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -32179,7 +32322,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return TIMING_STRATEGY_FORCE_SPAWN_NEW; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return SyncModes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return SyncSources; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncManager", function() { return SNSyncManager; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return SNSyncService; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.js");
@@ -32267,12 +32410,22 @@ var SyncSources = {
   IntegrityCheck: 6,
   ResolveOutOfSync: 7
 };
-var SNSyncManager =
+/** 
+ * The sync service orchestrates with the model manager, api service, and storage service
+ * to ensure consistent state between the three. When a change is made to an item, consumers
+ * call the sync service's sync function to first persist pending changes to local storage.
+ * Then, the items are uploaded to the server. The sync service handles server responses,
+ * including mapping any retrieved items to application state via model manager mapping.
+ * After each sync request, any changes made or retrieved are also persisted locally.
+ * The sync service largely does not perform any task unless it is called upon.
+ */
+
+var SNSyncService =
 /*#__PURE__*/
 function (_PureService) {
-  _inherits(SNSyncManager, _PureService);
+  _inherits(SNSyncService, _PureService);
 
-  function SNSyncManager(_ref) {
+  function SNSyncService(_ref) {
     var _this;
 
     var sessionManager = _ref.sessionManager,
@@ -32282,9 +32435,9 @@ function (_PureService) {
         apiService = _ref.apiService,
         interval = _ref.interval;
 
-    _classCallCheck(this, SNSyncManager);
+    _classCallCheck(this, SNSyncService);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSyncManager).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSyncService).call(this));
     _this.sessionManager = sessionManager;
     _this.protocolService = protocolService;
     _this.modelManager = modelManager;
@@ -32308,7 +32461,7 @@ function (_PureService) {
     return _this;
   }
 
-  _createClass(SNSyncManager, [{
+  _createClass(SNSyncService, [{
     key: "initializeStatus",
     value: function initializeStatus() {
       var _this2 = this;
@@ -33353,7 +33506,7 @@ function (_PureService) {
           switch (_context15.prev = _context15.next) {
             case 0:
               payloads = _ref4.payloads, checkIntegrity = _ref4.checkIntegrity, source = _ref4.source, mode = _ref4.mode;
-              this.log('Syncing online user', "source:", source, "mode:", mode, "payloads:", payloads);
+              this.log('Syncing online user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
               _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_7__["AccountSyncOperation"];
               _context15.t1 = this.apiService;
               _context15.t2 = payloads;
@@ -33898,7 +34051,7 @@ function (_PureService) {
             case 7:
               _context24.prev = 7;
               _context24.t0 = _context24["catch"](0);
-              console.error("Error computing data integrity hash", _context24.t0);
+              console.error('Error computing data integrity hash', _context24.t0);
               return _context24.abrupt("return", null);
 
             case 11:
@@ -33915,7 +34068,7 @@ function (_PureService) {
         while (1) {
           switch (_context25.prev = _context25.next) {
             case 0:
-              _get(_getPrototypeOf(SNSyncManager.prototype), "deinit", this).call(this);
+              _get(_getPrototypeOf(SNSyncService.prototype), "deinit", this).call(this);
 
               this.state.reset();
               this.opStatus.reset();
@@ -34053,7 +34206,7 @@ function (_PureService) {
     }
   }]);
 
-  return SNSyncManager;
+  return SNSyncService;
 }(_Services_pure_service__WEBPACK_IMPORTED_MODULE_1__["PureService"]);
 
 /***/ }),
@@ -34661,7 +34814,7 @@ function deepFreeze(object) {
     for (var _iterator7 = propNames[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
       var name = _step7.value;
       var value = object[name];
-      object[name] = value && _typeof(value) === "object" ? deepFreeze(value) : value;
+      object[name] = value && _typeof(value) === 'object' ? deepFreeze(value) : value;
     }
   } catch (err) {
     _didIteratorError7 = true;
@@ -34689,7 +34842,7 @@ function sleep(milliseconds) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          console.warn("Sleeping for", milliseconds);
+          console.warn('Sleeping for', milliseconds);
           return _context.abrupt("return", new Promise(function (resolve, reject) {
             setTimeout(function () {
               resolve();
