@@ -107,7 +107,20 @@ app.streamItems({
 });
 ```
 
+## Building
+
+1. `npm install`
+2. `npm run start` or `npm run bundle`.
+
+## Tests
+
+Tests must be run in the browser due to WebCrypto dependency.
+
+1. `node test-server.js`
+2. Open browser to `http://localhost:9001/test/test.html`.
+
 ## Notes
 - SNJS uses an asynchronous API. All functions are asynchronous, and return immediately even if they have not finished. Add `.then()` to every call to be notified of the result, or use `await` if you don't want to use callbacks.
+- 
 ## Help
 Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.
