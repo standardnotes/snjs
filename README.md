@@ -119,6 +119,8 @@ Tests must be run in the browser due to WebCrypto dependency.
 1. `node test-server.js`
 2. Open browser to `http://localhost:9001/test/test.html`.
 
+_Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test.
+
 ## Notes
 - SNJS uses an asynchronous API. All functions are asynchronous, and return immediately even if they have not finished. Add `.then()` to every call to be notified of the result, or use `await` if you don't want to use callbacks.
 - 

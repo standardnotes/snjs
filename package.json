@@ -37,7 +37,7 @@
     "regenerator-runtime": "^0.13.3",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
-    "sncrypto": "file:~/Desktop/sn/dev/sncrypto",
+    "sncrypto": "github:standardnotes/sncrypto#42fd703d52fdad016935165dbd2214aaf26825d3",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },

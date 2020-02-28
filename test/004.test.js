@@ -82,7 +82,7 @@ describe('004 protocol operations', () => {
     expect(decString).to.equal(text);
   });
 
-  it.skip('fails to decrypt non-matching aad', async () => {
+  it('fails to decrypt non-matching aad', async () => {
     const text = "hello world";
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
@@ -100,7 +100,7 @@ describe('004 protocol operations', () => {
       nonce: nonce,
       aad: nonmatchingAad
     });
-    expect(decString).to.not.equal(text);
+    expect(decString).to.not.be.ok;
   });
 
   it('generates existing keys for key params', async () => {

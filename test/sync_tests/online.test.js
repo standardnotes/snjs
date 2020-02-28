@@ -46,11 +46,11 @@ describe('online syncing', () => {
 
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const items = this.application.modelManager.allItems;
     expect(items.length).to.equal(this.expectedItemCount);
-    await this.application.deinit();
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    await this.application.deinit();
   });
 
   function noteObjectsFromObjects(items) {
@@ -88,7 +88,7 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it("can complete multipage sync on sign in", async function () {
-    const count = 10;
+    const count = 0;
     await Factory.createManyMappedNotes(this.application, count);
     this.expectedItemCount += count;
     await this.application.sync();
@@ -100,10 +100,10 @@ describe('online syncing', () => {
       password: this.password
     });
     /** Throw in some random syncs to cause trouble */
-    const syncCount = 10;
+    const syncCount = 30;
     for(let i = 0; i < syncCount; i++) {
       this.application.sync();
-      await Factory.sleep(0.1);
+      await Factory.sleep(0.01);
     }
     await promise;
     expect(promise).to.be.fulfilled;
