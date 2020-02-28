@@ -36,13 +36,7 @@ module.exports = {
       new CopyPlugin([
         { from: 'node_modules/sncrypto/dist/libsodium.bundle.js', to: 'libsodium.bundle.js' },
         { from: 'node_modules/sncrypto/dist/vendors~libsodium.bundle.js', to: 'vendors~libsodium.bundle.js' },
-      ]),
-      new JsDocPlugin({
-        conf: 'jsdoc.json',
-        cwd: '.',
-        preserveTmpFile: false,
-        recursive: false
-      })
+      ])
     ],
     stats: {
       colors: true
