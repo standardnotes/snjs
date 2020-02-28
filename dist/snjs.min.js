@@ -19232,7 +19232,7 @@ var REQUEST_READY_STATE_COMPLETED = 4;
 var HTTP_STATUS_MIN_SUCCESS = 200;
 var HTTP_STATUS_MAX_SUCCESS = 299;
 /**
- * A framework-agnostic wrapper for XMLHttpRequests
+ * A non-SNJS specific wrapper for XMLHttpRequests
  */
 
 var SNHttpService =
