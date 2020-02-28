@@ -4,7 +4,25 @@
 
 The 004 protocol upgrade centers around a system that makes it easy and painless to upgrade to a future protocol version, as well as more modern cryptographic primitives.
 
-_Note: this document largely documents only areas where procedures will have changed with respect to the previous version, 003. Some procedures, such as the auth\_params endpoint, are not documented below, but may be looked up in the respective version's specification document._
+### Introduction
+
+The Standard Notes Protocol describes a set of procedures that ensure client-side encryption of data in such a way that makes it impossible for the server, which houses the data, to read or decrypt the data. It treats the server as a dumb data-store that simply saves and returns values on demand.
+
+Even in scenarios when the server is under active attack, clients should be fully protected, and cannot be tricked into revealing any sensitive information.
+
+The client and server communicate under two common procedures: authentication, and syncing.
+
+Authentication is a one-time transfer of information between client and server. In short, clients generate a long secret key by stretching a user-inputted password using a KDF. The first half of that key is kept locally as the "master key" and is never revealed to the server. The second half of that key is sent to the server as the "account server password".
+
+The master key is then used to encrypt an arbitrary amount of items keys. Items keys are generated randomly and not based on the account password. Items keys are used to encrypt syncable data, like notes, tags, and user preferences. Items keys themselves are also synced to user accounts, and are encrypted directly with the master key.
+
+When a user's master key changes, all items keys must be re-encrypted with the new master key. Accounts should generally have one items key per protocol version, so even in the event where many protocol upgrades are created, only a few KB of data must be re-encrypted when a user's credentials change (as opposed to completely re-encrypting many megabytes or gigabytes of data).
+
+Data is also encrypted client-side for on-device storage. When an account is present, all local data is encrypted by default, including simple key-value storage (similar to a localStorage-like store). Persistence stores are always encrypted with the account master key, and the master key is stored in the device's secure keychain (when available).
+
+Clients also have the option of configuring an application passcode, which wraps the account master key with an additional layer of encryption. Having a passcode enabled is referred to as having a "root key wrapper" enabled. When a root key is wrapped, it's stored in local storage as an encrypted payload, and the keychain is bypassed. This allows for secure key storage even in environments that don't expose a keychain, such as web browsers.
+
+This document delineates client-side procedures for key management and generation, data encryption, and storage encryption. Concepts related to server syncing and server session management are outside the scope of this document. This document however wholly covers any values that a server would receive, so even though syncing and server session management is out of scope, the procedures outlined in this document should guarantee that no secret value is ever revealed to the server.
 
 ### Key Management
 

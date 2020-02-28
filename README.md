@@ -123,6 +123,6 @@ _Note:_ Many tests involve registering for a new account as part of the `beforeE
 
 ## Notes
 - SNJS uses an asynchronous API. All functions are asynchronous, and return immediately even if they have not finished. Add `.then()` to every call to be notified of the result, or use `await` if you don't want to use callbacks.
-- 
+
 ## Help
 Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.
