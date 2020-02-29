@@ -12,40 +12,40 @@ The client and server communicate under two common procedures: authentication, a
 
 Authentication is a one-time transfer of information between client and server. In short, clients generate a long secret key by stretching a user-inputted password using a KDF. The first half of that key is kept locally as the "master key" and is never revealed to the server. The second half of that key is sent to the server as the "account server password".
 
-The master key is then used to encrypt an arbitrary amount of items keys. Items keys are generated randomly and not based on the account password. Items keys are used to encrypt syncable data, like notes, tags, and user preferences. Items keys themselves are also synced to user accounts, and are encrypted directly with the master key.
+The master key is then used to encrypt an arbitrary number of items keys. Items keys are generated randomly and not based on the account password. Items keys are used to encrypt syncable data, like notes, tags, and user preferences. Items keys themselves are also synced to user accounts, and are encrypted directly with the master key.
 
 When a user's master key changes, all items keys must be re-encrypted with the new master key. Accounts should generally have one items key per protocol version, so even in the event where many protocol upgrades are created, only a few KB of data must be re-encrypted when a user's credentials change (as opposed to completely re-encrypting many megabytes or gigabytes of data).
 
 Data is also encrypted client-side for on-device storage. When an account is present, all local data is encrypted by default, including simple key-value storage (similar to a localStorage-like store). Persistence stores are always encrypted with the account master key, and the master key is stored in the device's secure keychain (when available).
 
-Clients also have the option of configuring an application passcode, which wraps the account master key with an additional layer of encryption. Having a passcode enabled is referred to as having a "root key wrapper" enabled. When a root key is wrapped, it's stored in local storage as an encrypted payload, and the keychain is bypassed. This allows for secure key storage even in environments that don't expose a keychain, such as web browsers.
+Clients also have the option of configuring an application passcode, which wraps the account master key with an additional layer of encryption. Having a passcode enabled is referred to as having a "root key wrapper" enabled. When a root key is wrapped, it is stored in local storage as an encrypted payload, and the keychain is bypassed. This allows for secure key storage even in environments that don't expose a keychain, such as web browsers.
 
 This document delineates client-side procedures for key management and generation, data encryption, and storage encryption. Concepts related to server syncing and server session management are outside the scope of this document. This document however wholly covers any values that a server would receive, so even though syncing and server session management is out of scope, the procedures outlined in this document should guarantee that no secret value is ever revealed to the server.
 
 ## Key Management
 
-**There are three main concepts when it comes to keys:**
+**There are three main concepts as related to keys:**
 
 1. **A root key**—based on an account's user-inputted password. There exists only one root key per account.
-2. **A root key wrapper**—_wraps_ a root key (encrypts it) with an additional layer. This is a local-only construct, and translates directly as an 'app passcode' feature.
-3. **Items keys**—used to encrypt items. There can exist many items keys. Each items key is encrypted with the root key. When the root key changes, all items keys must be re-encrypted using the new root key.
+2. **A root key wrapper**—_wraps_ a root key (encrypts it) with an additional layer. This is a local-only construct, and translates directly as an "application passcode" feature.
+3. **Items keys**—used to encrypt items. There can exist many items keys, and one items key can encrypt many items. Each items key is encrypted with the root key. When the root key changes, all items keys must be re-encrypted using the new root key.
 
 ### Key Generation Flow
 
 1. User registers with an email (`identifier`) and a `password`.
-2. `password` is run through KDF to generate 512-bit key, which is then split in two, as part of a single `rootKey`.
+2. `password` is run through a KDF to generate a key, which is then split in two, as part of a single `rootKey`.
    1. The first half is the `masterKey`.
    2. The second half is the `serverPassword`.
 3. Client registers user account with server using `email` and `rootKey.serverPassword`.
-4. Client creates new random 256-bit key `itemsKey`. This key is encrypted directly with `rootKey.masterKey`, and the encrypted `itemsKey` is assigned a UUID and uploaded to the user's account. (Each `itemsKey` is a traditional item, just like a note or tag.)
+4. Client creates new random key `itemsKey`. This key is encrypted directly with `rootKey.masterKey`, and the encrypted `itemsKey` is assigned a UUID and uploaded to the user's account. (Each `itemsKey` is a traditional item, just like a note or tag.)
 
 ### Password change or protocol upgrade flow
 
 **When a user changes their password, or when a new protocol version is available:**
 
-1. Client generates new `rootKey` using account identifier and password, and thus generates new `rootKey.masterKey` and `rootKey.serverPassword` and `keyParams`, which include the protocol version and other public information used to guide clients on generating the `rootKey` given a user password.
-2. Client submits new `rootKey.serverPassword` to server. Note that the changing the `serverPassword` does not necessarily invalidate a user's session. Sessions are handled through a separate server specification.
-3. Client loops through all `itemsKeys` and re-encrypts them with new `rootKey.masterKey`. All `itemsKeys` are then re-uploaded to server. Note that `itemsKey`s are immutable and their inner key does not change. The key is only re-encrypted using the new `masterKey`.
+1. Client generates new `rootKey` using account identifier and password, and thus generates new `rootKey.masterKey`, `rootKey.serverPassword`, and `keyParams`, which include the protocol version and other public information used to guide clients on generating the `rootKey` given a user password.
+2. Client submits new `rootKey.serverPassword` and `keyParams` to server. Note that the changing the `serverPassword` does not necessarily invalidate a user's session. Sessions management is outside of the scope of this document.
+3. Client loops through all `itemsKeys` and re-encrypts them with new `rootKey.masterKey`. All `itemsKeys` are then re-uploaded to server. Note that `itemsKeys` are immutable and their inner key never changes. The key is only re-encrypted using the new `masterKey`.
 
 This flow means that when a new protocol version is available or when a user changes their password, we do not need to re-encrypt all their data, but instead only a handful of keys.
 
@@ -61,19 +61,19 @@ By default, upgrading an account's protocol version will create a new `itemsKey`
 ## Encryption Flow
 
 _For each_ item (such as a note) the client wants to encrypt:
-1. Client generates random 256-bit `item_key` (note: singular. Not related to `itemsKey`). 
+1. Client generates random `item_key` (note: singular. Not related to `itemsKey`). 
 2. Client encrypts note content with `item_key`.
 3. Client encrypts `item_key` with default `itemsKey` as `enc_item_key`.
-4. Client notes `itemsKey` UUID and associates it with encrypted item payload as `items_key_id`, and uploads item to server.
+4. Client notes `itemsKey` UUID and associates it with encrypted item payload as `items_key_id`, and uploads payload to server.
 
 To decrypt an item payload:
-1. Client retrieves `itemsKey` matching `items_key_id` of item.
+1. Client retrieves `itemsKey` matching `items_key_id` of payload.
 2. Client decrypts item's `enc_item_key` as `item_key` using `itemsKey`.
 3. Client decrypts item's content using `item_key`.
 
 ## Authentication
 
-Registering for an account involves generating a rootKey and respective keyParams, according to the key generation flow above. The key params are uploaded to the server, and include:
+Registering for an account involves generating a `rootKey` and respective `keyParams`, according to the key generation flow above. The key parameters are uploaded to the server, and include:
 
 - unique identifier (email)
 - salt seed
@@ -81,9 +81,9 @@ Registering for an account involves generating a rootKey and respective keyParam
 
 To sign into an account, clients first make a request to the server to retrieve the key params for a given email. This endpoint is public and non-authenticated (unless the account has two-factor authentication enabled). The client then uses the retrieved key params to generate a `rootKey`, and uses the `rootKey.serverPassword` to authenticate the account. 
 
-Note that by default, the client trusts the protocol version the server reports. The client uses this protocol version to determine which cryptographic primitives (and their parameters) to use for key generation. This raises the question of, what happens if a malicious server underreports an account's version in order to weaken key generation parameters? For example, if a user's account is 004, but the server reports 002, then the client will proceed to generate a `serverPassword` using outdated primitives.
+Note that by default, the client trusts the protocol version the server reports. The client uses this protocol version to determine which cryptographic primitives (and their parameters) to use for key generation. This raises the question of, what happens if a malicious server underreports an account's version in order to weaken key generation parameters? For example, if a user's account is 004, but the server reports 002, the client will proceed to generate a `serverPassword` using outdated primitives.
 
-There are two safeguards to protect against this scenario:
+There are two safeguards against this scenario:
 
 1. Older protocol versions are expired and become no longer supported after a certain period.
 2. Clients may sign in with a flag known as "strict sign in" (SSI). SSI ensures that the client _always_ signs in with the client-side _hardcoded latest version_ of the protocol. For example, if a client with SNJS 004 support attempts to sign in with SSI enabled, and the server reports a protocol version of 002 for a given account, the client will refuse this sign-in, and will not proceed with key generation. SSI is a user-controlled option. Clients cannot be programmed to default to SSI, as otherwise, users would be unable to sign in to their account whenever a new protocol version is available.
@@ -95,14 +95,14 @@ Root key wrapping is a local-only construct that pertains to how the root key is
 Root key wrapping allows the client to encrypt the `rootKey` before storing it to disk. Wrapping a root key consists of:
 
 1. Client asks user to choose a "local passcode".
-2. The local passcode is run through the same key generation flow as account registration (using KDF) to generate a separate new root key known as the `rootKeyWrappingKey` (which likewise consists of a `masterKey` and an unused `serverPassword`).
+2. The local passcode is run through the same key generation flow as account registration (using a random UUID as the account identifier, in place of an email) to generate a separate new root key known as the `rootKeyWrappingKey` (which likewise consists of a `masterKey` and an unused `serverPassword`).
 3. The `rootKeyWrappingKey` is used to encrypt the `rootKey` as `wrappedRootKey`. The `wrappedRootKey` (along with `wrappingKeyKeyParams`) is stored directly in storage, and the keychain is cleared of previous unwrapped `rootKey`. (Some keychains have fixed payload size limit, so an encrypted payload may not always fit. For this reason `wrappedRootKey` is always stored directly in storage.)
 
 **To unwrap a root key:**
 
 1. Client displays an "Enter your local passcode" prompt to user.
 2. Client runs user-inputted password through key generation scheme (using stored `wrappingKeyKeyParams`) to generate a temporary `rootKeyWrappingKey`.
-3. Client attempts to decrypt `wrappedRootKey` using `rootKeyWrappingKey`. If the decryption process succeeds (no errors are thrown), the client successfully unlocks application, and keeps the unwrapped `rootKey` in application memory to aid in encryption and decryption of items (itemsKeys, to be exact).
+3. Client attempts to decrypt `wrappedRootKey` using `rootKeyWrappingKey`. If the decryption process succeeds (no errors are thrown), the client successfully unlocks application, and keeps the unwrapped `rootKey` in application memory to aid in encryption and decryption of items (or rather `itemsKeys`, to be exact).
 
 **The purpose of root key wrapping is many-fold:**
 
@@ -117,9 +117,9 @@ When a root key is wrapped, no information about the wrapper is persisted locall
 
 **There exists three types of storage:**
 
-1. **Value storage**: values such as user preferences, session token, and other app-specific values.
-2. **Payload storage**: encrypted item payloads (such as notes and tags).
-3. **Root key storage**: the primary root key.
+1. **Value storage**—values such as user preferences, session token, and other app-specific values.
+2. **Payload storage**—encrypted item payloads (such as notes and tags).
+3. **Root key storage**—the primary root key.
 
 How data is stored depends on different key scenarios.
 
@@ -190,8 +190,15 @@ Given a user `identifier` (email) and `password` (user password):
    1. `hash = SHA256Hex('identifier:seed')`
    2. `salt = hash.substring(0, 32)`
 3. Generate `derivedKey = argon2(password, salt, ITERATIONS, MEMORY, OUTPUT_LENGTH) `
-4. Generate `rootKey = {masterKey: derivedKey.firstHalf, serverPassword: derivedKey.secondHalf, version: '004'}`
-5. For account registration, `seed`, `serverPassword`, and `version` must be uploaded to the server.
+4. Generate `rootKey` as:
+   ``` 
+    {
+      masterKey: derivedKey.firstHalf, 
+      serverPassword: derivedKey.secondHalf, 
+      version: '004'
+    }
+    ```
+5. For account registration, `identifier`, `seed`, `serverPassword`, and `version` must be uploaded to the server.
 
 **Understanding the salt `seed`:**
 
