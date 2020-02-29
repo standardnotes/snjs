@@ -1,7 +1,8 @@
-// Used for running mocha tests
-
-var connect = require('connect');
-var serveStatic = require('serve-static');
-connect().use(serveStatic(__dirname)).listen(9001, function(){
-    console.info('Server running on 9001...');
+/* Used for running mocha tests */
+const connect = require('connect');
+const serveStatic = require('serve-static');
+const port = 9001;
+connect().use(serveStatic(__dirname)).listen(port, () => {
+    console.log(`Tests server running on ${port}`);
+    console.log(`Open browser to localhost:${port}/test/test.html`);
 });

@@ -5,7 +5,6 @@
   "scripts": {
     "start": "webpack --mode development -w",
     "bundle": "webpack --mode production",
-    "test": "mocha --require babel-register",
     "docs": "jsdoc -c jsdoc.json"
   },
   "devDependencies": {
@@ -32,12 +31,11 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "exports-loader": "^0.7.0",
-    "jsdoc-webpack-plugin": "^0.3.0",
     "mocha": "^6.2.2",
     "regenerator-runtime": "^0.13.3",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
-    "sncrypto": "github:standardnotes/sncrypto#42fd703d52fdad016935165dbd2214aaf26825d3",
+    "sncrypto": "github:standardnotes/sncrypto#a119703a3225d0e75bb0302fbe5d82587843cf08",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },

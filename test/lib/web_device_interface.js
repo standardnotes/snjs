@@ -7,7 +7,7 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   async getAllRawStorageKeyValues() {
     const results = [];
-    for(const key of Object.keys(localStorage)) {
+    for (const key of Object.keys(localStorage)) {
       results.push({
         key: key,
         value: localStorage[key]
@@ -35,10 +35,10 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   _getDatabaseKeyPrefix() {
-    if(this.namespace) {
+    if (this.namespace) {
       return `${this.namespace}-item-`;
     } else {
-      return `item-`;
+      return 'item-';
     }
   }
 
@@ -48,8 +48,8 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   async getAllRawDatabasePayloads() {
     const models = [];
-    for(const key in localStorage) {
-      if(key.startsWith(this._getDatabaseKeyPrefix())) {
+    for (const key in localStorage) {
+      if (key.startsWith(this._getDatabaseKeyPrefix())) {
         models.push(JSON.parse(localStorage[key]));
       }
     }
@@ -64,7 +64,7 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   async saveRawDatabasePayloads(payloads) {
-    for(const payload of payloads) {
+    for (const payload of payloads) {
       await this.saveRawDatabasePayload(payload);
     }
   }
@@ -74,8 +74,8 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   async removeAllRawDatabasePayloads() {
-    for(const key in localStorage) {
-      if(key.startsWith(this._getDatabaseKeyPrefix())) {
+    for (const key in localStorage) {
+      if (key.startsWith(this._getDatabaseKeyPrefix())) {
         delete localStorage[key];
       }
     }
