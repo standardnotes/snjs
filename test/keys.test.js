@@ -341,7 +341,7 @@ describe('keys', () => {
       key: newRootKey
     });
     expect(decrypted3.errorDecrypting).to.not.be.ok;
-  });
+  }).timeout(5000);
 
   it('changing account password with key rotation option should create new items key', async function () {
     await Factory.registerUserToApplication({
@@ -424,5 +424,5 @@ describe('keys', () => {
     );
     const refreshedNotePayload = refreshedNotePayloads[0];
     expect(refreshedNotePayload.version).to.equal(latestVersion);
-  });
+  }).timeout(5000);
 });

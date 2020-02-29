@@ -307,17 +307,17 @@ function () {
 
             case 8:
               _context3.next = 10;
-              return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
+              return regeneratorRuntime.awrap(this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].StorageDecrypted_09));
 
             case 10:
+              _context3.next = 12;
+              return regeneratorRuntime.awrap(this.sessionManager.initializeFromDisk());
+
+            case 12:
               this.historyManager.initializeFromDisk();
               this.unlocked = true;
-              _context3.next = 14;
-              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].Launched));
-
-            case 14:
               _context3.next = 16;
-              return regeneratorRuntime.awrap(this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].StorageDecrypted_09));
+              return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_3__["ApplicationEvents"].Launched));
 
             case 16:
               _context3.next = 18;
@@ -3944,6 +3944,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
+/* harmony import */ var _services_api_session__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../services/api/session */ "./lib/services/api/session.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -3973,9 +3974,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var LEGACY_WEB_PASSCODE_PARAMS_KEY = 'offlineParams';
 var LEGACY_MOBILE_PASSCODE_PARAMS_KEY = 'pc_params';
 var LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY = 'auth_params';
+var LEGACY_ALL_SESSION_TOKEN_KEY = 'jwt';
 var LEGACY_WEB_ENCRYPTED_STORAGE_KEY = 'encryptedStorage';
 var LEGACY_MOBILE_WRAPPED_ROOT_KEY_KEY = 'encrypted_account_keys';
 var Migration20200115 =
@@ -4032,6 +4035,10 @@ function (_Migration) {
                 return regeneratorRuntime.awrap(_this.migrateArbitraryRawStorageToManagedStorageAllPlatforms());
 
               case 2:
+                _context2.next = 4;
+                return regeneratorRuntime.awrap(_this.migrateSessionStorage());
+
+              case 4:
               case "end":
                 return _context2.stop();
             }
@@ -4641,7 +4648,7 @@ function (_Migration) {
     /**
      * All platforms
      * Migrate all previously independently stored storage keys into new
-     * managed approach. These keys are ones that do not need to be renamed.
+     * managed approach.
      * @access private
      */
 
@@ -4754,6 +4761,45 @@ function (_Migration) {
     }
     /**
      * All platforms
+     * Migrate previously stored session string token into object
+     * @access private
+     */
+
+  }, {
+    key: "migrateSessionStorage",
+    value: function migrateSessionStorage() {
+      var currentToken, session;
+      return regeneratorRuntime.async(function migrateSessionStorage$(_context12) {
+        while (1) {
+          switch (_context12.prev = _context12.next) {
+            case 0:
+              _context12.next = 2;
+              return regeneratorRuntime.awrap(this.application.storageService.getValue(LEGACY_ALL_SESSION_TOKEN_KEY));
+
+            case 2:
+              currentToken = _context12.sent;
+
+              if (currentToken) {
+                _context12.next = 5;
+                break;
+              }
+
+              return _context12.abrupt("return");
+
+            case 5:
+              session = new _services_api_session__WEBPACK_IMPORTED_MODULE_9__["Session"](currentToken);
+              _context12.next = 8;
+              return regeneratorRuntime.awrap(this.application.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].Session, session));
+
+            case 8:
+            case "end":
+              return _context12.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * All platforms
      * Create new default SNItemsKey from root key.
      * Otherwise, when data is loaded, we won't be able to decrypt it
      * without existence of an item key. This will mean that if this migration
@@ -4767,47 +4813,47 @@ function (_Migration) {
     key: "createDefaultItemsKeyForAllPlatforms",
     value: function createDefaultItemsKeyForAllPlatforms() {
       var rootKey, rootKeyParams, itemsKey;
-      return regeneratorRuntime.async(function createDefaultItemsKeyForAllPlatforms$(_context12) {
+      return regeneratorRuntime.async(function createDefaultItemsKeyForAllPlatforms$(_context13) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
-              _context12.next = 2;
+              _context13.next = 2;
               return regeneratorRuntime.awrap(this.application.keyManager.getRootKey());
 
             case 2:
-              rootKey = _context12.sent;
+              rootKey = _context13.sent;
 
               if (!rootKey) {
-                _context12.next = 14;
+                _context13.next = 14;
                 break;
               }
 
-              _context12.next = 6;
+              _context13.next = 6;
               return regeneratorRuntime.awrap(this.application.keyManager.getRootKeyParams());
 
             case 6:
-              rootKeyParams = _context12.sent;
+              rootKeyParams = _context13.sent;
               itemsKey = _Models__WEBPACK_IMPORTED_MODULE_5__["SNItemsKey"].FromRaw({
                 itemsKey: rootKey.masterKey,
                 dataAuthenticationKey: rootKey.dataAuthenticationKey,
                 version: rootKeyParams.version
               });
-              _context12.next = 10;
+              _context13.next = 10;
               return regeneratorRuntime.awrap(itemsKey.initUUID());
 
             case 10:
-              _context12.next = 12;
+              _context13.next = 12;
               return regeneratorRuntime.awrap(this.application.modelManager.mapItem({
                 item: itemsKey
               }));
 
             case 12:
-              _context12.next = 14;
+              _context13.next = 14;
               return regeneratorRuntime.awrap(this.application.modelManager.setItemDirty(itemsKey));
 
             case 14:
             case "end":
-              return _context12.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -14250,40 +14296,29 @@ function (_PureService) {
         }
       }, null, this);
     }
-  }, {
-    key: "setSessionAuthentication",
-    value: function setSessionAuthentication(_ref2) {
-      var token;
-      return regeneratorRuntime.async(function setSessionAuthentication$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              token = _ref2.token;
-              this.sessionToken = token;
+    /** @access public */
 
-            case 2:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
+  }, {
+    key: "setSession",
+    value: function setSession(session) {
+      this.session = session;
     }
   }, {
     key: "path",
     value: function path(_path) {
       var host;
-      return regeneratorRuntime.async(function path$(_context4) {
+      return regeneratorRuntime.async(function path$(_context3) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              _context4.next = 2;
+              _context3.next = 2;
               return regeneratorRuntime.awrap(this.getHost());
 
             case 2:
-              host = _context4.sent;
+              host = _context3.sent;
 
               if (host) {
-                _context4.next = 5;
+                _context3.next = 5;
                 break;
               }
 
@@ -14291,18 +14326,18 @@ function (_PureService) {
 
             case 5:
               if (_path) {
-                _context4.next = 7;
+                _context3.next = 7;
                 break;
               }
 
               throw 'Attempting to build path with null path.';
 
             case 7:
-              return _context4.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["joinPaths"])(host, _path));
+              return _context3.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["joinPaths"])(host, _path));
 
             case 8:
             case "end":
-              return _context4.stop();
+              return _context3.stop();
           }
         }
       }, null, this);
@@ -14344,37 +14379,86 @@ function (_PureService) {
 
   }, {
     key: "getAccountKeyParams",
-    value: function getAccountKeyParams(_ref3) {
+    value: function getAccountKeyParams(_ref2) {
       var _this2 = this;
 
       var email, mfaKeyPath, mfaCode, url, params, response;
-      return regeneratorRuntime.async(function getAccountKeyParams$(_context5) {
+      return regeneratorRuntime.async(function getAccountKeyParams$(_context4) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              email = _ref3.email, mfaKeyPath = _ref3.mfaKeyPath, mfaCode = _ref3.mfaCode;
-              _context5.next = 3;
+              email = _ref2.email, mfaKeyPath = _ref2.mfaKeyPath, mfaCode = _ref2.mfaCode;
+              _context4.next = 3;
               return regeneratorRuntime.awrap(this.path(REQUEST_PATH_KEY_PARAMS));
 
             case 3:
-              url = _context5.sent;
+              url = _context4.sent;
               params = this.params(_defineProperty({
                 email: email
               }, mfaKeyPath, mfaCode));
-              _context5.next = 7;
+              _context4.next = 7;
               return regeneratorRuntime.awrap(this.httpService.getAbsolute({
                 url: url,
-                params: params,
-                authentication: this.sessionToken
+                params: params
               }).catch(function (errorResponse) {
                 return _this2.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
               }));
 
             case 7:
-              response = _context5.sent;
-              return _context5.abrupt("return", response);
+              response = _context4.sent;
+              return _context4.abrupt("return", response);
 
             case 9:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "register",
+    value: function register(_ref3) {
+      var _this3 = this;
+
+      var email, serverPassword, keyParams, url, params, response;
+      return regeneratorRuntime.async(function register$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              email = _ref3.email, serverPassword = _ref3.serverPassword, keyParams = _ref3.keyParams;
+
+              if (!this.registerInProgress) {
+                _context5.next = 3;
+                break;
+              }
+
+              return _context5.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
+
+            case 3:
+              this.registering = true;
+              _context5.next = 6;
+              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_REGISTER));
+
+            case 6:
+              url = _context5.sent;
+              params = this.params(_objectSpread({
+                password: serverPassword,
+                email: email
+              }, keyParams.getPortableValue()));
+              _context5.next = 10;
+              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
+                url: url,
+                params: params
+              }).catch(function (errorResponse) {
+                return _this3.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
+              }));
+
+            case 10:
+              response = _context5.sent;
+              this.registering = false;
+              return _context5.abrupt("return", response);
+
+            case 13:
             case "end":
               return _context5.stop();
           }
@@ -14382,47 +14466,46 @@ function (_PureService) {
       }, null, this);
     }
   }, {
-    key: "register",
-    value: function register(_ref4) {
-      var _this3 = this;
+    key: "signIn",
+    value: function signIn(_ref4) {
+      var _this4 = this;
 
-      var email, serverPassword, keyParams, url, params, response;
-      return regeneratorRuntime.async(function register$(_context6) {
+      var email, serverPassword, mfaKeyPath, mfaCode, url, params, response;
+      return regeneratorRuntime.async(function signIn$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              email = _ref4.email, serverPassword = _ref4.serverPassword, keyParams = _ref4.keyParams;
+              email = _ref4.email, serverPassword = _ref4.serverPassword, mfaKeyPath = _ref4.mfaKeyPath, mfaCode = _ref4.mfaCode;
 
-              if (!this.registerInProgress) {
+              if (!this.authenticating) {
                 _context6.next = 3;
                 break;
               }
 
-              return _context6.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
+              return _context6.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
 
             case 3:
-              this.registering = true;
+              this.authenticating = true;
               _context6.next = 6;
-              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_REGISTER));
+              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_LOGIN));
 
             case 6:
               url = _context6.sent;
-              params = this.params(_objectSpread({
-                password: serverPassword,
-                email: email
-              }, keyParams.getPortableValue()));
+              params = this.params(_defineProperty({
+                email: email,
+                password: serverPassword
+              }, mfaKeyPath, mfaCode));
               _context6.next = 10;
               return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
-                params: params,
-                authentication: this.sessionToken
+                params: params
               }).catch(function (errorResponse) {
-                return _this3.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
+                return _this4.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
               }));
 
             case 10:
               response = _context6.sent;
-              this.registering = false;
+              this.authenticating = false;
               return _context6.abrupt("return", response);
 
             case 13:
@@ -14433,47 +14516,47 @@ function (_PureService) {
       }, null, this);
     }
   }, {
-    key: "signIn",
-    value: function signIn(_ref5) {
-      var _this4 = this;
+    key: "changePassword",
+    value: function changePassword(_ref5) {
+      var _this5 = this;
 
-      var email, serverPassword, mfaKeyPath, mfaCode, url, params, response;
-      return regeneratorRuntime.async(function signIn$(_context7) {
+      var email, currentServerPassword, newServerPassword, newKeyParams, url, params, response;
+      return regeneratorRuntime.async(function changePassword$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
-              email = _ref5.email, serverPassword = _ref5.serverPassword, mfaKeyPath = _ref5.mfaKeyPath, mfaCode = _ref5.mfaCode;
+              email = _ref5.email, currentServerPassword = _ref5.currentServerPassword, newServerPassword = _ref5.newServerPassword, newKeyParams = _ref5.newKeyParams;
 
-              if (!this.authenticating) {
+              if (!this.changing) {
                 _context7.next = 3;
                 break;
               }
 
-              return _context7.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
+              return _context7.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
 
             case 3:
-              this.authenticating = true;
+              this.changing = true;
               _context7.next = 6;
-              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_LOGIN));
+              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_CHANGE_PW));
 
             case 6:
               url = _context7.sent;
-              params = this.params(_defineProperty({
-                email: email,
-                password: serverPassword
-              }, mfaKeyPath, mfaCode));
+              params = _objectSpread({
+                current_password: currentServerPassword,
+                new_password: newServerPassword
+              }, newKeyParams.getPortableValue());
               _context7.next = 10;
               return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
-                authentication: this.sessionToken
+                authentication: this.session.token
               }).catch(function (errorResponse) {
-                return _this4.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
+                return _this5.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]);
               }));
 
             case 10:
               response = _context7.sent;
-              this.authenticating = false;
+              this.changing = false;
               return _context7.abrupt("return", response);
 
             case 13:
@@ -14484,90 +14567,39 @@ function (_PureService) {
       }, null, this);
     }
   }, {
-    key: "changePassword",
-    value: function changePassword(_ref6) {
-      var _this5 = this;
-
-      var email, currentServerPassword, newServerPassword, newKeyParams, url, params, response;
-      return regeneratorRuntime.async(function changePassword$(_context8) {
-        while (1) {
-          switch (_context8.prev = _context8.next) {
-            case 0:
-              email = _ref6.email, currentServerPassword = _ref6.currentServerPassword, newServerPassword = _ref6.newServerPassword, newKeyParams = _ref6.newKeyParams;
-
-              if (!this.changing) {
-                _context8.next = 3;
-                break;
-              }
-
-              return _context8.abrupt("return", this.error(_Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
-
-            case 3:
-              this.changing = true;
-              _context8.next = 6;
-              return regeneratorRuntime.awrap(this.path(REQUEST_PATH_CHANGE_PW));
-
-            case 6:
-              url = _context8.sent;
-              params = _objectSpread({
-                current_password: currentServerPassword,
-                new_password: newServerPassword
-              }, newKeyParams.getPortableValue());
-              _context8.next = 10;
-              return regeneratorRuntime.awrap(this.httpService.postAbsolute({
-                url: url,
-                params: params,
-                authentication: this.sessionToken
-              }).catch(function (errorResponse) {
-                return _this5.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]);
-              }));
-
-            case 10:
-              response = _context8.sent;
-              this.changing = false;
-              return _context8.abrupt("return", response);
-
-            case 13:
-            case "end":
-              return _context8.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
     key: "sync",
-    value: function sync(_ref7) {
+    value: function sync(_ref6) {
       var _this$params3,
           _this6 = this;
 
       var payloads, lastSyncToken, paginationToken, limit, checkIntegrity, contentType, customEvent, url, params, response;
-      return regeneratorRuntime.async(function sync$(_context9) {
+      return regeneratorRuntime.async(function sync$(_context8) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
-              payloads = _ref7.payloads, lastSyncToken = _ref7.lastSyncToken, paginationToken = _ref7.paginationToken, limit = _ref7.limit, checkIntegrity = _ref7.checkIntegrity, contentType = _ref7.contentType, customEvent = _ref7.customEvent;
-              _context9.next = 3;
+              payloads = _ref6.payloads, lastSyncToken = _ref6.lastSyncToken, paginationToken = _ref6.paginationToken, limit = _ref6.limit, checkIntegrity = _ref6.checkIntegrity, contentType = _ref6.contentType, customEvent = _ref6.customEvent;
+              _context8.next = 3;
               return regeneratorRuntime.awrap(this.path(REQUEST_PATH_SYNC));
 
             case 3:
-              url = _context9.sent;
+              url = _context8.sent;
               params = this.params((_this$params3 = {}, _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].SyncPayloads, payloads), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].LastSyncToken, lastSyncToken), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].PaginationToken, paginationToken), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params3, _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].SyncDlLimit, limit), _defineProperty(_this$params3, "content_type", contentType), _defineProperty(_this$params3, "event", customEvent), _this$params3));
-              _context9.next = 7;
+              _context8.next = 7;
               return regeneratorRuntime.awrap(this.httpService.postAbsolute({
                 url: url,
                 params: params,
-                authentication: this.sessionToken
+                authentication: this.session.token
               }).catch(function (errorResponse) {
                 return _this6.errorResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_2__["API_MESSAGE_GENERIC_SYNC_FAIL"]);
               }));
 
             case 7:
-              response = _context9.sent;
-              return _context9.abrupt("return", response);
+              response = _context8.sent;
+              return _context8.abrupt("return", response);
 
             case 9:
             case "end":
-              return _context9.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -14651,6 +14683,26 @@ function StrictSignInFailed(current, latest) {
 
 /***/ }),
 
+/***/ "./lib/services/api/session.js":
+/*!*************************************!*\
+  !*** ./lib/services/api/session.js ***!
+  \*************************************/
+/*! exports provided: Session */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Session", function() { return Session; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Session = function Session(token) {
+  _classCallCheck(this, Session);
+
+  this.token = token;
+};
+
+/***/ }),
+
 /***/ "./lib/services/api/session_manager.js":
 /*!*********************************************!*\
   !*** ./lib/services/api/session_manager.js ***!
@@ -14665,7 +14717,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.js");
+/* harmony import */ var _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/api/session */ "./lib/services/api/session.js");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14683,6 +14736,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -14728,7 +14782,7 @@ function (_PureService) {
   _createClass(SNSessionManager, [{
     key: "initializeFromDisk",
     value: function initializeFromDisk() {
-      var uuid, token;
+      var uuid, rawSession;
       return regeneratorRuntime.async(function initializeFromDisk$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -14758,20 +14812,41 @@ function (_PureService) {
 
             case 8:
               _context.next = 10;
-              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt));
+              return regeneratorRuntime.awrap(this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session));
 
             case 10:
-              token = _context.sent;
+              rawSession = _context.sent;
 
-              if (token) {
-                this.apiService.setSessionAuthentication({
-                  token: token
-                });
+              if (!rawSession) {
+                _context.next = 14;
+                break;
               }
 
-            case 12:
+              _context.next = 14;
+              return regeneratorRuntime.awrap(this.setSession(new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"](rawSession)));
+
+            case 14:
             case "end":
               return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @access private */
+
+  }, {
+    key: "setSession",
+    value: function setSession(session) {
+      return regeneratorRuntime.async(function setSession$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              this.session = session;
+              this.apiService.setSession(this.session);
+
+            case 2:
+            case "end":
+              return _context2.stop();
           }
         }
       }, null, this);
@@ -14784,7 +14859,7 @@ function (_PureService) {
   }, {
     key: "offline",
     value: function offline() {
-      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(this.user);
+      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(this.session);
     }
   }, {
     key: "getUser",
@@ -14796,11 +14871,11 @@ function (_PureService) {
     value: function returnAfterTimeout(value) {
       var _this2 = this;
 
-      return regeneratorRuntime.async(function returnAfterTimeout$(_context2) {
+      return regeneratorRuntime.async(function returnAfterTimeout$(_context3) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              return _context2.abrupt("return", new Promise(function (resolve, reject) {
+              return _context3.abrupt("return", new Promise(function (resolve, reject) {
                 _this2.timeout(function () {
                   resolve(value);
                 });
@@ -14808,23 +14883,26 @@ function (_PureService) {
 
             case 1:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
         }
       });
     }
+    /** @access public */
+
   }, {
     key: "signOut",
     value: function signOut() {
-      return regeneratorRuntime.async(function signOut$(_context3) {
+      return regeneratorRuntime.async(function signOut$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               this.user = null;
+              this.session = null;
 
-            case 1:
+            case 2:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -14835,45 +14913,45 @@ function (_PureService) {
       var _this3 = this;
 
       var email, password, result, serverPassword, keyParams, rootKey;
-      return regeneratorRuntime.async(function register$(_context5) {
+      return regeneratorRuntime.async(function register$(_context6) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               email = _ref2.email, password = _ref2.password;
 
               if (!(password.length < MINIMUM_PASSWORD_LENGTH)) {
-                _context5.next = 3;
+                _context6.next = 3;
                 break;
               }
 
-              return _context5.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH)));
+              return _context6.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH)));
 
             case 3:
-              _context5.next = 5;
+              _context6.next = 5;
               return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: email,
                 password: password
               }));
 
             case 5:
-              result = _context5.sent;
+              result = _context6.sent;
               serverPassword = result.key.serverPassword;
               keyParams = result.keyParams;
               rootKey = result.key;
-              return _context5.abrupt("return", this.apiService.register({
+              return _context6.abrupt("return", this.apiService.register({
                 email: email,
                 serverPassword: serverPassword,
                 keyParams: keyParams
               }).then(function _callee(response) {
-                return regeneratorRuntime.async(function _callee$(_context4) {
+                return regeneratorRuntime.async(function _callee$(_context5) {
                   while (1) {
-                    switch (_context4.prev = _context4.next) {
+                    switch (_context5.prev = _context5.next) {
                       case 0:
-                        _context4.next = 2;
+                        _context5.next = 2;
                         return regeneratorRuntime.awrap(_this3.handleAuthResponse(response));
 
                       case 2:
-                        return _context4.abrupt("return", _this3.returnAfterTimeout({
+                        return _context5.abrupt("return", _this3.returnAfterTimeout({
                           response: response,
                           keyParams: keyParams,
                           rootKey: rootKey
@@ -14881,7 +14959,7 @@ function (_PureService) {
 
                       case 3:
                       case "end":
-                        return _context4.stop();
+                        return _context5.stop();
                     }
                   }
                 });
@@ -14889,7 +14967,7 @@ function (_PureService) {
 
             case 10:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -14901,12 +14979,12 @@ function (_PureService) {
 
       var email, password, strict, mfaKeyPath, mfaCode, paramsResponse, keyParams, message, confirmed, minimum, latest, _ref4, rootKey, serverPassword;
 
-      return regeneratorRuntime.async(function signIn$(_context7) {
+      return regeneratorRuntime.async(function signIn$(_context8) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               email = _ref3.email, password = _ref3.password, strict = _ref3.strict, mfaKeyPath = _ref3.mfaKeyPath, mfaCode = _ref3.mfaCode;
-              _context7.next = 3;
+              _context8.next = 3;
               return regeneratorRuntime.awrap(this.apiService.getAccountKeyParams({
                 email: email,
                 mfaKeyPath: mfaKeyPath,
@@ -14920,101 +14998,101 @@ function (_PureService) {
               }));
 
             case 3:
-              paramsResponse = _context7.sent;
+              paramsResponse = _context8.sent;
 
               if (!paramsResponse.error) {
-                _context7.next = 6;
+                _context8.next = 6;
                 break;
               }
 
-              return _context7.abrupt("return", paramsResponse);
+              return _context8.abrupt("return", paramsResponse);
 
             case 6:
               keyParams = paramsResponse.keyParams;
 
               if (!(!keyParams || !keyParams.kdfIterations)) {
-                _context7.next = 9;
+                _context8.next = 9;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_FAILBACK_LOGIN_FAIL"]));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_FAILBACK_LOGIN_FAIL"]));
 
             case 9:
               if (this.protocolService.supportedVersions().includes(keyParams.version)) {
-                _context7.next = 15;
+                _context8.next = 15;
                 break;
               }
 
               if (!this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
-                _context7.next = 14;
+                _context8.next = 14;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["UNSUPPORTED_PROTOCOL_VERSION"]));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["UNSUPPORTED_PROTOCOL_VERSION"]));
 
             case 14:
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["EXPIRED_PROTOCOL_VERSION"]));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["EXPIRED_PROTOCOL_VERSION"]));
 
             case 15:
               if (!this.protocolService.isProtocolVersionOutdated(keyParams.version)) {
-                _context7.next = 22;
+                _context8.next = 22;
                 break;
               }
 
-              message = _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_VERSION"];
-              _context7.next = 19;
+              message = _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_VERSION"];
+              _context8.next = 19;
               return regeneratorRuntime.awrap(this.alertService.confirm({
-                title: _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_ALERT_TITLE"],
+                title: _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_ALERT_TITLE"],
                 text: message,
-                confirmButtonText: _messages__WEBPACK_IMPORTED_MODULE_4__["OUTDATED_PROTOCOL_ALERT_IGNORE"] // eslint-disable-next-line handle-callback-err
+                confirmButtonText: _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_ALERT_IGNORE"] // eslint-disable-next-line handle-callback-err
 
               }).catch(function (error) {}));
 
             case 19:
-              confirmed = _context7.sent;
+              confirmed = _context8.sent;
 
               if (confirmed) {
-                _context7.next = 22;
+                _context8.next = 22;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error());
+              return _context8.abrupt("return", this.apiService.error());
 
             case 22:
               if (this.protocolService.supportsPasswordDerivationCost(keyParams.kdfIterations)) {
-                _context7.next = 24;
+                _context8.next = 24;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["UNSUPPORTED_PASSWORD_COST"]));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["UNSUPPORTED_PASSWORD_COST"]));
 
             case 24:
               minimum = this.protocolService.costMinimumForVersion(keyParams.version);
 
               if (!(keyParams.kdfIterations < minimum)) {
-                _context7.next = 27;
+                _context8.next = 27;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["INVALID_PASSWORD_COST"]));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["INVALID_PASSWORD_COST"]));
 
             case 27:
               if (!strict) {
-                _context7.next = 31;
+                _context8.next = 31;
                 break;
               }
 
               latest = this.protocolService.getLatestVersion();
 
               if (!(keyParams.version !== latest)) {
-                _context7.next = 31;
+                _context8.next = 31;
                 break;
               }
 
-              return _context7.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_4__["StrictSignInFailed"](keyParams.version, latest)));
+              return _context8.abrupt("return", this.apiService.error(_messages__WEBPACK_IMPORTED_MODULE_5__["StrictSignInFailed"](keyParams.version, latest)));
 
             case 31:
-              _context7.next = 33;
+              _context8.next = 33;
               return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: password,
                 keyParams: keyParams
@@ -15026,24 +15104,24 @@ function (_PureService) {
               }));
 
             case 33:
-              _ref4 = _context7.sent;
+              _ref4 = _context8.sent;
               rootKey = _ref4.rootKey;
               serverPassword = _ref4.serverPassword;
-              return _context7.abrupt("return", this.apiService.signIn({
+              return _context8.abrupt("return", this.apiService.signIn({
                 email: email,
                 serverPassword: serverPassword,
                 mfaKeyPath: mfaKeyPath,
                 mfaCode: mfaCode
               }).then(function _callee2(response) {
-                return regeneratorRuntime.async(function _callee2$(_context6) {
+                return regeneratorRuntime.async(function _callee2$(_context7) {
                   while (1) {
-                    switch (_context6.prev = _context6.next) {
+                    switch (_context7.prev = _context7.next) {
                       case 0:
-                        _context6.next = 2;
+                        _context7.next = 2;
                         return regeneratorRuntime.awrap(_this4.handleAuthResponse(response));
 
                       case 2:
-                        return _context6.abrupt("return", _this4.returnAfterTimeout({
+                        return _context7.abrupt("return", _this4.returnAfterTimeout({
                           response: response,
                           keyParams: keyParams,
                           rootKey: rootKey
@@ -15051,7 +15129,7 @@ function (_PureService) {
 
                       case 3:
                       case "end":
-                        return _context6.stop();
+                        return _context7.stop();
                     }
                   }
                 });
@@ -15059,7 +15137,7 @@ function (_PureService) {
 
             case 37:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
@@ -15071,12 +15149,12 @@ function (_PureService) {
 
       var email, currentPassword, currentKeyParams, newPassword, currentServerPassword, _ref6, newServerPassword, newRootKey, newKeyParams;
 
-      return regeneratorRuntime.async(function changePassword$(_context9) {
+      return regeneratorRuntime.async(function changePassword$(_context10) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               email = _ref5.email, currentPassword = _ref5.currentPassword, currentKeyParams = _ref5.currentKeyParams, newPassword = _ref5.newPassword;
-              _context9.next = 3;
+              _context10.next = 3;
               return regeneratorRuntime.awrap(this.protocolService.computeRootKey({
                 password: currentPassword,
                 keyParams: currentKeyParams
@@ -15085,8 +15163,8 @@ function (_PureService) {
               }));
 
             case 3:
-              currentServerPassword = _context9.sent;
-              _context9.next = 6;
+              currentServerPassword = _context10.sent;
+              _context10.next = 6;
               return regeneratorRuntime.awrap(this.protocolService.createRootKey({
                 identifier: email,
                 password: newPassword
@@ -15099,25 +15177,25 @@ function (_PureService) {
               }));
 
             case 6:
-              _ref6 = _context9.sent;
+              _ref6 = _context10.sent;
               newServerPassword = _ref6.newServerPassword;
               newRootKey = _ref6.newRootKey;
               newKeyParams = _ref6.newKeyParams;
-              return _context9.abrupt("return", this.apiService.changePassword({
+              return _context10.abrupt("return", this.apiService.changePassword({
                 email: email,
                 currentServerPassword: currentServerPassword,
                 newServerPassword: newServerPassword,
                 newKeyParams: newKeyParams
               }).then(function _callee3(response) {
-                return regeneratorRuntime.async(function _callee3$(_context8) {
+                return regeneratorRuntime.async(function _callee3$(_context9) {
                   while (1) {
-                    switch (_context8.prev = _context8.next) {
+                    switch (_context9.prev = _context9.next) {
                       case 0:
-                        _context8.next = 2;
+                        _context9.next = 2;
                         return regeneratorRuntime.awrap(_this5.handleAuthResponse(response));
 
                       case 2:
-                        return _context8.abrupt("return", _this5.returnAfterTimeout({
+                        return _context9.abrupt("return", _this5.returnAfterTimeout({
                           response: response,
                           keyParams: newKeyParams,
                           rootKey: newRootKey
@@ -15125,7 +15203,7 @@ function (_PureService) {
 
                       case 3:
                       case "end":
-                        return _context8.stop();
+                        return _context9.stop();
                     }
                   }
                 });
@@ -15133,55 +15211,36 @@ function (_PureService) {
 
             case 11:
             case "end":
-              return _context9.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "handleAuthResponse",
-    value: function handleAuthResponse(response) {
-      var user;
-      return regeneratorRuntime.async(function handleAuthResponse$(_context10) {
-        while (1) {
-          switch (_context10.prev = _context10.next) {
-            case 0:
-              user = response.user;
-              this.user = user;
-              _context10.next = 4;
-              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user));
-
-            case 4:
-              _context10.next = 6;
-              return regeneratorRuntime.awrap(this.setSessionAuthentication({
-                token: response.token
-              }));
-
-            case 6:
-            case "end":
               return _context10.stop();
           }
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
-    key: "setSessionAuthentication",
-    value: function setSessionAuthentication(_ref7) {
-      var token;
-      return regeneratorRuntime.async(function setSessionAuthentication$(_context11) {
+    key: "handleAuthResponse",
+    value: function handleAuthResponse(response) {
+      var user, session;
+      return regeneratorRuntime.async(function handleAuthResponse$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
-              token = _ref7.token;
-              _context11.next = 3;
-              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Jwt, token));
-
-            case 3:
-              this.apiService.setSessionAuthentication({
-                token: token
-              });
+              user = response.user;
+              this.user = user;
+              _context11.next = 4;
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user));
 
             case 4:
+              session = new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"](response.token);
+              _context11.next = 7;
+              return regeneratorRuntime.awrap(this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session, session));
+
+            case 7:
+              _context11.next = 9;
+              return regeneratorRuntime.awrap(this.setSession(session));
+
+            case 9:
             case "end":
               return _context11.stop();
           }
@@ -19406,6 +19465,12 @@ function (_PureService) {
             error: {
               message: response
             }
+          };
+        }
+
+        if (!response.error) {
+          response.error = {
+            status: httpStatus
           };
         }
 
@@ -27239,6 +27304,11 @@ function () {
   }
 
   _createClass(AccountSyncResponse, [{
+    key: "error",
+    get: function get() {
+      return this.rawResponse.error;
+    }
+  }, {
     key: "lastSyncToken",
     get: function get() {
       return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].LastSyncToken];
@@ -27787,6 +27857,11 @@ function () {
       this.timingMonitor = null;
     }
   }, {
+    key: "hasError",
+    value: function hasError() {
+      return this.error;
+    }
+  }, {
     key: "setError",
     value: function setError(error) {
       this.error = error;
@@ -27804,6 +27879,7 @@ function () {
       this.totalUpload = 0;
       this.inProgress = false;
       this.syncing = false;
+      this.error = null;
     }
   }, {
     key: "syncInProgress",
@@ -28916,6 +28992,15 @@ function (_PureService) {
 
             case 89:
               Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
+
+              if (!this.opStatus.hasError()) {
+                _context13.next = 92;
+                break;
+              }
+
+              return _context13.abrupt("return");
+
+            case 92:
               this.opStatus.reset();
               this.state.setLastSyncDate(new Date());
 
@@ -28923,39 +29008,39 @@ function (_PureService) {
                 this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].MajorDataChange);
               }
 
-              _context13.next = 95;
+              _context13.next = 97;
               return regeneratorRuntime.awrap(this.handleNeverSyncedDeleted(neverSyncedDeleted));
 
-            case 95:
+            case 97:
               if (!(useMode !== SyncModes.DownloadFirst)) {
-                _context13.next = 98;
+                _context13.next = 100;
                 break;
               }
 
-              _context13.next = 98;
+              _context13.next = 100;
               return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].FullSyncCompleted, {
                 source: source
               }));
 
-            case 98:
+            case 100:
               if (!(useMode === SyncModes.DownloadFirst)) {
-                _context13.next = 105;
+                _context13.next = 107;
                 break;
               }
 
               this.completedInitialSync = true;
-              _context13.next = 102;
+              _context13.next = 104;
               return regeneratorRuntime.awrap(this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_19__["SyncEvents"].DownloadFirstSyncCompleted));
 
-            case 102:
+            case 104:
               return _context13.abrupt("return", this.sync({
                 source: SyncSources.AfterDownloadFirst,
                 checkIntegrity: true
               }));
 
-            case 105:
+            case 107:
               if (!(!this.popSpawnQueue() && this.resolveQueue.length > 0)) {
-                _context13.next = 110;
+                _context13.next = 112;
                 break;
               }
 
@@ -28965,18 +29050,18 @@ function (_PureService) {
               this.sync({
                 source: SyncSources.ResolveQueue
               });
-              _context13.next = 123;
+              _context13.next = 125;
               break;
 
-            case 110:
-              _context13.next = 112;
+            case 112:
+              _context13.next = 114;
               return regeneratorRuntime.awrap(this.itemsNeedingSync());
 
-            case 112:
+            case 114:
               _context13.t1 = _context13.sent.length;
 
               if (!(_context13.t1 > 0)) {
-                _context13.next = 117;
+                _context13.next = 119;
                 break;
               }
 
@@ -28984,9 +29069,9 @@ function (_PureService) {
                 source: SyncSources.MoreDirtyItems
               }));
 
-            case 117:
+            case 119:
               if (!operation.checkIntegrity) {
-                _context13.next = 121;
+                _context13.next = 123;
                 break;
               }
 
@@ -28999,14 +29084,14 @@ function (_PureService) {
                 });
               }
 
-              _context13.next = 123;
+              _context13.next = 125;
               break;
 
-            case 121:
-              _context13.next = 123;
+            case 123:
+              _context13.next = 125;
               return regeneratorRuntime.awrap(this.state.clearIntegrityHashes());
 
-            case 123:
+            case 125:
             case "end":
               return _context13.stop();
           }
@@ -29943,11 +30028,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return StorageKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP", function() { return RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return namespacedKey; });
+/**
+ * Keys used for retrieving and saving simple key/value pairs.
+ */
 var StorageKeys = {
   RootKeyParams: 'ROOT_KEY_PARAMS',
   WrappedRootKey: 'WRAPPED_ROOT_KEY',
   RootKeyWrapperKeyParams: 'ROOT_KEY_WRAPPER_KEY_PARAMS',
-  Jwt: 'jwt',
+  Session: 'session',
   User: 'user',
   ServerHost: 'server',
   LegacyUuid: 'uuid',
@@ -30015,10 +30103,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/uniqWith */ "./node_modules/lodash/uniqWith.js");
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_3__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 
 
 

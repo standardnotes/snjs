@@ -62,6 +62,7 @@ describe('2020-01-15 web migration', () => {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
+      jwt: 'anything',
       auth_params: accountResult.keyParams.getPortableValue()
     };
     const storagePayload = CreateMaxPayloadFromAnyObject({
@@ -120,6 +121,7 @@ describe('2020-01-15 web migration', () => {
     await application.launch({
       awaitDatabaseLoad: true
     });
+    expect(application.sessionManager.online()).to.equal(true);
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_PLUS_WRAPPER
     );
@@ -313,6 +315,7 @@ describe('2020-01-15 web migration', () => {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
+      jwt: 'anything',
       auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
     };
     for(const key of Object.keys(storage)) {
@@ -345,6 +348,7 @@ describe('2020-01-15 web migration', () => {
     await application.launch({
       awaitDatabaseLoad: true
     });
+    expect(application.sessionManager.online()).to.equal(true);
     expect(application.keyManager.keyMode).to.equal(
       KEY_MODE_ROOT_KEY_ONLY
     );
