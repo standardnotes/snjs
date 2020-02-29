@@ -123,7 +123,7 @@ describe("model manager mapping", () => {
     const dirtyItems = modelManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
 
-    modelManager.clearDirtyItems(dirtyItems);
+    modelManager.setItemsDirty(dirtyItems, false);
     expect(modelManager.getDirtyItems().length).to.equal(0);
   });
 
@@ -136,7 +136,7 @@ describe("model manager mapping", () => {
       payloads.push(Factory.createNotePayload());
     }
     await modelManager.mapPayloadsToLocalItems({payloads: payloads});
-    await modelManager.setAllItemsDirty();
+    await this.application.syncService.markAllItemsAsNeedingSync();
 
     const dirtyItems = modelManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(this.expectedItemCount);

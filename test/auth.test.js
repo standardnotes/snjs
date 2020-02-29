@@ -108,7 +108,7 @@ describe("basic auth", () => {
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(this.application.modelManager.invalidItems().length).to.equal(0);
     
-    await this.application.modelManager.setAllItemsDirty();
+    await this.application.syncService.markAllItemsAsNeedingSync();
     await this.application.syncService.sync();
     
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
@@ -162,7 +162,7 @@ describe("basic auth", () => {
       expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
-      await this.application.modelManager.setAllItemsDirty();
+      await this.application.syncService.markAllItemsAsNeedingSync();
       await this.application.syncService.sync();
       await this.application.signOut();
       expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
