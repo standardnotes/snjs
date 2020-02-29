@@ -77,6 +77,23 @@ By default, upgrading an account's protocol version will create a new `itemsKey`
 - If a new protocol version is available, changing the account password will also upgrade to the latest protocol version and thus generates a new default `itemsKey`.
 - If no new protocol version is available, or if the user is already using the latest version, changing the account password generates a new `rootKey`, but does not generate a new `itemsKey`, unless the user explicitly chooses an option to "Rotate encryption keys". If the user chooses to rotate encryption keys, a new `itemsKey` will be generated and used as the default items encryption key, and will also be used to progressively re-encrypt previous data.
 
+### Authentication
+
+Registering for an account involves generating a rootKey and respective keyParams, according to the key generation flow above. The key params are uploaded to the server, and include:
+
+- unique identifier (email)
+- salt seed
+- protocol version
+
+To sign into an account, clients first make a request to the server to retrieve the key params for a given email. This endpoint is public and non-authenticated (unless the account has two-factor authentication enabled). The client then uses the retrieved key params to generate a `rootKey`, and uses the `rootKey.serverPassword` to authenticate the account. 
+
+Note that by default, the client trusts the protocol version the server reports. The client uses this protocol version to determine which cryptographic primitives (and their parameters) to use for key generation. This raises the question of, what happens if a malicious server underreports an account's version in order to weaken key generation parameters? For example, if a user's account is 004, but the server reports 002, then the client will proceed to generate a `serverPassword` using outdated primitives.
+
+There are two safeguards to protect against this scenario:
+
+1. Older protocol versions are expired and become no longer supported after a certain period.
+2. Clients may sign in with a flag known as "strict sign in" (SSI). SSI ensures that the client _always_ signs in with the client-side _hardcoded latest version_ of the protocol. For example, if a client with SNJS 004 support attempts to sign in with SSI enabled, and the server reports a protocol version of 002 for a given account, the client will refuse this sign-in, and will not proceed with key generation. SSI is a user-controlled option. Clients cannot be programmed to default to SSI, as otherwise, users would be unable to sign in to their account whenever a new protocol version is available.
+
 ### Root Key Wrapping
 
 Root key wrapping is a local-only construct that pertains to how the root key is stored locally. By default, and with no root key wrapping, the `rootKey` is stored in the secure device keychain. Only the `rootKey.masterKey` is stored locally; the `rootKey.serverPassword` is never stored locally, and is only used for initial account registration. If no keychain is available (web browsers), the `rootKey` is stored in storage in necessarily plain format.
