@@ -2970,7 +2970,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNServerExtension, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3017,8 +3017,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNEncryptedStorage"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNServerExtension"]; });
-
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNComponent"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNEditor"]; });
@@ -3035,8 +3033,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/history/item_history_entry */ "./lib/services/history/item_history_entry.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_11__["ItemHistoryEntry"]; });
 
-/* harmony import */ var _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_privileges_privileges__WEBPACK_IMPORTED_MODULE_12__["SFPrivileges"]; });
+/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/app/privileges */ "./lib/models/app/privileges.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["SFPrivileges"]; });
 
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! sncrypto */ "./node_modules/sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_13__);
@@ -3341,6 +3339,8 @@ function (_PureService) {
     _this.challengeResponder = challengeResponder;
     return _this;
   }
+  /** @access public */
+
 
   _createClass(SNMigrationService, [{
     key: "initialize",
@@ -3441,6 +3441,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "getRequiredMigrations",
     value: function getRequiredMigrations() {
@@ -3531,11 +3533,15 @@ function (_PureService) {
         }
       }, null, this, [[8, 12, 16, 24], [17,, 19, 23]]);
     }
+    /** @access private */
+
   }, {
     key: "getTimeStampKey",
     value: function getTimeStampKey() {
       return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
     }
+    /** @access private */
+
   }, {
     key: "getLastMigrationTimestamp",
     value: function getLastMigrationTimestamp() {
@@ -3567,6 +3573,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "saveLastMigrationTimestamp",
     value: function saveLastMigrationTimestamp(timestamp) {
@@ -3584,9 +3592,7 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /**
-     * @access private
-     */
+    /** @access private */
 
   }, {
     key: "addLoginObserver",
@@ -3614,6 +3620,8 @@ function (_PureService) {
         });
       });
     }
+    /** @access private */
+
   }, {
     key: "addSyncObserver",
     value: function addSyncObserver() {
@@ -3640,6 +3648,8 @@ function (_PureService) {
         });
       });
     }
+    /** @access private */
+
   }, {
     key: "handleStage",
     value: function handleStage(stage) {
@@ -4962,6 +4972,10 @@ __webpack_require__.r(__webpack_exports__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 
+/**
+ * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
+ */
+
 var Action = function Action(json) {
   _classCallCheck(this, Action);
 
@@ -5023,6 +5037,12 @@ var ComponentAreas = {
   Rooms: 'rooms',
   Modal: 'modal'
 };
+/**
+ * Components are mostly iframe based extensions that communicate with the SN parent
+ * via the postMessage API. However, a theme can also be a component, which is activated
+ * only by its url.
+ */
+
 var SNComponent =
 /*#__PURE__*/
 function (_SFItem) {
@@ -5293,7 +5313,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 /**
- * @legacy
+ * Legacy
  * Editor objects are depracated in favor of SNComponent objects
  */
 
@@ -5474,6 +5494,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+/**
+ * Related to the SNActionsService and the local Action model.
+ */
+
 var SNActionsExtension =
 /*#__PURE__*/
 function (_SFItem) {
@@ -5594,6 +5618,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * A key used to encrypt other items. Items keys are synced and persisted.
+ */
 
 var SNItemsKey =
 /*#__PURE__*/
@@ -5870,6 +5898,128 @@ function (_SFItem) {
 
 /***/ }),
 
+/***/ "./lib/models/app/privileges.js":
+/*!**************************************!*\
+  !*** ./lib/models/app/privileges.js ***!
+  \**************************************/
+/*! exports provided: SFPrivileges */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return SFPrivileges; });
+/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
+/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+/**
+ * Privileges are a singleton object that store the preferences a user
+ * may have configured for protecting certain actions.
+ */
+
+var SFPrivileges =
+/*#__PURE__*/
+function (_SFItem) {
+  _inherits(SFPrivileges, _SFItem);
+
+  _createClass(SFPrivileges, null, [{
+    key: "contentType",
+    value: function contentType() {
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Privileges;
+    }
+  }]);
+
+  function SFPrivileges(payload) {
+    var _this;
+
+    _classCallCheck(this, SFPrivileges);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFPrivileges).call(this, payload));
+
+    if (!_this.errorDecrypting && !_this.content.desktopPrivileges) {
+      _this.content.desktopPrivileges = {};
+    }
+
+    return _this;
+  }
+
+  _createClass(SFPrivileges, [{
+    key: "setCredentialsForAction",
+    value: function setCredentialsForAction(action, credentials) {
+      this.content.desktopPrivileges[action] = credentials;
+    }
+  }, {
+    key: "getCredentialsForAction",
+    value: function getCredentialsForAction(action) {
+      return this.content.desktopPrivileges[action] || [];
+    }
+  }, {
+    key: "toggleCredentialForAction",
+    value: function toggleCredentialForAction(action, credential) {
+      if (this.isCredentialRequiredForAction(action, credential)) {
+        this.removeCredentialForAction(action, credential);
+      } else {
+        this.addCredentialForAction(action, credential);
+      }
+    }
+  }, {
+    key: "removeCredentialForAction",
+    value: function removeCredentialForAction(action, credential) {
+      lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(this.content.desktopPrivileges[action], credential);
+    }
+  }, {
+    key: "addCredentialForAction",
+    value: function addCredentialForAction(action, credential) {
+      var credentials = this.getCredentialsForAction(action);
+      credentials.push(credential);
+      this.setCredentialsForAction(action, credentials);
+    }
+  }, {
+    key: "isCredentialRequiredForAction",
+    value: function isCredentialRequiredForAction(action, credential) {
+      var credentialsRequired = this.getCredentialsForAction(action);
+      return credentialsRequired.includes(credential);
+    }
+  }, {
+    key: "isSingleton",
+    get: function get() {
+      return true;
+    }
+  }, {
+    key: "singletonPredicate",
+    get: function get() {
+      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]('content_type', '=', this.content_type);
+    }
+  }]);
+
+  return SFPrivileges;
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
+
+/***/ }),
+
 /***/ "./lib/models/app/smartTag.js":
 /*!************************************!*\
   !*** ./lib/models/app/smartTag.js ***!
@@ -5909,6 +6059,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var SYSTEM_TAG_ALL_NOTES = 'all-notes';
 var SYSTEM_TAG_ARCHIVED_NOTES = 'archived-notes';
 var SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
+/**
+ * A tag that defines a predicate that consumers can use to retrieve a dynamic
+ * list of notes.
+ */
+
 var SNSmartTag =
 /*#__PURE__*/
 function (_SNTag) {
@@ -6012,6 +6167,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+/**
+ * Allows organization of notes into groups. A tag can have many notes, and a note
+ * can have many tags.
+ */
 
 var SNTag =
 /*#__PURE__*/
@@ -6396,6 +6556,79 @@ function displayStringForContentType(contentType) {
 
 /***/ }),
 
+/***/ "./lib/models/core/encryptedStorage.js":
+/*!*********************************************!*\
+  !*** ./lib/models/core/encryptedStorage.js ***!
+  \*********************************************/
+/*! exports provided: SNEncryptedStorage */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return SNEncryptedStorage; });
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+/**
+ * A local-only construct that is used to persist a collection of key-values.
+ * This object is typically stored in a device's key/value store and not in the
+ * device's database.
+ */
+
+var SNEncryptedStorage =
+/*#__PURE__*/
+function (_SFItem) {
+  _inherits(SNEncryptedStorage, _SFItem);
+
+  function SNEncryptedStorage() {
+    _classCallCheck(this, SNEncryptedStorage);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNEncryptedStorage).apply(this, arguments));
+  }
+
+  _createClass(SNEncryptedStorage, [{
+    key: "mapContentToLocalProperties",
+    value: function mapContentToLocalProperties(content) {
+      _get(_getPrototypeOf(SNEncryptedStorage.prototype), "mapContentToLocalProperties", this).call(this, content);
+
+      this.storage = content.storage;
+    } // eslint-disable-next-line camelcase
+
+  }, {
+    key: "content_type",
+    get: function get() {
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].EncryptedStorage;
+    }
+  }]);
+
+  return SNEncryptedStorage;
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+
+/***/ }),
+
 /***/ "./lib/models/core/functions.js":
 /*!**************************************!*\
   !*** ./lib/models/core/functions.js ***!
@@ -6416,7 +6649,8 @@ function ItemContentsEqual(_ref) {
       rightContent = _ref.rightContent,
       keysToIgnore = _ref.keysToIgnore,
       appDataKeysToIgnore = _ref.appDataKeysToIgnore;
-  // Create copies of objects before running omit as not to modify source values directly.
+
+  /* Create copies of objects before running omit as not to modify source values directly. */
   leftContent = JSON.parse(JSON.stringify(leftContent));
 
   if (leftContent.appData) {
@@ -7155,6 +7389,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+/**
+ * A local-only construct that defines a built query that can be used to 
+ * dynamically search items.
+ */
 var SFPredicate =
 /*#__PURE__*/
 function () {
@@ -7448,7 +7686,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ServerExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNServerExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models__WEBPACK_IMPORTED_MODULE_0__["SFPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
+var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models__WEBPACK_IMPORTED_MODULE_0__["SFPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
 function CreateItemFromPayload(payload) {
   if (!payload.isPayload) {
     throw 'Attempting to create item from non-payload object.';
@@ -7465,7 +7703,7 @@ function CreateItemFromPayload(payload) {
 /*!*****************************!*\
   !*** ./lib/models/index.js ***!
   \*****************************/
-/*! exports provided: SFItem, SingletonStrategies, SNItemsKey, SFPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SFPrivileges, SNServerExtension, SNSmartTag, SNTheme, SNEncryptedStorage, ContentTypes, displayStringForContentType, CreateItemFromPayload */
+/*! exports provided: SFItem, SingletonStrategies, SNItemsKey, SFPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SFPrivileges, SNSmartTag, SNTheme, SNEncryptedStorage, ContentTypes, displayStringForContentType, CreateItemFromPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7502,28 +7740,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/app/userPrefs */ "./lib/models/app/userPrefs.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNUserPrefs", function() { return _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__["SNUserPrefs"]; });
 
-/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_10__["SFPrivileges"]; });
+/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__["SFPrivileges"]; });
 
-/* harmony import */ var _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/server/serverExtension */ "./lib/models/server/serverExtension.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return _Models_server_serverExtension__WEBPACK_IMPORTED_MODULE_11__["SNServerExtension"]; });
+/* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__["SNSmartTag"]; });
 
-/* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_12__["SNSmartTag"]; });
+/* harmony import */ var _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/theme */ "./lib/models/app/theme.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__["SNTheme"]; });
 
-/* harmony import */ var _Models_app_theme__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/app/theme */ "./lib/models/app/theme.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_app_theme__WEBPACK_IMPORTED_MODULE_13__["SNTheme"]; });
+/* harmony import */ var _Models_core_encryptedStorage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/core/encryptedStorage */ "./lib/models/core/encryptedStorage.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _Models_core_encryptedStorage__WEBPACK_IMPORTED_MODULE_13__["SNEncryptedStorage"]; });
 
-/* harmony import */ var _Models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/local/encryptedStorage */ "./lib/models/local/encryptedStorage.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _Models_local_encryptedStorage__WEBPACK_IMPORTED_MODULE_14__["SNEncryptedStorage"]; });
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_14__["ContentTypes"]; });
 
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_15__["ContentTypes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_14__["displayStringForContentType"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_15__["displayStringForContentType"]; });
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_15__["CreateItemFromPayload"]; });
 
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_16__["CreateItemFromPayload"]; });
 
 
 
@@ -7540,259 +7776,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-
-/***/ }),
-
-/***/ "./lib/models/local/encryptedStorage.js":
-/*!**********************************************!*\
-  !*** ./lib/models/local/encryptedStorage.js ***!
-  \**********************************************/
-/*! exports provided: SNEncryptedStorage */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return SNEncryptedStorage; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-var SNEncryptedStorage =
-/*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNEncryptedStorage, _SFItem);
-
-  function SNEncryptedStorage() {
-    _classCallCheck(this, SNEncryptedStorage);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNEncryptedStorage).apply(this, arguments));
-  }
-
-  _createClass(SNEncryptedStorage, [{
-    key: "mapContentToLocalProperties",
-    value: function mapContentToLocalProperties(content) {
-      _get(_getPrototypeOf(SNEncryptedStorage.prototype), "mapContentToLocalProperties", this).call(this, content);
-
-      this.storage = content.storage;
-    } // eslint-disable-next-line camelcase
-
-  }, {
-    key: "content_type",
-    get: function get() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].EncryptedStorage;
-    }
-  }]);
-
-  return SNEncryptedStorage;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/privileges/privileges.js":
-/*!*********************************************!*\
-  !*** ./lib/models/privileges/privileges.js ***!
-  \*********************************************/
-/*! exports provided: SFPrivileges */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return SFPrivileges; });
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-
-
-var SFPrivileges =
-/*#__PURE__*/
-function (_SFItem) {
-  _inherits(SFPrivileges, _SFItem);
-
-  _createClass(SFPrivileges, null, [{
-    key: "contentType",
-    value: function contentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Privileges;
-    }
-  }]);
-
-  function SFPrivileges(payload) {
-    var _this;
-
-    _classCallCheck(this, SFPrivileges);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFPrivileges).call(this, payload));
-
-    if (!_this.errorDecrypting && !_this.content.desktopPrivileges) {
-      _this.content.desktopPrivileges = {};
-    }
-
-    return _this;
-  }
-
-  _createClass(SFPrivileges, [{
-    key: "setCredentialsForAction",
-    value: function setCredentialsForAction(action, credentials) {
-      this.content.desktopPrivileges[action] = credentials;
-    }
-  }, {
-    key: "getCredentialsForAction",
-    value: function getCredentialsForAction(action) {
-      return this.content.desktopPrivileges[action] || [];
-    }
-  }, {
-    key: "toggleCredentialForAction",
-    value: function toggleCredentialForAction(action, credential) {
-      if (this.isCredentialRequiredForAction(action, credential)) {
-        this.removeCredentialForAction(action, credential);
-      } else {
-        this.addCredentialForAction(action, credential);
-      }
-    }
-  }, {
-    key: "removeCredentialForAction",
-    value: function removeCredentialForAction(action, credential) {
-      lodash_pull__WEBPACK_IMPORTED_MODULE_0___default()(this.content.desktopPrivileges[action], credential);
-    }
-  }, {
-    key: "addCredentialForAction",
-    value: function addCredentialForAction(action, credential) {
-      var credentials = this.getCredentialsForAction(action);
-      credentials.push(credential);
-      this.setCredentialsForAction(action, credentials);
-    }
-  }, {
-    key: "isCredentialRequiredForAction",
-    value: function isCredentialRequiredForAction(action, credential) {
-      var credentialsRequired = this.getCredentialsForAction(action);
-      return credentialsRequired.includes(credential);
-    }
-  }, {
-    key: "isSingleton",
-    get: function get() {
-      return true;
-    }
-  }, {
-    key: "singletonPredicate",
-    get: function get() {
-      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]('content_type', '=', this.content_type);
-    }
-  }]);
-
-  return SFPrivileges;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/server/serverExtension.js":
-/*!**********************************************!*\
-  !*** ./lib/models/server/serverExtension.js ***!
-  \**********************************************/
-/*! exports provided: SNServerExtension */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNServerExtension", function() { return SNServerExtension; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-var SNServerExtension =
-/*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNServerExtension, _SFItem);
-
-  function SNServerExtension() {
-    _classCallCheck(this, SNServerExtension);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNServerExtension).apply(this, arguments));
-  }
-
-  _createClass(SNServerExtension, [{
-    key: "mapContentToLocalProperties",
-    value: function mapContentToLocalProperties(content) {
-      _get(_getPrototypeOf(SNServerExtension.prototype), "mapContentToLocalProperties", this).call(this, content);
-
-      this.url = content.url;
-    } // eslint-disable-next-line camelcase
-
-  }, {
-    key: "content_type",
-    get: function get() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ServerExtension;
-    }
-  }]);
-
-  return SNServerExtension;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
 
 /***/ }),
 
@@ -8107,6 +8090,10 @@ var PBKDF2_OUTPUT_KEY_LENGTH = 512;
 var PBKDF2_ITERATIONS = 3000;
 var SALT_SEED_LENGTH = 128;
 var NO_IV = '00000000000000000000000000000000';
+/**
+ * A legacy operator no longer used to generate new accounts
+ */
+
 var SNProtocolOperator001 =
 /*#__PURE__*/
 function (_SNProtocolOperator) {
@@ -8601,6 +8588,10 @@ var ENCRYPTION_IV_LENGTH = 128;
 var PBKDF2_OUTPUT_KEY_LENGTH = 768;
 var PBKDF2_ITERATIONS = 3000;
 var SALT_SEED_LENGTH = 128;
+/**
+ * A legacy operator no longer used to generate new accounts
+ */
+
 var SNProtocolOperator002 =
 /*#__PURE__*/
 function (_SNProtocolOperator) {
@@ -8955,7 +8946,7 @@ function (_SNProtocolOperator) {
               throw 'Attempting to generateDecryptedParameters with no itemsKey.';
 
             case 9:
-              // decrypt encrypted key
+              /* Decrypt encrypted key */
               encryptedItemKey = encryptedParameters.enc_item_key;
               itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey, key.dataAuthenticationKey);
               _context9.next = 13;
@@ -9167,6 +9158,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var PBKDF2_ITERATIONS = 110000;
 var SALT_SEED_LENGTH = 256;
+/**
+ * Valid operator but no longer used for generating new accounts.
+ * This operator subclasses the 002 operator to share functionality that has not
+ * changed, and overrides functions where behavior may differ.
+ */
+
 var SNProtocolOperator003 =
 /*#__PURE__*/
 function (_SNProtocolOperator) {
@@ -14312,7 +14309,7 @@ function (_PureService) {
                 break;
               }
 
-              throw "Attempting to build path with null path.";
+              throw 'Attempting to build path with null path.';
 
             case 7:
               return _context4.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["joinPaths"])(host, _path));
@@ -14551,10 +14548,6 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /**
-     * @Syncing
-     */
-
   }, {
     key: "sync",
     value: function sync(_ref7) {
@@ -21159,8 +21152,8 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @param password {string}: The password string to generate a root key from.
-     * @returns key|null: Key if valid password, otherwise null.
+     * @param {string} password  The password string to generate a root key from.
+     * @returns {key|null}  The computed rootKey if valid password, otherwise null.
      */
 
   }, {
@@ -21199,8 +21192,8 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @param passcode {string}: The passcode string to generate a root key from.
-     * @returns {boolean}: Whether the input passcode generates wrapping keys equal
+     * @param {string} passcode  The passcode string to generate a root key from.
+     * @returns {boolean}  Whether the input passcode generates wrapping keys equal
      * to the ones saved.
      */
 
@@ -23720,7 +23713,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return PRIVILEGE_SESSION_LENGTH_ONE_WEEK; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return SNPrivilegesService; });
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/privileges/privileges */ "./lib/models/privileges/privileges.js");
+/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
@@ -23951,7 +23944,7 @@ function (_PureService) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              contentType = _Models_privileges_privileges__WEBPACK_IMPORTED_MODULE_1__["SFPrivileges"].contentType();
+              contentType = _Models_app_privileges__WEBPACK_IMPORTED_MODULE_1__["SFPrivileges"].contentType();
               predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]('content_type', '=', contentType);
               return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton({
                 predicate: predicate,
@@ -27991,6 +27984,13 @@ function (_PureService) {
 
 
     _this.localLoadPriorty = [_Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].ItemsKey, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].UserPrefs, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].Privileges, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].Component, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].Theme];
+    /**
+     * Non-encrypted types are items whose values a server must be able to read.
+     * These include server extensions (such as a note history endpoint), and 
+     * multi-factor authentication items, which include a secret value that the server
+     * needs to be able to read in order to enforce.
+     */
+
     _this.nonEncryptedTypes = [_Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].ServerExtension];
     return _this;
   }

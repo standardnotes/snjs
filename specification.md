@@ -1,10 +1,8 @@
-# Protocol Specification
-
-## 004
+# Protocol Specification | v004
 
 The 004 protocol upgrade centers around a system that makes it easy and painless to upgrade to a future protocol version, as well as more modern cryptographic primitives.
 
-### Introduction
+## Introduction
 
 The Standard Notes Protocol describes a set of procedures that ensure client-side encryption of data in such a way that makes it impossible for the server, which houses the data, to read or decrypt the data. It treats the server as a dumb data-store that simply saves and returns values on demand.
 
@@ -24,19 +22,15 @@ Clients also have the option of configuring an application passcode, which wraps
 
 This document delineates client-side procedures for key management and generation, data encryption, and storage encryption. Concepts related to server syncing and server session management are outside the scope of this document. This document however wholly covers any values that a server would receive, so even though syncing and server session management is out of scope, the procedures outlined in this document should guarantee that no secret value is ever revealed to the server.
 
-### Key Management
+## Key Management
 
 **There are three main concepts when it comes to keys:**
 
-1. A root key
-2. A root key wrapper
-3. Items keys
+1. **A root key**—based on an account's user-inputted password. There exists only one root key per account.
+2. **A root key wrapper**—_wraps_ a root key (encrypts it) with an additional layer. This is a local-only construct, and translates directly as an 'app passcode' feature.
+3. **Items keys**—used to encrypt items. There can exist many items keys. Each items key is encrypted with the root key. When the root key changes, all items keys must be re-encrypted using the new root key.
 
-- A root key is based on an account's user-inputted password. There exists only one root key per account.
-- A root key wrapper _wraps_ a root key (encrypts it) with an additional layer. This is a local-only construct, and translates directly as an 'app passcode' feature.
-- An items key is used to encrypt items. There can exist many items keys. Each items key is encrypted with the root key. When the root key changes, all items keys must be re-encrypted using the new root key.
-
-#### Key Generation Flow
+### Key Generation Flow
 
 1. User registers with an email (`identifier`) and a `password`.
 2. `password` is run through KDF to generate 512-bit key, which is then split in two, as part of a single `rootKey`.
@@ -45,7 +39,26 @@ This document delineates client-side procedures for key management and generatio
 3. Client registers user account with server using `email` and `rootKey.serverPassword`.
 4. Client creates new random 256-bit key `itemsKey`. This key is encrypted directly with `rootKey.masterKey`, and the encrypted `itemsKey` is assigned a UUID and uploaded to the user's account. (Each `itemsKey` is a traditional item, just like a note or tag.)
 
-#### Encryption Flow
+### Password change or protocol upgrade flow
+
+**When a user changes their password, or when a new protocol version is available:**
+
+1. Client generates new `rootKey` using account identifier and password, and thus generates new `rootKey.masterKey` and `rootKey.serverPassword` and `keyParams`, which include the protocol version and other public information used to guide clients on generating the `rootKey` given a user password.
+2. Client submits new `rootKey.serverPassword` to server. Note that the changing the `serverPassword` does not necessarily invalidate a user's session. Sessions are handled through a separate server specification.
+3. Client loops through all `itemsKeys` and re-encrypts them with new `rootKey.masterKey`. All `itemsKeys` are then re-uploaded to server. Note that `itemsKey`s are immutable and their inner key does not change. The key is only re-encrypted using the new `masterKey`.
+
+This flow means that when a new protocol version is available or when a user changes their password, we do not need to re-encrypt all their data, but instead only a handful of keys.
+
+### Key Rotation
+
+By default, upgrading an account's protocol version will create a new `itemsKey` for that version, and that key will be used to encrypt all data going forward. To prevent large-scale data modification that may take hours to complete, any data encrypted with a previous `itemsKey` will be re-encrypted with the new `itemsKey` _progressively_, and not all at once. This progressive re-encryption occurs when an item is explicitly modified by the user. Applications can also be designed to bulk-modify items during idle-capacity, without user interaction.
+
+**When changing the account password:**
+
+- If a new protocol version is available, changing the account password will also upgrade to the latest protocol version and thus generates a new default `itemsKey`.
+- If no new protocol version is available, or if the user is already using the latest version, changing the account password generates a new `rootKey`, but does not generate a new `itemsKey`, unless the user explicitly chooses an option to "Rotate encryption keys". If the user chooses to rotate encryption keys, a new `itemsKey` will be generated and used as the default items encryption key, and will also be used to progressively re-encrypt previous data.
+
+## Encryption Flow
 
 _For each_ item (such as a note) the client wants to encrypt:
 1. Client generates random 256-bit `item_key` (note: singular. Not related to `itemsKey`). 
@@ -58,26 +71,7 @@ To decrypt an item payload:
 2. Client decrypts item's `enc_item_key` as `item_key` using `itemsKey`.
 3. Client decrypts item's content using `item_key`.
 
-#### Password change or protocol upgrade flow
-
-**When a user changes their password, or when a new protocol version is available:**
-
-1. Client generates new `rootKey` using account identifier and password, and thus generates new `rootKey.masterKey` and `rootKey.serverPassword` and `keyParams`, which include the protocol version and other public information used to guide clients on generating the `rootKey` given a user password.
-2. Client submits new `rootKey.serverPassword` to server. Note that the changing the `serverPassword` does not necessarily invalidate a user's session. Sessions are handled through a separate server specification.
-3. Client loops through all `itemsKeys` and re-encrypts them with new `rootKey.masterKey`. All `itemsKeys` are then re-uploaded to server. Note that `itemsKey`s are immutable and their inner key does not change. The key is only re-encrypted using the new `masterKey`.
-
-This flow means that when a new protocol version is available or when a user changes their password, we do not need to re-encrypt all their data, but instead only a handful of keys.
-
-#### Key Rotation
-
-By default, upgrading an account's protocol version will create a new `itemsKey` for that version, and that key will be used to encrypt all data going forward. To prevent large-scale data modification that may take hours to complete, any data encrypted with a previous `itemsKey` will be re-encrypted with the new `itemsKey` _progressively_, and not all at once. This progressive re-encryption occurs when an item is explicitly modified by the user. Applications can also be designed to bulk-modify items during idle-capacity, without user interaction.
-
-**When changing the account password:**
-
-- If a new protocol version is available, changing the account password will also upgrade to the latest protocol version and thus generates a new default `itemsKey`.
-- If no new protocol version is available, or if the user is already using the latest version, changing the account password generates a new `rootKey`, but does not generate a new `itemsKey`, unless the user explicitly chooses an option to "Rotate encryption keys". If the user chooses to rotate encryption keys, a new `itemsKey` will be generated and used as the default items encryption key, and will also be used to progressively re-encrypt previous data.
-
-### Authentication
+## Authentication
 
 Registering for an account involves generating a rootKey and respective keyParams, according to the key generation flow above. The key params are uploaded to the server, and include:
 
@@ -94,7 +88,7 @@ There are two safeguards to protect against this scenario:
 1. Older protocol versions are expired and become no longer supported after a certain period.
 2. Clients may sign in with a flag known as "strict sign in" (SSI). SSI ensures that the client _always_ signs in with the client-side _hardcoded latest version_ of the protocol. For example, if a client with SNJS 004 support attempts to sign in with SSI enabled, and the server reports a protocol version of 002 for a given account, the client will refuse this sign-in, and will not proceed with key generation. SSI is a user-controlled option. Clients cannot be programmed to default to SSI, as otherwise, users would be unable to sign in to their account whenever a new protocol version is available.
 
-### Root Key Wrapping
+## Root Key Wrapping
 
 Root key wrapping is a local-only construct that pertains to how the root key is stored locally. By default, and with no root key wrapping, the `rootKey` is stored in the secure device keychain. Only the `rootKey.masterKey` is stored locally; the `rootKey.serverPassword` is never stored locally, and is only used for initial account registration. If no keychain is available (web browsers), the `rootKey` is stored in storage in necessarily plain format.
 
@@ -119,7 +113,7 @@ Root key wrapping allows the client to encrypt the `rootKey` before storing it t
 
 When a root key is wrapped, no information about the wrapper is persisted locally or in memory beyond the `keyParams` for the wrapper. This includes any sort of hash for verification of the correctness of the entered local passcode. That is, when a user enters a local passcode, we know it is correct not because we compare one hash to another, but by whether it succeeds in decrypting some encrypted payload.
 
-### Storage
+## Storage
 
 **There exists three types of storage:**
 
@@ -129,13 +123,13 @@ When a root key is wrapped, no information about the wrapper is persisted locall
 
 How data is stored depends on different key scenarios.
 
-#### Scenario A
+### Scenario A
 _No root key and no root key wrapper (no account and no passcode)_
 - **Value storage**: Plain, unencrypted
 - **Payload storage**: Plain, unencrypted
 - **Root key storage**: Not applicable
 
-#### Scenario B 
+### Scenario B 
 _Root key but no root key wrapper (account but no passcode):_
 - **Value storage**: Encrypted with root key
 - **Payload storage:** Encrypted with root key
@@ -143,19 +137,31 @@ _Root key but no root key wrapper (account but no passcode):_
     - With device keychain: Plainly in secure keychain
     - With no device keychain: Plainly in device storage
 
-#### Scenario C
+### Scenario C
 _Root key and root key wrapper (account and passcode):_
 - **Value storage**: Encrypted with root key
 - **Payload storage**: Encrypted with root key
 - **Root key storage**: Encrypted in device storage
 
-#### Scenario D
+### Scenario D
 _No root key but root key wrapper (no account but passcode):_
 - **Value storage**: Encrypted with root key wrapper
 - **Payload storage**: Encrypted with root key wrapper
 - **Root key storage**: Not applicable
 
-### Cryptography Specifics
+## 003 Migration
+
+For the most part, SNJS does not branch off into different modes of behavior for different protocol versions (apart from the version specific operators). This means that new constructs in 004, like items keys, are also used in 003. This is accomplished via migrations that are performed when the application detects older data state.
+
+In particular, when SNJS detects a pre-existing 003 account (before the user even has the chance to perform the protocol upgrade), a migration will be triggered that creates a default `itemsKey` using the account's current `rootKey.masterKey`:
+
+```
+itemsKey = { itemsKey: rootKey.masterKey, version: '003' }
+```
+
+This `itemsKey` is encrypted as usual using `rootKey.masterKey`, and synced to the user's account. When the user eventually performs the 004 upgrade (by entering their account password when prompted), a new `itemsKey` will be created as a default for 004. However, their previously created 003 `itemsKey` will continue to exist, so that data previously encrypted with 003 will still be decryptable.
+
+## Cryptography Specifics
 
 **Key Derivation:**
 
@@ -176,7 +182,7 @@ _No root key but root key wrapper (no account but passcode):_
 | Key Length (Bits)  | 256                |
 | Nonce Length (Bits)| 192                |
 
-#### Root Key Derivation Flow - Specifics
+### Root Key Derivation Flow - Specifics
 
 Given a user `identifier` (email) and `password` (user password):
 1. Generate a random salt `seed`, 256 bits (`hex`).
@@ -195,11 +201,11 @@ At this point we have `salt = generateSalt(email)`. However, we'd ideally like t
 
 The salt `seed` serves as a way to make it truly impossible to know a salt for an account ahead of time, without first interacting with the server the account is hosted on. While retrieving a `seed` for a given account is a public, non-authorized operation, users who configure two-factor authentication can proceed to lock this operation so that a proper 2FA code is required to retrieve the salt `seed`. Salts are thus computed via `salt = generateSalt(email, seed)`.
 
-#### Items Key Generation Flow
+### Items Key Generation Flow
 1. Generate random `hex` string `key`, 256 bits.
 2. Create `itemsKey = {itemsKey: key, version: '004'}`
 
-#### Encryption - Specifics
+### Encryption - Specifics
 
 An encrypted payload consists of:
 - `items_key_id`: The UUID of the `itemsKey` used to encrypt `enc_item_key`.
