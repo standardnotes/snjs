@@ -1775,7 +1775,8 @@ function () {
               this.unlockSyncing();
               _context34.next = 24;
               return regeneratorRuntime.awrap(this.syncService.sync({
-                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst
+                mode: _Services__WEBPACK_IMPORTED_MODULE_4__["SyncModes"].DownloadFirst,
+                timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_4__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
               }));
 
             case 24:
@@ -6671,7 +6672,7 @@ function ItemContentsEqual(_ref) {
     }
   }
 
-  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(leftContent, keysToIgnore);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(leftContent, keysToIgnore);
   rightContent = JSON.parse(JSON.stringify(rightContent));
 
   if (rightContent.appData) {
@@ -6687,7 +6688,7 @@ function ItemContentsEqual(_ref) {
     }
   }
 
-  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(rightContent, keysToIgnore);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(rightContent, keysToIgnore);
   return JSON.stringify(leftContent) === JSON.stringify(rightContent);
 }
 function ItemContentsDiffer(item1, item2, excludeContentKeys) {
@@ -12443,7 +12444,7 @@ function CreatePayload(_ref4) {
       throw 'Attempting to override payload with non-object';
     }
 
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMergeByCopy"])(rawPayload, override);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
   } // eslint-disable-next-line new-cap
 
 
@@ -12456,7 +12457,7 @@ function CopyPayload(_ref5) {
   var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(payload, payload.fields());
 
   if (override) {
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMergeByCopy"])(rawPayload, override);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
   }
 
   return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new payload.constructor(rawPayload, true));
@@ -12476,7 +12477,7 @@ function CopyEncryptionParameters(_ref6) {
   var rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(encryptionParameters, _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNEncryptionParameters"].fields());
 
   if (override) {
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMergeByCopy"])(rawParameters, override);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawParameters, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
   }
 
   return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNEncryptionParameters"](rawParameters, true));
@@ -29978,7 +29979,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, omitInPlace, omitByCopy, isObject, isFunction, joinPaths, deepMerge, Copy, deepMergeByCopy, pickByCopy, deepFreeze, hasGetter, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29986,6 +29987,8 @@ __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return getGlobalScope; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isWebEnvironment", function() { return isWebEnvironment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return findInArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFunction", function() { return isFunction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return isNullOrUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return greaterOfTwoDates; });
@@ -29999,12 +30002,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitInPlace", function() { return omitInPlace; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFunction", function() { return isFunction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "joinPaths", function() { return joinPaths; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return deepMerge; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return Copy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepMergeByCopy", function() { return deepMergeByCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return deepMerge; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pickByCopy", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepFreeze", function() { return deepFreeze; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasGetter", function() { return hasGetter; });
@@ -30015,7 +30015,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/uniqWith */ "./node_modules/lodash/uniqWith.js");
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_3__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 
 
 
@@ -30023,20 +30026,68 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 function getGlobalScope() {
   return typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : null;
 }
+/**
+ * Whether we are in a web browser
+ * @returns {boolean}
+ */
+
 function isWebEnvironment() {
   return getGlobalScope() !== null;
 }
+/**
+ * Searches array of objects for first object where object[key] === value
+ * @param {Array.<object>} array 
+ * @param {string} key 
+ * @param {object} value
+ * @returns {object|null} Matching object or null if not found
+ */
+
 function findInArray(array, key, value) {
   return array.find(function (item) {
     return item[key] === value;
   });
 }
+/**
+ * @returns {boolean} Whether the value is a function or object
+ */
+
+function isObject(value) {
+  if (value === null) {
+    return false;
+  }
+
+  return typeof value === 'function' || _typeof(value) === 'object';
+}
+/**
+ * @returns {boolean} Whether the value is a function
+ */
+
+function isFunction(value) {
+  if (value === null) {
+    return false;
+  }
+
+  return typeof value === 'function';
+}
+/**
+ * @param {object|null} value
+ * @returns {boolean} True if the object is null or undefined, otherwise false
+ */
+
 function isNullOrUndefined(value) {
   return value === null || value === undefined;
 }
+/**
+ * @returns {boolean} Whether the value is a string
+ */
+
 function isString(value) {
   return typeof value === 'string' || value instanceof String;
 }
+/**
+ * @returns {Date} The greater of the two dates
+ */
+
 function greaterOfTwoDates(dateA, dateB) {
   if (dateA > dateB) {
     return dateA;
@@ -30044,6 +30095,15 @@ function greaterOfTwoDates(dateA, dateB) {
     return dateB;
   }
 }
+/**
+ * Returns a new array containing only unique values by combining the two input arrays.
+ * Elements are unique based on the values of `equalityKeys`.
+ * @param {Array.<object>} arrayA 
+ * @param {Array.<object>} arrayB
+ * @param {Array.<string>} equalityKeys - Keys to determine element equality
+ * @returns {Array.<object>} Array containing unique values
+ */
+
 function uniqCombineObjArrays(arrayA, arrayB, equalityKeys) {
   return lodash_uniqWith__WEBPACK_IMPORTED_MODULE_2___default()(arrayA.concat(arrayB), function (a, b) {
     var _iteratorNormalCompletion = true;
@@ -30076,12 +30136,19 @@ function uniqCombineObjArrays(arrayA, arrayB, equalityKeys) {
     return true;
   });
 }
-/** Returns the last element in the array. */
+/** 
+ * Returns the last element in the array.
+ * @returns {object} The last element in the array
+ */
 
 function lastElement(array) {
   return array[array.length - 1];
 }
-/** Adds all items from otherArray into inArray, in-place. */
+/** 
+ * Adds all items from otherArray into inArray, in-place.
+ * Does not return a value.
+ * @returns {void}
+ */
 
 function extendArray(inArray, otherArray) {
   var _iteratorNormalCompletion2 = true;
@@ -30108,7 +30175,12 @@ function extendArray(inArray, otherArray) {
     }
   }
 }
-/** Removes all items appearing in toSubtract from inArray, in-place */
+/** 
+ * Removes all items appearing in toSubtract from inArray, in-place 
+ * @param {Array} inArray
+ * @param {Array} toSubtract - The list of items to remove from inArray
+ * @returns {void}
+ */
 
 function subtractFromArray(inArray, toSubtract) {
   var _iteratorNormalCompletion3 = true;
@@ -30135,12 +30207,18 @@ function subtractFromArray(inArray, toSubtract) {
     }
   }
 }
-/** Removes an object from the array by value */
+/** 
+ * Removes an object from the array by value 
+ * @returns {void}
+ */
 
 function removeFromArray(array, value) {
   array.splice(array.indexOf(value), 1);
 }
-/** Returns a new array by removing all elements in subtract from array */
+/** 
+ * Returns a new array by removing all elements in subtract from array 
+ * @returns {Array}
+ */
 
 function arrayByDifference(array, subtract) {
   return array.filter(function (x) {
@@ -30149,21 +30227,34 @@ function arrayByDifference(array, subtract) {
     return !array.includes(x);
   }));
 }
-/** Removes the value from the array at the given index, in-place. */
+/** 
+ * Removes the value from the array at the given index, in-place. 
+ * @returns {void}
+ */
 
 function removeFromIndex(array, index) {
   array.splice(index, 1);
 }
-/** Removes the value from the array at the given index, in-place. */
+/** 
+ * Returns a new array by removeing the value from the array at the given index 
+ * @returns {Array}
+ */
 
 function arrayByRemovingFromIndex(array, index) {
   var copy = array.slice();
   removeFromIndex(copy, index);
   return copy;
 }
+/**
+ * Deletes keys of the input object.
+ * @param {object} object 
+ * @param {Array.<string>} keys 
+ * @returns {void}
+ */
+
 function omitInPlace(object, keys) {
   if (!object) {
-    return object;
+    return;
   }
 
   var _iteratorNormalCompletion4 = true;
@@ -30189,12 +30280,15 @@ function omitInPlace(object, keys) {
       }
     }
   }
-
-  return object;
 }
-/** Creates a new object by omitting `fields` from `object` */
+/** 
+ * Creates a new object by omitting `keys` from `object`
+ * @param {object} object
+ * @param {Array.<string>} keys
+ * @returns {object}
+ */
 
-function omitByCopy(object, fields) {
+function omitByCopy(object, keys) {
   var newObject = Object.assign({}, object);
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior
@@ -30206,7 +30300,7 @@ function omitByCopy(object, fields) {
   var _iteratorError5 = undefined;
 
   try {
-    for (var _iterator5 = fields[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+    for (var _iterator5 = keys[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
       var key = _step5.value;
       delete newObject[key];
     }
@@ -30227,20 +30321,13 @@ function omitByCopy(object, fields) {
 
   return newObject;
 }
-function isObject(value) {
-  if (value === null) {
-    return false;
-  }
+/**
+ * Similiar to Node's path.join, this function combines an array of paths into
+ * one resolved path.
+ * @param  {...string} args 
+ * @returns {string}
+ */
 
-  return typeof value === 'function' || _typeof(value) === 'object';
-}
-function isFunction(value) {
-  if (value === null) {
-    return false;
-  }
-
-  return typeof value === 'function';
-}
 function joinPaths() {
   for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
@@ -30257,43 +30344,42 @@ function joinPaths() {
   }).join('/');
 }
 /**
- * lodash.merge will not merge a full array with an empty one.
- * deepMerge will replace arrays wholesale
+ * Creates a copy of the input object by JSON stringifying then JSON parsing the string.
+ * @returns {object}
+ */
+
+function Copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+/**
+ * Merges the second object parameter into the first object, in-place.
+ * @returns {object} The now modified first object parameter passed into the function.
  */
 
 function deepMerge(a, b) {
+  /**
+   * lodash.merge will not merge a full array with an empty one.
+   * deepMerge will replace arrays wholesale
+   */
   if (!a || !b) {
     throw 'Attempting to deepMerge with null values';
   }
 
-  function mergeCopyArrays(objValue, srcValue) {
-    if (lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default()(objValue)) {
-      return srcValue;
+  var customizer = function customizer(aValue, bValue) {
+    if (lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default()(aValue)) {
+      return bValue;
     }
-  }
+  };
 
-  lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default()(a, b, mergeCopyArrays);
+  lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default()(a, b, customizer);
   return a;
 }
-function Copy(object) {
-  return JSON.parse(JSON.stringify(object));
-}
-function deepMergeByCopy(a, b) {
-  if (!a || !b) {
-    throw 'Attempting to deepMergeByCopy with null values';
-  }
-
-  function mergeCopyArrays(objValue, srcValue) {
-    if (lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default()(objValue)) {
-      return srcValue;
-    }
-  }
-
-  b = Copy(b);
-  lodash_mergeWith__WEBPACK_IMPORTED_MODULE_1___default()(a, b, mergeCopyArrays);
-  return a;
-}
-/** Picks fields from an object by copying rather than by value (which is how Lodash's pick works.) */
+/** 
+ * Returns a new object by selecting certain keys from input object.
+ * @param {object} object
+ * @param {Array.<string>} keys
+ * @returns {object}
+ */
 
 function pickByCopy(object, keys) {
   var result = {};
@@ -30323,10 +30409,12 @@ function pickByCopy(object, keys) {
 
   return Copy(result);
 }
-function deepFreeze(object) {
-  // Retrieve the property names defined on object
-  var propNames = Object.getOwnPropertyNames(object); // Freeze properties before freezing self
+/**
+ * Recursively makes an object immutable via Object.freeze
+ */
 
+function deepFreeze(object) {
+  var propNames = Object.getOwnPropertyNames(object);
   var _iteratorNormalCompletion7 = true;
   var _didIteratorError7 = false;
   var _iteratorError7 = undefined;
@@ -30354,10 +30442,22 @@ function deepFreeze(object) {
 
   return Object.freeze(object);
 }
+/**
+ * Determines if an object has a getter defined for a given property
+ * @param {object} object
+ * @param {string} property
+ */
+
 function hasGetter(object, property) {
   var descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(object), property);
   return descriptor && !isNullOrUndefined(descriptor.get);
 }
+/**
+ * When awaited, this function allows code execution to pause for a set time.
+ * Should be used primarily for testing.
+ * @param {number} milliseconds
+ */
+
 function sleep(milliseconds) {
   return regeneratorRuntime.async(function sleep$(_context) {
     while (1) {
@@ -30399,6 +30499,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
+/**
+ * An abstract class with no instance methods. Used globally to generate uuids by any 
+ * consumer. Application must call SetGenerators before use.
+ */
+
 var Uuid =
 /*#__PURE__*/
 function () {
@@ -30413,8 +30518,8 @@ function () {
      * Dynamically feed both a syncronous and asyncronous implementation of a UUID generator function.
      * Feeding it this way allows platforms to implement their own uuid generation schemes, without
      * this class having to import any global functions.
-     * @param syncImpl  A syncronous function that returns a UUID.
-     * @param asyncImpl  An asyncronous function that returns a UUID.
+     * @param {function} syncImpl - A syncronous function that returns a UUID.
+     * @param {function} asyncImpl - An asyncronous function that returns a UUID.
      */
     value: function SetGenerators(_ref) {
       var syncImpl = _ref.syncImpl,
@@ -30422,13 +30527,19 @@ function () {
       this.syncUuidFunc = syncImpl;
       this.asyncUuidFunc = asyncImpl;
     }
+    /**
+     * Whether there is a syncronous UUID generation function available.
+     * @returns {boolean}
+     */
+
   }, {
     key: "canGenSync",
     value: function canGenSync() {
       return !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isNullOrUndefined"])(this.syncUuidFunc);
     }
     /**
-     * A default async implementation of uuid generation.
+     * Generates a UUID string asyncronously.
+     * @returns {Promise<string>}
      */
 
   }, {
@@ -30456,7 +30567,8 @@ function () {
       }, null, this);
     }
     /**
-     * A default sync implementation of uuid generation.
+     * Generates a UUID string syncronously.
+     * @returns {string}
      */
 
   }, {

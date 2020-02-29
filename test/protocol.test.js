@@ -21,7 +21,7 @@ describe('protocol', () => {
   });
 
   beforeEach(async function () {
-    // this.application = await Factory.createInitAppWithRandNamespace();
+
   });
 
   it('checks version to make sure its 004', () => {
