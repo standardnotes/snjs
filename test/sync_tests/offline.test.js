@@ -35,7 +35,8 @@ describe('offline syncing', () => {
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncService.sync();
-    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
+    /** In rare cases a sync can complete so fast that the dates are equal; this is ok. */
+    expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
     this.expectedItemCount++;
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);

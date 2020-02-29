@@ -599,7 +599,6 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it('deleting an item while it is being synced should keep deletion state', async function () {
-    console.warn("beginning test");
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
 
@@ -1090,7 +1089,7 @@ describe('online syncing', () => {
     expect(note.lastSyncBegan).to.be.below(new Date());
     await sync;
     expect(note.dirty).to.equal(false);
-    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
+    expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
 
   }).timeout(10000);
 
