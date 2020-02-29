@@ -10,11 +10,11 @@ The entry point of SNJS is the [`SNApplication`](https://github.com/standardnote
 
 An application must be supplied a custom subclass of [DeviceInterface](https://github.com/standardnotes/snjs/blob/004/lib/device_interface.js). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
 
-The application interacts with a variety of services and managers to faciliate complete client functionality. While the distinction is not fully technical, a service can be thought of as a class that allows consumers to perform actions on demand, while a manager is responsible for managing and reacting to application state (but also expose on-demand functions). All managers and services live in `lib/services`.
+The application interacts with a variety of services and managers to facilitate complete client functionality. While the distinction is not fully technical, a service can be thought of as a class that allows consumers to perform actions on demand, while a manager is responsible for managing and reacting to application state (but also expose on-demand functions). All managers and services live in `lib/services`.
 
-SNJS interacts with `sncrypto` to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/004/specification.md) document. This includes operations like key generation and data encryption.
+SNJS interacts with [`sncrypto`](https://github.com/standardnotes/sncrypto/tree/004) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/004/specification.md) document. This includes operations like key generation and data encryption.
 
-SNJS also interacts with a Standard Notes [syncing-server](https://github.com/standardnotes/syncing-server), which is essentially a dumb data store that deals with encrypted data, and never learns of client secrets.
+SNJS also interacts with a Standard Notes [syncing-server](https://github.com/standardnotes/syncing-server), which is dumb data and sync store that deals with encrypted data, and never learns of client secrets or sensitive information.
 
 ## Installation
 
@@ -133,7 +133,7 @@ Tests must be run in the browser due to WebCrypto dependency.
 1. `node test-server.js`
 2. Open browser to `http://localhost:9001/test/test.html`.
 
-Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000. This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as neccessary.
+Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000. This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
 
 _Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test.
 
