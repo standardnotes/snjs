@@ -35,11 +35,9 @@
     "regenerator-runtime": "^0.13.3",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
-    "sncrypto": "github:standardnotes/sncrypto#a119703a3225d0e75bb0302fbe5d82587843cf08",
+    "sncrypto": "github:standardnotes/sncrypto#0059a66e8c234b0a94c6ae87b0e957c26a571b4a",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
-  },
-  "dependencies": {
+    "webpack-cli": "^3.3.10",
     "docdash": "^1.2.0",
     "lodash": "^4.17.15"
   }
