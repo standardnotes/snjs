@@ -19898,6 +19898,8 @@ function (_PureService) {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["removeFromArray"])(_this2.keyObservers, callback);
       };
     }
+    /** @access private */
+
   }, {
     key: "notifyObserversOfChange",
     value: function notifyObserversOfChange() {
@@ -20013,6 +20015,7 @@ function (_PureService) {
      * part of the sync (automatically runs after download-first sync completes).
      * We use this to see if the server has any default itemsKeys, and if so, allows us to 
      * delete any never-synced items keys we have here locally.
+     * @access private
      */
 
   }, {
@@ -20094,6 +20097,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "handleFullSyncCompletion",
     value: function handleFullSyncCompletion() {
@@ -20129,18 +20134,25 @@ function (_PureService) {
       }, null, this);
     }
     /**
+     * @access public
      * @returns All SN|ItemsKey objects synced to the account.
      */
 
   }, {
     key: "itemsKeyForPayload",
+
+    /**
+     * @access public
+     * @returns {SNItemsKey} The items key used to encrypt the payload
+     */
     value: function itemsKeyForPayload(payload) {
       return this.allItemsKeys.find(function (key) {
         return key.uuid === payload.items_key_id;
       });
     }
     /**
-     * @returns The SNItemsKey object to use to encrypt new or updated items.
+     * @access public
+     * @returns {SNItemsKey} The SNItemsKey object to use to encrypt new or updated items.
      */
 
   }, {
@@ -20155,9 +20167,9 @@ function (_PureService) {
       });
     }
     /**
-     * @access public
      * When the root key changes (non-null only), we must re-encrypt all items
      * keys with this new root key (by simply re-syncing).
+     * @access public
      */
 
   }, {
@@ -20186,9 +20198,12 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * When migrating from non-SNItemsKey architecture, many items will not have a relationship with any key object.
-     * For those items, we can be sure that only 1 key object will correspond to that protocol version.
-     * @returns The SNItemsKey object to decrypt items encrypted with previous protocol version.
+     * When migrating from non-SNItemsKey architecture, many items will not have a 
+     * relationship with any key object. For those items, we can be sure that only 1 key 
+     * object will correspond to that protocol version.
+     * @access public
+     * @returns {SNItemsKey|null} The SNItemsKey object to decrypt items encrypted
+     * with previous protocol version.
      */
 
   }, {
@@ -20210,10 +20225,11 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @access public
      * Creates a new random SNItemsKey to use for item encryption, and adds it to model management.
      * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
      * and its .itemsKey value should be equal to the root key masterKey value.
+     * @access public
+     * @returns {void}
      */
 
   }, {
@@ -28492,6 +28508,8 @@ function (_PureService) {
     _this.nonEncryptedTypes = [_Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentTypes"].ServerExtension];
     return _this;
   }
+  /** @access private */
+
 
   _createClass(SNSyncService, [{
     key: "initializeStatus",
@@ -28505,6 +28523,8 @@ function (_PureService) {
         }
       });
     }
+    /** @access private */
+
   }, {
     key: "initializeState",
     value: function initializeState() {
@@ -28521,29 +28541,37 @@ function (_PureService) {
         }
       });
     }
+    /** @access public */
+
   }, {
     key: "lockSyncing",
     value: function lockSyncing() {
       this.locked = true;
     }
+    /** @access public */
+
   }, {
     key: "unlockSyncing",
     value: function unlockSyncing() {
       this.locked = false;
     }
+    /** @access public */
+
   }, {
     key: "isOutOfSync",
     value: function isOutOfSync() {
       return this.state.isOutOfSync();
     }
+    /** @access public */
+
   }, {
     key: "getLastSyncDate",
     value: function getLastSyncDate() {
       return this.state.lastSyncDate;
     }
     /** 
-     * @access public 
      * Called by application when sign in or registration occurs.
+     * @access public 
      */
 
   }, {
@@ -28672,6 +28700,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "setLastSyncToken",
     value: function setLastSyncToken(token) {
@@ -28689,6 +28719,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "setPaginationToken",
     value: function setPaginationToken(token) {
@@ -28715,6 +28747,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "getLastSyncToken",
     value: function getLastSyncToken() {
@@ -28743,6 +28777,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "getPaginationToken",
     value: function getPaginationToken() {
@@ -28771,6 +28807,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "clearSyncPositionTokens",
     value: function clearSyncPositionTokens() {
@@ -28794,6 +28832,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "itemsNeedingSync",
     value: function itemsNeedingSync() {
@@ -28812,6 +28852,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "alternateUuidForItem",
     value: function alternateUuidForItem(item) {
@@ -28864,9 +28906,11 @@ function (_PureService) {
     }
     /**
      * Mark all items as dirty and needing sync, then persist to storage.
-     * @param alternateUuids  In the case of signing in and merging local data, we alternate UUIDs
-     *                        to avoid overwriting data a user may retrieve that has the same UUID.
-     *                        Alternating here forces us to to create duplicates of the items instead.
+     * @access public
+     * @param alternateUuids  
+     * In the case of signing in and merging local data, we alternate UUIDs
+     * to avoid overwriting data a user may retrieve that has the same UUID.
+     * Alternating here forces us to to create duplicates of the items instead.
      */
 
   }, {
@@ -28985,10 +29029,10 @@ function (_PureService) {
       }, null, this, [[7, 18, 22, 30], [23,, 25, 29]]);
     }
     /**
-     * @access public
      * If encryption status changes (esp. on mobile, where local storage encryption
      * can be disabled), consumers may call this function to repersist all items to
      * disk using latest encryption status.
+     * @access public
      */
 
   }, {
@@ -29020,6 +29064,7 @@ function (_PureService) {
      * Return the payloads that need local persistence, before beginning a sync.
      * This way, if the application is closed before a sync request completes,
      * pending data will be saved to disk, and synced the next time the app opens.
+     * @access private
      */
 
   }, {
@@ -29054,6 +29099,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "timingStrategyResolveOnNext",
     value: function timingStrategyResolveOnNext() {
@@ -29066,6 +29113,8 @@ function (_PureService) {
         });
       });
     }
+    /** @access private */
+
   }, {
     key: "timingStrategyForceSpawnNew",
     value: function timingStrategyForceSpawnNew(options) {
@@ -29082,6 +29131,7 @@ function (_PureService) {
     /**
      * For timing strategy TIMING_STRATEGY_FORCE_SPAWN_NEW, we will execute a whole sync request
      * and pop it from the queue.
+     * @access private
      */
 
   }, {
@@ -29106,6 +29156,7 @@ function (_PureService) {
     /** 
      * Certain content types should not be encrypted when sending to server, 
      * such as server extensions 
+     * @access private
      */
 
   }, {
@@ -29121,6 +29172,7 @@ function (_PureService) {
       });
     }
     /**
+     * @access public
      * @param timingStrategy  TIMING_STRATEGY_RESOLVE_ON_NEXT | Default
      *                        Promise will be resolved on the next sync requests after the current one completes.
      *                        If there is no scheduled sync request, one will be scheduled.
@@ -29534,9 +29586,7 @@ function (_PureService) {
         }
       }, null, this, [[73, 77, 81, 89], [82,, 84, 88]]);
     }
-    /**
-     * @access private
-     */
+    /** @access private */
 
   }, {
     key: "syncOnlineOperation",
@@ -29641,6 +29691,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "syncOfflineOperation",
     value: function syncOfflineOperation(_ref5) {
@@ -29700,6 +29752,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "handleStatusChange",
     value: function handleStatusChange(_ref6) {
@@ -29724,6 +29778,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "handleOfflineResponse",
     value: function handleOfflineResponse(response) {
@@ -29759,6 +29815,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "handleErrorServerResponse",
     value: function handleErrorServerResponse(_ref7) {
@@ -29784,6 +29842,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access private */
+
   }, {
     key: "handleSuccessServerResponse",
     value: function handleSuccessServerResponse(_ref8) {
@@ -30000,9 +30060,9 @@ function (_PureService) {
       }, null, this, [[13, 28, 32, 40], [33,, 35, 39], [48, 64, 68, 76], [69,, 71, 75]]);
     }
     /**
-     * @access private
      * Items that have never been synced and marked as deleted should be cleared
      * as dirty, mapped, then removed from storage.
+     * @access private
      */
 
   }, {
@@ -30038,6 +30098,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access public */
+
   }, {
     key: "persistPayloads",
     value: function persistPayloads(_ref9) {
@@ -30070,7 +30132,8 @@ function (_PureService) {
     /**
      * Computes a hash of all items updated_at strings joined with a comma.
      * The server will also do the same, to determine whether the client values match server values.
-     * @returns A SHA256 digest string (hex).
+     * @access private
+     * @returns {string} A SHA256 digest string (hex).
      */
 
   }, {
@@ -30104,6 +30167,8 @@ function (_PureService) {
         }
       }, null, this, [[0, 7]]);
     }
+    /** @access public */
+
   }, {
     key: "deinit",
     value: function deinit() {
@@ -30127,7 +30192,10 @@ function (_PureService) {
         }
       }, null, this);
     }
-    /** Downloads all items and maps to lcoal items to attempt resolve out-of-sync state */
+    /** 
+     * Downloads all items and maps to lcoal items to attempt resolve out-of-sync state 
+     * @access public
+     */
 
   }, {
     key: "resolveOutOfSync",
@@ -30183,6 +30251,8 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /** @access public */
+
   }, {
     key: "statelessDownloadAllItems",
     value: function statelessDownloadAllItems() {
