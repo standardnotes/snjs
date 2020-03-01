@@ -35,7 +35,7 @@ const createItem = () => {
   const payload = CreateMaxPayloadFromAnyObject({
     object: createItemParams()
   });
-  return new SFItem(payload);
+  return new SNItem(payload);
 };
 
 describe('predicates', () => {
@@ -60,15 +60,15 @@ describe('predicates', () => {
 
   it('test and operator', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('this_field_ignored', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Item']
     ]))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('', 'and', [
       ['content.title', '=', 'Wrong'],
       ['content_type', '=', 'Item']
     ]))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('', 'and', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Wrong']
     ]))).to.equal(false);
@@ -76,19 +76,19 @@ describe('predicates', () => {
 
   it('test or operator', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('this_field_ignored', 'or', [
+    expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'or', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Item']
     ]))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('', 'or', [
+    expect(item.satisfiesPredicate(new SNPredicate('', 'or', [
       ['content.title', '=', 'Wrong'],
       ['content_type', '=', 'Item']
     ]))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('', 'or', [
+    expect(item.satisfiesPredicate(new SNPredicate('', 'or', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Wrong']
     ]))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('', 'or', [
+    expect(item.satisfiesPredicate(new SNPredicate('', 'or', [
       ['content.title', '=', 'Wrong'],
       ['content_type', '=', 'Wrong']
     ]))).to.equal(false);
@@ -96,7 +96,7 @@ describe('predicates', () => {
 
   it('test deep nested recursive operator', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('this_field_ignored', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['content.title', '=', 'Hello'],
       ['this_field_ignored', 'or', [
         ['content.title', '=', 'Wrong'],
@@ -105,7 +105,7 @@ describe('predicates', () => {
       ]]
     ]))).to.equal(true);
 
-    expect(item.satisfiesPredicate(new SFPredicate('this_field_ignored', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['content.title', '=', 'Hello'],
       ['this_field_ignored', 'or', [
         ['content.title', '=', 'Wrong'],
@@ -119,7 +119,7 @@ describe('predicates', () => {
     const item = createItem();
     item.setAppDataItem('pinned', true);
     item.content.protected = true;
-    expect(item.satisfiesPredicate(new SFPredicate('this_field_ignored', 'and', [
+    expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['pinned', '=', true],
       ['content.protected', '=', true]
     ]))).to.equal(true);
@@ -129,9 +129,9 @@ describe('predicates', () => {
     const item = createItem();
     item.setAppDataItem('pinned', true);
     item.content.protected = true;
-    const pinnedPred = new SFPredicate('pinned', '=', true);
-    const protectedPred = new SFPredicate('content.protected', '=', true);
-    const compoundProd = SFPredicate.CompoundPredicate([
+    const pinnedPred = new SNPredicate('pinned', '=', true);
+    const protectedPred = new SNPredicate('content.protected', '=', true);
+    const compoundProd = SNPredicate.CompoundPredicate([
       pinnedPred,
       protectedPred
     ]);
@@ -141,52 +141,52 @@ describe('predicates', () => {
   it('test equality', () => {
     const item = createItem();
 
-    expect(item.satisfiesPredicate(new SFPredicate('content_type', '=', 'Foo'))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('content_type', '=', 'Item'))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Foo'))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Item'))).to.equal(true);
 
-    expect(item.satisfiesPredicate(new SFPredicate('content.title', '=', 'Foo'))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('content.title', '=', 'Hello'))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.title', '=', 'Foo'))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.title', '=', 'Hello'))).to.equal(true);
 
-    expect(item.satisfiesPredicate(new SFPredicate('content.numbers', '=', ['1']))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('content.numbers', '=', ['1', '2', '3']))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.numbers', '=', ['1']))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.numbers', '=', ['1', '2', '3']))).to.equal(true);
   });
 
   it('test inequality', () => {
     const item = createItem();
 
-    expect(item.satisfiesPredicate(new SFPredicate('content_type', '!=', 'Foo'))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('content_type', '!=', 'Item'))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Foo'))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Item'))).to.equal(false);
 
-    expect(item.satisfiesPredicate(new SFPredicate('content.title', '!=', 'Foo'))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('content.title', '!=', 'Hello'))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.title', '!=', 'Foo'))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.title', '!=', 'Hello'))).to.equal(false);
 
-    expect(item.satisfiesPredicate(new SFPredicate('content.numbers', '!=', ['1']))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('content.numbers', '!=', ['1', '2', '3']))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.numbers', '!=', ['1']))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.numbers', '!=', ['1', '2', '3']))).to.equal(false);
   });
 
   it('test nonexistent property', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', '!=', 'Foo'))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', '=', 'Foo'))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', '!=', 'Foo'))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', '=', 'Foo'))).to.equal(false);
 
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', '<', 3))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', '>', 3))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', '<=', 3))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('foobar', 'includes', 3))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', '<', 3))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', '>', 3))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', '<=', 3))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('foobar', 'includes', 3))).to.equal(false);
   });
 
   it('test includes', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('content.tags', 'includes', ['title', '=', 'bar']))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('content.tags', 'includes', new SFPredicate('title', '=', 'bar')))).to.equal(true);
-    expect(item.satisfiesPredicate(new SFPredicate('content.tags', 'includes', new SFPredicate('title', '=', 'foobar')))).to.equal(false);
-    expect(item.satisfiesPredicate(new SFPredicate('content.tags', 'includes', new SFPredicate('title', '=', 'foo')))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.tags', 'includes', ['title', '=', 'bar']))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.tags', 'includes', new SNPredicate('title', '=', 'bar')))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('content.tags', 'includes', new SNPredicate('title', '=', 'foobar')))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.tags', 'includes', new SNPredicate('title', '=', 'foo')))).to.equal(true);
   });
 
   it('test dynamic appData values', () => {
     const item = createItem();
     item.setAppDataItem('archived', true);
-    expect(item.satisfiesPredicate(new SFPredicate('archived', '=', true))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('archived', '=', true))).to.equal(true);
     expect(item.satisfiesPredicate(['archived', '=', true])).to.equal(true);
     expect(item.satisfiesPredicate(JSON.parse('["archived", "=", true]'))).to.equal(true);
     expect(item.satisfiesPredicate(JSON.parse('["archived", "=", false]'))).to.equal(false);
@@ -201,7 +201,7 @@ describe('predicates', () => {
     item1.updated_at = new Date();
 
     await modelManager.mapItem({ item: item1 });
-    const predicate = new SFPredicate('content.title', '=', 'ello');
+    const predicate = new SNPredicate('content.title', '=', 'ello');
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     predicate.keypath = 'content.desc';
@@ -251,17 +251,17 @@ describe('predicates', () => {
 
     // multi matching
     expect(modelManager.itemsMatchingPredicates([
-      new SFPredicate('content_type', '=', 'Item'),
-      new SFPredicate('content.title', '=', 'SHello')
+      new SNPredicate('content_type', '=', 'Item'),
+      new SNPredicate('content.title', '=', 'SHello')
     ]).length).to.equal(0);
 
     expect(modelManager.itemsMatchingPredicates([
-      new SFPredicate('content_type', '=', 'Item'),
-      new SFPredicate('content.title', '=', 'Hello')
+      new SNPredicate('content_type', '=', 'Item'),
+      new SNPredicate('content.title', '=', 'Hello')
     ]).length).to.equal(1);
 
     expect(modelManager.itemsMatchingPredicate(
-      new SFPredicate('content.title', 'startsWith', 'H')
+      new SNPredicate('content.title', 'startsWith', 'H')
     ).length).to.equal(1);
   });
 
@@ -288,28 +288,28 @@ describe('predicates', () => {
 
     const item2 = (await modelManager.mapPayloadsToLocalItems({ payloads: [payload] }))[0];
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate('content.tags', 'includes', ['title', 'includes', 'bar'])).length).to.equal(1);
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate('content.tags', 'includes', ['title', 'in', ['sobar']])).length).to.equal(1);
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate('content.tags', 'includes', ['title', 'in', ['sobar', 'foo']])).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'includes', 'bar'])).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'in', ['sobar']])).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'in', ['sobar', 'foo']])).length).to.equal(1);
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate('content.tags', 'includes', new SFPredicate('title', 'startsWith', 'f'))).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', new SNPredicate('title', 'startsWith', 'f'))).length).to.equal(1);
 
-    expect(modelManager.itemsMatchingPredicate(new SFPredicate('archived', '=', true)).length).to.equal(0);
-    const contentPred = new SFPredicate('content_type', '=', 'Item');
+    expect(modelManager.itemsMatchingPredicate(new SNPredicate('archived', '=', true)).length).to.equal(0);
+    const contentPred = new SNPredicate('content_type', '=', 'Item');
     item2.setAppDataItem('archived', true);
-    expect(modelManager.itemsMatchingPredicates([contentPred, new SFPredicate('archived', '=', true)]).length).to.equal(1);
+    expect(modelManager.itemsMatchingPredicates([contentPred, new SNPredicate('archived', '=', true)]).length).to.equal(1);
   });
 
   it('nonexistent property should not satisfy predicate', () => {
     const item = createItem();
-    expect(item.satisfiesPredicate(new SFPredicate('content.foobar.length', '=', 0))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('content.foobar.length', '=', 0))).to.equal(false);
   });
 
   it('false should compare true with undefined', async function () {
     const item = createItem();
     const modelManager = this.application.modelManager;
     await modelManager.mapItem({ item: item });
-    const predicate = new SFPredicate('pinned', '=', false);
+    const predicate = new SNPredicate('pinned', '=', false);
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(modelManager.allItems.length);
   });
 
@@ -319,7 +319,7 @@ describe('predicates', () => {
     const modelManager = this.application.modelManager;
     await modelManager.setItemDirty(item, true);
     // match only letters
-    const predicate = new SFPredicate('content.title', 'matches', '^[a-zA-Z]+$');
+    const predicate = new SNPredicate('content.title', 'matches', '^[a-zA-Z]+$');
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = 'abc';

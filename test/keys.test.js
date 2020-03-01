@@ -67,8 +67,8 @@ describe('keys', () => {
   it('validates content types requiring root encryption', async function () {
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.ItemsKey)).to.equal(true);
     expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.EncryptedStorage)).to.equal(true);
-    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('SF|Item')).to.equal(false);
-    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption('Note')).to.equal(false);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.Item)).to.equal(false);
+    expect(this.application.keyManager.contentTypeUsesRootKeyEncryption(ContentTypes.Note)).to.equal(false);
   });
 
   it('generating export params with no account or passcode should produce encrypted payload',

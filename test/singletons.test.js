@@ -53,9 +53,9 @@ describe('singletons', () => {
       });
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
-    this.extPred = SFPredicate.CompoundPredicate([
-      new SFPredicate('content_type', '=', ContentTypes.Component),
-      new SFPredicate('package_info.identifier', '=', this.extManagerId)
+    this.extPred = SNPredicate.CompoundPredicate([
+      new SNPredicate('content_type', '=', ContentTypes.Component),
+      new SNPredicate('package_info.identifier', '=', this.extManagerId)
     ]);
     this.createExtMgr = async () => {
       return this.application.createItem({
@@ -191,7 +191,7 @@ describe('singletons', () => {
     /** Set after sync so that it syncs properly */
     item.errorDecrypting = true;
 
-    const predicate = new SFPredicate('content_type', '=', item.content_type);
+    const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload
@@ -208,7 +208,7 @@ describe('singletons', () => {
     });
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    const predicate = new SFPredicate('content_type', '=', item.content_type);
+    const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload

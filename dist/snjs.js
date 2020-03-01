@@ -917,7 +917,7 @@ function () {
     }
     /** 
      * @access public 
-     * @param {Array.<SFItem>} params.items
+     * @param {Array.<SNItem>} params.items
      */
 
   }, {
@@ -945,7 +945,7 @@ function () {
     }
     /** 
      * @access public 
-     * @param {SFItem} params.item
+     * @param {SNItem} params.item
      * @param {bool} params.updateUserModifiedDate  Whether to change the modified date the user 
      * sees of the item.
      */
@@ -1257,7 +1257,7 @@ function () {
      * @param {string} params.password
      * @param {bool} [params.awaitSync = false]
      * @returns {Object}  result
-     * @returns {Array.<SFItem>} result.affectedItems  Items that were either created
+     * @returns {Array.<SNItem>} result.affectedItems  Items that were either created
      *          or dirtied by this import
      * @returns {int} result.errorCount  The number of items
      *          that were not imported due to failure to decrypt.
@@ -3061,7 +3061,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3088,11 +3088,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return _Lib_device_interface__WEBPACK_IMPORTED_MODULE_6__["DeviceInterface"]; });
 
 /* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models */ "./lib/models/index.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SFItem"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItem", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNItem"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNItemsKey"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SFPredicate"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPredicate", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNNote"]; });
 
@@ -3125,7 +3125,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_11__["ItemHistoryEntry"]; });
 
 /* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/app/privileges */ "./lib/models/app/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["SFPrivileges"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["SNPrivileges"]; });
 
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! sncrypto */ "./node_modules/sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_13__);
@@ -5184,8 +5184,8 @@ var ComponentAreas = {
 
 var SNComponent =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNComponent, _SFItem);
+function (_SNItem) {
+  _inherits(SNComponent, _SNItem);
 
   function SNComponent(payload) {
     var _this;
@@ -5399,7 +5399,7 @@ function (_SFItem) {
   }]);
 
   return SNComponent;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
@@ -5458,8 +5458,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNEditor =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNEditor, _SFItem);
+function (_SNItem) {
+  _inherits(SNEditor, _SNItem);
 
   function SNEditor(payload) {
     var _this;
@@ -5588,7 +5588,7 @@ function (_SFItem) {
   }]);
 
   return SNEditor;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SNItem"]);
 
 /***/ }),
 
@@ -5639,8 +5639,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNActionsExtension =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNActionsExtension, _SFItem);
+function (_SNItem) {
+  _inherits(SNActionsExtension, _SNItem);
 
   function SNActionsExtension(json) {
     var _this;
@@ -5714,7 +5714,7 @@ function (_SFItem) {
   }]);
 
   return SNActionsExtension;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
 
 /***/ }),
 
@@ -5764,8 +5764,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNItemsKey =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNItemsKey, _SFItem);
+function (_SNItem) {
+  _inherits(SNItemsKey, _SNItem);
 
   function SNItemsKey() {
     _classCallCheck(this, SNItemsKey);
@@ -5827,7 +5827,7 @@ function (_SFItem) {
     key: "FromRaw",
 
     /**
-     * Because this is a traditional SFItem, the constructor expects an object
+     * Because this is a traditional SNItem, the constructor expects an object
      * with a .content property. FromRaw allows you to send in an unwrapped
      * raw key hash instead.
      */
@@ -5842,7 +5842,7 @@ function (_SFItem) {
   }]);
 
   return SNItemsKey;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
@@ -5888,13 +5888,13 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 /** 
  * A note item
- * @extends SFItem
+ * @extends SNItem
  */
 
 var SNNote =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNNote, _SFItem);
+function (_SNItem) {
+  _inherits(SNNote, _SNItem);
 
   function SNNote(payload) {
     var _this;
@@ -6033,7 +6033,7 @@ function (_SFItem) {
   }]);
 
   return SNNote;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
 
 /***/ }),
 
@@ -6041,12 +6041,12 @@ function (_SFItem) {
 /*!**************************************!*\
   !*** ./lib/models/app/privileges.js ***!
   \**************************************/
-/*! exports provided: SFPrivileges */
+/*! exports provided: SNPrivileges */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return SFPrivileges; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return SNPrivileges; });
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
@@ -6079,24 +6079,24 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
  * may have configured for protecting certain actions.
  */
 
-var SFPrivileges =
+var SNPrivileges =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SFPrivileges, _SFItem);
+function (_SNItem) {
+  _inherits(SNPrivileges, _SNItem);
 
-  _createClass(SFPrivileges, null, [{
+  _createClass(SNPrivileges, null, [{
     key: "contentType",
     value: function contentType() {
       return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Privileges;
     }
   }]);
 
-  function SFPrivileges(payload) {
+  function SNPrivileges(payload) {
     var _this;
 
-    _classCallCheck(this, SFPrivileges);
+    _classCallCheck(this, SNPrivileges);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SFPrivileges).call(this, payload));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNPrivileges).call(this, payload));
 
     if (!_this.errorDecrypting && !_this.content.desktopPrivileges) {
       _this.content.desktopPrivileges = {};
@@ -6105,7 +6105,7 @@ function (_SFItem) {
     return _this;
   }
 
-  _createClass(SFPrivileges, [{
+  _createClass(SNPrivileges, [{
     key: "setCredentialsForAction",
     value: function setCredentialsForAction(action, credentials) {
       this.content.desktopPrivileges[action] = credentials;
@@ -6150,12 +6150,12 @@ function (_SFItem) {
   }, {
     key: "singletonPredicate",
     get: function get() {
-      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]('content_type', '=', this.content_type);
+      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SNPredicate"]('content_type', '=', this.content_type);
     }
   }]);
 
-  return SFPrivileges;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SFItem"]);
+  return SNPrivileges;
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
 
 /***/ }),
 
@@ -6229,7 +6229,7 @@ function (_SNTag) {
             title: 'All notes',
             isSystemTag: true,
             isAllTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
+            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
           }
         }
       });
@@ -6241,7 +6241,7 @@ function (_SNTag) {
             title: 'Archived',
             isSystemTag: true,
             isArchiveTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['archived', '=', true])
+            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['archived', '=', true])
           }
         }
       });
@@ -6253,7 +6253,7 @@ function (_SNTag) {
             title: 'Trash',
             isSystemTag: true,
             isTrashTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"].FromArray(['content.trashed', '=', true])
+            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content.trashed', '=', true])
           }
         }
       });
@@ -6314,8 +6314,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNTag =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNTag, _SFItem);
+function (_SNItem) {
+  _inherits(SNTag, _SNItem);
 
   function SNTag(payload) {
     var _this;
@@ -6450,7 +6450,7 @@ function (_SFItem) {
   }]);
 
   return SNTag;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"]);
 
 /***/ }),
 
@@ -6621,8 +6621,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNUserPrefs =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNUserPrefs, _SFItem);
+function (_SNItem) {
+  _inherits(SNUserPrefs, _SNItem);
 
   function SNUserPrefs() {
     _classCallCheck(this, SNUserPrefs);
@@ -6638,7 +6638,7 @@ function (_SFItem) {
   }, {
     key: "singletonPredicate",
     get: function get() {
-      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]('content_type', '=', this.content_type);
+      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]('content_type', '=', this.content_type);
     }
   }], [{
     key: "contentType",
@@ -6648,7 +6648,7 @@ function (_SFItem) {
   }]);
 
   return SNUserPrefs;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
@@ -6739,8 +6739,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var SNEncryptedStorage =
 /*#__PURE__*/
-function (_SFItem) {
-  _inherits(SNEncryptedStorage, _SFItem);
+function (_SNItem) {
+  _inherits(SNEncryptedStorage, _SNItem);
 
   function SNEncryptedStorage() {
     _classCallCheck(this, SNEncryptedStorage);
@@ -6764,7 +6764,7 @@ function (_SFItem) {
   }]);
 
   return SNEncryptedStorage;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
@@ -6848,13 +6848,13 @@ function ItemContentsDiffer(item1, item2, excludeContentKeys) {
 /*!*********************************!*\
   !*** ./lib/models/core/item.js ***!
   \*********************************/
-/*! exports provided: SingletonStrategies, SFItem */
+/*! exports provided: SingletonStrategies, SNItem */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SingletonStrategies", function() { return SingletonStrategies; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return SFItem; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItem", function() { return SNItem; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony import */ var _Models_core_functions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/functions */ "./lib/models/core/functions.js");
@@ -6882,11 +6882,11 @@ var SingletonStrategies = {
  * The most abstract item that any syncable item needs to extend from.
  */
 
-var SFItem =
+var SNItem =
 /*#__PURE__*/
 function () {
-  function SFItem(payload) {
-    _classCallCheck(this, SFItem);
+  function SNItem(payload) {
+    _classCallCheck(this, SNItem);
 
     this.content = {
       references: [],
@@ -6896,7 +6896,7 @@ function () {
 
     if (payload) {
       if (!payload.isPayload) {
-        throw "Attempting to construct SFItem from non-payload object ".concat(payload, ".");
+        throw "Attempting to construct SNItem from non-payload object ".concat(payload, ".");
       }
 
       this.updateFromPayload(payload);
@@ -6909,7 +6909,7 @@ function () {
     }
   }
 
-  _createClass(SFItem, [{
+  _createClass(SNItem, [{
     key: "payloadRepresentation",
     value: function payloadRepresentation() {
       var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -6959,7 +6959,7 @@ function () {
               }
 
               _context.next = 3;
-              return regeneratorRuntime.awrap(SFItem.GenerateUuid());
+              return regeneratorRuntime.awrap(SNItem.GenerateUuid());
 
             case 3:
               this.uuid = _context.sent;
@@ -7081,7 +7081,7 @@ function () {
     value: function structureParams() {
       return this.getContentCopy();
     }
-    /** Allows consumers to check if object is an SFItem subclass and not a generic JS object */
+    /** Allows consumers to check if object is an SNItem subclass and not a generic JS object */
 
   }, {
     key: "handleDeletedContent",
@@ -7374,7 +7374,7 @@ function () {
   }, {
     key: "satisfiesPredicate",
     value: function satisfiesPredicate(predicate) {
-      return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SFPredicate"].ItemSatisfiesPredicate(this, predicate);
+      return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_1__["SNPredicate"].ItemSatisfiesPredicate(this, predicate);
     }
     /** Dates */
 
@@ -7397,9 +7397,9 @@ function () {
     key: "dateToLocalizedString",
     value: function dateToLocalizedString(date) {
       if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
-        if (!SFItem.sharedDateFormatter) {
+        if (!SNItem.sharedDateFormatter) {
           var locale = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
-          SFItem.sharedDateFormatter = new Intl.DateTimeFormat(locale, {
+          SNItem.sharedDateFormatter = new Intl.DateTimeFormat(locale, {
             year: 'numeric',
             month: 'short',
             day: '2-digit',
@@ -7409,7 +7409,7 @@ function () {
           });
         }
 
-        return SFItem.sharedDateFormatter.format(date);
+        return SNItem.sharedDateFormatter.format(date);
       } else {
         // IE < 11, Safari <= 9.0.
         // In English, this generates the string most similar to
@@ -7498,7 +7498,7 @@ function () {
   }, {
     key: "singletonPredicate",
     get: function get() {
-      throw 'Must override SFItem.singletonPredicate';
+      throw 'Must override SNItem.singletonPredicate';
     }
   }, {
     key: "singletonStrategy",
@@ -7507,7 +7507,7 @@ function () {
     }
   }]);
 
-  return SFItem;
+  return SNItem;
 }();
 
 /***/ }),
@@ -7516,12 +7516,12 @@ function () {
 /*!**************************************!*\
   !*** ./lib/models/core/predicate.js ***!
   \**************************************/
-/*! exports provided: SFPredicate */
+/*! exports provided: SNPredicate */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return SFPredicate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPredicate", function() { return SNPredicate; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -7532,20 +7532,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * A local-only construct that defines a built query that can be used to 
  * dynamically search items.
  */
-var SFPredicate =
+var SNPredicate =
 /*#__PURE__*/
 function () {
-  function SFPredicate(keypath, operator, value) {
-    _classCallCheck(this, SFPredicate);
+  function SNPredicate(keypath, operator, value) {
+    _classCallCheck(this, SNPredicate);
 
     this.keypath = keypath;
     this.operator = operator;
     this.value = value;
 
-    if (SFPredicate.IsRecursiveOperator(this.operator)) {
+    if (SNPredicate.IsRecursiveOperator(this.operator)) {
       this.value = this.value.map(function (element) {
         if (Array.isArray(element)) {
-          return SFPredicate.FromArray(element);
+          return SNPredicate.FromArray(element);
         } else {
           return element;
         }
@@ -7553,15 +7553,15 @@ function () {
     }
   }
 
-  _createClass(SFPredicate, null, [{
+  _createClass(SNPredicate, null, [{
     key: "CompoundPredicate",
     value: function CompoundPredicate(predicates) {
-      return new SFPredicate('ignored', 'and', predicates);
+      return new SNPredicate('ignored', 'and', predicates);
     }
   }, {
     key: "FromArray",
     value: function FromArray(array) {
-      return new SFPredicate(array[0], array[1], array[2]);
+      return new SNPredicate(array[0], array[1], array[2]);
     }
   }, {
     key: "ObjectSatisfiesPredicate",
@@ -7572,7 +7572,7 @@ function () {
         predicate = this.FromArray(predicate);
       }
 
-      if (SFPredicate.IsRecursiveOperator(predicate.operator)) {
+      if (SNPredicate.IsRecursiveOperator(predicate.operator)) {
         if (predicate.operator === 'and') {
           var _iteratorNormalCompletion = true;
           var _didIteratorError = false;
@@ -7702,7 +7702,7 @@ function () {
         var innerPredicate;
 
         if (Array.isArray(predicateValue)) {
-          innerPredicate = SFPredicate.FromArray(predicateValue);
+          innerPredicate = SNPredicate.FromArray(predicateValue);
         } else {
           innerPredicate = predicateValue;
         }
@@ -7741,7 +7741,7 @@ function () {
     key: "ItemSatisfiesPredicate",
     value: function ItemSatisfiesPredicate(item, predicate) {
       if (Array.isArray(predicate)) {
-        predicate = SFPredicate.FromArray(predicate);
+        predicate = SNPredicate.FromArray(predicate);
       }
 
       return this.ObjectSatisfiesPredicate(item, predicate);
@@ -7802,7 +7802,7 @@ function () {
     }
   }]);
 
-  return SFPredicate;
+  return SNPredicate;
 }();
 
 /***/ }),
@@ -7825,13 +7825,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models__WEBPACK_IMPORTED_MODULE_0__["SFPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
+var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models__WEBPACK_IMPORTED_MODULE_0__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
 function CreateItemFromPayload(payload) {
   if (!payload.isPayload) {
     throw 'Attempting to create item from non-payload object.';
   }
 
-  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models__WEBPACK_IMPORTED_MODULE_0__["SFItem"]; // eslint-disable-next-line new-cap
+  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models__WEBPACK_IMPORTED_MODULE_0__["SNItem"]; // eslint-disable-next-line new-cap
 
   return new itemClass(payload);
 }
@@ -7842,13 +7842,13 @@ function CreateItemFromPayload(payload) {
 /*!*****************************!*\
   !*** ./lib/models/index.js ***!
   \*****************************/
-/*! exports provided: SFItem, SingletonStrategies, SNItemsKey, SFPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SFPrivileges, SNSmartTag, SNTheme, SNEncryptedStorage, ContentTypes, displayStringForContentType, CreateItemFromPayload */
+/*! exports provided: SNItem, SingletonStrategies, SNItemsKey, SNPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SNPrivileges, SNSmartTag, SNTheme, SNEncryptedStorage, ContentTypes, displayStringForContentType, CreateItemFromPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFItem", function() { return _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItem", function() { return _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SingletonStrategies", function() { return _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SingletonStrategies"]; });
 
@@ -7856,7 +7856,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]; });
 
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPredicate", function() { return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPredicate", function() { return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]; });
 
 /* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _Models_app_component__WEBPACK_IMPORTED_MODULE_3__["SNComponent"]; });
@@ -7880,7 +7880,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNUserPrefs", function() { return _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__["SNUserPrefs"]; });
 
 /* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SFPrivileges", function() { return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__["SFPrivileges"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__["SNPrivileges"]; });
 
 /* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__["SNSmartTag"]; });
@@ -12963,12 +12963,12 @@ function (_PurePayload) {
     key: "compareContentFields",
 
     /**
-     * Compares the .content fields for equality, creating new SFItem objects
+     * Compares the .content fields for equality, creating new SNItem objects
      * to properly handle .content intricacies.
      */
     value: function compareContentFields(otherPayload) {
-      var left = new _Models__WEBPACK_IMPORTED_MODULE_2__["SFItem"](this);
-      var right = new _Models__WEBPACK_IMPORTED_MODULE_2__["SFItem"](otherPayload);
+      var left = new _Models__WEBPACK_IMPORTED_MODULE_2__["SNItem"](this);
+      var right = new _Models__WEBPACK_IMPORTED_MODULE_2__["SNItem"](otherPayload);
       return left.isItemContentEqualWith(right);
     }
   }, {
@@ -19612,10 +19612,10 @@ function () {
         return false;
       }
 
-      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
+      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
         object: this.item
       }));
-      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SFItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
+      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
         object: entry.item
       }));
       return lhs.isItemContentEqualWith(rhs);
@@ -24029,11 +24029,11 @@ function (_PureService) {
   }, {
     key: "notesMatchingSmartTag",
     value: function notesMatchingSmartTag(smartTag) {
-      var contentTypePredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SFPredicate"]('content_type', '=', 'Note');
+      var contentTypePredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SNPredicate"]('content_type', '=', 'Note');
       var predicates = [contentTypePredicate, smartTag.content.predicate];
 
       if (!smartTag.content.isTrashTag) {
-        var notTrashedPredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SFPredicate"]('content.trashed', '=', false);
+        var notTrashedPredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SNPredicate"]('content.trashed', '=', false);
         predicates.push(notTrashedPredicate);
       }
 
@@ -24382,8 +24382,8 @@ function (_PureService) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              contentType = _Models_app_privileges__WEBPACK_IMPORTED_MODULE_1__["SFPrivileges"].contentType();
-              predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]('content_type', '=', contentType);
+              contentType = _Models_app_privileges__WEBPACK_IMPORTED_MODULE_1__["SNPrivileges"].contentType();
+              predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]('content_type', '=', contentType);
               return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton({
                 predicate: predicate,
                 createPayload: Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({

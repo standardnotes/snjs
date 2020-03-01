@@ -34,18 +34,18 @@ describe('app models', () => {
   });
 
   it('item should be defined', () => {
-    expect(SFItem).to.not.be.null;
+    expect(SNItem).to.not.be.null;
   });
 
   it('item content should be assigned', () => {
     const params = Factory.createNotePayload();
-    const item = new SFItem(params);
+    const item = new SNItem(params);
     expect(item.content.title).to.equal(params.content.title);
   });
 
   it('should default updated_at to 1970 and created_at to the present', () => {
     const params = Factory.createNotePayload();
-    const item = new SFItem(params);
+    const item = new SNItem(params);
     const epoch = new Date(0);
     expect(item.updated_at - epoch).to.equal(0);
     expect(item.created_at - epoch).to.be.above(0);

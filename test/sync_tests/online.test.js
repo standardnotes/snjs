@@ -1077,7 +1077,7 @@ describe('online syncing', () => {
     this.expectedItemCount++;
 
     expect(note.dirty).to.equal(true);
-    expect(note.dirtiedDate).to.be.below(new Date());
+    expect(note.dirtiedDate).to.be.at.most(new Date());
 
     note.text = `${Math.random()}`;
     await this.application.modelManager.setItemDirty(note);
