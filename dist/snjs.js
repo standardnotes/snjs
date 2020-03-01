@@ -2268,19 +2268,65 @@ function () {
   }, {
     key: "changeDeviceInterface",
     value: function changeDeviceInterface(deviceInterface) {
+      var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, service;
+
       return regeneratorRuntime.async(function changeDeviceInterface$(_context48) {
         while (1) {
           switch (_context48.prev = _context48.next) {
             case 0:
               this.deviceInterface = deviceInterface;
-              this.keyManager.setDeviceInterface(this.deviceInterface);
+              _iteratorNormalCompletion7 = true;
+              _didIteratorError7 = false;
+              _iteratorError7 = undefined;
+              _context48.prev = 4;
 
-            case 2:
+              for (_iterator7 = this.services[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                service = _step7.value;
+
+                if (service.deviceInterface) {
+                  service.deviceInterface = deviceInterface;
+                }
+              }
+
+              _context48.next = 12;
+              break;
+
+            case 8:
+              _context48.prev = 8;
+              _context48.t0 = _context48["catch"](4);
+              _didIteratorError7 = true;
+              _iteratorError7 = _context48.t0;
+
+            case 12:
+              _context48.prev = 12;
+              _context48.prev = 13;
+
+              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                _iterator7.return();
+              }
+
+            case 15:
+              _context48.prev = 15;
+
+              if (!_didIteratorError7) {
+                _context48.next = 18;
+                break;
+              }
+
+              throw _iteratorError7;
+
+            case 18:
+              return _context48.finish(15);
+
+            case 19:
+              return _context48.finish(12);
+
+            case 20:
             case "end":
               return _context48.stop();
           }
         }
-      }, null, this);
+      }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
     }
     /** @access private */
 
@@ -2301,7 +2347,6 @@ function () {
       this.protocolService.setKeyManager(this.keyManager);
       this.protocolService.setItemsKeyManager(this.itemsKeyManager);
       this.itemsKeyManager.setKeyManager(this.keyManager);
-      this.keyManager.setDeviceInterface(this.deviceInterface);
       this.createDeviceAuthService();
       this.createSingletonManager();
       this.createComponentManager();
@@ -2395,7 +2440,8 @@ function () {
         modelManager: this.modelManager,
         storageService: this.storageService,
         protocolService: this.protocolService,
-        itemsKeyManager: this.itemsKeyManager
+        itemsKeyManager: this.itemsKeyManager,
+        deviceInterface: this.deviceInterface
       });
       this.keyManager.onStatusChange(function _callee3() {
         return regeneratorRuntime.async(function _callee3$(_context49) {
@@ -20335,11 +20381,12 @@ function (_PureService) {
     var modelManager = _ref.modelManager,
         storageService = _ref.storageService,
         protocolService = _ref.protocolService,
-        itemsKeyManager = _ref.itemsKeyManager;
+        itemsKeyManager = _ref.itemsKeyManager,
+        deviceInterface = _ref.deviceInterface;
 
     _classCallCheck(this, SNKeyManager);
 
-    if (!modelManager || !storageService || !protocolService || !itemsKeyManager) {
+    if (!modelManager || !storageService || !protocolService || !itemsKeyManager || !deviceInterface) {
       throw 'Invalid KeyManager construction';
     }
 
@@ -20349,6 +20396,7 @@ function (_PureService) {
     _this.modelManager = modelManager;
     _this.storageService = storageService;
     _this.itemsKeyManager = itemsKeyManager;
+    _this.deviceInterface = deviceInterface;
     _this.keyObservers = [];
     /** Hide rootKey enumeration */
 
@@ -20358,6 +20406,8 @@ function (_PureService) {
     });
     return _this;
   }
+  /** @access public */
+
 
   _createClass(SNKeyManager, [{
     key: "initialize",
@@ -20448,6 +20498,8 @@ function (_PureService) {
       }, null, this);
     }
     /**
+     * Register a callback to be notified when root key status changes.
+     * @access public
      * @param callback  A function that takes in a content type to call back when root
      *                  key or wrapper status has changed.
      */
@@ -20462,6 +20514,8 @@ function (_PureService) {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this2.keyObservers, callback);
       };
     }
+    /** @access private */
+
   }, {
     key: "notifyObserversOfChange",
     value: function notifyObserversOfChange() {
@@ -20532,15 +20586,6 @@ function (_PureService) {
           }
         }
       }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-    }
-    /**
-     * Dynamically set a DeviceInterface object
-     */
-
-  }, {
-    key: "setDeviceInterface",
-    value: function setDeviceInterface(deviceInterface) {
-      this.deviceInterface = deviceInterface;
     }
     /** @access private */
 
@@ -20621,7 +20666,7 @@ function (_PureService) {
     }
     /**
      * @access public
-     * Returns true if a root key wrapper (passcode) is configured.
+     * @returns {Promise<boolean>} True if a root key wrapper (passcode) is configured.
      */
 
   }, {
@@ -20650,6 +20695,7 @@ function (_PureService) {
      * @access public
      * A non-async alternative to `hasRootKeyWrapper` which uses pre-loaded state
      * to determine if a passcode is configured.
+     * @returns {boolean}
      */
 
   }, {
@@ -20659,7 +20705,7 @@ function (_PureService) {
     }
     /**
      * @access public
-     * Returns true if the root key has not yet been unwrapped (passcode locked).
+     * @returns {Promise<boolean>} True if the root key has not yet been unwrapped (passcode locked).
      */
 
   }, {
@@ -20694,7 +20740,7 @@ function (_PureService) {
     }
     /**
      * @access public
-     * @returns  Key params object containing root key wrapper key params
+     * @returns {Promise<SNRootKeyParams>} Key params object containing root key wrapper key params
      */
 
   }, {
@@ -20730,7 +20776,7 @@ function (_PureService) {
     }
     /**
      * @access private
-     * @returns  Plain object containing persisted wrapped (encrypted) root key
+     * @returns {Promise<object>} Object containing persisted wrapped (encrypted) root key
      */
 
   }, {
@@ -20750,8 +20796,9 @@ function (_PureService) {
       }, null, this);
     }
     /**
+     * Returns rootKeyParams by reading from storage.
      * @access public
-     * @returns  The keyParams saved to disk for root key.
+     * @returns {Promise<SNRootKeyParams>}
      */
 
   }, {
@@ -20788,7 +20835,7 @@ function (_PureService) {
     }
     /**
      * @access public
-     * @returns  getRootKeyParams may return different params based on different
+     * @returns {SNRootKeyParams} getRootKeyParams may return different params based on different
      *           keyMode. This function however strictly returns only account params.
      */
 
@@ -20824,9 +20871,10 @@ function (_PureService) {
       }, null, this);
     }
     /**
-     * @access public
      * We know a wrappingKey is correct if it correctly decrypts
      * wrapped root key.
+     * @access public
+     * @returns {Promise<boolean>}
      */
 
   }, {
@@ -20884,6 +20932,13 @@ function (_PureService) {
         }
       }, null, this);
     }
+    /**
+     * Computes the root key wrapping key given a passcode.
+     * Wrapping key params are read from disk.
+     * @access public
+     * @returns {SNRootKey}
+     */
+
   }, {
     key: "computeWrappingKey",
     value: function computeWrappingKey(_ref2) {
@@ -20917,10 +20972,12 @@ function (_PureService) {
     }
     /**
      * @access public
+     * Unwraps the persisted root key value using the supplied wrappingKey.
      * Application interfaces must check to see if the root key requires unwrapping on load.
      * If so, they must generate the unwrapping key by getting our saved wrapping key keyParams.
      * After unwrapping, the root key is automatically loaded.
-    */
+     * @returns {void}
+     */
 
   }, {
     key: "unwrapRootKey",
@@ -21038,7 +21095,7 @@ function (_PureService) {
 
             case 12:
               if (!(this.keyMode === KEY_MODE_WRAPPER_ONLY || this.keyMode === KEY_MODE_ROOT_KEY_PLUS_WRAPPER)) {
-                _context14.next = 26;
+                _context14.next = 27;
                 break;
               }
 
@@ -21057,7 +21114,7 @@ function (_PureService) {
 
             case 19:
               _context14.next = 21;
-              return regeneratorRuntime.awrap(this.persistWrappedRootKey({
+              return regeneratorRuntime.awrap(this.wrapAndPersistRootKey({
                 wrappingKey: wrappingKey
               }));
 
@@ -21070,25 +21127,30 @@ function (_PureService) {
               return regeneratorRuntime.awrap(this.notifyObserversOfChange());
 
             case 25:
-              return _context14.abrupt("return");
-
-            case 26:
-              throw 'Invalid keyMode on setNewRootKeyWrapper';
+              _context14.next = 28;
+              break;
 
             case 27:
+              throw 'Invalid keyMode on setNewRootKeyWrapper';
+
+            case 28:
             case "end":
               return _context14.stop();
           }
         }
       }, null, this);
     }
-    /** @access private */
+    /** 
+     * Wraps the current in-memory root key value using the wrappingKey,
+     * then persists the wrapped value to disk.
+     * @access private 
+     */
 
   }, {
-    key: "persistWrappedRootKey",
-    value: function persistWrappedRootKey(_ref5) {
+    key: "wrapAndPersistRootKey",
+    value: function wrapAndPersistRootKey(_ref5) {
       var wrappingKey, payload, wrappedKey;
-      return regeneratorRuntime.async(function persistWrappedRootKey$(_context15) {
+      return regeneratorRuntime.async(function wrapAndPersistRootKey$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
@@ -21176,7 +21238,8 @@ function (_PureService) {
      * @access public
      * The root key is distinct from regular keys and are only saved locally in the keychain,
      * in non-item form. Applications set root key on sign in, register, or password change.
-     * @param key  A SNRootKey object.
+     * @param {SNRootKey} key  A SNRootKey object.
+     * @param {SNRootKeyParams} keyParams
      */
 
   }, {
@@ -21271,7 +21334,7 @@ function (_PureService) {
               }
 
               _context17.next = 31;
-              return regeneratorRuntime.awrap(this.persistWrappedRootKey({
+              return regeneratorRuntime.awrap(this.wrapAndPersistRootKey({
                 wrappingKey: previousRootKey
               }));
 
@@ -21291,8 +21354,9 @@ function (_PureService) {
       }, null, this);
     }
     /**
+     * Returns the in-memory root key value.
      * @access public
-     * @returns  SNRootKey object
+     * @returns {SNRootKey} SNRootKey object
      */
 
   }, {
@@ -21427,6 +21491,8 @@ function (_PureService) {
      * Only two types of items should be encrypted with a root key:
      * - An SNItemsKey object
      * - An encrypted storage object (local)
+     * @access public
+     * @returns {boolean}
      */
 
   }, {
@@ -21435,9 +21501,10 @@ function (_PureService) {
       return contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ItemsKey || contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].EncryptedStorage;
     }
     /**
-     * @returns  The SNItemsKey object to use for encrypting this item.
-                 For regular items, should be equal too this.getDefaultItemsKey.
-                 For SNItemsKey items, should be equal to root keys.
+     * Determines which key to use for encryption of the payload
+     * @access public
+     * @returns {SNRootKey|SNItemsKey} 
+     * The key object to use for encrypting the payload.
     */
 
   }, {
@@ -21504,7 +21571,7 @@ function (_PureService) {
      * items_key_id and return that key. If it doesn't, this means the payload was
      * encrypted with legacy behavior. We return then the key object corresponding
      * to the version of this payload.
-     * @returns  The SNItemsKey object to use for decrypting this payload.
+     * @returns {SNRootKey|SNItemsKey} The key object to use for decrypting this payload.
     */
 
   }, {
