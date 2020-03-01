@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("storage manager", () => {
+describe('storage manager', () => {
   /**
    * Items are saved in localStorage in tests.
    * Base keys are `storage` and `last_migration_timestamp`
@@ -39,29 +36,29 @@ describe("storage manager", () => {
     // localStorage.clear();
   });
 
-  it("should set and retrieve values", async function () {
-    const key = "foo";
-    const value = "bar";
+  it('should set and retrieve values', async function () {
+    const key = 'foo';
+    const value = 'bar';
     await sharedApplication.storageService.setValue(key, value);
     expect(await sharedApplication.storageService.getValue(key)).to.eql(value);
   });
 
-  it("should set and retrieve items", async function () {
+  it('should set and retrieve items', async function () {
     const payload = Factory.createNotePayload();
     await sharedApplication.storageService.savePayload(payload);
     const payloads = await sharedApplication.storageService.getAllRawPayloads();
     expect(payloads.length).to.equal(1);
   });
 
-  it("should clear values", async function () {
-    const key = "foo";
-    const value = "bar";
+  it('should clear values', async function () {
+    const key = 'foo';
+    const value = 'bar';
     await sharedApplication.storageService.setValue(key, value);
     await sharedApplication.storageService.clearAllData();
     expect(await sharedApplication.storageService.getValue(key)).to.not.be.ok;
   });
 
-  it("serverPassword should not be saved to keychain", async function () {
+  it('serverPassword should not be saved to keychain', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -73,7 +70,7 @@ describe("storage manager", () => {
     expect(keychainValue.serverPassword).to.not.be.ok;
   });
 
-  it("regular session should persist data", async function () {
+  it('regular session should persist data', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -92,7 +89,7 @@ describe("storage manager", () => {
     expect(retrievedValue).to.equal(value);
   });
 
-  it("ephemeral session should not persist data", async function () {
+  it('ephemeral session should not persist data', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -110,7 +107,7 @@ describe("storage manager", () => {
     expect(retrievedValue).to.equal(value);
   });
 
-  it("storage with no account and no passcode should not be encrypted", async function () {
+  it('storage with no account and no passcode should not be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
@@ -119,7 +116,7 @@ describe("storage manager", () => {
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   });
 
-  it("storage aftering adding passcode should be encrypted", async function () {
+  it('storage aftering adding passcode should be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
@@ -129,7 +126,7 @@ describe("storage manager", () => {
     expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
-  it("storage aftering adding passcode then removing passcode should not be encrypted", async function () {
+  it('storage aftering adding passcode then removing passcode should not be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
     await this.application.setValue('bar', 'foo');
@@ -141,7 +138,7 @@ describe("storage manager", () => {
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);
 
-  it("storage aftering adding passcode/removing passcode w/account should be encrypted", async function () {
+  it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
     /** 
      * After setting passcode, we expect that the keychain has been cleared, as the account keys 
      * are now wrapped in storage with the passcode. Once the passcode is removed, we expect
@@ -167,7 +164,7 @@ describe("storage manager", () => {
     expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   }).timeout(5000);
 
-  it("adding account should encrypt storage with account keys", async function () {
+  it('adding account should encrypt storage with account keys', async function () {
     await this.application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
       application: this.application,
@@ -179,7 +176,7 @@ describe("storage manager", () => {
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
   });
 
-  it("signing out of account should decrypt storage", async function () {
+  it('signing out of account should decrypt storage', async function () {
     await this.application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
       application: this.application,
@@ -196,7 +193,7 @@ describe("storage manager", () => {
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   });
   
-  it("adding account then passcode should encrypt storage with account keys", async function () {
+  it('adding account then passcode should encrypt storage with account keys', async function () {
     /** Should encrypt storage with account keys and encrypt account keys with passcode */
     await this.application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
@@ -232,7 +229,7 @@ describe("storage manager", () => {
     expect(decrypted.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);
 
-  it("disabling storage encryption should store items without encryption", async function () {
+  it('disabling storage encryption should store items without encryption', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -250,7 +247,7 @@ describe("storage manager", () => {
     expect(payload.content.references).to.be.ok;
   });
 
-  it("signing out should clear unwrapped value store", async function () {
+  it('signing out should clear unwrapped value store', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -263,7 +260,7 @@ describe("storage manager", () => {
     expect(Object.keys(values).length).to.equal(0);
   });
 
-  it("signing out should clear payloads", async function () {
+  it('signing out should clear payloads', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

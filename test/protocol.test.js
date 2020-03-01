@@ -1,10 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
-import { EncryptionIntents } from '../lib/protocol/intents.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -25,11 +21,11 @@ describe('protocol', () => {
   });
 
   it('checks version to make sure its 004', () => {
-    expect(application.protocolService.getLatestVersion()).to.equal("004");
+    expect(application.protocolService.getLatestVersion()).to.equal('004');
   });
 
   it('checks supported versions to make sure it includes 001, 002, 003, 004', () => {
-    expect(application.protocolService.supportedVersions()).to.eql(["001", "002", "003", "004"]);
+    expect(application.protocolService.supportedVersions()).to.eql(['001', '002', '003', '004']);
   });
 
   it('cryptoweb should support costs greater than 5000', () => {
@@ -37,11 +33,11 @@ describe('protocol', () => {
   });
 
   it('version comparison of 002 should be older than library version', () => {
-    expect(application.protocolService.isVersionNewerThanLibraryVersion("002")).to.equal(false);
+    expect(application.protocolService.isVersionNewerThanLibraryVersion('002')).to.equal(false);
   });
 
   it('version comparison of 005 should be newer than library version', () => {
-    expect(application.protocolService.isVersionNewerThanLibraryVersion("005")).to.equal(true);
+    expect(application.protocolService.isVersionNewerThanLibraryVersion('005')).to.equal(true);
   });
 
   it('library version should not be outdated', () => {

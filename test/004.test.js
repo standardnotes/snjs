@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('004 protocol operations', () => {
-  const _identifier = "hello@test.com";
-  const _password = "password";
+  const _identifier = 'hello@test.com';
+  const _password = 'password';
   let _keyParams;
   let _key;
 
@@ -31,7 +28,7 @@ describe('004 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    expect(application.protocolService.costMinimumForVersion("004")).to.equal(5);
+    expect(application.protocolService.costMinimumForVersion('004')).to.equal(5);
   });
 
   it('generates valid keys for registration', async () => {
@@ -40,8 +37,8 @@ describe('004 protocol operations', () => {
       password: _password
     });
 
-    expect(result).to.have.property("key");
-    expect(result).to.have.property("keyParams");
+    expect(result).to.have.property('key');
+    expect(result).to.have.property('keyParams');
 
     expect(result.key.masterKey).to.be.ok;
 
@@ -62,10 +59,10 @@ describe('004 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    const text = "hello world";
+    const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const additionalData = {foo: "bar"};
+    const additionalData = {foo: 'bar'};
     const encString = await application.protocolService.defaultOperator().encryptString({
       plaintext: text,
       rawKey: rawKey,
@@ -82,11 +79,11 @@ describe('004 protocol operations', () => {
   });
 
   it('fails to decrypt non-matching aad', async () => {
-    const text = "hello world";
+    const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const aad = {foo: "bar"};
-    const nonmatchingAad = {foo: "rab"};
+    const aad = {foo: 'bar'};
+    const nonmatchingAad = {foo: 'rab'};
     const encString = await application.protocolService.defaultOperator().encryptString({
       plaintext: text,
       rawKey: rawKey,

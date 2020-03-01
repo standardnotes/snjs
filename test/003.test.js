@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -17,8 +14,8 @@ describe('003 protocol operations', () => {
     localStorage.clear();
   });
 
-  const _identifier = "hello@test.com";
-  const _password = "password";
+  const _identifier = 'hello@test.com';
+  const _password = 'password';
   let _keyParams, _key;
 
   const sharedApplication = Factory.createApplication();
@@ -40,7 +37,7 @@ describe('003 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    expect(sharedApplication.protocolService.costMinimumForVersion("003")).to.equal(110000);
+    expect(sharedApplication.protocolService.costMinimumForVersion('003')).to.equal(110000);
   });
 
   it('generates random key', async () => {
@@ -54,8 +51,8 @@ describe('003 protocol operations', () => {
       identifier: _identifier,
       password: _password
     });
-    expect(result).to.have.property("key");
-    expect(result).to.have.property("keyParams");
+    expect(result).to.have.property('key');
+    expect(result).to.have.property('keyParams');
 
     expect(result.key.dataAuthenticationKey).to.not.be.null;
     expect(result.key.serverPassword).to.not.be.null;
@@ -68,7 +65,7 @@ describe('003 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    const text = "hello world";
+    const text = 'hello world';
     const rawKey = _key.masterKey;
     const iv = await protocol003.crypto.generateRandomKey(128);
     const encString = await protocol003.encryptString(text, rawKey, iv);

@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("mapping performance", () => {
+describe('mapping performance', () => {
 
-  it("shouldn't take a long time", async () => {
+  it('shouldnt take a long time', async () => {
     /*
     There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
     which caused searching to be really expensive and caused a huge slowdown.
@@ -25,7 +22,7 @@ describe("mapping performance", () => {
     for (let i = 0; i < tagCount; i++) {
       var tag = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: "Tag",
+        content_type: 'Tag',
         content: {
           title: `${Math.random()}`,
           references: []
@@ -36,7 +33,7 @@ describe("mapping performance", () => {
     for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: "Note",
+        content_type: 'Note',
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
@@ -46,7 +43,7 @@ describe("mapping performance", () => {
       const randomTag = Factory.randomArrayValue(tags);
       randomTag.content.references.push(
         {
-          content_type: "Note",
+          content_type: 'Note',
           uuid: note.uuid
         }
       );
@@ -72,13 +69,13 @@ describe("mapping performance", () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for (const note of modelManager.validItemsForContentType("Note")) {
+    for (const note of modelManager.validItemsForContentType('Note')) {
       expect(note.referencingItemsCount).to.be.above(0);
     }
     await application.deinit();
   }).timeout(20000);
 
-  it("mapping a tag with thousands of notes should be quick", async () => {
+  it('mapping a tag with thousands of notes should be quick', async () => {
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
@@ -92,7 +89,7 @@ describe("mapping performance", () => {
 
     const tag = {
       uuid: Uuid.GenerateUuidSynchronously(),
-      content_type: "Tag",
+      content_type: 'Tag',
       content: {
         title: `${Math.random()}`,
         references: []
@@ -102,7 +99,7 @@ describe("mapping performance", () => {
     for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: "Note",
+        content_type: 'Note',
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
@@ -111,7 +108,7 @@ describe("mapping performance", () => {
       };
 
       tag.content.references.push({
-        content_type: "Note",
+        content_type: 'Note',
         uuid: note.uuid
       });
       notes.push(note);
@@ -140,8 +137,8 @@ describe("mapping performance", () => {
     const EXPECTED_RUN_TIME = 8.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
-    const mappedTag = modelManager.validItemsForContentType("Tag")[0];
-    for (const note of modelManager.validItemsForContentType("Note")) {
+    const mappedTag = modelManager.validItemsForContentType('Tag')[0];
+    for (const note of modelManager.validItemsForContentType('Note')) {
       expect(note.referencingItemsCount).to.equal(1);
       expect(note.allReferencingItems[0]).to.equal(mappedTag);
     }

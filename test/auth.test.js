@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("basic auth", () => {
+describe('basic auth', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   before(async function () {
@@ -29,7 +26,7 @@ describe("basic auth", () => {
     this.application.deinit();
   });
 
-  it("successfully register new account",  async function () {
+  it('successfully register new account',  async function () {
     const response = await this.application.register({
       email: this.email,
       password: this.password
@@ -38,7 +35,7 @@ describe("basic auth", () => {
     expect(await this.application.keyManager.getRootKey()).to.be.ok;
   }).timeout(5000);
 
-  it("successfully logs out of account", async function () {
+  it('successfully logs out of account', async function () {
     await this.application.register({
       email: this.email,
       password: this.password
@@ -52,7 +49,7 @@ describe("basic auth", () => {
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
   });
 
-  it("successfully logins to registered account", async function () {
+  it('successfully logins to registered account', async function () {
     await this.application.register({
       email: this.email,
       password: this.password
@@ -67,7 +64,7 @@ describe("basic auth", () => {
     expect(await this.application.keyManager.getRootKey()).to.be.ok;
   }).timeout(20000);
 
-  it("fails login with wrong password", async function () {
+  it('fails login with wrong password', async function () {
     await this.application.register({
       email: this.email,
       password: this.password
@@ -82,7 +79,7 @@ describe("basic auth", () => {
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
   }).timeout(20000);
 
-  it("successfully changes password", async function () {
+  it('successfully changes password', async function () {
     await this.application.register({
       email: this.email,
       password: this.password
@@ -135,7 +132,7 @@ describe("basic auth", () => {
     expect(this.application.modelManager.invalidItems().length).to.equal(0);
   }).timeout(20000);
 
-  it("changes password many times", async function () {
+  it('changes password many times', async function () {
     await this.application.register({
       email: this.email,
       password: this.password

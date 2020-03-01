@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("items", () => {
+describe('items', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function() {
@@ -51,13 +48,13 @@ describe("items", () => {
     const item = modelManager.items[0];
     expect(item.pinned).to.not.be.ok;
 
-    item.setAppDataItem("pinned", true);
+    item.setAppDataItem('pinned', true);
     expect(item.pinned).to.equal(true);
 
-    item.setAppDataItem("archived", true);
+    item.setAppDataItem('archived', true);
     expect(item.archived).to.equal(true);
 
-    item.setAppDataItem("locked", true);
+    item.setAppDataItem('locked', true);
     expect(item.locked).to.equal(true);
   });
 
@@ -78,11 +75,11 @@ describe("items", () => {
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
-    item1.content.foo = "bar";
+    item1.content.foo = 'bar';
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(false);
 
-    item2.content.foo = "bar";
+    item2.content.foo = 'bar';
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
     expect(item2.isItemContentEqualWith(item1)).to.equal(true);
@@ -112,15 +109,15 @@ describe("items", () => {
     const item1 = modelManager.notes[0];
     const item2 = modelManager.notes[1];
 
-    item1.content.foo = "bar";
-    expect(item1.content.foo).to.equal("bar");
+    item1.content.foo = 'bar';
+    expect(item1.content.foo).to.equal('bar');
 
     item1.contentKeysToIgnoreWhenCheckingEquality = () => {
-      return ["foo"];
+      return ['foo'];
     };
 
     item2.contentKeysToIgnoreWhenCheckingEquality = () => {
-      return ["foo"];
+      return ['foo'];
     };
 
     // calling isItemContentEqualWith should not have side effects
@@ -129,15 +126,15 @@ describe("items", () => {
 
     await modelManager.setItemsDirty([item1, item2], true);
 
-    expect(item1.getAppDataItem("client_updated_at")).to.be.ok;
-    expect(item2.getAppDataItem("client_updated_at")).to.be.ok;
+    expect(item1.getAppDataItem('client_updated_at')).to.be.ok;
+    expect(item2.getAppDataItem('client_updated_at')).to.be.ok;
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
     expect(item2.isItemContentEqualWith(item1)).to.equal(true);
 
-    expect(item1.getAppDataItem("client_updated_at")).to.be.ok;
-    expect(item2.getAppDataItem("client_updated_at")).to.be.ok;
+    expect(item1.getAppDataItem('client_updated_at')).to.be.ok;
+    expect(item2.getAppDataItem('client_updated_at')).to.be.ok;
 
-    expect(item1.content.foo).to.equal("bar");
+    expect(item1.content.foo).to.equal('bar');
   });
 });

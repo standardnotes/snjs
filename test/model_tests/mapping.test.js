@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("model manager mapping", () => {
+describe('model manager mapping', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -93,7 +90,7 @@ describe("model manager mapping", () => {
     const payload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
 
-    const newTitle = "updated title";
+    const newTitle = 'updated title';
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {title: newTitle}}
@@ -148,7 +145,7 @@ describe("model manager mapping", () => {
     await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
     const item = modelManager.allItems[0];
     return new Promise((resolve) => {
-      modelManager.addMappingObserver("*", (items, validItems, deletedItems, source, sourceKey) => {
+      modelManager.addMappingObserver('*', (items, validItems, deletedItems, source, sourceKey) => {
         expect(items[0].uuid === item.uuid);
         resolve();
       });

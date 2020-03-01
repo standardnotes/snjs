@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import '../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -28,7 +25,7 @@ describe('offline syncing', () => {
     localStorage.clear();
   });
 
-  it("should sync item with no passcode", async function() {
+  it('should sync item with no passcode', async function() {
     const note = await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
@@ -56,7 +53,7 @@ describe('offline syncing', () => {
     expect(typeof itemsKeyRP.content).to.equal('object');
   });
 
-  it("should sync item encrypted with passcode", async function() {
+  it('should sync item encrypted with passcode', async function() {
     await this.application.setPasscode('foobar');
     await Factory.createMappedNote(this.application);
     expect(this.application.modelManager.getDirtyItems().length).to.equal(1);

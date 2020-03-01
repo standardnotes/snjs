@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 var expect = chai.expect;
 
@@ -44,5 +41,5 @@ describe('payload collections', () => {
     const masterCollection = sharedApplication.modelManager.getMasterCollection();
     const result = masterCollection.findPayload(note.uuid);
     expect(result.uuid).to.equal(note.uuid);
-  })
-})
+  });
+});

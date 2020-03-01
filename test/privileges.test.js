@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("privileges", () => {
+describe('privileges', () => {
 
   before(async function () {
     localStorage.clear();
@@ -28,7 +25,7 @@ describe("privileges", () => {
     await this.application.deinit();
   });
 
-  it("loads default actions and credentials", async function () {
+  it('loads default actions and credentials', async function () {
     expect(this.privilegesService.getAvailableActions().length).to.be.above(0);
     expect(this.privilegesService.getAvailableCredentials().length).to.be.above(0);
   });
@@ -38,7 +35,7 @@ describe("privileges", () => {
     expect(privileges).to.be.ok;
   });
 
-  it("adds credentials for actions", async function () {
+  it('adds credentials for actions', async function () {
     const privileges = await this.privilegesService.getPrivileges();
     privileges.addCredentialForAction(
       ProtectedActions.ViewProtectedNotes,
@@ -55,7 +52,7 @@ describe("privileges", () => {
     expect(requiresCredentials).to.equal(true);
   });
 
-  it("handles session length", async function () {
+  it('handles session length', async function () {
     await this.privilegesService.setSessionLength(
       PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES
     );

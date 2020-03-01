@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("singletons", () => {
+describe('singletons', () => {
 
   const syncOptions = {
     checkIntegrity: true
@@ -83,7 +80,7 @@ describe("singletons", () => {
     await this.application.deinit();
   });
 
-  it("only resolves to 1 item", async function () {
+  it('only resolves to 1 item', async function () {
     /** Privileges are an item we know to always return true for isSingleton */
     const privs1 = createPrivsPayload();
     const privs2 = createPrivsPayload();
@@ -98,7 +95,7 @@ describe("singletons", () => {
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
-  it("resolves registered predicate", async function () {
+  it('resolves registered predicate', async function () {
     this.application.singletonManager.registerPredicate(this.extPred);
     const extManager = await this.createExtMgr();
     this.expectedItemCount += 1;
@@ -115,7 +112,7 @@ describe("singletons", () => {
     expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
   });
 
-  it("resolves registered predicate with signing in/out", async function () {
+  it('resolves registered predicate with signing in/out', async function () {
     await this.signOut();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -164,7 +161,7 @@ describe("singletons", () => {
     expect(didCompleteRelevantSync).to.equal(true);
   }).timeout(10000);
 
-  it("signing into account and retrieving singleton shouldn't put us in deadlock", async function () {
+  it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
     /** Create privs */
     const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
@@ -184,7 +181,7 @@ describe("singletons", () => {
     expect(allPrivs.length).to.equal(1);
   });
 
-  it("if only result is errorDecrypting, create new item", async function () {
+  it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
@@ -194,7 +191,7 @@ describe("singletons", () => {
     /** Set after sync so that it syncs properly */
     item.errorDecrypting = true;
 
-    const predicate = new SFPredicate("content_type", "=", item.content_type);
+    const predicate = new SFPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload
@@ -204,14 +201,14 @@ describe("singletons", () => {
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
 
-  it("alternating the uuid of a singleton should return correct result", async function () {
+  it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
       payload: payload
     });
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    const predicate = new SFPredicate("content_type", "=", item.content_type);
+    const predicate = new SFPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
       createPayload: payload

@@ -1,18 +1,15 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("notes + tags syncing", async function() {
+describe('notes + tags syncing', async function() {
   const sharedApplication = Factory.createApplication();
   before(async function() {
     await Factory.initializeApplication(sharedApplication);
   });
-
+  
   after(async function () {
     localStorage.clear();
     await sharedApplication.deinit();
@@ -49,8 +46,8 @@ describe("notes + tags syncing", async function() {
     const tagPayload = pair[1];
 
     await this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = this.application.modelManager.getItems(["Note"])[0];
-    const tag = this.application.modelManager.getItems(["Tag"])[0];
+    const note = this.application.modelManager.getItems(['Note'])[0];
+    const tag = this.application.modelManager.getItems(['Tag'])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 
@@ -63,12 +60,12 @@ describe("notes + tags syncing", async function() {
       expect(tag.notes.length).to.equal(1);
       expect(this.application.modelManager.notes.length).to.equal(1);
       expect(this.application.modelManager.tags.length).to.equal(1);
-      console.warn("Waiting 0.1s...");
+      console.warn('Waiting 0.1s...');
       await Factory.sleep(0.1);
     }
   }).timeout(20000);
 
-  it("handles signing in and merging data", async function() {
+  it('handles signing in and merging data', async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -90,7 +87,7 @@ describe("notes + tags syncing", async function() {
     await this.application.storageService.clearAllPayloads();
     await this.application.syncService.markAllItemsAsNeedingSync({
       alternateUuids: true
-    })
+    });
 
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
@@ -106,7 +103,7 @@ describe("notes + tags syncing", async function() {
     expect(note.referencingItemsCount).to.equal(1);
     expect(tag.notes.length).to.equal(1);
     expect(note.tags.length).to.equal(1);
-  })
+  });
 
   it('duplicating a tag should maintian its relationships', async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();

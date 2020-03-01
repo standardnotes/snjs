@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -121,7 +118,7 @@ describe('app models', () => {
     const payload = Factory.createNotePayload();
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
-      override: {content: {foo: "bar"}}
+      override: {content: {foo: 'bar'}}
     });
 
     let items = await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
@@ -131,7 +128,7 @@ describe('app models', () => {
     items = await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
     item = items[0];
 
-    expect(item.content.foo).to.equal("bar");
+    expect(item.content.foo).to.equal('bar');
     expect(modelManager.notes.length).to.equal(1);
   });
 

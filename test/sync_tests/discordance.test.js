@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import '../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -37,7 +34,7 @@ describe('sync discordance', () => {
     await this.application.deinit();
   });
 
-  it("should begin discordance upon instructions", async function () {
+  it('should begin discordance upon instructions', async function () {
     await this.application.syncService.sync({checkIntegrity: false});
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.ok;
 
@@ -59,7 +56,7 @@ describe('sync discordance', () => {
     expect(this.application.syncService.state.discordance).to.equal(0);
   }).timeout(10000);
 
-  it("should increase discordance as client server mismatches", async function () {
+  it('should increase discordance as client server mismatches', async function () {
     await this.application.syncService.sync();
 
     const payload = Factory.createNotePayload();
@@ -107,7 +104,7 @@ describe('sync discordance', () => {
     expect(this.application.syncService.state.discordance).to.equal(0);
   }).timeout(10000);
 
-  it("should perform sync resolution in which differing items are duplicated instead of merged", async function () {
+  it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
     const payload = Factory.createNotePayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({payload});
     this.expectedItemCount++;
@@ -141,7 +138,7 @@ describe('sync discordance', () => {
 
     // now lets change the local content without syncing it.
     const aNote = this.application.modelManager.notes[0];
-    aNote.text = "discordance";
+    aNote.text = 'discordance';
     await this.application.modelManager.setItemDirty(aNote);
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)

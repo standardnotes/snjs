@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -41,7 +38,7 @@ describe('session history', () => {
     return string.substring(0, string.length - amount);
   }
 
-  it("create basic history entries", async function () {
+  it('create basic history entries', async function () {
     const item = await Factory.createSyncedNote(this.application);
     const itemHistory = this.historyManager.historyForItem(item);
     expect(itemHistory).to.be.ok;
@@ -67,7 +64,7 @@ describe('session history', () => {
     expect(this.historyManager.historyForItem(item).entries.length).to.equal(0);
   });
 
-  it("should optimize basic entries", async function () {
+  it('should optimize basic entries', async function () {
     const item = await Factory.createSyncedNote(this.application);
     const itemHistory = this.historyManager.historyForItem(item);
     /** It should keep the first revision, regardless of character delta. */
@@ -141,7 +138,7 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(5);
   });
 
-  it("should keep the entry right before a large deletion, regardless of its delta",
+  it('should keep the entry right before a large deletion, regardless of its delta',
   async function () {
     const payload = CreateMaxPayloadFromAnyObject({
       object: Factory.createNoteParams({

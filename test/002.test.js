@@ -1,16 +1,13 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../dist/snjs.js';
-import '../node_modules/chai/chai.js';
-import './vendor/chai-as-promised-built.js';
-import Factory from './lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('002 protocol operations', () => {
 
-  const _identifier = "hello@test.com";
-  const _password = "password";
+  const _identifier = 'hello@test.com';
+  const _password = 'password';
   let _keyParams, _key;
   const application = Factory.createApplication();
   const protocol002 = new SNProtocolOperator002(new SNWebCrypto());
@@ -29,7 +26,7 @@ describe('002 protocol operations', () => {
   });
 
   it('cost minimum', () => {
-    expect(application.protocolService.costMinimumForVersion("002")).to.equal(3000);
+    expect(application.protocolService.costMinimumForVersion('002')).to.equal(3000);
   });
 
   it('generates random key', async () => {
@@ -40,8 +37,8 @@ describe('002 protocol operations', () => {
 
   it('generates valid keys for registration', async () => {
     const result = await protocol002.createRootKey({ identifier: _identifier, password: _password });
-    expect(result).to.have.property("key");
-    expect(result).to.have.property("keyParams");
+    expect(result).to.have.property('key');
+    expect(result).to.have.property('keyParams');
 
     expect(result.key.dataAuthenticationKey).to.not.be.null;
     expect(result.key.serverPassword).to.not.be.null;
@@ -53,7 +50,7 @@ describe('002 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts strings', async () => {
-    const text = "hello world";
+    const text = 'hello world';
     const key = _key.masterKey;
     const iv = await protocol002.crypto.generateRandomKey(128);
     const encString = await protocol002.encryptString(text, key, iv);

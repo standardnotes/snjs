@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("notes and tags", () => {
+describe('notes and tags', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -22,14 +19,14 @@ describe("notes and tags", () => {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
     await modelManager.mapPayloadToLocalItem({payload});
-    const note = modelManager.getItems(["Note"])[0];
+    const note = modelManager.getItems(['Note'])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
 
   it('properly constructs syncing params', async function() {
     const note = new SNNote();
-    const title = "Foo";
-    const text = "Bar";
+    const title = 'Foo';
+    const text = 'Bar';
     note.title = title;
     note.text = text;
 
@@ -67,8 +64,8 @@ describe("notes and tags", () => {
     });
 
     await modelManager.mapPayloadsToLocalItems({payloads: [mutatedNote, mutatedTag]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.tags.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -120,8 +117,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
@@ -151,8 +148,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
@@ -184,8 +181,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.tagsString().length).to.not.equal(0);
 
@@ -210,8 +207,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.tagsString()).to.equal(`#${tagPayload.content.title}`);
 
@@ -245,8 +242,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
@@ -296,7 +293,7 @@ describe("notes and tags", () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
+    const note = modelManager.getItems(['Note'])[0];
     const duplicateNote = await modelManager.duplicateItem({item: note, isConflict: true});
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
     expect(duplicateNote.tags.length).to.equal(note.tags.length);
@@ -310,8 +307,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(tag.content.references.length).to.equal(1);
     expect(tag.notes.length).to.equal(1);
@@ -330,7 +327,7 @@ describe("notes and tags", () => {
     const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
-    const note = modelManager.getItems(["Note"])[0];
+    const note = modelManager.getItems(['Note'])[0];
     expect(note.content === notePayload.content).to.equal(false);
     /** Items transfer payload values on update, so these should be equal */
     expect(note.content.references === notePayload.content.references).to.equal(false);
@@ -358,8 +355,8 @@ describe("notes and tags", () => {
     });
 
     await modelManager.mapPayloadsToLocalItems({payloads: [mutatedPayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     expect(tag.notes.length).to.equal(1);
     expect(note.tags.length).to.equal(1);
@@ -385,8 +382,8 @@ describe("notes and tags", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
 
     await this.application.syncService.sync();
 
@@ -399,9 +396,9 @@ describe("notes and tags", () => {
   it('setting a note dirty should collapse its properties into content', async function () {
     const modelManager = this.application.modelManager;
     const note = new SNNote();
-    note.title = "Foo";
+    note.title = 'Foo';
     expect(note.content.title).to.not.be.ok;
     await modelManager.setItemDirty(note);
-    expect(note.content.title).to.equal("Foo");
+    expect(note.content.title).to.equal('Foo');
   });
 });

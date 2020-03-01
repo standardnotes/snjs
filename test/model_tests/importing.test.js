@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import '../../dist/snjs.js';
-import '../../node_modules/chai/chai.js';
-import './../vendor/chai-as-promised-built.js';
-import Factory from '../lib/factory.js';
+import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe("importing", () => {
+describe('importing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -27,8 +24,8 @@ describe("importing", () => {
     const tagPayload = pair[1];
 
     await modelManager.mapPayloadsToLocalItems({ payloads: [notePayload, tagPayload] });
-    const note = modelManager.getItems(["Note"])[0];
-    const tag = modelManager.getItems(["Tag"])[0];
+    const note = modelManager.getItems(['Note'])[0];
+    const tag = modelManager.getItems(['Tag'])[0];
     this.expectedItemCount += 2;
 
     expect(tag.content.references.length).to.equal(1);
