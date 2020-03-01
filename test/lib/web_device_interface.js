@@ -28,8 +28,6 @@ export default class WebDeviceInterface extends DeviceInterface {
     localStorage.clear();
   }
 
-  /** @database */
-
   async openDatabase() {
     /** no-op */
   }
@@ -81,7 +79,6 @@ export default class WebDeviceInterface extends DeviceInterface {
     }
   }
 
-
   /** @keychian */
   async getKeychainValue() {
     return this.keychainValue;
@@ -94,5 +91,4 @@ export default class WebDeviceInterface extends DeviceInterface {
   async clearKeychainValue() {
     this.keychainValue = null;
   }
-
 }

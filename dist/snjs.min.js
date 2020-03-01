@@ -2964,7 +2964,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SFItem, SNItemsKey, SFPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SFPrivileges, SNWebCrypto, SNReactNativeCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3128,6 +3128,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["greaterOfTwoDates"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["getGlobalScope"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["truncateHexString"]; });
 
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__["Uuid"]; });
@@ -8122,9 +8124,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
- // eslint-disable-next-line no-unused-vars
 
-var ENCRYPTION_ALGORITHM = 'AES-CBC';
 var ENCRYPTION_KEY_LENGTH = 256;
 var PBKDF2_OUTPUT_KEY_LENGTH = 512;
 var PBKDF2_ITERATIONS = 3000;
@@ -8132,6 +8132,9 @@ var SALT_SEED_LENGTH = 128;
 var NO_IV = '00000000000000000000000000000000';
 /**
  * A legacy operator no longer used to generate new accounts
+ * 001 Primitives:
+ * Encryption: AES-CBC
+ * KDF: PBKDF2
  */
 
 var SNProtocolOperator001 =
@@ -8484,9 +8487,7 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
-    /**
-     * @access private
-     */
+    /** @access private */
 
   }, {
     key: "encryptionComponentsFromString",
@@ -8498,6 +8499,8 @@ function (_SNProtocolOperator) {
         encryptionKey: encryptionKey
       };
     }
+    /** @access private */
+
   }, {
     key: "deriveKey",
     value: function deriveKey() {
@@ -8615,9 +8618,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
- // eslint-disable-next-line no-unused-vars
 
-var ENCRYPTION_ALGORITHM = 'AES-CBC';
 var ENCRYPTION_KEY_LENGTH = 256;
 var ENCRYPTION_IV_LENGTH = 128;
 var PBKDF2_OUTPUT_KEY_LENGTH = 768;
@@ -8625,6 +8626,9 @@ var PBKDF2_ITERATIONS = 3000;
 var SALT_SEED_LENGTH = 128;
 /**
  * A legacy operator no longer used to generate new accounts
+ * 002 Primitives:
+ * Encryption: AES-CBC
+ * KDF: PBKDF2
  */
 
 var SNProtocolOperator002 =
@@ -9192,6 +9196,9 @@ var SALT_SEED_LENGTH = 256;
  * Valid operator but no longer used for generating new accounts.
  * This operator subclasses the 002 operator to share functionality that has not
  * changed, and overrides functions where behavior may differ.
+ * 003 Primitives:
+ * Encryption: AES-CBC
+ * KDF: PBKDF2
  */
 
 var SNProtocolOperator003 =
@@ -9356,6 +9363,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -9387,6 +9395,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var ARGON2_MEMLIMIT = 67108864;
 var ARGON2_OUTPUT_KEY_BYTES = 64;
 var ARGON2_ITERATIONS = 5;
@@ -9394,9 +9403,10 @@ var ARGON2_SALT_SEED_LENGTH = 256;
 var ARGON2_SALT_LENGTH = 128;
 var ENCRYPTION_KEY_LENGTH = 256;
 var ENCRYPTION_NONCE_LENGTH = 192;
+var PARTITION_CHARACTER = ':';
 /**
  * 004 Primitives:
- * Encryption: Xchacha20+Poly1305
+ * Encryption: XChaCha20+Poly1305
  * KDF: Argon2id
  */
 
@@ -9414,7 +9424,10 @@ function (_SNProtocolOperator) {
   _createClass(SNProtocolOperator004, [{
     key: "generateNewItemsKeyContent",
 
-    /** @override */
+    /** 
+     * @override
+     * @access protected
+     */
     value: function generateNewItemsKeyContent() {
       var itemsKey, version;
       return regeneratorRuntime.async(function generateNewItemsKeyContent$(_context) {
@@ -9444,23 +9457,26 @@ function (_SNProtocolOperator) {
      * salt. This way, a comprimised server cannot benefit from sending the same seed value 
      * for every user. We mix a client-controlled value that is globally unique 
      * (their identifier), with a server controlled value to produce a salt for our KDF.
+     * @access private
+     * @param {string} identifier
+     * @param {string} seed
     */
 
   }, {
     key: "generateSalt",
     value: function generateSalt(_ref) {
-      var identifier, seed, result;
+      var identifier, seed, hash;
       return regeneratorRuntime.async(function generateSalt$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               identifier = _ref.identifier, seed = _ref.seed;
               _context2.next = 3;
-              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, seed].join(':')));
+              return regeneratorRuntime.awrap(this.crypto.sha256([identifier, seed].join(PARTITION_CHARACTER)));
 
             case 3:
-              result = _context2.sent;
-              return _context2.abrupt("return", result.substring(0, ARGON2_SALT_LENGTH / 2 / 2));
+              hash = _context2.sent;
+              return _context2.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["truncateHexString"])(hash, ARGON2_SALT_LENGTH));
 
             case 5:
             case "end":
@@ -9469,6 +9485,15 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /**
+     * Computes a root key given a password and previous keyParams
+     * @access public
+     * @param {object} params
+     * @param {string} params.password - Plain string representing raw user password
+     * @param {SNRootKeyParams} params.keyParams - KeyParams object
+     * @returns {SNRootKey}
+     */
+
   }, {
     key: "computeRootKey",
     value: function computeRootKey(_ref2) {
@@ -9513,6 +9538,16 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /**
+     * Creates a new root key given an identifier and a user password
+     * @access public
+     * @param {object} params
+     * @param {string} params.identifier - Plain string representing a unique identifier
+     *    for the user
+     * @param {string} params.password - Plain string representing raw user password
+     * @returns {SNRootKey}
+     */
+
   }, {
     key: "createRootKey",
     value: function createRootKey(_ref3) {
@@ -9565,10 +9600,11 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
     /**
-     * @param plaintext  The plaintext to encrypt.
-     * @param rawKey  The key to use to encrypt the plaintext.
-     * @param nonce  The nonce for encryption.
-     * @param aad  JavaScript object (will be stringified) representing
+     * @access private
+     * @param {string} plaintext - The plaintext to encrypt.
+     * @param {string} rawKey - The key to use to encrypt the plaintext.
+     * @param {string} nonce - The nonce for encryption.
+     * @param {object} aad - JavaScript object (will be stringified) representing
                   'Additional authenticated data': data you want to be included in authentication.
      */
 
@@ -9608,10 +9644,11 @@ function (_SNProtocolOperator) {
       }, null, this);
     }
     /**
-     * @param ciphertext  The encrypred text to decrypt.
-     * @param rawKey  The key to use to decrypt the ciphertext.
-     * @param nonce  The nonce for decryption.
-     * @param aad  JavaScript object (will be stringified) representing
+     * @access private
+     * @param {string} ciphertext  The encrypted text to decrypt.
+     * @param {string} rawKey  The key to use to decrypt the ciphertext.
+     * @param {string} nonce  The nonce for decryption.
+     * @param {object} aad  JavaScript object (will be stringified) representing
                   'Additional authenticated data' - data you want to be included in authentication.
      */
 
@@ -9633,6 +9670,13 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /**
+     * @access private
+     * @param {string} plaintext  The plaintext text to decrypt.
+     * @param {string} rawKey  The key to use to encrypt the plaintext.
+     * @param {string} itemUuid  The uuid of the item being encrypted
+     */
+
   }, {
     key: "generateEncryptedProtocolString",
     value: function generateEncryptedProtocolString(_ref6) {
@@ -9661,7 +9705,7 @@ function (_SNProtocolOperator) {
 
             case 7:
               ciphertext = _context7.sent;
-              payload = [version, nonce, ciphertext].join(':');
+              payload = [version, nonce, ciphertext].join(PARTITION_CHARACTER);
               return _context7.abrupt("return", payload);
 
             case 10:
@@ -9671,6 +9715,17 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /**
+     * Converts a bare payload into an encrypted one in the desired format.
+     * @access public
+     * @param {Payload} payload - The non-encrypted payload object to encrypt
+     * @param {SNRootKey|SNItemsKey} key - The key to use to encrypt the payload. Can be either
+     *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
+     * items keys), or an ItemsKey (if encrypted regular items)
+     * @param {PayloadFormat} format - The desired result format
+     * @returns {SNEncryptionParameters}
+     */
+
   }, {
     key: "generateEncryptionParameters",
     value: function generateEncryptionParameters(_ref7) {
@@ -9744,6 +9799,16 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
+    /**
+     * Converts encrypted parameters (a subset of a Payload) into decrypted counterpart.
+     * @access public
+     * @param {SNEncryptionParameters} encryptedParameters - The encrypted payload object to decrypt
+     * @param {SNRootKey|SNItemsKey} key - The key to use to decrypt the payload. Can be either
+     *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
+     * items keys), or an ItemsKey (if encrypted regular items)
+     * @returns {SNEncryptionParameters}
+     */
+
   }, {
     key: "generateDecryptedParameters",
     value: function generateDecryptedParameters(_ref8) {
@@ -9842,19 +9907,25 @@ function (_SNProtocolOperator) {
         }
       }, null, this);
     }
-    /** @access private */
+    /** 
+     * @access private 
+     * @returns {object}
+     */
 
   }, {
     key: "deconstructEncryptedPayloadString",
     value: function deconstructEncryptedPayloadString(payloadString) {
-      var components = payloadString.split(':');
+      var components = payloadString.split(PARTITION_CHARACTER);
       return {
         version: components[0],
         nonce: components[1],
         ciphertext: components[2]
       };
     }
-    /** @access private */
+    /** 
+     * @access private 
+     * @returns {SNRootKey}
+     */
 
   }, {
     key: "deriveKey",
@@ -9867,7 +9938,6 @@ function (_SNProtocolOperator) {
           partitions,
           masterKey,
           serverPassword,
-          key,
           _args10 = arguments;
 
       return regeneratorRuntime.async(function deriveKey$(_context10) {
@@ -9899,8 +9969,7 @@ function (_SNProtocolOperator) {
               partitions = _context10.sent;
               masterKey = partitions[0];
               serverPassword = partitions[1];
-              _context10.next = 13;
-              return regeneratorRuntime.awrap(_Protocol_root_key__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
+              return _context10.abrupt("return", _Protocol_root_key__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
                 content: {
                   masterKey: masterKey,
                   serverPassword: serverPassword,
@@ -9908,11 +9977,7 @@ function (_SNProtocolOperator) {
                 }
               }));
 
-            case 13:
-              key = _context10.sent;
-              return _context10.abrupt("return", key);
-
-            case 15:
+            case 12:
             case "end":
               return _context10.stop();
           }
@@ -30219,7 +30284,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -30248,6 +30313,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pickByCopy", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepFreeze", function() { return deepFreeze; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasGetter", function() { return hasGetter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return truncateHexString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sleep", function() { return sleep; });
 /* harmony import */ var lodash_isArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/isArray */ "./node_modules/lodash/isArray.js");
 /* harmony import */ var lodash_isArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_isArray__WEBPACK_IMPORTED_MODULE_0__);
@@ -30688,6 +30754,18 @@ function deepFreeze(object) {
 function hasGetter(object, property) {
   var descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(object), property);
   return descriptor && !isNullOrUndefined(descriptor.get);
+}
+/**
+  * Truncates a hex string into a desired number of bits
+  * @param {string} string
+  * @param {number} desiredBits
+  * @returns {string} A hexadecimal string truncated to the number of desired bits
+  */
+
+function truncateHexString(string, desiredBits) {
+  var BITS_PER_HEX_CHAR = 4;
+  var desiredCharLength = desiredBits / BITS_PER_HEX_CHAR;
+  return string.substring(0, desiredCharLength);
 }
 /**
  * When awaited, this function allows code execution to pause for a set time.

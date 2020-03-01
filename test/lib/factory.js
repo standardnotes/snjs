@@ -4,7 +4,7 @@ import WebDeviceInterface from './web_device_interface.js';
 import { Environments, Platforms } from '../../lib/platforms.js';
 
 export function createApplication(namespace, environment, platform) {
-  const url = this.serverURL();
+  const url = serverURL();
   const deviceInterface = new WebDeviceInterface({
     namespace,
     timeout: setTimeout.bind(window),
@@ -24,17 +24,17 @@ export function createApplication(namespace, environment, platform) {
 
 export async function createAppWithRandNamespace(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
-  return this.createApplication(namespace, environment, platform);
+  return createApplication(namespace, environment, platform);
 }
 
 export async function createInitAppWithRandNamespace(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
-  return this.createAndInitializeApplication(namespace, environment, platform);
+  return createAndInitializeApplication(namespace, environment, platform);
 }
 
 export async function createAndInitializeApplication(namespace, environment, platform) {
-  const application = this.createApplication(namespace, environment, platform);
-  await this.initializeApplication(application);
+  const application = createApplication(namespace, environment, platform);
+  await initializeApplication(application);
   return application;
 }
 
@@ -53,8 +53,8 @@ export async function initializeApplication(application) {
 }
 
 export async function createInitAppWithPasscode(passcode) {
-  const namespace = Factory.randomString();
-  const application = await Factory.createAndInitializeApplication(namespace);
+  const namespace = randomString();
+  const application = await createAndInitializeApplication(namespace);
   await application.setPasscode(passcode);
   const handleChallenges = async (challenges) => {
     const responses = [];
@@ -77,8 +77,8 @@ export async function createInitAppWithPasscode(passcode) {
 }
 
 export async function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
-  if (!email) email = this.generateUuid();
-  if (!password) password = this.generateUuid();
+  if (!email) email = generateUuid();
+  if (!password) password = generateUuid();
   return application.register({ email, password, ephemeral, mergeLocal });
 }
 
@@ -87,8 +87,8 @@ export async function registerUserToApplication({ application, email, password, 
  * To use older version, use this method.
  */
 export async function registerOldUser({ application, email, password, version }) {
-  if (!email) email = this.generateUuid();
-  if (!password) password = this.generateUuid();
+  if (!email) email = generateUuid();
+  if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
   const result = await operator.createRootKey({
     identifier: email,
@@ -116,16 +116,16 @@ export async function registerOldUser({ application, email, password, version })
 
 export function createStorageItemPayload(contentType) {
   return CreateMaxPayloadFromAnyObject({
-    object: this.createItemParams(contentType)
+    object: createItemParams(contentType)
   });
 }
 
 export function createNotePayload() {
-  return CreateMaxPayloadFromAnyObject({ object: this.createNoteParams() });
+  return CreateMaxPayloadFromAnyObject({ object: createNoteParams() });
 }
 
 export function createStorageItemTagPayload() {
-  return CreateMaxPayloadFromAnyObject({ object: this.createTagParams() });
+  return CreateMaxPayloadFromAnyObject({ object: createTagParams() });
 }
 
 export function itemToStoragePayload(item) {
@@ -133,17 +133,17 @@ export function itemToStoragePayload(item) {
 }
 
 export function createMappedNote(application) {
-  const payload = this.createNotePayload();
+  const payload = createNotePayload();
   return application.modelManager.mapPayloadToLocalItem({ payload });
 }
 
 export function createMappedTag(application) {
-  const payload = this.createStorageItemTagPayload();
+  const payload = createStorageItemTagPayload();
   return application.modelManager.mapPayloadToLocalItem({ payload });
 }
 
 export async function createSyncedNote(application) {
-  const payload = this.createNotePayload();
+  const payload = createNotePayload();
   const note = await application.modelManager.mapPayloadToLocalItem({ payload });
   await application.modelManager.setItemDirty(note, true);
   await application.syncService.sync();
@@ -161,14 +161,14 @@ export async function getStoragePayloadsOfType(application, type) {
 
 export async function createManyMappedNotes(application, count) {
   for (let i = 0; i < count; i++) {
-    const note = await Factory.createMappedNote(application);
+    const note = await createMappedNote(application);
     await application.modelManager.setItemDirty(note, true);
   }
 }
 
 export async function loginToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
   return application.signIn({
-    url: Factory.serverURL(),
+    url: serverURL(),
     email: email,
     password: password,
     ephemeral: ephemeral,
@@ -178,7 +178,7 @@ export async function loginToApplication({ application, email, password, ephemer
 
 export function createItemParams(contentType) {
   const params = {
-    uuid: this.generateUuid(),
+    uuid: generateUuid(),
     content_type: contentType,
     content: {
       title: 'hello',
@@ -195,7 +195,7 @@ export function generateUuid() {
 
 export function createNoteParams({ title, text, dirty = true } = {}) {
   const params = {
-    uuid: this.generateUuid(),
+    uuid: generateUuid(),
     content_type: 'Note',
     dirty: dirty,
     content: {
@@ -209,7 +209,7 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
 
 export function createTagParams({ dirty = true } = {}) {
   const params = {
-    uuid: this.generateUuid(),
+    uuid: generateUuid(),
     content_type: 'Tag',
     content: {
       title: 'thoughts',
@@ -220,8 +220,8 @@ export function createTagParams({ dirty = true } = {}) {
 }
 
 export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
-  const noteParams = this.createNoteParams({ dirty });
-  const tagParams = this.createTagParams({ dirty });
+  const noteParams = createNoteParams({ dirty });
+  const tagParams = createTagParams({ dirty });
   tagParams.content.references = [{
     uuid: noteParams.uuid,
     content_type: noteParams.content_type
@@ -239,7 +239,7 @@ export async function storagePayloadCount(application) {
 }
 
 export function serverURL() {
-  return 'http://localhost:3000';
+  return window.sync_server_url;
 }
 
 export function yesterday() {

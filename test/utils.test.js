@@ -75,4 +75,12 @@ describe('utils', () => {
     deepMerge(a, b);
     expect(a.content.references).to.eql([]);
   });
+
+  it('truncates hex string', () => {
+    const hex256 = 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b';
+    const desiredBits = 128;
+    const expectedLength = 32;
+    const result = truncateHexString(hex256, desiredBits);
+    expect(result.length).to.equal(expectedLength);
+  });
 });
