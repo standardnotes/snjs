@@ -27,8 +27,9 @@ describe('004 protocol operations', () => {
     application.deinit();
   });
 
-  it('cost minimum', () => {
-    expect(application.protocolService.costMinimumForVersion('004')).to.equal(5);
+  it('cost minimum should throw', () => {
+    expect(() => {application.protocolService.costMinimumForVersion('004')})
+      .to.throw('Cost minimums only apply to versions <= 002');
   });
 
   it('generates valid keys for registration', async () => {

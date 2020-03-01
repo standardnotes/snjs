@@ -24,15 +24,15 @@ describe('002 protocol operations', () => {
   after(() => {
     application.deinit();
   });
-
-  it('cost minimum', () => {
-    expect(application.protocolService.costMinimumForVersion('002')).to.equal(3000);
-  });
-
+  
   it('generates random key', async () => {
     const length = 128;
     const key = await protocol002.crypto.generateRandomKey(length);
     expect(key.length).to.equal(length / 4);
+  });
+
+  it('cost minimum', () => {
+    expect(application.protocolService.costMinimumForVersion('002')).to.equal(3000);
   });
 
   it('generates valid keys for registration', async () => {

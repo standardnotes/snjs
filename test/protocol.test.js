@@ -16,10 +16,6 @@ describe('protocol', () => {
     localStorage.clear();
   });
 
-  beforeEach(async function () {
-
-  });
-
   it('checks version to make sure its 004', () => {
     expect(application.protocolService.getLatestVersion()).to.equal('004');
   });
@@ -28,8 +24,28 @@ describe('protocol', () => {
     expect(application.protocolService.supportedVersions()).to.eql(['001', '002', '003', '004']);
   });
 
-  it('cryptoweb should support costs greater than 5000', () => {
-    expect(application.protocolService.supportsPasswordDerivationCost(5001)).to.equal(true);
+  it('platform derivation support', () => {
+    expect(application.protocolService.platformSupportsKeyDerivation({ version: '001' })).to.equal(true);
+    expect(application.protocolService.platformSupportsKeyDerivation({ version: '002' })).to.equal(true);
+    expect(application.protocolService.platformSupportsKeyDerivation({ version: '003' })).to.equal(true);
+    expect(application.protocolService.platformSupportsKeyDerivation({ version: '004' })).to.equal(true);
+    expect(application.protocolService.platformSupportsKeyDerivation({ version: '005' })).to.equal(true);
+  });
+
+  it('key params versions <= 002 should include pw_cost in portable value', () => {
+    const keyParams002 = application.protocolService.createKeyParams({
+      version: '002',
+      pw_cost: 5000
+    });
+    expect(keyParams002.getPortableValue().pw_cost).to.be.ok;
+  });
+
+  it('key params versions >= 003 should not include pw_cost in portable value', () => {
+    const keyParams003 = application.protocolService.createKeyParams({
+      version: '003',
+      pw_cost: 110000
+    });
+    expect(keyParams003.getPortableValue().pw_cost).to.not.be.ok;
   });
 
   it('version comparison of 002 should be older than library version', () => {
@@ -45,7 +61,7 @@ describe('protocol', () => {
     expect(application.protocolService.isProtocolVersionOutdated(currentVersion)).to.equal(false);
   });
 
-  it('decrypting already decrypted payload should return same payload', async function() {
+  it('decrypting already decrypted payload should return same payload', async function () {
     const payload = Factory.createNotePayload();
     const result = await application.protocolService.payloadByDecryptingPayload({ payload });
     expect(payload).to.equal(result);
@@ -67,7 +83,7 @@ describe('protocol', () => {
       intent: EncryptionIntents.SyncDecrypted
     });
     expect(encrypted.content.startsWith('000')).to.equal(true);
-    const decrypted = await application.protocolService.payloadByDecryptingPayload({ 
+    const decrypted = await application.protocolService.payloadByDecryptingPayload({
       payload: encrypted
     });
     expect(decrypted.errorDecrypting).to.not.be.ok;

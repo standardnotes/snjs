@@ -36,14 +36,15 @@ describe('003 protocol operations', () => {
     sharedApplication.deinit();
   });
 
-  it('cost minimum', () => {
-    expect(sharedApplication.protocolService.costMinimumForVersion('003')).to.equal(110000);
-  });
-
   it('generates random key', async () => {
     const length = 128;
     const key = await protocol003.crypto.generateRandomKey(length);
     expect(key.length).to.equal(length/4);
+  });
+
+  it('cost minimum should throw', () => {
+    expect(() => {sharedApplication.protocolService.costMinimumForVersion('003')})
+      .to.throw('Cost minimums only apply to versions <= 002');
   });
 
   it('generates valid keys for registration', async () => {

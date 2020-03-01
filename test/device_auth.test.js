@@ -52,7 +52,7 @@ describe('device authentication', () => {
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await tmpApplication.deinit();
-  }).timeout(7000);
+  }).timeout(10000);
 
   it('handles application launch with passcode and biometrics', async function() {
     const namespace = Factory.randomString();
@@ -98,7 +98,7 @@ describe('device authentication', () => {
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     tmpApplication.deinit();
-  }).timeout(5000);
+  }).timeout(10000);
 
   it('handles application launch with passcode and account', async function() {
     const namespace = Factory.randomString();
@@ -148,5 +148,5 @@ describe('device authentication', () => {
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
     tmpApplication.deinit();
-  }).timeout(5000);
+  }).timeout(10000);
 });

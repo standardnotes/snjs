@@ -9,8 +9,8 @@ describe('001 protocol operations', () => {
   const application = Factory.createApplication();
   const protocol001 = new SNProtocolOperator001(new SNWebCrypto());
 
-  const _identifier = "hello@test.com";
-  const _password = "password";
+  const _identifier = 'hello@test.com';
+  const _password = 'password';
   let _keyParams, _key;
 
   // runs once before all tests in this block
@@ -28,20 +28,20 @@ describe('001 protocol operations', () => {
     application.deinit();
   });
 
-  it('cost minimum', () => {
-    expect(application.protocolService.costMinimumForVersion("001")).to.equal(3000);
-  });
-
   it('generates random key', async () => {
     const length = 128;
     const key = await protocol001.crypto.generateRandomKey(length);
     expect(key.length).to.equal(length / 4);
   });
 
+  it('cost minimum', () => {
+    expect(application.protocolService.costMinimumForVersion('001')).to.equal(3000);
+  });
+
   it('generates valid keys for registration', async () => {
     const result = await protocol001.createRootKey({ identifier: _identifier, password: _password });
-    expect(result).to.have.property("key");
-    expect(result).to.have.property("keyParams");
+    expect(result).to.have.property('key');
+    expect(result).to.have.property('keyParams');
 
     expect(result.key.serverPassword).to.not.be.null;
     expect(result.key.masterKey).to.not.be.null;
@@ -52,7 +52,7 @@ describe('001 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    const text = "hello world";
+    const text = 'hello world';
     const key = _key.masterKey;
     const encString = await protocol001.encryptString(text, key);
     const decString = await protocol001.decryptString(encString, key);
@@ -64,8 +64,8 @@ describe('001 protocol operations', () => {
       password: _password,
       keyParams: _keyParams
     });
-    expect(key.content).to.have.property("serverPassword");
-    expect(key.content).to.have.property("masterKey");
+    expect(key.content).to.have.property('serverPassword');
+    expect(key.content).to.have.property('masterKey');
     expect(key.compare(_key)).to.be.true;
   });
 
