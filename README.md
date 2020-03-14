@@ -2,6 +2,8 @@
 
 SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared logic for all Standard Notes clients.
 
+_Note: This branch covers the 004 protocol, which is in development. To view the current production code, switch over to the master branch._
+
 ## Introduction
 
 SNJS (Standard Notes JavaScript) is a shared library we use in all Standard Notes clients (desktop, web, and mobile React Native). Its role is essentially to extract any business or data logic from client code, so that clients are mostly responsible for UI-level code, and don’t have to think about encryption and key stretching, or even authentication or storage specifics. Extracting the code into a shared library also prevents us from having to write the same critical code on multiple platforms.
@@ -133,9 +135,9 @@ Tests must be run in the browser due to WebCrypto dependency.
 1. `node test-server.js`
 2. Open browser to `http://localhost:9001/test/test.html`.
 
-Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000. This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
+Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000 (branch `004` of the server repository as well). This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
 
-_Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test.
+_Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test. Note that the browser tab which runs the tests must remain in the foreground while the tests are running due to browsers de-optimizing inactive tabs.
 
 ## Notes
 - SNJS uses an asynchronous API. All functions are asynchronous, and return immediately even if they have not finished. Add `.then()` to every call to be notified of the result, or use `await` if you don't want to use callbacks.
