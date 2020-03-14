@@ -3168,8 +3168,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__["SNSessionManager"]; });
 
-/* harmony import */ var _migration_migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./migration/migration_service */ "./lib/migration/migration_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _migration_migration_service__WEBPACK_IMPORTED_MODULE_23__["SNMigrationService"]; });
+/* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_23__["SNMigrationService"]; });
 
 /* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _services_alert_service__WEBPACK_IMPORTED_MODULE_24__["SNAlertService"]; });
@@ -3282,8 +3282,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__["StorageKeys"]; });
 
-/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
+/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["ProtectedActions"]; });
 
@@ -3353,477 +3353,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./lib/migration/migration_service.js":
-/*!********************************************!*\
-  !*** ./lib/migration/migration_service.js ***!
-  \********************************************/
-/*! exports provided: SNMigrationService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
-/* harmony import */ var _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations */ "./lib/migration/migrations/index.js");
-/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
-/* harmony import */ var _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/migration/migrations/2020-01-01-base */ "./lib/migration/migrations/2020-01-01-base.js");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-
-
-
-
-/**
- * The migration service orchestrates the execution of multi-stage migrations.
- * Migrations are registered during initial application launch, and listen for application
- * life-cycle events, and act accordingly. For example, a single migration may perform
- * a unique set of steps when the application first launches, and also other steps after the 
- * application is unlocked, or after the first sync completes. Migrations live under /migrations
- * and inherit from the base Migration class.
- */
-
-var SNMigrationService =
-/*#__PURE__*/
-function (_PureService) {
-  _inherits(SNMigrationService, _PureService);
-
-  function SNMigrationService(_ref) {
-    var _this;
-
-    var application = _ref.application,
-        challengeResponder = _ref.challengeResponder;
-
-    _classCallCheck(this, SNMigrationService);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNMigrationService).call(this));
-    _this.application = application;
-    _this.challengeResponder = challengeResponder;
-    return _this;
-  }
-  /** @access public */
-
-
-  _createClass(SNMigrationService, [{
-    key: "initialize",
-    value: function initialize() {
-      var _this2 = this;
-
-      var lastMigration;
-      return regeneratorRuntime.async(function initialize$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return regeneratorRuntime.awrap(this.runBaseMigration());
-
-            case 2:
-              _context2.next = 4;
-              return regeneratorRuntime.awrap(this.getRequiredMigrations());
-
-            case 4:
-              this.activeMigrations = _context2.sent;
-
-              if (this.activeMigrations.length > 0) {
-                lastMigration = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["lastElement"])(this.activeMigrations);
-                lastMigration.onDone(function _callee() {
-                  return regeneratorRuntime.async(function _callee$(_context) {
-                    while (1) {
-                      switch (_context.prev = _context.next) {
-                        case 0:
-                          _context.next = 2;
-                          return regeneratorRuntime.awrap(_this2.saveLastMigrationTimestamp(lastMigration.constructor.timestamp()));
-
-                        case 2:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }
-                  });
-                });
-              }
-
-            case 6:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-    /**
-    * @access public
-    * Application instances will call this function directly when they arrive
-    * at a certain migratory state.
-    */
-
-  }, {
-    key: "handleApplicationStage",
-    value: function handleApplicationStage(stage) {
-      return regeneratorRuntime.async(function handleApplicationStage$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNMigrationService.prototype), "handleApplicationStage", this).call(this, stage));
-
-            case 2:
-              if (stage === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].ReadyForLaunch_05) {
-                this.addLoginObserver();
-                this.addSyncObserver();
-              }
-
-              _context3.next = 5;
-              return regeneratorRuntime.awrap(this.handleStage(stage));
-
-            case 5:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "runBaseMigration",
-    value: function runBaseMigration() {
-      var baseMigration;
-      return regeneratorRuntime.async(function runBaseMigration$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              baseMigration = new _Lib_migration_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__["BaseMigration"]({
-                application: this.application
-              });
-              _context4.next = 3;
-              return regeneratorRuntime.awrap(baseMigration.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].PreparingForLaunch_0));
-
-            case 3:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @access private */
-
-  }, {
-    key: "getRequiredMigrations",
-    value: function getRequiredMigrations() {
-      var lastMigrationTimestamp, activeMigrations, migrationClasses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationClass, migrationTimestamp;
-
-      return regeneratorRuntime.async(function getRequiredMigrations$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              _context5.next = 2;
-              return regeneratorRuntime.awrap(this.getLastMigrationTimestamp());
-
-            case 2:
-              lastMigrationTimestamp = _context5.sent;
-              activeMigrations = [];
-              migrationClasses = Object.keys(_Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__).map(function (key) {
-                return _Lib_migration_migrations__WEBPACK_IMPORTED_MODULE_0__[key];
-              }).sort(function (a, b) {
-                var aTimestamp = a.timestamp();
-                var bTimestamp = b.timestamp();
-
-                if (aTimestamp < bTimestamp) {
-                  return -1;
-                } else if (aTimestamp > bTimestamp) {
-                  return 1;
-                } else {
-                  return 0;
-                }
-              });
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context5.prev = 8;
-
-              for (_iterator = migrationClasses[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                migrationClass = _step.value;
-                migrationTimestamp = migrationClass.timestamp();
-
-                if (migrationTimestamp > lastMigrationTimestamp) {
-                  // eslint-disable-next-line new-cap
-                  activeMigrations.push(new migrationClass({
-                    application: this.application,
-                    challengeResponder: this.challengeResponder
-                  }));
-                }
-              }
-
-              _context5.next = 16;
-              break;
-
-            case 12:
-              _context5.prev = 12;
-              _context5.t0 = _context5["catch"](8);
-              _didIteratorError = true;
-              _iteratorError = _context5.t0;
-
-            case 16:
-              _context5.prev = 16;
-              _context5.prev = 17;
-
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-
-            case 19:
-              _context5.prev = 19;
-
-              if (!_didIteratorError) {
-                _context5.next = 22;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 22:
-              return _context5.finish(19);
-
-            case 23:
-              return _context5.finish(16);
-
-            case 24:
-              return _context5.abrupt("return", activeMigrations);
-
-            case 25:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, null, this, [[8, 12, 16, 24], [17,, 19, 23]]);
-    }
-    /** @access private */
-
-  }, {
-    key: "getTimeStampKey",
-    value: function getTimeStampKey() {
-      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
-    }
-    /** @access private */
-
-  }, {
-    key: "getLastMigrationTimestamp",
-    value: function getLastMigrationTimestamp() {
-      var timestamp;
-      return regeneratorRuntime.async(function getLastMigrationTimestamp$(_context6) {
-        while (1) {
-          switch (_context6.prev = _context6.next) {
-            case 0:
-              _context6.next = 2;
-              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawStorageValue(this.getTimeStampKey()));
-
-            case 2:
-              timestamp = _context6.sent;
-
-              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(timestamp)) {
-                _context6.next = 5;
-                break;
-              }
-
-              throw 'Timestamp should not be null. Be sure to run base migration first.';
-
-            case 5:
-              return _context6.abrupt("return", JSON.parse(timestamp));
-
-            case 6:
-            case "end":
-              return _context6.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @access private */
-
-  }, {
-    key: "saveLastMigrationTimestamp",
-    value: function saveLastMigrationTimestamp(timestamp) {
-      return regeneratorRuntime.async(function saveLastMigrationTimestamp$(_context7) {
-        while (1) {
-          switch (_context7.prev = _context7.next) {
-            case 0:
-              _context7.next = 2;
-              return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(this.getTimeStampKey(), JSON.stringify(timestamp)));
-
-            case 2:
-            case "end":
-              return _context7.stop();
-          }
-        }
-      }, null, this);
-    }
-    /** @access private */
-
-  }, {
-    key: "addLoginObserver",
-    value: function addLoginObserver() {
-      var _this3 = this;
-
-      this.application.addEventObserver(function _callee2(event, data) {
-        return regeneratorRuntime.async(function _callee2$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvents"].SignedIn)) {
-                  _context8.next = 3;
-                  break;
-                }
-
-                _context8.next = 3;
-                return regeneratorRuntime.awrap(_this3.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].SignedIn_30));
-
-              case 3:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        });
-      });
-    }
-    /** @access private */
-
-  }, {
-    key: "addSyncObserver",
-    value: function addSyncObserver() {
-      var _this4 = this;
-
-      this.application.syncService.addEventObserver(function _callee3(event, data) {
-        return regeneratorRuntime.async(function _callee3$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].FullSyncCompleted)) {
-                  _context9.next = 3;
-                  break;
-                }
-
-                _context9.next = 3;
-                return regeneratorRuntime.awrap(_this4.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].FullSyncCompleted_13));
-
-              case 3:
-              case "end":
-                return _context9.stop();
-            }
-          }
-        });
-      });
-    }
-    /** @access private */
-
-  }, {
-    key: "handleStage",
-    value: function handleStage(stage) {
-      var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migration;
-
-      return regeneratorRuntime.async(function handleStage$(_context10) {
-        while (1) {
-          switch (_context10.prev = _context10.next) {
-            case 0:
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context10.prev = 3;
-              _iterator2 = this.activeMigrations[Symbol.iterator]();
-
-            case 5:
-              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                _context10.next = 12;
-                break;
-              }
-
-              migration = _step2.value;
-              _context10.next = 9;
-              return regeneratorRuntime.awrap(migration.handleStage(stage));
-
-            case 9:
-              _iteratorNormalCompletion2 = true;
-              _context10.next = 5;
-              break;
-
-            case 12:
-              _context10.next = 18;
-              break;
-
-            case 14:
-              _context10.prev = 14;
-              _context10.t0 = _context10["catch"](3);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context10.t0;
-
-            case 18:
-              _context10.prev = 18;
-              _context10.prev = 19;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 21:
-              _context10.prev = 21;
-
-              if (!_didIteratorError2) {
-                _context10.next = 24;
-                break;
-              }
-
-              throw _iteratorError2;
-
-            case 24:
-              return _context10.finish(21);
-
-            case 25:
-              return _context10.finish(18);
-
-            case 26:
-            case "end":
-              return _context10.stop();
-          }
-        }
-      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-    }
-  }]);
-
-  return SNMigrationService;
-}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
-
-/***/ }),
-
-/***/ "./lib/migration/migrations/2020-01-01-base.js":
-/*!*****************************************************!*\
-  !*** ./lib/migration/migrations/2020-01-01-base.js ***!
-  \*****************************************************/
+/***/ "./lib/migrations/2020-01-01-base.js":
+/*!*******************************************!*\
+  !*** ./lib/migrations/2020-01-01-base.js ***!
+  \*******************************************/
 /*! exports provided: BaseMigration */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return BaseMigration; });
-/* harmony import */ var _Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations/migration */ "./lib/migration/migrations/migration.js");
+/* harmony import */ var _Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migrations/migration */ "./lib/migrations/migration.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -4005,21 +3545,21 @@ function (_Migration) {
   }]);
 
   return BaseMigration;
-}(_Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
+}(_Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
 
 /***/ }),
 
-/***/ "./lib/migration/migrations/2020-01-15.js":
-/*!************************************************!*\
-  !*** ./lib/migration/migrations/2020-01-15.js ***!
-  \************************************************/
+/***/ "./lib/migrations/2020-01-15.js":
+/*!**************************************!*\
+  !*** ./lib/migrations/2020-01-15.js ***!
+  \**************************************/
 /*! exports provided: Migration20200115 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Migration20200115", function() { return Migration20200115; });
-/* harmony import */ var _Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migration/migrations/migration */ "./lib/migration/migrations/migration.js");
+/* harmony import */ var _Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migrations/migration */ "./lib/migrations/migration.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -4028,7 +3568,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
-/* harmony import */ var _services_api_session__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../services/api/session */ "./lib/services/api/session.js");
+/* harmony import */ var _Services_api_session__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/api/session */ "./lib/services/api/session.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -4549,50 +4089,44 @@ function (_Migration) {
               passcodeParams = this.application.protocolService.createKeyParams(rawPasscodeParams);
 
               getPasscodeKey = function getPasscodeKey() {
-                var keychainValue, pwHash, passcodeKey, response, passcode;
+                var pwHash, passcodeKey, response, passcode;
                 return regeneratorRuntime.async(function getPasscodeKey$(_context9) {
                   while (1) {
                     switch (_context9.prev = _context9.next) {
                       case 0:
-                        _context9.next = 2;
-                        return regeneratorRuntime.awrap(_this2.application.deviceInterface.getKeychainValue());
-
-                      case 2:
-                        keychainValue = _context9.sent;
-
                         /** Validate current passcode by comparing against keychain offline.pw value */
                         pwHash = keychainValue.offline.pw;
                         passcodeKey = {
                           serverPassword: null
                         };
 
-                      case 5:
+                      case 2:
                         if (!(passcodeKey.serverPassword !== pwHash)) {
-                          _context9.next = 15;
+                          _context9.next = 12;
                           break;
                         }
 
-                        _context9.next = 8;
+                        _context9.next = 5;
                         return regeneratorRuntime.awrap(_this2.requestChallengeResponse(_Lib__WEBPACK_IMPORTED_MODULE_1__["Challenges"].LocalPasscode));
 
-                      case 8:
+                      case 5:
                         response = _context9.sent;
                         passcode = response.value;
-                        _context9.next = 12;
+                        _context9.next = 9;
                         return regeneratorRuntime.awrap(_this2.application.protocolService.computeRootKey({
                           password: passcode,
                           keyParams: passcodeParams
                         }));
 
-                      case 12:
+                      case 9:
                         passcodeKey = _context9.sent;
-                        _context9.next = 5;
+                        _context9.next = 2;
                         break;
 
-                      case 15:
+                      case 12:
                         return _context9.abrupt("return", passcodeKey);
 
-                      case 16:
+                      case 13:
                       case "end":
                         return _context9.stop();
                     }
@@ -4871,7 +4405,7 @@ function (_Migration) {
               return _context12.abrupt("return");
 
             case 5:
-              session = new _services_api_session__WEBPACK_IMPORTED_MODULE_9__["Session"](currentToken);
+              session = new _Services_api_session__WEBPACK_IMPORTED_MODULE_9__["Session"](currentToken);
               _context12.next = 8;
               return regeneratorRuntime.awrap(this.application.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].Session, session));
 
@@ -4950,30 +4484,30 @@ function (_Migration) {
   }]);
 
   return Migration20200115;
-}(_Lib_migration_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
+}(_Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_0__["Migration"]);
 
 /***/ }),
 
-/***/ "./lib/migration/migrations/index.js":
-/*!*******************************************!*\
-  !*** ./lib/migration/migrations/index.js ***!
-  \*******************************************/
+/***/ "./lib/migrations/index.js":
+/*!*********************************!*\
+  !*** ./lib/migrations/index.js ***!
+  \*********************************/
 /*! exports provided: Migration20200115 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _2020_01_15__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./2020-01-15 */ "./lib/migration/migrations/2020-01-15.js");
+/* harmony import */ var _2020_01_15__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./2020-01-15 */ "./lib/migrations/2020-01-15.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Migration20200115", function() { return _2020_01_15__WEBPACK_IMPORTED_MODULE_0__["Migration20200115"]; });
 
 
 
 /***/ }),
 
-/***/ "./lib/migration/migrations/migration.js":
-/*!***********************************************!*\
-  !*** ./lib/migration/migrations/migration.js ***!
-  \***********************************************/
+/***/ "./lib/migrations/migration.js":
+/*!*************************************!*\
+  !*** ./lib/migrations/migration.js ***!
+  \*************************************/
 /*! exports provided: Migration */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -19705,8 +19239,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_service */ "./lib/services/actions_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__["SNActionsService"]; });
 
-/* harmony import */ var _Lib_migration_migration_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/migration/migration_service */ "./lib/migration/migration_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _Lib_migration_migration_service__WEBPACK_IMPORTED_MODULE_8__["SNMigrationService"]; });
+/* harmony import */ var _Lib_services_migration_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/services/migration_service */ "./lib/services/migration_service.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _Lib_services_migration_service__WEBPACK_IMPORTED_MODULE_8__["SNMigrationService"]; });
 
 /* harmony import */ var _Services_protocol_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/protocol_service */ "./lib/services/protocol_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return _Services_protocol_service__WEBPACK_IMPORTED_MODULE_9__["SNProtocolService"]; });
@@ -21619,6 +21153,466 @@ function (_PureService) {
 
   return SNKeyManager;
 }(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_0__["PureService"]);
+
+/***/ }),
+
+/***/ "./lib/services/migration_service.js":
+/*!*******************************************!*\
+  !*** ./lib/services/migration_service.js ***!
+  \*******************************************/
+/*! exports provided: SNMigrationService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return SNMigrationService; });
+/* harmony import */ var _Lib_migrations__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/migrations */ "./lib/migrations/index.js");
+/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
+/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+
+
+/**
+ * The migration service orchestrates the execution of multi-stage migrations.
+ * Migrations are registered during initial application launch, and listen for application
+ * life-cycle events, and act accordingly. For example, a single migration may perform
+ * a unique set of steps when the application first launches, and also other steps after the 
+ * application is unlocked, or after the first sync completes. Migrations live under /migrations
+ * and inherit from the base Migration class.
+ */
+
+var SNMigrationService =
+/*#__PURE__*/
+function (_PureService) {
+  _inherits(SNMigrationService, _PureService);
+
+  function SNMigrationService(_ref) {
+    var _this;
+
+    var application = _ref.application,
+        challengeResponder = _ref.challengeResponder;
+
+    _classCallCheck(this, SNMigrationService);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNMigrationService).call(this));
+    _this.application = application;
+    _this.challengeResponder = challengeResponder;
+    return _this;
+  }
+  /** @access public */
+
+
+  _createClass(SNMigrationService, [{
+    key: "initialize",
+    value: function initialize() {
+      var _this2 = this;
+
+      var lastMigration;
+      return regeneratorRuntime.async(function initialize$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return regeneratorRuntime.awrap(this.runBaseMigration());
+
+            case 2:
+              _context2.next = 4;
+              return regeneratorRuntime.awrap(this.getRequiredMigrations());
+
+            case 4:
+              this.activeMigrations = _context2.sent;
+
+              if (this.activeMigrations.length > 0) {
+                lastMigration = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["lastElement"])(this.activeMigrations);
+                lastMigration.onDone(function _callee() {
+                  return regeneratorRuntime.async(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.next = 2;
+                          return regeneratorRuntime.awrap(_this2.saveLastMigrationTimestamp(lastMigration.constructor.timestamp()));
+
+                        case 2:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  });
+                });
+              }
+
+            case 6:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+    * @access public
+    * Application instances will call this function directly when they arrive
+    * at a certain migratory state.
+    */
+
+  }, {
+    key: "handleApplicationStage",
+    value: function handleApplicationStage(stage) {
+      return regeneratorRuntime.async(function handleApplicationStage$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return regeneratorRuntime.awrap(_get(_getPrototypeOf(SNMigrationService.prototype), "handleApplicationStage", this).call(this, stage));
+
+            case 2:
+              if (stage === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].ReadyForLaunch_05) {
+                this.addLoginObserver();
+                this.addSyncObserver();
+              }
+
+              _context3.next = 5;
+              return regeneratorRuntime.awrap(this.handleStage(stage));
+
+            case 5:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "runBaseMigration",
+    value: function runBaseMigration() {
+      var baseMigration;
+      return regeneratorRuntime.async(function runBaseMigration$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              baseMigration = new _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_2__["BaseMigration"]({
+                application: this.application
+              });
+              _context4.next = 3;
+              return regeneratorRuntime.awrap(baseMigration.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].PreparingForLaunch_0));
+
+            case 3:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @access private */
+
+  }, {
+    key: "getRequiredMigrations",
+    value: function getRequiredMigrations() {
+      var lastMigrationTimestamp, activeMigrations, migrationClasses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, migrationClass, migrationTimestamp;
+
+      return regeneratorRuntime.async(function getRequiredMigrations$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return regeneratorRuntime.awrap(this.getLastMigrationTimestamp());
+
+            case 2:
+              lastMigrationTimestamp = _context5.sent;
+              activeMigrations = [];
+              migrationClasses = Object.keys(_Lib_migrations__WEBPACK_IMPORTED_MODULE_0__).map(function (key) {
+                return _Lib_migrations__WEBPACK_IMPORTED_MODULE_0__[key];
+              }).sort(function (a, b) {
+                var aTimestamp = a.timestamp();
+                var bTimestamp = b.timestamp();
+
+                if (aTimestamp < bTimestamp) {
+                  return -1;
+                } else if (aTimestamp > bTimestamp) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              });
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context5.prev = 8;
+
+              for (_iterator = migrationClasses[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                migrationClass = _step.value;
+                migrationTimestamp = migrationClass.timestamp();
+
+                if (migrationTimestamp > lastMigrationTimestamp) {
+                  // eslint-disable-next-line new-cap
+                  activeMigrations.push(new migrationClass({
+                    application: this.application,
+                    challengeResponder: this.challengeResponder
+                  }));
+                }
+              }
+
+              _context5.next = 16;
+              break;
+
+            case 12:
+              _context5.prev = 12;
+              _context5.t0 = _context5["catch"](8);
+              _didIteratorError = true;
+              _iteratorError = _context5.t0;
+
+            case 16:
+              _context5.prev = 16;
+              _context5.prev = 17;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 19:
+              _context5.prev = 19;
+
+              if (!_didIteratorError) {
+                _context5.next = 22;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 22:
+              return _context5.finish(19);
+
+            case 23:
+              return _context5.finish(16);
+
+            case 24:
+              return _context5.abrupt("return", activeMigrations);
+
+            case 25:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this, [[8, 12, 16, 24], [17,, 19, 23]]);
+    }
+    /** @access private */
+
+  }, {
+    key: "getTimeStampKey",
+    value: function getTimeStampKey() {
+      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
+    }
+    /** @access private */
+
+  }, {
+    key: "getLastMigrationTimestamp",
+    value: function getLastMigrationTimestamp() {
+      var timestamp;
+      return regeneratorRuntime.async(function getLastMigrationTimestamp$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.getRawStorageValue(this.getTimeStampKey()));
+
+            case 2:
+              timestamp = _context6.sent;
+
+              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(timestamp)) {
+                _context6.next = 5;
+                break;
+              }
+
+              throw 'Timestamp should not be null. Be sure to run base migration first.';
+
+            case 5:
+              return _context6.abrupt("return", JSON.parse(timestamp));
+
+            case 6:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @access private */
+
+  }, {
+    key: "saveLastMigrationTimestamp",
+    value: function saveLastMigrationTimestamp(timestamp) {
+      return regeneratorRuntime.async(function saveLastMigrationTimestamp$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _context7.next = 2;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.setRawStorageValue(this.getTimeStampKey(), JSON.stringify(timestamp)));
+
+            case 2:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+    /** @access private */
+
+  }, {
+    key: "addLoginObserver",
+    value: function addLoginObserver() {
+      var _this3 = this;
+
+      this.application.addEventObserver(function _callee2(event, data) {
+        return regeneratorRuntime.async(function _callee2$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvents"].SignedIn)) {
+                  _context8.next = 3;
+                  break;
+                }
+
+                _context8.next = 3;
+                return regeneratorRuntime.awrap(_this3.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].SignedIn_30));
+
+              case 3:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        });
+      });
+    }
+    /** @access private */
+
+  }, {
+    key: "addSyncObserver",
+    value: function addSyncObserver() {
+      var _this4 = this;
+
+      this.application.syncService.addEventObserver(function _callee3(event, data) {
+        return regeneratorRuntime.async(function _callee3$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                if (!(event === _Lib__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].FullSyncCompleted)) {
+                  _context9.next = 3;
+                  break;
+                }
+
+                _context9.next = 3;
+                return regeneratorRuntime.awrap(_this4.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"].FullSyncCompleted_13));
+
+              case 3:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        });
+      });
+    }
+    /** @access private */
+
+  }, {
+    key: "handleStage",
+    value: function handleStage(stage) {
+      var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, migration;
+
+      return regeneratorRuntime.async(function handleStage$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              _iteratorNormalCompletion2 = true;
+              _didIteratorError2 = false;
+              _iteratorError2 = undefined;
+              _context10.prev = 3;
+              _iterator2 = this.activeMigrations[Symbol.iterator]();
+
+            case 5:
+              if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                _context10.next = 12;
+                break;
+              }
+
+              migration = _step2.value;
+              _context10.next = 9;
+              return regeneratorRuntime.awrap(migration.handleStage(stage));
+
+            case 9:
+              _iteratorNormalCompletion2 = true;
+              _context10.next = 5;
+              break;
+
+            case 12:
+              _context10.next = 18;
+              break;
+
+            case 14:
+              _context10.prev = 14;
+              _context10.t0 = _context10["catch"](3);
+              _didIteratorError2 = true;
+              _iteratorError2 = _context10.t0;
+
+            case 18:
+              _context10.prev = 18;
+              _context10.prev = 19;
+
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+
+            case 21:
+              _context10.prev = 21;
+
+              if (!_didIteratorError2) {
+                _context10.next = 24;
+                break;
+              }
+
+              throw _iteratorError2;
+
+            case 24:
+              return _context10.finish(21);
+
+            case 25:
+              return _context10.finish(18);
+
+            case 26:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+    }
+  }]);
+
+  return SNMigrationService;
+}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
 
 /***/ }),
 
