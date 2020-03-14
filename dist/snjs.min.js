@@ -5000,74 +5000,75 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
     key: "deleteLegacyStorageValues",
     value: function () {
       var _deleteLegacyStorageValues = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12() {
-        var managedKeys, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, key;
+        var miscKeys, managedKeys, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, key;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                managedKeys = [].concat(_toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"])), _toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(LegacyKeys)));
+                miscKeys = ['mk', 'ak', 'jwt', 'ephemeral', 'cachedThemes'];
+                managedKeys = [].concat(_toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"])), _toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(LegacyKeys)), miscKeys);
                 _iteratorNormalCompletion2 = true;
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
-                _context12.prev = 4;
+                _context12.prev = 5;
                 _iterator2 = managedKeys[Symbol.iterator]();
 
-              case 6:
+              case 7:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context12.next = 13;
+                  _context12.next = 14;
                   break;
                 }
 
                 key = _step2.value;
-                _context12.next = 10;
+                _context12.next = 11;
                 return this.application.deviceInterface.removeRawStorageValue(key);
 
-              case 10:
+              case 11:
                 _iteratorNormalCompletion2 = true;
-                _context12.next = 6;
+                _context12.next = 7;
                 break;
 
-              case 13:
-                _context12.next = 19;
+              case 14:
+                _context12.next = 20;
                 break;
 
-              case 15:
-                _context12.prev = 15;
-                _context12.t0 = _context12["catch"](4);
+              case 16:
+                _context12.prev = 16;
+                _context12.t0 = _context12["catch"](5);
                 _didIteratorError2 = true;
                 _iteratorError2 = _context12.t0;
 
-              case 19:
-                _context12.prev = 19;
+              case 20:
                 _context12.prev = 20;
+                _context12.prev = 21;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                   _iterator2.return();
                 }
 
-              case 22:
-                _context12.prev = 22;
+              case 23:
+                _context12.prev = 23;
 
                 if (!_didIteratorError2) {
-                  _context12.next = 25;
+                  _context12.next = 26;
                   break;
                 }
 
                 throw _iteratorError2;
 
-              case 25:
-                return _context12.finish(22);
-
               case 26:
-                return _context12.finish(19);
+                return _context12.finish(23);
 
               case 27:
+                return _context12.finish(20);
+
+              case 28:
               case "end":
                 return _context12.stop();
             }
           }
-        }, _callee12, this, [[4, 15, 19, 27], [20,, 22, 26]]);
+        }, _callee12, this, [[5, 16, 20, 28], [21,, 23, 27]]);
       }));
 
       function deleteLegacyStorageValues() {
@@ -16117,11 +16118,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Session", function() { return Session; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Session = function Session(token) {
-  _classCallCheck(this, Session);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.token = token;
-};
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Session = /*#__PURE__*/function () {
+  _createClass(Session, null, [{
+    key: "FromRaw",
+    value: function FromRaw(raw) {
+      return new Session(raw.token);
+    }
+  }]);
+
+  function Session(token) {
+    _classCallCheck(this, Session);
+
+    this.token = token;
+  }
+
+  return Session;
+}();
 
 /***/ }),
 
@@ -16250,7 +16266,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context.next = 14;
-                return this.setSession(new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__["Session"](rawSession));
+                return this.setSession(_Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__["Session"].FromRaw(rawSession));
 
               case 14:
               case "end":

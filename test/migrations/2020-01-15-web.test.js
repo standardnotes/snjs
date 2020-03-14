@@ -374,6 +374,7 @@ describe('2020-01-15 web migration', () => {
 
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok;
     expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok;
     
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
