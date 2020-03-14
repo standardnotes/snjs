@@ -122,6 +122,8 @@ describe('basic auth', () => {
       currentPassword: this.password,
       newPassword: newPassword
     });
+    /** New items key */
+    this.expectedItemCount++;
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     
@@ -176,6 +178,8 @@ describe('basic auth', () => {
         currentPassword: currentPassword,
         newPassword: newPassword
       });
+      /** New items key */
+      this.expectedItemCount++;
 
       currentPassword = newPassword;
       newPassword = Factory.randomString();
