@@ -12,6 +12,13 @@ module.exports = function (api) {
   ];
 
   const plugins = [
+    ['@babel/plugin-transform-runtime', {
+      'useESModules': true,
+      'regenerator': true,
+      'absoluteRuntime': false,
+      'corejs': false,
+      'helpers': false,
+    }],
     '@babel/plugin-proposal-class-properties'
   ];
 
@@ -19,4 +26,4 @@ module.exports = function (api) {
     presets,
     plugins
   };
-}
+};
