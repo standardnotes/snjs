@@ -1946,12 +1946,12 @@ function () {
   }, {
     key: "changePassword",
     value: function changePassword(_ref25) {
-      var email, currentPassword, newPassword, rotateItemsKey, currentKeyParams, result, newKeyParams, versionUpgraded;
+      var email, currentPassword, newPassword, currentKeyParams, result;
       return regeneratorRuntime.async(function changePassword$(_context38) {
         while (1) {
           switch (_context38.prev = _context38.next) {
             case 0:
-              email = _ref25.email, currentPassword = _ref25.currentPassword, newPassword = _ref25.newPassword, rotateItemsKey = _ref25.rotateItemsKey;
+              email = _ref25.email, currentPassword = _ref25.currentPassword, newPassword = _ref25.newPassword;
               _context38.next = 3;
               return regeneratorRuntime.awrap(this.keyManager.getRootKeyParams());
 
@@ -1970,7 +1970,7 @@ function () {
               result = _context38.sent;
 
               if (result.response.error) {
-                _context38.next = 21;
+                _context38.next = 18;
                 break;
               }
 
@@ -1981,33 +1981,25 @@ function () {
               }));
 
             case 11:
-              newKeyParams = result.keyParams;
-              versionUpgraded = newKeyParams.version !== currentKeyParams.version;
-
-              if (!(rotateItemsKey || versionUpgraded)) {
-                _context38.next = 16;
-                break;
-              }
-
-              _context38.next = 16;
+              _context38.next = 13;
               return regeneratorRuntime.awrap(this.itemsKeyManager.createNewDefaultItemsKey());
 
-            case 16:
+            case 13:
               this.unlockSyncing();
-              _context38.next = 19;
+              _context38.next = 16;
               return regeneratorRuntime.awrap(this.syncService.sync());
 
-            case 19:
-              _context38.next = 22;
+            case 16:
+              _context38.next = 19;
               break;
 
-            case 21:
+            case 18:
               this.unlockSyncing();
 
-            case 22:
+            case 19:
               return _context38.abrupt("return", result.response);
 
-            case 23:
+            case 20:
             case "end":
               return _context38.stop();
           }

@@ -56,7 +56,7 @@ By default, upgrading an account's protocol version will create a new `itemsKey`
 **When changing the account password:**
 
 - If a new protocol version is available, changing the account password will also upgrade to the latest protocol version and thus generates a new default `itemsKey`.
-- If no new protocol version is available, or if the user is already using the latest version, changing the account password generates a new `rootKey`, but does not generate a new `itemsKey`, unless the user explicitly chooses an option to "Rotate encryption keys". If the user chooses to rotate encryption keys, a new `itemsKey` will be generated and used as the default items encryption key, and will also be used to progressively re-encrypt previous data.
+- If no new protocol version is available, or if the user is already using the latest version, changing the account password generates a new `rootKey`, as well as generates a new `itemsKey`. The new `itemsKey` will be used as the default items encryption key, and will also be used to progressively re-encrypt previous data. Generating a new `itemsKey` on password change ensures backward secrecy in the case the previous account password is compromised.
 
 ## Encryption Flow
 

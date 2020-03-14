@@ -340,7 +340,7 @@ describe('keys', () => {
     expect(decrypted3.errorDecrypting).to.not.be.ok;
   }).timeout(5000);
 
-  it('changing account password with key rotation option should create new items key', async function () {
+  it('changing account password should create new items key', async function () {
     await Factory.registerUserToApplication({
       application: this.application, email: this.email, password: this.password
     });
@@ -351,8 +351,7 @@ describe('keys', () => {
     await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      newPassword: 'foobarfoo',
-      rotateItemsKey: true
+      newPassword: 'foobarfoo'
     });
 
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(2);
