@@ -35,6 +35,16 @@ describe('basic auth', () => {
     expect(await this.application.keyManager.getRootKey()).to.be.ok;
   }).timeout(5000);
 
+  it('fails register new account with short password', async function () {
+    const password = '123456';
+    const response = await this.application.register({
+      email: this.email,
+      password: password
+    });
+    expect(response.error).to.be.ok;
+    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
+  }).timeout(5000);
+
   it('successfully logs out of account', async function () {
     await this.application.register({
       email: this.email,
@@ -77,6 +87,20 @@ describe('basic auth', () => {
     expect(response).to.be.ok;
     expect(response.error).to.be.ok;
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
+  }).timeout(20000);
+
+  it('fails to change to short password', async function () {
+    await this.application.register({
+      email: this.email,
+      password: this.password
+    });
+    const newPassword = '123456';
+    const response = await this.application.changePassword({
+      email: this.email,
+      currentPassword: this.password,
+      newPassword: newPassword
+    });
+    expect(response.error).to.be.ok;
   }).timeout(20000);
 
   it('successfully changes password', async function () {

@@ -351,7 +351,7 @@ describe('keys', () => {
     await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      newPassword: 'foobar',
+      newPassword: 'foobarfoo',
       rotateItemsKey: true
     });
 
@@ -396,7 +396,7 @@ describe('keys', () => {
     await this.application.changePassword({
       email: this.email,
       currentPassword: this.password,
-      newPassword: 'foobar'
+      newPassword: 'foobarfoo'
     });
 
     const latestVersion = this.application.protocolService.getLatestVersion();
