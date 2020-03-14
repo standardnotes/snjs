@@ -150,6 +150,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
 
+    const keychainValue = await application.deviceInterface.getKeychainValue();
+    expect(keychainValue).to.not.be.ok;
+
     /** Expect note is decrypted */
     expect(application.modelManager.notes.length).to.equal(1);
     const retrievedNote = application.modelManager.notes[0];
@@ -256,6 +259,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
     expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+
+    const keychainValue = await application.deviceInterface.getKeychainValue();
+    expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
     expect(application.modelManager.notes.length).to.equal(1);

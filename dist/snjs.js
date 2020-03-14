@@ -4082,7 +4082,7 @@ function (_Migration) {
               keychainValue = _context10.sent;
 
               if (!rawPasscodeParams) {
-                _context10.next = 53;
+                _context10.next = 57;
                 break;
               }
 
@@ -4138,7 +4138,7 @@ function (_Migration) {
               rawStructure.unwrapped[_Lib__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].MobilePasscodeTiming] = timing;
 
               if (!wrappedAccountKey) {
-                _context10.next = 34;
+                _context10.next = 36;
                 break;
               }
 
@@ -4181,25 +4181,29 @@ function (_Migration) {
             case 30:
               newWrappedAccountKey = _context10.sent;
               rawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_1__["StorageKeys"].WrappedRootKey] = newWrappedAccountKey;
-              _context10.next = 51;
-              break;
+              _context10.next = 34;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.clearKeychainValue());
 
             case 34:
+              _context10.next = 55;
+              break;
+
+            case 36:
               if (wrappedAccountKey) {
-                _context10.next = 51;
+                _context10.next = 55;
                 break;
               }
 
-              _context10.next = 37;
+              _context10.next = 39;
               return regeneratorRuntime.awrap(getPasscodeKey());
 
-            case 37:
+            case 39:
               _passcodeKey = _context10.sent;
               _context10.t0 = _Payloads__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"];
-              _context10.next = 41;
+              _context10.next = 43;
               return regeneratorRuntime.awrap(_Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid());
 
-            case 41:
+            case 43:
               _context10.t1 = _context10.sent;
               _context10.t2 = rawStructure.unwrapped;
               _context10.t3 = _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].EncryptedStorage;
@@ -4212,32 +4216,34 @@ function (_Migration) {
                 object: _context10.t4
               };
               payload = (0, _context10.t0)(_context10.t5);
-              _context10.next = 49;
+              _context10.next = 51;
               return regeneratorRuntime.awrap(this.application.protocolService.payloadByEncryptingPayload({
                 payload: payload,
                 key: _passcodeKey,
                 intent: _Protocol__WEBPACK_IMPORTED_MODULE_4__["EncryptionIntents"].LocalStoragePreferEncrypted
               }));
 
-            case 49:
+            case 51:
               wrapped = _context10.sent;
               rawStructure.wrapped = wrapped;
+              _context10.next = 55;
+              return regeneratorRuntime.awrap(this.application.deviceInterface.clearKeychainValue());
 
-            case 51:
-              _context10.next = 61;
+            case 55:
+              _context10.next = 65;
               break;
 
-            case 53:
+            case 57:
               /** No passcode, potentially account. Migrate keychain property keys. */
               hasAccount = keychainValue && keychainValue.mk;
 
               if (!hasAccount) {
-                _context10.next = 61;
+                _context10.next = 65;
                 break;
               }
 
               _defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["isNullOrUndefined"])(keychainValue.ak) ? _Protocol__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersions"].V002;
-              _context10.next = 58;
+              _context10.next = 62;
               return regeneratorRuntime.awrap(_Protocol__WEBPACK_IMPORTED_MODULE_4__["SNRootKey"].Create({
                 content: {
                   masterKey: keychainValue.mk,
@@ -4247,16 +4253,16 @@ function (_Migration) {
                 }
               }));
 
-            case 58:
+            case 62:
               accountKey = _context10.sent;
-              _context10.next = 61;
+              _context10.next = 65;
               return regeneratorRuntime.awrap(this.application.deviceInterface.setKeychainValue(accountKey.getPersistableValue()));
 
-            case 61:
-              _context10.next = 63;
+            case 65:
+              _context10.next = 67;
               return regeneratorRuntime.awrap(this.allPlatformHelperSetStorageStructure(rawStructure));
 
-            case 63:
+            case 67:
             case "end":
               return _context10.stop();
           }
