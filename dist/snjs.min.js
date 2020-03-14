@@ -3518,7 +3518,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.js ***!
   \**********************/
-/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, StorageKeys, namespacedKey, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP */
+/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, StorageKeys, RawStorageKeys, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3549,9 +3549,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RawStorageKeys"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"]; });
 
 var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 
@@ -4001,7 +4001,7 @@ var BaseMigration = /*#__PURE__*/function (_Migration) {
                 break;
 
               case 14:
-                newKey = Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
+                newKey = Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RawStorageKeys"].LastMigrationTimestamp);
                 _context2.next = 17;
                 return this.application.deviceInterface.getRawStorageValue(newKey);
 
@@ -4100,6 +4100,14 @@ __webpack_require__.r(__webpack_exports__);
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -4132,12 +4140,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var LEGACY_WEB_PASSCODE_PARAMS_KEY = 'offlineParams';
-var LEGACY_MOBILE_PASSCODE_PARAMS_KEY = 'pc_params';
-var LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY = 'auth_params';
-var LEGACY_ALL_SESSION_TOKEN_KEY = 'jwt';
-var LEGACY_WEB_ENCRYPTED_STORAGE_KEY = 'encryptedStorage';
-var LEGACY_MOBILE_WRAPPED_ROOT_KEY_KEY = 'encrypted_account_keys';
+var LegacyKeys = {
+  WebPasscodeParamsKey: 'offlineParams',
+  MobilePasscodeParamsKey: 'pc_params',
+  AllAccountKeyParamsKey: 'auth_params',
+  WebEncryptedStorageKey: 'encryptedStorage',
+  MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  AllMigrations: 'migrations'
+};
 var Migration20200115 = /*#__PURE__*/function (_Migration) {
   _inherits(Migration20200115, _Migration);
 
@@ -4194,6 +4204,10 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 return _this.migrateSessionStorage();
 
               case 4:
+                _context2.next = 6;
+                return _this.deleteLegacyStorageValues();
+
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -4246,7 +4260,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 deviceInterface = this.application.deviceInterface;
                 newStorageRawStructure = (_newStorageRawStructu = {}, _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_9__["ValueModesKeys"].Wrapped, null), _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_9__["ValueModesKeys"].Unwrapped, {}), _defineProperty(_newStorageRawStructu, _Services_storage_service__WEBPACK_IMPORTED_MODULE_9__["ValueModesKeys"].Nonwrapped, {}), _newStorageRawStructu);
                 _context4.next = 4;
-                return deviceInterface.getJsonParsedStorageValue(LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY);
+                return deviceInterface.getJsonParsedStorageValue(LegacyKeys.AllAccountKeyParamsKey);
 
               case 4:
                 rawAccountKeyParams = _context4.sent;
@@ -4257,7 +4271,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 }
 
                 _context4.next = 8;
-                return deviceInterface.getJsonParsedStorageValue(LEGACY_WEB_ENCRYPTED_STORAGE_KEY);
+                return deviceInterface.getJsonParsedStorageValue(LegacyKeys.WebEncryptedStorageKey);
 
               case 8:
                 encryptedStorage = _context4.sent;
@@ -4282,7 +4296,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 storageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["Copy"])(decryptedStoragePayload.content.storage);
                 /** Store previously encrypted auth_params into new nonwrapped key */
 
-                newStorageRawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].RootKeyParams] = storageValueStore[LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY];
+                newStorageRawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].RootKeyParams] = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
                 keyToEncryptStorageWith = passcodeKey;
                 /** Extract account key (mk, pw, ak) if it exists */
 
@@ -4384,7 +4398,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 newStructure = _Services__WEBPACK_IMPORTED_MODULE_7__["SNStorageService"].defaultValuesObject(rawStructure);
                 newStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_9__["ValueModesKeys"].Unwrapped] = null;
                 _context5.next = 4;
-                return this.application.deviceInterface.setRawStorageValue(Object(_Lib__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.application.namespace, _Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].StorageObject), JSON.stringify(newStructure));
+                return this.application.deviceInterface.setRawStorageValue(Object(_Lib__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.application.namespace, _Lib__WEBPACK_IMPORTED_MODULE_2__["RawStorageKeys"].StorageObject), JSON.stringify(newStructure));
 
               case 4:
               case "end":
@@ -4415,7 +4429,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return this.application.deviceInterface.getJsonParsedStorageValue(LEGACY_WEB_PASSCODE_PARAMS_KEY);
+                return this.application.deviceInterface.getJsonParsedStorageValue(LegacyKeys.WebPasscodeParamsKey);
 
               case 2:
                 rawPasscodeParams = _context6.sent;
@@ -4627,17 +4641,17 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 _context10.next = 2;
-                return this.application.deviceInterface.getJsonParsedStorageValue(LEGACY_MOBILE_WRAPPED_ROOT_KEY_KEY);
+                return this.application.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileWrappedRootKeyKey);
 
               case 2:
                 wrappedAccountKey = _context10.sent;
                 _context10.next = 5;
-                return this.application.deviceInterface.getJsonParsedStorageValue(LEGACY_ALL_ACCOUNT_KEY_PARAMS_KEY);
+                return this.application.deviceInterface.getJsonParsedStorageValue(LegacyKeys.AllAccountKeyParamsKey);
 
               case 5:
                 rawAccountKeyParams = _context10.sent;
                 _context10.next = 8;
-                return this.application.deviceInterface.getJsonParsedStorageValue(LEGACY_MOBILE_PASSCODE_PARAMS_KEY);
+                return this.application.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobilePasscodeParamsKey);
 
               case 8:
                 rawPasscodeParams = _context10.sent;
@@ -4863,7 +4877,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
     key: "migrateArbitraryRawStorageToManagedStorageAllPlatforms",
     value: function () {
       var _migrateArbitraryRawStorageToManagedStorageAllPlatforms = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11() {
-        var allKeyValues, legacyKeys, tryJsonParse, namespace, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, keyValuePair, key, value, isNameSpacedKey, newValue, _i, _legacyKeys, legacyKey;
+        var allKeyValues, legacyKeys, tryJsonParse, namespace, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, keyValuePair, key, value, isNameSpacedKey, newValue;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
@@ -4874,7 +4888,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 2:
                 allKeyValues = _context11.sent;
-                legacyKeys = [LEGACY_WEB_ENCRYPTED_STORAGE_KEY, LEGACY_WEB_PASSCODE_PARAMS_KEY, LEGACY_MOBILE_PASSCODE_PARAMS_KEY];
+                legacyKeys = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(LegacyKeys);
 
                 tryJsonParse = function tryJsonParse(value) {
                   try {
@@ -4893,7 +4907,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 11:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context11.next = 27;
+                  _context11.next = 25;
                   break;
                 }
 
@@ -4907,11 +4921,11 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   break;
                 }
 
-                return _context11.abrupt("continue", 24);
+                return _context11.abrupt("continue", 22);
 
               case 18:
                 if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(value)) {
-                  _context11.next = 24;
+                  _context11.next = 22;
                   break;
                 }
 
@@ -4924,72 +4938,50 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 return this.application.storageService.setValue(key, newValue);
 
               case 22:
-                _context11.next = 24;
-                return this.application.deviceInterface.removeRawStorageValue(key);
-
-              case 24:
                 _iteratorNormalCompletion = true;
                 _context11.next = 11;
                 break;
 
-              case 27:
-                _context11.next = 33;
+              case 25:
+                _context11.next = 31;
                 break;
 
-              case 29:
-                _context11.prev = 29;
+              case 27:
+                _context11.prev = 27;
                 _context11.t0 = _context11["catch"](9);
                 _didIteratorError = true;
                 _iteratorError = _context11.t0;
 
-              case 33:
-                _context11.prev = 33;
-                _context11.prev = 34;
+              case 31:
+                _context11.prev = 31;
+                _context11.prev = 32;
 
                 if (!_iteratorNormalCompletion && _iterator.return != null) {
                   _iterator.return();
                 }
 
-              case 36:
-                _context11.prev = 36;
+              case 34:
+                _context11.prev = 34;
 
                 if (!_didIteratorError) {
-                  _context11.next = 39;
+                  _context11.next = 37;
                   break;
                 }
 
                 throw _iteratorError;
 
+              case 37:
+                return _context11.finish(34);
+
+              case 38:
+                return _context11.finish(31);
+
               case 39:
-                return _context11.finish(36);
-
-              case 40:
-                return _context11.finish(33);
-
-              case 41:
-                _i = 0, _legacyKeys = legacyKeys;
-
-              case 42:
-                if (!(_i < _legacyKeys.length)) {
-                  _context11.next = 49;
-                  break;
-                }
-
-                legacyKey = _legacyKeys[_i];
-                _context11.next = 46;
-                return this.application.deviceInterface.removeRawStorageValue(legacyKey);
-
-              case 46:
-                _i++;
-                _context11.next = 42;
-                break;
-
-              case 49:
               case "end":
                 return _context11.stop();
             }
           }
-        }, _callee11, this, [[9, 29, 33, 41], [34,, 36, 40]]);
+        }, _callee11, this, [[9, 27, 31, 39], [32,, 34, 38]]);
       }));
 
       function migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
@@ -5000,6 +4992,92 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
     }()
     /**
      * All platforms
+     * Deletes all StorageKeys and LegacyKeys from root raw storage.
+     * @access private
+     */
+
+  }, {
+    key: "deleteLegacyStorageValues",
+    value: function () {
+      var _deleteLegacyStorageValues = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12() {
+        var managedKeys, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, key;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                managedKeys = [].concat(_toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"])), _toConsumableArray(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["objectToValueArray"])(LegacyKeys)));
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+                _context12.prev = 4;
+                _iterator2 = managedKeys[Symbol.iterator]();
+
+              case 6:
+                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                  _context12.next = 13;
+                  break;
+                }
+
+                key = _step2.value;
+                _context12.next = 10;
+                return this.application.deviceInterface.removeRawStorageValue(key);
+
+              case 10:
+                _iteratorNormalCompletion2 = true;
+                _context12.next = 6;
+                break;
+
+              case 13:
+                _context12.next = 19;
+                break;
+
+              case 15:
+                _context12.prev = 15;
+                _context12.t0 = _context12["catch"](4);
+                _didIteratorError2 = true;
+                _iteratorError2 = _context12.t0;
+
+              case 19:
+                _context12.prev = 19;
+                _context12.prev = 20;
+
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
+                }
+
+              case 22:
+                _context12.prev = 22;
+
+                if (!_didIteratorError2) {
+                  _context12.next = 25;
+                  break;
+                }
+
+                throw _iteratorError2;
+
+              case 25:
+                return _context12.finish(22);
+
+              case 26:
+                return _context12.finish(19);
+
+              case 27:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this, [[4, 15, 19, 27], [20,, 22, 26]]);
+      }));
+
+      function deleteLegacyStorageValues() {
+        return _deleteLegacyStorageValues.apply(this, arguments);
+      }
+
+      return deleteLegacyStorageValues;
+    }()
+    /**
+     * All platforms
      * Migrate previously stored session string token into object
      * @access private
      */
@@ -5007,36 +5085,37 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
   }, {
     key: "migrateSessionStorage",
     value: function () {
-      var _migrateSessionStorage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12() {
-        var currentToken, session;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+      var _migrateSessionStorage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13() {
+        var LEGACY_SESSION_TOKEN_KEY, currentToken, session;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                _context12.next = 2;
-                return this.application.storageService.getValue(LEGACY_ALL_SESSION_TOKEN_KEY);
+                LEGACY_SESSION_TOKEN_KEY = 'jwt';
+                _context13.next = 3;
+                return this.application.storageService.getValue(LEGACY_SESSION_TOKEN_KEY);
 
-              case 2:
-                currentToken = _context12.sent;
+              case 3:
+                currentToken = _context13.sent;
 
                 if (currentToken) {
-                  _context12.next = 5;
+                  _context13.next = 6;
                   break;
                 }
 
-                return _context12.abrupt("return");
+                return _context13.abrupt("return");
 
-              case 5:
+              case 6:
                 session = new _Services_api_session__WEBPACK_IMPORTED_MODULE_10__["Session"](currentToken);
-                _context12.next = 8;
+                _context13.next = 9;
                 return this.application.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].Session, session);
 
-              case 8:
+              case 9:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       }));
 
       function migrateSessionStorage() {
@@ -5059,52 +5138,52 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
   }, {
     key: "createDefaultItemsKeyForAllPlatforms",
     value: function () {
-      var _createDefaultItemsKeyForAllPlatforms = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13() {
+      var _createDefaultItemsKeyForAllPlatforms = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14() {
         var rootKey, rootKeyParams, itemsKey;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                _context13.next = 2;
+                _context14.next = 2;
                 return this.application.keyManager.getRootKey();
 
               case 2:
-                rootKey = _context13.sent;
+                rootKey = _context14.sent;
 
                 if (!rootKey) {
-                  _context13.next = 14;
+                  _context14.next = 14;
                   break;
                 }
 
-                _context13.next = 6;
+                _context14.next = 6;
                 return this.application.keyManager.getRootKeyParams();
 
               case 6:
-                rootKeyParams = _context13.sent;
+                rootKeyParams = _context14.sent;
                 itemsKey = _Models__WEBPACK_IMPORTED_MODULE_6__["SNItemsKey"].FromRaw({
                   itemsKey: rootKey.masterKey,
                   dataAuthenticationKey: rootKey.dataAuthenticationKey,
                   version: rootKeyParams.version
                 });
-                _context13.next = 10;
+                _context14.next = 10;
                 return itemsKey.initUUID();
 
               case 10:
-                _context13.next = 12;
+                _context14.next = 12;
                 return this.application.modelManager.mapItem({
                   item: itemsKey
                 });
 
               case 12:
-                _context13.next = 14;
+                _context14.next = 14;
                 return this.application.modelManager.setItemDirty(itemsKey);
 
               case 14:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee14, this);
       }));
 
       function createDefaultItemsKeyForAllPlatforms() {
@@ -23324,7 +23403,7 @@ var SNMigrationService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getTimeStampKey",
     value: function getTimeStampKey() {
-      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP"]);
+      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["namespacedKey"])(this.application.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["RawStorageKeys"].LastMigrationTimestamp);
     }
     /** @access private */
 
@@ -29580,7 +29659,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getPersistenceKey",
     value: function getPersistenceKey() {
-      return Object(_Lib__WEBPACK_IMPORTED_MODULE_3__["namespacedKey"])(this.namespace, _Lib__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].StorageObject);
+      return Object(_Lib__WEBPACK_IMPORTED_MODULE_3__["namespacedKey"])(this.namespace, _Lib__WEBPACK_IMPORTED_MODULE_3__["RawStorageKeys"].StorageObject);
     }
   }, {
     key: "defaultValuesObject",
@@ -33368,17 +33447,28 @@ var ApplicationStages = {
 /*!*****************************!*\
   !*** ./lib/storage_keys.js ***!
   \*****************************/
-/*! exports provided: StorageKeys, RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP, namespacedKey */
+/*! exports provided: RawStorageKeys, StorageKeys, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return RawStorageKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return StorageKeys; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP", function() { return RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return namespacedKey; });
 /**
- * Keys used for retrieving and saving simple key/value pairs.
+ * Unmanaged keys stored in root storage
  */
+var RawStorageKeys = {
+  StorageObject: 'storage',
+
+  /** Raw storage keys exist outside of StorageManager domain */
+  LastMigrationTimestamp: 'last_migration_timestamp'
+};
+/**
+ * Keys used for retrieving and saving simple key/value pairs.
+ * These keys are managed and are embedded inside RawStorageKeys.StorageObject
+ */
+
 var StorageKeys = {
   RootKeyParams: 'ROOT_KEY_PARAMS',
   WrappedRootKey: 'WRAPPED_ROOT_KEY',
@@ -33389,7 +33479,6 @@ var StorageKeys = {
   LegacyUuid: 'uuid',
   LastSyncToken: 'syncToken',
   PaginationToken: 'cursorToken',
-  StorageObject: 'storage',
   BiometricPrefs: 'biometrics_prefs',
   MobilePasscodeTiming: 'passcode_timing',
   PrivilegesExpirey: 'SessionExpiresAtKey',
@@ -33398,9 +33487,6 @@ var StorageKeys = {
   SessionHistoryRevisions: 'sessionHistory_revisions',
   SessionHistoryOptimize: 'sessionHistory_autoOptimize'
 };
-/** Raw storage keys exist outside of StorageManager domain */
-
-var RAW_STORAGE_KEY_LAST_MIGRATION_TIMESTAMP = 'last_migration_timestamp';
 function namespacedKey(namespace, key) {
   if (namespace) {
     return "".concat(namespace, "-").concat(key);
@@ -33415,7 +33501,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -33436,6 +33522,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "objectToValueArray", function() { return objectToValueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitInPlace", function() { return omitInPlace; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "joinPaths", function() { return joinPaths; });
@@ -33686,6 +33773,23 @@ function arrayByRemovingFromIndex(array, index) {
   var copy = array.slice();
   removeFromIndex(copy, index);
   return copy;
+}
+/**
+ * Returns an array where each element is the value of a top-level
+ * object key.
+ * Example: objectToValueArray({a: 1, b: 2}) returns [1, 2]
+ * @param {object} object 
+ */
+
+function objectToValueArray(object) {
+  var values = [];
+
+  for (var _i = 0, _Object$keys = Object.keys(object); _i < _Object$keys.length; _i++) {
+    var key = _Object$keys[_i];
+    values.push(object[key]);
+  }
+
+  return values;
 }
 /**
  * Deletes keys of the input object.

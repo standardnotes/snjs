@@ -263,7 +263,6 @@ describe('2020-01-15 web migration', () => {
     expect(valueStore.content_type).to.not.be.ok;
 
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok;
-    expect(await application.deviceInterface.getRawStorageValue('foo')).to.not.be.ok;
 
     /** Embedded value should match */
     const migratedKeyParams = await application.storageService.getValue(
@@ -292,6 +291,10 @@ describe('2020-01-15 web migration', () => {
     await application.deinit();
   });
 
+  /**
+   * This test will pass but sync afterwards will not be successful
+   * as we are using a random value for the legacy session token
+   */
   it('2020-01-15 migration with account only', async function () {
     const application = await Factory.createAppWithRandNamespace();
     /** Create legacy migrations value so that base migration detects old app */
