@@ -94,7 +94,7 @@ describe('keys', () => {
         }
         return responses;
       },
-      handleChallengeFailures: async () => {
+      handleFailedChallengeResponses: async () => {
 
       }
     });

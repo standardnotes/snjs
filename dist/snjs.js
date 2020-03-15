@@ -210,8 +210,8 @@ var SNApplication = /*#__PURE__*/function () {
    * Return an array of ChallengeResponse for each Challenge.
    * @param {Array.<Challenge>} params.callbacks.requiresChallengeResponses.challenges  
    * An array of challenges that need a ChallengeResponse.
-   * @param {async|function} params.callbacks.handleChallengeFailures
-   * @param {Array.<ChallengeResponse>} params.callbacks.handleChallengeFailures.failedResponses
+   * @param {async|function} params.callbacks.handleFailedChallengeResponses
+   * @param {Array.<ChallengeResponse>} params.callbacks.handleFailedChallengeResponses.failedResponses
    * An array of ChallengeResponse that have failed.
    */
 
@@ -518,7 +518,7 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 22:
                 _context5.next = 24;
-                return this.launchCallbacks.handleChallengeFailures([_response]);
+                return this.launchCallbacks.handleFailedChallengeResponses([_response]);
 
               case 24:
                 _iteratorNormalCompletion = true;
@@ -1434,8 +1434,8 @@ var SNApplication = /*#__PURE__*/function () {
      * Return an array of ChallengeResponse for each Challenge.
      * @param {Array.<Challenge>} callbacks.requiresChallengeResponses.challenges
      * An array of challenges that need a ChallengeResponse.
-     * @param {async|function} callbacks.handleChallengeFailures
-     * @param {Array.<ChallengeResponse>} callbacks.handleChallengeFailures.failedResponses
+     * @param {async|function} callbacks.handleFailedChallengeResponses
+     * @param {Array.<ChallengeResponse>} callbacks.handleFailedChallengeResponses.failedResponses
      * An array of ChallengeResponse that have failed.
      * @returns {Array.<object>} An array of errors, if any.
      */
@@ -1444,7 +1444,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "upgradeProtocolVersion",
     value: function () {
       var _upgradeProtocolVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24(callbacks) {
-        var hasPasscode, hasAccount, challenges, pendingChallenges, validResponses, responses, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, response, valid, errors, passcodeResponse, passcode, accountResponse, password, changeResponse;
+        var hasPasscode, hasAccount, challenges, pendingChallenges, validResponses, failedResponses, responses, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, response, valid, errors, passcodeResponse, passcode, accountResponse, password, changeResponse;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
           while (1) {
@@ -1467,96 +1467,99 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 7:
                 if (!(pendingChallenges.length > 0)) {
-                  _context24.next = 47;
+                  _context24.next = 45;
                   break;
                 }
 
-                _context24.next = 10;
+                failedResponses = [];
+                _context24.next = 11;
                 return callbacks.requiresChallengeResponses(pendingChallenges);
 
-              case 10:
+              case 11:
                 responses = _context24.sent;
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
                 _iteratorError4 = undefined;
-                _context24.prev = 14;
+                _context24.prev = 15;
                 _iterator4 = responses[Symbol.iterator]();
 
-              case 16:
+              case 17:
                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                  _context24.next = 31;
-                  break;
-                }
-
-                response = _step4.value;
-                _context24.next = 20;
-                return this.deviceAuthService.validateChallengeResponse(response);
-
-              case 20:
-                valid = _context24.sent;
-
-                if (!valid) {
                   _context24.next = 26;
                   break;
                 }
 
-                validResponses.push(response);
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(pendingChallenges, response.challenge);
-                _context24.next = 28;
+                response = _step4.value;
+                _context24.next = 21;
+                return this.deviceAuthService.validateChallengeResponse(response);
+
+              case 21:
+                valid = _context24.sent;
+
+                if (valid) {
+                  validResponses.push(response);
+                  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(pendingChallenges, response.challenge);
+                } else {
+                  failedResponses.push(response);
+                }
+
+              case 23:
+                _iteratorNormalCompletion4 = true;
+                _context24.next = 17;
                 break;
 
               case 26:
-                _context24.next = 28;
-                return callbacks.handleChallengeFailures([response]);
+                _context24.next = 32;
+                break;
 
               case 28:
-                _iteratorNormalCompletion4 = true;
-                _context24.next = 16;
-                break;
-
-              case 31:
-                _context24.next = 37;
-                break;
-
-              case 33:
-                _context24.prev = 33;
-                _context24.t0 = _context24["catch"](14);
+                _context24.prev = 28;
+                _context24.t0 = _context24["catch"](15);
                 _didIteratorError4 = true;
                 _iteratorError4 = _context24.t0;
 
-              case 37:
-                _context24.prev = 37;
-                _context24.prev = 38;
+              case 32:
+                _context24.prev = 32;
+                _context24.prev = 33;
 
                 if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                   _iterator4.return();
                 }
 
-              case 40:
-                _context24.prev = 40;
+              case 35:
+                _context24.prev = 35;
 
                 if (!_didIteratorError4) {
-                  _context24.next = 43;
+                  _context24.next = 38;
                   break;
                 }
 
                 throw _iteratorError4;
 
+              case 38:
+                return _context24.finish(35);
+
+              case 39:
+                return _context24.finish(32);
+
+              case 40:
+                if (!(failedResponses.length > 0)) {
+                  _context24.next = 43;
+                  break;
+                }
+
+                _context24.next = 43;
+                return callbacks.handleFailedChallengeResponses(failedResponses);
+
               case 43:
-                return _context24.finish(40);
-
-              case 44:
-                return _context24.finish(37);
-
-              case 45:
                 _context24.next = 7;
                 break;
 
-              case 47:
+              case 45:
                 errors = [];
 
                 if (!hasPasscode) {
-                  _context24.next = 53;
+                  _context24.next = 51;
                   break;
                 }
 
@@ -1565,12 +1568,12 @@ var SNApplication = /*#__PURE__*/function () {
                   return r.challenge === _Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].LocalPasscode;
                 });
                 passcode = passcodeResponse.value;
-                _context24.next = 53;
+                _context24.next = 51;
                 return this.changePasscode(passcode);
 
-              case 53:
+              case 51:
                 if (!hasAccount) {
-                  _context24.next = 60;
+                  _context24.next = 58;
                   break;
                 }
 
@@ -1579,28 +1582,28 @@ var SNApplication = /*#__PURE__*/function () {
                   return r.challenge === _Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].AccountPassword;
                 });
                 password = accountResponse.value;
-                _context24.next = 58;
+                _context24.next = 56;
                 return this.changePassword({
                   currentPassword: password,
                   newPassword: password
                 });
 
-              case 58:
+              case 56:
                 changeResponse = _context24.sent;
 
                 if (changeResponse.error) {
                   errors.push(changeResponse.error);
                 }
 
-              case 60:
+              case 58:
                 return _context24.abrupt("return", errors);
 
-              case 61:
+              case 59:
               case "end":
                 return _context24.stop();
             }
           }
-        }, _callee24, this, [[14, 33, 37, 45], [38,, 40, 44]]);
+        }, _callee24, this, [[15, 28, 32, 40], [33,, 35, 39]]);
       }));
 
       function upgradeProtocolVersion(_x18) {
@@ -3194,17 +3197,26 @@ var SNApplication = /*#__PURE__*/function () {
 /*!***************************!*\
   !*** ./lib/challenges.js ***!
   \***************************/
-/*! exports provided: Challenges */
+/*! exports provided: Challenges, challengeToString */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Challenges", function() { return Challenges; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "challengeToString", function() { return challengeToString; });
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var Challenges = {
   LocalPasscode: 1,
   AccountPassword: 2,
   Biometric: 3
 };
+function challengeToString(challenge) {
+  var _mapping;
+
+  var mapping = (_mapping = {}, _defineProperty(_mapping, Challenges.LocalPasscode, 'application passcode'), _defineProperty(_mapping, Challenges.AccountPassword, 'account password'), _defineProperty(_mapping, Challenges.Biometric, 'biometrics'), _mapping);
+  return mapping[challenge];
+}
 
 /***/ }),
 
@@ -3702,7 +3714,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.js ***!
   \**********************/
-/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, StorageKeys, RawStorageKeys, namespacedKey */
+/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, challengeToString, StorageKeys, RawStorageKeys, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3730,6 +3742,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenges", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenges"]; });
 
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "challengeToString", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["challengeToString"]; });
+
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"]; });
 
@@ -3750,7 +3764,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, challengeToString, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3848,6 +3862,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenges", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["Challenges"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "challengeToString", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["challengeToString"]; });
 
 /* harmony import */ var _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./services/sync/sync_service */ "./lib/services/sync/sync_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SNSyncService"]; });

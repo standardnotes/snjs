@@ -44,7 +44,7 @@ export async function initializeApplication(application) {
       requiresChallengeResponses: (handleChallengeResponses) => {
         throw 'Factory application shouldnt have challenges';
       },
-      handleChallengeFailures: (responses) => {
+      handleFailedChallengeResponses: (responses) => {
 
       }
     },
@@ -70,7 +70,7 @@ export async function createInitAppWithPasscode(passcode) {
   await application.prepareForLaunch({
     callbacks: {
       requiresChallengeResponses: handleChallenges,
-      handleChallengeFailures: () => { }
+      handleFailedChallengeResponses: () => { }
     }
   });
   await application.launch();

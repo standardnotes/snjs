@@ -44,7 +44,7 @@ describe('device authentication', () => {
     await tmpApplication.prepareForLaunch({
       callbacks: {
         requiresChallengeResponses: handleChallenges,
-        handleChallengeFailures: () => {}
+        handleFailedChallengeResponses: () => {}
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
@@ -89,7 +89,7 @@ describe('device authentication', () => {
     await tmpApplication.prepareForLaunch({
       callbacks: {
         requiresChallengeResponses: handleChallenges,
-        handleChallengeFailures: () => { }
+        handleFailedChallengeResponses: () => { }
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
@@ -137,7 +137,7 @@ describe('device authentication', () => {
     await tmpApplication.prepareForLaunch({
       callbacks: {
         requiresChallengeResponses: handleChallenges,
-        handleChallengeFailures: () => { }
+        handleFailedChallengeResponses: () => { }
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;

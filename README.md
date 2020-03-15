@@ -58,7 +58,7 @@ const app = new SNApplication({
      requiresChallengeResponses: (handleChallengeResponses) => {
 
      },
-     handleChallengeFailures: (responses) => {
+     handleFailedChallengeResponses: (responses) => {
        
      }
    },
