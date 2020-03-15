@@ -61,7 +61,7 @@ export async function createInitAppWithPasscode(passcode) {
     for (const challenge of challenges) {
       if (challenge === Challenges.LocalPasscode) {
         const value = passcode;
-        const response = new ChallengeResponse({ challenge, value });
+        const response = new ChallengeResponse(challenge, value);
         responses.push(response);
       }
     }
@@ -80,6 +80,21 @@ export async function registerUserToApplication({ application, email, password, 
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   return application.register({ email, password, ephemeral, mergeLocal });
+}
+
+export async function setOldVersionPasscode({application, passcode, version}) {
+  const identifier = await application.protocolService.crypto.generateUUID();
+  const operator = application.protocolService.operatorForVersion(version);
+  const { key, keyParams } = await operator.createRootKey({
+    identifier: identifier,
+    password: passcode
+  });
+  await application.keyManager.setNewRootKeyWrapper({
+    wrappingKey: key,
+    keyParams: keyParams
+  });
+  await application.rewriteItemsKeys();
+  await application.syncService.sync();
 }
 
 /**

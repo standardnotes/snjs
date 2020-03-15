@@ -96,7 +96,6 @@ describe('basic auth', () => {
     });
     const newPassword = '123456';
     const response = await this.application.changePassword({
-      email: this.email,
       currentPassword: this.password,
       newPassword: newPassword
     });
@@ -118,7 +117,6 @@ describe('basic auth', () => {
 
     const newPassword = 'newpassword';
     const response = await this.application.changePassword({
-      email: this.email,
       currentPassword: this.password,
       newPassword: newPassword
     });
@@ -174,7 +172,6 @@ describe('basic auth', () => {
     let currentPassword = this.password;
     for(let i = 0; i < numTimesToChangePw; i++) {
       await this.application.changePassword({
-        email: this.email,
         currentPassword: currentPassword,
         newPassword: newPassword
       });

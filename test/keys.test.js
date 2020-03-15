@@ -349,7 +349,6 @@ describe('keys', () => {
     const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
 
     await this.application.changePassword({
-      email: this.email,
       currentPassword: this.password,
       newPassword: 'foobarfoo'
     });
@@ -357,68 +356,5 @@ describe('keys', () => {
     expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(2);
     const newDefaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
-  }).timeout(5000);
-
-  it('protocol version should be upgraded on password change', async function () {
-    /** Delete default items key that is created on launch */
-    const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
-    await this.application.modelManager.setItemToBeDeleted(itemsKey);
-    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(0);
-    
-    /** Register with 003 version */
-    await Factory.registerOldUser({
-      application: this.application,
-      email: this.email,
-      password: this.password,
-      version: ProtocolVersions.V003
-    });
-
-    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
-
-    expect(
-      (await this.application.keyManager.getRootKeyParams()).version
-    ).to.equal('003');
-    expect(
-      (await this.application.keyManager.getRootKey()).version
-    ).to.equal('003');
-
-    /** Create note and ensure its encrypted with 003 */
-    await Factory.createSyncedNote(this.application);
-
-    const notePayloads = await Factory.getStoragePayloadsOfType(
-      this.application,
-      'Note'
-    );
-    const notePayload003 = notePayloads[0];
-    expect(notePayload003.version).to.equal('003');
-
-    await this.application.changePassword({
-      email: this.email,
-      currentPassword: this.password,
-      newPassword: 'foobarfoo'
-    });
-
-    const latestVersion = this.application.protocolService.getLatestVersion();
-    expect(
-      (await this.application.keyManager.getRootKeyParams()).version
-    ).to.equal(latestVersion);
-    expect(
-      (await this.application.keyManager.getRootKey()).version
-    ).to.equal(latestVersion);
-
-    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
-    expect(defaultItemsKey.version).to.equal(latestVersion);
-
-    /** After change, note should now be encrypted with latest protocol version */
-
-    const note = this.application.modelManager.notes[0];
-    await this.application.saveItem({ item: note });
-
-    const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
-      this.application,
-      'Note'
-    );
-    const refreshedNotePayload = refreshedNotePayloads[0];
-    expect(refreshedNotePayload.version).to.equal(latestVersion);
   }).timeout(5000);
 });

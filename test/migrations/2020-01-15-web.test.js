@@ -106,10 +106,7 @@ describe('2020-01-15 web migration', () => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new ChallengeResponse({
-                challenge,
-                value: passcode
-              }));
+              responses.push(new ChallengeResponse(challenge, passcode));
             }
           }
           return responses;
@@ -246,10 +243,7 @@ describe('2020-01-15 web migration', () => {
           const responses = [];
           for (const challenge of challenges) {
             if (challenge === Challenges.LocalPasscode) {
-              responses.push(new ChallengeResponse({
-                challenge,
-                value: passcode
-              }));
+              responses.push(new ChallengeResponse(challenge, passcode));
             }
           }
           return responses;

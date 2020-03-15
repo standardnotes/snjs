@@ -34,7 +34,7 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new ChallengeResponse({challenge, value});
+          const response = new ChallengeResponse(challenge, value);
           responses.push(response);
           numPasscodeAttempts++;
         }
@@ -74,7 +74,7 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new ChallengeResponse({challenge, value});
+          const response = new ChallengeResponse(challenge, value);
           responses.push(response);
           numPasscodeAttempts++;
         } else if(challenge === Challenges.Biometric) {
@@ -128,7 +128,7 @@ describe('device authentication', () => {
       for(const challenge of challenges) {
         if(challenge === Challenges.LocalPasscode) {
           const value = passcode;
-          const response = new ChallengeResponse({challenge, value});
+          const response = new ChallengeResponse(challenge, value);
           responses.push(response);
         }
       }
