@@ -3566,7 +3566,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNModelManager, SNHttpService, DeviceAuthService, ChallengeResponse, PureService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenges, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3730,6 +3730,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["getGlobalScope"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["truncateHexString"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return _utils__WEBPACK_IMPORTED_MODULE_30__["jsonParseEmbeddedKeys"]; });
 
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__["Uuid"]; });
@@ -4251,7 +4253,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
       var _migrateStorageStructureForWebDesktop = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
         var _newStorageRawStructu;
 
-        var deviceInterface, newStorageRawStructure, rawAccountKeyParams, encryptedStorage, encryptedStoragePayload, passcodeResult, passcodeKey, decryptedStoragePayload, passcodeParams, storageValueStore, keyToEncryptStorageWith, hasAccountKeys, _ref4, accountKey, wrappedKey, ak, version, _accountKey;
+        var deviceInterface, newStorageRawStructure, rawAccountKeyParams, encryptedStorage, encryptedStoragePayload, passcodeResult, passcodeKey, decryptedStoragePayload, passcodeParams, rawStorageValueStore, storageValueStore, keyToEncryptStorageWith, hasAccountKeys, _ref4, accountKey, wrappedKey, ak, version, _accountKey;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
@@ -4277,7 +4279,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 encryptedStorage = _context4.sent;
 
                 if (!encryptedStorage) {
-                  _context4.next = 35;
+                  _context4.next = 36;
                   break;
                 }
 
@@ -4293,8 +4295,9 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 decryptedStoragePayload = passcodeResult.decryptedStoragePayload;
                 passcodeParams = passcodeResult.keyParams;
                 newStorageRawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].RootKeyWrapperKeyParams] = passcodeParams.getPortableValue();
-                storageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["Copy"])(decryptedStoragePayload.content.storage);
-                /** Store previously encrypted auth_params into new nonwrapped key */
+                rawStorageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["Copy"])(decryptedStoragePayload.content.storage);
+                storageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["jsonParseEmbeddedKeys"])(rawStorageValueStore);
+                /** Store previously encrypted auth_params into new nonwrapped value key */
 
                 newStorageRawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].RootKeyParams] = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
                 keyToEncryptStorageWith = passcodeKey;
@@ -4303,46 +4306,46 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 hasAccountKeys = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(storageValueStore.mk);
 
                 if (!hasAccountKeys) {
-                  _context4.next = 30;
+                  _context4.next = 31;
                   break;
                 }
 
-                _context4.next = 25;
+                _context4.next = 26;
                 return this.webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, storageValueStore);
 
-              case 25:
+              case 26:
                 _ref4 = _context4.sent;
                 accountKey = _ref4.accountKey;
                 wrappedKey = _ref4.wrappedKey;
                 keyToEncryptStorageWith = accountKey;
                 newStorageRawStructure.nonwrapped[_Lib__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].WrappedRootKey] = wrappedKey;
 
-              case 30:
-                _context4.next = 32;
+              case 31:
+                _context4.next = 33;
                 return this.webDesktopHelperEncryptStorage(keyToEncryptStorageWith, decryptedStoragePayload, storageValueStore);
 
-              case 32:
+              case 33:
                 newStorageRawStructure.wrapped = _context4.sent;
-                _context4.next = 55;
+                _context4.next = 56;
                 break;
 
-              case 35:
-                _context4.next = 37;
+              case 36:
+                _context4.next = 38;
                 return this.application.deviceInterface.getRawStorageValue('ak');
 
-              case 37:
+              case 38:
                 ak = _context4.sent;
                 version = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isNullOrUndefined"])(ak) ? _Protocol__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_5__["ProtocolVersions"].V002;
                 _context4.t0 = _Protocol__WEBPACK_IMPORTED_MODULE_5__["SNRootKey"];
-                _context4.next = 42;
+                _context4.next = 43;
                 return this.application.deviceInterface.getRawStorageValue('mk');
 
-              case 42:
+              case 43:
                 _context4.t1 = _context4.sent;
-                _context4.next = 45;
+                _context4.next = 46;
                 return this.application.deviceInterface.getRawStorageValue('pw');
 
-              case 45:
+              case 46:
                 _context4.t2 = _context4.sent;
                 _context4.t3 = ak;
                 _context4.t4 = version;
@@ -4355,19 +4358,19 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 _context4.t6 = {
                   content: _context4.t5
                 };
-                _context4.next = 52;
+                _context4.next = 53;
                 return _context4.t0.Create.call(_context4.t0, _context4.t6);
 
-              case 52:
+              case 53:
                 _accountKey = _context4.sent;
-                _context4.next = 55;
+                _context4.next = 56;
                 return this.application.deviceInterface.setKeychainValue(_accountKey.getPersistableValue());
 
-              case 55:
-                _context4.next = 57;
+              case 56:
+                _context4.next = 58;
                 return this.allPlatformHelperSetStorageStructure(newStorageRawStructure);
 
-              case 57:
+              case 58:
               case "end":
                 return _context4.stop();
             }
@@ -33517,7 +33520,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -33539,6 +33542,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "objectToValueArray", function() { return objectToValueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return jsonParseEmbeddedKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitInPlace", function() { return omitInPlace; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "joinPaths", function() { return joinPaths; });
@@ -33806,6 +33810,30 @@ function objectToValueArray(object) {
   }
 
   return values;
+}
+/**
+ * Returns a new object by attempting to JSON.parse any top-level object keys.
+ * @param {object} object 
+ */
+
+function jsonParseEmbeddedKeys(object) {
+  var result = {};
+
+  for (var _i2 = 0, _Object$keys2 = Object.keys(object); _i2 < _Object$keys2.length; _i2++) {
+    var key = _Object$keys2[_i2];
+    var value = void 0;
+
+    try {
+      value = JSON.parse(object[key]);
+      ;
+    } catch (error) {
+      value = object[key];
+    }
+
+    result[key] = value;
+  }
+
+  return result;
 }
 /**
  * Deletes keys of the input object.

@@ -40,7 +40,7 @@ describe('2020-01-15 web migration', () => {
       zar: 'tar',
       har: 'car'
     };
-    for(const key of Object.keys(arbitraryValues)) {
+    for (const key of Object.keys(arbitraryValues)) {
       await application.deviceInterface.setRawStorageValue(
         key,
         arbitraryValues[key]
@@ -60,7 +60,8 @@ describe('2020-01-15 web migration', () => {
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
       jwt: 'anything',
-      auth_params: accountResult.keyParams.getPortableValue()
+      /** Legacy versions would store json strings inside of embedded storage */
+      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
     };
     const storagePayload = CreateMaxPayloadFromAnyObject({
       object: {
@@ -103,8 +104,8 @@ describe('2020-01-15 web migration', () => {
       callbacks: {
         requiresChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
@@ -131,12 +132,18 @@ describe('2020-01-15 web migration', () => {
 
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok;
 
+    const keyParams = await application.storageService.getValue(
+      StorageKeys.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(typeof keyParams).to.equal('object');
+
     /** Embedded value should match */
     const migratedKeyParams = await application.storageService.getValue(
       StorageKeys.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
+    expect(migratedKeyParams).to.eql(JSON.parse(embeddedStorage.auth_params));
     const rootKey = await application.keyManager.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
@@ -151,7 +158,7 @@ describe('2020-01-15 web migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     /** Ensure arbitrary values have been migrated */
-    for(const key of Object.keys(arbitraryValues)) {
+    for (const key of Object.keys(arbitraryValues)) {
       const value = await application.storageService.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
@@ -186,7 +193,7 @@ describe('2020-01-15 web migration', () => {
       zar: 'tar',
       har: 'car'
     };
-    for(const key of Object.keys(arbitraryValues)) {
+    for (const key of Object.keys(arbitraryValues)) {
       await application.deviceInterface.setRawStorageValue(
         key,
         arbitraryValues[key]
@@ -237,8 +244,8 @@ describe('2020-01-15 web migration', () => {
       callbacks: {
         requiresChallengeResponses: (challenges) => {
           const responses = [];
-          for(const challenge of challenges) {
-            if(challenge === Challenges.LocalPasscode) {
+          for (const challenge of challenges) {
+            if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse({
                 challenge,
                 value: passcode
@@ -284,7 +291,7 @@ describe('2020-01-15 web migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     /** Ensure arbitrary values have been migrated */
-    for(const key of Object.keys(arbitraryValues)) {
+    for (const key of Object.keys(arbitraryValues)) {
       const value = await application.storageService.getValue(key);
       expect(arbitraryValues[key]).to.equal(value);
     }
@@ -321,9 +328,10 @@ describe('2020-01-15 web migration', () => {
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
       jwt: 'anything',
+      /** Legacy versions would store json strings inside of embedded storage */
       auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
     };
-    for(const key of Object.keys(storage)) {
+    for (const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
         key,
         storage[key]
@@ -375,7 +383,13 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok;
     expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok;
     expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok;
-    
+
+    const keyParams = await application.storageService.getValue(
+      StorageKeys.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(typeof keyParams).to.equal('object');
+
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
@@ -389,9 +403,9 @@ describe('2020-01-15 web migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     /** Ensure arbitrary values have been migrated */
-    for(const key of Object.keys(storage)) {
+    for (const key of Object.keys(storage)) {
       /** Is stringified in storage, but parsed in storageService */
-      if(key === 'auth_params') {
+      if (key === 'auth_params') {
         continue;
       }
       const value = await application.storageService.getValue(key);
@@ -415,7 +429,7 @@ describe('2020-01-15 web migration', () => {
       zar: 'tar',
       har: 'car',
     };
-    for(const key of Object.keys(storage)) {
+    for (const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
         key,
         storage[key]
@@ -469,7 +483,7 @@ describe('2020-01-15 web migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     /** Ensure arbitrary values have been migrated */
-    for(const key of Object.keys(storage)) {
+    for (const key of Object.keys(storage)) {
       const value = await application.storageService.getValue(key);
       expect(storage[key]).to.equal(value);
     }

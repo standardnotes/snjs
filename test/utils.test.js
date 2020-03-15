@@ -28,6 +28,16 @@ describe('utils', () => {
     expect(array).to.eql(original.concat(extended));
   });
 
+  it('jsonParseEmbeddedKeys', () => {
+    const object = {
+      a: {foo: 'bar'},
+      b: JSON.stringify({foo: 'bar'})
+    };
+    const parsed = jsonParseEmbeddedKeys(object);
+    expect(typeof parsed.a).to.equal('object');
+    expect(typeof parsed.b).to.equal('object');
+  });
+
   it('subtractFromArray', () => {
     const array = [1, 2, 3, 4, 5];
     subtractFromArray(array, [1, 3, 5]);
