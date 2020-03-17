@@ -285,8 +285,8 @@ describe('keys', () => {
   it('correctly validates local passcode', async function () {
     const passcode = 'foo';
     await this.application.setPasscode('foo');
-    expect(await this.application.keyManager.validatePasscode('wrong')).to.equal(false);
-    expect(await this.application.keyManager.validatePasscode(passcode)).to.equal(true);
+    expect((await this.application.keyManager.validatePasscode('wrong')).valid).to.equal(false);
+    expect((await this.application.keyManager.validatePasscode(passcode)).valid).to.equal(true);
   }).timeout(5000);
 
   it('signing into 003 account should delete latest offline items key and create 003 items key',

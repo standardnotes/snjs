@@ -482,7 +482,7 @@ var SNApplication = /*#__PURE__*/function () {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context5.prev = 6;
-                _iterator = request.getResponses()[Symbol.iterator]();
+                _iterator = request.getValidResponses()[Symbol.iterator]();
 
               case 8:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -557,7 +557,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "getValidChallengesResponse",
     value: function () {
       var _getValidChallengesResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(challenges, reason) {
-        var request, responses, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, response, valid;
+        var request, responses, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, response, validationArtifacts, valid, result, validResponse;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
@@ -567,7 +567,7 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 1:
                 if (!(request.getPendingChallenges().length > 0)) {
-                  _context6.next = 42;
+                  _context6.next = 49;
                   break;
                 }
 
@@ -592,82 +592,96 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 12:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context6.next = 26;
+                  _context6.next = 33;
                   break;
                 }
 
                 response = _step2.value;
-                _context6.next = 16;
-                return this.deviceAuthService.validateChallengeResponse(response);
+                validationArtifacts = response.validationArtifacts;
+                valid = !!response.validationArtifacts;
+                /* If validation artifacts exist, the result has already been validated. */
 
-              case 16:
-                valid = _context6.sent;
-
-                if (!valid) {
-                  _context6.next = 21;
+                if (validationArtifacts) {
+                  _context6.next = 22;
                   break;
                 }
 
-                request.addValidResponse(response);
-                _context6.next = 23;
+                _context6.next = 19;
+                return this.validateChallengeResponse(response);
+
+              case 19:
+                result = _context6.sent;
+                valid = result.valid;
+                validationArtifacts = result.validationArtifacts;
+
+              case 22:
+                if (!valid) {
+                  _context6.next = 27;
+                  break;
+                }
+
+                validResponse = new _Lib__WEBPACK_IMPORTED_MODULE_4__["ChallengeResponse"](response.challenge, response.value, validationArtifacts);
+                request.addValidResponse(validResponse);
+                _context6.next = 30;
                 break;
 
-              case 21:
-                _context6.next = 23;
+              case 27:
+                request.addFailedResponse(response);
+                _context6.next = 30;
                 return this.launchCallbacks.handleFailedChallengeResponses([response]);
 
-              case 23:
+              case 30:
                 _iteratorNormalCompletion2 = true;
                 _context6.next = 12;
                 break;
 
-              case 26:
-                _context6.next = 32;
+              case 33:
+                _context6.next = 39;
                 break;
 
-              case 28:
-                _context6.prev = 28;
+              case 35:
+                _context6.prev = 35;
                 _context6.t0 = _context6["catch"](10);
                 _didIteratorError2 = true;
                 _iteratorError2 = _context6.t0;
 
-              case 32:
-                _context6.prev = 32;
-                _context6.prev = 33;
+              case 39:
+                _context6.prev = 39;
+                _context6.prev = 40;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                   _iterator2.return();
                 }
 
-              case 35:
-                _context6.prev = 35;
+              case 42:
+                _context6.prev = 42;
 
                 if (!_didIteratorError2) {
-                  _context6.next = 38;
+                  _context6.next = 45;
                   break;
                 }
 
                 throw _iteratorError2;
 
-              case 38:
-                return _context6.finish(35);
+              case 45:
+                return _context6.finish(42);
 
-              case 39:
-                return _context6.finish(32);
+              case 46:
+                return _context6.finish(39);
 
-              case 40:
+              case 47:
                 _context6.next = 1;
                 break;
 
-              case 42:
+              case 49:
                 return _context6.abrupt("return", request);
 
-              case 43:
+              case 50:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, this, [[10, 28, 32, 40], [33,, 35, 39]]);
+        }, _callee6, this, [[10, 35, 39, 47], [40,, 42, 46]]);
       }));
 
       function getValidChallengesResponse(_x3, _x4) {
@@ -675,6 +689,36 @@ var SNApplication = /*#__PURE__*/function () {
       }
 
       return getValidChallengesResponse;
+    }()
+    /** 
+     * Applications can manually validate responses before submitting a UI modal
+     * so that they can update their UI in real time with errors.
+     * @access public 
+     */
+
+  }, {
+    key: "validateChallengeResponse",
+    value: function () {
+      var _validateChallengeResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(response) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                return _context7.abrupt("return", this.deviceAuthService.validateChallengeResponse(response));
+
+              case 1:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function validateChallengeResponse(_x5) {
+        return _validateChallengeResponse.apply(this, arguments);
+      }
+
+      return validateChallengeResponse;
     }()
     /** 
      * The migrations service is initialized with this function, so that it can retrieve
@@ -688,29 +732,29 @@ var SNApplication = /*#__PURE__*/function () {
       var _this3 = this;
 
       return (/*#__PURE__*/function () {
-          var _ref5 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(challenge) {
+          var _ref5 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(challenge) {
             var request, responses;
-            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
               while (1) {
-                switch (_context7.prev = _context7.next) {
+                switch (_context8.prev = _context8.next) {
                   case 0:
                     request = new _Lib__WEBPACK_IMPORTED_MODULE_4__["ChallengeRequest"]([challenge], _Lib__WEBPACK_IMPORTED_MODULE_4__["ChallengeReason"].Migration);
-                    _context7.next = 3;
+                    _context8.next = 3;
                     return _this3.launchCallbacks.handleChallengeRequest(request);
 
                   case 3:
-                    responses = _context7.sent;
-                    return _context7.abrupt("return", responses[0]);
+                    responses = _context8.sent;
+                    return _context8.abrupt("return", responses[0]);
 
                   case 5:
                   case "end":
-                    return _context7.stop();
+                    return _context8.stop();
                 }
               }
-            }, _callee7);
+            }, _callee8);
           }));
 
-          return function (_x5) {
+          return function (_x6) {
             return _ref5.apply(this, arguments);
           };
         }()
@@ -721,77 +765,77 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "handleStage",
     value: function () {
-      var _handleStage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(stage) {
+      var _handleStage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(stage) {
         var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, service;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 _iteratorNormalCompletion3 = true;
                 _didIteratorError3 = false;
                 _iteratorError3 = undefined;
-                _context8.prev = 3;
+                _context9.prev = 3;
                 _iterator3 = this.services[Symbol.iterator]();
 
               case 5:
                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                  _context8.next = 12;
+                  _context9.next = 12;
                   break;
                 }
 
                 service = _step3.value;
-                _context8.next = 9;
+                _context9.next = 9;
                 return service.handleApplicationStage(stage);
 
               case 9:
                 _iteratorNormalCompletion3 = true;
-                _context8.next = 5;
+                _context9.next = 5;
                 break;
 
               case 12:
-                _context8.next = 18;
+                _context9.next = 18;
                 break;
 
               case 14:
-                _context8.prev = 14;
-                _context8.t0 = _context8["catch"](3);
+                _context9.prev = 14;
+                _context9.t0 = _context9["catch"](3);
                 _didIteratorError3 = true;
-                _iteratorError3 = _context8.t0;
+                _iteratorError3 = _context9.t0;
 
               case 18:
-                _context8.prev = 18;
-                _context8.prev = 19;
+                _context9.prev = 18;
+                _context9.prev = 19;
 
                 if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                   _iterator3.return();
                 }
 
               case 21:
-                _context8.prev = 21;
+                _context9.prev = 21;
 
                 if (!_didIteratorError3) {
-                  _context8.next = 24;
+                  _context9.next = 24;
                   break;
                 }
 
                 throw _iteratorError3;
 
               case 24:
-                return _context8.finish(21);
+                return _context9.finish(21);
 
               case 25:
-                return _context8.finish(18);
+                return _context9.finish(18);
 
               case 26:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee9, this, [[3, 14, 18, 26], [19,, 21, 25]]);
       }));
 
-      function handleStage(_x6) {
+      function handleStage(_x7) {
         return _handleStage.apply(this, arguments);
       }
 
@@ -837,96 +881,96 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "notifyEvent",
     value: function () {
-      var _notifyEvent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(event, data) {
+      var _notifyEvent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(event, data) {
         var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, observer;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
                 _iteratorError4 = undefined;
-                _context9.prev = 3;
+                _context10.prev = 3;
                 _iterator4 = this.eventHandlers.slice()[Symbol.iterator]();
 
               case 5:
                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                  _context9.next = 18;
+                  _context10.next = 18;
                   break;
                 }
 
                 observer = _step4.value;
 
                 if (!(observer.singleEvent && observer.singleEvent === event)) {
-                  _context9.next = 12;
+                  _context10.next = 12;
                   break;
                 }
 
-                _context9.next = 10;
+                _context10.next = 10;
                 return observer.callback(event, data || {});
 
               case 10:
-                _context9.next = 15;
+                _context10.next = 15;
                 break;
 
               case 12:
                 if (observer.singleEvent) {
-                  _context9.next = 15;
+                  _context10.next = 15;
                   break;
                 }
 
-                _context9.next = 15;
+                _context10.next = 15;
                 return observer.callback(event, data || {});
 
               case 15:
                 _iteratorNormalCompletion4 = true;
-                _context9.next = 5;
+                _context10.next = 5;
                 break;
 
               case 18:
-                _context9.next = 24;
+                _context10.next = 24;
                 break;
 
               case 20:
-                _context9.prev = 20;
-                _context9.t0 = _context9["catch"](3);
+                _context10.prev = 20;
+                _context10.t0 = _context10["catch"](3);
                 _didIteratorError4 = true;
-                _iteratorError4 = _context9.t0;
+                _iteratorError4 = _context10.t0;
 
               case 24:
-                _context9.prev = 24;
-                _context9.prev = 25;
+                _context10.prev = 24;
+                _context10.prev = 25;
 
                 if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                   _iterator4.return();
                 }
 
               case 27:
-                _context9.prev = 27;
+                _context10.prev = 27;
 
                 if (!_didIteratorError4) {
-                  _context9.next = 30;
+                  _context10.next = 30;
                   break;
                 }
 
                 throw _iteratorError4;
 
               case 30:
-                return _context9.finish(27);
+                return _context10.finish(27);
 
               case 31:
-                return _context9.finish(24);
+                return _context10.finish(24);
 
               case 32:
               case "end":
-                return _context9.stop();
+                return _context10.stop();
             }
           }
-        }, _callee9, this, [[3, 20, 24, 32], [25,, 27, 31]]);
+        }, _callee10, this, [[3, 20, 24, 32], [25,, 27, 31]]);
       }));
 
-      function notifyEvent(_x7, _x8) {
+      function notifyEvent(_x8, _x9) {
         return _notifyEvent.apply(this, arguments);
       }
 
@@ -947,11 +991,11 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "savePayload",
     value: function () {
-      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref6) {
+      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref6) {
         var payload, dirtied;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
                 payload = _ref6.payload;
                 dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
@@ -960,24 +1004,24 @@ var SNApplication = /*#__PURE__*/function () {
                     dirty: true
                   }
                 });
-                _context10.next = 4;
+                _context11.next = 4;
                 return this.modelManager.mapPayloadToLocalItem({
                   payload: dirtied
                 });
 
               case 4:
-                _context10.next = 6;
+                _context11.next = 6;
                 return this.syncService.sync();
 
               case 6:
               case "end":
-                return _context10.stop();
+                return _context11.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee11, this);
       }));
 
-      function savePayload(_x9) {
+      function savePayload(_x10) {
         return _savePayload.apply(this, arguments);
       }
 
@@ -1011,27 +1055,27 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "mergeItem",
     value: function () {
-      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref9) {
+      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref9) {
         var item, source;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 item = _ref9.item, source = _ref9.source;
-                return _context11.abrupt("return", this.modelManager.mapItem({
+                return _context12.abrupt("return", this.modelManager.mapItem({
                   item: item,
                   source: source
                 }));
 
               case 2:
               case "end":
-                return _context11.stop();
+                return _context12.stop();
             }
           }
-        }, _callee11, this);
+        }, _callee12, this);
       }));
 
-      function mergeItem(_x10) {
+      function mergeItem(_x11) {
         return _mergeItem.apply(this, arguments);
       }
 
@@ -1046,14 +1090,14 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createItem",
     value: function () {
-      var _createItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref10) {
+      var _createItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref10) {
         var contentType, content, add, needsSync, item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
                 contentType = _ref10.contentType, content = _ref10.content, add = _ref10.add, needsSync = _ref10.needsSync;
-                _context12.next = 3;
+                _context13.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
                   content: content,
@@ -1062,18 +1106,18 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 3:
-                item = _context12.sent;
-                return _context12.abrupt("return", item);
+                item = _context13.sent;
+                return _context13.abrupt("return", item);
 
               case 5:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       }));
 
-      function createItem(_x11) {
+      function createItem(_x12) {
         return _createItem.apply(this, arguments);
       }
 
@@ -1084,51 +1128,15 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItem",
     value: function () {
-      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref11) {
+      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref11) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                item = _ref11.item;
-                _context13.next = 3;
-                return this.modelManager.setItemDirty(item, true);
-
-              case 3:
-                _context13.next = 5;
-                return this.syncService.sync();
-
-              case 5:
-              case "end":
-                return _context13.stop();
-            }
-          }
-        }, _callee13, this);
-      }));
-
-      function saveItem(_x12) {
-        return _saveItem.apply(this, arguments);
-      }
-
-      return saveItem;
-    }()
-    /** 
-     * @access public 
-     * @param {Array.<SNItem>} params.items
-     */
-
-  }, {
-    key: "saveItems",
-    value: function () {
-      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref12) {
-        var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                items = _ref12.items;
+                item = _ref11.item;
                 _context14.next = 3;
-                return this.modelManager.setItemsDirty(items);
+                return this.modelManager.setItemDirty(item, true);
 
               case 3:
                 _context14.next = 5;
@@ -1142,7 +1150,43 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee14, this);
       }));
 
-      function saveItems(_x13) {
+      function saveItem(_x13) {
+        return _saveItem.apply(this, arguments);
+      }
+
+      return saveItem;
+    }()
+    /** 
+     * @access public 
+     * @param {Array.<SNItem>} params.items
+     */
+
+  }, {
+    key: "saveItems",
+    value: function () {
+      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref12) {
+        var items;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                items = _ref12.items;
+                _context15.next = 3;
+                return this.modelManager.setItemsDirty(items);
+
+              case 3:
+                _context15.next = 5;
+                return this.syncService.sync();
+
+              case 5:
+              case "end":
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function saveItems(_x14) {
         return _saveItems.apply(this, arguments);
       }
 
@@ -1158,24 +1202,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemNeedsSync",
     value: function () {
-      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref13) {
+      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref13) {
         var item, updateUserModifiedDate;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 item = _ref13.item, updateUserModifiedDate = _ref13.updateUserModifiedDate;
-                return _context15.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
+                return _context16.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
 
               case 2:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
-      function setItemNeedsSync(_x14) {
+      function setItemNeedsSync(_x15) {
         return _setItemNeedsSync.apply(this, arguments);
       }
 
@@ -1190,24 +1234,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemsNeedsSync",
     value: function () {
-      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref14) {
+      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref14) {
         var items;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context16.prev = _context16.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
                 items = _ref14.items;
-                return _context16.abrupt("return", this.modelManager.setItemsDirty(items));
+                return _context17.abrupt("return", this.modelManager.setItemsDirty(items));
 
               case 2:
               case "end":
-                return _context16.stop();
+                return _context17.stop();
             }
           }
-        }, _callee16, this);
+        }, _callee17, this);
       }));
 
-      function setItemsNeedsSync(_x15) {
+      function setItemsNeedsSync(_x16) {
         return _setItemsNeedsSync.apply(this, arguments);
       }
 
@@ -1218,11 +1262,11 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItem",
     value: function () {
-      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref15) {
+      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref15) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context17.prev = _context17.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
                 item = _ref15.item;
                 this.modelManager.setItemToBeDeleted(item);
@@ -1230,13 +1274,13 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 3:
               case "end":
-                return _context17.stop();
+                return _context18.stop();
             }
           }
-        }, _callee17, this);
+        }, _callee18, this);
       }));
 
-      function deleteItem(_x16) {
+      function deleteItem(_x17) {
         return _deleteItem.apply(this, arguments);
       }
 
@@ -1247,24 +1291,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItemLocally",
     value: function () {
-      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref16) {
+      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref16) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
                 item = _ref16.item;
                 this.modelManager.removeItemLocally(item);
 
               case 2:
               case "end":
-                return _context18.stop();
+                return _context19.stop();
             }
           }
-        }, _callee18, this);
+        }, _callee19, this);
       }));
 
-      function deleteItemLocally(_x17) {
+      function deleteItemLocally(_x18) {
         return _deleteItemLocally.apply(this, arguments);
       }
 
@@ -1275,23 +1319,23 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "emptyTrash",
     value: function () {
-      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
+      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context19.prev = _context19.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
-                _context19.next = 2;
+                _context20.next = 2;
                 return this.modelManager.emptyTrash();
 
               case 2:
-                return _context19.abrupt("return", this.sync());
+                return _context20.abrupt("return", this.sync());
 
               case 3:
               case "end":
-                return _context19.stop();
+                return _context20.stop();
             }
           }
-        }, _callee19, this);
+        }, _callee20, this);
       }));
 
       function emptyTrash() {
@@ -1347,24 +1391,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "findOrCreateTag",
     value: function () {
-      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(_ref21) {
+      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(_ref21) {
         var title;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
-            switch (_context20.prev = _context20.next) {
+            switch (_context21.prev = _context21.next) {
               case 0:
                 title = _ref21.title;
-                return _context20.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
+                return _context21.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
 
               case 2:
               case "end":
-                return _context20.stop();
+                return _context21.stop();
             }
           }
-        }, _callee20, this);
+        }, _callee21, this);
       }));
 
-      function findOrCreateTag(_x18) {
+      function findOrCreateTag(_x19) {
         return _findOrCreateTag.apply(this, arguments);
       }
 
@@ -1418,22 +1462,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setHost",
     value: function () {
-      var _setHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(host) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
+      var _setHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22(host) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
           while (1) {
-            switch (_context21.prev = _context21.next) {
+            switch (_context22.prev = _context22.next) {
               case 0:
-                return _context21.abrupt("return", this.apiService.setHost(host));
+                return _context22.abrupt("return", this.apiService.setHost(host));
 
               case 1:
               case "end":
-                return _context21.stop();
+                return _context22.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee22, this);
       }));
 
-      function setHost(_x19) {
+      function setHost(_x20) {
         return _setHost.apply(this, arguments);
       }
 
@@ -1444,19 +1488,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getHost",
     value: function () {
-      var _getHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
+      var _getHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
           while (1) {
-            switch (_context22.prev = _context22.next) {
+            switch (_context23.prev = _context23.next) {
               case 0:
-                return _context22.abrupt("return", this.apiService.getHost());
+                return _context23.abrupt("return", this.apiService.getHost());
 
               case 1:
               case "end":
-                return _context22.stop();
+                return _context23.stop();
             }
           }
-        }, _callee22, this);
+        }, _callee23, this);
       }));
 
       function getHost() {
@@ -1481,19 +1525,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getUserVersion",
     value: function () {
-      var _getUserVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
+      var _getUserVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
           while (1) {
-            switch (_context23.prev = _context23.next) {
+            switch (_context24.prev = _context24.next) {
               case 0:
-                return _context23.abrupt("return", this.protocolService.getUserVersion());
+                return _context24.abrupt("return", this.protocolService.getUserVersion());
 
               case 1:
               case "end":
-                return _context23.stop();
+                return _context24.stop();
             }
           }
-        }, _callee23, this);
+        }, _callee24, this);
       }));
 
       function getUserVersion() {
@@ -1510,19 +1554,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "protocolUpgradeAvailable",
     value: function () {
-      var _protocolUpgradeAvailable = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
+      var _protocolUpgradeAvailable = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
           while (1) {
-            switch (_context24.prev = _context24.next) {
+            switch (_context25.prev = _context25.next) {
               case 0:
-                return _context24.abrupt("return", this.protocolService.upgradeAvailable());
+                return _context25.abrupt("return", this.protocolService.upgradeAvailable());
 
               case 1:
               case "end":
-                return _context24.stop();
+                return _context25.stop();
             }
           }
-        }, _callee24, this);
+        }, _callee25, this);
       }));
 
       function protocolUpgradeAvailable() {
@@ -1539,11 +1583,11 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "upgradeProtocolVersion",
     value: function () {
-      var _upgradeProtocolVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25() {
+      var _upgradeProtocolVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26() {
         var hasPasscode, hasAccount, challenges, request, errors, passcode, passcodeResponse, accountResponse, password, changeResponse;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
           while (1) {
-            switch (_context25.prev = _context25.next) {
+            switch (_context26.prev = _context26.next) {
               case 0:
                 hasPasscode = this.hasPasscode();
                 hasAccount = !this.noAccount();
@@ -1557,47 +1601,47 @@ var SNApplication = /*#__PURE__*/function () {
                   challenges.push(_Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].AccountPassword);
                 }
 
-                _context25.next = 7;
+                _context26.next = 7;
                 return this.getValidChallengesResponse(challenges, _Lib__WEBPACK_IMPORTED_MODULE_4__["ChallengeReason"].ProtocolUpgrade);
 
               case 7:
-                request = _context25.sent;
+                request = _context26.sent;
 
                 if (!request.isCanceled) {
-                  _context25.next = 10;
+                  _context26.next = 10;
                   break;
                 }
 
-                return _context25.abrupt("return");
+                return _context26.abrupt("return");
 
               case 10:
                 errors = [];
 
                 if (!hasPasscode) {
-                  _context25.next = 16;
+                  _context26.next = 16;
                   break;
                 }
 
                 /* Upgrade passcode version */
-                passcodeResponse = request.getResponses().find(function (r) {
+                passcodeResponse = request.getValidResponses().find(function (r) {
                   return r.challenge === _Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].LocalPasscode;
                 });
                 passcode = passcodeResponse.value;
-                _context25.next = 16;
+                _context26.next = 16;
                 return this.changePasscode(passcode);
 
               case 16:
                 if (!hasAccount) {
-                  _context25.next = 23;
+                  _context26.next = 23;
                   break;
                 }
 
                 /* Upgrade account version */
-                accountResponse = request.getResponses().find(function (r) {
+                accountResponse = request.getValidResponses().find(function (r) {
                   return r.challenge === _Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].AccountPassword;
                 });
                 password = accountResponse.value;
-                _context25.next = 21;
+                _context26.next = 21;
                 return this.changePassword({
                   currentPassword: password,
                   newPassword: password,
@@ -1605,21 +1649,21 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 21:
-                changeResponse = _context25.sent;
+                changeResponse = _context26.sent;
 
                 if (changeResponse.error) {
                   errors.push(changeResponse.error);
                 }
 
               case 23:
-                return _context25.abrupt("return", errors);
+                return _context26.abrupt("return", errors);
 
               case 24:
               case "end":
-                return _context25.stop();
+                return _context26.stop();
             }
           }
-        }, _callee25, this);
+        }, _callee26, this);
       }));
 
       function upgradeProtocolVersion() {
@@ -1651,54 +1695,54 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "importData",
     value: function () {
-      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26(_ref23) {
+      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27(_ref23) {
         var data, password, awaitSync, decryptedPayloads, validPayloads, affectedItems, promise;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee27$(_context27) {
           while (1) {
-            switch (_context26.prev = _context26.next) {
+            switch (_context27.prev = _context27.next) {
               case 0:
                 data = _ref23.data, password = _ref23.password, awaitSync = _ref23.awaitSync;
-                _context26.next = 3;
+                _context27.next = 3;
                 return this.protocolService.payloadsByDecryptingBackupFile({
                   data: data,
                   password: password
                 });
 
               case 3:
-                decryptedPayloads = _context26.sent;
+                decryptedPayloads = _context27.sent;
                 validPayloads = decryptedPayloads.filter(function (payload) {
                   return !payload.errorDecrypting;
                 });
-                _context26.next = 7;
+                _context27.next = 7;
                 return this.modelManager.importPayloads(validPayloads);
 
               case 7:
-                affectedItems = _context26.sent;
+                affectedItems = _context27.sent;
                 promise = this.sync();
 
                 if (!awaitSync) {
-                  _context26.next = 12;
+                  _context27.next = 12;
                   break;
                 }
 
-                _context26.next = 12;
+                _context27.next = 12;
                 return promise;
 
               case 12:
-                return _context26.abrupt("return", {
+                return _context27.abrupt("return", {
                   affectedItems: affectedItems,
                   errorCount: decryptedPayloads.length - validPayloads.length
                 });
 
               case 13:
               case "end":
-                return _context26.stop();
+                return _context27.stop();
             }
           }
-        }, _callee26, this);
+        }, _callee27, this);
       }));
 
-      function importData(_x20) {
+      function importData(_x21) {
         return _importData.apply(this, arguments);
       }
 
@@ -1713,19 +1757,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createBackupFile",
     value: function () {
-      var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27() {
+      var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee28() {
         var _ref24,
             subItems,
             intent,
             returnIfEmpty,
-            _args27 = arguments;
+            _args28 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee27$(_context27) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee28$(_context28) {
           while (1) {
-            switch (_context27.prev = _context27.next) {
+            switch (_context28.prev = _context28.next) {
               case 0:
-                _ref24 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, subItems = _ref24.subItems, intent = _ref24.intent, returnIfEmpty = _ref24.returnIfEmpty;
-                return _context27.abrupt("return", this.protocolService.createBackupFile({
+                _ref24 = _args28.length > 0 && _args28[0] !== undefined ? _args28[0] : {}, subItems = _ref24.subItems, intent = _ref24.intent, returnIfEmpty = _ref24.returnIfEmpty;
+                return _context28.abrupt("return", this.protocolService.createBackupFile({
                   subItems: subItems,
                   intent: intent,
                   returnIfEmpty: returnIfEmpty
@@ -1733,10 +1777,10 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 2:
               case "end":
-                return _context27.stop();
+                return _context28.stop();
             }
           }
-        }, _callee27, this);
+        }, _callee28, this);
       }));
 
       function createBackupFile() {
@@ -1771,19 +1815,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getSyncStatus",
     value: function () {
-      var _getSyncStatus = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee28() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee28$(_context28) {
+      var _getSyncStatus = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee29() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee29$(_context29) {
           while (1) {
-            switch (_context28.prev = _context28.next) {
+            switch (_context29.prev = _context29.next) {
               case 0:
-                return _context28.abrupt("return", this.syncService.status);
+                return _context29.abrupt("return", this.syncService.status);
 
               case 1:
               case "end":
-                return _context28.stop();
+                return _context29.stop();
             }
           }
-        }, _callee28, this);
+        }, _callee29, this);
       }));
 
       function getSyncStatus() {
@@ -1797,22 +1841,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee29(options) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee29$(_context29) {
+      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee30(options) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee30$(_context30) {
           while (1) {
-            switch (_context29.prev = _context29.next) {
+            switch (_context30.prev = _context30.next) {
               case 0:
-                return _context29.abrupt("return", this.syncService.sync(options));
+                return _context30.abrupt("return", this.syncService.sync(options));
 
               case 1:
               case "end":
-                return _context29.stop();
+                return _context30.stop();
             }
           }
-        }, _callee29, this);
+        }, _callee30, this);
       }));
 
-      function sync(_x21) {
+      function sync(_x22) {
         return _sync.apply(this, arguments);
       }
 
@@ -1823,19 +1867,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "resolveOutOfSync",
     value: function () {
-      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee30() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee30$(_context30) {
+      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee31() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee31$(_context31) {
           while (1) {
-            switch (_context30.prev = _context30.next) {
+            switch (_context31.prev = _context31.next) {
               case 0:
-                return _context30.abrupt("return", this.syncService.resolveOutOfSync());
+                return _context31.abrupt("return", this.syncService.resolveOutOfSync());
 
               case 1:
               case "end":
-                return _context30.stop();
+                return _context31.stop();
             }
           }
-        }, _callee30, this);
+        }, _callee31, this);
       }));
 
       function resolveOutOfSync() {
@@ -1849,22 +1893,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setValue",
     value: function () {
-      var _setValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee31(key, value, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee31$(_context31) {
+      var _setValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee32(key, value, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee32$(_context32) {
           while (1) {
-            switch (_context31.prev = _context31.next) {
+            switch (_context32.prev = _context32.next) {
               case 0:
-                return _context31.abrupt("return", this.storageService.setValue(key, value, mode));
+                return _context32.abrupt("return", this.storageService.setValue(key, value, mode));
 
               case 1:
               case "end":
-                return _context31.stop();
+                return _context32.stop();
             }
           }
-        }, _callee31, this);
+        }, _callee32, this);
       }));
 
-      function setValue(_x22, _x23, _x24) {
+      function setValue(_x23, _x24, _x25) {
         return _setValue.apply(this, arguments);
       }
 
@@ -1875,22 +1919,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getValue",
     value: function () {
-      var _getValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee32(key, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee32$(_context32) {
+      var _getValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee33(key, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee33$(_context33) {
           while (1) {
-            switch (_context32.prev = _context32.next) {
+            switch (_context33.prev = _context33.next) {
               case 0:
-                return _context32.abrupt("return", this.storageService.getValue(key, mode));
+                return _context33.abrupt("return", this.storageService.getValue(key, mode));
 
               case 1:
               case "end":
-                return _context32.stop();
+                return _context33.stop();
             }
           }
-        }, _callee32, this);
+        }, _callee33, this);
       }));
 
-      function getValue(_x25, _x26) {
+      function getValue(_x26, _x27) {
         return _getValue.apply(this, arguments);
       }
 
@@ -1901,22 +1945,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "removeValue",
     value: function () {
-      var _removeValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee33(key, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee33$(_context33) {
+      var _removeValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee34(key, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee34$(_context34) {
           while (1) {
-            switch (_context33.prev = _context33.next) {
+            switch (_context34.prev = _context34.next) {
               case 0:
-                return _context33.abrupt("return", this.storageService.removeValue(key, mode));
+                return _context34.abrupt("return", this.storageService.removeValue(key, mode));
 
               case 1:
               case "end":
-                return _context33.stop();
+                return _context34.stop();
             }
           }
-        }, _callee33, this);
+        }, _callee34, this);
       }));
 
-      function removeValue(_x27, _x28) {
+      function removeValue(_x28, _x29) {
         return _removeValue.apply(this, arguments);
       }
 
@@ -1930,19 +1974,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "clearDatabase",
     value: function () {
-      var _clearDatabase = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee34() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee34$(_context34) {
+      var _clearDatabase = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee35() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee35$(_context35) {
           while (1) {
-            switch (_context34.prev = _context34.next) {
+            switch (_context35.prev = _context35.next) {
               case 0:
-                return _context34.abrupt("return", this.storageService.clearAllPayloads());
+                return _context35.abrupt("return", this.storageService.clearAllPayloads());
 
               case 1:
               case "end":
-                return _context34.stop();
+                return _context35.stop();
             }
           }
-        }, _callee34, this);
+        }, _callee35, this);
       }));
 
       function clearDatabase() {
@@ -1964,31 +2008,31 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "rewriteItemsKeys",
     value: function () {
-      var _rewriteItemsKeys = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee35() {
+      var _rewriteItemsKeys = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36() {
         var itemsKeys, payloads;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee35$(_context35) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
           while (1) {
-            switch (_context35.prev = _context35.next) {
+            switch (_context36.prev = _context36.next) {
               case 0:
                 itemsKeys = this.itemsKeyManager.allItemsKeys;
                 payloads = itemsKeys.map(function (key) {
                   return key.payloadRepresentation();
                 });
-                _context35.next = 4;
+                _context36.next = 4;
                 return this.storageService.deletePayloads(payloads);
 
               case 4:
-                _context35.next = 6;
+                _context36.next = 6;
                 return this.syncService.persistPayloads({
                   decryptedPayloads: payloads
                 });
 
               case 6:
               case "end":
-                return _context35.stop();
+                return _context36.stop();
             }
           }
-        }, _callee35, this);
+        }, _callee36, this);
       }));
 
       function rewriteItemsKeys() {
@@ -2002,34 +2046,34 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "restart",
     value: function () {
-      var _restart = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
+      var _restart = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
           while (1) {
-            switch (_context36.prev = _context36.next) {
+            switch (_context37.prev = _context37.next) {
               case 0:
-                _context36.next = 2;
+                _context37.next = 2;
                 return this.deinit();
 
               case 2:
                 this.dealloced = false;
                 this.constructServices();
-                _context36.next = 6;
+                _context37.next = 6;
                 return this.prepareForLaunch({
                   callbacks: this.launchCallbacks
                 });
 
               case 6:
-                _context36.next = 8;
+                _context37.next = 8;
                 return this.launch({
                   awaitDatabaseLoad: true
                 });
 
               case 8:
               case "end":
-                return _context36.stop();
+                return _context37.stop();
             }
           }
-        }, _callee36, this);
+        }, _callee37, this);
       }));
 
       function restart() {
@@ -2046,162 +2090,162 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deinit",
     value: function () {
-      var _deinit = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37() {
+      var _deinit = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38() {
         var _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, uninstallObserver, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, uninstallSubscriber, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, service;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee38$(_context38) {
           while (1) {
-            switch (_context37.prev = _context37.next) {
+            switch (_context38.prev = _context38.next) {
               case 0:
                 clearInterval(this.autoSyncInterval);
                 _iteratorNormalCompletion5 = true;
                 _didIteratorError5 = false;
                 _iteratorError5 = undefined;
-                _context37.prev = 4;
+                _context38.prev = 4;
 
                 for (_iterator5 = this.serviceObservers[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                   uninstallObserver = _step5.value;
                   uninstallObserver();
                 }
 
-                _context37.next = 12;
+                _context38.next = 12;
                 break;
 
               case 8:
-                _context37.prev = 8;
-                _context37.t0 = _context37["catch"](4);
+                _context38.prev = 8;
+                _context38.t0 = _context38["catch"](4);
                 _didIteratorError5 = true;
-                _iteratorError5 = _context37.t0;
+                _iteratorError5 = _context38.t0;
 
               case 12:
-                _context37.prev = 12;
-                _context37.prev = 13;
+                _context38.prev = 12;
+                _context38.prev = 13;
 
                 if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                   _iterator5.return();
                 }
 
               case 15:
-                _context37.prev = 15;
+                _context38.prev = 15;
 
                 if (!_didIteratorError5) {
-                  _context37.next = 18;
+                  _context38.next = 18;
                   break;
                 }
 
                 throw _iteratorError5;
 
               case 18:
-                return _context37.finish(15);
+                return _context38.finish(15);
 
               case 19:
-                return _context37.finish(12);
+                return _context38.finish(12);
 
               case 20:
                 _iteratorNormalCompletion6 = true;
                 _didIteratorError6 = false;
                 _iteratorError6 = undefined;
-                _context37.prev = 23;
+                _context38.prev = 23;
 
                 for (_iterator6 = this.managedSubscribers[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                   uninstallSubscriber = _step6.value;
                   uninstallSubscriber();
                 }
 
-                _context37.next = 31;
+                _context38.next = 31;
                 break;
 
               case 27:
-                _context37.prev = 27;
-                _context37.t1 = _context37["catch"](23);
+                _context38.prev = 27;
+                _context38.t1 = _context38["catch"](23);
                 _didIteratorError6 = true;
-                _iteratorError6 = _context37.t1;
+                _iteratorError6 = _context38.t1;
 
               case 31:
-                _context37.prev = 31;
-                _context37.prev = 32;
+                _context38.prev = 31;
+                _context38.prev = 32;
 
                 if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
                   _iterator6.return();
                 }
 
               case 34:
-                _context37.prev = 34;
+                _context38.prev = 34;
 
                 if (!_didIteratorError6) {
-                  _context37.next = 37;
+                  _context38.next = 37;
                   break;
                 }
 
                 throw _iteratorError6;
 
               case 37:
-                return _context37.finish(34);
+                return _context38.finish(34);
 
               case 38:
-                return _context37.finish(31);
+                return _context38.finish(31);
 
               case 39:
                 _iteratorNormalCompletion7 = true;
                 _didIteratorError7 = false;
                 _iteratorError7 = undefined;
-                _context37.prev = 42;
+                _context38.prev = 42;
                 _iterator7 = this.services[Symbol.iterator]();
 
               case 44:
                 if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                  _context37.next = 52;
+                  _context38.next = 52;
                   break;
                 }
 
                 service = _step7.value;
 
                 if (!service.deinit) {
-                  _context37.next = 49;
+                  _context38.next = 49;
                   break;
                 }
 
-                _context37.next = 49;
+                _context38.next = 49;
                 return service.deinit();
 
               case 49:
                 _iteratorNormalCompletion7 = true;
-                _context37.next = 44;
+                _context38.next = 44;
                 break;
 
               case 52:
-                _context37.next = 58;
+                _context38.next = 58;
                 break;
 
               case 54:
-                _context37.prev = 54;
-                _context37.t2 = _context37["catch"](42);
+                _context38.prev = 54;
+                _context38.t2 = _context38["catch"](42);
                 _didIteratorError7 = true;
-                _iteratorError7 = _context37.t2;
+                _iteratorError7 = _context38.t2;
 
               case 58:
-                _context37.prev = 58;
-                _context37.prev = 59;
+                _context38.prev = 58;
+                _context38.prev = 59;
 
                 if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
                   _iterator7.return();
                 }
 
               case 61:
-                _context37.prev = 61;
+                _context38.prev = 61;
 
                 if (!_didIteratorError7) {
-                  _context37.next = 64;
+                  _context38.next = 64;
                   break;
                 }
 
                 throw _iteratorError7;
 
               case 64:
-                return _context37.finish(61);
+                return _context38.finish(61);
 
               case 65:
-                return _context37.finish(58);
+                return _context38.finish(58);
 
               case 66:
                 this.streamObservers = [];
@@ -2211,10 +2255,10 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 70:
               case "end":
-                return _context37.stop();
+                return _context38.stop();
             }
           }
-        }, _callee37, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
+        }, _callee38, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
       }));
 
       function deinit() {
@@ -2247,65 +2291,65 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getWrappingKeyIfNecessary",
     value: function () {
-      var _getWrappingKeyIfNecessary = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(passcode) {
+      var _getWrappingKeyIfNecessary = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee39(passcode) {
         var request, response, wrappingKey;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee38$(_context38) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee39$(_context39) {
           while (1) {
-            switch (_context38.prev = _context38.next) {
+            switch (_context39.prev = _context39.next) {
               case 0:
                 if (this.hasPasscode()) {
-                  _context38.next = 2;
+                  _context39.next = 2;
                   break;
                 }
 
-                return _context38.abrupt("return", {});
+                return _context39.abrupt("return", {});
 
               case 2:
                 if (passcode) {
-                  _context38.next = 10;
+                  _context39.next = 10;
                   break;
                 }
 
-                _context38.next = 5;
+                _context39.next = 5;
                 return this.getValidChallengesResponse([_Lib__WEBPACK_IMPORTED_MODULE_4__["Challenges"].LocalPasscode], _Lib__WEBPACK_IMPORTED_MODULE_4__["ChallengeReason"].ResaveRootKey);
 
               case 5:
-                request = _context38.sent;
+                request = _context39.sent;
 
                 if (!request.isCanceled) {
-                  _context38.next = 8;
+                  _context39.next = 8;
                   break;
                 }
 
-                return _context38.abrupt("return", {
+                return _context39.abrupt("return", {
                   canceled: true
                 });
 
               case 8:
-                response = request.getResponses()[0];
+                response = request.getValidResponses()[0];
                 passcode = response.value;
 
               case 10:
-                _context38.next = 12;
+                _context39.next = 12;
                 return this.keyManager.computeWrappingKey({
                   passcode: passcode
                 });
 
               case 12:
-                wrappingKey = _context38.sent;
-                return _context38.abrupt("return", {
+                wrappingKey = _context39.sent;
+                return _context39.abrupt("return", {
                   wrappingKey: wrappingKey
                 });
 
               case 14:
               case "end":
-                return _context38.stop();
+                return _context39.stop();
             }
           }
-        }, _callee38, this);
+        }, _callee39, this);
       }));
 
-      function getWrappingKeyIfNecessary(_x29) {
+      function getWrappingKeyIfNecessary(_x30) {
         return _getWrappingKeyIfNecessary.apply(this, arguments);
       }
 
@@ -2320,138 +2364,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee39(_ref25) {
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref25) {
         var email, password, ephemeral, mergeLocal, _ref26, wrappingKey, canceled, result;
-
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee39$(_context39) {
-          while (1) {
-            switch (_context39.prev = _context39.next) {
-              case 0:
-                email = _ref25.email, password = _ref25.password, ephemeral = _ref25.ephemeral, mergeLocal = _ref25.mergeLocal;
-                _context39.next = 3;
-                return this.getWrappingKeyIfNecessary();
-
-              case 3:
-                _ref26 = _context39.sent;
-                wrappingKey = _ref26.wrappingKey;
-                canceled = _ref26.canceled;
-
-                if (!canceled) {
-                  _context39.next = 8;
-                  break;
-                }
-
-                return _context39.abrupt("return");
-
-              case 8:
-                this.lockSyncing();
-                _context39.next = 11;
-                return this.sessionManager.register({
-                  email: email,
-                  password: password
-                });
-
-              case 11:
-                result = _context39.sent;
-
-                if (result.response.error) {
-                  _context39.next = 34;
-                  break;
-                }
-
-                _context39.next = 15;
-                return this.keyManager.setNewRootKey({
-                  key: result.rootKey,
-                  keyParams: result.keyParams,
-                  wrappingKey: wrappingKey
-                });
-
-              case 15:
-                this.syncService.resetSyncState();
-                _context39.next = 18;
-                return this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_5__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_5__["StoragePersistencePolicies"].Default);
-
-              case 18:
-                if (!mergeLocal) {
-                  _context39.next = 23;
-                  break;
-                }
-
-                _context39.next = 21;
-                return this.syncService.markAllItemsAsNeedingSync({
-                  alternateUuids: true
-                });
-
-              case 21:
-                _context39.next = 26;
-                break;
-
-              case 23:
-                this.modelManager.removeAllItemsFromMemory();
-                _context39.next = 26;
-                return this.clearDatabase();
-
-              case 26:
-                _context39.next = 28;
-                return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_4__["ApplicationEvents"].SignedIn);
-
-              case 28:
-                this.unlockSyncing();
-                _context39.next = 31;
-                return this.syncService.sync({
-                  mode: _Services__WEBPACK_IMPORTED_MODULE_5__["SyncModes"].DownloadFirst,
-                  timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_5__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
-                });
-
-              case 31:
-                this.protocolService.decryptErroredItems();
-                _context39.next = 35;
-                break;
-
-              case 34:
-                this.unlockSyncing();
-
-              case 35:
-                return _context39.abrupt("return", result.response);
-
-              case 36:
-              case "end":
-                return _context39.stop();
-            }
-          }
-        }, _callee39, this);
-      }));
-
-      function register(_x30) {
-        return _register.apply(this, arguments);
-      }
-
-      return register;
-    }()
-    /**
-     *  @access public 
-     *  @param mergeLocal  Whether to merge existing offline data into account. If false, 
-     *                     any pre-existing data will be fully deleted upon success.
-     */
-
-  }, {
-    key: "signIn",
-    value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref27) {
-        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref27$mergeLocal, mergeLocal, _ref28, wrappingKey, canceled, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee40$(_context40) {
           while (1) {
             switch (_context40.prev = _context40.next) {
               case 0:
-                email = _ref27.email, password = _ref27.password, strict = _ref27.strict, ephemeral = _ref27.ephemeral, mfaKeyPath = _ref27.mfaKeyPath, mfaCode = _ref27.mfaCode, _ref27$mergeLocal = _ref27.mergeLocal, mergeLocal = _ref27$mergeLocal === void 0 ? true : _ref27$mergeLocal;
+                email = _ref25.email, password = _ref25.password, ephemeral = _ref25.ephemeral, mergeLocal = _ref25.mergeLocal;
                 _context40.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref28 = _context40.sent;
-                wrappingKey = _ref28.wrappingKey;
-                canceled = _ref28.canceled;
+                _ref26 = _context40.sent;
+                wrappingKey = _ref26.wrappingKey;
+                canceled = _ref26.canceled;
 
                 if (!canceled) {
                   _context40.next = 8;
@@ -2461,15 +2388,11 @@ var SNApplication = /*#__PURE__*/function () {
                 return _context40.abrupt("return");
 
               case 8:
-                /** Prevent a timed sync from occuring while signing in. */
                 this.lockSyncing();
                 _context40.next = 11;
-                return this.sessionManager.signIn({
+                return this.sessionManager.register({
                   email: email,
-                  password: password,
-                  strict: strict,
-                  mfaKeyPath: mfaKeyPath,
-                  mfaCode: mfaCode
+                  password: password
                 });
 
               case 11:
@@ -2521,7 +2444,6 @@ var SNApplication = /*#__PURE__*/function () {
                 _context40.next = 31;
                 return this.syncService.sync({
                   mode: _Services__WEBPACK_IMPORTED_MODULE_5__["SyncModes"].DownloadFirst,
-                  checkIntegrity: true,
                   timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_5__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
                 });
 
@@ -2544,7 +2466,129 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee40, this);
       }));
 
-      function signIn(_x31) {
+      function register(_x31) {
+        return _register.apply(this, arguments);
+      }
+
+      return register;
+    }()
+    /**
+     *  @access public 
+     *  @param mergeLocal  Whether to merge existing offline data into account. If false, 
+     *                     any pre-existing data will be fully deleted upon success.
+     */
+
+  }, {
+    key: "signIn",
+    value: function () {
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee41(_ref27) {
+        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref27$mergeLocal, mergeLocal, _ref28, wrappingKey, canceled, result;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee41$(_context41) {
+          while (1) {
+            switch (_context41.prev = _context41.next) {
+              case 0:
+                email = _ref27.email, password = _ref27.password, strict = _ref27.strict, ephemeral = _ref27.ephemeral, mfaKeyPath = _ref27.mfaKeyPath, mfaCode = _ref27.mfaCode, _ref27$mergeLocal = _ref27.mergeLocal, mergeLocal = _ref27$mergeLocal === void 0 ? true : _ref27$mergeLocal;
+                _context41.next = 3;
+                return this.getWrappingKeyIfNecessary();
+
+              case 3:
+                _ref28 = _context41.sent;
+                wrappingKey = _ref28.wrappingKey;
+                canceled = _ref28.canceled;
+
+                if (!canceled) {
+                  _context41.next = 8;
+                  break;
+                }
+
+                return _context41.abrupt("return");
+
+              case 8:
+                /** Prevent a timed sync from occuring while signing in. */
+                this.lockSyncing();
+                _context41.next = 11;
+                return this.sessionManager.signIn({
+                  email: email,
+                  password: password,
+                  strict: strict,
+                  mfaKeyPath: mfaKeyPath,
+                  mfaCode: mfaCode
+                });
+
+              case 11:
+                result = _context41.sent;
+
+                if (result.response.error) {
+                  _context41.next = 34;
+                  break;
+                }
+
+                _context41.next = 15;
+                return this.keyManager.setNewRootKey({
+                  key: result.rootKey,
+                  keyParams: result.keyParams,
+                  wrappingKey: wrappingKey
+                });
+
+              case 15:
+                this.syncService.resetSyncState();
+                _context41.next = 18;
+                return this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_5__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_5__["StoragePersistencePolicies"].Default);
+
+              case 18:
+                if (!mergeLocal) {
+                  _context41.next = 23;
+                  break;
+                }
+
+                _context41.next = 21;
+                return this.syncService.markAllItemsAsNeedingSync({
+                  alternateUuids: true
+                });
+
+              case 21:
+                _context41.next = 26;
+                break;
+
+              case 23:
+                this.modelManager.removeAllItemsFromMemory();
+                _context41.next = 26;
+                return this.clearDatabase();
+
+              case 26:
+                _context41.next = 28;
+                return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_4__["ApplicationEvents"].SignedIn);
+
+              case 28:
+                this.unlockSyncing();
+                _context41.next = 31;
+                return this.syncService.sync({
+                  mode: _Services__WEBPACK_IMPORTED_MODULE_5__["SyncModes"].DownloadFirst,
+                  checkIntegrity: true,
+                  timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_5__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
+                });
+
+              case 31:
+                this.protocolService.decryptErroredItems();
+                _context41.next = 35;
+                break;
+
+              case 34:
+                this.unlockSyncing();
+
+              case 35:
+                return _context41.abrupt("return", result.response);
+
+              case 36:
+              case "end":
+                return _context41.stop();
+            }
+          }
+        }, _callee41, this);
+      }));
+
+      function signIn(_x32) {
         return _signIn.apply(this, arguments);
       }
 
@@ -2562,37 +2606,37 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee41(_ref29) {
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee42(_ref29) {
         var currentPassword, newPassword, passcode, _ref30, wrappingKey, canceled, currentKeyParams, result;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee41$(_context41) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee42$(_context42) {
           while (1) {
-            switch (_context41.prev = _context41.next) {
+            switch (_context42.prev = _context42.next) {
               case 0:
                 currentPassword = _ref29.currentPassword, newPassword = _ref29.newPassword, passcode = _ref29.passcode;
-                _context41.next = 3;
+                _context42.next = 3;
                 return this.getWrappingKeyIfNecessary(passcode);
 
               case 3:
-                _ref30 = _context41.sent;
+                _ref30 = _context42.sent;
                 wrappingKey = _ref30.wrappingKey;
                 canceled = _ref30.canceled;
 
                 if (!canceled) {
-                  _context41.next = 8;
+                  _context42.next = 8;
                   break;
                 }
 
-                return _context41.abrupt("return");
+                return _context42.abrupt("return");
 
               case 8:
-                _context41.next = 10;
+                _context42.next = 10;
                 return this.keyManager.getRootKeyParams();
 
               case 10:
-                currentKeyParams = _context41.sent;
+                currentKeyParams = _context42.sent;
                 this.lockSyncing();
-                _context41.next = 14;
+                _context42.next = 14;
                 return this.sessionManager.changePassword({
                   currentPassword: currentPassword,
                   currentKeyParams: currentKeyParams,
@@ -2600,14 +2644,14 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 14:
-                result = _context41.sent;
+                result = _context42.sent;
 
                 if (result.response.error) {
-                  _context41.next = 25;
+                  _context42.next = 25;
                   break;
                 }
 
-                _context41.next = 18;
+                _context42.next = 18;
                 return this.keyManager.setNewRootKey({
                   key: result.rootKey,
                   keyParams: result.keyParams,
@@ -2615,33 +2659,33 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 18:
-                _context41.next = 20;
+                _context42.next = 20;
                 return this.itemsKeyManager.createNewDefaultItemsKey();
 
               case 20:
                 this.unlockSyncing();
-                _context41.next = 23;
+                _context42.next = 23;
                 return this.syncService.sync();
 
               case 23:
-                _context41.next = 26;
+                _context42.next = 26;
                 break;
 
               case 25:
                 this.unlockSyncing();
 
               case 26:
-                return _context41.abrupt("return", result.response);
+                return _context42.abrupt("return", result.response);
 
               case 27:
               case "end":
-                return _context41.stop();
+                return _context42.stop();
             }
           }
-        }, _callee41, this);
+        }, _callee42, this);
       }));
 
-      function changePassword(_x32) {
+      function changePassword(_x33) {
         return _changePassword.apply(this, arguments);
       }
 
@@ -2652,36 +2696,36 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "signOut",
     value: function () {
-      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee42() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee42$(_context42) {
+      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
           while (1) {
-            switch (_context42.prev = _context42.next) {
+            switch (_context43.prev = _context43.next) {
               case 0:
-                _context42.next = 2;
+                _context43.next = 2;
                 return this.sessionManager.signOut();
 
               case 2:
-                _context42.next = 4;
+                _context43.next = 4;
                 return this.keyManager.clearLocalKeyState();
 
               case 4:
-                _context42.next = 6;
+                _context43.next = 6;
                 return this.storageService.clearAllData();
 
               case 6:
-                _context42.next = 8;
+                _context43.next = 8;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_4__["ApplicationEvents"].SignedOut);
 
               case 8:
-                _context42.next = 10;
+                _context43.next = 10;
                 return this.restart();
 
               case 10:
               case "end":
-                return _context42.stop();
+                return _context43.stop();
             }
           }
-        }, _callee42, this);
+        }, _callee43, this);
       }));
 
       function signOut() {
@@ -2695,24 +2739,31 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "validateAccountPassword",
     value: function () {
-      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43(_ref31) {
-        var password;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
+      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee44(_ref31) {
+        var password, _ref32, valid;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee44$(_context44) {
           while (1) {
-            switch (_context43.prev = _context43.next) {
+            switch (_context44.prev = _context44.next) {
               case 0:
                 password = _ref31.password;
-                return _context43.abrupt("return", this.keyManager.validateAccountPassword(password));
+                _context44.next = 3;
+                return this.keyManager.validateAccountPassword(password);
 
-              case 2:
+              case 3:
+                _ref32 = _context44.sent;
+                valid = _ref32.valid;
+                return _context44.abrupt("return", valid);
+
+              case 6:
               case "end":
-                return _context43.stop();
+                return _context44.stop();
             }
           }
-        }, _callee43, this);
+        }, _callee44, this);
       }));
 
-      function validateAccountPassword(_x33) {
+      function validateAccountPassword(_x34) {
         return _validateAccountPassword.apply(this, arguments);
       }
 
@@ -2737,27 +2788,27 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "isLocked",
     value: function () {
-      var _isLocked = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee44() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee44$(_context44) {
+      var _isLocked = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee45() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee45$(_context45) {
           while (1) {
-            switch (_context44.prev = _context44.next) {
+            switch (_context45.prev = _context45.next) {
               case 0:
                 if (this.started) {
-                  _context44.next = 2;
+                  _context45.next = 2;
                   break;
                 }
 
-                return _context44.abrupt("return", true);
+                return _context45.abrupt("return", true);
 
               case 2:
-                return _context44.abrupt("return", this.deviceAuthService.isPasscodeLocked());
+                return _context45.abrupt("return", this.deviceAuthService.isPasscodeLocked());
 
               case 3:
               case "end":
-                return _context44.stop();
+                return _context45.stop();
             }
           }
-        }, _callee44, this);
+        }, _callee45, this);
       }));
 
       function isLocked() {
@@ -2771,19 +2822,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "lock",
     value: function () {
-      var _lock = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee45() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee45$(_context45) {
+      var _lock = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee46() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee46$(_context46) {
           while (1) {
-            switch (_context45.prev = _context45.next) {
+            switch (_context46.prev = _context46.next) {
               case 0:
-                return _context45.abrupt("return", this.restart());
+                return _context46.abrupt("return", this.restart());
 
               case 1:
               case "end":
-                return _context45.stop();
+                return _context46.stop();
             }
           }
-        }, _callee45, this);
+        }, _callee46, this);
       }));
 
       function lock() {
@@ -2797,51 +2848,51 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setPasscode",
     value: function () {
-      var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee46(passcode) {
-        var identifier, _ref32, key, keyParams;
+      var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee47(passcode) {
+        var identifier, _ref33, key, keyParams;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee46$(_context46) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee47$(_context47) {
           while (1) {
-            switch (_context46.prev = _context46.next) {
+            switch (_context47.prev = _context47.next) {
               case 0:
-                _context46.next = 2;
+                _context47.next = 2;
                 return this.protocolService.crypto.generateUUID();
 
               case 2:
-                identifier = _context46.sent;
-                _context46.next = 5;
+                identifier = _context47.sent;
+                _context47.next = 5;
                 return this.protocolService.createRootKey({
                   identifier: identifier,
                   password: passcode
                 });
 
               case 5:
-                _ref32 = _context46.sent;
-                key = _ref32.key;
-                keyParams = _ref32.keyParams;
-                _context46.next = 10;
+                _ref33 = _context47.sent;
+                key = _ref33.key;
+                keyParams = _ref33.keyParams;
+                _context47.next = 10;
                 return this.keyManager.setNewRootKeyWrapper({
                   wrappingKey: key,
                   keyParams: keyParams
                 });
 
               case 10:
-                _context46.next = 12;
+                _context47.next = 12;
                 return this.rewriteItemsKeys();
 
               case 12:
-                _context46.next = 14;
+                _context47.next = 14;
                 return this.syncService.sync();
 
               case 14:
               case "end":
-                return _context46.stop();
+                return _context47.stop();
             }
           }
-        }, _callee46, this);
+        }, _callee47, this);
       }));
 
-      function setPasscode(_x34) {
+      function setPasscode(_x35) {
         return _setPasscode.apply(this, arguments);
       }
 
@@ -2852,24 +2903,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "removePasscode",
     value: function () {
-      var _removePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee47() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee47$(_context47) {
+      var _removePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee48() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee48$(_context48) {
           while (1) {
-            switch (_context47.prev = _context47.next) {
+            switch (_context48.prev = _context48.next) {
               case 0:
-                _context47.next = 2;
+                _context48.next = 2;
                 return this.keyManager.removeRootKeyWrapper();
 
               case 2:
-                _context47.next = 4;
+                _context48.next = 4;
                 return this.rewriteItemsKeys();
 
               case 4:
               case "end":
-                return _context47.stop();
+                return _context48.stop();
             }
           }
-        }, _callee47, this);
+        }, _callee48, this);
       }));
 
       function removePasscode() {
@@ -2883,26 +2934,26 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePasscode",
     value: function () {
-      var _changePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee48(passcode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee48$(_context48) {
+      var _changePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee49(passcode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee49$(_context49) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context49.prev = _context49.next) {
               case 0:
-                _context48.next = 2;
+                _context49.next = 2;
                 return this.removePasscode();
 
               case 2:
-                return _context48.abrupt("return", this.setPasscode(passcode));
+                return _context49.abrupt("return", this.setPasscode(passcode));
 
               case 3:
               case "end":
-                return _context48.stop();
+                return _context49.stop();
             }
           }
-        }, _callee48, this);
+        }, _callee49, this);
       }));
 
-      function changePasscode(_x35) {
+      function changePasscode(_x36) {
         return _changePasscode.apply(this, arguments);
       }
 
@@ -2913,26 +2964,26 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setStorageEncryptionPolicy",
     value: function () {
-      var _setStorageEncryptionPolicy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee49(encryptionPolicy) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee49$(_context49) {
+      var _setStorageEncryptionPolicy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(encryptionPolicy) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
           while (1) {
-            switch (_context49.prev = _context49.next) {
+            switch (_context50.prev = _context50.next) {
               case 0:
-                _context49.next = 2;
+                _context50.next = 2;
                 return this.storageService.setEncryptionPolicy(encryptionPolicy);
 
               case 2:
-                return _context49.abrupt("return", this.syncService.repersistAllItems());
+                return _context50.abrupt("return", this.syncService.repersistAllItems());
 
               case 3:
               case "end":
-                return _context49.stop();
+                return _context50.stop();
             }
           }
-        }, _callee49, this);
+        }, _callee50, this);
       }));
 
-      function setStorageEncryptionPolicy(_x36) {
+      function setStorageEncryptionPolicy(_x37) {
         return _setStorageEncryptionPolicy.apply(this, arguments);
       }
 
@@ -2943,19 +2994,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "generateUuid",
     value: function () {
-      var _generateUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
+      var _generateUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee51() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee51$(_context51) {
           while (1) {
-            switch (_context50.prev = _context50.next) {
+            switch (_context51.prev = _context51.next) {
               case 0:
-                return _context50.abrupt("return", this.protocolService.crypto.generateUUID());
+                return _context51.abrupt("return", this.protocolService.crypto.generateUUID());
 
               case 1:
               case "end":
-                return _context50.stop();
+                return _context51.stop();
             }
           }
-        }, _callee50, this);
+        }, _callee51, this);
       }));
 
       function generateUuid() {
@@ -2973,18 +3024,18 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changeDeviceInterface",
     value: function () {
-      var _changeDeviceInterface = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee51(deviceInterface) {
+      var _changeDeviceInterface = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee52(deviceInterface) {
         var _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, service;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee51$(_context51) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee52$(_context52) {
           while (1) {
-            switch (_context51.prev = _context51.next) {
+            switch (_context52.prev = _context52.next) {
               case 0:
                 this.deviceInterface = deviceInterface;
                 _iteratorNormalCompletion8 = true;
                 _didIteratorError8 = false;
                 _iteratorError8 = undefined;
-                _context51.prev = 4;
+                _context52.prev = 4;
 
                 for (_iterator8 = this.services[Symbol.iterator](); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
                   service = _step8.value;
@@ -2994,48 +3045,48 @@ var SNApplication = /*#__PURE__*/function () {
                   }
                 }
 
-                _context51.next = 12;
+                _context52.next = 12;
                 break;
 
               case 8:
-                _context51.prev = 8;
-                _context51.t0 = _context51["catch"](4);
+                _context52.prev = 8;
+                _context52.t0 = _context52["catch"](4);
                 _didIteratorError8 = true;
-                _iteratorError8 = _context51.t0;
+                _iteratorError8 = _context52.t0;
 
               case 12:
-                _context51.prev = 12;
-                _context51.prev = 13;
+                _context52.prev = 12;
+                _context52.prev = 13;
 
                 if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
                   _iterator8.return();
                 }
 
               case 15:
-                _context51.prev = 15;
+                _context52.prev = 15;
 
                 if (!_didIteratorError8) {
-                  _context51.next = 18;
+                  _context52.next = 18;
                   break;
                 }
 
                 throw _iteratorError8;
 
               case 18:
-                return _context51.finish(15);
+                return _context52.finish(15);
 
               case 19:
-                return _context51.finish(12);
+                return _context52.finish(12);
 
               case 20:
               case "end":
-                return _context51.stop();
+                return _context52.stop();
             }
           }
-        }, _callee51, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+        }, _callee52, this, [[4, 8, 12, 20], [13,, 15, 19]]);
       }));
 
-      function changeDeviceInterface(_x37) {
+      function changeDeviceInterface(_x38) {
         return _changeDeviceInterface.apply(this, arguments);
       }
 
@@ -3156,20 +3207,20 @@ var SNApplication = /*#__PURE__*/function () {
         itemsKeyManager: this.itemsKeyManager,
         deviceInterface: this.deviceInterface
       });
-      this.keyManager.onStatusChange( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee52() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee52$(_context52) {
+      this.keyManager.onStatusChange( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee53() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee53$(_context53) {
           while (1) {
-            switch (_context52.prev = _context52.next) {
+            switch (_context53.prev = _context53.next) {
               case 0:
-                _context52.next = 2;
+                _context53.next = 2;
                 return _this6.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_4__["ApplicationEvents"].KeyStatusChanged);
 
               case 2:
               case "end":
-                return _context52.stop();
+                return _context53.stop();
             }
           }
-        }, _callee52);
+        }, _callee53);
       })));
       this.services.push(this.keyManager);
     }
@@ -3243,32 +3294,32 @@ var SNApplication = /*#__PURE__*/function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncService.addEventObserver( /*#__PURE__*/function () {
-        var _ref34 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee53(eventName) {
+        var _ref35 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee54(eventName) {
           var appEvent;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee53$(_context53) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee54$(_context54) {
             while (1) {
-              switch (_context53.prev = _context53.next) {
+              switch (_context54.prev = _context54.next) {
                 case 0:
                   appEvent = Object(_Lib__WEBPACK_IMPORTED_MODULE_4__["applicationEventForSyncEvent"])(eventName);
 
                   if (!appEvent) {
-                    _context53.next = 4;
+                    _context54.next = 4;
                     break;
                   }
 
-                  _context53.next = 4;
+                  _context54.next = 4;
                   return _this7.notifyEvent(appEvent);
 
                 case 4:
                 case "end":
-                  return _context53.stop();
+                  return _context54.stop();
               }
             }
-          }, _callee53);
+          }, _callee54);
         }));
 
-        return function (_x38) {
-          return _ref34.apply(this, arguments);
+        return function (_x39) {
+          return _ref35.apply(this, arguments);
         };
       }());
       this.serviceObservers.push(uninstall);
@@ -3397,37 +3448,74 @@ var ChallengeResponse =
 /**
  * @param {Challenge} challenge 
  * @param {string|boolean} value 
+ * @param {object} validationArtifacts
  */
-function ChallengeResponse(challenge, value) {
+function ChallengeResponse(challenge, value, validationArtifacts) {
   _classCallCheck(this, ChallengeResponse);
 
   this.challenge = challenge;
   this.value = value;
+  this.validationArtifacts = validationArtifacts;
   Object.freeze(this);
 };
 var ChallengeRequest = /*#__PURE__*/function () {
   /**
    * @param {Array.<Challenge>} challenges 
    * @param {ChallengeReason} reason 
+   * @param {boolean} cancelable - Whether the request is cancelable
    */
-  function ChallengeRequest(challenges, reason) {
+  function ChallengeRequest(challenges, reason, cancelable) {
     _classCallCheck(this, ChallengeRequest);
 
     this.challenges = challenges.slice();
     this.pendingChallenges = challenges.slice();
     this.reason = reason;
-    this.responses = [];
+    this.cancelable = cancelable;
+    this.validResponses = [];
+    this.failedResponses = [];
   }
   /**
    * @access public
-   * Returns an array of challenges that need to be responded to
+   * Returns an array of all original challenges for this request
    */
 
 
   _createClass(ChallengeRequest, [{
+    key: "getAllChallenges",
+    value: function getAllChallenges() {
+      return this.challenges;
+    }
+    /**
+     * @access public
+     * Returns an array of challenges that need to be responded to
+     */
+
+  }, {
     key: "getPendingChallenges",
     value: function getPendingChallenges() {
       return this.pendingChallenges;
+    }
+    /** 
+     * Called by request orchestrator once all responses have completed validation
+     * @access public 
+     */
+
+  }, {
+    key: "didCompleteValidation",
+    value: function didCompleteValidation() {
+      this.onValidationCallback && this.onValidationCallback();
+    }
+    /**
+     * Called by consumers who wish to be informed once validation has completed
+     * and when getValidResponses and getFailedResponses returns the most recent values.
+     * @access public
+     * @param {function} callback 
+     */
+
+  }, {
+    key: "onValidation",
+    value: function onValidation(callback) {
+      this.onValidationCallback = callback;
     }
     /** 
      * Cancel this request. Orchestrators of this request check to see if it's canceled 
@@ -3454,8 +3542,24 @@ var ChallengeRequest = /*#__PURE__*/function () {
      * response.challenge from the list of pending challenges.
      */
     value: function addValidResponse(response) {
-      this.responses.push(response);
+      this.validResponses.push(response);
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.pendingChallenges, response.challenge);
+    }
+    /**
+     * @access public
+     * Adds the response to list of failed responses.
+     */
+
+  }, {
+    key: "addFailedResponse",
+    value: function addFailedResponse(response) {
+      if (this.failedResponses.find(function (r) {
+        return r.challenge === response.challenge;
+      })) {
+        return;
+      }
+
+      this.failedResponses.push(response);
     }
     /**
      * @access public
@@ -3463,9 +3567,19 @@ var ChallengeRequest = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "getResponses",
-    value: function getResponses() {
-      return this.responses;
+    key: "getValidResponses",
+    value: function getValidResponses() {
+      return this.validResponses;
+    }
+    /**
+     * @access public
+     * Returns an array of valid responses, as added to by addValidResponse.
+     */
+
+  }, {
+    key: "getFailedResponses",
+    value: function getFailedResponses() {
+      return this.failedResponses;
     }
   }, {
     key: "isCanceled",
@@ -3973,7 +4087,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.js ***!
   \**********************/
-/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, ChallengeReason, ChallengeRequest, challengeToString, StorageKeys, RawStorageKeys, namespacedKey */
+/*! exports provided: DEFAULT_APP_DOMAIN, ApplicationEvents, SyncEvents, applicationEventForSyncEvent, ApplicationStages, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, Challenges, ChallengeReason, ChallengeRequest, challengeToString, ChallengeResponse, StorageKeys, RawStorageKeys, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4006,6 +4120,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeRequest", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["ChallengeRequest"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "challengeToString", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["challengeToString"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["ChallengeResponse"]; });
 
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"]; });
@@ -20366,6 +20482,11 @@ var DeviceAuthService = /*#__PURE__*/function (_PureService) {
 
       return enableBiometrics;
     }()
+    /**
+     * @access public
+     * @returns {object} {valid, validationArtifacts}
+     */
+
   }, {
     key: "validateChallengeResponse",
     value: function () {
@@ -20395,7 +20516,9 @@ var DeviceAuthService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context3.abrupt("return", response.value === true);
+                return _context3.abrupt("return", {
+                  valid: response.value === true
+                });
 
               case 10:
                 throw "Cannot validate challenge type ".concat(response.challenge);
@@ -20418,33 +20541,42 @@ var DeviceAuthService = /*#__PURE__*/function (_PureService) {
     key: "handleChallengeResponse",
     value: function () {
       var _handleChallengeResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(response) {
-        var key;
+        var wrappingKey;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(response.challenge === _Lib_challenges__WEBPACK_IMPORTED_MODULE_4__["Challenges"].LocalPasscode)) {
-                  _context4.next = 8;
+                  _context4.next = 10;
                   break;
                 }
 
-                _context4.next = 3;
+                wrappingKey = response.validationArtifacts && response.validationArtifacts.wrappingKey;
+
+                if (wrappingKey) {
+                  _context4.next = 6;
+                  break;
+                }
+
+                _context4.next = 5;
                 return this.keyManager.computeWrappingKey({
                   passcode: response.value
                 });
 
-              case 3:
-                key = _context4.sent;
-                _context4.next = 6;
-                return this.keyManager.unwrapRootKey({
-                  wrappingKey: key
-                });
+              case 5:
+                wrappingKey = _context4.sent;
 
               case 6:
                 _context4.next = 8;
-                break;
+                return this.keyManager.unwrapRootKey({
+                  wrappingKey: wrappingKey
+                });
 
               case 8:
+                _context4.next = 10;
+                break;
+
+              case 10:
               case "end":
                 return _context4.stop();
             }
@@ -23320,14 +23452,14 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
     }()
     /**
      * @param {string} password  The password string to generate a root key from.
-     * @returns {key|null}  The computed rootKey if valid password, otherwise null.
+     * @returns {object}  { valid, validationArtificats : { wrappingKey : object } }
      */
 
   }, {
     key: "validateAccountPassword",
     value: function () {
       var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(password) {
-        var keyParams, key, success;
+        var keyParams, key, valid;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
             switch (_context20.prev = _context20.next) {
@@ -23345,10 +23477,26 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
 
               case 5:
                 key = _context20.sent;
-                success = key.compare(this.rootKey);
-                return _context20.abrupt("return", success ? key : null);
+                valid = key.compare(this.rootKey);
 
-              case 8:
+                if (!valid) {
+                  _context20.next = 11;
+                  break;
+                }
+
+                return _context20.abrupt("return", {
+                  valid: valid,
+                  validationArtifacts: {
+                    rootKey: key
+                  }
+                });
+
+              case 11:
+                return _context20.abrupt("return", {
+                  valid: false
+                });
+
+              case 12:
               case "end":
                 return _context20.stop();
             }
@@ -23364,15 +23512,14 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
     }()
     /**
      * @param {string} passcode  The passcode string to generate a root key from.
-     * @returns {boolean}  Whether the input passcode generates wrapping keys equal
-     * to the ones saved.
+     * @returns {object}  { valid, validationArtificats : { wrappingKey : object } }
      */
 
   }, {
     key: "validatePasscode",
     value: function () {
       var _validatePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(passcode) {
-        var keyParams, key;
+        var keyParams, key, valid;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
             switch (_context21.prev = _context21.next) {
@@ -23390,9 +23537,30 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
 
               case 5:
                 key = _context21.sent;
-                return _context21.abrupt("return", this.validateWrappingKey(key));
+                _context21.next = 8;
+                return this.validateWrappingKey(key);
 
-              case 7:
+              case 8:
+                valid = _context21.sent;
+
+                if (!valid) {
+                  _context21.next = 13;
+                  break;
+                }
+
+                return _context21.abrupt("return", {
+                  valid: valid,
+                  validationArtifacts: {
+                    wrappingKey: key
+                  }
+                });
+
+              case 13:
+                return _context21.abrupt("return", {
+                  valid: false
+                });
+
+              case 14:
               case "end":
                 return _context21.stop();
             }
@@ -27435,26 +27603,40 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
     key: "verifyAuthenticationParameters",
     value: function () {
       var _verifyAuthenticationParameters = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(credential, value) {
+        var _ref2, valid, _ref3, _valid;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
                 if (!(credential === PrivilegeCredentials.AccountPassword)) {
-                  _context11.next = 4;
+                  _context11.next = 8;
                   break;
                 }
 
-                return _context11.abrupt("return", this.keyManager.validateAccountPassword(value));
+                _context11.next = 3;
+                return this.keyManager.validateAccountPassword(value);
 
-              case 4:
+              case 3:
+                _ref2 = _context11.sent;
+                valid = _ref2.valid;
+                return _context11.abrupt("return", valid);
+
+              case 8:
                 if (!(credential === PrivilegeCredentials.LocalPasscode)) {
-                  _context11.next = 6;
+                  _context11.next = 14;
                   break;
                 }
 
-                return _context11.abrupt("return", this.keyManager.validatePasscode(value));
+                _context11.next = 11;
+                return this.keyManager.validatePasscode(value);
 
-              case 6:
+              case 11:
+                _ref3 = _context11.sent;
+                _valid = _ref3.valid;
+                return _context11.abrupt("return", _valid);
+
+              case 14:
               case "end":
                 return _context11.stop();
             }
