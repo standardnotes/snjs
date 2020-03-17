@@ -109,6 +109,37 @@ describe('keys', () => {
     expect(keyToUse).to.equal(await this.application.keyManager.getRootKey());
   });
 
+  it('changing root key should with passcode should re-wrap root key', async function () {
+    const email = 'foo';
+    const password = 'bar';
+    const result = await this.application.protocolService.createRootKey({ identifier: email, password });
+    await this.application.keyManager.setNewRootKey(result);
+    await this.application.setPasscode(password);
+
+    /** We should be able to decrypt wrapped root key with passcode */
+    const wrappingKeyParams = await this.application.keyManager.getRootKeyWrapperKeyParams();
+    const wrappingKey = await this.application.protocolService.computeRootKey({
+      password: password,
+      keyParams: wrappingKeyParams
+    });
+    await this.application.keyManager.unwrapRootKey({ wrappingKey: wrappingKey }).catch((error) => {
+      expect(error).to.not.be.ok;
+    });
+
+    const newPassword = 'bar';
+    const newResult = await this.application.protocolService.createRootKey({
+      identifier: email,
+      password: newPassword
+    });
+    await this.application.keyManager.setNewRootKey({
+      ...newResult,
+      wrappingKey: wrappingKey
+    });
+    await this.application.keyManager.unwrapRootKey({ wrappingKey: wrappingKey }).catch((error) => {
+      expect(error).to.not.be.ok;
+    });
+  }).timeout(5000);
+
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
@@ -258,33 +289,33 @@ describe('keys', () => {
     expect(await this.application.keyManager.validatePasscode(passcode)).to.equal(true);
   }).timeout(5000);
 
-  it('signing into 003 account should delete latest offline items key and create 003 items key', 
-  async function () {
-    /** 
-     * When starting the application it will create an items key with the latest protocol version (004).
-     * Upon signing into an 003 account, the application should delete any neverSynced items keys,
-     * and create a new default items key that is the default for a given protocol version.
-     */
-    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
-    const latestVersion = this.application.protocolService.getLatestVersion();
-    expect(defaultItemsKey.version).to.equal(latestVersion);
+  it('signing into 003 account should delete latest offline items key and create 003 items key',
+    async function () {
+      /** 
+       * When starting the application it will create an items key with the latest protocol version (004).
+       * Upon signing into an 003 account, the application should delete any neverSynced items keys,
+       * and create a new default items key that is the default for a given protocol version.
+       */
+      const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
+      const latestVersion = this.application.protocolService.getLatestVersion();
+      expect(defaultItemsKey.version).to.equal(latestVersion);
 
-    /** Register with 003 version */
-    await Factory.registerOldUser({
-      application: this.application,
-      email: this.email,
-      password: this.password,
-      version: ProtocolVersions.V003
+      /** Register with 003 version */
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: ProtocolVersions.V003
+      });
+
+      const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
+      expect(itemsKeys.length).to.equal(1);
+      const newestItemsKey = itemsKeys[0];
+      expect(newestItemsKey.version).to.equal(SNProtocolOperator003.versionString());
+      const rootKey = await this.application.keyManager.getRootKey();
+      expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
+      expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
     });
-
-    const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
-    expect(itemsKeys.length).to.equal(1);
-    const newestItemsKey = itemsKeys[0];
-    expect(newestItemsKey.version).to.equal(SNProtocolOperator003.versionString());
-    const rootKey = await this.application.keyManager.getRootKey();
-    expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
-    expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
-  });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');

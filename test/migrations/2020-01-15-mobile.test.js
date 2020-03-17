@@ -16,7 +16,7 @@ describe('2020-01-15 mobile migration', () => {
 
   it('2020-01-15 migration with passcode and account', async function () {
     const application = await Factory.createAppWithRandNamespace(
-      Environments.Mobile, 
+      Environments.Mobile,
       Platforms.Ios
     );
     /** Create legacy migrations value so that base migration detects old app */
@@ -114,9 +114,9 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }
@@ -229,9 +229,9 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }
@@ -339,9 +339,9 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }
@@ -431,9 +431,9 @@ describe('2020-01-15 mobile migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }

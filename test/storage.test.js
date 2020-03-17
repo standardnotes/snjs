@@ -204,21 +204,21 @@ describe('storage manager', () => {
     });
 
     /** Should not be wrapped root key yet */
-    expect(await this.application.keyManager.getWrappedRootKeyFromStorage()).to.not.be.ok;
+    expect(await this.application.keyManager.getWrappedRootKey()).to.not.be.ok;
     
     const passcode = '123';
     await this.application.setPasscode(passcode);
     await this.application.setValue('bar', 'foo');
     
     /** Root key should now be wrapped */
-    expect(await this.application.keyManager.getWrappedRootKeyFromStorage()).to.be.ok;
+    expect(await this.application.keyManager.getWrappedRootKey()).to.be.ok;
   
     const accountKey = await this.application.keyManager.getRootKey();
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
     const passcodeKey = await this.application.keyManager.computeWrappingKey({
       passcode: passcode
     });
-    const wrappedRootKey = await this.application.keyManager.getWrappedRootKeyFromStorage();
+    const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
     /** Expect that we can decrypt wrapped root key with passcode key */
     const payload = CreateMaxPayloadFromAnyObject({object: wrappedRootKey});
     const decrypted = await this.application.protocolService.payloadByDecryptingPayload({

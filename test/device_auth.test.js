@@ -14,7 +14,7 @@ describe('device authentication', () => {
     localStorage.clear();
   });
 
-  it('handles application launch with passcode only', async function() {
+  it('handles application launch with passcode only', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
@@ -29,10 +29,10 @@ describe('device authentication', () => {
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
     let numPasscodeAttempts = 0;
-    const handleChallenges = async (challenges) => {
+    const handleChallenges = async (request) => {
       const responses = [];
-      for(const challenge of challenges) {
-        if(challenge === Challenges.LocalPasscode) {
+      for (const challenge of request.getPendingChallenges()) {
+        if (challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
           const response = new ChallengeResponse(challenge, value);
           responses.push(response);
@@ -43,8 +43,8 @@ describe('device authentication', () => {
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: handleChallenges,
-        handleFailedChallengeResponses: () => {}
+        handleChallengeRequest: handleChallenges,
+        handleFailedChallengeResponses: () => { }
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
@@ -54,7 +54,7 @@ describe('device authentication', () => {
     await tmpApplication.deinit();
   }).timeout(10000);
 
-  it('handles application launch with passcode and biometrics', async function() {
+  it('handles application launch with passcode and biometrics', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
@@ -69,26 +69,23 @@ describe('device authentication', () => {
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
     let numPasscodeAttempts = 0;
-    const handleChallenges = async (challenges) => {
+    const handleChallenges = async (request) => {
       const responses = [];
-      for(const challenge of challenges) {
-        if(challenge === Challenges.LocalPasscode) {
+      for (const challenge of request.getPendingChallenges()) {
+        if (challenge === Challenges.LocalPasscode) {
           const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
           const response = new ChallengeResponse(challenge, value);
           responses.push(response);
           numPasscodeAttempts++;
-        } else if(challenge === Challenges.Biometric) {
-          responses.push(new ChallengeResponse({
-            challenge: challenge,
-            value: true
-          }));
+        } else if (challenge === Challenges.Biometric) {
+          responses.push(new ChallengeResponse(challenge, true));
         }
       }
       return responses;
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: handleChallenges,
+        handleChallengeRequest: handleChallenges,
         handleFailedChallengeResponses: () => { }
       }
     });
@@ -100,7 +97,7 @@ describe('device authentication', () => {
     tmpApplication.deinit();
   }).timeout(10000);
 
-  it('handles application launch with passcode and account', async function() {
+  it('handles application launch with passcode and account', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const email = Uuid.GenerateUuidSynchronously();
@@ -123,10 +120,10 @@ describe('device authentication', () => {
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    const handleChallenges = async (challenges) => {
+    const handleChallenges = async (request) => {
       const responses = [];
-      for(const challenge of challenges) {
-        if(challenge === Challenges.LocalPasscode) {
+      for (const challenge of request.getPendingChallenges()) {
+        if (challenge === Challenges.LocalPasscode) {
           const value = passcode;
           const response = new ChallengeResponse(challenge, value);
           responses.push(response);
@@ -136,7 +133,7 @@ describe('device authentication', () => {
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: handleChallenges,
+        handleChallengeRequest: handleChallenges,
         handleFailedChallengeResponses: () => { }
       }
     });

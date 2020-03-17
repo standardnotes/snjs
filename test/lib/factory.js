@@ -41,7 +41,7 @@ export async function createAndInitializeApplication(namespace, environment, pla
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
     callbacks: {
-      requiresChallengeResponses: (handleChallengeResponses) => {
+      handleChallengeRequest: () => {
         throw 'Factory application shouldnt have challenges';
       },
       handleFailedChallengeResponses: (responses) => {
@@ -56,9 +56,9 @@ export async function createInitAppWithPasscode(passcode) {
   const namespace = randomString();
   const application = await createAndInitializeApplication(namespace);
   await application.setPasscode(passcode);
-  const handleChallenges = async (challenges) => {
+  const handleChallenges = async (request) => {
     const responses = [];
-    for (const challenge of challenges) {
+    for (const challenge of request.getPendingChallenges()) {
       if (challenge === Challenges.LocalPasscode) {
         const value = passcode;
         const response = new ChallengeResponse(challenge, value);
@@ -69,7 +69,7 @@ export async function createInitAppWithPasscode(passcode) {
   };
   await application.prepareForLaunch({
     callbacks: {
-      requiresChallengeResponses: handleChallenges,
+      handleChallengeRequest: handleChallenges,
       handleFailedChallengeResponses: () => { }
     }
   });
@@ -82,7 +82,7 @@ export async function registerUserToApplication({ application, email, password, 
   return application.register({ email, password, ephemeral, mergeLocal });
 }
 
-export async function setOldVersionPasscode({application, passcode, version}) {
+export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
   const { key, keyParams } = await operator.createRootKey({

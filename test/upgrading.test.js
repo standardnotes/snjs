@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('keys', () => {
+describe('upgrading', () => {
 
   before(async function () {
     localStorage.clear();
@@ -78,10 +78,10 @@ describe('keys', () => {
     ).to.equal(oldVersion);
 
     let passcodeTries = 0;
-    await this.application.upgradeProtocolVersion({
-      requiresChallengeResponses: async (challenges) => {
+    this.application.launchCallbacks = {
+      handleChallengeRequest: async (request) => {
         const responses = [];
-        for (const challenge of challenges) {
+        for (const challenge of request.getPendingChallenges()) {
           if (challenge === Challenges.LocalPasscode) {
             responses.push(new ChallengeResponse(
               challenge,
@@ -97,7 +97,12 @@ describe('keys', () => {
       handleFailedChallengeResponses: async () => {
 
       }
-    });
+    };
+    await this.application.upgradeProtocolVersion();
+
+    const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
+    const payload = CreateMaxPayloadFromAnyObject({ object: wrappedRootKey });
+    expect(payload.version).to.equal(newVersion);
 
     expect(
       (await this.application.keyManager.getRootKeyWrapperKeyParams()).version

@@ -102,9 +102,9 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }
@@ -239,9 +239,9 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           const responses = [];
-          for (const challenge of challenges) {
+          for (const challenge of request.getPendingChallenges()) {
             if (challenge === Challenges.LocalPasscode) {
               responses.push(new ChallengeResponse(challenge, passcode));
             }
@@ -347,7 +347,7 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           return null;
         }
       }
@@ -445,7 +445,7 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        requiresChallengeResponses: (challenges) => {
+        handleChallengeRequest: (request) => {
           return null;
         }
       }
