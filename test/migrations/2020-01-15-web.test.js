@@ -100,17 +100,28 @@ describe('2020-01-15 web migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, passcode));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
+    };
     await application.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: (request) => {
-          const responses = [];
-          for (const challenge of request.getPendingChallenges()) {
-            if (challenge === Challenges.LocalPasscode) {
-              responses.push(new ChallengeResponse(challenge, passcode));
-            }
-          }
-          return responses;
-        }
+        receiveChallenge: receiveChallenge,
       }
     });
     await application.launch({
@@ -237,17 +248,28 @@ describe('2020-01-15 web migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, passcode));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
+    };
     await application.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: (request) => {
-          const responses = [];
-          for (const challenge of request.getPendingChallenges()) {
-            if (challenge === Challenges.LocalPasscode) {
-              responses.push(new ChallengeResponse(challenge, passcode));
-            }
-          }
-          return responses;
-        }
+        receiveChallenge: receiveChallenge,
       }
     });
     await application.launch({
@@ -345,11 +367,28 @@ describe('2020-01-15 web migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, passcode));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
+    };
     await application.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: (request) => {
-          return null;
-        }
+        receiveChallenge: receiveChallenge,
       }
     });
     await application.launch({
@@ -445,7 +484,7 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: (request) => {
+        receiveChallenge: (challenge) => {
           return null;
         }
       }

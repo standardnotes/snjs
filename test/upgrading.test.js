@@ -77,27 +77,31 @@ describe('upgrading', () => {
       (await this.application.keyManager.getRootKey()).version
     ).to.equal(oldVersion);
 
-    let passcodeTries = 0;
-    this.application.launchCallbacks = {
-      handleChallengeRequest: async (request) => {
-        const responses = [];
-        for (const challenge of request.getPendingChallenges()) {
-          if (challenge === Challenges.LocalPasscode) {
-            responses.push(new ChallengeResponse(
-              challenge,
-              passcodeTries < 1 ? 'wrong' : passcode
-            ));
-            passcodeTries++;
-          } else {
-            responses.push(new ChallengeResponse(challenge, this.password));
-          }
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type,passcode));
+        } else {
+          values.push(new ChallengeValue(type, this.password));
         }
-        return responses;
-      },
-      handleFailedChallengeResponses: async () => {
-
       }
+      return values;
     };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+          numPasscodeAttempts++;
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
+    };
+    this.application.setLaunchCallbacks({
+      receiveChallenge: receiveChallenge
+    });
     await this.application.upgradeProtocolVersion();
 
     const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();

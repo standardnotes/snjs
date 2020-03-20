@@ -41,39 +41,12 @@ export async function createAndInitializeApplication(namespace, environment, pla
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
     callbacks: {
-      handleChallengeRequest: () => {
+      receiveChallenge: () => {
         throw 'Factory application shouldnt have challenges';
-      },
-      handleFailedChallengeResponses: (responses) => {
-
       }
     },
   });
   await application.launch({ awaitDatabaseLoad: true });
-}
-
-export async function createInitAppWithPasscode(passcode) {
-  const namespace = randomString();
-  const application = await createAndInitializeApplication(namespace);
-  await application.setPasscode(passcode);
-  const handleChallenges = async (request) => {
-    const responses = [];
-    for (const challenge of request.getPendingChallenges()) {
-      if (challenge === Challenges.LocalPasscode) {
-        const value = passcode;
-        const response = new ChallengeResponse(challenge, value);
-        responses.push(response);
-      }
-    }
-    return responses;
-  };
-  await application.prepareForLaunch({
-    callbacks: {
-      handleChallengeRequest: handleChallenges,
-      handleFailedChallengeResponses: () => { }
-    }
-  });
-  await application.launch();
 }
 
 export async function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {

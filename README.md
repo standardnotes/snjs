@@ -55,11 +55,8 @@ const app = new SNApplication({
 ```javascript
  await app.prepareForLaunch({
    callbacks: {
-     handleChallengeRequest: (handleChallengeResponses) => {
+     receiveChallenge: (challenge, orchestrator) => {
 
-     },
-     handleFailedChallengeResponses: (responses) => {
-       
      }
    },
  });

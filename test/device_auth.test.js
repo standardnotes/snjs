@@ -19,33 +19,38 @@ describe('device authentication', () => {
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
-    expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(0);
+    expect((await application.challengeService.getLaunchChallenge())).to.not.be.ok;
     await application.setPasscode(passcode);
     expect(await application.hasPasscode()).to.equal(true);
-    expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(1);
+    expect((await application.challengeService.getLaunchChallenge())).to.be.ok;
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
     let numPasscodeAttempts = 0;
-    const handleChallenges = async (request) => {
-      const responses = [];
-      for (const challenge of request.getPendingChallenges()) {
-        if (challenge === Challenges.LocalPasscode) {
-          const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new ChallengeResponse(challenge, value);
-          responses.push(response);
-          numPasscodeAttempts++;
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
         }
       }
-      return responses;
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+          numPasscodeAttempts++;
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
     };
     await tmpApplication.prepareForLaunch({
-      callbacks: {
-        handleChallengeRequest: handleChallenges,
-        handleFailedChallengeResponses: () => { }
-      }
+      callbacks: { receiveChallenge }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
     await tmpApplication.launch({ awaitDatabaseLoad: true });
@@ -60,37 +65,45 @@ describe('device authentication', () => {
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
     await application.setPasscode(passcode);
-    await application.deviceAuthService.enableBiometrics();
+    await application.challengeService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
-    expect((await application.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
+    expect(((await application.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
     await application.deinit();
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    let numPasscodeAttempts = 0;
-    const handleChallenges = async (request) => {
-      const responses = [];
-      for (const challenge of request.getPendingChallenges()) {
-        if (challenge === Challenges.LocalPasscode) {
-          const value = numPasscodeAttempts < 2 ? wrongPasscode : passcode;
-          const response = new ChallengeResponse(challenge, value);
-          responses.push(response);
-          numPasscodeAttempts++;
-        } else if (challenge === Challenges.Biometric) {
-          responses.push(new ChallengeResponse(challenge, true));
+    let numPasscodeAttempts = 1;
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          const response = new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode);
+          values.push(response);
+        } else if (type === ChallengeType.Biometric) {
+          values.push(new ChallengeValue(type, true));
         }
       }
-      return responses;
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+          numPasscodeAttempts++;
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: handleChallenges,
-        handleFailedChallengeResponses: () => { }
+        receiveChallenge: receiveChallenge
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
-    expect((await tmpApplication.deviceAuthService.getLaunchChallenges()).length).to.equal(2);
+    expect(((await tmpApplication.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
     await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
     expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
@@ -118,23 +131,33 @@ describe('device authentication', () => {
     ).to.equal(true);
     await application.deinit();
 
+    const wrongPasscode = 'barfoo';
+    let numPasscodeAttempts = 1;
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    const handleChallenges = async (request) => {
-      const responses = [];
-      for (const challenge of request.getPendingChallenges()) {
-        if (challenge === Challenges.LocalPasscode) {
-          const value = passcode;
-          const response = new ChallengeResponse(challenge, value);
-          responses.push(response);
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
         }
       }
-      return responses;
+      return values;
+    };
+    const receiveChallenge = async (challenge, orchestrator) => {
+      orchestrator.setCallbacks({
+        onInvalidValue: (value) => {
+          const values = promptForValuesForTypes([value.type]);
+          orchestrator.submitValues(values);
+          numPasscodeAttempts++;
+        },
+      });
+      const initialValues = promptForValuesForTypes(challenge.types);
+      orchestrator.submitValues(initialValues);
     };
     await tmpApplication.prepareForLaunch({
       callbacks: {
-        handleChallengeRequest: handleChallenges,
-        handleFailedChallengeResponses: () => { }
+        receiveChallenge: receiveChallenge,
       }
     });
     expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
