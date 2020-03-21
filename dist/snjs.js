@@ -851,27 +851,28 @@ var SNApplication = /*#__PURE__*/function () {
       return mergeItem;
     }()
     /** 
+     * Creates a managed item.
      * @access public 
-     * @param add  Whether to add the item to application state.
      * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
      */
 
   }, {
-    key: "createItem",
+    key: "createManagedItem",
     value: function () {
-      var _createItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref10) {
-        var contentType, content, add, needsSync, item;
+      var _createManagedItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref10) {
+        var contentType, content, needsSync, override, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                contentType = _ref10.contentType, content = _ref10.content, add = _ref10.add, needsSync = _ref10.needsSync;
+                contentType = _ref10.contentType, content = _ref10.content, needsSync = _ref10.needsSync, override = _ref10.override;
                 _context10.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
                   content: content,
-                  add: add,
-                  needsSync: needsSync
+                  add: true,
+                  needsSync: needsSync,
+                  override: override
                 });
 
               case 3:
@@ -886,11 +887,51 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee10, this);
       }));
 
-      function createItem(_x11) {
-        return _createItem.apply(this, arguments);
+      function createManagedItem(_x11) {
+        return _createManagedItem.apply(this, arguments);
       }
 
-      return createItem;
+      return createManagedItem;
+    }()
+    /** 
+     * Creates an unmanaged item that can be added later.
+     * @access public 
+     * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
+     */
+
+  }, {
+    key: "createTemplateItem",
+    value: function () {
+      var _createTemplateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref11) {
+        var contentType, content, item;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                contentType = _ref11.contentType, content = _ref11.content;
+                _context11.next = 3;
+                return this.modelManager.createItem({
+                  contentType: contentType,
+                  content: content
+                });
+
+              case 3:
+                item = _context11.sent;
+                return _context11.abrupt("return", item);
+
+              case 5:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function createTemplateItem(_x12) {
+        return _createTemplateItem.apply(this, arguments);
+      }
+
+      return createTemplateItem;
     }()
     /** 
      * Creates an unmanaged item from a payload.
@@ -920,51 +961,15 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItem",
     value: function () {
-      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref11) {
+      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref12) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
-          while (1) {
-            switch (_context11.prev = _context11.next) {
-              case 0:
-                item = _ref11.item;
-                _context11.next = 3;
-                return this.modelManager.setItemDirty(item, true);
-
-              case 3:
-                _context11.next = 5;
-                return this.syncService.sync();
-
-              case 5:
-              case "end":
-                return _context11.stop();
-            }
-          }
-        }, _callee11, this);
-      }));
-
-      function saveItem(_x12) {
-        return _saveItem.apply(this, arguments);
-      }
-
-      return saveItem;
-    }()
-    /** 
-     * @access public 
-     * @param {Array.<SNItem>} params.items
-     */
-
-  }, {
-    key: "saveItems",
-    value: function () {
-      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref12) {
-        var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                items = _ref12.items;
+                item = _ref12.item;
                 _context12.next = 3;
-                return this.modelManager.setItemsDirty(items);
+                return this.modelManager.setItemDirty(item, true);
 
               case 3:
                 _context12.next = 5;
@@ -978,7 +983,43 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee12, this);
       }));
 
-      function saveItems(_x13) {
+      function saveItem(_x13) {
+        return _saveItem.apply(this, arguments);
+      }
+
+      return saveItem;
+    }()
+    /** 
+     * @access public 
+     * @param {Array.<SNItem>} params.items
+     */
+
+  }, {
+    key: "saveItems",
+    value: function () {
+      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref13) {
+        var items;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                items = _ref13.items;
+                _context13.next = 3;
+                return this.modelManager.setItemsDirty(items);
+
+              case 3:
+                _context13.next = 5;
+                return this.syncService.sync();
+
+              case 5:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function saveItems(_x14) {
         return _saveItems.apply(this, arguments);
       }
 
@@ -994,46 +1035,14 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemNeedsSync",
     value: function () {
-      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref13) {
+      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref14) {
         var item, updateUserModifiedDate;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                item = _ref13.item, updateUserModifiedDate = _ref13.updateUserModifiedDate;
-                return _context13.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
-
-              case 2:
-              case "end":
-                return _context13.stop();
-            }
-          }
-        }, _callee13, this);
-      }));
-
-      function setItemNeedsSync(_x14) {
-        return _setItemNeedsSync.apply(this, arguments);
-      }
-
-      return setItemNeedsSync;
-    }()
-    /** 
-     * @access public 
-     * @param updateUserModifiedDate  
-     *  Whether to change the modified date the user sees of the item.
-     */
-
-  }, {
-    key: "setItemsNeedsSync",
-    value: function () {
-      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref14) {
-        var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                items = _ref14.items;
-                return _context14.abrupt("return", this.modelManager.setItemsDirty(items));
+                item = _ref14.item, updateUserModifiedDate = _ref14.updateUserModifiedDate;
+                return _context14.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
 
               case 2:
               case "end":
@@ -1043,7 +1052,49 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee14, this);
       }));
 
-      function setItemsNeedsSync(_x15) {
+      function setItemNeedsSync(_x15) {
+        return _setItemNeedsSync.apply(this, arguments);
+      }
+
+      return setItemNeedsSync;
+    }()
+    /**
+     * @access public
+     * @returns {Date|null} The date of last sync
+     */
+
+  }, {
+    key: "getLastSyncDate",
+    value: function getLastSyncDate() {
+      return this.syncService.getLastSyncDate();
+    }
+    /** 
+     * @access public 
+     * @param updateUserModifiedDate  
+     *  Whether to change the modified date the user sees of the item.
+     */
+
+  }, {
+    key: "setItemsNeedsSync",
+    value: function () {
+      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref15) {
+        var items;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                items = _ref15.items;
+                return _context15.abrupt("return", this.modelManager.setItemsDirty(items));
+
+              case 2:
+              case "end":
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function setItemsNeedsSync(_x16) {
         return _setItemsNeedsSync.apply(this, arguments);
       }
 
@@ -1054,25 +1105,25 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItem",
     value: function () {
-      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref15) {
+      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref16) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
-                item = _ref15.item;
+                item = _ref16.item;
                 this.modelManager.setItemToBeDeleted(item);
                 this.sync();
 
               case 3:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
-      function deleteItem(_x16) {
+      function deleteItem(_x17) {
         return _deleteItem.apply(this, arguments);
       }
 
@@ -1083,24 +1134,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItemLocally",
     value: function () {
-      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref16) {
+      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref17) {
         var item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context16.prev = _context16.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
-                item = _ref16.item;
+                item = _ref17.item;
                 this.modelManager.removeItemLocally(item);
 
               case 2:
               case "end":
-                return _context16.stop();
+                return _context17.stop();
             }
           }
-        }, _callee16, this);
+        }, _callee17, this);
       }));
 
-      function deleteItemLocally(_x17) {
+      function deleteItemLocally(_x18) {
         return _deleteItemLocally.apply(this, arguments);
       }
 
@@ -1111,23 +1162,23 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "emptyTrash",
     value: function () {
-      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
+      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context17.prev = _context17.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
-                _context17.next = 2;
+                _context18.next = 2;
                 return this.modelManager.emptyTrash();
 
               case 2:
-                return _context17.abrupt("return", this.sync());
+                return _context18.abrupt("return", this.sync());
 
               case 3:
               case "end":
-                return _context17.stop();
+                return _context18.stop();
             }
           }
-        }, _callee17, this);
+        }, _callee18, this);
       }));
 
       function emptyTrash() {
@@ -1150,32 +1201,32 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "getItems",
-    value: function getItems(_ref17) {
-      var contentType = _ref17.contentType;
+    value: function getItems(_ref18) {
+      var contentType = _ref18.contentType;
       return this.modelManager.getItems(contentType);
     }
     /** @access public */
 
   }, {
     key: "getDisplayableItems",
-    value: function getDisplayableItems(_ref18) {
-      var contentType = _ref18.contentType;
+    value: function getDisplayableItems(_ref19) {
+      var contentType = _ref19.contentType;
       return this.modelManager.validItemsForContentType(contentType);
     }
     /** @access public */
 
   }, {
     key: "getNotesMatchingSmartTag",
-    value: function getNotesMatchingSmartTag(_ref19) {
-      var smartTag = _ref19.smartTag;
+    value: function getNotesMatchingSmartTag(_ref20) {
+      var smartTag = _ref20.smartTag;
       return this.modelManager.notesMatchingSmartTag(smartTag);
     }
     /** @access public */
 
   }, {
     key: "findTag",
-    value: function findTag(_ref20) {
-      var title = _ref20.title;
+    value: function findTag(_ref21) {
+      var title = _ref21.title;
       return this.modelManager.findTagByTitle(title);
     }
     /** @access public */
@@ -1183,24 +1234,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "findOrCreateTag",
     value: function () {
-      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref21) {
+      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref22) {
         var title;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
-                title = _ref21.title;
-                return _context18.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
+                title = _ref22.title;
+                return _context19.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
 
               case 2:
               case "end":
-                return _context18.stop();
+                return _context19.stop();
             }
           }
-        }, _callee18, this);
+        }, _callee19, this);
       }));
 
-      function findOrCreateTag(_x18) {
+      function findOrCreateTag(_x19) {
         return _findOrCreateTag.apply(this, arguments);
       }
 
@@ -1228,11 +1279,11 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "streamItems",
-    value: function streamItems(_ref22) {
+    value: function streamItems(_ref23) {
       var _this5 = this;
 
-      var contentType = _ref22.contentType,
-          stream = _ref22.stream;
+      var contentType = _ref23.contentType,
+          stream = _ref23.stream;
       var observer = this.modelManager.addMappingObserver(contentType, function (allItems, validItems, deletedItems, source, sourceKey) {
         var includedContentTypes = allItems.map(function (item) {
           return item.content_type;
@@ -1254,22 +1305,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setHost",
     value: function () {
-      var _setHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(host) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
+      var _setHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(host) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context19.prev = _context19.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
-                return _context19.abrupt("return", this.apiService.setHost(host));
+                return _context20.abrupt("return", this.apiService.setHost(host));
 
               case 1:
               case "end":
-                return _context19.stop();
+                return _context20.stop();
             }
           }
-        }, _callee19, this);
+        }, _callee20, this);
       }));
 
-      function setHost(_x19) {
+      function setHost(_x20) {
         return _setHost.apply(this, arguments);
       }
 
@@ -1280,19 +1331,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getHost",
     value: function () {
-      var _getHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
+      var _getHost = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
-            switch (_context20.prev = _context20.next) {
+            switch (_context21.prev = _context21.next) {
               case 0:
-                return _context20.abrupt("return", this.apiService.getHost());
+                return _context21.abrupt("return", this.apiService.getHost());
 
               case 1:
               case "end":
-                return _context20.stop();
+                return _context21.stop();
             }
           }
-        }, _callee20, this);
+        }, _callee21, this);
       }));
 
       function getHost() {
@@ -1317,19 +1368,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getUserVersion",
     value: function () {
-      var _getUserVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
+      var _getUserVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
           while (1) {
-            switch (_context21.prev = _context21.next) {
+            switch (_context22.prev = _context22.next) {
               case 0:
-                return _context21.abrupt("return", this.protocolService.getUserVersion());
+                return _context22.abrupt("return", this.protocolService.getUserVersion());
 
               case 1:
               case "end":
-                return _context21.stop();
+                return _context22.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee22, this);
       }));
 
       function getUserVersion() {
@@ -1346,19 +1397,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "protocolUpgradeAvailable",
     value: function () {
-      var _protocolUpgradeAvailable = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
+      var _protocolUpgradeAvailable = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
           while (1) {
-            switch (_context22.prev = _context22.next) {
+            switch (_context23.prev = _context23.next) {
               case 0:
-                return _context22.abrupt("return", this.protocolService.upgradeAvailable());
+                return _context23.abrupt("return", this.protocolService.upgradeAvailable());
 
               case 1:
               case "end":
-                return _context22.stop();
+                return _context23.stop();
             }
           }
-        }, _callee22, this);
+        }, _callee23, this);
       }));
 
       function protocolUpgradeAvailable() {
@@ -1375,12 +1426,12 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "upgradeProtocolVersion",
     value: function () {
-      var _upgradeProtocolVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23() {
+      var _upgradeProtocolVersion = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24() {
         var hasPasscode, hasAccount, types, challenge, response, errors, passcode, value, _value, password, changeResponse;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
           while (1) {
-            switch (_context23.prev = _context23.next) {
+            switch (_context24.prev = _context24.next) {
               case 0:
                 hasPasscode = this.hasPasscode();
                 hasAccount = !this.noAccount();
@@ -1395,43 +1446,43 @@ var SNApplication = /*#__PURE__*/function () {
                 }
 
                 challenge = new _Lib__WEBPACK_IMPORTED_MODULE_5__["Challenge"](types, _Lib__WEBPACK_IMPORTED_MODULE_5__["ChallengeReason"].ProtocolUpgrade);
-                _context23.next = 8;
+                _context24.next = 8;
                 return this.challengeService.promptForChallengeResponse(challenge);
 
               case 8:
-                response = _context23.sent;
+                response = _context24.sent;
 
                 if (response) {
-                  _context23.next = 11;
+                  _context24.next = 11;
                   break;
                 }
 
-                return _context23.abrupt("return");
+                return _context24.abrupt("return");
 
               case 11:
                 errors = [];
 
                 if (!hasPasscode) {
-                  _context23.next = 17;
+                  _context24.next = 17;
                   break;
                 }
 
                 /* Upgrade passcode version */
                 value = response.getValueForType(_Lib__WEBPACK_IMPORTED_MODULE_5__["ChallengeType"].LocalPasscode);
                 passcode = value.value;
-                _context23.next = 17;
+                _context24.next = 17;
                 return this.changePasscode(passcode);
 
               case 17:
                 if (!hasAccount) {
-                  _context23.next = 24;
+                  _context24.next = 24;
                   break;
                 }
 
                 /* Upgrade account version */
                 _value = response.getValueForType(_Lib__WEBPACK_IMPORTED_MODULE_5__["ChallengeType"].AccountPassword);
                 password = _value.value;
-                _context23.next = 22;
+                _context24.next = 22;
                 return this.changePassword({
                   currentPassword: password,
                   newPassword: password,
@@ -1439,21 +1490,21 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 22:
-                changeResponse = _context23.sent;
+                changeResponse = _context24.sent;
 
                 if (changeResponse.error) {
                   errors.push(changeResponse.error);
                 }
 
               case 24:
-                return _context23.abrupt("return", errors);
+                return _context24.abrupt("return", errors);
 
               case 25:
               case "end":
-                return _context23.stop();
+                return _context24.stop();
             }
           }
-        }, _callee23, this);
+        }, _callee24, this);
       }));
 
       function upgradeProtocolVersion() {
@@ -1485,54 +1536,54 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "importData",
     value: function () {
-      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24(_ref23) {
+      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25(_ref24) {
         var data, password, awaitSync, decryptedPayloads, validPayloads, affectedItems, promise;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
           while (1) {
-            switch (_context24.prev = _context24.next) {
+            switch (_context25.prev = _context25.next) {
               case 0:
-                data = _ref23.data, password = _ref23.password, awaitSync = _ref23.awaitSync;
-                _context24.next = 3;
+                data = _ref24.data, password = _ref24.password, awaitSync = _ref24.awaitSync;
+                _context25.next = 3;
                 return this.protocolService.payloadsByDecryptingBackupFile({
                   data: data,
                   password: password
                 });
 
               case 3:
-                decryptedPayloads = _context24.sent;
+                decryptedPayloads = _context25.sent;
                 validPayloads = decryptedPayloads.filter(function (payload) {
                   return !payload.errorDecrypting;
                 });
-                _context24.next = 7;
+                _context25.next = 7;
                 return this.modelManager.importPayloads(validPayloads);
 
               case 7:
-                affectedItems = _context24.sent;
+                affectedItems = _context25.sent;
                 promise = this.sync();
 
                 if (!awaitSync) {
-                  _context24.next = 12;
+                  _context25.next = 12;
                   break;
                 }
 
-                _context24.next = 12;
+                _context25.next = 12;
                 return promise;
 
               case 12:
-                return _context24.abrupt("return", {
+                return _context25.abrupt("return", {
                   affectedItems: affectedItems,
                   errorCount: decryptedPayloads.length - validPayloads.length
                 });
 
               case 13:
               case "end":
-                return _context24.stop();
+                return _context25.stop();
             }
           }
-        }, _callee24, this);
+        }, _callee25, this);
       }));
 
-      function importData(_x20) {
+      function importData(_x21) {
         return _importData.apply(this, arguments);
       }
 
@@ -1547,19 +1598,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createBackupFile",
     value: function () {
-      var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25() {
-        var _ref24,
+      var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26() {
+        var _ref25,
             subItems,
             intent,
             returnIfEmpty,
-            _args25 = arguments;
+            _args26 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
           while (1) {
-            switch (_context25.prev = _context25.next) {
+            switch (_context26.prev = _context26.next) {
               case 0:
-                _ref24 = _args25.length > 0 && _args25[0] !== undefined ? _args25[0] : {}, subItems = _ref24.subItems, intent = _ref24.intent, returnIfEmpty = _ref24.returnIfEmpty;
-                return _context25.abrupt("return", this.protocolService.createBackupFile({
+                _ref25 = _args26.length > 0 && _args26[0] !== undefined ? _args26[0] : {}, subItems = _ref25.subItems, intent = _ref25.intent, returnIfEmpty = _ref25.returnIfEmpty;
+                return _context26.abrupt("return", this.protocolService.createBackupFile({
                   subItems: subItems,
                   intent: intent,
                   returnIfEmpty: returnIfEmpty
@@ -1567,10 +1618,10 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 2:
               case "end":
-                return _context25.stop();
+                return _context26.stop();
             }
           }
-        }, _callee25, this);
+        }, _callee26, this);
       }));
 
       function createBackupFile() {
@@ -1605,19 +1656,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getSyncStatus",
     value: function () {
-      var _getSyncStatus = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
+      var _getSyncStatus = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee27$(_context27) {
           while (1) {
-            switch (_context26.prev = _context26.next) {
+            switch (_context27.prev = _context27.next) {
               case 0:
-                return _context26.abrupt("return", this.syncService.status);
+                return _context27.abrupt("return", this.syncService.status);
 
               case 1:
               case "end":
-                return _context26.stop();
+                return _context27.stop();
             }
           }
-        }, _callee26, this);
+        }, _callee27, this);
       }));
 
       function getSyncStatus() {
@@ -1631,22 +1682,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27(options) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee27$(_context27) {
+      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee28(options) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee28$(_context28) {
           while (1) {
-            switch (_context27.prev = _context27.next) {
+            switch (_context28.prev = _context28.next) {
               case 0:
-                return _context27.abrupt("return", this.syncService.sync(options));
+                return _context28.abrupt("return", this.syncService.sync(options));
 
               case 1:
               case "end":
-                return _context27.stop();
+                return _context28.stop();
             }
           }
-        }, _callee27, this);
+        }, _callee28, this);
       }));
 
-      function sync(_x21) {
+      function sync(_x22) {
         return _sync.apply(this, arguments);
       }
 
@@ -1657,19 +1708,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "resolveOutOfSync",
     value: function () {
-      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee28() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee28$(_context28) {
+      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee29() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee29$(_context29) {
           while (1) {
-            switch (_context28.prev = _context28.next) {
+            switch (_context29.prev = _context29.next) {
               case 0:
-                return _context28.abrupt("return", this.syncService.resolveOutOfSync());
+                return _context29.abrupt("return", this.syncService.resolveOutOfSync());
 
               case 1:
               case "end":
-                return _context28.stop();
+                return _context29.stop();
             }
           }
-        }, _callee28, this);
+        }, _callee29, this);
       }));
 
       function resolveOutOfSync() {
@@ -1683,22 +1734,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setValue",
     value: function () {
-      var _setValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee29(key, value, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee29$(_context29) {
+      var _setValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee30(key, value, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee30$(_context30) {
           while (1) {
-            switch (_context29.prev = _context29.next) {
+            switch (_context30.prev = _context30.next) {
               case 0:
-                return _context29.abrupt("return", this.storageService.setValue(key, value, mode));
+                return _context30.abrupt("return", this.storageService.setValue(key, value, mode));
 
               case 1:
               case "end":
-                return _context29.stop();
+                return _context30.stop();
             }
           }
-        }, _callee29, this);
+        }, _callee30, this);
       }));
 
-      function setValue(_x22, _x23, _x24) {
+      function setValue(_x23, _x24, _x25) {
         return _setValue.apply(this, arguments);
       }
 
@@ -1709,22 +1760,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getValue",
     value: function () {
-      var _getValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee30(key, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee30$(_context30) {
+      var _getValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee31(key, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee31$(_context31) {
           while (1) {
-            switch (_context30.prev = _context30.next) {
+            switch (_context31.prev = _context31.next) {
               case 0:
-                return _context30.abrupt("return", this.storageService.getValue(key, mode));
+                return _context31.abrupt("return", this.storageService.getValue(key, mode));
 
               case 1:
               case "end":
-                return _context30.stop();
+                return _context31.stop();
             }
           }
-        }, _callee30, this);
+        }, _callee31, this);
       }));
 
-      function getValue(_x25, _x26) {
+      function getValue(_x26, _x27) {
         return _getValue.apply(this, arguments);
       }
 
@@ -1735,22 +1786,22 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "removeValue",
     value: function () {
-      var _removeValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee31(key, mode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee31$(_context31) {
+      var _removeValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee32(key, mode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee32$(_context32) {
           while (1) {
-            switch (_context31.prev = _context31.next) {
+            switch (_context32.prev = _context32.next) {
               case 0:
-                return _context31.abrupt("return", this.storageService.removeValue(key, mode));
+                return _context32.abrupt("return", this.storageService.removeValue(key, mode));
 
               case 1:
               case "end":
-                return _context31.stop();
+                return _context32.stop();
             }
           }
-        }, _callee31, this);
+        }, _callee32, this);
       }));
 
-      function removeValue(_x27, _x28) {
+      function removeValue(_x28, _x29) {
         return _removeValue.apply(this, arguments);
       }
 
@@ -1764,19 +1815,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "clearDatabase",
     value: function () {
-      var _clearDatabase = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee32() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee32$(_context32) {
+      var _clearDatabase = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee33() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee33$(_context33) {
           while (1) {
-            switch (_context32.prev = _context32.next) {
+            switch (_context33.prev = _context33.next) {
               case 0:
-                return _context32.abrupt("return", this.storageService.clearAllPayloads());
+                return _context33.abrupt("return", this.storageService.clearAllPayloads());
 
               case 1:
               case "end":
-                return _context32.stop();
+                return _context33.stop();
             }
           }
-        }, _callee32, this);
+        }, _callee33, this);
       }));
 
       function clearDatabase() {
@@ -1798,31 +1849,31 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "rewriteItemsKeys",
     value: function () {
-      var _rewriteItemsKeys = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee33() {
+      var _rewriteItemsKeys = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee34() {
         var itemsKeys, payloads;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee33$(_context33) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee34$(_context34) {
           while (1) {
-            switch (_context33.prev = _context33.next) {
+            switch (_context34.prev = _context34.next) {
               case 0:
                 itemsKeys = this.itemsKeyManager.allItemsKeys;
                 payloads = itemsKeys.map(function (key) {
                   return key.payloadRepresentation();
                 });
-                _context33.next = 4;
+                _context34.next = 4;
                 return this.storageService.deletePayloads(payloads);
 
               case 4:
-                _context33.next = 6;
+                _context34.next = 6;
                 return this.syncService.persistPayloads({
                   decryptedPayloads: payloads
                 });
 
               case 6:
               case "end":
-                return _context33.stop();
+                return _context34.stop();
             }
           }
-        }, _callee33, this);
+        }, _callee34, this);
       }));
 
       function rewriteItemsKeys() {
@@ -1836,34 +1887,34 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "restart",
     value: function () {
-      var _restart = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee34() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee34$(_context34) {
+      var _restart = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee35() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee35$(_context35) {
           while (1) {
-            switch (_context34.prev = _context34.next) {
+            switch (_context35.prev = _context35.next) {
               case 0:
-                _context34.next = 2;
+                _context35.next = 2;
                 return this.deinit();
 
               case 2:
                 this.dealloced = false;
                 this.constructServices();
-                _context34.next = 6;
+                _context35.next = 6;
                 return this.prepareForLaunch({
                   callbacks: this.launchCallbacks
                 });
 
               case 6:
-                _context34.next = 8;
+                _context35.next = 8;
                 return this.launch({
                   awaitDatabaseLoad: true
                 });
 
               case 8:
               case "end":
-                return _context34.stop();
+                return _context35.stop();
             }
           }
-        }, _callee34, this);
+        }, _callee35, this);
       }));
 
       function restart() {
@@ -1880,162 +1931,162 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deinit",
     value: function () {
-      var _deinit = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee35() {
+      var _deinit = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36() {
         var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, uninstallObserver, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, uninstallSubscriber, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, service;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee35$(_context35) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
           while (1) {
-            switch (_context35.prev = _context35.next) {
+            switch (_context36.prev = _context36.next) {
               case 0:
                 clearInterval(this.autoSyncInterval);
                 _iteratorNormalCompletion3 = true;
                 _didIteratorError3 = false;
                 _iteratorError3 = undefined;
-                _context35.prev = 4;
+                _context36.prev = 4;
 
                 for (_iterator3 = this.serviceObservers[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                   uninstallObserver = _step3.value;
                   uninstallObserver();
                 }
 
-                _context35.next = 12;
+                _context36.next = 12;
                 break;
 
               case 8:
-                _context35.prev = 8;
-                _context35.t0 = _context35["catch"](4);
+                _context36.prev = 8;
+                _context36.t0 = _context36["catch"](4);
                 _didIteratorError3 = true;
-                _iteratorError3 = _context35.t0;
+                _iteratorError3 = _context36.t0;
 
               case 12:
-                _context35.prev = 12;
-                _context35.prev = 13;
+                _context36.prev = 12;
+                _context36.prev = 13;
 
                 if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                   _iterator3.return();
                 }
 
               case 15:
-                _context35.prev = 15;
+                _context36.prev = 15;
 
                 if (!_didIteratorError3) {
-                  _context35.next = 18;
+                  _context36.next = 18;
                   break;
                 }
 
                 throw _iteratorError3;
 
               case 18:
-                return _context35.finish(15);
+                return _context36.finish(15);
 
               case 19:
-                return _context35.finish(12);
+                return _context36.finish(12);
 
               case 20:
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
                 _iteratorError4 = undefined;
-                _context35.prev = 23;
+                _context36.prev = 23;
 
                 for (_iterator4 = this.managedSubscribers[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                   uninstallSubscriber = _step4.value;
                   uninstallSubscriber();
                 }
 
-                _context35.next = 31;
+                _context36.next = 31;
                 break;
 
               case 27:
-                _context35.prev = 27;
-                _context35.t1 = _context35["catch"](23);
+                _context36.prev = 27;
+                _context36.t1 = _context36["catch"](23);
                 _didIteratorError4 = true;
-                _iteratorError4 = _context35.t1;
+                _iteratorError4 = _context36.t1;
 
               case 31:
-                _context35.prev = 31;
-                _context35.prev = 32;
+                _context36.prev = 31;
+                _context36.prev = 32;
 
                 if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                   _iterator4.return();
                 }
 
               case 34:
-                _context35.prev = 34;
+                _context36.prev = 34;
 
                 if (!_didIteratorError4) {
-                  _context35.next = 37;
+                  _context36.next = 37;
                   break;
                 }
 
                 throw _iteratorError4;
 
               case 37:
-                return _context35.finish(34);
+                return _context36.finish(34);
 
               case 38:
-                return _context35.finish(31);
+                return _context36.finish(31);
 
               case 39:
                 _iteratorNormalCompletion5 = true;
                 _didIteratorError5 = false;
                 _iteratorError5 = undefined;
-                _context35.prev = 42;
+                _context36.prev = 42;
                 _iterator5 = this.services[Symbol.iterator]();
 
               case 44:
                 if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                  _context35.next = 52;
+                  _context36.next = 52;
                   break;
                 }
 
                 service = _step5.value;
 
                 if (!service.deinit) {
-                  _context35.next = 49;
+                  _context36.next = 49;
                   break;
                 }
 
-                _context35.next = 49;
+                _context36.next = 49;
                 return service.deinit();
 
               case 49:
                 _iteratorNormalCompletion5 = true;
-                _context35.next = 44;
+                _context36.next = 44;
                 break;
 
               case 52:
-                _context35.next = 58;
+                _context36.next = 58;
                 break;
 
               case 54:
-                _context35.prev = 54;
-                _context35.t2 = _context35["catch"](42);
+                _context36.prev = 54;
+                _context36.t2 = _context36["catch"](42);
                 _didIteratorError5 = true;
-                _iteratorError5 = _context35.t2;
+                _iteratorError5 = _context36.t2;
 
               case 58:
-                _context35.prev = 58;
-                _context35.prev = 59;
+                _context36.prev = 58;
+                _context36.prev = 59;
 
                 if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
                   _iterator5.return();
                 }
 
               case 61:
-                _context35.prev = 61;
+                _context36.prev = 61;
 
                 if (!_didIteratorError5) {
-                  _context35.next = 64;
+                  _context36.next = 64;
                   break;
                 }
 
                 throw _iteratorError5;
 
               case 64:
-                return _context35.finish(61);
+                return _context36.finish(61);
 
               case 65:
-                return _context35.finish(58);
+                return _context36.finish(58);
 
               case 66:
                 this.streamObservers = [];
@@ -2045,10 +2096,10 @@ var SNApplication = /*#__PURE__*/function () {
 
               case 70:
               case "end":
-                return _context35.stop();
+                return _context36.stop();
             }
           }
-        }, _callee35, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
+        }, _callee36, this, [[4, 8, 12, 20], [13,, 15, 19], [23, 27, 31, 39], [32,, 34, 38], [42, 54, 58, 66], [59,, 61, 65]]);
       }));
 
       function deinit() {
@@ -2079,38 +2130,38 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getWrappingKeyIfNecessary",
     value: function () {
-      var _getWrappingKeyIfNecessary = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36(passcode) {
+      var _getWrappingKeyIfNecessary = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(passcode) {
         var challenge, response, value, wrappingKey;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
           while (1) {
-            switch (_context36.prev = _context36.next) {
+            switch (_context37.prev = _context37.next) {
               case 0:
                 if (this.hasPasscode()) {
-                  _context36.next = 2;
+                  _context37.next = 2;
                   break;
                 }
 
-                return _context36.abrupt("return", {});
+                return _context37.abrupt("return", {});
 
               case 2:
                 if (passcode) {
-                  _context36.next = 11;
+                  _context37.next = 11;
                   break;
                 }
 
                 challenge = new _Lib__WEBPACK_IMPORTED_MODULE_5__["Challenge"]([_Lib__WEBPACK_IMPORTED_MODULE_5__["ChallengeType"].LocalPasscode], _Lib__WEBPACK_IMPORTED_MODULE_5__["ChallengeReason"].ResaveRootKey);
-                _context36.next = 6;
+                _context37.next = 6;
                 return this.challengeService.promptForChallengeResponse(challenge);
 
               case 6:
-                response = _context36.sent;
+                response = _context37.sent;
 
                 if (response) {
-                  _context36.next = 9;
+                  _context37.next = 9;
                   break;
                 }
 
-                return _context36.abrupt("return", {
+                return _context37.abrupt("return", {
                   canceled: true
                 });
 
@@ -2119,26 +2170,26 @@ var SNApplication = /*#__PURE__*/function () {
                 passcode = value.value;
 
               case 11:
-                _context36.next = 13;
+                _context37.next = 13;
                 return this.keyManager.computeWrappingKey({
                   passcode: passcode
                 });
 
               case 13:
-                wrappingKey = _context36.sent;
-                return _context36.abrupt("return", {
+                wrappingKey = _context37.sent;
+                return _context37.abrupt("return", {
                   wrappingKey: wrappingKey
                 });
 
               case 15:
               case "end":
-                return _context36.stop();
+                return _context37.stop();
             }
           }
-        }, _callee36, this);
+        }, _callee37, this);
       }));
 
-      function getWrappingKeyIfNecessary(_x29) {
+      function getWrappingKeyIfNecessary(_x30) {
         return _getWrappingKeyIfNecessary.apply(this, arguments);
       }
 
@@ -2153,138 +2204,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(_ref25) {
-        var email, password, ephemeral, mergeLocal, _ref26, wrappingKey, canceled, result;
-
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
-          while (1) {
-            switch (_context37.prev = _context37.next) {
-              case 0:
-                email = _ref25.email, password = _ref25.password, ephemeral = _ref25.ephemeral, mergeLocal = _ref25.mergeLocal;
-                _context37.next = 3;
-                return this.getWrappingKeyIfNecessary();
-
-              case 3:
-                _ref26 = _context37.sent;
-                wrappingKey = _ref26.wrappingKey;
-                canceled = _ref26.canceled;
-
-                if (!canceled) {
-                  _context37.next = 8;
-                  break;
-                }
-
-                return _context37.abrupt("return");
-
-              case 8:
-                this.lockSyncing();
-                _context37.next = 11;
-                return this.sessionManager.register({
-                  email: email,
-                  password: password
-                });
-
-              case 11:
-                result = _context37.sent;
-
-                if (result.response.error) {
-                  _context37.next = 34;
-                  break;
-                }
-
-                _context37.next = 15;
-                return this.keyManager.setNewRootKey({
-                  key: result.rootKey,
-                  keyParams: result.keyParams,
-                  wrappingKey: wrappingKey
-                });
-
-              case 15:
-                this.syncService.resetSyncState();
-                _context37.next = 18;
-                return this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_6__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_6__["StoragePersistencePolicies"].Default);
-
-              case 18:
-                if (!mergeLocal) {
-                  _context37.next = 23;
-                  break;
-                }
-
-                _context37.next = 21;
-                return this.syncService.markAllItemsAsNeedingSync({
-                  alternateUuids: true
-                });
-
-              case 21:
-                _context37.next = 26;
-                break;
-
-              case 23:
-                this.modelManager.removeAllItemsFromMemory();
-                _context37.next = 26;
-                return this.clearDatabase();
-
-              case 26:
-                _context37.next = 28;
-                return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].SignedIn);
-
-              case 28:
-                this.unlockSyncing();
-                _context37.next = 31;
-                return this.syncService.sync({
-                  mode: _Services__WEBPACK_IMPORTED_MODULE_6__["SyncModes"].DownloadFirst,
-                  timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_6__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
-                });
-
-              case 31:
-                this.protocolService.decryptErroredItems();
-                _context37.next = 35;
-                break;
-
-              case 34:
-                this.unlockSyncing();
-
-              case 35:
-                return _context37.abrupt("return", result.response);
-
-              case 36:
-              case "end":
-                return _context37.stop();
-            }
-          }
-        }, _callee37, this);
-      }));
-
-      function register(_x30) {
-        return _register.apply(this, arguments);
-      }
-
-      return register;
-    }()
-    /**
-     *  @access public 
-     *  @param mergeLocal  Whether to merge existing offline data into account. If false, 
-     *                     any pre-existing data will be fully deleted upon success.
-     */
-
-  }, {
-    key: "signIn",
-    value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref27) {
-        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref27$mergeLocal, mergeLocal, _ref28, wrappingKey, canceled, result;
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref26) {
+        var email, password, ephemeral, mergeLocal, _ref27, wrappingKey, canceled, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee38$(_context38) {
           while (1) {
             switch (_context38.prev = _context38.next) {
               case 0:
-                email = _ref27.email, password = _ref27.password, strict = _ref27.strict, ephemeral = _ref27.ephemeral, mfaKeyPath = _ref27.mfaKeyPath, mfaCode = _ref27.mfaCode, _ref27$mergeLocal = _ref27.mergeLocal, mergeLocal = _ref27$mergeLocal === void 0 ? true : _ref27$mergeLocal;
+                email = _ref26.email, password = _ref26.password, ephemeral = _ref26.ephemeral, mergeLocal = _ref26.mergeLocal;
                 _context38.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref28 = _context38.sent;
-                wrappingKey = _ref28.wrappingKey;
-                canceled = _ref28.canceled;
+                _ref27 = _context38.sent;
+                wrappingKey = _ref27.wrappingKey;
+                canceled = _ref27.canceled;
 
                 if (!canceled) {
                   _context38.next = 8;
@@ -2294,15 +2228,11 @@ var SNApplication = /*#__PURE__*/function () {
                 return _context38.abrupt("return");
 
               case 8:
-                /** Prevent a timed sync from occuring while signing in. */
                 this.lockSyncing();
                 _context38.next = 11;
-                return this.sessionManager.signIn({
+                return this.sessionManager.register({
                   email: email,
-                  password: password,
-                  strict: strict,
-                  mfaKeyPath: mfaKeyPath,
-                  mfaCode: mfaCode
+                  password: password
                 });
 
               case 11:
@@ -2354,7 +2284,6 @@ var SNApplication = /*#__PURE__*/function () {
                 _context38.next = 31;
                 return this.syncService.sync({
                   mode: _Services__WEBPACK_IMPORTED_MODULE_6__["SyncModes"].DownloadFirst,
-                  checkIntegrity: true,
                   timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_6__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
                 });
 
@@ -2377,7 +2306,129 @@ var SNApplication = /*#__PURE__*/function () {
         }, _callee38, this);
       }));
 
-      function signIn(_x31) {
+      function register(_x31) {
+        return _register.apply(this, arguments);
+      }
+
+      return register;
+    }()
+    /**
+     *  @access public 
+     *  @param mergeLocal  Whether to merge existing offline data into account. If false, 
+     *                     any pre-existing data will be fully deleted upon success.
+     */
+
+  }, {
+    key: "signIn",
+    value: function () {
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee39(_ref28) {
+        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref28$mergeLocal, mergeLocal, _ref29, wrappingKey, canceled, result;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee39$(_context39) {
+          while (1) {
+            switch (_context39.prev = _context39.next) {
+              case 0:
+                email = _ref28.email, password = _ref28.password, strict = _ref28.strict, ephemeral = _ref28.ephemeral, mfaKeyPath = _ref28.mfaKeyPath, mfaCode = _ref28.mfaCode, _ref28$mergeLocal = _ref28.mergeLocal, mergeLocal = _ref28$mergeLocal === void 0 ? true : _ref28$mergeLocal;
+                _context39.next = 3;
+                return this.getWrappingKeyIfNecessary();
+
+              case 3:
+                _ref29 = _context39.sent;
+                wrappingKey = _ref29.wrappingKey;
+                canceled = _ref29.canceled;
+
+                if (!canceled) {
+                  _context39.next = 8;
+                  break;
+                }
+
+                return _context39.abrupt("return");
+
+              case 8:
+                /** Prevent a timed sync from occuring while signing in. */
+                this.lockSyncing();
+                _context39.next = 11;
+                return this.sessionManager.signIn({
+                  email: email,
+                  password: password,
+                  strict: strict,
+                  mfaKeyPath: mfaKeyPath,
+                  mfaCode: mfaCode
+                });
+
+              case 11:
+                result = _context39.sent;
+
+                if (result.response.error) {
+                  _context39.next = 34;
+                  break;
+                }
+
+                _context39.next = 15;
+                return this.keyManager.setNewRootKey({
+                  key: result.rootKey,
+                  keyParams: result.keyParams,
+                  wrappingKey: wrappingKey
+                });
+
+              case 15:
+                this.syncService.resetSyncState();
+                _context39.next = 18;
+                return this.storageService.setPersistencePolicy(ephemeral ? _Services__WEBPACK_IMPORTED_MODULE_6__["StoragePersistencePolicies"].Ephemeral : _Services__WEBPACK_IMPORTED_MODULE_6__["StoragePersistencePolicies"].Default);
+
+              case 18:
+                if (!mergeLocal) {
+                  _context39.next = 23;
+                  break;
+                }
+
+                _context39.next = 21;
+                return this.syncService.markAllItemsAsNeedingSync({
+                  alternateUuids: true
+                });
+
+              case 21:
+                _context39.next = 26;
+                break;
+
+              case 23:
+                this.modelManager.removeAllItemsFromMemory();
+                _context39.next = 26;
+                return this.clearDatabase();
+
+              case 26:
+                _context39.next = 28;
+                return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].SignedIn);
+
+              case 28:
+                this.unlockSyncing();
+                _context39.next = 31;
+                return this.syncService.sync({
+                  mode: _Services__WEBPACK_IMPORTED_MODULE_6__["SyncModes"].DownloadFirst,
+                  checkIntegrity: true,
+                  timingStrategy: _Services__WEBPACK_IMPORTED_MODULE_6__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]
+                });
+
+              case 31:
+                this.protocolService.decryptErroredItems();
+                _context39.next = 35;
+                break;
+
+              case 34:
+                this.unlockSyncing();
+
+              case 35:
+                return _context39.abrupt("return", result.response);
+
+              case 36:
+              case "end":
+                return _context39.stop();
+            }
+          }
+        }, _callee39, this);
+      }));
+
+      function signIn(_x32) {
         return _signIn.apply(this, arguments);
       }
 
@@ -2395,37 +2446,37 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee39(_ref29) {
-        var currentPassword, newPassword, passcode, _ref30, wrappingKey, canceled, currentKeyParams, result;
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref30) {
+        var currentPassword, newPassword, passcode, _ref31, wrappingKey, canceled, currentKeyParams, result;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee39$(_context39) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee40$(_context40) {
           while (1) {
-            switch (_context39.prev = _context39.next) {
+            switch (_context40.prev = _context40.next) {
               case 0:
-                currentPassword = _ref29.currentPassword, newPassword = _ref29.newPassword, passcode = _ref29.passcode;
-                _context39.next = 3;
+                currentPassword = _ref30.currentPassword, newPassword = _ref30.newPassword, passcode = _ref30.passcode;
+                _context40.next = 3;
                 return this.getWrappingKeyIfNecessary(passcode);
 
               case 3:
-                _ref30 = _context39.sent;
-                wrappingKey = _ref30.wrappingKey;
-                canceled = _ref30.canceled;
+                _ref31 = _context40.sent;
+                wrappingKey = _ref31.wrappingKey;
+                canceled = _ref31.canceled;
 
                 if (!canceled) {
-                  _context39.next = 8;
+                  _context40.next = 8;
                   break;
                 }
 
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 8:
-                _context39.next = 10;
+                _context40.next = 10;
                 return this.keyManager.getRootKeyParams();
 
               case 10:
-                currentKeyParams = _context39.sent;
+                currentKeyParams = _context40.sent;
                 this.lockSyncing();
-                _context39.next = 14;
+                _context40.next = 14;
                 return this.sessionManager.changePassword({
                   currentPassword: currentPassword,
                   currentKeyParams: currentKeyParams,
@@ -2433,14 +2484,14 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 14:
-                result = _context39.sent;
+                result = _context40.sent;
 
                 if (result.response.error) {
-                  _context39.next = 25;
+                  _context40.next = 25;
                   break;
                 }
 
-                _context39.next = 18;
+                _context40.next = 18;
                 return this.keyManager.setNewRootKey({
                   key: result.rootKey,
                   keyParams: result.keyParams,
@@ -2448,33 +2499,33 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 18:
-                _context39.next = 20;
+                _context40.next = 20;
                 return this.itemsKeyManager.createNewDefaultItemsKey();
 
               case 20:
                 this.unlockSyncing();
-                _context39.next = 23;
+                _context40.next = 23;
                 return this.syncService.sync();
 
               case 23:
-                _context39.next = 26;
+                _context40.next = 26;
                 break;
 
               case 25:
                 this.unlockSyncing();
 
               case 26:
-                return _context39.abrupt("return", result.response);
+                return _context40.abrupt("return", result.response);
 
               case 27:
               case "end":
-                return _context39.stop();
+                return _context40.stop();
             }
           }
-        }, _callee39, this);
+        }, _callee40, this);
       }));
 
-      function changePassword(_x32) {
+      function changePassword(_x33) {
         return _changePassword.apply(this, arguments);
       }
 
@@ -2485,36 +2536,36 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "signOut",
     value: function () {
-      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee40$(_context40) {
+      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee41() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee41$(_context41) {
           while (1) {
-            switch (_context40.prev = _context40.next) {
+            switch (_context41.prev = _context41.next) {
               case 0:
-                _context40.next = 2;
+                _context41.next = 2;
                 return this.sessionManager.signOut();
 
               case 2:
-                _context40.next = 4;
+                _context41.next = 4;
                 return this.keyManager.clearLocalKeyState();
 
               case 4:
-                _context40.next = 6;
+                _context41.next = 6;
                 return this.storageService.clearAllData();
 
               case 6:
-                _context40.next = 8;
+                _context41.next = 8;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].SignedOut);
 
               case 8:
-                _context40.next = 10;
+                _context41.next = 10;
                 return this.restart();
 
               case 10:
               case "end":
-                return _context40.stop();
+                return _context41.stop();
             }
           }
-        }, _callee40, this);
+        }, _callee41, this);
       }));
 
       function signOut() {
@@ -2528,31 +2579,31 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "validateAccountPassword",
     value: function () {
-      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee41(_ref31) {
-        var password, _ref32, valid;
+      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee42(_ref32) {
+        var password, _ref33, valid;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee41$(_context41) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee42$(_context42) {
           while (1) {
-            switch (_context41.prev = _context41.next) {
+            switch (_context42.prev = _context42.next) {
               case 0:
-                password = _ref31.password;
-                _context41.next = 3;
+                password = _ref32.password;
+                _context42.next = 3;
                 return this.keyManager.validateAccountPassword(password);
 
               case 3:
-                _ref32 = _context41.sent;
-                valid = _ref32.valid;
-                return _context41.abrupt("return", valid);
+                _ref33 = _context42.sent;
+                valid = _ref33.valid;
+                return _context42.abrupt("return", valid);
 
               case 6:
               case "end":
-                return _context41.stop();
+                return _context42.stop();
             }
           }
-        }, _callee41, this);
+        }, _callee42, this);
       }));
 
-      function validateAccountPassword(_x33) {
+      function validateAccountPassword(_x34) {
         return _validateAccountPassword.apply(this, arguments);
       }
 
@@ -2584,27 +2635,27 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "isLocked",
     value: function () {
-      var _isLocked = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee42() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee42$(_context42) {
+      var _isLocked = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
           while (1) {
-            switch (_context42.prev = _context42.next) {
+            switch (_context43.prev = _context43.next) {
               case 0:
                 if (this.started) {
-                  _context42.next = 2;
+                  _context43.next = 2;
                   break;
                 }
 
-                return _context42.abrupt("return", true);
+                return _context43.abrupt("return", true);
 
               case 2:
-                return _context42.abrupt("return", this.challengeService.isPasscodeLocked());
+                return _context43.abrupt("return", this.challengeService.isPasscodeLocked());
 
               case 3:
               case "end":
-                return _context42.stop();
+                return _context43.stop();
             }
           }
-        }, _callee42, this);
+        }, _callee43, this);
       }));
 
       function isLocked() {
@@ -2618,19 +2669,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "lock",
     value: function () {
-      var _lock = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
+      var _lock = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee44() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee44$(_context44) {
           while (1) {
-            switch (_context43.prev = _context43.next) {
+            switch (_context44.prev = _context44.next) {
               case 0:
-                return _context43.abrupt("return", this.restart());
+                return _context44.abrupt("return", this.restart());
 
               case 1:
               case "end":
-                return _context43.stop();
+                return _context44.stop();
             }
           }
-        }, _callee43, this);
+        }, _callee44, this);
       }));
 
       function lock() {
@@ -2644,51 +2695,51 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setPasscode",
     value: function () {
-      var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee44(passcode) {
-        var identifier, _ref33, key, keyParams;
+      var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee45(passcode) {
+        var identifier, _ref34, key, keyParams;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee44$(_context44) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee45$(_context45) {
           while (1) {
-            switch (_context44.prev = _context44.next) {
+            switch (_context45.prev = _context45.next) {
               case 0:
-                _context44.next = 2;
+                _context45.next = 2;
                 return this.protocolService.crypto.generateUUID();
 
               case 2:
-                identifier = _context44.sent;
-                _context44.next = 5;
+                identifier = _context45.sent;
+                _context45.next = 5;
                 return this.protocolService.createRootKey({
                   identifier: identifier,
                   password: passcode
                 });
 
               case 5:
-                _ref33 = _context44.sent;
-                key = _ref33.key;
-                keyParams = _ref33.keyParams;
-                _context44.next = 10;
+                _ref34 = _context45.sent;
+                key = _ref34.key;
+                keyParams = _ref34.keyParams;
+                _context45.next = 10;
                 return this.keyManager.setNewRootKeyWrapper({
                   wrappingKey: key,
                   keyParams: keyParams
                 });
 
               case 10:
-                _context44.next = 12;
+                _context45.next = 12;
                 return this.rewriteItemsKeys();
 
               case 12:
-                _context44.next = 14;
+                _context45.next = 14;
                 return this.syncService.sync();
 
               case 14:
               case "end":
-                return _context44.stop();
+                return _context45.stop();
             }
           }
-        }, _callee44, this);
+        }, _callee45, this);
       }));
 
-      function setPasscode(_x34) {
+      function setPasscode(_x35) {
         return _setPasscode.apply(this, arguments);
       }
 
@@ -2699,24 +2750,24 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "removePasscode",
     value: function () {
-      var _removePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee45() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee45$(_context45) {
+      var _removePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee46() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee46$(_context46) {
           while (1) {
-            switch (_context45.prev = _context45.next) {
+            switch (_context46.prev = _context46.next) {
               case 0:
-                _context45.next = 2;
+                _context46.next = 2;
                 return this.keyManager.removeRootKeyWrapper();
 
               case 2:
-                _context45.next = 4;
+                _context46.next = 4;
                 return this.rewriteItemsKeys();
 
               case 4:
               case "end":
-                return _context45.stop();
+                return _context46.stop();
             }
           }
-        }, _callee45, this);
+        }, _callee46, this);
       }));
 
       function removePasscode() {
@@ -2730,26 +2781,26 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePasscode",
     value: function () {
-      var _changePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee46(passcode) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee46$(_context46) {
+      var _changePasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee47(passcode) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee47$(_context47) {
           while (1) {
-            switch (_context46.prev = _context46.next) {
+            switch (_context47.prev = _context47.next) {
               case 0:
-                _context46.next = 2;
+                _context47.next = 2;
                 return this.removePasscode();
 
               case 2:
-                return _context46.abrupt("return", this.setPasscode(passcode));
+                return _context47.abrupt("return", this.setPasscode(passcode));
 
               case 3:
               case "end":
-                return _context46.stop();
+                return _context47.stop();
             }
           }
-        }, _callee46, this);
+        }, _callee47, this);
       }));
 
-      function changePasscode(_x35) {
+      function changePasscode(_x36) {
         return _changePasscode.apply(this, arguments);
       }
 
@@ -2760,26 +2811,26 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setStorageEncryptionPolicy",
     value: function () {
-      var _setStorageEncryptionPolicy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee47(encryptionPolicy) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee47$(_context47) {
+      var _setStorageEncryptionPolicy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee48(encryptionPolicy) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee48$(_context48) {
           while (1) {
-            switch (_context47.prev = _context47.next) {
+            switch (_context48.prev = _context48.next) {
               case 0:
-                _context47.next = 2;
+                _context48.next = 2;
                 return this.storageService.setEncryptionPolicy(encryptionPolicy);
 
               case 2:
-                return _context47.abrupt("return", this.syncService.repersistAllItems());
+                return _context48.abrupt("return", this.syncService.repersistAllItems());
 
               case 3:
               case "end":
-                return _context47.stop();
+                return _context48.stop();
             }
           }
-        }, _callee47, this);
+        }, _callee48, this);
       }));
 
-      function setStorageEncryptionPolicy(_x36) {
+      function setStorageEncryptionPolicy(_x37) {
         return _setStorageEncryptionPolicy.apply(this, arguments);
       }
 
@@ -2790,19 +2841,19 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "generateUuid",
     value: function () {
-      var _generateUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee48() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee48$(_context48) {
+      var _generateUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee49() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee49$(_context49) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context49.prev = _context49.next) {
               case 0:
-                return _context48.abrupt("return", this.protocolService.crypto.generateUUID());
+                return _context49.abrupt("return", this.protocolService.crypto.generateUUID());
 
               case 1:
               case "end":
-                return _context48.stop();
+                return _context49.stop();
             }
           }
-        }, _callee48, this);
+        }, _callee49, this);
       }));
 
       function generateUuid() {
@@ -2820,18 +2871,18 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changeDeviceInterface",
     value: function () {
-      var _changeDeviceInterface = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee49(deviceInterface) {
+      var _changeDeviceInterface = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(deviceInterface) {
         var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, service;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee49$(_context49) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
           while (1) {
-            switch (_context49.prev = _context49.next) {
+            switch (_context50.prev = _context50.next) {
               case 0:
                 this.deviceInterface = deviceInterface;
                 _iteratorNormalCompletion6 = true;
                 _didIteratorError6 = false;
                 _iteratorError6 = undefined;
-                _context49.prev = 4;
+                _context50.prev = 4;
 
                 for (_iterator6 = this.services[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                   service = _step6.value;
@@ -2841,48 +2892,48 @@ var SNApplication = /*#__PURE__*/function () {
                   }
                 }
 
-                _context49.next = 12;
+                _context50.next = 12;
                 break;
 
               case 8:
-                _context49.prev = 8;
-                _context49.t0 = _context49["catch"](4);
+                _context50.prev = 8;
+                _context50.t0 = _context50["catch"](4);
                 _didIteratorError6 = true;
-                _iteratorError6 = _context49.t0;
+                _iteratorError6 = _context50.t0;
 
               case 12:
-                _context49.prev = 12;
-                _context49.prev = 13;
+                _context50.prev = 12;
+                _context50.prev = 13;
 
                 if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
                   _iterator6.return();
                 }
 
               case 15:
-                _context49.prev = 15;
+                _context50.prev = 15;
 
                 if (!_didIteratorError6) {
-                  _context49.next = 18;
+                  _context50.next = 18;
                   break;
                 }
 
                 throw _iteratorError6;
 
               case 18:
-                return _context49.finish(15);
+                return _context50.finish(15);
 
               case 19:
-                return _context49.finish(12);
+                return _context50.finish(12);
 
               case 20:
               case "end":
-                return _context49.stop();
+                return _context50.stop();
             }
           }
-        }, _callee49, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+        }, _callee50, this, [[4, 8, 12, 20], [13,, 15, 19]]);
       }));
 
-      function changeDeviceInterface(_x37) {
+      function changeDeviceInterface(_x38) {
         return _changeDeviceInterface.apply(this, arguments);
       }
 
@@ -3003,20 +3054,20 @@ var SNApplication = /*#__PURE__*/function () {
         itemsKeyManager: this.itemsKeyManager,
         deviceInterface: this.deviceInterface
       });
-      this.keyManager.onStatusChange( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
+      this.keyManager.onStatusChange( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee51() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee51$(_context51) {
           while (1) {
-            switch (_context50.prev = _context50.next) {
+            switch (_context51.prev = _context51.next) {
               case 0:
-                _context50.next = 2;
+                _context51.next = 2;
                 return _this6.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].KeyStatusChanged);
 
               case 2:
               case "end":
-                return _context50.stop();
+                return _context51.stop();
             }
           }
-        }, _callee50);
+        }, _callee51);
       })));
       this.services.push(this.keyManager);
     }
@@ -3090,32 +3141,32 @@ var SNApplication = /*#__PURE__*/function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncService.addEventObserver( /*#__PURE__*/function () {
-        var _ref35 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee51(eventName) {
+        var _ref36 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee52(eventName) {
           var appEvent;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee51$(_context51) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee52$(_context52) {
             while (1) {
-              switch (_context51.prev = _context51.next) {
+              switch (_context52.prev = _context52.next) {
                 case 0:
                   appEvent = Object(_Lib__WEBPACK_IMPORTED_MODULE_5__["applicationEventForSyncEvent"])(eventName);
 
                   if (!appEvent) {
-                    _context51.next = 4;
+                    _context52.next = 4;
                     break;
                   }
 
-                  _context51.next = 4;
+                  _context52.next = 4;
                   return _this7.notifyEvent(appEvent);
 
                 case 4:
                 case "end":
-                  return _context51.stop();
+                  return _context52.stop();
               }
             }
-          }, _callee51);
+          }, _callee52);
         }));
 
-        return function (_x38) {
-          return _ref35.apply(this, arguments);
+        return function (_x39) {
+          return _ref36.apply(this, arguments);
         };
       }());
       this.serviceObservers.push(uninstall);
@@ -24753,13 +24804,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/sortedIndexBy */ "./node_modules/lodash/sortedIndexBy.js");
-/* harmony import */ var lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -24803,7 +24852,6 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
@@ -24833,8 +24881,8 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
     _this.components = [];
     _this.itemsHash = {};
     _this.resolveQueue = {};
-    _this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadCollection"]();
-    _this.systemSmartTags = _Models__WEBPACK_IMPORTED_MODULE_5__["SNSmartTag"].systemSmartTags();
+    _this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]();
+    _this.systemSmartTags = _Models__WEBPACK_IMPORTED_MODULE_4__["SNSmartTag"].systemSmartTags();
     return _this;
   }
   /**
@@ -24892,7 +24940,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
       this.components.length = 0;
       this.itemsHash = {};
       this.resolveQueue = {};
-      this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadCollection"]();
+      this.masterCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]();
     }
     /**
      * Consumers wanting to modify an item should run it through this block,
@@ -25230,6 +25278,15 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 items = _ref7.items, source = _ref7.source, sourceKey = _ref7.sourceKey;
+
+                /** 
+                 * Insert the items first. This way, if one of the input items is a template item,
+                 * unmanaged item, and we run it through the mapper, we don't want the mapper to create
+                 * a new object reference, but instead use the one supplied to this function.
+                 */
+                this.insertItems({
+                  items: items
+                });
                 payloads = items.map(function (item) {
                   return item.payloadRepresentation();
                 });
@@ -25239,7 +25296,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                   sourceKey: sourceKey
                 }));
 
-              case 3:
+              case 4:
               case "end":
                 return _context8.stop();
             }
@@ -25407,7 +25464,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 if (item) {
                   item.updateFromPayload(payload);
                 } else {
-                  item = Object(_Models__WEBPACK_IMPORTED_MODULE_5__["CreateItemFromPayload"])(payload);
+                  item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
                   this.insertItems({
                     items: [item],
                     globalOnly: isDirtyDeleted
@@ -25546,7 +25603,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 89:
-                newCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadCollection"]({
+                newCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]({
                   payloads: allItems.map(function (item) {
                     return item.payloadRepresentation();
                   }),
@@ -25632,20 +25689,13 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
             continue;
           }
 
-          if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].ItemsKey) {
+          if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].ItemsKey) {
             this.itemsKeys.unshift(item);
-          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Tag) {
-            var index = lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3___default()(this.tags, item, function (item) {
-              if (item.title) {
-                return item.title.toLowerCase();
-              } else {
-                return '';
-              }
-            });
-            this.tags.splice(index, 0, item);
-          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Note) {
+          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Tag) {
+            this.tags.unshift(item);
+          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Note) {
             this.notes.unshift(item);
-          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Component) {
+          } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Component) {
             this.components.unshift(item);
           }
         }
@@ -25717,7 +25767,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 globalOnly = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : false;
                 console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
                 payloads = items.map(function (item) {
-                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_7__["CreateMaxPayloadFromAnyObject"])({
+                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])({
                     object: item
                   });
                 });
@@ -26245,14 +26295,9 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 updateClientDate = _args17.length > 2 ? _args17[2] : undefined;
                 source = _args17.length > 3 ? _args17[3] : undefined;
                 sourceKey = _args17.length > 4 ? _args17[4] : undefined;
-
-                if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Tag) {
-                  this.reorderTagLocation(item);
-                }
-
                 return _context17.abrupt("return", this.setItemsDirty([item], dirty, updateClientDate, source, sourceKey));
 
-              case 6:
+              case 5:
               case "end":
                 return _context17.stop();
             }
@@ -26365,7 +26410,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
               case 31:
                 return _context18.abrupt("return", this.mapItems({
                   items: items,
-                  source: source || _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalDirtied,
+                  source: source || _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].LocalDirtied,
                   sourceKey: sourceKey
                 }));
 
@@ -26411,11 +26456,11 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to duplicate non-item object.';
 
               case 3:
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_7__["CreateMaxPayloadFromAnyObject"])({
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])({
                   object: item
                 });
                 _context19.next = 6;
-                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadsByDuplicating"])({
+                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])({
                   payload: payload,
                   baseCollection: this.getMasterCollection(),
                   isConflict: isConflict
@@ -26464,12 +26509,12 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
     key: "createItem",
     value: function () {
       var _createItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref15) {
-        var contentType, content, add, needsSync, payload, item;
+        var contentType, content, add, needsSync, override, payload, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context20) {
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
-                contentType = _ref15.contentType, content = _ref15.content, add = _ref15.add, needsSync = _ref15.needsSync;
+                contentType = _ref15.contentType, content = _ref15.content, add = _ref15.add, needsSync = _ref15.needsSync, override = _ref15.override;
 
                 if (contentType) {
                   _context20.next = 3;
@@ -26479,27 +26524,29 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to create item with no contentType';
 
               case 3:
-                _context20.t0 = _Payloads__WEBPACK_IMPORTED_MODULE_7__["CreateMaxPayloadFromAnyObject"];
+                _context20.t0 = _Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"];
                 _context20.next = 6;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
+                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
 
               case 6:
                 _context20.t1 = _context20.sent;
                 _context20.t2 = contentType;
-                _context20.t3 = content;
+                _context20.t3 = content || {};
                 _context20.t4 = {
                   uuid: _context20.t1,
                   content_type: _context20.t2,
                   content: _context20.t3
                 };
-                _context20.t5 = {
-                  object: _context20.t4
+                _context20.t5 = override;
+                _context20.t6 = {
+                  object: _context20.t4,
+                  override: _context20.t5
                 };
-                payload = (0, _context20.t0)(_context20.t5);
-                item = Object(_Models__WEBPACK_IMPORTED_MODULE_5__["CreateItemFromPayload"])(payload);
+                payload = (0, _context20.t0)(_context20.t6);
+                item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
 
                 if (!add) {
-                  _context20.next = 20;
+                  _context20.next = 21;
                   break;
                 }
 
@@ -26508,21 +26555,21 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 });
 
                 if (!needsSync) {
-                  _context20.next = 18;
+                  _context20.next = 19;
                   break;
                 }
 
-                _context20.next = 18;
+                _context20.next = 19;
                 return this.setItemDirty(item);
 
-              case 18:
-                _context20.next = 20;
+              case 19:
+                _context20.next = 21;
                 return this.notifyCreationObservers([item]);
 
-              case 20:
+              case 21:
                 return _context20.abrupt("return", item);
 
-              case 21:
+              case 22:
               case "end":
                 return _context20.stop();
             }
@@ -26888,19 +26935,19 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "removeItemFromRespectiveArray",
     value: function removeItemFromRespectiveArray(item) {
-      if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Tag) {
+      if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Tag) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.tags, {
           uuid: item.uuid
         });
-      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Note) {
+      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Note) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.notes, {
           uuid: item.uuid
         });
-      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Component) {
+      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Component) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.components, {
           uuid: item.uuid
         });
-      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].ItemsKey) {
+      } else if (item.content_type === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].ItemsKey) {
         lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(this.itemsKeys, {
           uuid: item.uuid
         });
@@ -26935,12 +26982,12 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "managedItemsForContentType",
     value: function managedItemsForContentType(contentType) {
-      if (contentType === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Note) {
-        return this.notes;
-      } else if (contentType === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Component) {
-        return this.components;
-      } else if (contentType === _Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Tag) {
-        return this.tags;
+      if (contentType === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Note) {
+        return this.notes.slice();
+      } else if (contentType === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Component) {
+        return this.components.slice();
+      } else if (contentType === _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].Tag) {
+        return this.tags.slice();
       }
 
       return null;
@@ -27110,11 +27157,11 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context25.prev = _context25.next) {
               case 0:
-                delta = new _Payloads__WEBPACK_IMPORTED_MODULE_7__["DeltaFileImport"]({
+                delta = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["DeltaFileImport"]({
                   baseCollection: this.getMasterCollection(),
-                  applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadCollection"]({
+                  applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]({
                     payloads: payloads,
-                    source: _Payloads__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].FileImport
+                    source: _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].FileImport
                   })
                 });
                 _context25.next = 3;
@@ -27263,7 +27310,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "findTagByTitle",
     value: function findTagByTitle(title) {
-      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["findInArray"])(this.tags, 'title', title);
+      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["findInArray"])(this.tags, 'title', title);
     }
     /**
     * Finds or creates a tag with a given title
@@ -27318,19 +27365,6 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
 
       return findOrCreateTagByTitle;
     }()
-    /** 
-     * Re-sorts the tag to its proper alphabetical location, after a potential title change
-     * @access private 
-     */
-
-  }, {
-    key: "reorderTagLocation",
-    value: function reorderTagLocation(tag) {
-      lodash_pull__WEBPACK_IMPORTED_MODULE_2___default()(this.tags, tag);
-      this.tags.splice(lodash_sortedIndexBy__WEBPACK_IMPORTED_MODULE_3___default()(this.tags, tag, function (tag) {
-        if (tag.title) return tag.title.toLowerCase();else return '';
-      }), 0, tag);
-    }
     /**
      * Returns all notes matching the smart tag
      * @access public
@@ -27340,11 +27374,11 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "notesMatchingSmartTag",
     value: function notesMatchingSmartTag(smartTag) {
-      var contentTypePredicate = new _Models__WEBPACK_IMPORTED_MODULE_5__["SNPredicate"]('content_type', '=', 'Note');
+      var contentTypePredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SNPredicate"]('content_type', '=', 'Note');
       var predicates = [contentTypePredicate, smartTag.content.predicate];
 
       if (!smartTag.content.isTrashTag) {
-        var notTrashedPredicate = new _Models__WEBPACK_IMPORTED_MODULE_5__["SNPredicate"]('content.trashed', '=', false);
+        var notTrashedPredicate = new _Models__WEBPACK_IMPORTED_MODULE_4__["SNPredicate"]('content.trashed', '=', false);
         predicates.push(notTrashedPredicate);
       }
 
@@ -27412,7 +27446,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getSmartTags",
     value: function getSmartTags() {
-      var userTags = this.validItemsForContentType(_Models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].SmartTag).sort(function (a, b) {
+      var userTags = this.validItemsForContentType(_Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].SmartTag).sort(function (a, b) {
         return a.content.title < b.content.title ? -1 : 1;
       });
       return this.systemSmartTags.concat(userTags);
@@ -27449,7 +27483,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
   }]);
 
   return SNModelManager;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_6__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__["PureService"]);
 
 /***/ }),
 
@@ -32626,11 +32660,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 28:
+                this.databaseLoaded = true;
                 this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].LocalDataLoaded);
                 this.opStatus.setDatabaseLoadStatus({
                   done: true
                 });
-                this.databaseLoaded = true;
 
               case 31:
               case "end":
@@ -37953,82 +37987,6 @@ module.exports = baseSlice;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseSortedIndexBy.js":
-/*!***************************************************!*\
-  !*** ./node_modules/lodash/_baseSortedIndexBy.js ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/lodash/isSymbol.js");
-/** Used as references for the maximum length and index of an array. */
-
-
-var MAX_ARRAY_LENGTH = 4294967295,
-    MAX_ARRAY_INDEX = MAX_ARRAY_LENGTH - 1;
-/* Built-in method references for those with the same name as other `lodash` methods. */
-
-var nativeFloor = Math.floor,
-    nativeMin = Math.min;
-/**
- * The base implementation of `_.sortedIndexBy` and `_.sortedLastIndexBy`
- * which invokes `iteratee` for `value` and each element of `array` to compute
- * their sort ranking. The iteratee is invoked with one argument; (value).
- *
- * @private
- * @param {Array} array The sorted array to inspect.
- * @param {*} value The value to evaluate.
- * @param {Function} iteratee The iteratee invoked per element.
- * @param {boolean} [retHighest] Specify returning the highest qualified index.
- * @returns {number} Returns the index at which `value` should be inserted
- *  into `array`.
- */
-
-function baseSortedIndexBy(array, value, iteratee, retHighest) {
-  value = iteratee(value);
-  var low = 0,
-      high = array == null ? 0 : array.length,
-      valIsNaN = value !== value,
-      valIsNull = value === null,
-      valIsSymbol = isSymbol(value),
-      valIsUndefined = value === undefined;
-
-  while (low < high) {
-    var mid = nativeFloor((low + high) / 2),
-        computed = iteratee(array[mid]),
-        othIsDefined = computed !== undefined,
-        othIsNull = computed === null,
-        othIsReflexive = computed === computed,
-        othIsSymbol = isSymbol(computed);
-
-    if (valIsNaN) {
-      var setLow = retHighest || othIsReflexive;
-    } else if (valIsUndefined) {
-      setLow = othIsReflexive && (retHighest || othIsDefined);
-    } else if (valIsNull) {
-      setLow = othIsReflexive && othIsDefined && (retHighest || !othIsNull);
-    } else if (valIsSymbol) {
-      setLow = othIsReflexive && othIsDefined && !othIsNull && (retHighest || !othIsSymbol);
-    } else if (othIsNull || othIsSymbol) {
-      setLow = false;
-    } else {
-      setLow = retHighest ? computed <= value : computed < value;
-    }
-
-    if (setLow) {
-      low = mid + 1;
-    } else {
-      high = mid;
-    }
-  }
-
-  return nativeMin(high, MAX_ARRAY_INDEX);
-}
-
-module.exports = baseSortedIndexBy;
-
-/***/ }),
-
 /***/ "./node_modules/lodash/_baseTimes.js":
 /*!*******************************************!*\
   !*** ./node_modules/lodash/_baseTimes.js ***!
@@ -43072,50 +43030,6 @@ function remove(array, predicate) {
 }
 
 module.exports = remove;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/sortedIndexBy.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/sortedIndexBy.js ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseIteratee = __webpack_require__(/*! ./_baseIteratee */ "./node_modules/lodash/_baseIteratee.js"),
-    baseSortedIndexBy = __webpack_require__(/*! ./_baseSortedIndexBy */ "./node_modules/lodash/_baseSortedIndexBy.js");
-/**
- * This method is like `_.sortedIndex` except that it accepts `iteratee`
- * which is invoked for `value` and each element of `array` to compute their
- * sort ranking. The iteratee is invoked with one argument: (value).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Array
- * @param {Array} array The sorted array to inspect.
- * @param {*} value The value to evaluate.
- * @param {Function} [iteratee=_.identity] The iteratee invoked per element.
- * @returns {number} Returns the index at which `value` should be inserted
- *  into `array`.
- * @example
- *
- * var objects = [{ 'x': 4 }, { 'x': 5 }];
- *
- * _.sortedIndexBy(objects, { 'x': 4 }, function(o) { return o.x; });
- * // => 0
- *
- * // The `_.property` iteratee shorthand.
- * _.sortedIndexBy(objects, { 'x': 4 }, 'x');
- * // => 0
- */
-
-
-function sortedIndexBy(array, value, iteratee) {
-  return baseSortedIndexBy(array, value, baseIteratee(iteratee, 2));
-}
-
-module.exports = sortedIndexBy;
 
 /***/ }),
 

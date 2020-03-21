@@ -98,7 +98,7 @@ app.setPasscode(somePasscode).then(() => {
 ### Create a note
 
 ```javascript
-const item = await app.createItem({
+const item = await app.createManagedItem({
   contentType: ContentTypes.Note, 
   content: {
     title: 'Ideas',

@@ -58,8 +58,7 @@ describe('singletons', () => {
       new SNPredicate('package_info.identifier', '=', this.extManagerId)
     ]);
     this.createExtMgr = async () => {
-      return this.application.createItem({
-        add: true,
+      return this.application.createManagedItem({
         needsSync: true,
         contentType: ContentTypes.Component,
         content: {
