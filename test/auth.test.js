@@ -67,7 +67,8 @@ describe('basic auth', () => {
     await this.application.signOut();
     const response = await this.application.signIn({
       email: this.email,
-      password: this.password
+      password: this.password,
+      awaitSync: true
     });
     expect(response).to.be.ok;
     expect(response.error).to.not.be.ok;
@@ -82,7 +83,8 @@ describe('basic auth', () => {
     await this.application.signOut();
     const response = await this.application.signIn({
       email: this.email,
-      password: 'wrongpassword'
+      password: 'wrongpassword',
+      awaitSync: true
     });
     expect(response).to.be.ok;
     expect(response.error).to.be.ok;
@@ -145,7 +147,8 @@ describe('basic auth', () => {
     /** Should login with new password */
     const signinResponse = await this.application.signIn({
       email: this.email,
-      password: newPassword
+      password: newPassword,
+      awaitSync: true
     });
 
     // await Factory.sleep(0.5);
@@ -193,7 +196,8 @@ describe('basic auth', () => {
       /** Should login with new password */
       const signinResponse = await this.application.signIn({
         email: this.email,
-        password: currentPassword
+        password: currentPassword,
+        awaitSync: true
       });
       expect(signinResponse).to.be.ok;
       expect(signinResponse.error).to.not.be.ok;

@@ -35,7 +35,8 @@ describe('online syncing', () => {
     this.signIn = async () => {
       await this.application.signIn({
         email: this.email,
-        password: this.password
+        password: this.password,
+        awaitSync: true
       });
     };
   });
@@ -224,7 +225,8 @@ describe('online syncing', () => {
     });
     await this.application.signIn({
       email: this.email,
-      password: this.password
+      password: this.password,
+      awaitSync: true
     });
   }).timeout(10000);
 
@@ -401,7 +403,8 @@ describe('online syncing', () => {
     await this.application.signOut();
     await this.application.signIn({
       email: this.email,
-      password: this.password
+      password: this.password,
+      awaitSync: true
     });
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
@@ -1024,7 +1027,8 @@ describe('online syncing', () => {
 
     await this.application.signIn({
       email: this.email,
-      password: this.password
+      password: this.password,
+      awaitSync: true
     });
 
     this.application.syncService.ut_setDatabaseLoaded(false);

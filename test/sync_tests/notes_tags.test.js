@@ -109,9 +109,11 @@ describe('notes + tags syncing', async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [notePayload, tagPayload]
+      payloads: [
+        notePayload, 
+        tagPayload
+      ]
     });
     const note = this.application.modelManager.notes[0];
     const tag = this.application.modelManager.tags[0];
@@ -127,7 +129,7 @@ describe('notes + tags syncing', async function() {
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(1);
 
-    tag.title = `${Math.random()}`
+    tag.title = `${Math.random()}`;
     tag.updated_at = Factory.yesterday();
     await this.application.saveItem({item: tag});
 
@@ -135,19 +137,20 @@ describe('notes + tags syncing', async function() {
     expect(this.application.modelManager.notes.length).to.equal(1);
     expect(this.application.modelManager.tags.length).to.equal(2);
     const tags = this.application.modelManager.tags;
-    const tag1 = tags[0];
-    const tag2 = tags[1];
+    /* New tags are unshifted onto .tags array */
+    const conflictedTag = tags[0];
+    const originalTag = tags[1];
 
-    expect(tag1.uuid).to.not.equal(tag2.uuid);
+    expect(conflictedTag.uuid).to.not.equal(originalTag.uuid);
 
-    expect(tag1.uuid).to.equal(tag.uuid);
-    expect(tag2.content.conflict_of).to.equal(tag1.uuid);
-    expect(tag1.notes.length).to.equal(tag2.notes.length);
-    expect(tag1.referencingItemsCount).to.equal(0);
-    expect(tag2.referencingItemsCount).to.equal(0);
+    expect(originalTag.uuid).to.equal(tag.uuid);
+    expect(conflictedTag.content.conflict_of).to.equal(originalTag.uuid);
+    expect(conflictedTag.notes.length).to.equal(originalTag.notes.length);
+    expect(conflictedTag.referencingItemsCount).to.equal(0);
+    expect(originalTag.referencingItemsCount).to.equal(0);
 
     // Two tags now link to this note
     expect(note.referencingItemsCount).to.equal(2);
     expect(note.allReferencingItems[0]).to.not.equal(note.allReferencingItems[1]);
   }).timeout(10000);
-})
+});

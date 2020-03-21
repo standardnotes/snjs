@@ -49,7 +49,8 @@ describe('singletons', () => {
     this.signIn = async () => {
       await this.application.signIn({
         email: this.email,
-        password: this.password
+        password: this.password,
+        awaitSync: true
       });
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';

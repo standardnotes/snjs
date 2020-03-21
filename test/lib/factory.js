@@ -160,7 +160,8 @@ export async function loginToApplication({ application, email, password, ephemer
     email: email,
     password: password,
     ephemeral: ephemeral,
-    mergeLocal: mergeLocal
+    mergeLocal: mergeLocal,
+    awaitSync: true
   });
 }
 
