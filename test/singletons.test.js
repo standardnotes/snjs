@@ -181,6 +181,27 @@ describe('singletons', () => {
     expect(allPrivs.length).to.equal(1);
   });
 
+  it('resolving singleton before first sync, then signing in, should result in correct number of instances', async function () {
+    /** Create privs and associate them with account */
+    const ogPrivs = await this.application.privilegesService.getPrivileges();
+    this.expectedItemCount++;
+    await this.application.sync(syncOptions);
+    await this.application.signOut();
+    
+    /** Create another instance while signed out */
+    await this.application.privilegesService.getPrivileges();
+    await Factory.loginToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+    /** After signing in, the instance retrieved from the server should be the one kept */
+    const latestPrivs = await this.application.privilegesService.getPrivileges();
+    expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
+    const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
+    expect(allPrivs.length).to.equal(1);
+  });
+
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
