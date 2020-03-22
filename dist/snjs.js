@@ -11430,8 +11430,15 @@ var PayloadCollection = /*#__PURE__*/function () {
 
     Object.freeze(this);
   }
+  /** @access public */
+
 
   _createClass(PayloadCollection, [{
+    key: "getAllPayloads",
+    value: function getAllPayloads() {
+      return this.allPayloads;
+    }
+  }, {
     key: "findPayload",
     value: function findPayload(id) {
       return this.payloadMap[id];
@@ -15644,7 +15651,7 @@ var REQUEST_PATH_REGISTER = '/auth';
 var REQUEST_PATH_LOGIN = '/auth/sign_in';
 var REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 var REQUEST_PATH_SYNC = '/items/sync';
-var API_VERSION = '20190520';
+var API_VERSION = '20200115';
 var SNApiService = /*#__PURE__*/function (_PureService) {
   _inherits(SNApiService, _PureService);
 
@@ -21386,7 +21393,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
             var item = _step.value;
 
             try {
-              if (!item.deleted) {
+              if (!item.deleted && !item.errorDecrypting) {
                 _this2.addHistoryEntryForItem(item);
               }
             } catch (e) {
@@ -25291,7 +25298,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 collection = _ref5.collection, sourceKey = _ref5.sourceKey;
                 return _context6.abrupt("return", this.mapPayloadsToLocalItems({
-                  payloads: collection.allPayloads,
+                  payloads: collection.getAllPayloads(),
                   source: collection.source,
                   sourceKey: sourceKey
                 }));
@@ -25560,13 +25567,8 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                   });
                   newItems.push(item);
                 }
-                /** Observers do not need to handle items that errored while decrypting. */
 
-
-                if (!item.errorDecrypting) {
-                  itemsToNotifyObserversOf.push(item);
-                }
-
+                itemsToNotifyObserversOf.push(item);
                 processed[item.uuid] = {
                   item: item,
                   payload: payload
@@ -31976,7 +31978,11 @@ var AccountSyncResponseResolver = /*#__PURE__*/function () {
 
               case 3:
                 collectionRetrieved = _context.sent;
-                collections.push(collectionRetrieved);
+
+                if (collectionRetrieved.getAllPayloads().length > 0) {
+                  collections.push(collectionRetrieved);
+                }
+
                 _context.next = 7;
                 return this.collectionByProcessingRawItems({
                   rawItems: this.response.rawSavedItems,
@@ -31985,7 +31991,11 @@ var AccountSyncResponseResolver = /*#__PURE__*/function () {
 
               case 7:
                 collectionSaved = _context.sent;
-                collections.push(collectionSaved);
+
+                if (collectionSaved.getAllPayloads().length > 0) {
+                  collections.push(collectionSaved);
+                }
+
                 _context.next = 11;
                 return this.collectionByProcessingRawItems({
                   rawItems: this.response.rawUuidConflictItems,
@@ -31994,7 +32004,11 @@ var AccountSyncResponseResolver = /*#__PURE__*/function () {
 
               case 11:
                 collectionUuidConflicts = _context.sent;
-                collections.push(collectionUuidConflicts);
+
+                if (collectionUuidConflicts.getAllPayloads().length > 0) {
+                  collections.push(collectionUuidConflicts);
+                }
+
                 _context.next = 15;
                 return this.collectionByProcessingRawItems({
                   rawItems: this.response.rawDataConflictItems,
@@ -32003,7 +32017,11 @@ var AccountSyncResponseResolver = /*#__PURE__*/function () {
 
               case 15:
                 collectionDataConflicts = _context.sent;
-                collections.push(collectionDataConflicts);
+
+                if (collectionDataConflicts.getAllPayloads().length > 0) {
+                  collections.push(collectionDataConflicts);
+                }
+
                 return _context.abrupt("return", collections);
 
               case 18:
@@ -32311,7 +32329,7 @@ var SyncOpStatus = /*#__PURE__*/function () {
     key: "setDownloadStatus",
     value: function setDownloadStatus(_ref3) {
       var downloaded = _ref3.downloaded;
-      this.downloaded = downloaded;
+      this.downloaded += downloaded;
       this.receiver(_Lib__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged);
     }
   }, {
