@@ -20,8 +20,9 @@ describe('keys', () => {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(async function () {
-    await this.application.deinit();
+  afterEach(function () {
+    this.application.deinit();
+    this.application = null;
   });
 
   it('validate isLocalStorageIntent', async function () {
