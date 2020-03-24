@@ -184,7 +184,7 @@ describe('storage manager', () => {
       password: this.password,
       ephemeral: true
     });
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     await this.application.setValue('bar', 'foo');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject({
@@ -255,7 +255,7 @@ describe('storage manager', () => {
       ephemeral: false
     });
 
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const values = this.application.storageService.values[ValueModesKeys.Unwrapped];
     expect(Object.keys(values).length).to.equal(0);
   });
@@ -270,7 +270,7 @@ describe('storage manager', () => {
 
     await Factory.createSyncedNote(this.application);
     expect(await Factory.storagePayloadCount(this.application)).to.equal(BASE_ITEM_COUNT + 1);
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(await Factory.storagePayloadCount(this.application)).to.equal(BASE_ITEM_COUNT);
   });
 });

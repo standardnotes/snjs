@@ -14,7 +14,7 @@ describe('offline syncing', () => {
 
   afterEach(async function() {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    await this.application.deinit();
+    this.application.deinit();
   });
 
   before(async function() {
@@ -70,5 +70,14 @@ describe('offline syncing', () => {
     const payload = rawPayloads2[0];
     expect(typeof payload.content).to.equal('string');
     expect(payload.content.startsWith(this.application.protocolService.getLatestVersion())).to.equal(true);
+  });
+
+  it.only('signing out while offline should succeed', async function () {
+    await Factory.createMappedNote(this.application);
+    this.expectedItemCount++;
+    await this.application.syncService.sync();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    expect(this.application.noAccount()).to.equal(true);
+    expect(this.application.getUser()).to.not.be.ok;
   });
 });

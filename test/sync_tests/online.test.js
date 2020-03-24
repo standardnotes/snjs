@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online syncing', () => {
+describe.only('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -30,7 +30,7 @@ describe('online syncing', () => {
       password: this.password
     });
     this.signOut = async () => {
-      await this.application.signOut();
+      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     };
     this.signIn = async () => {
       await this.application.signIn({
@@ -71,7 +71,7 @@ describe('online syncing', () => {
   it('should login and retrieve synced item', async function () {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
 
     await Factory.loginToApplication({
       application: this.application,
@@ -89,7 +89,7 @@ describe('online syncing', () => {
     await Factory.createManyMappedNotes(this.application, count);
     this.expectedItemCount += count;
     await this.application.sync();
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
     const promise = Factory.loginToApplication({
       application: this.application,
@@ -107,7 +107,7 @@ describe('online syncing', () => {
   }).timeout(20000);
 
   it('marking all items as needing sync with alternation should delete original payload', async function () {
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.syncService.markAllItemsAsNeedingSync({
@@ -121,7 +121,7 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it('having offline data then signing in should alternate uuid and merge with account', async function () {
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await Factory.loginToApplication({
@@ -216,7 +216,7 @@ describe('online syncing', () => {
   it('retrieving new items should not mark them as dirty', async function () {
     const originalNote = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     this.application.syncService.addEventObserver((event, data) => {
       if (event === SyncEvents.SingleSyncCompleted) {
         const note = this.application.findItem({ uuid: originalNote.uuid });
@@ -232,7 +232,7 @@ describe('online syncing', () => {
 
   it('allows me to save data after Ive signed out', async function () {
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(this.application.modelManager.itemsKeys.length).to.equal(1);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
@@ -400,7 +400,7 @@ describe('online syncing', () => {
     await this.application.saveItem({ item: note });
     this.expectedItemCount += 1;
 
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     await this.application.signIn({
       email: this.email,
       password: this.password,
@@ -1021,7 +1021,7 @@ describe('online syncing', () => {
     this.expectedItemCount += largeItemCount;
     await this.application.syncService.sync();
 
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
 

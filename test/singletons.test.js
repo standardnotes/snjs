@@ -44,7 +44,7 @@ describe('singletons', () => {
       password: this.password
     });
     this.signOut = async () => {
-      await this.application.signOut();
+      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     };
     this.signIn = async () => {
       await this.application.signIn({
@@ -166,7 +166,7 @@ describe('singletons', () => {
     const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
     await this.application.sync(syncOptions);
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Create another instance while signed out */
     await this.application.privilegesService.getPrivileges();
     await Factory.loginToApplication({
@@ -186,7 +186,7 @@ describe('singletons', () => {
     const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
     await this.application.sync(syncOptions);
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     
     /** Create another instance while signed out */
     await this.application.privilegesService.getPrivileges();

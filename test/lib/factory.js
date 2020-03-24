@@ -165,6 +165,15 @@ export async function loginToApplication({ application, email, password, ephemer
   });
 }
 
+/**
+ * Signing out of an application deinits it.
+ * A new one must be created.
+ */
+export async function signOutApplicationAndReturnNew(application) {
+  await application.signOut();
+  return createInitAppWithRandNamespace();
+}
+
 export function createItemParams(contentType) {
   const params = {
     uuid: generateUuid(),

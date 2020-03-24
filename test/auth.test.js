@@ -52,7 +52,7 @@ describe('basic auth', () => {
     });
 
     expect(await this.application.keyManager.getRootKey()).to.be.ok;
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
     expect(this.application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
@@ -64,7 +64,7 @@ describe('basic auth', () => {
       email: this.email,
       password: this.password
     });
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const response = await this.application.signIn({
       email: this.email,
       password: this.password,
@@ -80,7 +80,7 @@ describe('basic auth', () => {
       email: this.email,
       password: this.password
     });
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const response = await this.application.signIn({
       email: this.email,
       password: 'wrongpassword',
@@ -143,7 +143,7 @@ describe('basic auth', () => {
     await this.application.saveItem({item: note});
     this.expectedItemCount++;
   
-    await this.application.signOut();
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Should login with new password */
     const signinResponse = await this.application.signIn({
       email: this.email,
@@ -189,7 +189,7 @@ describe('basic auth', () => {
 
       await this.application.syncService.markAllItemsAsNeedingSync();
       await this.application.syncService.sync();
-      await this.application.signOut();
+      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
       expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
