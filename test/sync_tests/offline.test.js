@@ -72,7 +72,7 @@ describe('offline syncing', () => {
     expect(payload.content.startsWith(this.application.protocolService.getLatestVersion())).to.equal(true);
   });
 
-  it.only('signing out while offline should succeed', async function () {
+  it('signing out while offline should succeed', async function () {
     await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.syncService.sync();

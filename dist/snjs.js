@@ -129,33 +129,33 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/__webpack_require__.p="/dist/";/******/ /******/ /******/ // Load entry module and return exports
 /******/return __webpack_require__(__webpack_require__.s="./lib/main.js");/******/}(/************************************************************************/ /******/{/***/"./lib/crypto/pure_crypto.js":/*!***********************************!*\
   !*** ./lib/crypto/pure_crypto.js ***!
-  \***********************************/ /*! exports provided: SNPureCrypto */ /***/function libCryptoPure_cryptoJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"SNPureCrypto",function(){return SNPureCrypto;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);/* harmony import */var _Lib_web_utils__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! @Lib/web_utils */"./lib/web_utils.js");function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}function _createClass(Constructor,protoProps,staticProps){if(protoProps)_defineProperties(Constructor.prototype,protoProps);if(staticProps)_defineProperties(Constructor,staticProps);return Constructor;}/**
+  \***********************************/ /*! exports provided: SNPureCrypto */ /***/function libCryptoPure_cryptoJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"SNPureCrypto",function(){return SNPureCrypto;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);/* harmony import */var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! @Lib/utils */"./lib/utils/index.js");function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}function _createClass(Constructor,protoProps,staticProps){if(protoProps)_defineProperties(Constructor.prototype,protoProps);if(staticProps)_defineProperties(Constructor,staticProps);return Constructor;}/**
  * Abstract class with default implementations of basic helper functions.
  */var SNPureCrypto=/*#__PURE__*/function(){function SNPureCrypto(){_classCallCheck(this,SNPureCrypto);}_createClass(SNPureCrypto,[{key:"deinit",/** @access public */value:function deinit(){}/** Optional override */ /**
      * Generates a UUID string syncronously.
      * @returns {string}
-     */},{key:"generateUUIDSync",value:function generateUUIDSync(){return Object(_Lib_web_utils__WEBPACK_IMPORTED_MODULE_1__["generateUUIDSync"])();}/**
+     */},{key:"generateUUIDSync",value:function generateUUIDSync(){return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["generateUUIDSync"])();}/**
      * Generates a UUID string asyncronously.
      * Can be overriden by native platforms to provide async implementation
      * @returns {Promise<string>}
-     */},{key:"generateUUID",value:function(){var _generateUUID=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context){while(1){switch(_context.prev=_context.next){case 0:return _context.abrupt("return",Object(_Lib_web_utils__WEBPACK_IMPORTED_MODULE_1__["generateUUIDSync"])());case 1:case"end":return _context.stop();}}},_callee);}));function generateUUID(){return _generateUUID.apply(this,arguments);}return generateUUID;}()/**
+     */},{key:"generateUUID",value:function(){var _generateUUID=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context){while(1){switch(_context.prev=_context.next){case 0:return _context.abrupt("return",Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["generateUUIDSync"])());case 1:case"end":return _context.stop();}}},_callee);}));function generateUUID(){return _generateUUID.apply(this,arguments);}return generateUUID;}()/**
      * Constant-time string comparison 
      * @param {string} a
      * @param {string} b
      * @returns {boolean} Whether the strings are equal
      */},{key:"timingSafeEqual",value:function timingSafeEqual(a,b){var strA=String(a);var strB=String(b);var lenA=strA.length;var result=0;if(lenA!==strB.length){strB=strA;result=1;}for(var i=0;i<lenA;i++){result|=strA.charCodeAt(i)^strB.charCodeAt(i);}return result===0;}}]);return SNPureCrypto;}();/***/},/***/"./lib/crypto/webcrypto.js":/*!*********************************!*\
   !*** ./lib/crypto/webcrypto.js ***!
-  \*********************************/ /*! exports provided: SNWebCrypto */ /***/function libCryptoWebcryptoJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"SNWebCrypto",function(){return SNWebCrypto;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);/* harmony import */var _Crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! @Crypto/pure_crypto */"./lib/crypto/pure_crypto.js");/* harmony import */var _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(/*! @Lib/web_utils */"./lib/web_utils.js");/* harmony import */var _Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__(/*! @Lib/libsodium */"./lib/libsodium.js");function _typeof(obj){"@babel/helpers - typeof";if(typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"){_typeof=function _typeof(obj){return typeof obj;};}else{_typeof=function _typeof(obj){return obj&&typeof Symbol==="function"&&obj.constructor===Symbol&&obj!==Symbol.prototype?"symbol":typeof obj;};}return _typeof(obj);}function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}function _createClass(Constructor,protoProps,staticProps){if(protoProps)_defineProperties(Constructor.prototype,protoProps);if(staticProps)_defineProperties(Constructor,staticProps);return Constructor;}function _possibleConstructorReturn(self,call){if(call&&(_typeof(call)==="object"||typeof call==="function")){return call;}return _assertThisInitialized(self);}function _assertThisInitialized(self){if(self===void 0){throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return self;}function _get(target,property,receiver){if(typeof Reflect!=="undefined"&&Reflect.get){_get=Reflect.get;}else{_get=function _get(target,property,receiver){var base=_superPropBase(target,property);if(!base)return;var desc=Object.getOwnPropertyDescriptor(base,property);if(desc.get){return desc.get.call(receiver);}return desc.value;};}return _get(target,property,receiver||target);}function _superPropBase(object,property){while(!Object.prototype.hasOwnProperty.call(object,property)){object=_getPrototypeOf(object);if(object===null)break;}return object;}function _getPrototypeOf(o){_getPrototypeOf=Object.setPrototypeOf?Object.getPrototypeOf:function _getPrototypeOf(o){return o.__proto__||Object.getPrototypeOf(o);};return _getPrototypeOf(o);}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function");}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,writable:true,configurable:true}});if(superClass)_setPrototypeOf(subClass,superClass);}function _setPrototypeOf(o,p){_setPrototypeOf=Object.setPrototypeOf||function _setPrototypeOf(o,p){o.__proto__=p;return o;};return _setPrototypeOf(o,p);};var subtleCrypto=_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["getSubtleCrypto"]();var WebCryptoAlgs={AesCbc:'AES-CBC',Sha512:'SHA-512',Sha256:'SHA-256',Pbkdf2:'PBKDF2',Sha1:'SHA-1',Hmac:'HMAC'};var WebCryptoActions={DeriveBits:'deriveBits',Encrypt:'encrypt',Decrypt:'decrypt',Sign:'sign'};/**
+  \*********************************/ /*! exports provided: SNWebCrypto */ /***/function libCryptoWebcryptoJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"SNWebCrypto",function(){return SNWebCrypto;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);/* harmony import */var _Crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! @Crypto/pure_crypto */"./lib/crypto/pure_crypto.js");/* harmony import */var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(/*! @Lib/utils */"./lib/utils/index.js");/* harmony import */var _Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__=__webpack_require__(/*! @Lib/libsodium */"./lib/libsodium.js");function _typeof(obj){"@babel/helpers - typeof";if(typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"){_typeof=function _typeof(obj){return typeof obj;};}else{_typeof=function _typeof(obj){return obj&&typeof Symbol==="function"&&obj.constructor===Symbol&&obj!==Symbol.prototype?"symbol":typeof obj;};}return _typeof(obj);}function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}function _createClass(Constructor,protoProps,staticProps){if(protoProps)_defineProperties(Constructor.prototype,protoProps);if(staticProps)_defineProperties(Constructor,staticProps);return Constructor;}function _possibleConstructorReturn(self,call){if(call&&(_typeof(call)==="object"||typeof call==="function")){return call;}return _assertThisInitialized(self);}function _assertThisInitialized(self){if(self===void 0){throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return self;}function _get(target,property,receiver){if(typeof Reflect!=="undefined"&&Reflect.get){_get=Reflect.get;}else{_get=function _get(target,property,receiver){var base=_superPropBase(target,property);if(!base)return;var desc=Object.getOwnPropertyDescriptor(base,property);if(desc.get){return desc.get.call(receiver);}return desc.value;};}return _get(target,property,receiver||target);}function _superPropBase(object,property){while(!Object.prototype.hasOwnProperty.call(object,property)){object=_getPrototypeOf(object);if(object===null)break;}return object;}function _getPrototypeOf(o){_getPrototypeOf=Object.setPrototypeOf?Object.getPrototypeOf:function _getPrototypeOf(o){return o.__proto__||Object.getPrototypeOf(o);};return _getPrototypeOf(o);}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function");}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,writable:true,configurable:true}});if(superClass)_setPrototypeOf(subClass,superClass);}function _setPrototypeOf(o,p){_setPrototypeOf=Object.setPrototypeOf||function _setPrototypeOf(o,p){o.__proto__=p;return o;};return _setPrototypeOf(o,p);};var subtleCrypto=_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["getSubtleCrypto"]();var WebCryptoAlgs={AesCbc:'AES-CBC',Sha512:'SHA-512',Sha256:'SHA-256',Pbkdf2:'PBKDF2',Sha1:'SHA-1',Hmac:'HMAC'};var WebCryptoActions={DeriveBits:'deriveBits',Encrypt:'encrypt',Decrypt:'decrypt',Sign:'sign'};/**
  * The web crypto class allows access to a set of cryptographic primitives available
  * in a web environment, consisting of two main sources:
  * — Built-in browser WebCrypto
  * — Libsodium.js library integration
  */var SNWebCrypto=/*#__PURE__*/function(_SNPureCrypto){_inherits(SNWebCrypto,_SNPureCrypto);function SNWebCrypto(){var _this;_classCallCheck(this,SNWebCrypto);_this=_possibleConstructorReturn(this,_getPrototypeOf(SNWebCrypto).call(this));/** Functions using Libsodium must await this 
-     * promise before performing any library functions */_this.ready=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__["ready"];return _this;}/** @access public */_createClass(SNWebCrypto,[{key:"deinit",value:function deinit(){console.log("Deinit webcrypto");_get(_getPrototypeOf(SNWebCrypto.prototype),"deinit",this).call(this);this.ready=null;}/** 
+     * promise before performing any library functions */_this.ready=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__["ready"];return _this;}_createClass(SNWebCrypto,[{key:"deinit",value:function deinit(){_get(_getPrototypeOf(SNWebCrypto.prototype),"deinit",this).call(this);this.ready=null;}/** 
      * Derives a key from a password and salt using PBKDF2 via WebCrypto.
      * @access public 
-     * @param {string} password
-     * @param {string} salt - In hex format
+     * @param {string} password - utf8 string
+     * @param {string} salt - utf8 string
      * @param {number} iterations
      * @param {number} length - In bits
      * @returns {Promise<string|null>} Hex string
@@ -164,36 +164,36 @@ return /******/ (function(modules) { // webpackBootstrap
      * @access public
      * @param {number} bits - Length of key in bits
      * @returns {Promise<string>} A string key in hex format
-     */},{key:"generateRandomKey",value:function(){var _generateRandomKey=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(bits){var bytes,arrayBuffer;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:bytes=bits/8;arrayBuffer=_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["getGlobalScope"]().crypto.getRandomValues(new Uint8Array(bytes));return _context2.abrupt("return",_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](arrayBuffer));case 3:case"end":return _context2.stop();}}},_callee2);}));function generateRandomKey(_x5){return _generateRandomKey.apply(this,arguments);}return generateRandomKey;}()/** 
+     */},{key:"generateRandomKey",value:function(){var _generateRandomKey=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(bits){var bytes,arrayBuffer;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:bytes=bits/8;arrayBuffer=_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["getGlobalScope"]().crypto.getRandomValues(new Uint8Array(bytes));return _context2.abrupt("return",_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](arrayBuffer));case 3:case"end":return _context2.stop();}}},_callee2);}));function generateRandomKey(_x5){return _generateRandomKey.apply(this,arguments);}return generateRandomKey;}()/** 
      * Encrypts a string using AES-CBC via WebCrypto.
      * @access public 
      * @param {string} plaintext
      * @param {string} iv - In hex format
      * @param {string} key - In hex format
      * @returns {Promise<string>} Ciphertext in Base64 format.
-     */},{key:"aes256CbcEncrypt",value:function(){var _aes256CbcEncrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(plaintext,iv,key){var keyData,ivData,alg,importedKeyData,textData,result,ciphertext;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyData=_context3.sent;_context3.next=5;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](iv);case 5:ivData=_context3.sent;alg={name:WebCryptoAlgs.AesCbc,iv:ivData};_context3.next=9;return this.webCryptoImportKey(keyData,alg.name,[WebCryptoActions.Encrypt]);case 9:importedKeyData=_context3.sent;_context3.next=12;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](plaintext);case 12:textData=_context3.sent;_context3.next=15;return crypto.subtle.encrypt(alg,importedKeyData,textData);case 15:result=_context3.sent;_context3.next=18;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToBase64"](result);case 18:ciphertext=_context3.sent;return _context3.abrupt("return",ciphertext);case 20:case"end":return _context3.stop();}}},_callee3,this);}));function aes256CbcEncrypt(_x6,_x7,_x8){return _aes256CbcEncrypt.apply(this,arguments);}return aes256CbcEncrypt;}()/**
+     */},{key:"aes256CbcEncrypt",value:function(){var _aes256CbcEncrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(plaintext,iv,key){var keyData,ivData,alg,importedKeyData,textData,result,ciphertext;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyData=_context3.sent;_context3.next=5;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](iv);case 5:ivData=_context3.sent;alg={name:WebCryptoAlgs.AesCbc,iv:ivData};_context3.next=9;return this.webCryptoImportKey(keyData,alg.name,[WebCryptoActions.Encrypt]);case 9:importedKeyData=_context3.sent;_context3.next=12;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](plaintext);case 12:textData=_context3.sent;_context3.next=15;return crypto.subtle.encrypt(alg,importedKeyData,textData);case 15:result=_context3.sent;_context3.next=18;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToBase64"](result);case 18:ciphertext=_context3.sent;return _context3.abrupt("return",ciphertext);case 20:case"end":return _context3.stop();}}},_callee3,this);}));function aes256CbcEncrypt(_x6,_x7,_x8){return _aes256CbcEncrypt.apply(this,arguments);}return aes256CbcEncrypt;}()/**
      * Decrypts a string using AES-CBC via WebCrypto.
      * @access public
      * @param {string} ciphertext - Base64 format
      * @param {string} iv - In hex format
      * @param {string} key - In hex format
      * @returns {Promise<string|null>} Plain utf8 string or null if decryption fails
-     */},{key:"aes256CbcDecrypt",value:function(){var _aes256CbcDecrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(ciphertext,iv,key){var keyData,ivData,alg,importedKeyData,textData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5){while(1){switch(_context5.prev=_context5.next){case 0:_context5.next=2;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyData=_context5.sent;_context5.next=5;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](iv);case 5:ivData=_context5.sent;alg={name:WebCryptoAlgs.AesCbc,iv:ivData};_context5.next=9;return this.webCryptoImportKey(keyData,alg.name,[WebCryptoActions.Decrypt]);case 9:importedKeyData=_context5.sent;_context5.next=12;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["base64ToArrayBuffer"](ciphertext);case 12:textData=_context5.sent;return _context5.abrupt("return",crypto.subtle.decrypt(alg,importedKeyData,textData).then(/*#__PURE__*/function(){var _ref=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(result){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:return _context4.abrupt("return",_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToString"](result));case 1:case"end":return _context4.stop();}}},_callee4);}));return function(_x12){return _ref.apply(this,arguments);};}()).catch(function(error){console.error('Error performing AES-CBC decryption:',error);return null;}));case 14:case"end":return _context5.stop();}}},_callee5,this);}));function aes256CbcDecrypt(_x9,_x10,_x11){return _aes256CbcDecrypt.apply(this,arguments);}return aes256CbcDecrypt;}()/** 
+     */},{key:"aes256CbcDecrypt",value:function(){var _aes256CbcDecrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(ciphertext,iv,key){var keyData,ivData,alg,importedKeyData,textData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5){while(1){switch(_context5.prev=_context5.next){case 0:_context5.next=2;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyData=_context5.sent;_context5.next=5;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](iv);case 5:ivData=_context5.sent;alg={name:WebCryptoAlgs.AesCbc,iv:ivData};_context5.next=9;return this.webCryptoImportKey(keyData,alg.name,[WebCryptoActions.Decrypt]);case 9:importedKeyData=_context5.sent;_context5.next=12;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["base64ToArrayBuffer"](ciphertext);case 12:textData=_context5.sent;return _context5.abrupt("return",crypto.subtle.decrypt(alg,importedKeyData,textData).then(/*#__PURE__*/function(){var _ref=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(result){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:return _context4.abrupt("return",_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToString"](result));case 1:case"end":return _context4.stop();}}},_callee4);}));return function(_x12){return _ref.apply(this,arguments);};}()).catch(function(error){console.error('Error performing AES-CBC decryption:',error);return null;}));case 14:case"end":return _context5.stop();}}},_callee5,this);}));function aes256CbcDecrypt(_x9,_x10,_x11){return _aes256CbcDecrypt.apply(this,arguments);}return aes256CbcDecrypt;}()/** 
      * Runs HMAC with SHA-256 on a message with key.
      * @access public 
      * @param {string} message - Plain utf8 string
      * @param {string} key - In hex format
      * @returns {Promise<string|null>} Hex string or null if computation fails
-     */},{key:"hmac256",value:function(){var _hmac=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(message,key){var keyHexData,keyData,messageData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6){while(1){switch(_context6.prev=_context6.next){case 0:_context6.next=2;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyHexData=_context6.sent;_context6.next=5;return this.webCryptoImportKey(keyHexData,WebCryptoAlgs.Hmac,[WebCryptoActions.Sign],{name:WebCryptoAlgs.Sha256});case 5:keyData=_context6.sent;_context6.next=8;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](message);case 8:messageData=_context6.sent;return _context6.abrupt("return",crypto.subtle.sign({name:WebCryptoAlgs.Hmac},keyData,messageData).then(function(signature){return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](signature);}).catch(function(err){console.error('Error computing HMAC:',err);return null;}));case 10:case"end":return _context6.stop();}}},_callee6,this);}));function hmac256(_x13,_x14){return _hmac.apply(this,arguments);}return hmac256;}()/** 
+     */},{key:"hmac256",value:function(){var _hmac=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(message,key){var keyHexData,keyData,messageData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6){while(1){switch(_context6.prev=_context6.next){case 0:_context6.next=2;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"](key);case 2:keyHexData=_context6.sent;_context6.next=5;return this.webCryptoImportKey(keyHexData,WebCryptoAlgs.Hmac,[WebCryptoActions.Sign],{name:WebCryptoAlgs.Sha256});case 5:keyData=_context6.sent;_context6.next=8;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](message);case 8:messageData=_context6.sent;return _context6.abrupt("return",crypto.subtle.sign({name:WebCryptoAlgs.Hmac},keyData,messageData).then(function(signature){return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](signature);}).catch(function(err){console.error('Error computing HMAC:',err);return null;}));case 10:case"end":return _context6.stop();}}},_callee6,this);}));function hmac256(_x13,_x14){return _hmac.apply(this,arguments);}return hmac256;}()/** 
      * @access public 
      * @param {string} text - Plain utf8 string
      * @returns {Promise<string>} Hex string
-     */},{key:"sha256",value:function(){var _sha=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(text){var textData,digest;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7){while(1){switch(_context7.prev=_context7.next){case 0:_context7.next=2;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](text);case 2:textData=_context7.sent;_context7.next=5;return crypto.subtle.digest(WebCryptoAlgs.Sha256,textData);case 5:digest=_context7.sent;return _context7.abrupt("return",_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](digest));case 7:case"end":return _context7.stop();}}},_callee7);}));function sha256(_x15){return _sha.apply(this,arguments);}return sha256;}()/**
+     */},{key:"sha256",value:function(){var _sha=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(text){var textData,digest;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7){while(1){switch(_context7.prev=_context7.next){case 0:_context7.next=2;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](text);case 2:textData=_context7.sent;_context7.next=5;return crypto.subtle.digest(WebCryptoAlgs.Sha256,textData);case 5:digest=_context7.sent;return _context7.abrupt("return",_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](digest));case 7:case"end":return _context7.stop();}}},_callee7);}));function sha256(_x15){return _sha.apply(this,arguments);}return sha256;}()/**
      * Use only for legacy applications.
      * @access public
      * @param {string} text - Plain utf8 string
      * @returns {Promise<string>} Hex string
-     */},{key:"unsafeSha1",value:function(){var _unsafeSha=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(text){var textData,digest;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8){while(1){switch(_context8.prev=_context8.next){case 0:_context8.next=2;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](text);case 2:textData=_context8.sent;_context8.next=5;return crypto.subtle.digest(WebCryptoAlgs.Sha1,textData);case 5:digest=_context8.sent;return _context8.abrupt("return",_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](digest));case 7:case"end":return _context8.stop();}}},_callee8);}));function unsafeSha1(_x16){return _unsafeSha.apply(this,arguments);}return unsafeSha1;}()/** 
+     */},{key:"unsafeSha1",value:function(){var _unsafeSha=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(text){var textData,digest;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8){while(1){switch(_context8.prev=_context8.next){case 0:_context8.next=2;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](text);case 2:textData=_context8.sent;_context8.next=5;return crypto.subtle.digest(WebCryptoAlgs.Sha1,textData);case 5:digest=_context8.sent;return _context8.abrupt("return",_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](digest));case 7:case"end":return _context8.stop();}}},_callee8);}));function unsafeSha1(_x16){return _unsafeSha.apply(this,arguments);}return unsafeSha1;}()/** 
      * Converts a raw string key to a WebCrypto CryptoKey object.
      * @access private 
      * @param {string|Buffer} rawKey
@@ -208,15 +208,15 @@ return /******/ (function(modules) { // webpackBootstrap
      * @param {string|WebCryptoAlgs} hash.name
      *    The name of the hashing function to use with HMAC.
      * @returns {Promise<CryptoKey|null>} A WebCrypto CryptoKey object
-     */},{key:"webCryptoImportKey",value:function(){var _webCryptoImportKey=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(rawKey,alg,actions,hash){var keyData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9){while(1){switch(_context9.prev=_context9.next){case 0:if(!_Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["isString"](rawKey)){_context9.next=6;break;}_context9.next=3;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](rawKey);case 3:_context9.t0=_context9.sent;_context9.next=7;break;case 6:_context9.t0=rawKey;case 7:keyData=_context9.t0;return _context9.abrupt("return",subtleCrypto.importKey('raw',keyData,{name:alg,hash:hash},false,actions).then(function(key){return key;}).catch(function(err){console.error(err);return null;}));case 9:case"end":return _context9.stop();}}},_callee9);}));function webCryptoImportKey(_x17,_x18,_x19,_x20){return _webCryptoImportKey.apply(this,arguments);}return webCryptoImportKey;}()/** 
+     */},{key:"webCryptoImportKey",value:function(){var _webCryptoImportKey=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(rawKey,alg,actions,hash){var keyData;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9){while(1){switch(_context9.prev=_context9.next){case 0:if(!_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"](rawKey)){_context9.next=6;break;}_context9.next=3;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](rawKey);case 3:_context9.t0=_context9.sent;_context9.next=7;break;case 6:_context9.t0=rawKey;case 7:keyData=_context9.t0;return _context9.abrupt("return",subtleCrypto.importKey('raw',keyData,{name:alg,hash:hash},false,actions).then(function(key){return key;}).catch(function(err){console.error(err);return null;}));case 9:case"end":return _context9.stop();}}},_callee9);}));function webCryptoImportKey(_x17,_x18,_x19,_x20){return _webCryptoImportKey.apply(this,arguments);}return webCryptoImportKey;}()/** 
      * Performs WebCrypto PBKDF2 derivation.
      * @access private
      * @param {CryptoKey} key - A WebCrypto CryptoKey object
-     * @param {string} salt - In hex format
+     * @param {string} salt - In utf8 format
      * @param {number} iterations
      * @param {number} length - In bits
      * @returns {Promise<string|null>} Hex string
-     */},{key:"webCryptoDeriveBits",value:function(){var _webCryptoDeriveBits=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(key,salt,iterations,length){var params;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10){while(1){switch(_context10.prev=_context10.next){case 0:_context10.t0=WebCryptoAlgs.Pbkdf2;_context10.next=3;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](salt);case 3:_context10.t1=_context10.sent;_context10.t2=iterations;_context10.t3={name:WebCryptoAlgs.Sha512};params={name:_context10.t0,salt:_context10.t1,iterations:_context10.t2,hash:_context10.t3};return _context10.abrupt("return",subtleCrypto.deriveBits(params,key,length).then(function(bits){return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](new Uint8Array(bits));}).catch(function(err){console.error(err);return null;}));case 8:case"end":return _context10.stop();}}},_callee10);}));function webCryptoDeriveBits(_x21,_x22,_x23,_x24){return _webCryptoDeriveBits.apply(this,arguments);}return webCryptoDeriveBits;}()/**
+     */},{key:"webCryptoDeriveBits",value:function(){var _webCryptoDeriveBits=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(key,salt,iterations,length){var params;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10){while(1){switch(_context10.prev=_context10.next){case 0:_context10.t0=WebCryptoAlgs.Pbkdf2;_context10.next=3;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"](salt);case 3:_context10.t1=_context10.sent;_context10.t2=iterations;_context10.t3={name:WebCryptoAlgs.Sha512};params={name:_context10.t0,salt:_context10.t1,iterations:_context10.t2,hash:_context10.t3};return _context10.abrupt("return",subtleCrypto.deriveBits(params,key,length).then(function(bits){return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"](new Uint8Array(bits));}).catch(function(err){console.error(err);return null;}));case 8:case"end":return _context10.stop();}}},_callee10);}));function webCryptoDeriveBits(_x21,_x22,_x23,_x24){return _webCryptoDeriveBits.apply(this,arguments);}return webCryptoDeriveBits;}()/**
      * Derives a key from a password and salt using 
      * argon2id (crypto_pwhash_ALG_DEFAULT).
      * @param {string} password - Plain text string
@@ -225,27 +225,92 @@ return /******/ (function(modules) { // webpackBootstrap
      * @param {string} bytes - The algorithm's memory limit (memlimit) (recommended min 67108864)
      * @param {string} length - The output key length
      * @returns {Promise<string>} Derived key in hex format
-     */},{key:"argon2",value:function(){var _argon=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(password,salt,iterations,bytes,length){var result;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11){while(1){switch(_context11.prev=_context11.next){case 0:_context11.next=2;return this.ready;case 2:_context11.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context11.t1=length;_context11.next=6;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](password,'binary');case 6:_context11.t2=_context11.sent;_context11.next=9;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](salt,'hex');case 9:_context11.t3=_context11.sent;_context11.t4=iterations;_context11.t5=bytes;_context11.t6=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__["crypto_pwhash_ALG_DEFAULT"];result=_context11.t0.crypto_pwhash.call(_context11.t0,_context11.t1,_context11.t2,_context11.t3,_context11.t4,_context11.t5,_context11.t6,'hex');return _context11.abrupt("return",result);case 15:case"end":return _context11.stop();}}},_callee11,this);}));function argon2(_x25,_x26,_x27,_x28,_x29){return _argon.apply(this,arguments);}return argon2;}()/**
+     */},{key:"argon2",value:function(){var _argon=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(password,salt,iterations,bytes,length){var result;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11){while(1){switch(_context11.prev=_context11.next){case 0:_context11.next=2;return this.ready;case 2:_context11.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context11.t1=length;_context11.next=6;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](password,'binary');case 6:_context11.t2=_context11.sent;_context11.next=9;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](salt,'hex');case 9:_context11.t3=_context11.sent;_context11.t4=iterations;_context11.t5=bytes;_context11.t6=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__["crypto_pwhash_ALG_DEFAULT"];result=_context11.t0.crypto_pwhash.call(_context11.t0,_context11.t1,_context11.t2,_context11.t3,_context11.t4,_context11.t5,_context11.t6,'hex');return _context11.abrupt("return",result);case 15:case"end":return _context11.stop();}}},_callee11,this);}));function argon2(_x25,_x26,_x27,_x28,_x29){return _argon.apply(this,arguments);}return argon2;}()/**
      * Encrypt a message (and associated data) with XChaCha20-Poly1305.
      * @param {string|Buffer} plaintext
      * @param {string|Buffer} nonce - In hex format
      * @param {string|Buffer} key - In hex format
      * @param {string|Buffer} assocData
      * @returns {Promise<string>} Base64 ciphertext string
-     */},{key:"xchacha20Encrypt",value:function(){var _xchacha20Encrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(plaintext,nonce,key,assocData){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12){while(1){switch(_context12.prev=_context12.next){case 0:_context12.next=2;return this.ready;case 2:if(!(nonce.length!==48)){_context12.next=4;break;}throw'Nonce must be 24 bytes';case 4:_context12.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context12.next=7;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](plaintext);case 7:_context12.t1=_context12.sent;_context12.next=10;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](assocData);case 10:_context12.t2=_context12.sent;_context12.next=13;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](nonce,'hex');case 13:_context12.t3=_context12.sent;_context12.next=16;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](key,'hex');case 16:_context12.t4=_context12.sent;return _context12.abrupt("return",_context12.t0.crypto_aead_xchacha20poly1305_ietf_encrypt.call(_context12.t0,_context12.t1,_context12.t2,null,_context12.t3,_context12.t4,'base64'));case 18:case"end":return _context12.stop();}}},_callee12,this);}));function xchacha20Encrypt(_x30,_x31,_x32,_x33){return _xchacha20Encrypt.apply(this,arguments);}return xchacha20Encrypt;}()/**
+     */},{key:"xchacha20Encrypt",value:function(){var _xchacha20Encrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(plaintext,nonce,key,assocData){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12){while(1){switch(_context12.prev=_context12.next){case 0:_context12.next=2;return this.ready;case 2:if(!(nonce.length!==48)){_context12.next=4;break;}throw'Nonce must be 24 bytes';case 4:_context12.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context12.next=7;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](plaintext);case 7:_context12.t1=_context12.sent;_context12.next=10;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](assocData);case 10:_context12.t2=_context12.sent;_context12.next=13;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](nonce,'hex');case 13:_context12.t3=_context12.sent;_context12.next=16;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](key,'hex');case 16:_context12.t4=_context12.sent;return _context12.abrupt("return",_context12.t0.crypto_aead_xchacha20poly1305_ietf_encrypt.call(_context12.t0,_context12.t1,_context12.t2,null,_context12.t3,_context12.t4,'base64'));case 18:case"end":return _context12.stop();}}},_callee12,this);}));function xchacha20Encrypt(_x30,_x31,_x32,_x33){return _xchacha20Encrypt.apply(this,arguments);}return xchacha20Encrypt;}()/**
      * Decrypt a message (and associated data) with XChaCha20-Poly1305
      * @param {string|Buffer} ciphertext
      * @param {string|Buffer} nonce - In hex format
      * @param {string|Buffer} key - In hex format
      * @param {string|Buffer} assocData
      * @returns {Promise<string|null>} Plain utf8 string or null if decryption fails
-     */},{key:"xchacha20Decrypt",value:function(){var _xchacha20Decrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(ciphertext,nonce,key,assocData){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13){while(1){switch(_context13.prev=_context13.next){case 0:_context13.next=2;return this.ready;case 2:if(!(nonce.length!==48)){_context13.next=4;break;}throw'Nonce must be 24 bytes';case 4:_context13.prev=4;_context13.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context13.next=8;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](ciphertext,'base64');case 8:_context13.t1=_context13.sent;_context13.next=11;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](assocData);case 11:_context13.t2=_context13.sent;_context13.next=14;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](nonce,'hex');case 14:_context13.t3=_context13.sent;_context13.next=17;return _Lib_web_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](key,'hex');case 17:_context13.t4=_context13.sent;return _context13.abrupt("return",_context13.t0.crypto_aead_xchacha20poly1305_ietf_decrypt.call(_context13.t0,null,_context13.t1,_context13.t2,_context13.t3,_context13.t4,'text'));case 21:_context13.prev=21;_context13.t5=_context13["catch"](4);return _context13.abrupt("return",null);case 24:case"end":return _context13.stop();}}},_callee13,this,[[4,21]]);}));function xchacha20Decrypt(_x34,_x35,_x36,_x37){return _xchacha20Decrypt.apply(this,arguments);}return xchacha20Decrypt;}()}]);return SNWebCrypto;}(_Crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_1__["SNPureCrypto"]);/***/},/***/"./lib/libsodium.js":/*!**************************!*\
+     */},{key:"xchacha20Decrypt",value:function(){var _xchacha20Decrypt=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(ciphertext,nonce,key,assocData){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13){while(1){switch(_context13.prev=_context13.next){case 0:_context13.next=2;return this.ready;case 2:if(!(nonce.length!==48)){_context13.next=4;break;}throw'Nonce must be 24 bytes';case 4:_context13.prev=4;_context13.t0=_Lib_libsodium__WEBPACK_IMPORTED_MODULE_3__;_context13.next=8;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](ciphertext,'base64');case 8:_context13.t1=_context13.sent;_context13.next=11;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](assocData);case 11:_context13.t2=_context13.sent;_context13.next=14;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](nonce,'hex');case 14:_context13.t3=_context13.sent;_context13.next=17;return _Lib_utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"](key,'hex');case 17:_context13.t4=_context13.sent;return _context13.abrupt("return",_context13.t0.crypto_aead_xchacha20poly1305_ietf_decrypt.call(_context13.t0,null,_context13.t1,_context13.t2,_context13.t3,_context13.t4,'text'));case 21:_context13.prev=21;_context13.t5=_context13["catch"](4);return _context13.abrupt("return",null);case 24:case"end":return _context13.stop();}}},_callee13,this,[[4,21]]);}));function xchacha20Decrypt(_x34,_x35,_x36,_x37){return _xchacha20Decrypt.apply(this,arguments);}return xchacha20Decrypt;}()}]);return SNWebCrypto;}(_Crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_1__["SNPureCrypto"]);/***/},/***/"./lib/libsodium.js":/*!**************************!*\
   !*** ./lib/libsodium.js ***!
-  \**************************/ /*! exports provided: ready, crypto_pwhash, crypto_pwhash_ALG_DEFAULT, crypto_aead_xchacha20poly1305_ietf_encrypt, crypto_aead_xchacha20poly1305_ietf_decrypt */ /***/function libLibsodiumJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony import */var libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! libsodium-wrappers */"./node_modules/libsodium-wrappers/dist/modules/libsodium-wrappers.js");/* harmony import */var libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__);/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"ready",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["ready"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_pwhash",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_pwhash"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_pwhash_ALG_DEFAULT",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_pwhash_ALG_DEFAULT"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_aead_xchacha20poly1305_ietf_encrypt",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_aead_xchacha20poly1305_ietf_encrypt"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_aead_xchacha20poly1305_ietf_decrypt",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_aead_xchacha20poly1305_ietf_decrypt"];});/* eslint-disable camelcase */ /***/},/***/"./lib/main.js":/*!*********************!*\
+  \**************************/ /*! exports provided: ready, crypto_pwhash, crypto_pwhash_ALG_DEFAULT, crypto_aead_xchacha20poly1305_ietf_encrypt, crypto_aead_xchacha20poly1305_ietf_decrypt, to_base64, from_base64, base64_variants, from_hex, to_hex, from_string, to_string */ /***/function libLibsodiumJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony import */var libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! libsodium-wrappers */"./node_modules/libsodium-wrappers/dist/modules/libsodium-wrappers.js");/* harmony import */var libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__);/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"ready",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["ready"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_pwhash",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_pwhash"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_pwhash_ALG_DEFAULT",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_pwhash_ALG_DEFAULT"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_aead_xchacha20poly1305_ietf_encrypt",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_aead_xchacha20poly1305_ietf_encrypt"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"crypto_aead_xchacha20poly1305_ietf_decrypt",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["crypto_aead_xchacha20poly1305_ietf_decrypt"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"to_base64",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["to_base64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"from_base64",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["from_base64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64_variants",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["base64_variants"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"from_hex",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["from_hex"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"to_hex",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["to_hex"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"from_string",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["from_string"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"to_string",function(){return libsodium_wrappers__WEBPACK_IMPORTED_MODULE_0__["to_string"];});/* eslint-disable camelcase */ /***/},/***/"./lib/main.js":/*!*********************!*\
   !*** ./lib/main.js ***!
-  \*********************/ /*! exports provided: SNPureCrypto, SNWebCrypto, isWebCryptoAvailable, Buffer, base64Encode, base64Decode, base64ToHex, hexToBase64 */ /***/function libMainJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony import */var _crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! ./crypto/pure_crypto */"./lib/crypto/pure_crypto.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"SNPureCrypto",function(){return _crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_0__["SNPureCrypto"];});/* harmony import */var _crypto_webcrypto__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! ./crypto/webcrypto */"./lib/crypto/webcrypto.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"SNWebCrypto",function(){return _crypto_webcrypto__WEBPACK_IMPORTED_MODULE_1__["SNWebCrypto"];});/* harmony import */var _web_utils__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(/*! ./web_utils */"./lib/web_utils.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"isWebCryptoAvailable",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["isWebCryptoAvailable"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"Buffer",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["Buffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Encode",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["base64Encode"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Decode",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["base64Decode"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64ToHex",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["base64ToHex"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"hexToBase64",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_2__["hexToBase64"];});/***/},/***/"./lib/web_utils.js":/*!**************************!*\
-  !*** ./lib/web_utils.js ***!
-  \**************************/ /*! exports provided: Buffer, getGlobalScope, ieOrEdge, isWebCryptoAvailable, getSubtleCrypto, generateUUIDSync, isString, stringToArrayBuffer, arrayBufferToString, arrayBufferToHexString, hexStringToArrayBuffer, base64ToArrayBuffer, arrayBufferToBase64, hexToBase64, base64ToHex, base64Encode, base64Decode, toBuffer */ /***/function libWeb_utilsJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* WEBPACK VAR INJECTION */(function(global){/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"Buffer",function(){return Buffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"getGlobalScope",function(){return getGlobalScope;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"ieOrEdge",function(){return ieOrEdge;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"isWebCryptoAvailable",function(){return isWebCryptoAvailable;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"getSubtleCrypto",function(){return getSubtleCrypto;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"generateUUIDSync",function(){return generateUUIDSync;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"isString",function(){return isString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"stringToArrayBuffer",function(){return stringToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToString",function(){return arrayBufferToString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToHexString",function(){return arrayBufferToHexString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"hexStringToArrayBuffer",function(){return hexStringToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64ToArrayBuffer",function(){return base64ToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToBase64",function(){return arrayBufferToBase64;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"hexToBase64",function(){return hexToBase64;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64ToHex",function(){return base64ToHex;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64Encode",function(){return base64Encode;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64Decode",function(){return base64Decode;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"toBuffer",function(){return toBuffer;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}var arrayToBuffer=__webpack_require__(/*! typedarray-to-buffer */"./node_modules/typedarray-to-buffer/index.js");var Buffer=__webpack_require__(/*! buffer/ */"./node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer;/**
+  \*********************/ /*! exports provided: SNPureCrypto, SNWebCrypto, isWebCryptoAvailable, Buffer, stringToArrayBuffer, arrayBufferToString, arrayBufferToHexString, hexStringToArrayBuffer, base64ToArrayBuffer, arrayBufferToBase64, hexToBase64, base64ToHex, base64Encode, base64Decode, toBuffer */ /***/function libMainJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony import */var _crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! ./crypto/pure_crypto */"./lib/crypto/pure_crypto.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"SNPureCrypto",function(){return _crypto_pure_crypto__WEBPACK_IMPORTED_MODULE_0__["SNPureCrypto"];});/* harmony import */var _crypto_webcrypto__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! ./crypto/webcrypto */"./lib/crypto/webcrypto.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"SNWebCrypto",function(){return _crypto_webcrypto__WEBPACK_IMPORTED_MODULE_1__["SNWebCrypto"];});/* harmony import */var _utils__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(/*! ./utils */"./lib/utils/index.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"isWebCryptoAvailable",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["isWebCryptoAvailable"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"Buffer",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["Buffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"stringToArrayBuffer",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["stringToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToString",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToString"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToHexString",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToHexString"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"hexStringToArrayBuffer",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["hexStringToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64ToArrayBuffer",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["base64ToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToBase64",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["arrayBufferToBase64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"hexToBase64",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["hexToBase64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64ToHex",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["base64ToHex"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Encode",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["base64Encode"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Decode",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["base64Decode"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"toBuffer",function(){return _utils__WEBPACK_IMPORTED_MODULE_2__["toBuffer"];});/***/},/***/"./lib/utils/common_utils.js":/*!***********************************!*\
+  !*** ./lib/utils/common_utils.js ***!
+  \***********************************/ /*! exports provided: Buffer, isString, stringToArrayBuffer, arrayBufferToString, arrayBufferToHexString, hexStringToArrayBuffer, base64ToArrayBuffer, arrayBufferToBase64, hexToBase64, base64ToHex, base64Encode, base64Decode, toBuffer */ /***/function libUtilsCommon_utilsJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"Buffer",function(){return Buffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"isString",function(){return isString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"stringToArrayBuffer",function(){return stringToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToString",function(){return arrayBufferToString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToHexString",function(){return arrayBufferToHexString;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"hexStringToArrayBuffer",function(){return hexStringToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64ToArrayBuffer",function(){return base64ToArrayBuffer;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"arrayBufferToBase64",function(){return arrayBufferToBase64;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"hexToBase64",function(){return hexToBase64;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64ToHex",function(){return base64ToHex;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64Encode",function(){return base64Encode;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"base64Decode",function(){return base64Decode;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"toBuffer",function(){return toBuffer;});/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! @babel/runtime/regenerator */"./node_modules/@babel/runtime/regenerator/index.js");/* harmony import */var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default=/*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);/* harmony import */var _libsodium__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! ../libsodium */"./lib/libsodium.js");function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){try{var info=gen[key](arg);var value=info.value;}catch(error){reject(error);return;}if(info.done){resolve(value);}else{Promise.resolve(value).then(_next,_throw);}}function _asyncToGenerator(fn){return function(){var self=this,args=arguments;return new Promise(function(resolve,reject){var gen=fn.apply(self,args);function _next(value){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);}function _throw(err){asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);}_next(undefined);});};}/* eslint-disable camelcase */ /**
+ * Libsodium's to_* functions take either a Buffer or String, but do not take raw buffers,
+ * as may be returned by WebCrypto API.
+ */var arrayToBuffer=__webpack_require__(/*! typedarray-to-buffer */"./node_modules/typedarray-to-buffer/index.js");var Buffer=__webpack_require__(/*! buffer/ */"./node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer;var Format={Utf8:'utf8',Base64:'base64',Hex:'hex',Binary:'binary'};/**
+ * Determines if the input value is a string
+ * @access public
+ * @returns {boolean}
+ */function isString(value){return typeof value==='string'||value instanceof String;}/**
+ * Converts a plain string into an ArrayBuffer
+ * @access public
+ * @param {string} string - A plain string
+ * @returns {ArrayBuffer}
+ */function stringToArrayBuffer(_x){return _stringToArrayBuffer.apply(this,arguments);}/**
+ * Converts an ArrayBuffer into a plain string
+ * @access public
+ * @param {ArrayBuffer} arrayBuffer
+ * @returns {string} Plain string
+ */function _stringToArrayBuffer(){_stringToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(string){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context){while(1){switch(_context.prev=_context.next){case 0:if(isString(string)){_context.next=2;break;}throw Error('Attempting to convert non-string to arrayBuffer');case 2:_context.next=4;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 4:return _context.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_string"])(string));case 5:case"end":return _context.stop();}}},_callee);}));return _stringToArrayBuffer.apply(this,arguments);}function arrayBufferToString(_x2){return _arrayBufferToString.apply(this,arguments);}/**
+ * Converts an ArrayBuffer into a hex string
+ * @access public
+ * @param {ArrayBuffer} arrayBuffer
+ * @returns {string} Hex string
+ */function _arrayBufferToString(){_arrayBufferToString=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(arrayBuffer){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:_context2.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context2.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_string"])(arrayBuffer));case 3:case"end":return _context2.stop();}}},_callee2);}));return _arrayBufferToString.apply(this,arguments);}function arrayBufferToHexString(_x3){return _arrayBufferToHexString.apply(this,arguments);}/**
+ * Converts a hex string into an ArrayBuffer
+ * @access public
+ * @param {string} hex - A hex string
+ * @returns {ArrayBuffer}
+ */function _arrayBufferToHexString(){_arrayBufferToHexString=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(arrayBuffer){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context3.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_hex"])(Buffer.from(arrayBuffer)));case 3:case"end":return _context3.stop();}}},_callee3);}));return _arrayBufferToHexString.apply(this,arguments);}function hexStringToArrayBuffer(_x4){return _hexStringToArrayBuffer.apply(this,arguments);}/**
+ * Converts a base64 string into an ArrayBuffer
+ * @access public
+ * @param {string} base64 - A base64 string
+ * @returns {ArrayBuffer}
+ */function _hexStringToArrayBuffer(){_hexStringToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(hex){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context4.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_hex"])(hex));case 3:case"end":return _context4.stop();}}},_callee4);}));return _hexStringToArrayBuffer.apply(this,arguments);}function base64ToArrayBuffer(_x5){return _base64ToArrayBuffer.apply(this,arguments);}/**
+ * Converts an ArrayBuffer into a base64 string
+ * @access public
+ * @param {ArrayBuffer} buffer
+ * @returns {string} base64 string
+ */function _base64ToArrayBuffer(){_base64ToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(base64){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5){while(1){switch(_context5.prev=_context5.next){case 0:_context5.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context5.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_base64"])(base64,_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL));case 3:case"end":return _context5.stop();}}},_callee5);}));return _base64ToArrayBuffer.apply(this,arguments);}function arrayBufferToBase64(_x6){return _arrayBufferToBase.apply(this,arguments);}/**
+ * Converts a hex string into a base64 string
+ * @access public
+ * @param {string} hex - A hex string
+ * @returns {string} A base64 string
+ */function _arrayBufferToBase(){_arrayBufferToBase=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(arrayBuffer){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6){while(1){switch(_context6.prev=_context6.next){case 0:_context6.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context6.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_base64"])(Buffer.from(arrayBuffer),_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL));case 3:case"end":return _context6.stop();}}},_callee6);}));return _arrayBufferToBase.apply(this,arguments);}function hexToBase64(_x7){return _hexToBase.apply(this,arguments);}/**
+ * Converts a base64 string into a hex string
+ * @access public
+ * @param {string} base64 - A base64 string
+ * @returns {string} A hex string
+ */function _hexToBase(){_hexToBase=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(hex){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7){while(1){switch(_context7.prev=_context7.next){case 0:_context7.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context7.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_base64"])(Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_hex"])(hex),_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL));case 3:case"end":return _context7.stop();}}},_callee7);}));return _hexToBase.apply(this,arguments);}function base64ToHex(_x8){return _base64ToHex.apply(this,arguments);}/**
+ * Converts a plain string into base64
+ * @access public
+ * @param {string} text - A plain string
+ * @returns {string} A base64 encoded string
+ */function _base64ToHex(){_base64ToHex=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(base64){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8){while(1){switch(_context8.prev=_context8.next){case 0:_context8.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context8.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_hex"])(Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_base64"])(base64,_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL)));case 3:case"end":return _context8.stop();}}},_callee8);}));return _base64ToHex.apply(this,arguments);}function base64Encode(_x9){return _base64Encode.apply(this,arguments);}/**
+ * Converts a base64 string into a plain string
+ * @access public
+ * @param {string} base64String - A base64 encoded string
+ * @returns {string} A plain string
+ */function _base64Encode(){_base64Encode=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(text){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9){while(1){switch(_context9.prev=_context9.next){case 0:_context9.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context9.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_base64"])(text,_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL));case 3:case"end":return _context9.stop();}}},_callee9);}));return _base64Encode.apply(this,arguments);}function base64Decode(_x10){return _base64Decode.apply(this,arguments);}/**
+ * Coerce input to a Buffer, throwing a TypeError if it cannot be coerced.
+ * @param {string|Buffer|Uint8Array|Promise<Buffer>} stringOrBuffer
+ * @returns {Buffer}
+ */function _base64Decode(){_base64Decode=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(base64String){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10){while(1){switch(_context10.prev=_context10.next){case 0:_context10.next=2;return _libsodium__WEBPACK_IMPORTED_MODULE_1__["ready"];case 2:return _context10.abrupt("return",Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["to_string"])(Object(_libsodium__WEBPACK_IMPORTED_MODULE_1__["from_base64"])(base64String,_libsodium__WEBPACK_IMPORTED_MODULE_1__["base64_variants"].ORIGINAL)));case 3:case"end":return _context10.stop();}}},_callee10);}));return _base64Decode.apply(this,arguments);}function toBuffer(_x11){return _toBuffer.apply(this,arguments);}function _toBuffer(){_toBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(stringOrBuffer){var format,_args11=arguments;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11){while(1){switch(_context11.prev=_context11.next){case 0:format=_args11.length>1&&_args11[1]!==undefined?_args11[1]:Format.Binary;if(!Buffer.isBuffer(stringOrBuffer)){_context11.next=5;break;}return _context11.abrupt("return",stringOrBuffer);case 5:if(!(stringOrBuffer===null)){_context11.next=9;break;}return _context11.abrupt("return",null);case 9:if(!(typeof stringOrBuffer==='string')){_context11.next=13;break;}return _context11.abrupt("return",Buffer.from(stringOrBuffer,format));case 13:if(!(stringOrBuffer instanceof Uint8Array)){_context11.next=17;break;}return _context11.abrupt("return",arrayToBuffer(stringOrBuffer));case 17:if(!(stringOrBuffer instanceof Promise)){_context11.next=21;break;}return _context11.abrupt("return",stringOrBuffer);case 21:throw new TypeError('Invalid type; string or buffer expected');case 22:case"end":return _context11.stop();}}},_callee11);}));return _toBuffer.apply(this,arguments);}/***/},/***/"./lib/utils/index.js":/*!****************************!*\
+  !*** ./lib/utils/index.js ***!
+  \****************************/ /*! exports provided: getGlobalScope, ieOrEdge, isWebCryptoAvailable, getSubtleCrypto, generateUUIDSync, isString, Buffer, toBuffer, stringToArrayBuffer, arrayBufferToString, arrayBufferToHexString, hexStringToArrayBuffer, base64ToArrayBuffer, arrayBufferToBase64, hexToBase64, base64ToHex, base64Encode, base64Decode */ /***/function libUtilsIndexJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* harmony import */var _web_utils__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(/*! ./web_utils */"./lib/utils/web_utils.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"getGlobalScope",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_0__["getGlobalScope"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"ieOrEdge",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_0__["ieOrEdge"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"isWebCryptoAvailable",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_0__["isWebCryptoAvailable"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"getSubtleCrypto",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_0__["getSubtleCrypto"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"generateUUIDSync",function(){return _web_utils__WEBPACK_IMPORTED_MODULE_0__["generateUUIDSync"];});/* harmony import */var _common_utils__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(/*! ./common_utils */"./lib/utils/common_utils.js");/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"isString",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["isString"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"Buffer",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["Buffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"toBuffer",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["toBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"stringToArrayBuffer",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["stringToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToString",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["arrayBufferToString"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToHexString",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["arrayBufferToHexString"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"hexStringToArrayBuffer",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["hexStringToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64ToArrayBuffer",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["base64ToArrayBuffer"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"arrayBufferToBase64",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["arrayBufferToBase64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"hexToBase64",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["hexToBase64"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64ToHex",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["base64ToHex"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Encode",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["base64Encode"];});/* harmony reexport (safe) */__webpack_require__.d(__webpack_exports__,"base64Decode",function(){return _common_utils__WEBPACK_IMPORTED_MODULE_1__["base64Decode"];});/***/},/***/"./lib/utils/web_utils.js":/*!********************************!*\
+  !*** ./lib/utils/web_utils.js ***!
+  \********************************/ /*! exports provided: getGlobalScope, ieOrEdge, isWebCryptoAvailable, getSubtleCrypto, generateUUIDSync */ /***/function libUtilsWeb_utilsJs(module,__webpack_exports__,__webpack_require__){"use strict";__webpack_require__.r(__webpack_exports__);/* WEBPACK VAR INJECTION */(function(global){/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"getGlobalScope",function(){return getGlobalScope;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"ieOrEdge",function(){return ieOrEdge;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"isWebCryptoAvailable",function(){return isWebCryptoAvailable;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"getSubtleCrypto",function(){return getSubtleCrypto;});/* harmony export (binding) */__webpack_require__.d(__webpack_exports__,"generateUUIDSync",function(){return generateUUIDSync;});/**
  * Returns `window` if available, or `global` if supported in environment.
  * @returns {object|null}
  */function getGlobalScope(){return typeof window!=='undefined'?window:typeof global!=='undefined'?global:null;}/**
@@ -265,65 +330,7 @@ return /******/ (function(modules) { // webpackBootstrap
  * @access public
  * @returns {string}
  */function generateUUIDSync(){var globalScope=getGlobalScope();var crypto=globalScope.crypto||globalScope.msCrypto;if(crypto){var buf=new Uint32Array(4);crypto.getRandomValues(buf);var idx=-1;return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){idx++;var r=buf[idx>>3]>>idx%8*4&15;var v=c==='x'?r:r&0x3|0x8;return v.toString(16);});}else{var d=new Date().getTime();if(globalScope.performance&&typeof globalScope.performance.now==="function"){d+=performance.now();// use high-precision timer if available
-}var uuid='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=(d+Math.random()*16)%16|0;d=Math.floor(d/16);return(c==='x'?r:r&0x3|0x8).toString(16);});return uuid;}}/**
- * Determines if the input value is a string
- * @access public
- * @returns {boolean}
- */function isString(value){return typeof value==='string'||value instanceof String;}/**
- * Converts a plain string into an ArrayBuffer
- * @access public
- * @param {string} string - A plain string
- * @returns {ArrayBuffer}
- */function stringToArrayBuffer(_x){return _stringToArrayBuffer.apply(this,arguments);}/**
- * Converts an ArrayBuffer into a plain string
- * @access public
- * @param {ArrayBuffer} arrayBuffer
- * @returns {string} Plain string
- */function _stringToArrayBuffer(){_stringToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(string){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context){while(1){switch(_context.prev=_context.next){case 0:return _context.abrupt("return",new Promise(function(resolve,reject){var blob=new Blob([string]);var reader=new FileReader();reader.onload=function(e){resolve(e.target.result);};reader.readAsArrayBuffer(blob);}));case 1:case"end":return _context.stop();}}},_callee);}));return _stringToArrayBuffer.apply(this,arguments);}function arrayBufferToString(_x2){return _arrayBufferToString.apply(this,arguments);}/**
- * Converts an ArrayBuffer into a hex string
- * @access public
- * @param {ArrayBuffer} arrayBuffer
- * @returns {string} Hex string
- */function _arrayBufferToString(){_arrayBufferToString=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(arrayBuffer){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:return _context2.abrupt("return",new Promise(function(resolve,reject){var blob=new Blob([arrayBuffer]);var reader=new FileReader();reader.onload=function(e){resolve(e.target.result);};reader.readAsText(blob);}));case 1:case"end":return _context2.stop();}}},_callee2);}));return _arrayBufferToString.apply(this,arguments);}function arrayBufferToHexString(_x3){return _arrayBufferToHexString.apply(this,arguments);}/**
- * Converts a hex string into an ArrayBuffer
- * @access public
- * @param {string} hex - A hex string
- * @returns {ArrayBuffer}
- */function _arrayBufferToHexString(){_arrayBufferToHexString=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(arrayBuffer){var byteArray,hexString,nextHexByte,i;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:byteArray=new Uint8Array(arrayBuffer);hexString="";for(i=0;i<byteArray.byteLength;i++){nextHexByte=byteArray[i].toString(16);if(nextHexByte.length<2){nextHexByte="0"+nextHexByte;}hexString+=nextHexByte;}return _context3.abrupt("return",hexString);case 4:case"end":return _context3.stop();}}},_callee3);}));return _arrayBufferToHexString.apply(this,arguments);}function hexStringToArrayBuffer(_x4){return _hexStringToArrayBuffer.apply(this,arguments);}/**
- * Converts a base64 string into an ArrayBuffer
- * @access public
- * @param {string} base64 - A base64 string
- * @returns {ArrayBuffer}
- */function _hexStringToArrayBuffer(){_hexStringToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(hex){var bytes,c;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:bytes=[];for(c=0;c<hex.length;c+=2){bytes.push(parseInt(hex.substr(c,2),16));}return _context4.abrupt("return",new Uint8Array(bytes));case 3:case"end":return _context4.stop();}}},_callee4);}));return _hexStringToArrayBuffer.apply(this,arguments);}function base64ToArrayBuffer(_x5){return _base64ToArrayBuffer.apply(this,arguments);}/**
- * Converts an ArrayBuffer into a base64 string
- * @access public
- * @param {ArrayBuffer} buffer
- * @returns {string} base64 string
- */function _base64ToArrayBuffer(){_base64ToArrayBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(base64){var binaryString,len,bytes,i;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5){while(1){switch(_context5.prev=_context5.next){case 0:_context5.next=2;return base64Decode(base64);case 2:binaryString=_context5.sent;len=binaryString.length;bytes=new Uint8Array(len);for(i=0;i<len;i++){bytes[i]=binaryString.charCodeAt(i);}return _context5.abrupt("return",bytes.buffer);case 7:case"end":return _context5.stop();}}},_callee5);}));return _base64ToArrayBuffer.apply(this,arguments);}function arrayBufferToBase64(_x6){return _arrayBufferToBase.apply(this,arguments);}/**
- * Converts a hex string into a base64 string
- * @access public
- * @param {string} hex - A hex string
- * @returns {string} A base64 string
- */function _arrayBufferToBase(){_arrayBufferToBase=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(buffer){return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6){while(1){switch(_context6.prev=_context6.next){case 0:return _context6.abrupt("return",new Promise(function(resolve,reject){var blob=new Blob([buffer],{type:'application/octet-binary'});var reader=new FileReader();reader.onload=function(evt){var dataurl=evt.target.result;resolve(dataurl.substr(dataurl.indexOf(',')+1));};reader.readAsDataURL(blob);}));case 1:case"end":return _context6.stop();}}},_callee6);}));return _arrayBufferToBase.apply(this,arguments);}function hexToBase64(_x7){return _hexToBase.apply(this,arguments);}/**
- * Converts a base64 string into a hex string
- * @access public
- * @param {string} base64 - A base64 string
- * @returns {string} A hex string
- */function _hexToBase(){_hexToBase=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(hex){var buffer;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7){while(1){switch(_context7.prev=_context7.next){case 0:buffer=Buffer.from(hex,'hex');return _context7.abrupt("return",buffer.toString('base64'));case 2:case"end":return _context7.stop();}}},_callee7);}));return _hexToBase.apply(this,arguments);}function base64ToHex(_x8){return _base64ToHex.apply(this,arguments);}/**
- * Converts a plain string into base64
- * @access public
- * @param {string} text - A plain string
- * @returns {string} A base64 encoded string
- */function _base64ToHex(){_base64ToHex=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(base64){var buffer;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8){while(1){switch(_context8.prev=_context8.next){case 0:buffer=Buffer.from(base64,'base64');return _context8.abrupt("return",buffer.toString('hex'));case 2:case"end":return _context8.stop();}}},_callee8);}));return _base64ToHex.apply(this,arguments);}function base64Encode(text){return getGlobalScope().btoa(encodeURIComponent(text).replace(/%([0-9A-F]{2})/g,function toSolidBytes(match,p1){return String.fromCharCode('0x'+p1);}));}/**
- * Converts a base64 string into a plain string
- * @access public
- * @param {string} base64String - A base64 encoded string
- * @returns {string} A plain string
- */function base64Decode(base64String){return getGlobalScope().atob(base64String);}/**
- * Coerce input to a Buffer, throwing a TypeError if it cannot be coerced.
- * @param {string|Buffer|Uint8Array|Promise<Buffer>} stringOrBuffer
- * @returns {Buffer}
- */function toBuffer(_x9){return _toBuffer.apply(this,arguments);}function _toBuffer(){_toBuffer=_asyncToGenerator(/*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(stringOrBuffer){var format,_args9=arguments;return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9){while(1){switch(_context9.prev=_context9.next){case 0:format=_args9.length>1&&_args9[1]!==undefined?_args9[1]:'binary';if(!Buffer.isBuffer(stringOrBuffer)){_context9.next=5;break;}return _context9.abrupt("return",stringOrBuffer);case 5:if(!(stringOrBuffer===null)){_context9.next=9;break;}return _context9.abrupt("return",null);case 9:if(!(typeof stringOrBuffer==='string')){_context9.next=13;break;}return _context9.abrupt("return",Buffer.from(stringOrBuffer,format));case 13:if(!(stringOrBuffer instanceof Uint8Array)){_context9.next=17;break;}return _context9.abrupt("return",arrayToBuffer(stringOrBuffer));case 17:if(!(stringOrBuffer instanceof Promise)){_context9.next=21;break;}return _context9.abrupt("return",stringOrBuffer);case 21:throw new TypeError('Invalid type; string or buffer expected');case 22:case"end":return _context9.stop();}}},_callee9);}));return _toBuffer.apply(this,arguments);}/* WEBPACK VAR INJECTION */}).call(this,__webpack_require__(/*! ./../node_modules/webpack/buildin/global.js */"./node_modules/webpack/buildin/global.js"));/***/},/***/"./node_modules/@babel/runtime/regenerator/index.js":/*!**********************************************************!*\
+}var uuid='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=(d+Math.random()*16)%16|0;d=Math.floor(d/16);return(c==='x'?r:r&0x3|0x8).toString(16);});return uuid;}}/* WEBPACK VAR INJECTION */}).call(this,__webpack_require__(/*! ./../../node_modules/webpack/buildin/global.js */"./node_modules/webpack/buildin/global.js"));/***/},/***/"./node_modules/@babel/runtime/regenerator/index.js":/*!**********************************************************!*\
   !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
   \**********************************************************/ /*! no static exports found */ /***/function node_modulesBabelRuntimeRegeneratorIndexJs(module,exports,__webpack_require__){module.exports=__webpack_require__(/*! regenerator-runtime */"./node_modules/regenerator-runtime/runtime.js");/***/},/***/"./node_modules/asn1.js/lib/asn1.js":/*!******************************************!*\
   !*** ./node_modules/asn1.js/lib/asn1.js ***!
@@ -2612,7 +2619,8 @@ var SNApplication = /*#__PURE__*/function () {
     key: "prepareForLaunch",
     value: function () {
       var _prepareForLaunch = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref2) {
-        var callbacks;
+        var callbacks, _ref3, isNewDatabase;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2632,31 +2640,34 @@ var SNApplication = /*#__PURE__*/function () {
                 return this.deviceInterface.openDatabase();
 
               case 6:
-                _context.next = 8;
+                _ref3 = _context.sent;
+                isNewDatabase = _ref3.isNewDatabase;
+                this.createdNewDatabase = isNewDatabase;
+                _context.next = 11;
                 return this.migrationService.initialize();
 
-              case 8:
-                _context.next = 10;
+              case 11:
+                _context.next = 13;
                 return this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].PreparingForLaunch_0);
 
-              case 10:
-                _context.next = 12;
+              case 13:
+                _context.next = 15;
                 return this.storageService.initializeFromDisk();
 
-              case 12:
-                _context.next = 14;
+              case 15:
+                _context.next = 17;
                 return this.keyManager.initialize();
 
-              case 14:
-                _context.next = 16;
+              case 17:
+                _context.next = 19;
                 return this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].ReadyForLaunch_05);
 
-              case 16:
+              case 19:
                 this.started = true;
-                _context.next = 19;
+                _context.next = 22;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].Started);
 
-              case 19:
+              case 22:
               case "end":
                 return _context.stop();
             }
@@ -2693,7 +2704,7 @@ var SNApplication = /*#__PURE__*/function () {
       var _launch = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
         var _this = this;
 
-        var _ref3,
+        var _ref4,
             awaitDatabaseLoad,
             launchChallenge,
             response,
@@ -2705,7 +2716,7 @@ var SNApplication = /*#__PURE__*/function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _ref3 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, awaitDatabaseLoad = _ref3.awaitDatabaseLoad;
+                _ref4 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, awaitDatabaseLoad = _ref4.awaitDatabaseLoad;
                 this.launched = false;
                 _context3.next = 4;
                 return this.challengeService.getLaunchChallenge();
@@ -2767,6 +2778,15 @@ var SNApplication = /*#__PURE__*/function () {
                 return this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].LoadingDatabase_11);
 
               case 31:
+                if (!this.createdNewDatabase) {
+                  _context3.next = 34;
+                  break;
+                }
+
+                _context3.next = 34;
+                return this.syncService.onNewDatabaseCreated();
+
+              case 34:
                 /**
                 * We don't want to await this, as we want to begin allowing the app to function
                 * before local data has been loaded fully. We await only initial
@@ -2804,14 +2824,14 @@ var SNApplication = /*#__PURE__*/function () {
                 })));
 
                 if (!awaitDatabaseLoad) {
-                  _context3.next = 35;
+                  _context3.next = 38;
                   break;
                 }
 
-                _context3.next = 35;
+                _context3.next = 38;
                 return loadPromise;
 
-              case 35:
+              case 38:
               case "end":
                 return _context3.stop();
             }
@@ -2901,7 +2921,7 @@ var SNApplication = /*#__PURE__*/function () {
       var _this3 = this;
 
       return (/*#__PURE__*/function () {
-          var _ref5 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(challenge, validate, orchestratorFill) {
+          var _ref6 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(challenge, validate, orchestratorFill) {
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
               while (1) {
                 switch (_context5.prev = _context5.next) {
@@ -2917,7 +2937,7 @@ var SNApplication = /*#__PURE__*/function () {
           }));
 
           return function (_x3, _x4, _x5) {
-            return _ref5.apply(this, arguments);
+            return _ref6.apply(this, arguments);
           };
         }()
       );
@@ -3153,13 +3173,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "savePayload",
     value: function () {
-      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(_ref6) {
+      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(_ref7) {
         var payload, dirtied;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                payload = _ref6.payload;
+                payload = _ref7.payload;
                 dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
                   payload: payload,
                   override: {
@@ -3197,8 +3217,8 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "findItem",
-    value: function findItem(_ref7) {
-      var uuid = _ref7.uuid;
+    value: function findItem(_ref8) {
+      var uuid = _ref8.uuid;
       return this.modelManager.findItem(uuid);
     }
     /** 
@@ -3208,8 +3228,8 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "findItems",
-    value: function findItems(_ref8) {
-      var predicate = _ref8.predicate;
+    value: function findItems(_ref9) {
+      var predicate = _ref9.predicate;
       return this.modelManager.itemsMatchingPredicate(predicate);
     }
     /** @access public */
@@ -3217,13 +3237,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "mergeItem",
     value: function () {
-      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref9) {
+      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref10) {
         var item, source;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                item = _ref9.item, source = _ref9.source;
+                item = _ref10.item, source = _ref10.source;
                 return _context9.abrupt("return", this.modelManager.mapItem({
                   item: item,
                   source: source
@@ -3252,13 +3272,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createManagedItem",
     value: function () {
-      var _createManagedItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref10) {
+      var _createManagedItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref11) {
         var contentType, content, needsSync, override, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                contentType = _ref10.contentType, content = _ref10.content, needsSync = _ref10.needsSync, override = _ref10.override;
+                contentType = _ref11.contentType, content = _ref11.content, needsSync = _ref11.needsSync, override = _ref11.override;
                 _context10.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
@@ -3295,13 +3315,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createTemplateItem",
     value: function () {
-      var _createTemplateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref11) {
+      var _createTemplateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref12) {
         var contentType, content, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                contentType = _ref11.contentType, content = _ref11.content;
+                contentType = _ref12.contentType, content = _ref12.content;
                 _context11.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
@@ -3354,13 +3374,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItem",
     value: function () {
-      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref12) {
+      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref13) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                item = _ref12.item;
+                item = _ref13.item;
                 _context12.next = 3;
                 return this.modelManager.setItemDirty(item, true);
 
@@ -3390,13 +3410,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItems",
     value: function () {
-      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref13) {
+      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref14) {
         var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                items = _ref13.items;
+                items = _ref14.items;
                 _context13.next = 3;
                 return this.modelManager.setItemsDirty(items);
 
@@ -3428,13 +3448,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemNeedsSync",
     value: function () {
-      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref14) {
+      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref15) {
         var item, updateUserModifiedDate;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                item = _ref14.item, updateUserModifiedDate = _ref14.updateUserModifiedDate;
+                item = _ref15.item, updateUserModifiedDate = _ref15.updateUserModifiedDate;
                 return _context14.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
 
               case 2:
@@ -3480,13 +3500,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemsNeedsSync",
     value: function () {
-      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref15) {
+      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref16) {
         var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                items = _ref15.items;
+                items = _ref16.items;
                 return _context15.abrupt("return", this.modelManager.setItemsDirty(items));
 
               case 2:
@@ -3508,13 +3528,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItem",
     value: function () {
-      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref16) {
+      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref17) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                item = _ref16.item;
+                item = _ref17.item;
                 this.modelManager.setItemToBeDeleted(item);
                 this.sync();
 
@@ -3537,13 +3557,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItemLocally",
     value: function () {
-      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref17) {
+      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref18) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                item = _ref17.item;
+                item = _ref18.item;
                 this.modelManager.removeItemLocally(item);
 
               case 2:
@@ -3604,32 +3624,32 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "getItems",
-    value: function getItems(_ref18) {
-      var contentType = _ref18.contentType;
+    value: function getItems(_ref19) {
+      var contentType = _ref19.contentType;
       return this.modelManager.getItems(contentType);
     }
     /** @access public */
 
   }, {
     key: "getDisplayableItems",
-    value: function getDisplayableItems(_ref19) {
-      var contentType = _ref19.contentType;
+    value: function getDisplayableItems(_ref20) {
+      var contentType = _ref20.contentType;
       return this.modelManager.validItemsForContentType(contentType);
     }
     /** @access public */
 
   }, {
     key: "getNotesMatchingSmartTag",
-    value: function getNotesMatchingSmartTag(_ref20) {
-      var smartTag = _ref20.smartTag;
+    value: function getNotesMatchingSmartTag(_ref21) {
+      var smartTag = _ref21.smartTag;
       return this.modelManager.notesMatchingSmartTag(smartTag);
     }
     /** @access public */
 
   }, {
     key: "findTag",
-    value: function findTag(_ref21) {
-      var title = _ref21.title;
+    value: function findTag(_ref22) {
+      var title = _ref22.title;
       return this.modelManager.findTagByTitle(title);
     }
     /** @access public */
@@ -3637,13 +3657,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "findOrCreateTag",
     value: function () {
-      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref22) {
+      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref23) {
         var title;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
-                title = _ref22.title;
+                title = _ref23.title;
                 return _context19.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
 
               case 2:
@@ -3682,11 +3702,11 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "streamItems",
-    value: function streamItems(_ref23) {
+    value: function streamItems(_ref24) {
       var _this5 = this;
 
-      var contentType = _ref23.contentType,
-          stream = _ref23.stream;
+      var contentType = _ref24.contentType,
+          stream = _ref24.stream;
       var observer = this.modelManager.addMappingObserver(contentType, function (allItems, validItems, deletedItems, source, sourceKey) {
         var includedContentTypes = allItems.map(function (item) {
           return item.content_type;
@@ -3970,13 +3990,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "importData",
     value: function () {
-      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26(_ref24) {
+      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26(_ref25) {
         var data, password, awaitSync, decryptedPayloads, validPayloads, affectedItems, promise;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
           while (1) {
             switch (_context26.prev = _context26.next) {
               case 0:
-                data = _ref24.data, password = _ref24.password, awaitSync = _ref24.awaitSync;
+                data = _ref25.data, password = _ref25.password, awaitSync = _ref25.awaitSync;
                 _context26.next = 3;
                 return this.protocolService.payloadsByDecryptingBackupFile({
                   data: data,
@@ -4033,7 +4053,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "createBackupFile",
     value: function () {
       var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27() {
-        var _ref25,
+        var _ref26,
             subItems,
             intent,
             returnIfEmpty,
@@ -4043,7 +4063,7 @@ var SNApplication = /*#__PURE__*/function () {
           while (1) {
             switch (_context27.prev = _context27.next) {
               case 0:
-                _ref25 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, subItems = _ref25.subItems, intent = _ref25.intent, returnIfEmpty = _ref25.returnIfEmpty;
+                _ref26 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, subItems = _ref26.subItems, intent = _ref26.intent, returnIfEmpty = _ref26.returnIfEmpty;
                 return _context27.abrupt("return", this.protocolService.createBackupFile({
                   subItems: subItems,
                   intent: intent,
@@ -4375,8 +4395,11 @@ var SNApplication = /*#__PURE__*/function () {
         }
       }
 
+      this.deviceInterface.deinit();
+      this.deviceInterface = null;
       this.launchCallbacks = null;
       this.crypto = null;
+      this.createdNewDatabase = null;
       this.services.length = 0;
       this.serviceObservers.length = 0;
       this.managedSubscribers.length = 0;
@@ -4474,21 +4497,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36(_ref26) {
-        var email, password, ephemeral, mergeLocal, _ref27, wrappingKey, canceled, result;
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36(_ref27) {
+        var email, password, ephemeral, mergeLocal, _ref28, wrappingKey, canceled, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
           while (1) {
             switch (_context36.prev = _context36.next) {
               case 0:
-                email = _ref26.email, password = _ref26.password, ephemeral = _ref26.ephemeral, mergeLocal = _ref26.mergeLocal;
+                email = _ref27.email, password = _ref27.password, ephemeral = _ref27.ephemeral, mergeLocal = _ref27.mergeLocal;
                 _context36.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref27 = _context36.sent;
-                wrappingKey = _ref27.wrappingKey;
-                canceled = _ref27.canceled;
+                _ref28 = _context36.sent;
+                wrappingKey = _ref28.wrappingKey;
+                canceled = _ref28.canceled;
 
                 if (!canceled) {
                   _context36.next = 8;
@@ -4592,21 +4615,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "signIn",
     value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(_ref28) {
-        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref28$mergeLocal, mergeLocal, awaitSync, _ref29, wrappingKey, canceled, result, syncPromise;
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(_ref29) {
+        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref29$mergeLocal, mergeLocal, awaitSync, _ref30, wrappingKey, canceled, result, syncPromise;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
           while (1) {
             switch (_context37.prev = _context37.next) {
               case 0:
-                email = _ref28.email, password = _ref28.password, strict = _ref28.strict, ephemeral = _ref28.ephemeral, mfaKeyPath = _ref28.mfaKeyPath, mfaCode = _ref28.mfaCode, _ref28$mergeLocal = _ref28.mergeLocal, mergeLocal = _ref28$mergeLocal === void 0 ? true : _ref28$mergeLocal, awaitSync = _ref28.awaitSync;
+                email = _ref29.email, password = _ref29.password, strict = _ref29.strict, ephemeral = _ref29.ephemeral, mfaKeyPath = _ref29.mfaKeyPath, mfaCode = _ref29.mfaCode, _ref29$mergeLocal = _ref29.mergeLocal, mergeLocal = _ref29$mergeLocal === void 0 ? true : _ref29$mergeLocal, awaitSync = _ref29.awaitSync;
                 _context37.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref29 = _context37.sent;
-                wrappingKey = _ref29.wrappingKey;
-                canceled = _ref29.canceled;
+                _ref30 = _context37.sent;
+                wrappingKey = _ref30.wrappingKey;
+                canceled = _ref30.canceled;
 
                 if (!canceled) {
                   _context37.next = 8;
@@ -4724,21 +4747,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref30) {
-        var currentPassword, newPassword, passcode, _ref31, wrappingKey, canceled, currentKeyParams, result;
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref31) {
+        var currentPassword, newPassword, passcode, _ref32, wrappingKey, canceled, currentKeyParams, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee38$(_context38) {
           while (1) {
             switch (_context38.prev = _context38.next) {
               case 0:
-                currentPassword = _ref30.currentPassword, newPassword = _ref30.newPassword, passcode = _ref30.passcode;
+                currentPassword = _ref31.currentPassword, newPassword = _ref31.newPassword, passcode = _ref31.passcode;
                 _context38.next = 3;
                 return this.getWrappingKeyIfNecessary(passcode);
 
               case 3:
-                _ref31 = _context38.sent;
-                wrappingKey = _ref31.wrappingKey;
-                canceled = _ref31.canceled;
+                _ref32 = _context38.sent;
+                wrappingKey = _ref32.wrappingKey;
+                canceled = _ref32.canceled;
 
                 if (!canceled) {
                   _context38.next = 8;
@@ -4856,20 +4879,20 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "validateAccountPassword",
     value: function () {
-      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref32) {
-        var password, _ref33, valid;
+      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref33) {
+        var password, _ref34, valid;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee40$(_context40) {
           while (1) {
             switch (_context40.prev = _context40.next) {
               case 0:
-                password = _ref32.password;
+                password = _ref33.password;
                 _context40.next = 3;
                 return this.keyManager.validateAccountPassword(password);
 
               case 3:
-                _ref33 = _context40.sent;
-                valid = _ref33.valid;
+                _ref34 = _context40.sent;
+                valid = _ref34.valid;
                 return _context40.abrupt("return", valid);
 
               case 6:
@@ -4973,7 +4996,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "setPasscode",
     value: function () {
       var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43(passcode) {
-        var identifier, _ref34, key, keyParams;
+        var identifier, _ref35, key, keyParams;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
           while (1) {
@@ -4991,9 +5014,9 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 5:
-                _ref34 = _context43.sent;
-                key = _ref34.key;
-                keyParams = _ref34.keyParams;
+                _ref35 = _context43.sent;
+                key = _ref35.key;
+                keyParams = _ref35.keyParams;
                 _context43.next = 10;
                 return this.keyManager.setNewRootKeyWrapper({
                   wrappingKey: key,
@@ -5419,7 +5442,7 @@ var SNApplication = /*#__PURE__*/function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncService.addEventObserver( /*#__PURE__*/function () {
-        var _ref36 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(eventName) {
+        var _ref37 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(eventName) {
           var appEvent;
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
             while (1) {
@@ -5444,7 +5467,7 @@ var SNApplication = /*#__PURE__*/function () {
         }));
 
         return function (_x39) {
-          return _ref36.apply(this, arguments);
+          return _ref37.apply(this, arguments);
         };
       }());
       this.serviceObservers.push(uninstall);
@@ -5671,8 +5694,18 @@ var DeviceInterface = /*#__PURE__*/function () {
     this.timeout = timeout || setTimeout.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["getGlobalScope"])());
     this.interval = interval || setInterval.bind(Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["getGlobalScope"])());
   }
+  /** @access public */
+
 
   _createClass(DeviceInterface, [{
+    key: "deinit",
+    value: function deinit() {
+      /* Optional override */
+      this.namespace = null;
+      this.timeout = null;
+      this.interval = null;
+    }
+  }, {
     key: "getRawStorageValue",
     value: function () {
       var _getRawStorageValue = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(key) {
@@ -5822,6 +5855,14 @@ var DeviceInterface = /*#__PURE__*/function () {
 
       return removeAllRawStorageValues;
     }()
+    /**
+     * On web platforms, databased created may be new.
+     * New databases can be because of new sessions, or if the browser deleted it. 
+     * In this case, callers should orchestrate with the server to redownload all items
+     * from scratch.
+     * @returns {object} { isNewDatabase } - True if the database was newly created
+     */
+
   }, {
     key: "openDatabase",
     value: function () {
@@ -19485,21 +19526,29 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
+                if (!response.error) {
+                  _context10.next = 2;
+                  break;
+                }
+
+                return _context10.abrupt("return");
+
+              case 2:
                 user = response.user;
                 this.user = user;
-                _context10.next = 4;
+                _context10.next = 6;
                 return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].User, user);
 
-              case 4:
+              case 6:
                 session = new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__["Session"](response.token);
-                _context10.next = 7;
+                _context10.next = 9;
                 return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].Session, session);
 
-              case 7:
-                _context10.next = 9;
+              case 9:
+                _context10.next = 11;
                 return this.setSession(session);
 
-              case 9:
+              case 11:
               case "end":
                 return _context10.stop();
             }
@@ -25038,7 +25087,7 @@ var ItemsKeyManager = /*#__PURE__*/function (_PureService) {
      * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
      * and its .itemsKey value should be equal to the root key masterKey value.
      * @access public
-     * @returns {void}
+     * @returns {Promise<void>}
      */
 
   }, {
@@ -34803,7 +34852,7 @@ var SyncOpStatus = /*#__PURE__*/function () {
   }, {
     key: "hasError",
     value: function hasError() {
-      return this.error;
+      return !!this.error;
     }
   }, {
     key: "setError",
@@ -34987,6 +35036,9 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     _this.statusObservers = [];
     _this.resolveQueue = [];
     _this.spawnQueue = [];
+    /* A DownloadFirst sync must always be the first sync completed */
+
+    _this.completedOnlineDownloadFirstSync = false;
     _this.majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD;
     _this.maxDiscordance = DEFAULT_MAX_DISCORDANCE;
 
@@ -35007,10 +35059,50 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     _this.nonEncryptedTypes = [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].ServerExtension];
     return _this;
   }
-  /** @access public */
+  /** 
+   * If the database has been newly created (because its new or was previously destroyed)
+   * we want to reset any sync tokens we have.
+   * @access public 
+   */
 
 
   _createClass(SNSyncService, [{
+    key: "onNewDatabaseCreated",
+    value: function () {
+      var _onNewDatabaseCreated = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.getLastSyncToken();
+
+              case 2:
+                if (!_context.sent) {
+                  _context.next = 5;
+                  break;
+                }
+
+                _context.next = 5;
+                return this.clearSyncPositionTokens();
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function onNewDatabaseCreated() {
+        return _onNewDatabaseCreated.apply(this, arguments);
+      }
+
+      return onNewDatabaseCreated;
+    }()
+    /** @access public */
+
+  }, {
     key: "deinit",
     value: function deinit() {
       this.sessionManager = null;
@@ -35021,6 +35113,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
       this.interval = null;
       this.state.reset();
       this.opStatus.reset();
+      this.state = null;
+      this.opStatus = null;
       this.statusObservers.length = 0;
       this.resolveQueue.length = 0;
       this.spawnQueue.length = 0;
@@ -35107,21 +35201,31 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     /** @access public */
 
   }, {
+    key: "isDatabaseLoaded",
+    value: function isDatabaseLoaded() {
+      return this.databaseLoaded;
+    }
+    /** 
+     * Used in tandem with `loadDatabasePayloads`
+     * @access public 
+     */
+
+  }, {
     key: "getDatabasePayloads",
     value: function () {
-      var _getDatabasePayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+      var _getDatabasePayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                return _context.abrupt("return", this.storageService.getAllRawPayloads());
+                return _context2.abrupt("return", this.storageService.getAllRawPayloads());
 
               case 1:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function getDatabasePayloads() {
@@ -35130,26 +35234,24 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
       return getDatabasePayloads;
     }()
-    /** @access public */
-
-  }, {
-    key: "isDatabaseLoaded",
-    value: function isDatabaseLoaded() {
-      return this.databaseLoaded;
-    }
-    /** @access public */
+    /** 
+     * @access public 
+     * @param {Array.<objects>} rawPayloads - use `getDatabasePayloads` to get these payloads.
+     * They are fed as a parameter so that callers don't have to await the loading, but can
+     * await getting the raw payloads from storage
+     */
 
   }, {
     key: "loadDatabasePayloads",
     value: function () {
-      var _loadDatabasePayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(rawPayloads) {
+      var _loadDatabasePayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(rawPayloads) {
         var unsortedPayloads, payloads, itemsKeysPayloads, decryptedItemsKeys, payloadCount, batchSize, numBatches, batchIndex, currentPosition, batch, decrypted;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (!this.databaseLoaded) {
-                  _context2.next = 2;
+                  _context3.next = 2;
                   break;
                 }
 
@@ -35168,14 +35270,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].ItemsKey;
                 });
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(payloads, itemsKeysPayloads);
-                _context2.next = 8;
+                _context3.next = 8;
                 return this.protocolService.payloadsByDecryptingPayloads({
                   payloads: itemsKeysPayloads
                 });
 
               case 8:
-                decryptedItemsKeys = _context2.sent;
-                _context2.next = 11;
+                decryptedItemsKeys = _context3.sent;
+                _context3.next = 11;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: decryptedItemsKeys,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalRetrieved
@@ -35190,20 +35292,20 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 15:
                 if (!(batchIndex < numBatches)) {
-                  _context2.next = 28;
+                  _context3.next = 28;
                   break;
                 }
 
                 currentPosition = batchIndex * batchSize;
                 batch = payloads.slice(currentPosition, currentPosition + batchSize);
-                _context2.next = 20;
+                _context3.next = 20;
                 return this.protocolService.payloadsByDecryptingPayloads({
                   payloads: batch
                 });
 
               case 20:
-                decrypted = _context2.sent;
-                _context2.next = 23;
+                decrypted = _context3.sent;
+                _context3.next = 23;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: decrypted,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalRetrieved
@@ -35218,7 +35320,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 25:
                 batchIndex++;
-                _context2.next = 15;
+                _context3.next = 15;
                 break;
 
               case 28:
@@ -35230,10 +35332,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 31:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       function loadDatabasePayloads(_x) {
@@ -35247,20 +35349,20 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "setLastSyncToken",
     value: function () {
-      var _setLastSyncToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(token) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+      var _setLastSyncToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(token) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 this.syncToken = token;
-                return _context3.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].LastSyncToken, token));
+                return _context4.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].LastSyncToken, token));
 
               case 2:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       function setLastSyncToken(_x2) {
@@ -35274,29 +35376,29 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "setPaginationToken",
     value: function () {
-      var _setPaginationToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(token) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+      var _setPaginationToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(token) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 this.cursorToken = token;
 
                 if (!token) {
-                  _context4.next = 5;
+                  _context5.next = 5;
                   break;
                 }
 
-                return _context4.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken, token));
+                return _context5.abrupt("return", this.storageService.setValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken, token));
 
               case 5:
-                return _context4.abrupt("return", this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken));
+                return _context5.abrupt("return", this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken));
 
               case 6:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function setPaginationToken(_x3) {
@@ -35310,31 +35412,31 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getLastSyncToken",
     value: function () {
-      var _getLastSyncToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
+      var _getLastSyncToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 if (this.syncToken) {
-                  _context5.next = 4;
+                  _context6.next = 4;
                   break;
                 }
 
-                _context5.next = 3;
+                _context6.next = 3;
                 return this.storageService.getValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].LastSyncToken);
 
               case 3:
-                this.syncToken = _context5.sent;
+                this.syncToken = _context6.sent;
 
               case 4:
-                return _context5.abrupt("return", this.syncToken);
+                return _context6.abrupt("return", this.syncToken);
 
               case 5:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       function getLastSyncToken() {
@@ -35348,31 +35450,31 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getPaginationToken",
     value: function () {
-      var _getPaginationToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
+      var _getPaginationToken = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 if (this.cursorToken) {
-                  _context6.next = 4;
+                  _context7.next = 4;
                   break;
                 }
 
-                _context6.next = 3;
+                _context7.next = 3;
                 return this.storageService.getValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken);
 
               case 3:
-                this.cursorToken = _context6.sent;
+                this.cursorToken = _context7.sent;
 
               case 4:
-                return _context6.abrupt("return", this.cursorToken);
+                return _context7.abrupt("return", this.cursorToken);
 
               case 5:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee7, this);
       }));
 
       function getPaginationToken() {
@@ -35381,31 +35483,31 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
       return getPaginationToken;
     }()
-    /** @access tests */
+    /** @access private & tests */
 
   }, {
     key: "clearSyncPositionTokens",
     value: function () {
-      var _clearSyncPositionTokens = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
+      var _clearSyncPositionTokens = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 this.syncToken = null;
                 this.cursorToken = null;
-                _context7.next = 4;
+                _context8.next = 4;
                 return this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].LastSyncToken);
 
               case 4:
-                _context7.next = 6;
+                _context8.next = 6;
                 return this.storageService.removeValue(_Lib__WEBPACK_IMPORTED_MODULE_20__["StorageKeys"].PaginationToken);
 
               case 6:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee8, this);
       }));
 
       function clearSyncPositionTokens() {
@@ -35419,21 +35521,21 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsNeedingSync",
     value: function () {
-      var _itemsNeedingSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8() {
+      var _itemsNeedingSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9() {
         var items;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 items = this.modelManager.getDirtyItems();
-                return _context8.abrupt("return", items);
+                return _context9.abrupt("return", items);
 
               case 2:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee9, this);
       }));
 
       function itemsNeedingSync() {
@@ -35447,14 +35549,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "alternateUuidForItem",
     value: function () {
-      var _alternateUuidForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(item) {
+      var _alternateUuidForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(item) {
         var payload, results, mapped;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
                 if (item.isItem) {
-                  _context9.next = 2;
+                  _context10.next = 2;
                   break;
                 }
 
@@ -35464,36 +35566,36 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
                   object: item
                 });
-                _context9.next = 5;
+                _context10.next = 5;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_14__["PayloadsByAlternatingUuid"])({
                   payload: payload,
                   baseCollection: this.modelManager.getMasterCollection()
                 });
 
               case 5:
-                results = _context9.sent;
-                _context9.next = 8;
+                results = _context10.sent;
+                _context10.next = 8;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: results,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalSaved
                 });
 
               case 8:
-                mapped = _context9.sent;
-                _context9.next = 11;
+                mapped = _context10.sent;
+                _context10.next = 11;
                 return this.persistPayloads({
                   decryptedPayloads: results
                 });
 
               case 11:
-                return _context9.abrupt("return", mapped[0]);
+                return _context10.abrupt("return", mapped[0]);
 
               case 12:
               case "end":
-                return _context9.stop();
+                return _context10.stop();
             }
           }
-        }, _callee9, this);
+        }, _callee10, this);
       }));
 
       function alternateUuidForItem(_x4) {
@@ -35514,7 +35616,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "markAllItemsAsNeedingSync",
     value: function () {
-      var _markAllItemsAsNeedingSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10() {
+      var _markAllItemsAsNeedingSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11() {
         var _ref2,
             alternateUuids,
             _items,
@@ -35526,17 +35628,17 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             item,
             items,
             payloads,
-            _args10 = arguments;
+            _args11 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
-                _ref2 = _args10.length > 0 && _args10[0] !== undefined ? _args10[0] : {}, alternateUuids = _ref2.alternateUuids;
+                _ref2 = _args11.length > 0 && _args11[0] !== undefined ? _args11[0] : {}, alternateUuids = _ref2.alternateUuids;
                 this.log('Marking all items as needing sync');
 
                 if (!alternateUuids) {
-                  _context10.next = 30;
+                  _context11.next = 30;
                   break;
                 }
 
@@ -35547,57 +35649,57 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context10.prev = 7;
+                _context11.prev = 7;
                 _iterator = _items[Symbol.iterator]();
 
               case 9:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context10.next = 16;
+                  _context11.next = 16;
                   break;
                 }
 
                 item = _step.value;
-                _context10.next = 13;
+                _context11.next = 13;
                 return this.alternateUuidForItem(item);
 
               case 13:
                 _iteratorNormalCompletion = true;
-                _context10.next = 9;
+                _context11.next = 9;
                 break;
 
               case 16:
-                _context10.next = 22;
+                _context11.next = 22;
                 break;
 
               case 18:
-                _context10.prev = 18;
-                _context10.t0 = _context10["catch"](7);
+                _context11.prev = 18;
+                _context11.t0 = _context11["catch"](7);
                 _didIteratorError = true;
-                _iteratorError = _context10.t0;
+                _iteratorError = _context11.t0;
 
               case 22:
-                _context10.prev = 22;
-                _context10.prev = 23;
+                _context11.prev = 22;
+                _context11.prev = 23;
 
                 if (!_iteratorNormalCompletion && _iterator.return != null) {
                   _iterator.return();
                 }
 
               case 25:
-                _context10.prev = 25;
+                _context11.prev = 25;
 
                 if (!_didIteratorError) {
-                  _context10.next = 28;
+                  _context11.next = 28;
                   break;
                 }
 
                 throw _iteratorError;
 
               case 28:
-                return _context10.finish(25);
+                return _context11.finish(25);
 
               case 29:
-                return _context10.finish(22);
+                return _context11.finish(22);
 
               case 30:
                 items = this.modelManager.allNondummyItems;
@@ -35609,23 +35711,23 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                     }
                   });
                 });
-                _context10.next = 34;
+                _context11.next = 34;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: payloads
                 });
 
               case 34:
-                _context10.next = 36;
+                _context11.next = 36;
                 return this.persistPayloads({
                   decryptedPayloads: payloads
                 });
 
               case 36:
               case "end":
-                return _context10.stop();
+                return _context11.stop();
             }
           }
-        }, _callee10, this, [[7, 18, 22, 30], [23,, 25, 29]]);
+        }, _callee11, this, [[7, 18, 22, 30], [23,, 25, 29]]);
       }));
 
       function markAllItemsAsNeedingSync() {
@@ -35644,11 +35746,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "repersistAllItems",
     value: function () {
-      var _repersistAllItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11() {
+      var _repersistAllItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12() {
         var items, payloads;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 items = this.modelManager.allItems;
                 payloads = items.map(function (item) {
@@ -35656,16 +35758,16 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                     object: item
                   });
                 });
-                return _context11.abrupt("return", this.persistPayloads({
+                return _context12.abrupt("return", this.persistPayloads({
                   decryptedPayloads: payloads
                 }));
 
               case 3:
               case "end":
-                return _context11.stop();
+                return _context12.stop();
             }
           }
-        }, _callee11, this);
+        }, _callee12, this);
       }));
 
       function repersistAllItems() {
@@ -35684,20 +35786,20 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "popPayloadsNeedingPreSyncSave",
     value: function () {
-      var _popPayloadsNeedingPreSyncSave = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(from) {
+      var _popPayloadsNeedingPreSyncSave = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(from) {
         var lastPreSyncSave, payloads;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
                 lastPreSyncSave = this.state.lastPreSyncSaveDate;
 
                 if (lastPreSyncSave) {
-                  _context12.next = 3;
+                  _context13.next = 3;
                   break;
                 }
 
-                return _context12.abrupt("return", from);
+                return _context13.abrupt("return", from);
 
               case 3:
                 /** dirtiedDate can be null if the payload was created as dirty */
@@ -35705,14 +35807,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   return !candidate.dirtiedDate || candidate.dirtiedDate > lastPreSyncSave;
                 });
                 this.state.setLastPresaveSyncDate(new Date());
-                return _context12.abrupt("return", payloads);
+                return _context13.abrupt("return", payloads);
 
               case 6:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       }));
 
       function popPayloadsNeedingPreSyncSave(_x5) {
@@ -35816,7 +35918,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13() {
+      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14() {
         var _this7 = this;
 
         var _ref3,
@@ -35837,8 +35939,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             inTimeResolveQueue,
             useStrategy,
             beginDate,
-            useMode,
             online,
+            useMode,
             uploadPayloads,
             operation,
             _iteratorNormalCompletion2,
@@ -35847,21 +35949,21 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             _iterator2,
             _step2,
             callback,
-            _args13 = arguments;
+            _args14 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                _ref3 = _args13.length > 0 && _args13[0] !== undefined ? _args13[0] : {}, timingStrategy = _ref3.timingStrategy, mode = _ref3.mode, checkIntegrity = _ref3.checkIntegrity, source = _ref3.source;
+                _ref3 = _args14.length > 0 && _args14[0] !== undefined ? _args14[0] : {}, timingStrategy = _ref3.timingStrategy, mode = _ref3.mode, checkIntegrity = _ref3.checkIntegrity, source = _ref3.source;
 
                 if (!this.locked) {
-                  _context13.next = 4;
+                  _context14.next = 4;
                   break;
                 }
 
                 this.log('Sync Locked');
-                return _context13.abrupt("return");
+                return _context14.abrupt("return");
 
               case 4:
                 /** 
@@ -35896,11 +35998,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   source = SyncSources.External;
                 }
 
-                _context13.next = 14;
+                _context14.next = 14;
                 return this.itemsNeedingSync();
 
               case 14:
-                items = _context13.sent;
+                items = _context14.sent;
 
                 /**
                  * Items that have never been synced and marked as deleted should not be
@@ -35913,12 +36015,12 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 decryptedPayloads = items.map(function (item) {
                   return item.payloadRepresentation();
                 });
-                _context13.next = 20;
+                _context14.next = 20;
                 return this.popPayloadsNeedingPreSyncSave(decryptedPayloads);
 
               case 20:
-                payloadsNeedingSave = _context13.sent;
-                _context13.next = 23;
+                payloadsNeedingSave = _context14.sent;
+                _context14.next = 23;
                 return this.persistPayloads({
                   decryptedPayloads: payloadsNeedingSave
                 });
@@ -35929,26 +36031,26 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 useStrategy = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(timingStrategy) ? timingStrategy : TIMING_STRATEGY_RESOLVE_ON_NEXT;
 
                 if (!(syncInProgress || !databaseLoaded || !canExecuteSync)) {
-                  _context13.next = 36;
+                  _context14.next = 36;
                   break;
                 }
 
                 this.log(!canExecuteSync ? 'Another function call has begun preparing for sync.' : syncInProgress ? 'Attempting to sync while existing sync in progress.' : 'Attempting to sync before local database has loaded.');
 
                 if (!(useStrategy === TIMING_STRATEGY_RESOLVE_ON_NEXT)) {
-                  _context13.next = 31;
+                  _context14.next = 31;
                   break;
                 }
 
-                return _context13.abrupt("return", this.timingStrategyResolveOnNext());
+                return _context14.abrupt("return", this.timingStrategyResolveOnNext());
 
               case 31:
                 if (!(useStrategy === TIMING_STRATEGY_FORCE_SPAWN_NEW)) {
-                  _context13.next = 35;
+                  _context14.next = 35;
                   break;
                 }
 
-                return _context13.abrupt("return", this.timingStrategyForceSpawnNew({
+                return _context14.abrupt("return", this.timingStrategyForceSpawnNew({
                   mode: mode,
                   checkIntegrity: checkIntegrity,
                   source: source
@@ -35967,27 +36069,36 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                  */
 
                 beginDate = new Date();
-                _context13.next = 41;
+                _context14.next = 41;
                 return this.modelManager.setItemsProperties({
                   items: items,
                   properties: _defineProperty({}, _Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadFields"].LastSyncBegan, beginDate)
                 });
 
               case 41:
-                useMode = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(mode) ? mode : SyncModes.Default;
-                _context13.next = 44;
+                _context14.next = 43;
                 return this.sessionManager.online();
 
-              case 44:
-                online = _context13.sent;
+              case 43:
+                online = _context14.sent;
+
+                useMode = function (tryMode) {
+                  if (online && !_this7.completedOnlineDownloadFirstSync) {
+                    return SyncModes.DownloadFirst;
+                  } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(tryMode)) {
+                    return tryMode;
+                  } else {
+                    return SyncModes.Default;
+                  }
+                }(mode);
 
                 if (!(useMode === SyncModes.Default)) {
-                  _context13.next = 57;
+                  _context14.next = 57;
                   break;
                 }
 
-                if (this.completedInitialSync) {
-                  _context13.next = 48;
+                if (!(online && !this.completedOnlineDownloadFirstSync)) {
+                  _context14.next = 48;
                   break;
                 }
 
@@ -35995,23 +36106,23 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 48:
                 if (!online) {
-                  _context13.next = 54;
+                  _context14.next = 54;
                   break;
                 }
 
-                _context13.next = 51;
+                _context14.next = 51;
                 return this.payloadsByPreparingForServer(decryptedPayloads);
 
               case 51:
-                uploadPayloads = _context13.sent;
-                _context13.next = 55;
+                uploadPayloads = _context14.sent;
+                _context14.next = 55;
                 break;
 
               case 54:
                 uploadPayloads = decryptedPayloads;
 
               case 55:
-                _context13.next = 58;
+                _context14.next = 58;
                 break;
 
               case 57:
@@ -36021,11 +36132,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 58:
                 if (!online) {
-                  _context13.next = 64;
+                  _context14.next = 64;
                   break;
                 }
 
-                _context13.next = 61;
+                _context14.next = 61;
                 return this.syncOnlineOperation({
                   payloads: uploadPayloads,
                   checkIntegrity: checkIntegrity,
@@ -36034,85 +36145,36 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 });
 
               case 61:
-                operation = _context13.sent;
-                _context13.next = 67;
+                operation = _context14.sent;
+                _context14.next = 67;
                 break;
 
               case 64:
-                _context13.next = 66;
+                _context14.next = 66;
                 return this.syncOfflineOperation({
                   payloads: uploadPayloads
                 });
 
               case 66:
-                operation = _context13.sent;
+                operation = _context14.sent;
 
               case 67:
-                _context13.next = 69;
+                _context14.next = 69;
                 return operation.run();
 
               case 69:
                 this.opStatus.setDidEnd();
                 releaseLock();
-                /**
-                 * For timing strategy TIMING_STRATEGY_RESOLVE_ON_NEXT.
-                 * Execute any callbacks pulled before this sync request began.
-                 */
-
-                _iteratorNormalCompletion2 = true;
-                _didIteratorError2 = false;
-                _iteratorError2 = undefined;
-                _context13.prev = 74;
-
-                for (_iterator2 = inTimeResolveQueue[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                  callback = _step2.value;
-                  callback.resolve();
-                }
-
-                _context13.next = 82;
-                break;
-
-              case 78:
-                _context13.prev = 78;
-                _context13.t0 = _context13["catch"](74);
-                _didIteratorError2 = true;
-                _iteratorError2 = _context13.t0;
-
-              case 82:
-                _context13.prev = 82;
-                _context13.prev = 83;
-
-                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                  _iterator2.return();
-                }
-
-              case 85:
-                _context13.prev = 85;
-
-                if (!_didIteratorError2) {
-                  _context13.next = 88;
-                  break;
-                }
-
-                throw _iteratorError2;
-
-              case 88:
-                return _context13.finish(85);
-
-              case 89:
-                return _context13.finish(82);
-
-              case 90:
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
 
                 if (!this.opStatus.hasError()) {
-                  _context13.next = 93;
+                  _context14.next = 74;
                   break;
                 }
 
-                return _context13.abrupt("return");
+                return _context14.abrupt("return");
 
-              case 93:
+              case 74:
                 this.opStatus.reset();
                 this.state.setLastSyncDate(new Date());
 
@@ -36120,39 +36182,42 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].MajorDataChange);
                 }
 
-                _context13.next = 98;
+                _context14.next = 79;
                 return this.handleNeverSyncedDeleted(neverSyncedDeleted);
 
-              case 98:
+              case 79:
                 if (!(useMode !== SyncModes.DownloadFirst)) {
-                  _context13.next = 101;
+                  _context14.next = 82;
                   break;
                 }
 
-                _context13.next = 101;
+                _context14.next = 82;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].FullSyncCompleted, {
                   source: source
                 });
 
-              case 101:
+              case 82:
                 if (!(useMode === SyncModes.DownloadFirst)) {
-                  _context13.next = 108;
+                  _context14.next = 89;
                   break;
                 }
 
-                this.completedInitialSync = true;
-                _context13.next = 105;
+                if (online) {
+                  this.completedOnlineDownloadFirstSync = true;
+                }
+
+                _context14.next = 86;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DownloadFirstSyncCompleted);
 
-              case 105:
-                return _context13.abrupt("return", this.sync({
+              case 86:
+                return _context14.abrupt("return", this.sync({
                   source: SyncSources.AfterDownloadFirst,
                   checkIntegrity: true
                 }));
 
-              case 108:
+              case 89:
                 if (!(!this.popSpawnQueue() && this.resolveQueue.length > 0)) {
-                  _context13.next = 113;
+                  _context14.next = 94;
                   break;
                 }
 
@@ -36162,28 +36227,28 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.sync({
                   source: SyncSources.ResolveQueue
                 });
-                _context13.next = 126;
+                _context14.next = 107;
                 break;
 
-              case 113:
-                _context13.next = 115;
+              case 94:
+                _context14.next = 96;
                 return this.itemsNeedingSync();
 
-              case 115:
-                _context13.t1 = _context13.sent.length;
+              case 96:
+                _context14.t0 = _context14.sent.length;
 
-                if (!(_context13.t1 > 0)) {
-                  _context13.next = 120;
+                if (!(_context14.t0 > 0)) {
+                  _context14.next = 101;
                   break;
                 }
 
-                return _context13.abrupt("return", this.sync({
+                return _context14.abrupt("return", this.sync({
                   source: SyncSources.MoreDirtyItems
                 }));
 
-              case 120:
+              case 101:
                 if (!operation.checkIntegrity) {
-                  _context13.next = 124;
+                  _context14.next = 105;
                   break;
                 }
 
@@ -36196,19 +36261,70 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   });
                 }
 
-                _context13.next = 126;
+                _context14.next = 107;
                 break;
 
-              case 124:
-                _context13.next = 126;
+              case 105:
+                _context14.next = 107;
                 return this.state.clearIntegrityHashes();
+
+              case 107:
+                /**
+                 * For timing strategy TIMING_STRATEGY_RESOLVE_ON_NEXT.
+                 * Execute any callbacks pulled before this sync request began.
+                 * Calling resolve on the callbacks should be the last thing we do in this function,
+                 * to simulate calling .sync as if it went through straight to the end without having
+                 * to be queued.
+                 */
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+                _context14.prev = 110;
+
+                for (_iterator2 = inTimeResolveQueue[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  callback = _step2.value;
+                  callback.resolve();
+                }
+
+                _context14.next = 118;
+                break;
+
+              case 114:
+                _context14.prev = 114;
+                _context14.t1 = _context14["catch"](110);
+                _didIteratorError2 = true;
+                _iteratorError2 = _context14.t1;
+
+              case 118:
+                _context14.prev = 118;
+                _context14.prev = 119;
+
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
+                }
+
+              case 121:
+                _context14.prev = 121;
+
+                if (!_didIteratorError2) {
+                  _context14.next = 124;
+                  break;
+                }
+
+                throw _iteratorError2;
+
+              case 124:
+                return _context14.finish(121);
+
+              case 125:
+                return _context14.finish(118);
 
               case 126:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this, [[74, 78, 82, 90], [83,, 85, 89]]);
+        }, _callee14, this, [[110, 114, 118, 126], [119,, 121, 125]]);
       }));
 
       function sync() {
@@ -36222,88 +36338,88 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "syncOnlineOperation",
     value: function () {
-      var _syncOnlineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref4) {
+      var _syncOnlineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref4) {
         var _this8 = this;
 
         var payloads, checkIntegrity, source, mode, operation;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 payloads = _ref4.payloads, checkIntegrity = _ref4.checkIntegrity, source = _ref4.source, mode = _ref4.mode;
                 this.log('Syncing online user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
-                _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__["AccountSyncOperation"];
-                _context15.t1 = this.apiService;
-                _context15.t2 = payloads;
-                _context15.t3 = checkIntegrity;
-                _context15.next = 8;
+                _context16.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__["AccountSyncOperation"];
+                _context16.t1 = this.apiService;
+                _context16.t2 = payloads;
+                _context16.t3 = checkIntegrity;
+                _context16.next = 8;
                 return this.getLastSyncToken();
 
               case 8:
-                _context15.t4 = _context15.sent;
-                _context15.next = 11;
+                _context16.t4 = _context16.sent;
+                _context16.next = 11;
                 return this.getPaginationToken();
 
               case 11:
-                _context15.t5 = _context15.sent;
+                _context16.t5 = _context16.sent;
 
-                _context15.t6 = function () {
-                  var _receiver = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(signal, type) {
+                _context16.t6 = function () {
+                  var _receiver = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(signal, type) {
                     var response;
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
                       while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                           case 0:
                             if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SIGNAL_TYPE_RESPONSE"])) {
-                              _context14.next = 11;
+                              _context15.next = 11;
                               break;
                             }
 
                             response = signal;
 
                             if (!response.hasError) {
-                              _context14.next = 7;
+                              _context15.next = 7;
                               break;
                             }
 
-                            _context14.next = 5;
+                            _context15.next = 5;
                             return _this8.handleErrorServerResponse({
                               operation: operation,
                               response: response
                             });
 
                           case 5:
-                            _context14.next = 9;
+                            _context15.next = 9;
                             break;
 
                           case 7:
-                            _context14.next = 9;
+                            _context15.next = 9;
                             return _this8.handleSuccessServerResponse({
                               operation: operation,
                               response: response
                             });
 
                           case 9:
-                            _context14.next = 14;
+                            _context15.next = 14;
                             break;
 
                           case 11:
                             if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SIGNAL_TYPE_STATUS_CHANGED"])) {
-                              _context14.next = 14;
+                              _context15.next = 14;
                               break;
                             }
 
-                            _context14.next = 14;
+                            _context15.next = 14;
                             return _this8.handleStatusChange({
                               operation: operation
                             });
 
                           case 14:
                           case "end":
-                            return _context14.stop();
+                            return _context15.stop();
                         }
                       }
-                    }, _callee14);
+                    }, _callee15);
                   }));
 
                   function receiver(_x7, _x8) {
@@ -36313,23 +36429,23 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   return receiver;
                 }();
 
-                _context15.t7 = {
-                  apiService: _context15.t1,
-                  payloads: _context15.t2,
-                  checkIntegrity: _context15.t3,
-                  lastSyncToken: _context15.t4,
-                  paginationToken: _context15.t5,
-                  receiver: _context15.t6
+                _context16.t7 = {
+                  apiService: _context16.t1,
+                  payloads: _context16.t2,
+                  checkIntegrity: _context16.t3,
+                  lastSyncToken: _context16.t4,
+                  paginationToken: _context16.t5,
+                  receiver: _context16.t6
                 };
-                operation = new _context15.t0(_context15.t7);
-                return _context15.abrupt("return", operation);
+                operation = new _context16.t0(_context16.t7);
+                return _context16.abrupt("return", operation);
 
               case 16:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
       function syncOnlineOperation(_x6) {
@@ -36343,53 +36459,53 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "syncOfflineOperation",
     value: function () {
-      var _syncOfflineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref5) {
+      var _syncOfflineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref5) {
         var _this9 = this;
 
         var payloads, operation;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context17.prev = _context17.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
                 payloads = _ref5.payloads;
                 this.log('Syncing offline user', payloads);
                 operation = new _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_9__["OfflineSyncOperation"]({
                   payloads: payloads,
                   receiver: function () {
-                    var _receiver2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(signal, type) {
-                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
+                    var _receiver2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(signal, type) {
+                      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
                         while (1) {
-                          switch (_context16.prev = _context16.next) {
+                          switch (_context17.prev = _context17.next) {
                             case 0:
                               if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SIGNAL_TYPE_RESPONSE"])) {
-                                _context16.next = 5;
+                                _context17.next = 5;
                                 break;
                               }
 
-                              _context16.next = 3;
+                              _context17.next = 3;
                               return _this9.handleOfflineResponse(signal);
 
                             case 3:
-                              _context16.next = 8;
+                              _context17.next = 8;
                               break;
 
                             case 5:
                               if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SIGNAL_TYPE_STATUS_CHANGED"])) {
-                                _context16.next = 8;
+                                _context17.next = 8;
                                 break;
                               }
 
-                              _context16.next = 8;
+                              _context17.next = 8;
                               return _this9.handleStatusChange({
                                 operation: operation
                               });
 
                             case 8:
                             case "end":
-                              return _context16.stop();
+                              return _context17.stop();
                           }
                         }
-                      }, _callee16);
+                      }, _callee17);
                     }));
 
                     function receiver(_x10, _x11) {
@@ -36399,14 +36515,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                     return receiver;
                   }()
                 });
-                return _context17.abrupt("return", operation);
+                return _context18.abrupt("return", operation);
 
               case 4:
               case "end":
-                return _context17.stop();
+                return _context18.stop();
             }
           }
-        }, _callee17, this);
+        }, _callee18, this);
       }));
 
       function syncOfflineOperation(_x9) {
@@ -36420,11 +36536,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleStatusChange",
     value: function () {
-      var _handleStatusChange = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref6) {
+      var _handleStatusChange = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref6) {
         var operation, pendingUploadCount, totalUploadCount, completedUploadCount;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
                 operation = _ref6.operation;
                 pendingUploadCount = operation.pendingUploadCount();
@@ -36437,10 +36553,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 5:
               case "end":
-                return _context18.stop();
+                return _context19.stop();
             }
           }
-        }, _callee18, this);
+        }, _callee19, this);
       }));
 
       function handleStatusChange(_x12) {
@@ -36454,11 +36570,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleOfflineResponse",
     value: function () {
-      var _handleOfflineResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(response) {
+      var _handleOfflineResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(response) {
         var payloadsToMap, masterCollection, payloadsToPersist;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context19.prev = _context19.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
                 payloadsToMap = response.savedPayloads;
                 /** Before persisting, merge with current base value that has content field */
@@ -36468,13 +36584,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   var base = masterCollection.findPayload(payload.uuid);
                   return base.mergedWith(payload);
                 });
-                _context19.next = 5;
+                _context20.next = 5;
                 return this.persistPayloads({
                   decryptedPayloads: payloadsToPersist
                 });
 
               case 5:
-                _context19.next = 7;
+                _context20.next = 7;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: payloadsToMap,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalSaved
@@ -36485,15 +36601,15 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.opStatus.setDownloadStatus({
                   downloaded: response.retrievedPayloads.length
                 });
-                _context19.next = 11;
+                _context20.next = 11;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
 
               case 11:
               case "end":
-                return _context19.stop();
+                return _context20.stop();
             }
           }
-        }, _callee19, this);
+        }, _callee20, this);
       }));
 
       function handleOfflineResponse(_x13) {
@@ -36507,11 +36623,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleErrorServerResponse",
     value: function () {
-      var _handleErrorServerResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(_ref7) {
+      var _handleErrorServerResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(_ref7) {
         var response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
-            switch (_context20.prev = _context20.next) {
+            switch (_context21.prev = _context21.next) {
               case 0:
                 response = _ref7.response;
                 this.log('Sync Error', response);
@@ -36525,10 +36641,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 5:
               case "end":
-                return _context20.stop();
+                return _context21.stop();
             }
           }
-        }, _callee20, this);
+        }, _callee21, this);
       }));
 
       function handleErrorServerResponse(_x14) {
@@ -36542,21 +36658,21 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleSuccessServerResponse",
     value: function () {
-      var _handleSuccessServerResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(_ref8) {
+      var _handleSuccessServerResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22(_ref8) {
         var operation, response, decryptedPayloads, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, collection, payloadsToPersist, payloadClass, clientHash;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
           while (1) {
-            switch (_context21.prev = _context21.next) {
+            switch (_context22.prev = _context22.next) {
               case 0:
                 operation = _ref8.operation, response = _ref8.response;
 
                 if (!this._simulate_latency) {
-                  _context21.next = 4;
+                  _context22.next = 4;
                   break;
                 }
 
-                _context21.next = 4;
+                _context22.next = 4;
                 return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["sleep"])(this._simulate_latency.latency);
 
               case 4:
@@ -36571,72 +36687,72 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion3 = true;
                 _didIteratorError3 = false;
                 _iteratorError3 = undefined;
-                _context21.prev = 13;
+                _context22.prev = 13;
                 _iterator3 = response.allProcessedPayloads[Symbol.iterator]();
 
               case 15:
                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                  _context21.next = 26;
+                  _context22.next = 26;
                   break;
                 }
 
                 payload = _step3.value;
 
                 if (!(payload.deleted || !payload.fields().includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadFields"].Content))) {
-                  _context21.next = 19;
+                  _context22.next = 19;
                   break;
                 }
 
-                return _context21.abrupt("continue", 23);
+                return _context22.abrupt("continue", 23);
 
               case 19:
-                _context21.next = 21;
+                _context22.next = 21;
                 return this.protocolService.payloadByDecryptingPayload({
                   payload: payload
                 });
 
               case 21:
-                decrypted = _context21.sent;
+                decrypted = _context22.sent;
                 decryptedPayloads.push(decrypted);
 
               case 23:
                 _iteratorNormalCompletion3 = true;
-                _context21.next = 15;
+                _context22.next = 15;
                 break;
 
               case 26:
-                _context21.next = 32;
+                _context22.next = 32;
                 break;
 
               case 28:
-                _context21.prev = 28;
-                _context21.t0 = _context21["catch"](13);
+                _context22.prev = 28;
+                _context22.t0 = _context22["catch"](13);
                 _didIteratorError3 = true;
-                _iteratorError3 = _context21.t0;
+                _iteratorError3 = _context22.t0;
 
               case 32:
-                _context21.prev = 32;
-                _context21.prev = 33;
+                _context22.prev = 32;
+                _context22.prev = 33;
 
                 if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
                   _iterator3.return();
                 }
 
               case 35:
-                _context21.prev = 35;
+                _context22.prev = 35;
 
                 if (!_didIteratorError3) {
-                  _context21.next = 38;
+                  _context22.next = 38;
                   break;
                 }
 
                 throw _iteratorError3;
 
               case 38:
-                return _context21.finish(35);
+                return _context22.finish(35);
 
               case 39:
-                return _context21.finish(32);
+                return _context22.finish(32);
 
               case 40:
                 masterCollection = this.modelManager.getMasterCollection();
@@ -36646,25 +36762,25 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   payloadsSavedOrSaving: operation.payloadsSavedOrSaving,
                   baseCollection: masterCollection
                 });
-                _context21.next = 44;
+                _context22.next = 44;
                 return resolver.collectionsByProcessingResponse();
 
               case 44:
-                collections = _context21.sent;
+                collections = _context22.sent;
                 _iteratorNormalCompletion4 = true;
                 _didIteratorError4 = false;
                 _iteratorError4 = undefined;
-                _context21.prev = 48;
+                _context22.prev = 48;
                 _iterator4 = collections[Symbol.iterator]();
 
               case 50:
                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                  _context21.next = 62;
+                  _context22.next = 62;
                   break;
                 }
 
                 collection = _step4.value;
-                _context21.next = 54;
+                _context22.next = 54;
                 return this.modelManager.mapCollectionToLocalItems({
                   collection: collection
                 });
@@ -36683,66 +36799,66 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   payloadsToPersist = collection.allPayloads;
                 }
 
-                _context21.next = 59;
+                _context22.next = 59;
                 return this.persistPayloads({
                   decryptedPayloads: payloadsToPersist
                 });
 
               case 59:
                 _iteratorNormalCompletion4 = true;
-                _context21.next = 50;
+                _context22.next = 50;
                 break;
 
               case 62:
-                _context21.next = 68;
+                _context22.next = 68;
                 break;
 
               case 64:
-                _context21.prev = 64;
-                _context21.t1 = _context21["catch"](48);
+                _context22.prev = 64;
+                _context22.t1 = _context22["catch"](48);
                 _didIteratorError4 = true;
-                _iteratorError4 = _context21.t1;
+                _iteratorError4 = _context22.t1;
 
               case 68:
-                _context21.prev = 68;
-                _context21.prev = 69;
+                _context22.prev = 68;
+                _context22.prev = 69;
 
                 if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                   _iterator4.return();
                 }
 
               case 71:
-                _context21.prev = 71;
+                _context22.prev = 71;
 
                 if (!_didIteratorError4) {
-                  _context21.next = 74;
+                  _context22.next = 74;
                   break;
                 }
 
                 throw _iteratorError4;
 
               case 74:
-                return _context21.finish(71);
+                return _context22.finish(71);
 
               case 75:
-                return _context21.finish(68);
+                return _context22.finish(68);
 
               case 76:
-                _context21.next = 78;
+                _context22.next = 78;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
 
               case 78:
                 if (!response.checkIntegrity) {
-                  _context21.next = 84;
+                  _context22.next = 84;
                   break;
                 }
 
-                _context21.next = 81;
+                _context22.next = 81;
                 return this.computeDataIntegrityHash();
 
               case 81:
-                clientHash = _context21.sent;
-                _context21.next = 84;
+                clientHash = _context22.sent;
+                _context22.next = 84;
                 return this.state.setIntegrityHashes({
                   clientHash: clientHash,
                   serverHash: response.integrityHash
@@ -36750,10 +36866,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 84:
               case "end":
-                return _context21.stop();
+                return _context22.stop();
             }
           }
-        }, _callee21, this, [[13, 28, 32, 40], [33,, 35, 39], [48, 64, 68, 76], [69,, 71, 75]]);
+        }, _callee22, this, [[13, 28, 32, 40], [33,, 35, 39], [48, 64, 68, 76], [69,, 71, 75]]);
       }));
 
       function handleSuccessServerResponse(_x15) {
@@ -36771,11 +36887,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleNeverSyncedDeleted",
     value: function () {
-      var _handleNeverSyncedDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22(items) {
+      var _handleNeverSyncedDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23(items) {
         var payloads;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context22) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
           while (1) {
-            switch (_context22.prev = _context22.next) {
+            switch (_context23.prev = _context23.next) {
               case 0:
                 payloads = items.map(function (item) {
                   return item.payloadRepresentation({
@@ -36784,23 +36900,23 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                     }
                   });
                 });
-                _context22.next = 3;
+                _context23.next = 3;
                 return this.modelManager.mapPayloadsToLocalItems({
                   payloads: payloads
                 });
 
               case 3:
-                _context22.next = 5;
+                _context23.next = 5;
                 return this.persistPayloads({
                   decryptedPayloads: payloads
                 });
 
               case 5:
               case "end":
-                return _context22.stop();
+                return _context23.stop();
             }
           }
-        }, _callee22, this);
+        }, _callee23, this);
       }));
 
       function handleNeverSyncedDeleted(_x16) {
@@ -36814,32 +36930,32 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "persistPayloads",
     value: function () {
-      var _persistPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee23(_ref9) {
+      var _persistPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24(_ref9) {
         var _ref9$decryptedPayloa, decryptedPayloads;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee23$(_context23) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
           while (1) {
-            switch (_context23.prev = _context23.next) {
+            switch (_context24.prev = _context24.next) {
               case 0:
                 _ref9$decryptedPayloa = _ref9.decryptedPayloads, decryptedPayloads = _ref9$decryptedPayloa === void 0 ? [] : _ref9$decryptedPayloa;
 
                 if (!(decryptedPayloads.length === 0)) {
-                  _context23.next = 3;
+                  _context24.next = 3;
                   break;
                 }
 
-                return _context23.abrupt("return");
+                return _context24.abrupt("return");
 
               case 3:
-                _context23.next = 5;
+                _context24.next = 5;
                 return this.storageService.savePayloads(decryptedPayloads);
 
               case 5:
               case "end":
-                return _context23.stop();
+                return _context24.stop();
             }
           }
-        }, _callee23, this);
+        }, _callee24, this);
       }));
 
       function persistPayloads(_x17) {
@@ -36858,13 +36974,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "computeDataIntegrityHash",
     value: function () {
-      var _computeDataIntegrityHash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24() {
+      var _computeDataIntegrityHash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25() {
         var items, dates, string;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
           while (1) {
-            switch (_context24.prev = _context24.next) {
+            switch (_context25.prev = _context25.next) {
               case 0:
-                _context24.prev = 0;
+                _context25.prev = 0;
                 items = this.modelManager.nonDeletedItems.sort(function (a, b) {
                   return b.updated_at - a.updated_at;
                 });
@@ -36872,20 +36988,20 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   return item.updatedAtTimestamp();
                 });
                 string = dates.join(',');
-                return _context24.abrupt("return", this.protocolService.crypto.sha256(string));
+                return _context25.abrupt("return", this.protocolService.crypto.sha256(string));
 
               case 7:
-                _context24.prev = 7;
-                _context24.t0 = _context24["catch"](0);
-                console.error('Error computing data integrity hash', _context24.t0);
-                return _context24.abrupt("return", null);
+                _context25.prev = 7;
+                _context25.t0 = _context25["catch"](0);
+                console.error('Error computing data integrity hash', _context25.t0);
+                return _context25.abrupt("return", null);
 
               case 11:
               case "end":
-                return _context24.stop();
+                return _context25.stop();
             }
           }
-        }, _callee24, this, [[0, 7]]);
+        }, _callee25, this, [[0, 7]]);
       }));
 
       function computeDataIntegrityHash() {
@@ -36902,22 +37018,22 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "resolveOutOfSync",
     value: function () {
-      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee25() {
+      var _resolveOutOfSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26() {
         var downloader, payloads, delta, collection;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee25$(_context25) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
           while (1) {
-            switch (_context25.prev = _context25.next) {
+            switch (_context26.prev = _context26.next) {
               case 0:
                 downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__["AccountDownloader"]({
                   apiService: this.apiService,
                   protocolService: this.protocolService,
                   customEvent: 'resolve-out-of-sync'
                 });
-                _context25.next = 3;
+                _context26.next = 3;
                 return downloader.run();
 
               case 3:
-                payloads = _context25.sent;
+                payloads = _context26.sent;
                 delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"]({
                   baseCollection: this.modelManager.getMasterCollection(),
                   applyCollection: new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"]({
@@ -36925,34 +37041,34 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                     source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved
                   })
                 });
-                _context25.next = 7;
+                _context26.next = 7;
                 return delta.resultingCollection();
 
               case 7:
-                collection = _context25.sent;
-                _context25.next = 10;
+                collection = _context26.sent;
+                _context26.next = 10;
                 return this.modelManager.mapCollectionToLocalItems({
                   collection: collection
                 });
 
               case 10:
-                _context25.next = 12;
+                _context26.next = 12;
                 return this.persistPayloads({
                   decryptedPayloads: collection.payloads
                 });
 
               case 12:
-                return _context25.abrupt("return", this.sync({
+                return _context26.abrupt("return", this.sync({
                   checkIntegrity: true,
                   source: SyncSources.ResolveOutOfSync
                 }));
 
               case 13:
               case "end":
-                return _context25.stop();
+                return _context26.stop();
             }
           }
-        }, _callee25, this);
+        }, _callee26, this);
       }));
 
       function resolveOutOfSync() {
@@ -36966,40 +37082,40 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "statelessDownloadAllItems",
     value: function () {
-      var _statelessDownloadAllItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26() {
+      var _statelessDownloadAllItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27() {
         var _ref10,
             contentType,
             customEvent,
             downloader,
             payloads,
-            _args26 = arguments;
+            _args27 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee27$(_context27) {
           while (1) {
-            switch (_context26.prev = _context26.next) {
+            switch (_context27.prev = _context27.next) {
               case 0:
-                _ref10 = _args26.length > 0 && _args26[0] !== undefined ? _args26[0] : {}, contentType = _ref10.contentType, customEvent = _ref10.customEvent;
+                _ref10 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, contentType = _ref10.contentType, customEvent = _ref10.customEvent;
                 downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__["AccountDownloader"]({
                   apiService: this.apiService,
                   protocolService: this.protocolService,
                   contentType: contentType,
                   customEvent: customEvent
                 });
-                _context26.next = 4;
+                _context27.next = 4;
                 return downloader.run();
 
               case 4:
-                payloads = _context26.sent;
-                return _context26.abrupt("return", payloads.map(function (payload) {
+                payloads = _context27.sent;
+                return _context27.abrupt("return", payloads.map(function (payload) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_18__["CreateItemFromPayload"])(payload);
                 }));
 
               case 6:
               case "end":
-                return _context26.stop();
+                return _context27.stop();
             }
           }
-        }, _callee26, this);
+        }, _callee27, this);
       }));
 
       function statelessDownloadAllItems() {

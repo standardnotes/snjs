@@ -53,6 +53,23 @@ describe('004 protocol operations', () => {
     expect(result.keyParams.identifier).to.be.ok;
   });
 
+  it('computes proper keys for sign in', async () => {
+    const identifier = 'foo@bar.com';
+    const password = 'very_secure';
+    const keyParams = application.protocolService.createKeyParams({
+      pw_nonce: 'baaec0131d677cf993381367eb082fe377cefe70118c1699cb9b38f0bc850e7b',
+      identifier: identifier,
+      version: '004'
+    });
+    const key = await protocol004.computeRootKey({
+      keyParams: keyParams,
+      password: password
+    });
+    expect(key.masterKey).to.equal('5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943');
+    expect(key.serverPassword).to.equal('83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d');
+    expect(key.dataAuthenticationKey).to.not.be.ok;
+  });
+
   it('generates random key', async () => {
     const length = 96;
     const key = await application.protocolService.crypto.generateRandomKey(length);

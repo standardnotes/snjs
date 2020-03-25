@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('online syncing', () => {
+describe('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -728,7 +728,7 @@ describe.only('online syncing', () => {
     });
 
     this.application.modelManager.resetState();
-    await this.application.syncService.deinit();
+    await this.application.syncService.clearSyncPositionTokens();
 
     expect(this.application.modelManager.allItems.length).to.equal(0);
 
@@ -846,7 +846,7 @@ describe.only('online syncing', () => {
 
     /** Clear local data */
     await this.application.modelManager.resetState();
-    await this.application.syncService.deinit();
+    await this.application.syncService.clearSyncPositionTokens();
     await this.application.storageService.clearAllPayloads();
     expect(this.application.modelManager.allItems.length).to.equal(0);
 
@@ -891,7 +891,7 @@ describe.only('online syncing', () => {
     this.expectedItemCount++;
 
     /** Simulate database not loaded */
-    await this.application.syncService.deinit();
+    await this.application.syncService.clearSyncPositionTokens();
     this.application.syncService.ut_setDatabaseLoaded(false);
     this.application.syncService.sync(syncOptions);
     await Factory.sleep(0.3);
@@ -919,7 +919,7 @@ describe.only('online syncing', () => {
       this.application.syncService.ut_setDatabaseLoaded(false);
       /** You don't want to clear model manager state as we'll lose encrypting items key */
       // await this.application.modelManager.resetState();
-      await this.application.syncService.deinit();
+      await this.application.syncService.clearSyncPositionTokens();
       expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
 
       const note = await Factory.createMappedNote(this.application);
@@ -943,7 +943,7 @@ describe.only('online syncing', () => {
       expect(typeof rawPayload.content).to.equal('string');
 
       /** Clear state data and upload item from storage to server */
-      await this.application.syncService.deinit();
+      await this.application.syncService.clearSyncPositionTokens();
       await this.application.modelManager.resetState();
       const databasePayloads = await this.application.storageService.getAllRawPayloads();
       await this.application.syncService.loadDatabasePayloads(databasePayloads);
@@ -973,7 +973,7 @@ describe.only('online syncing', () => {
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
     this.application.syncService.ut_setDatabaseLoaded(false);
-    this.application.syncService.deinit();
+    this.application.syncService.clearSyncPositionTokens();
     this.application.modelManager.resetState();
 
     this.application.syncService.localLoadPriorty = ['C', 'A', 'B'];
@@ -1138,14 +1138,15 @@ describe.only('online syncing', () => {
     // Now do a regular sync with no latency.
     this.application.syncService.ut_endLatencySimulator();
     const midSync = this.application.syncService.sync(syncOptions);
-    await Promise.all([slowSync, midSync]);
+    
+    await slowSync;
+    await midSync;
 
     expect(note.dirty).to.equal(false);
     expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
     expect(note.content.text).to.equal(text);
-
+    
     // client B
-    await this.application.syncService.deinit();
     await this.application.modelManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);

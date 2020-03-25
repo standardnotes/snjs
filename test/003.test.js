@@ -65,6 +65,23 @@ describe('003 protocol operations', () => {
     expect(result.keyParams.identifier).to.be.ok;
   });
 
+  it('computes proper keys for sign in', async () => {
+    const identifier = 'foo@bar.com';
+    const password = 'very_secure';
+    const keyParams = sharedApplication.protocolService.createKeyParams({
+      pw_nonce: 'baaec0131d677cf993381367eb082fe377cefe70118c1699cb9b38f0bc850e7b',
+      identifier: identifier,
+      version: '003'
+    });
+    const key = await protocol003.computeRootKey({
+      keyParams: keyParams,
+      password: password
+    });
+    expect(key.serverPassword).to.equal('60fdae231049d81974c562e943ad472f0143daa87f43048d2ede2d199ea7be25');
+    expect(key.masterKey).to.equal('2b2162e5299f71f9fcd39789a01f6062f2779220e97a43d7895cf30da11186e9');
+    expect(key.dataAuthenticationKey).to.equal('24dfba6f42ffc07a5223440a28a574d463e99d8d4aeb68fe95f55aa8ed5fd39f');
+  });
+
   it('properly encrypts and decrypts', async () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;

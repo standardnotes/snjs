@@ -46,38 +46,4 @@ describe('application instances', () => {
     await app1.deinit();
     await app2.deinit();
   });
-
-  it('restarting should clear stream observers', async () => {
-    const app = await Factory.createAndInitializeApplication();
-    let actualEventCount = 0;
-    const expectedEventCount = 1;
-    app.streamItems({
-      contentType: ContentTypes.Note,
-      stream: ({ items }) => {
-        actualEventCount++;
-      }
-    });
-    /** Should trigger stream observer */
-    await Factory.createMappedNote(app);
-    await app.restart();
-    /** Should not trigger stream observer as application should have reset observers on restart */
-    await Factory.createMappedNote(app);
-    await Factory.sleep(0.1);
-    expect(actualEventCount).to.equal(expectedEventCount);
-    expect(app.streamObservers.length).to.equal(0);
-  });
-
-  it('onStart should be called twice after restart', async () => {
-    const app = await Factory.createApplication();
-    let actualEventCount = 0;
-    const expectedEventCount = 2;
-    app.addEventObserver((event) => {
-      if(event === ApplicationEvents.Started) {
-        actualEventCount++;
-      }
-    });
-    await Factory.initializeApplication(app);
-    await app.restart();
-    expect(actualEventCount).to.equal(expectedEventCount);
-  });
 });
