@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('singletons', () => {
+describe.only('singletons', () => {
 
   const syncOptions = {
     checkIntegrity: true
@@ -38,11 +38,13 @@ describe('singletons', () => {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password
-    });
+    this.registerUser = async () => {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password
+      });
+    };
     this.signOut = async () => {
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     };
@@ -112,7 +114,40 @@ describe('singletons', () => {
     expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
   });
 
+  it.only('resolves via find or create', async function () {
+    /* Set to never synced as singleton manager will attempt to sync before resolving */
+    this.application.syncService.ut_clearLastSyncDate();
+    this.application.syncService.ut_setDatabaseLoaded(false);
+    const contentType = ContentTypes.UserPrefs;
+    const predicate = new SNPredicate('content_type', '=', contentType);
+    /* Start a sync right after we await singleton resolve below */
+    setImmediate(() => {
+      this.application.syncService.ut_setDatabaseLoaded(true);
+      this.application.sync({
+        /* Simulate the first sync occuring as that is handled specially by sync service */
+        mode: SyncModes.DownloadFirst
+      });
+    });
+    const userPreferences = await this.application.singletonManager.findOrCreateSingleton({
+      predicate: predicate,
+      createPayload: CreateMaxPayloadFromAnyObject({
+        object: {
+          content_type: contentType,
+          content: {}
+        }
+      })
+    });
+    this.expectedItemCount += 1;
+
+    expect(userPreferences).to.be.ok;
+    const refreshedUserPrefs = this.application.findItem({ uuid: userPreferences.uuid });
+    expect(refreshedUserPrefs).to.be.ok;
+    await this.application.sync(syncOptions);
+    expect(this.application.modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+  }).timeout(Factory.TestTimeout);
+
   it('resolves registered predicate with signing in/out', async function () {
+    await this.registerUser();
     await this.signOut();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -134,6 +169,7 @@ describe('singletons', () => {
   }).timeout(5000);
 
   it('singletons that are deleted after download first sync should not sync to server', async function () {
+    await this.registerUser();
     this.application.singletonManager.registerPredicate(this.extPred);
     await this.createExtMgr();
     await this.createExtMgr();
@@ -162,6 +198,7 @@ describe('singletons', () => {
   }).timeout(10000);
 
   it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
+    await this.registerUser();
     /** Create privs */
     const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
@@ -179,9 +216,10 @@ describe('singletons', () => {
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
     const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
-  });
+  }).timeout(Factory.TestTimeout);
 
   it('resolving singleton before first sync, then signing in, should result in correct number of instances', async function () {
+    await this.registerUser();
     /** Create privs and associate them with account */
     const ogPrivs = await this.application.privilegesService.getPrivileges();
     this.expectedItemCount++;
@@ -200,7 +238,7 @@ describe('singletons', () => {
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
     const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
-  });
+  }).timeout(Factory.TestTimeout);
 
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();

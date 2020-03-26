@@ -3,6 +3,8 @@
 import WebDeviceInterface from './web_device_interface.js';
 import { Environments, Platforms } from '../../lib/platforms.js';
 
+export const TestTimeout = 10000;
+
 export function createApplication(namespace, environment, platform) {
   const url = serverURL();
   const deviceInterface = new WebDeviceInterface({

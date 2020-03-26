@@ -107,6 +107,19 @@ describe('storage manager', () => {
     expect(retrievedValue).to.equal(value);
   });
 
+  it('ephemeral session should not persist to database', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: true
+    });
+    await Factory.createSyncedNote(this.application);
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
+    expect(rawPayloads.length).to.equal(0);
+
+  });
+
   it('storage with no account and no passcode should not be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
