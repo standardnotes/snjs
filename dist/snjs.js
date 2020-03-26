@@ -2619,8 +2619,9 @@ var SNApplication = /*#__PURE__*/function () {
     key: "prepareForLaunch",
     value: function () {
       var _prepareForLaunch = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref2) {
-        var callbacks, _ref3, isNewDatabase;
+        var _this = this;
 
+        var callbacks, databaseResult;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2637,37 +2638,38 @@ var SNApplication = /*#__PURE__*/function () {
               case 3:
                 this.setLaunchCallbacks(callbacks);
                 _context.next = 6;
-                return this.deviceInterface.openDatabase();
+                return this.deviceInterface.openDatabase().catch(function (error) {
+                  _this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].LocalDatabaseReadError, error);
+                });
 
               case 6:
-                _ref3 = _context.sent;
-                isNewDatabase = _ref3.isNewDatabase;
-                this.createdNewDatabase = isNewDatabase;
-                _context.next = 11;
+                databaseResult = _context.sent;
+                this.createdNewDatabase = databaseResult && databaseResult.isNewDatabase;
+                _context.next = 10;
                 return this.migrationService.initialize();
 
-              case 11:
-                _context.next = 13;
+              case 10:
+                _context.next = 12;
                 return this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].PreparingForLaunch_0);
 
-              case 13:
-                _context.next = 15;
+              case 12:
+                _context.next = 14;
                 return this.storageService.initializeFromDisk();
 
-              case 15:
-                _context.next = 17;
+              case 14:
+                _context.next = 16;
                 return this.keyManager.initialize();
 
-              case 17:
-                _context.next = 19;
+              case 16:
+                _context.next = 18;
                 return this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].ReadyForLaunch_05);
 
-              case 19:
+              case 18:
                 this.started = true;
-                _context.next = 22;
+                _context.next = 21;
                 return this.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].Started);
 
-              case 22:
+              case 21:
               case "end":
                 return _context.stop();
             }
@@ -2702,9 +2704,9 @@ var SNApplication = /*#__PURE__*/function () {
     key: "launch",
     value: function () {
       var _launch = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
-        var _this = this;
+        var _this2 = this;
 
-        var _ref4,
+        var _ref3,
             awaitDatabaseLoad,
             launchChallenge,
             response,
@@ -2716,7 +2718,7 @@ var SNApplication = /*#__PURE__*/function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _ref4 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, awaitDatabaseLoad = _ref4.awaitDatabaseLoad;
+                _ref3 = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : {}, awaitDatabaseLoad = _ref3.awaitDatabaseLoad;
                 this.launched = false;
                 _context3.next = 4;
                 return this.challengeService.getLaunchChallenge();
@@ -2797,7 +2799,7 @@ var SNApplication = /*#__PURE__*/function () {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
                         case 0:
-                          if (!_this.dealloced) {
+                          if (!_this2.dealloced) {
                             _context2.next = 2;
                             break;
                           }
@@ -2806,12 +2808,12 @@ var SNApplication = /*#__PURE__*/function () {
 
                         case 2:
                           _context2.next = 4;
-                          return _this.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].LoadedDatabase_12);
+                          return _this2.handleStage(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationStages"].LoadedDatabase_12);
 
                         case 4:
-                          _this.beginAutoSyncTimer();
+                          _this2.beginAutoSyncTimer();
 
-                          return _context2.abrupt("return", _this.syncService.sync({
+                          return _context2.abrupt("return", _this2.syncService.sync({
                             mode: _Services__WEBPACK_IMPORTED_MODULE_6__["SyncModes"].DownloadFirst
                           }));
 
@@ -2901,12 +2903,12 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "beginAutoSyncTimer",
     value: function beginAutoSyncTimer() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.autoSyncInterval = this.deviceInterface.interval(function () {
-        _this2.syncService.log('Syncing from autosync');
+        _this3.syncService.log('Syncing from autosync');
 
-        _this2.sync();
+        _this3.sync();
       }, DEFAULT_AUTO_SYNC_INTERVAL);
     }
     /** 
@@ -2918,15 +2920,15 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getMigrationChallengeResponder",
     value: function getMigrationChallengeResponder() {
-      var _this3 = this;
+      var _this4 = this;
 
       return (/*#__PURE__*/function () {
-          var _ref6 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(challenge, validate, orchestratorFill) {
+          var _ref5 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(challenge, validate, orchestratorFill) {
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
               while (1) {
                 switch (_context5.prev = _context5.next) {
                   case 0:
-                    return _context5.abrupt("return", _this3.challengeService.promptForChallengeResponse(challenge, validate, orchestratorFill));
+                    return _context5.abrupt("return", _this4.challengeService.promptForChallengeResponse(challenge, validate, orchestratorFill));
 
                   case 1:
                   case "end":
@@ -2937,7 +2939,7 @@ var SNApplication = /*#__PURE__*/function () {
           }));
 
           return function (_x3, _x4, _x5) {
-            return _ref6.apply(this, arguments);
+            return _ref5.apply(this, arguments);
           };
         }()
       );
@@ -3032,7 +3034,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "addEventObserver",
     value: function addEventObserver(callback, singleEvent) {
-      var _this4 = this;
+      var _this5 = this;
 
       var observer = {
         callback: callback,
@@ -3040,7 +3042,7 @@ var SNApplication = /*#__PURE__*/function () {
       };
       this.eventHandlers.push(observer);
       return function () {
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this4.eventHandlers, observer);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this5.eventHandlers, observer);
       };
     }
     /**
@@ -3173,13 +3175,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "savePayload",
     value: function () {
-      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(_ref7) {
+      var _savePayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(_ref6) {
         var payload, dirtied;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                payload = _ref7.payload;
+                payload = _ref6.payload;
                 dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
                   payload: payload,
                   override: {
@@ -3217,8 +3219,8 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "findItem",
-    value: function findItem(_ref8) {
-      var uuid = _ref8.uuid;
+    value: function findItem(_ref7) {
+      var uuid = _ref7.uuid;
       return this.modelManager.findItem(uuid);
     }
     /** 
@@ -3228,8 +3230,8 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "findItems",
-    value: function findItems(_ref9) {
-      var predicate = _ref9.predicate;
+    value: function findItems(_ref8) {
+      var predicate = _ref8.predicate;
       return this.modelManager.itemsMatchingPredicate(predicate);
     }
     /** @access public */
@@ -3237,13 +3239,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "mergeItem",
     value: function () {
-      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref10) {
+      var _mergeItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref9) {
         var item, source;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                item = _ref10.item, source = _ref10.source;
+                item = _ref9.item, source = _ref9.source;
                 return _context9.abrupt("return", this.modelManager.mapItem({
                   item: item,
                   source: source
@@ -3272,13 +3274,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createManagedItem",
     value: function () {
-      var _createManagedItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref11) {
+      var _createManagedItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref10) {
         var contentType, content, needsSync, override, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                contentType = _ref11.contentType, content = _ref11.content, needsSync = _ref11.needsSync, override = _ref11.override;
+                contentType = _ref10.contentType, content = _ref10.content, needsSync = _ref10.needsSync, override = _ref10.override;
                 _context10.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
@@ -3315,13 +3317,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createTemplateItem",
     value: function () {
-      var _createTemplateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref12) {
+      var _createTemplateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref11) {
         var contentType, content, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                contentType = _ref12.contentType, content = _ref12.content;
+                contentType = _ref11.contentType, content = _ref11.content;
                 _context11.next = 3;
                 return this.modelManager.createItem({
                   contentType: contentType,
@@ -3374,13 +3376,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItem",
     value: function () {
-      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref13) {
+      var _saveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(_ref12) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                item = _ref13.item;
+                item = _ref12.item;
                 _context12.next = 3;
                 return this.modelManager.setItemDirty(item, true);
 
@@ -3410,13 +3412,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "saveItems",
     value: function () {
-      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref14) {
+      var _saveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(_ref13) {
         var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                items = _ref14.items;
+                items = _ref13.items;
                 _context13.next = 3;
                 return this.modelManager.setItemsDirty(items);
 
@@ -3448,13 +3450,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemNeedsSync",
     value: function () {
-      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref15) {
+      var _setItemNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(_ref14) {
         var item, updateUserModifiedDate;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                item = _ref15.item, updateUserModifiedDate = _ref15.updateUserModifiedDate;
+                item = _ref14.item, updateUserModifiedDate = _ref14.updateUserModifiedDate;
                 return _context14.abrupt("return", this.modelManager.setItemDirty(item, true, updateUserModifiedDate));
 
               case 2:
@@ -3500,13 +3502,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "setItemsNeedsSync",
     value: function () {
-      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref16) {
+      var _setItemsNeedsSync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(_ref15) {
         var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                items = _ref16.items;
+                items = _ref15.items;
                 return _context15.abrupt("return", this.modelManager.setItemsDirty(items));
 
               case 2:
@@ -3528,13 +3530,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItem",
     value: function () {
-      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref17) {
+      var _deleteItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref16) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                item = _ref17.item;
+                item = _ref16.item;
                 this.modelManager.setItemToBeDeleted(item);
                 this.sync();
 
@@ -3557,13 +3559,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "deleteItemLocally",
     value: function () {
-      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref18) {
+      var _deleteItemLocally = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(_ref17) {
         var item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                item = _ref18.item;
+                item = _ref17.item;
                 this.modelManager.removeItemLocally(item);
 
               case 2:
@@ -3624,32 +3626,32 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "getItems",
-    value: function getItems(_ref19) {
-      var contentType = _ref19.contentType;
+    value: function getItems(_ref18) {
+      var contentType = _ref18.contentType;
       return this.modelManager.getItems(contentType);
     }
     /** @access public */
 
   }, {
     key: "getDisplayableItems",
-    value: function getDisplayableItems(_ref20) {
-      var contentType = _ref20.contentType;
+    value: function getDisplayableItems(_ref19) {
+      var contentType = _ref19.contentType;
       return this.modelManager.validItemsForContentType(contentType);
     }
     /** @access public */
 
   }, {
     key: "getNotesMatchingSmartTag",
-    value: function getNotesMatchingSmartTag(_ref21) {
-      var smartTag = _ref21.smartTag;
+    value: function getNotesMatchingSmartTag(_ref20) {
+      var smartTag = _ref20.smartTag;
       return this.modelManager.notesMatchingSmartTag(smartTag);
     }
     /** @access public */
 
   }, {
     key: "findTag",
-    value: function findTag(_ref22) {
-      var title = _ref22.title;
+    value: function findTag(_ref21) {
+      var title = _ref21.title;
       return this.modelManager.findTagByTitle(title);
     }
     /** @access public */
@@ -3657,13 +3659,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "findOrCreateTag",
     value: function () {
-      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref23) {
+      var _findOrCreateTag = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(_ref22) {
         var title;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
-                title = _ref23.title;
+                title = _ref22.title;
                 return _context19.abrupt("return", this.modelManager.findOrCreateTagByTitle(title));
 
               case 2:
@@ -3702,11 +3704,11 @@ var SNApplication = /*#__PURE__*/function () {
 
   }, {
     key: "streamItems",
-    value: function streamItems(_ref24) {
-      var _this5 = this;
+    value: function streamItems(_ref23) {
+      var _this6 = this;
 
-      var contentType = _ref24.contentType,
-          stream = _ref24.stream;
+      var contentType = _ref23.contentType,
+          stream = _ref23.stream;
       var observer = this.modelManager.addMappingObserver(contentType, function (allItems, validItems, deletedItems, source, sourceKey) {
         var includedContentTypes = allItems.map(function (item) {
           return item.content_type;
@@ -3721,7 +3723,7 @@ var SNApplication = /*#__PURE__*/function () {
       this.streamObservers.push(observer);
       return function () {
         observer();
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this5.streamObservers, observer);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this6.streamObservers, observer);
       };
     }
     /** @access public */
@@ -3990,13 +3992,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "importData",
     value: function () {
-      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26(_ref25) {
+      var _importData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee26(_ref24) {
         var data, password, awaitSync, decryptedPayloads, validPayloads, affectedItems, promise;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee26$(_context26) {
           while (1) {
             switch (_context26.prev = _context26.next) {
               case 0:
-                data = _ref25.data, password = _ref25.password, awaitSync = _ref25.awaitSync;
+                data = _ref24.data, password = _ref24.password, awaitSync = _ref24.awaitSync;
                 _context26.next = 3;
                 return this.protocolService.payloadsByDecryptingBackupFile({
                   data: data,
@@ -4053,7 +4055,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "createBackupFile",
     value: function () {
       var _createBackupFile = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee27() {
-        var _ref26,
+        var _ref25,
             subItems,
             intent,
             returnIfEmpty,
@@ -4063,7 +4065,7 @@ var SNApplication = /*#__PURE__*/function () {
           while (1) {
             switch (_context27.prev = _context27.next) {
               case 0:
-                _ref26 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, subItems = _ref26.subItems, intent = _ref26.intent, returnIfEmpty = _ref26.returnIfEmpty;
+                _ref25 = _args27.length > 0 && _args27[0] !== undefined ? _args27[0] : {}, subItems = _ref25.subItems, intent = _ref25.intent, returnIfEmpty = _ref25.returnIfEmpty;
                 return _context27.abrupt("return", this.protocolService.createBackupFile({
                   subItems: subItems,
                   intent: intent,
@@ -4497,21 +4499,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36(_ref27) {
-        var email, password, ephemeral, mergeLocal, _ref28, wrappingKey, canceled, result;
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee36(_ref26) {
+        var email, password, ephemeral, mergeLocal, _ref27, wrappingKey, canceled, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee36$(_context36) {
           while (1) {
             switch (_context36.prev = _context36.next) {
               case 0:
-                email = _ref27.email, password = _ref27.password, ephemeral = _ref27.ephemeral, mergeLocal = _ref27.mergeLocal;
+                email = _ref26.email, password = _ref26.password, ephemeral = _ref26.ephemeral, mergeLocal = _ref26.mergeLocal;
                 _context36.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref28 = _context36.sent;
-                wrappingKey = _ref28.wrappingKey;
-                canceled = _ref28.canceled;
+                _ref27 = _context36.sent;
+                wrappingKey = _ref27.wrappingKey;
+                canceled = _ref27.canceled;
 
                 if (!canceled) {
                   _context36.next = 8;
@@ -4615,21 +4617,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "signIn",
     value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(_ref29) {
-        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref29$mergeLocal, mergeLocal, awaitSync, _ref30, wrappingKey, canceled, result, syncPromise;
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee37(_ref28) {
+        var email, password, strict, ephemeral, mfaKeyPath, mfaCode, _ref28$mergeLocal, mergeLocal, awaitSync, _ref29, wrappingKey, canceled, result, syncPromise;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee37$(_context37) {
           while (1) {
             switch (_context37.prev = _context37.next) {
               case 0:
-                email = _ref29.email, password = _ref29.password, strict = _ref29.strict, ephemeral = _ref29.ephemeral, mfaKeyPath = _ref29.mfaKeyPath, mfaCode = _ref29.mfaCode, _ref29$mergeLocal = _ref29.mergeLocal, mergeLocal = _ref29$mergeLocal === void 0 ? true : _ref29$mergeLocal, awaitSync = _ref29.awaitSync;
+                email = _ref28.email, password = _ref28.password, strict = _ref28.strict, ephemeral = _ref28.ephemeral, mfaKeyPath = _ref28.mfaKeyPath, mfaCode = _ref28.mfaCode, _ref28$mergeLocal = _ref28.mergeLocal, mergeLocal = _ref28$mergeLocal === void 0 ? true : _ref28$mergeLocal, awaitSync = _ref28.awaitSync;
                 _context37.next = 3;
                 return this.getWrappingKeyIfNecessary();
 
               case 3:
-                _ref30 = _context37.sent;
-                wrappingKey = _ref30.wrappingKey;
-                canceled = _ref30.canceled;
+                _ref29 = _context37.sent;
+                wrappingKey = _ref29.wrappingKey;
+                canceled = _ref29.canceled;
 
                 if (!canceled) {
                   _context37.next = 8;
@@ -4747,21 +4749,21 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref31) {
-        var currentPassword, newPassword, passcode, _ref32, wrappingKey, canceled, currentKeyParams, result;
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee38(_ref30) {
+        var currentPassword, newPassword, passcode, _ref31, wrappingKey, canceled, currentKeyParams, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee38$(_context38) {
           while (1) {
             switch (_context38.prev = _context38.next) {
               case 0:
-                currentPassword = _ref31.currentPassword, newPassword = _ref31.newPassword, passcode = _ref31.passcode;
+                currentPassword = _ref30.currentPassword, newPassword = _ref30.newPassword, passcode = _ref30.passcode;
                 _context38.next = 3;
                 return this.getWrappingKeyIfNecessary(passcode);
 
               case 3:
-                _ref32 = _context38.sent;
-                wrappingKey = _ref32.wrappingKey;
-                canceled = _ref32.canceled;
+                _ref31 = _context38.sent;
+                wrappingKey = _ref31.wrappingKey;
+                canceled = _ref31.canceled;
 
                 if (!canceled) {
                   _context38.next = 8;
@@ -4879,20 +4881,20 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "validateAccountPassword",
     value: function () {
-      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref33) {
-        var password, _ref34, valid;
+      var _validateAccountPassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee40(_ref32) {
+        var password, _ref33, valid;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee40$(_context40) {
           while (1) {
             switch (_context40.prev = _context40.next) {
               case 0:
-                password = _ref33.password;
+                password = _ref32.password;
                 _context40.next = 3;
                 return this.keyManager.validateAccountPassword(password);
 
               case 3:
-                _ref34 = _context40.sent;
-                valid = _ref34.valid;
+                _ref33 = _context40.sent;
+                valid = _ref33.valid;
                 return _context40.abrupt("return", valid);
 
               case 6:
@@ -4996,7 +4998,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "setPasscode",
     value: function () {
       var _setPasscode = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43(passcode) {
-        var identifier, _ref35, key, keyParams;
+        var identifier, _ref34, key, keyParams;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
           while (1) {
@@ -5014,9 +5016,9 @@ var SNApplication = /*#__PURE__*/function () {
                 });
 
               case 5:
-                _ref35 = _context43.sent;
-                key = _ref35.key;
-                keyParams = _ref35.keyParams;
+                _ref34 = _context43.sent;
+                key = _ref34.key;
+                keyParams = _ref34.keyParams;
                 _context43.next = 10;
                 return this.keyManager.setNewRootKeyWrapper({
                   wrappingKey: key,
@@ -5346,7 +5348,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createKeyManager",
     value: function createKeyManager() {
-      var _this6 = this;
+      var _this7 = this;
 
       this.keyManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_6__["SNKeyManager"]))({
         modelManager: this.modelManager,
@@ -5361,7 +5363,7 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context49.prev = _context49.next) {
               case 0:
                 _context49.next = 2;
-                return _this6.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].KeyStatusChanged);
+                return _this7.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_5__["ApplicationEvents"].KeyStatusChanged);
 
               case 2:
               case "end":
@@ -5431,7 +5433,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createSyncManager",
     value: function createSyncManager() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.syncService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_6__["SNSyncService"]))({
         modelManager: this.modelManager,
@@ -5442,7 +5444,7 @@ var SNApplication = /*#__PURE__*/function () {
         interval: this.deviceInterface.interval
       });
       var uninstall = this.syncService.addEventObserver( /*#__PURE__*/function () {
-        var _ref37 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(eventName) {
+        var _ref36 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee50(eventName) {
           var appEvent;
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee50$(_context50) {
             while (1) {
@@ -5456,7 +5458,7 @@ var SNApplication = /*#__PURE__*/function () {
                   }
 
                   _context50.next = 4;
-                  return _this7.notifyEvent(appEvent);
+                  return _this8.notifyEvent(appEvent);
 
                 case 4:
                 case "end":
@@ -5467,7 +5469,7 @@ var SNApplication = /*#__PURE__*/function () {
         }));
 
         return function (_x39) {
-          return _ref37.apply(this, arguments);
+          return _ref36.apply(this, arguments);
         };
       }());
       this.serviceObservers.push(uninstall);
@@ -6140,12 +6142,14 @@ var ApplicationEvents = {
   LocalDataIncrementalLoad: 16,
   SyncStatusChanged: 17,
   WillSync: 18,
-  InvalidSyncSession: 19
+  InvalidSyncSession: 19,
+  LocalDatabaseReadError: 20,
+  LocalDatabaseWriteError: 21
 };
 function applicationEventForSyncEvent(syncEvent) {
   var _SyncEvents$FullSyncC;
 
-  return (_SyncEvents$FullSyncC = {}, _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].FullSyncCompleted, ApplicationEvents.CompletedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncError, ApplicationEvents.FailedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong, ApplicationEvents.HighLatencySync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].EnterOutOfSync, ApplicationEvents.EnteredOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].ExitOutOfSync, ApplicationEvents.ExitedOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataLoaded, ApplicationEvents.LocalDataLoaded), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].MajorDataChange, ApplicationEvents.MajorDataChange), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataIncrementalLoad, ApplicationEvents.LocalDataIncrementalLoad), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged, ApplicationEvents.SyncStatusChanged), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncWillBegin, ApplicationEvents.WillSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].InvalidSession, ApplicationEvents.InvalidSyncSession), _SyncEvents$FullSyncC)[syncEvent];
+  return (_SyncEvents$FullSyncC = {}, _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].FullSyncCompleted, ApplicationEvents.CompletedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncError, ApplicationEvents.FailedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong, ApplicationEvents.HighLatencySync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].EnterOutOfSync, ApplicationEvents.EnteredOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].ExitOutOfSync, ApplicationEvents.ExitedOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataLoaded, ApplicationEvents.LocalDataLoaded), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].MajorDataChange, ApplicationEvents.MajorDataChange), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataIncrementalLoad, ApplicationEvents.LocalDataIncrementalLoad), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged, ApplicationEvents.SyncStatusChanged), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncWillBegin, ApplicationEvents.WillSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].InvalidSession, ApplicationEvents.InvalidSyncSession), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].DatabaseReadError, ApplicationEvents.LocalDatabaseReadError), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].DatabaseWriteError, ApplicationEvents.LocalDatabaseWriteError), _SyncEvents$FullSyncC)[syncEvent];
 }
 
 /***/ }),
@@ -34424,7 +34428,9 @@ var SyncEvents = {
   LocalDataLoaded: 'local-data-loaded',
   EnterOutOfSync: 'enter-out-of-sync',
   ExitOutOfSync: 'exit-out-of-sync',
-  StatusChanged: 'status-changed'
+  StatusChanged: 'status-changed',
+  DatabaseWriteError: 'database-write-error',
+  DatabaseReadError: 'database-read-error'
 };
 
 /***/ }),
@@ -35214,11 +35220,17 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "getDatabasePayloads",
     value: function () {
       var _getDatabasePayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+        var _this4 = this;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                return _context2.abrupt("return", this.storageService.getAllRawPayloads());
+                return _context2.abrupt("return", this.storageService.getAllRawPayloads().catch(function (error) {
+                  _this4.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DatabaseReadError, error);
+
+                  throw error;
+                }));
 
               case 1:
               case "end":
@@ -35828,10 +35840,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "timingStrategyResolveOnNext",
     value: function timingStrategyResolveOnNext() {
-      var _this4 = this;
+      var _this5 = this;
 
       return new Promise(function (resolve, reject) {
-        _this4.resolveQueue.push({
+        _this5.resolveQueue.push({
           resolve: resolve,
           reject: reject
         });
@@ -35842,10 +35854,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "timingStrategyForceSpawnNew",
     value: function timingStrategyForceSpawnNew(options) {
-      var _this5 = this;
+      var _this6 = this;
 
       return new Promise(function (resolve, reject) {
-        _this5.spawnQueue.push({
+        _this6.spawnQueue.push({
           resolve: resolve,
           reject: reject,
           options: options
@@ -35886,12 +35898,12 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "payloadsByPreparingForServer",
     value: function payloadsByPreparingForServer(payloads) {
-      var _this6 = this;
+      var _this7 = this;
 
       return this.protocolService.payloadsByEncryptingPayloads({
         payloads: payloads,
         intent: function intent(payload) {
-          return _this6.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].Sync;
+          return _this7.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].Sync;
         }
       });
     }
@@ -35919,7 +35931,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "sync",
     value: function () {
       var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14() {
-        var _this7 = this;
+        var _this8 = this;
 
         var _ref3,
             timingStrategy,
@@ -35975,15 +35987,15 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                  * 2. syncOpInProgress: If a sync() call is in flight to the server.
                  */
                 syncLocked = function syncLocked() {
-                  return _this7.syncLock;
+                  return _this8.syncLock;
                 };
 
                 captureLock = function captureLock() {
-                  _this7.syncLock = true;
+                  _this8.syncLock = true;
                 };
 
                 releaseLock = function releaseLock() {
-                  _this7.syncLock = false;
+                  _this8.syncLock = false;
                 };
 
                 syncInProgress = this.opStatus.syncInProgress;
@@ -36083,7 +36095,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 online = _context14.sent;
 
                 useMode = function (tryMode) {
-                  if (online && !_this7.completedOnlineDownloadFirstSync) {
+                  if (online && !_this8.completedOnlineDownloadFirstSync) {
                     return SyncModes.DownloadFirst;
                   } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(tryMode)) {
                     return tryMode;
@@ -36339,7 +36351,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "syncOnlineOperation",
     value: function () {
       var _syncOnlineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(_ref4) {
-        var _this8 = this;
+        var _this9 = this;
 
         var payloads, checkIntegrity, source, mode, operation;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
@@ -36383,7 +36395,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                             }
 
                             _context15.next = 5;
-                            return _this8.handleErrorServerResponse({
+                            return _this9.handleErrorServerResponse({
                               operation: operation,
                               response: response
                             });
@@ -36394,7 +36406,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                           case 7:
                             _context15.next = 9;
-                            return _this8.handleSuccessServerResponse({
+                            return _this9.handleSuccessServerResponse({
                               operation: operation,
                               response: response
                             });
@@ -36410,7 +36422,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                             }
 
                             _context15.next = 14;
-                            return _this8.handleStatusChange({
+                            return _this9.handleStatusChange({
                               operation: operation
                             });
 
@@ -36460,7 +36472,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "syncOfflineOperation",
     value: function () {
       var _syncOfflineOperation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(_ref5) {
-        var _this9 = this;
+        var _this10 = this;
 
         var payloads, operation;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context18) {
@@ -36483,7 +36495,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                               }
 
                               _context17.next = 3;
-                              return _this9.handleOfflineResponse(signal);
+                              return _this10.handleOfflineResponse(signal);
 
                             case 3:
                               _context17.next = 8;
@@ -36496,7 +36508,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                               }
 
                               _context17.next = 8;
-                              return _this9.handleStatusChange({
+                              return _this10.handleStatusChange({
                                 operation: operation
                               });
 
@@ -36931,6 +36943,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "persistPayloads",
     value: function () {
       var _persistPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee24(_ref9) {
+        var _this11 = this;
+
         var _ref9$decryptedPayloa, decryptedPayloads;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee24$(_context24) {
@@ -36947,10 +36961,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 return _context24.abrupt("return");
 
               case 3:
-                _context24.next = 5;
-                return this.storageService.savePayloads(decryptedPayloads);
+                return _context24.abrupt("return", this.storageService.savePayloads(decryptedPayloads).catch(function (error) {
+                  _this11.notifyEvent(_Lib__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DatabaseWriteError, error);
 
-              case 5:
+                  throw error;
+                }));
+
+              case 4:
               case "end":
                 return _context24.stop();
             }
@@ -36968,7 +36985,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
      * Computes a hash of all items updated_at strings joined with a comma.
      * The server will also do the same, to determine whether the client values match server values.
      * @access private
-     * @returns {string} A SHA256 digest string (hex).
+     * @returns {Promise<string>} A SHA256 digest string (hex).
      */
 
   }, {
