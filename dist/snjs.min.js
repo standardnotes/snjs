@@ -6455,7 +6455,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["isPayloadSourceRetrieved"]; });
 
-/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__["ProtocolVersions"]; });
 
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
@@ -6995,7 +6995,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 33:
                 newStorageRawStructure.wrapped = _context4.sent;
-                _context4.next = 56;
+                _context4.next = 55;
                 break;
 
               case 36:
@@ -7024,22 +7024,19 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   dataAuthenticationKey: _context4.t3,
                   version: _context4.t4
                 };
-                _context4.t6 = {
-                  content: _context4.t5
-                };
-                _context4.next = 53;
-                return _context4.t0.Create.call(_context4.t0, _context4.t6);
+                _context4.next = 52;
+                return _context4.t0.Create.call(_context4.t0, null, _context4.t5);
 
-              case 53:
+              case 52:
                 _accountKey = _context4.sent;
-                _context4.next = 56;
+                _context4.next = 55;
                 return this.application.deviceInterface.setKeychainValue(_accountKey.getPersistableValue());
 
-              case 56:
-                _context4.next = 58;
+              case 55:
+                _context4.next = 57;
                 return this.allPlatformHelperSetStorageStructure(newStorageRawStructure);
 
-              case 58:
+              case 57:
               case "end":
                 return _context4.stop();
             }
@@ -7184,13 +7181,11 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
               case 0:
                 version = storageValueStore.ak ? _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V002;
                 _context7.next = 3;
-                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
-                  content: {
-                    masterKey: storageValueStore.mk,
-                    serverPassword: storageValueStore.pw,
-                    dataAuthenticationKey: storageValueStore.ak,
-                    version: version
-                  }
+                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create(null, {
+                  masterKey: storageValueStore.mk,
+                  serverPassword: storageValueStore.pw,
+                  dataAuthenticationKey: storageValueStore.ak,
+                  version: version
                 });
 
               case 3:
@@ -7501,13 +7496,11 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
                 _defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(keychainValue.ak) ? _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V002;
                 _context10.next = 61;
-                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
-                  content: {
-                    masterKey: keychainValue.mk,
-                    serverPassword: keychainValue.pw,
-                    dataAuthenticationKey: keychainValue.ak,
-                    version: keychainValue.version || _defaultVersion
-                  }
+                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create(null, {
+                  masterKey: keychainValue.mk,
+                  serverPassword: keychainValue.pw,
+                  dataAuthenticationKey: keychainValue.ak,
+                  version: keychainValue.version || _defaultVersion
                 });
 
               case 61:
@@ -10915,7 +10908,7 @@ function isEnvironmentMobile(environment) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersions"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["compareVersions"]; });
@@ -10927,10 +10920,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["intentRequiresEncryption"]; });
 
-/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
+/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return _Protocol_root_key__WEBPACK_IMPORTED_MODULE_2__["SNRootKey"]; });
 
-/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
+/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateKeyParams", function() { return _Protocol_key_params__WEBPACK_IMPORTED_MODULE_3__["CreateKeyParams"]; });
 
 /* harmony import */ var _Protocol_operator_001_operator_001__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/operator/001/operator_001 */ "./lib/protocol/operator/001/operator_001.js");
@@ -11003,9 +10996,9 @@ function intentRequiresEncryption(intent) {
 
 /***/ }),
 
-/***/ "./lib/protocol/key_params.js":
+/***/ "./lib/protocol/key_params.ts":
 /*!************************************!*\
-  !*** ./lib/protocol/key_params.js ***!
+  !*** ./lib/protocol/key_params.ts ***!
   \************************************/
 /*! exports provided: CreateKeyParams, SNRootKeyParams */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -11015,12 +11008,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateKeyParams", function() { return CreateKeyParams; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKeyParams", function() { return SNRootKeyParams; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -11037,9 +11032,7 @@ var SNRootKeyParams = /*#__PURE__*/function () {
   function SNRootKeyParams(content) {
     _classCallCheck(this, SNRootKeyParams);
 
-    if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isObject"])(content) || content.isKeyParamsObject) {
-      throw 'Attempting to construct root key params with non-object';
-    }
+    _defineProperty(this, "content", void 0);
 
     this.content = content;
   }
@@ -11119,12 +11112,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Protocol_operator_operator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/operator/operator */ "./lib/protocol/operator/operator.js");
-/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
+/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.ts");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -11610,12 +11603,10 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 6:
                 partitions = _context8.sent;
                 _context8.next = 9;
-                return _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create({
-                  content: {
-                    serverPassword: partitions[0],
-                    masterKey: partitions[1],
-                    version: this.constructor.versionString()
-                  }
+                return _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create(null, {
+                  serverPassword: partitions[0],
+                  masterKey: partitions[1],
+                  version: this.constructor.versionString()
                 });
 
               case 9:
@@ -11665,13 +11656,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator002", function() { return SNProtocolOperator002; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
+/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.ts");
 /* harmony import */ var _Protocol_operator_001_operator_001__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/operator/001/operator_001 */ "./lib/protocol/operator/001/operator_001.js");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.ts");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_8__);
 
@@ -12268,13 +12259,11 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 8:
                 partitions = _context10.sent;
                 _context10.next = 11;
-                return _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create({
-                  content: {
-                    serverPassword: partitions[0],
-                    masterKey: partitions[1],
-                    dataAuthenticationKey: partitions[2],
-                    version: this.constructor.versionString()
-                  }
+                return _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create(null, {
+                  serverPassword: partitions[0],
+                  masterKey: partitions[1],
+                  dataAuthenticationKey: partitions[2],
+                  version: this.constructor.versionString()
                 });
 
               case 11:
@@ -12339,9 +12328,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator003", function() { return SNProtocolOperator003; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
+/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.ts");
 /* harmony import */ var _Protocol_operator_002_operator_002__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/operator/002/operator_002 */ "./lib/protocol/operator/002/operator_002.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -12567,13 +12556,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return SNProtocolOperator004; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
+/* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.ts");
 /* harmony import */ var _Protocol_operator_003_operator_003__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/operator/003/operator_003 */ "./lib/protocol/operator/003/operator_003.js");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -13248,12 +13237,10 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
                 partitions = _context10.sent;
                 masterKey = partitions[0];
                 serverPassword = partitions[1];
-                return _context10.abrupt("return", _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create({
-                  content: {
-                    masterKey: masterKey,
-                    serverPassword: serverPassword,
-                    version: this.constructor.versionString()
-                  }
+                return _context10.abrupt("return", _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create(null, {
+                  masterKey: masterKey,
+                  serverPassword: serverPassword,
+                  version: this.constructor.versionString()
                 }));
 
               case 12:
@@ -13302,7 +13289,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/items_key */ "./lib/models/app/items_key.js");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_5__);
 
@@ -15320,7 +15307,7 @@ var ConflictStrategies;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionParameters", function() { return EncryptionParameters; });
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
@@ -16164,7 +16151,7 @@ var SNMaxItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return SNPureItemPayload; });
 /* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -16240,7 +16227,7 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return PurePayload; });
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
@@ -16629,9 +16616,9 @@ var SNStorageItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/root_key.js":
+/***/ "./lib/protocol/root_key.ts":
 /*!**********************************!*\
-  !*** ./lib/protocol/root_key.js ***!
+  !*** ./lib/protocol/root_key.ts ***!
   \**********************************/
 /*! exports provided: SNRootKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16642,7 +16629,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
@@ -16657,6 +16644,9 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -16665,37 +16655,30 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * A root key is a local only construct that houses the key used for the encryption
  * and decryption of items keys.
  */
-
 var SNRootKey = /*#__PURE__*/function () {
   _createClass(SNRootKey, null, [{
     key: "Create",
     value: function () {
-      var _Create = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref) {
-        var uuid, content;
+      var _Create = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(uuid, content) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                uuid = _ref.uuid, content = _ref.content;
-
                 if (uuid) {
-                  _context.next = 5;
+                  _context.next = 4;
                   break;
                 }
 
-                _context.next = 4;
+                _context.next = 3;
                 return _Lib_uuid__WEBPACK_IMPORTED_MODULE_3__["Uuid"].GenerateUuid();
 
-              case 4:
+              case 3:
                 uuid = _context.sent;
 
-              case 5:
-                return _context.abrupt("return", new SNRootKey({
-                  uuid: uuid,
-                  content: content
-                }));
+              case 4:
+                return _context.abrupt("return", new SNRootKey(uuid, content));
 
-              case 6:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -16703,7 +16686,7 @@ var SNRootKey = /*#__PURE__*/function () {
         }, _callee);
       }));
 
-      function Create(_x) {
+      function Create(_x, _x2) {
         return _Create.apply(this, arguments);
       }
 
@@ -16711,11 +16694,12 @@ var SNRootKey = /*#__PURE__*/function () {
     }()
   }]);
 
-  function SNRootKey(_ref2) {
-    var uuid = _ref2.uuid,
-        content = _ref2.content;
-
+  function SNRootKey(uuid, content) {
     _classCallCheck(this, SNRootKey);
+
+    _defineProperty(this, "uuid", void 0);
+
+    _defineProperty(this, "content", void 0);
 
     this.uuid = uuid;
     this.content = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["Copy"])(content);
@@ -16744,8 +16728,7 @@ var SNRootKey = /*#__PURE__*/function () {
 
     /**
      * Compares two keys for equality
-     * @returns {boolean} true if equal, otherwise false.
-    */
+     */
     value: function compare(otherKey) {
       if (this.version !== otherKey.version) {
         return false;
@@ -16823,9 +16806,9 @@ var SNRootKey = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/versions.js":
+/***/ "./lib/protocol/versions.ts":
 /*!**********************************!*\
-  !*** ./lib/protocol/versions.js ***!
+  !*** ./lib/protocol/versions.ts ***!
   \**********************************/
 /*! exports provided: ProtocolVersions, compareVersions */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16834,16 +16817,19 @@ var SNRootKey = /*#__PURE__*/function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return ProtocolVersions; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return compareVersions; });
-var ProtocolVersions = {
-  V000Base64Decrypted: '000',
-  V001: '001',
-  V002: '002',
-  V003: '003',
-  V004: '004',
-  VersionLength: 3
-};
+var ProtocolVersions;
+
+(function (ProtocolVersions) {
+  ProtocolVersions["V000Base64Decrypted"] = "000";
+  ProtocolVersions["V001"] = "001";
+  ProtocolVersions["V002"] = "002";
+  ProtocolVersions["V003"] = "003";
+  ProtocolVersions["V004"] = "004";
+  ProtocolVersions[ProtocolVersions["VersionLength"] = 3] = "VersionLength";
+})(ProtocolVersions || (ProtocolVersions = {}));
+
+;
 /**
- * @returns {number}
  *  -1 if a < b
  *  0 if a == b
  *  1 is a > b
@@ -24347,7 +24333,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 
 
@@ -25296,9 +25282,7 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
 
               case 5:
                 _context3.next = 7;
-                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
-                  content: rawKey
-                });
+                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create(null, rawKey);
 
               case 7:
                 rootKey = _context3.sent;
@@ -25792,10 +25776,7 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
 
               case 17:
                 _context13.next = 19;
-                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
-                  uuid: decrypted.uuid,
-                  content: decrypted.content
-                });
+                return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create(decrypted.uuid, decrypted.content);
 
               case 19:
                 this.rootKey = _context13.sent;
