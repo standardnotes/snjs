@@ -6759,7 +6759,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migrations/migration */ "./lib/migrations/migration.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
@@ -8075,7 +8075,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return SNComponent; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8664,7 +8664,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -9382,7 +9382,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return SNTheme; });
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9772,7 +9772,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony import */ var _Models_core_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/functions */ "./lib/models/core/functions.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
@@ -13692,8 +13692,6 @@ var PayloadCollection = /*#__PURE__*/function () {
 
     Object.freeze(this);
   }
-  /** @access public */
-
 
   _createClass(PayloadCollection, [{
     key: "getAllPayloads",
@@ -13815,9 +13813,9 @@ var PayloadCollectionSet = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/conflict.js":
+/***/ "./lib/protocol/payloads/deltas/conflict.ts":
 /*!**************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/conflict.js ***!
+  !*** ./lib/protocol/payloads/deltas/conflict.ts ***!
   \**************************************************/
 /*! exports provided: ConflictDelta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -13829,14 +13827,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -13848,15 +13843,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -13864,27 +13851,22 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-
-var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
-  _inherits(ConflictDelta, _PayloadsDelta);
-
-  function ConflictDelta(_ref) {
-    var _this;
-
-    var baseCollection = _ref.baseCollection,
-        basePayload = _ref.basePayload,
-        applyPayload = _ref.applyPayload,
-        source = _ref.source;
-
+var ConflictDelta = /*#__PURE__*/function () {
+  function ConflictDelta(baseCollection, basePayload, applyPayload, source) {
     _classCallCheck(this, ConflictDelta);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(ConflictDelta).call(this, {
-      baseCollection: baseCollection
-    }));
-    _this.basePayload = basePayload;
-    _this.applyPayload = applyPayload;
-    _this.source = source;
-    return _this;
+    _defineProperty(this, "baseCollection", void 0);
+
+    _defineProperty(this, "basePayload", void 0);
+
+    _defineProperty(this, "applyPayload", void 0);
+
+    _defineProperty(this, "source", void 0);
+
+    this.baseCollection = baseCollection;
+    this.basePayload = basePayload;
+    this.applyPayload = applyPayload;
+    this.source = source;
   }
 
   _createClass(ConflictDelta, [{
@@ -13902,9 +13884,7 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
                   item: tmpApplyItem
                 });
                 _context.next = 5;
-                return this.payloadsByHandlingStrategy({
-                  strategy: strategy
-                });
+                return this.payloadsByHandlingStrategy(strategy);
 
               case 5:
                 results = _context.sent;
@@ -13927,71 +13907,69 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
   }, {
     key: "payloadsByHandlingStrategy",
     value: function () {
-      var _payloadsByHandlingStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(_ref2) {
-        var strategy, updatedAt, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt, payload;
+      var _payloadsByHandlingStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(strategy) {
+        var updatedAt, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt, payload;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                strategy = _ref2.strategy;
-
                 if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeft)) {
-                  _context2.next = 3;
+                  _context2.next = 2;
                   break;
                 }
 
                 return _context2.abrupt("return", [this.basePayload]);
 
-              case 3:
+              case 2:
                 if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepRight)) {
-                  _context2.next = 5;
+                  _context2.next = 4;
                   break;
                 }
 
                 return _context2.abrupt("return", [this.applyPayload]);
 
-              case 5:
+              case 4:
                 if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeftDuplicateRight)) {
-                  _context2.next = 12;
+                  _context2.next = 11;
                   break;
                 }
 
-                updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-                leftPayload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(this.basePayload, {
+                updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+                leftPayload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"])(this.basePayload, {
                   updated_at: updatedAt,
                   dirty: true
                 });
-                _context2.next = 10;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
+                _context2.next = 9;
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
 
-              case 10:
+              case 9:
                 rightPayloads = _context2.sent;
                 return _context2.abrupt("return", [leftPayload].concat(rightPayloads));
 
-              case 12:
+              case 11:
                 if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].DuplicateLeftKeepRight)) {
-                  _context2.next = 18;
+                  _context2.next = 17;
                   break;
                 }
 
-                _context2.next = 15;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.basePayload, this.baseCollection, true);
+                _context2.next = 14;
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByDuplicating"])(this.basePayload, this.baseCollection, true);
 
-              case 15:
+              case 14:
                 leftPayloads = _context2.sent;
                 rightPayload = this.applyPayload;
                 return _context2.abrupt("return", leftPayloads.concat([rightPayload]));
 
-              case 18:
+              case 17:
                 if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeftMergeRefs)) {
-                  _context2.next = 23;
+                  _context2.next = 22;
                   break;
                 }
 
-                refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["uniqCombineObjArrays"])(this.basePayload.content.references, this.applyPayload.content.references, ['uuid', 'content_type']);
-                _updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(this.basePayload, {
+                refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["uniqCombineObjArrays"])(this.basePayload.content.references, this.applyPayload.content.references, ['uuid', 'content_type']);
+                _updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"])(this.basePayload, {
                   updated_at: _updatedAt,
                   dirty: true,
                   content: {
@@ -14000,10 +13978,10 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
                 });
                 return _context2.abrupt("return", [payload]);
 
-              case 23:
+              case 22:
                 throw 'Unhandled strategy';
 
-              case 24:
+              case 23:
               case "end":
                 return _context2.stop();
             }
@@ -14020,13 +13998,13 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
   }]);
 
   return ConflictDelta;
-}(_Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_4__["PayloadsDelta"]);
+}();
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/delta.js":
+/***/ "./lib/protocol/payloads/deltas/delta.ts":
 /*!***********************************************!*\
-  !*** ./lib/protocol/payloads/deltas/delta.js ***!
+  !*** ./lib/protocol/payloads/deltas/delta.ts ***!
   \***********************************************/
 /*! exports provided: PayloadsDelta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14047,6 +14025,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
@@ -14071,12 +14051,14 @@ var PayloadsDelta = /*#__PURE__*/function () {
    * @param relatedCollectionSet A collection set (many collections) that contain payloads
    *                             that may be neccessary to carry out computation.
    */
-  function PayloadsDelta(_ref) {
-    var baseCollection = _ref.baseCollection,
-        applyCollection = _ref.applyCollection,
-        relatedCollectionSet = _ref.relatedCollectionSet;
-
+  function PayloadsDelta(baseCollection, applyCollection, relatedCollectionSet) {
     _classCallCheck(this, PayloadsDelta);
+
+    _defineProperty(this, "baseCollection", void 0);
+
+    _defineProperty(this, "applyCollection", void 0);
+
+    _defineProperty(this, "relatedCollectionSet", void 0);
 
     this.baseCollection = baseCollection;
     this.applyCollection = applyCollection;
@@ -14107,19 +14089,22 @@ var PayloadsDelta = /*#__PURE__*/function () {
 
       return resultingCollection;
     }()
+    /**
+     * @param {string} id  - The uuid of the payload to find 
+     */
+
   }, {
     key: "findBasePayload",
-    value: function findBasePayload(_ref2) {
-      var id = _ref2.id;
+    value: function findBasePayload(id) {
       return this.baseCollection.findPayload(id);
     }
   }, {
     key: "findRelatedPayload",
-    value: function findRelatedPayload(_ref3) {
-      var id = _ref3.id,
-          source = _ref3.source;
-      var collection = this.relatedCollectionSet.collectionForSource(source);
-      return collection.findPayload(id);
+    value: function findRelatedPayload(id, source) {
+      var _this$relatedCollecti;
+
+      var collection = (_this$relatedCollecti = this.relatedCollectionSet) === null || _this$relatedCollecti === void 0 ? void 0 : _this$relatedCollecti.collectionForSource(source);
+      return collection === null || collection === void 0 ? void 0 : collection.findPayload(id);
     }
   }]);
 
@@ -14128,9 +14113,9 @@ var PayloadsDelta = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/file_import.js":
+/***/ "./lib/protocol/payloads/deltas/file_import.ts":
 /*!*****************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/file_import.js ***!
+  !*** ./lib/protocol/payloads/deltas/file_import.ts ***!
   \*****************************************************/
 /*! exports provided: DeltaFileImport */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14140,8 +14125,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaFileImport", function() { return DeltaFileImport; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
+/* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -14208,10 +14193,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
                 payload = _step.value;
                 _context.next = 10;
-                return this.payloadsByHandlingPayload({
-                  payload: payload,
-                  currentResults: results
-                });
+                return this.payloadsByHandlingPayload(payload, results);
 
               case 10:
                 payloads = _context.sent;
@@ -14276,14 +14258,12 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
   }, {
     key: "payloadsByHandlingPayload",
     value: function () {
-      var _payloadsByHandlingPayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(_ref) {
-        var payload, currentResults, current, delta, deltaCollection;
+      var _payloadsByHandlingPayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(payload, currentResults) {
+        var current, delta, deltaCollection;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                payload = _ref.payload, currentResults = _ref.currentResults;
-
                 /**
                  * Check to see if we've already processed a payload for this id.
                  * If so, that would be the latest value, and not what's in the BC.
@@ -14311,9 +14291,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
 
                 if (!current) {
-                  current = this.findBasePayload({
-                    id: payload.uuid
-                  });
+                  current = this.findBasePayload(payload.uuid);
                 }
                 /**
                  * If the current doesn't exist, we're creating a new item from payload.
@@ -14321,26 +14299,22 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
 
                 if (current) {
-                  _context2.next = 6;
+                  _context2.next = 5;
                   break;
                 }
 
                 return _context2.abrupt("return", [payload]);
 
-              case 6:
-                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"]({
-                  baseCollection: this.baseCollection,
-                  basePayload: current,
-                  applyPayload: payload
-                });
-                _context2.next = 9;
+              case 5:
+                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].FileImport);
+                _context2.next = 8;
                 return delta.resultingCollection();
 
-              case 9:
+              case 8:
                 deltaCollection = _context2.sent;
                 return _context2.abrupt("return", deltaCollection.getAllPayloads());
 
-              case 11:
+              case 10:
               case "end":
                 return _context2.stop();
             }
@@ -14348,7 +14322,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
         }, _callee2, this);
       }));
 
-      function payloadsByHandlingPayload(_x) {
+      function payloadsByHandlingPayload(_x, _x2) {
         return _payloadsByHandlingPayload.apply(this, arguments);
       }
 
@@ -14361,9 +14335,9 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/generator.js":
+/***/ "./lib/protocol/payloads/deltas/generator.ts":
 /*!***************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/generator.js ***!
+  !*** ./lib/protocol/payloads/deltas/generator.ts ***!
   \***************************************************/
 /*! exports provided: DeltaClassForSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14372,7 +14346,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaClassForSource", function() { return DeltaClassForSource; });
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./lib/protocol/payloads/deltas/index.ts");
 
 
 function DeltaClassForSource(source) {
@@ -14387,37 +14361,37 @@ function DeltaClassForSource(source) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/index.js":
+/***/ "./lib/protocol/payloads/deltas/index.ts":
 /*!***********************************************!*\
-  !*** ./lib/protocol/payloads/deltas/index.js ***!
+  !*** ./lib/protocol/payloads/deltas/index.ts ***!
   \***********************************************/
 /*! exports provided: DeltaFileImport, DeltaOutOfSync, DeltaRemoteConflicts, DeltaRemoteRetrieved, DeltaRemoteSaved, ConflictDelta, PayloadsDelta, ConflictStrategies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _file_import__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./file_import */ "./lib/protocol/payloads/deltas/file_import.js");
+/* harmony import */ var _file_import__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./file_import */ "./lib/protocol/payloads/deltas/file_import.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaFileImport", function() { return _file_import__WEBPACK_IMPORTED_MODULE_0__["DeltaFileImport"]; });
 
-/* harmony import */ var _out_of_sync__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./out_of_sync */ "./lib/protocol/payloads/deltas/out_of_sync.js");
+/* harmony import */ var _out_of_sync__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./out_of_sync */ "./lib/protocol/payloads/deltas/out_of_sync.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaOutOfSync", function() { return _out_of_sync__WEBPACK_IMPORTED_MODULE_1__["DeltaOutOfSync"]; });
 
-/* harmony import */ var _remote_conflicts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./remote_conflicts */ "./lib/protocol/payloads/deltas/remote_conflicts.js");
+/* harmony import */ var _remote_conflicts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./remote_conflicts */ "./lib/protocol/payloads/deltas/remote_conflicts.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteConflicts", function() { return _remote_conflicts__WEBPACK_IMPORTED_MODULE_2__["DeltaRemoteConflicts"]; });
 
-/* harmony import */ var _remote_retrieved__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./remote_retrieved */ "./lib/protocol/payloads/deltas/remote_retrieved.js");
+/* harmony import */ var _remote_retrieved__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./remote_retrieved */ "./lib/protocol/payloads/deltas/remote_retrieved.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteRetrieved", function() { return _remote_retrieved__WEBPACK_IMPORTED_MODULE_3__["DeltaRemoteRetrieved"]; });
 
-/* harmony import */ var _remote_saved__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./remote_saved */ "./lib/protocol/payloads/deltas/remote_saved.js");
+/* harmony import */ var _remote_saved__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./remote_saved */ "./lib/protocol/payloads/deltas/remote_saved.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteSaved", function() { return _remote_saved__WEBPACK_IMPORTED_MODULE_4__["DeltaRemoteSaved"]; });
 
-/* harmony import */ var _conflict__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./conflict */ "./lib/protocol/payloads/deltas/conflict.js");
+/* harmony import */ var _conflict__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictDelta", function() { return _conflict__WEBPACK_IMPORTED_MODULE_5__["ConflictDelta"]; });
 
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsDelta", function() { return _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_6__["PayloadsDelta"]; });
 
-/* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
+/* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__["ConflictStrategies"]; });
 
 
@@ -14431,9 +14405,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/out_of_sync.js":
+/***/ "./lib/protocol/payloads/deltas/out_of_sync.ts":
 /*!*****************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/out_of_sync.js ***!
+  !*** ./lib/protocol/payloads/deltas/out_of_sync.ts ***!
   \*****************************************************/
 /*! exports provided: DeltaOutOfSync */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14443,7 +14417,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaOutOfSync", function() { return DeltaOutOfSync; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
@@ -14517,9 +14491,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                  * This is also neccessary to map the updated_at value from the server
                  */
                 results.push(payload);
-                current = this.findBasePayload({
-                  id: payload.uuid
-                });
+                current = this.findBasePayload(payload.uuid);
 
                 if (current) {
                   _context.next = 12;
@@ -14609,9 +14581,9 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/remote_conflicts.js":
+/***/ "./lib/protocol/payloads/deltas/remote_conflicts.ts":
 /*!**********************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/remote_conflicts.js ***!
+  !*** ./lib/protocol/payloads/deltas/remote_conflicts.ts ***!
   \**********************************************************/
 /*! exports provided: DeltaRemoteConflicts */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14621,8 +14593,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteConflicts", function() { return DeltaRemoteConflicts; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
+/* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
@@ -14730,9 +14702,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 payload = _step.value;
-                current = this.findBasePayload({
-                  id: payload.uuid
-                });
+                current = this.findBasePayload(payload.uuid);
                 /** Could be deleted */
 
                 if (current) {
@@ -14744,10 +14714,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.abrupt("continue", 24);
 
               case 12:
-                decrypted = this.findRelatedPayload({
-                  id: payload.uuid,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient
-                });
+                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient);
 
                 if (decrypted) {
                   _context2.next = 18;
@@ -14766,11 +14733,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.abrupt("continue", 24);
 
               case 18:
-                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"]({
-                  baseCollection: this.baseCollection,
-                  basePayload: current,
-                  applyPayload: decrypted
-                });
+                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].ConflictData);
                 _context2.next = 21;
                 return delta.resultingCollection();
 
@@ -14865,12 +14828,9 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 payload = _step2.value;
-                decrypted = this.findRelatedPayload({
-                  id: payload.uuid,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient
-                });
+                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient);
                 _context3.next = 11;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByAlternatingUuid"])(this.baseCollection, decrypted);
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByAlternatingUuid"])(decrypted, this.baseCollection);
 
               case 11:
                 alternateResults = _context3.sent;
@@ -14939,9 +14899,9 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/remote_retrieved.js":
+/***/ "./lib/protocol/payloads/deltas/remote_retrieved.ts":
 /*!**********************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/remote_retrieved.js ***!
+  !*** ./lib/protocol/payloads/deltas/remote_retrieved.ts ***!
   \**********************************************************/
 /*! exports provided: DeltaRemoteRetrieved */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -14951,7 +14911,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteRetrieved", function() { return DeltaRemoteRetrieved; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
@@ -15024,14 +14984,8 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 received = _step.value;
-                savedOrSaving = this.findRelatedPayload({
-                  id: received.uuid,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving
-                });
-                decrypted = this.findRelatedPayload({
-                  id: received.uuid,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient
-                });
+                savedOrSaving = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving);
+                decrypted = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient);
 
                 if (decrypted) {
                   _context.next = 16;
@@ -15059,9 +15013,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.abrupt("continue", 24);
 
               case 19:
-                base = this.findBasePayload({
-                  id: received.uuid
-                });
+                base = this.findBasePayload(received.uuid);
 
                 if (!(base && base.dirty)) {
                   _context.next = 23;
@@ -15129,10 +15081,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 conflict = _conflicted[_i];
-                _decrypted = this.findRelatedPayload({
-                  id: conflict.uuid,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient
-                });
+                _decrypted = this.findRelatedPayload(conflict.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient);
 
                 if (_decrypted) {
                   _context.next = 48;
@@ -15142,9 +15091,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.abrupt("continue", 57);
 
               case 48:
-                current = this.findBasePayload({
-                  id: conflict.uuid
-                });
+                current = this.findBasePayload(conflict.uuid);
 
                 if (current) {
                   _context.next = 51;
@@ -15197,9 +15144,9 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/remote_saved.js":
+/***/ "./lib/protocol/payloads/deltas/remote_saved.ts":
 /*!******************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/remote_saved.js ***!
+  !*** ./lib/protocol/payloads/deltas/remote_saved.ts ***!
   \******************************************************/
 /*! exports provided: DeltaRemoteSaved */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15209,7 +15156,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteSaved", function() { return DeltaRemoteSaved; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
@@ -15272,9 +15219,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
 
                 for (_iterator = this.applyCollection.getAllPayloads()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                   payload = _step.value;
-                  current = this.findBasePayload({
-                    id: payload.uuid
-                  });
+                  current = this.findBasePayload(payload.uuid);
                   /** If we save an item, but while in transit it is deleted locally, we want to keep 
                    * local deletion status, and not old deleted value that was sent to server.
                    */
@@ -15341,9 +15286,9 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/deltas/strategies.js":
+/***/ "./lib/protocol/payloads/deltas/strategies.ts":
 /*!****************************************************!*\
-  !*** ./lib/protocol/payloads/deltas/strategies.js ***!
+  !*** ./lib/protocol/payloads/deltas/strategies.ts ***!
   \****************************************************/
 /*! exports provided: ConflictStrategies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15351,13 +15296,17 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return ConflictStrategies; });
-var ConflictStrategies = {
-  KeepLeft: 1,
-  KeepRight: 2,
-  KeepLeftDuplicateRight: 3,
-  DuplicateLeftKeepRight: 4,
-  KeepLeftMergeRefs: 5
-};
+var ConflictStrategies;
+
+(function (ConflictStrategies) {
+  ConflictStrategies[ConflictStrategies["KeepLeft"] = 1] = "KeepLeft";
+  ConflictStrategies[ConflictStrategies["KeepRight"] = 2] = "KeepRight";
+  ConflictStrategies[ConflictStrategies["KeepLeftDuplicateRight"] = 3] = "KeepLeftDuplicateRight";
+  ConflictStrategies[ConflictStrategies["DuplicateLeftKeepRight"] = 4] = "DuplicateLeftKeepRight";
+  ConflictStrategies[ConflictStrategies["KeepLeftMergeRefs"] = 5] = "KeepLeftMergeRefs";
+})(ConflictStrategies || (ConflictStrategies = {}));
+
+;
 
 /***/ }),
 
@@ -15928,7 +15877,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return CopyEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "payloadClassForSource", function() { return payloadClassForSource; });
-/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.ts");
@@ -16041,9 +15990,9 @@ function payloadClassForSource(source) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/index.js":
+/***/ "./lib/protocol/payloads/index.ts":
 /*!****************************************!*\
-  !*** ./lib/protocol/payloads/index.js ***!
+  !*** ./lib/protocol/payloads/index.ts ***!
   \****************************************/
 /*! exports provided: PayloadCollection, PayloadCollectionSet, CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, payloadClassForSource, PayloadsByDuplicating, PayloadsByAlternatingUuid, PayloadFields, PayloadSources, PurePayload, PayloadFormats, SNPureItemPayload, SNStorageItemPayload, SNServerItemPayload, SNFileItemPayload, RetrievedComponentPayload, SNMaxItemPayload, SNSavedServerItemPayload, EncryptionParameters, ConflictStrategies, PayloadsDelta, DeltaFileImport, DeltaOutOfSync, DeltaRemoteConflicts, DeltaRemoteRetrieved, DeltaRemoteSaved, ConflictDelta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16112,7 +16061,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionParameters", function() { return _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__["EncryptionParameters"]; });
 
-/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__["ConflictStrategies"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsDelta", function() { return _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__["PayloadsDelta"]; });
@@ -16613,7 +16562,7 @@ var PayloadSources;
   PayloadSources[PayloadSources["FileImport"] = 9] = "FileImport";
   PayloadSources[PayloadSources["RemoteConflict"] = 10] = "RemoteConflict";
   PayloadSources[PayloadSources["ImportConflict"] = 11] = "ImportConflict";
-  PayloadSources[PayloadSources["SaveOrSaving"] = 12] = "SaveOrSaving";
+  PayloadSources[PayloadSources["SavedOrSaving"] = 12] = "SavedOrSaving";
   PayloadSources[PayloadSources["DecryptedTransient"] = 13] = "DecryptedTransient";
   PayloadSources[PayloadSources["ConflictUuid"] = 14] = "ConflictUuid";
   PayloadSources[PayloadSources["ConflictData"] = 15] = "ConflictData";
@@ -16920,7 +16869,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return SNActionsService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
@@ -20528,7 +20477,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -25010,7 +24959,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
@@ -27140,7 +27089,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
 
@@ -29470,10 +29419,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context24.prev = _context24.next) {
               case 0:
-                delta = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["DeltaFileImport"]({
-                  baseCollection: this.getMasterCollection(),
-                  applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"](payloads, _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].FileImport)
-                });
+                delta = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["DeltaFileImport"](this.getMasterCollection(), new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"](payloads, _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].FileImport));
                 _context24.next = 3;
                 return delta.resultingCollection();
 
@@ -30583,7 +30529,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 
@@ -32582,7 +32528,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -33968,7 +33914,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncResponseResolver", function() { return SyncResponseResolver; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/generator */ "./lib/protocol/payloads/deltas/generator.js");
+/* harmony import */ var _Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/generator */ "./lib/protocol/payloads/deltas/generator.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection_set */ "./lib/protocol/payloads/collection_set.ts");
@@ -34107,11 +34053,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 collection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloads, source);
                 deltaClass = Object(_Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__["DeltaClassForSource"])(source); // eslint-disable-next-line new-cap
 
-                delta = new deltaClass({
-                  baseCollection: this.baseCollection,
-                  applyCollection: collection,
-                  relatedCollectionSet: this.relatedCollectionSet
-                });
+                delta = new deltaClass(this.baseCollection, collection, this.relatedCollectionSet);
                 _context2.next = 7;
                 return delta.resultingCollection();
 
@@ -34674,7 +34616,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_account_response_resolver__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/sync/account/response_resolver */ "./lib/services/sync/account/response_resolver.js");
 /* harmony import */ var _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/sync/account/operation */ "./lib/services/sync/account/operation.js");
 /* harmony import */ var _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/sync/offline/operation */ "./lib/services/sync/offline/operation.js");
-/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
+/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
@@ -36806,10 +36748,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 3:
                 payloads = _context26.sent;
-                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"]({
-                  baseCollection: this.modelManager.getMasterCollection(),
-                  applyCollection: new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved)
-                });
+                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved));
                 _context26.next = 7;
                 return delta.resultingCollection();
 

@@ -25,16 +25,15 @@ export class PayloadCollection {
     Object.freeze(this);
   }
 
-  /** @access public */
-  getAllPayloads() {
+  public getAllPayloads() {
     return this.payloads;
   }
 
-  findPayload(id: string) {
+  public findPayload(id: string) {
     return this.payloadMap[id];
   }
 
-  concat(inCollection: PayloadCollection) {
+  public concat(inCollection: PayloadCollection) {
     const result = inCollection.getAllPayloads().slice();
     for (const ours of this.payloads) {
       /** If the payload exists in incoming collection, don't add our version */
@@ -46,7 +45,7 @@ export class PayloadCollection {
     return new PayloadCollection(result, this.source);
   }
 
-  payloadsThatReferencePayload(payload) {
+  public payloadsThatReferencePayload(payload: PurePayload) {
     const results = [];
     for (const uuid of Object.keys(this.payloadMap)) {
       const candidate = this.findPayload(uuid);
