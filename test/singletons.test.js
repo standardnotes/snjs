@@ -4,14 +4,12 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('singletons', () => {
-
+describe('singletons', () => {
   const syncOptions = {
     checkIntegrity: true
   };
-
   const BASE_ITEM_COUNT = 1; /** Default items key */
-
+  
   function createPrivsPayload() {
     const params = {
       uuid: Uuid.GenerateUuidSynchronously(),
@@ -90,7 +88,8 @@ describe.only('singletons', () => {
 
     this.expectedItemCount++;
     const items = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [privs1, privs2, privs3]
+      payloads: [privs1, privs2, privs3],
+      source: PayloadSources.LocalChanged
     });
     await this.application.modelManager.setItemsDirty(items);
     await this.application.syncService.sync(syncOptions);
@@ -114,7 +113,7 @@ describe.only('singletons', () => {
     expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
   });
 
-  it.only('resolves via find or create', async function () {
+  it('resolves via find or create', async function () {
     /* Set to never synced as singleton manager will attempt to sync before resolving */
     this.application.syncService.ut_clearLastSyncDate();
     this.application.syncService.ut_setDatabaseLoaded(false);

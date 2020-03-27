@@ -151,7 +151,7 @@ describe('payloads', () => {
   }).timeout(5000);
 
   it('returns unencrypted params with no keys', async () => {
-    var payload = Factory.createNotePayload();
+    const payload = Factory.createNotePayload();
     const encodedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload({
       payload: payload,

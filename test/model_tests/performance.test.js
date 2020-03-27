@@ -60,7 +60,10 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({ payloads: subArray });
+      await modelManager.mapPayloadsToLocalItems({
+        payloads: subArray,
+        source: PayloadSources.LocalChanged
+      });
       currentIndex += batchSize;
     }
 
@@ -114,8 +117,8 @@ describe('mapping performance', () => {
       notes.push(note);
     }
 
-    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject({ 
-      object: item 
+    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject({
+      object: item
     }));
 
     const t0 = performance.now();
@@ -124,7 +127,10 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({ payloads: subArray });
+      await modelManager.mapPayloadsToLocalItems({
+        payloads: subArray,
+        source: PayloadSources.LocalChanged
+      });
       currentIndex += batchSize;
     }
 

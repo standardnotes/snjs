@@ -286,7 +286,10 @@ describe('predicates', () => {
       }
     });
 
-    const item2 = (await modelManager.mapPayloadsToLocalItems({ payloads: [payload] }))[0];
+    const item2 = (await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    }))[0];
 
     expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'includes', 'bar'])).length).to.equal(1);
     expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'in', ['sobar']])).length).to.equal(1);
@@ -323,7 +326,10 @@ describe('predicates', () => {
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = 'abc';
-    await modelManager.mapPayloadsToLocalItems({ payloads: [CreateMaxPayloadFromAnyObject({ object: item })] });
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [CreateMaxPayloadFromAnyObject({ object: item })],
+      source: PayloadSources.LocalChanged
+    });
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   });
 });

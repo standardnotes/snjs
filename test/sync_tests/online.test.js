@@ -289,7 +289,8 @@ describe('online syncing', () => {
       }
     });
     const items = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [errorred]
+      payloads: [errorred],
+      source: PayloadSources.LocalChanged
     });
     const mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal('string');
@@ -299,7 +300,8 @@ describe('online syncing', () => {
         payload: errorred
       });
     const mappedItems2 = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [decryptedPayload]
+      payloads: [decryptedPayload],
+      source: PayloadSources.LocalChanged
     });
     const mappedItem2 = mappedItems2[0];
     expect(typeof mappedItem2.content).to.equal('object');
@@ -564,7 +566,8 @@ describe('online syncing', () => {
       }
     });
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [mutatedPayload]
+      payloads: [mutatedPayload],
+      source: PayloadSources.LocalChanged
     });
     const resultNote = this.application.modelManager.findItem(note.uuid);
     expect(resultNote.uuid).to.equal(note.uuid);
@@ -748,7 +751,8 @@ describe('online syncing', () => {
       payloads.push(decrypted);
     }
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: payloads
+      payloads: payloads,
+      source: PayloadSources.LocalChanged
     });
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     const foundNote = this.application.modelManager.findItem(note.uuid);
@@ -761,7 +765,8 @@ describe('online syncing', () => {
     const payload2 = Factory.createStorageItemPayload('Bar');
 
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [payload1, payload2]
+      payloads: [payload1, payload2],
+      source: PayloadSources.LocalChanged
     });
     this.expectedItemCount += 2;
 
@@ -1183,5 +1188,14 @@ describe('online syncing', () => {
      */
     await syncRequest;
     expect(actualSaveCount).to.equal(expectedSaveCount);
-  }).timeout(10000);
+  }).timeout(Factory.TestTimeout);
+
+  it('retreiving a remote deleted item should succeed', async function () {
+    const note = await Factory.createSyncedNote(this.application);
+    const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
+    await this.application.deleteItem({item: note});
+    await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
+    await this.application.sync();
+    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+  }).timeout(Factory.TestTimeout);
 });

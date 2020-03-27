@@ -232,7 +232,8 @@ describe('keys', () => {
         payload: encryptedPayload
       });
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [decryptedPayload]
+      payloads: [decryptedPayload],
+      source: PayloadSources.LocalChanged
     });
 
     const note = this.application.modelManager.notes[0];
@@ -244,7 +245,8 @@ describe('keys', () => {
       object: itemsKey
     });
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [keyPayload]
+      payloads: [keyPayload],
+      source: PayloadSources.LocalChanged
     });
 
     /**

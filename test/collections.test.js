@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe('payload collections', () => {
   const sharedApplication = Factory.createApplication();

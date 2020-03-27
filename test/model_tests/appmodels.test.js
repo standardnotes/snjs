@@ -89,8 +89,14 @@ describe('app models', () => {
       }
     });
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
-    await modelManager.mapPayloadsToLocalItems({payloads: [params2]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutated],
+      source: PayloadSources.LocalChanged
+    });
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [params2],
+      source: PayloadSources.LocalChanged
+    });
 
     const item1 = modelManager.findItem(params1.uuid);
     const item2 = modelManager.findItem(params2.uuid);
@@ -109,7 +115,10 @@ describe('app models', () => {
       override: {uuid: null}
     });
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [params]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [params],
+      source: PayloadSources.LocalChanged
+    });
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
@@ -121,11 +130,17 @@ describe('app models', () => {
       override: {content: {foo: 'bar'}}
     });
 
-    let items = await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
+    let items = await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutated],
+      source: PayloadSources.LocalChanged
+    });
     let item = items[0];
     expect(item).to.not.be.null;
 
-    items = await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
+    items = await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutated],
+      source: PayloadSources.LocalChanged
+    });
     item = items[0];
 
     expect(item.content.foo).to.equal('bar');
@@ -143,7 +158,10 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1);
 
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems({payloads: [updatedPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [updatedPayload],
+      source: PayloadSources.LocalChanged
+    });
 
     expect(item1.content.references.length).to.equal(1);
   });
@@ -162,7 +180,10 @@ describe('app models', () => {
     // damage references of one object
     item1.content.references = [];
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems({payloads: [updatedPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [updatedPayload],
+      source: PayloadSources.LocalChanged
+    });
 
     expect(item1.content.references.length).to.equal(0);
     expect(item2.content.references.length).to.equal(1);

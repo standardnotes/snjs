@@ -45,7 +45,10 @@ describe('notes + tags syncing', async function() {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await this.application.modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await this.application.modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = this.application.modelManager.getItems(['Note'])[0];
     const tag = this.application.modelManager.getItems(['Tag'])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
@@ -70,7 +73,8 @@ describe('notes + tags syncing', async function() {
     const notePayload = pair[0];
     const tagPayload = pair[1];
     await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [notePayload, tagPayload]
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
     });
     const originalNote = this.application.modelManager.notes[0];
     const originalTag = this.application.modelManager.tags[0];
@@ -113,7 +117,8 @@ describe('notes + tags syncing', async function() {
       payloads: [
         notePayload, 
         tagPayload
-      ]
+      ],
+      source: PayloadSources.LocalChanged
     });
     const note = this.application.modelManager.notes[0];
     const tag = this.application.modelManager.tags[0];

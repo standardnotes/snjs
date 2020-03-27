@@ -63,7 +63,10 @@ describe('notes and tags', () => {
       ]}}
     });
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutatedNote, mutatedTag]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutatedNote, mutatedTag],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -80,7 +83,10 @@ describe('notes and tags', () => {
     expect(notePayload.content.references.length).to.equal(0);
     expect(tagPayload.content.references.length).to.equal(1);
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.notes[0];
     const tag = modelManager.tags[0];
 
@@ -116,7 +122,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -129,7 +138,10 @@ describe('notes and tags', () => {
       object: tagPayload,
       override: {content: {references: []}}
     });
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutatedTag]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutatedTag],
+      source: PayloadSources.LocalChanged
+    });
 
     expect(tag.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(0);
@@ -147,7 +159,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -159,7 +174,10 @@ describe('notes and tags', () => {
         deleted: true
       }
     });
-    await modelManager.mapPayloadsToLocalItems({payloads: [changedTagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [changedTagPayload],
+      source: PayloadSources.LocalChanged
+    });
 
     expect(modelManager.tags.length).to.equal(0);
 
@@ -180,7 +198,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -190,7 +211,10 @@ describe('notes and tags', () => {
       object: tagPayload,
       override: {content: {references: []}}
     });
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutatedTag]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutatedTag],
+      source: PayloadSources.LocalChanged
+    });
 
     // should be null
     expect(note.savedTagsString).to.not.be.ok;
@@ -206,7 +230,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -226,7 +253,8 @@ describe('notes and tags', () => {
 
     // simulate a save, which omits `content`
     await modelManager.mapPayloadsToLocalItems({
-      payloads: [changedTagPayload]
+      payloads: [changedTagPayload],
+      source: PayloadSources.LocalChanged
     });
 
     expect(tag.content.title).to.equal(newTitle);
@@ -241,7 +269,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -252,7 +283,10 @@ describe('notes and tags', () => {
 
     const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [newTagPayload],
+      source: PayloadSources.LocalChanged
+    });
 
     expect(note.tags.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
@@ -261,7 +295,10 @@ describe('notes and tags', () => {
   it('properly handles tag duplication', async function () {
     const modelManager = this.application.modelManager;
     const pair = Factory.createRelatedNoteTagPairPayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: pair});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: pair,
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.notes[0];
     const tag = modelManager.tags[0];
 
@@ -292,7 +329,10 @@ describe('notes and tags', () => {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const duplicateNote = await modelManager.duplicateItem({item: note, isConflict: true});
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
@@ -306,7 +346,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -318,7 +361,10 @@ describe('notes and tags', () => {
 
     await modelManager.setItemToBeDeleted(tag);
     const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
-    await modelManager.mapPayloadsToLocalItems({payloads: [newTagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [newTagPayload],
+      source: PayloadSources.LocalChanged
+    });
     expect(tag.content.references.length).to.equal(0);
     expect(tag.notes.length).to.equal(0);
   });
@@ -326,7 +372,10 @@ describe('notes and tags', () => {
   it('modifying item content should not modify payload content', async function () {
     const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     expect(note.content === notePayload.content).to.equal(false);
     /** Items transfer payload values on update, so these should be equal */
@@ -354,7 +403,10 @@ describe('notes and tags', () => {
       }] } }
     });
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutatedPayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutatedPayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 
@@ -381,7 +433,10 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems({payloads: [notePayload, tagPayload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [notePayload, tagPayload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
 

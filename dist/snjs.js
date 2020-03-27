@@ -3542,10 +3542,13 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context16.prev = _context16.next) {
               case 0:
                 item = _ref16.item;
-                this.modelManager.setItemToBeDeleted(item);
-                this.sync();
+                _context16.next = 3;
+                return this.modelManager.setItemToBeDeleted(item);
 
               case 3:
+                return _context16.abrupt("return", this.sync());
+
+              case 4:
               case "end":
                 return _context16.stop();
             }
@@ -9318,30 +9321,12 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
       _get(_getPrototypeOf(SNTag.prototype), "removeItemAsRelationship", this).call(this, item);
     }
   }, {
-    key: "updateLocalRelationships",
-    value: function updateLocalRelationships() {
-      var _this2 = this;
-
-      var references = this.content.references;
-      var uuids = references.map(function (ref) {
-        return ref.uuid;
-      });
-      this.notes.slice().forEach(function (note) {
-        if (!uuids.includes(note.uuid)) {
-          lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(_this2.notes, {
-            uuid: note.uuid
-          });
-          note.setIsNoLongerReferencedBy(_this2);
-        }
-      });
-    }
-  }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      var _this3 = this;
+      var _this2 = this;
 
       this.notes.forEach(function (note) {
-        note.setIsNoLongerReferencedBy(_this3);
+        note.setIsNoLongerReferencedBy(_this2);
       });
       this.notes.length = 0;
 
@@ -10028,7 +10013,7 @@ var SNItem = /*#__PURE__*/function () {
   }, {
     key: "structureParams",
     value: function structureParams() {
-      return this.getContentCopy();
+      return this.getContentCopy() || {};
     }
     /** Allows consumers to check if object is an SNItem subclass and not a generic JS object */
 
@@ -21119,17 +21104,23 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 var itemInContext = handler.contextRequestHandler(observer.component);
 
                 if (itemInContext) {
-                  (function () {
+                  var _ret4 = function () {
                     var matchingItem = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(allItems, {
                       uuid: itemInContext.uuid
                     });
 
                     if (matchingItem) {
+                      if (matchingItem.deleted) {
+                        return "continue";
+                      }
+
                       _this3.runWithPermissions(observer.component, requiredContextPermissions, function () {
                         _this3.sendContextItemInReply(observer.component, matchingItem, observer.originalMessage, source);
                       });
                     }
-                  })();
+                  }();
+
+                  if (_ret4 === "continue") continue;
                 }
               }
             }
@@ -22714,9 +22705,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         };
 
         for (var _iterator22 = requiredPermissions.slice()[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
-          var _ret4 = _loop5();
+          var _ret5 = _loop5();
 
-          if (_ret4 === "continue") continue;
+          if (_ret5 === "continue") continue;
         }
       } catch (err) {
         _didIteratorError22 = true;

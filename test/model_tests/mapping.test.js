@@ -18,7 +18,10 @@ describe('model manager mapping', () => {
   it('mapping nonexistent item creates it', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     this.expectedItemCount++;
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
@@ -40,14 +43,20 @@ describe('model manager mapping', () => {
     /** content is omitted to simulate handling saved_items sync success. */
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     const originalNote = modelManager.notes[0];
     expect(originalNote.content.title).to.equal(payload.content.title);
     const mutated = CreateSourcedPayloadFromObject({
       object: payload,
       source: PayloadSources.RemoteSaved
     });
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutated],
+      source: PayloadSources.LocalChanged
+    });
     const sameNote = modelManager.notes[0];
     expect(sameNote.content.title).to.equal(payload.content.title);
   });
@@ -55,7 +64,10 @@ describe('model manager mapping', () => {
   it('mapping and deleting nonexistent item creates and deletes it', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     this.expectedItemCount++;
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 
@@ -67,35 +79,50 @@ describe('model manager mapping', () => {
       }
     });
     this.expectedItemCount--;
-    await modelManager.mapPayloadsToLocalItems({payloads: [changedParams]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [changedParams],
+      source: PayloadSources.LocalChanged
+    });
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
   it('mapping deleted but dirty item should not delete it', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     this.expectedItemCount++;
 
     const item = modelManager.allItems[0];
     item.deleted = true;
     await modelManager.setItemDirty(item, true);
     const payload2 = CreateMaxPayloadFromAnyObject({object: item});
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload2]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload2],
+      source: PayloadSources.LocalChanged
+    });
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
   it('mapping existing item updates its properties', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
 
     const newTitle = 'updated title';
     const mutated = CreateMaxPayloadFromAnyObject({
       object: payload,
       override: {content: {title: newTitle}}
     });
-    await modelManager.mapPayloadsToLocalItems({payloads: [mutated]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [mutated],
+      source: PayloadSources.LocalChanged
+    });
     const item = modelManager.notes[0];
 
     expect(item.content.title).to.equal(newTitle);
@@ -104,7 +131,10 @@ describe('model manager mapping', () => {
   it('setting an item dirty should retrieve it in dirty items', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.notes[0];
     await modelManager.setItemDirty(note, true);
     const dirtyItems = modelManager.getDirtyItems();
@@ -114,7 +144,10 @@ describe('model manager mapping', () => {
   it('clearing dirty items should return no items', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.notes[0];
     await modelManager.setItemDirty(note);
     const dirtyItems = modelManager.getDirtyItems();
@@ -132,7 +165,10 @@ describe('model manager mapping', () => {
     for(let i = 0; i < count; i++) {
       payloads.push(Factory.createNotePayload());
     }
-    await modelManager.mapPayloadsToLocalItems({payloads: payloads});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: payloads,
+      source: PayloadSources.LocalChanged
+    });
     await this.application.syncService.markAllItemsAsNeedingSync();
 
     const dirtyItems = modelManager.getDirtyItems();
@@ -142,14 +178,20 @@ describe('model manager mapping', () => {
   it('sync observers should be notified of changes', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+    await modelManager.mapPayloadsToLocalItems({
+      payloads: [payload],
+      source: PayloadSources.LocalChanged
+    });
     const item = modelManager.allItems[0];
     return new Promise((resolve) => {
       modelManager.addMappingObserver('*', (items, validItems, deletedItems, source, sourceKey) => {
         expect(items[0].uuid === item.uuid);
         resolve();
       });
-      modelManager.mapPayloadsToLocalItems({payloads: [payload]});
+      modelManager.mapPayloadsToLocalItems({
+        payloads: [payload],
+        source: PayloadSources.LocalChanged
+      });
     });
   });
 });

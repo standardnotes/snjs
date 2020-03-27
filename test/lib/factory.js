@@ -6,7 +6,6 @@ import { Environments, Platforms } from '../../lib/platforms.js';
 export const TestTimeout = 10000;
 
 export function createApplication(namespace, environment, platform) {
-  const url = serverURL();
   const deviceInterface = new WebDeviceInterface({
     namespace,
     timeout: setTimeout.bind(window),
@@ -17,7 +16,6 @@ export function createApplication(namespace, environment, platform) {
     deviceInterface: deviceInterface,
     environment: environment || Environments.Web,
     platform: platform || Platforms.MacWeb,
-    host: url,
     skipClasses: [
       SNComponentManager
     ]
@@ -124,17 +122,26 @@ export function itemToStoragePayload(item) {
 
 export function createMappedNote(application) {
   const payload = createNotePayload();
-  return application.modelManager.mapPayloadToLocalItem({ payload });
+  return application.modelManager.mapPayloadToLocalItem({
+    payload,
+    source: PayloadSources.LocalChanged
+  });
 }
 
 export function createMappedTag(application) {
   const payload = createStorageItemTagPayload();
-  return application.modelManager.mapPayloadToLocalItem({ payload });
+  return application.modelManager.mapPayloadToLocalItem({
+    payload,
+    source: PayloadSources.LocalChanged
+  });
 }
 
 export async function createSyncedNote(application) {
   const payload = createNotePayload();
-  const note = await application.modelManager.mapPayloadToLocalItem({ payload });
+  const note = await application.modelManager.mapPayloadToLocalItem({
+    payload,
+    source: PayloadSources.LocalChanged
+  });
   await application.modelManager.setItemDirty(note, true);
   await application.syncService.sync();
   return note;
@@ -158,7 +165,6 @@ export async function createManyMappedNotes(application, count) {
 
 export async function loginToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
   return application.signIn({
-    url: serverURL(),
     email: email,
     password: password,
     ephemeral: ephemeral,
@@ -236,10 +242,6 @@ export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
 export async function storagePayloadCount(application) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
-}
-
-export function serverURL() {
-  return window.sync_server_url;
 }
 
 export function yesterday() {

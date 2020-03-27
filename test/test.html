@@ -9,7 +9,7 @@
         <script src="../node_modules/mocha/mocha.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
-          window.sync_server_url = 'http://localhost:3000';
+          window._default_sync_server = 'http://localhost:3000';
           Object.assign(window, SNLibrary);
           mocha.setup('bdd');
         </script>
