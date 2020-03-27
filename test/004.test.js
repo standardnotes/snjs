@@ -15,10 +15,10 @@ describe('004 protocol operations', () => {
 
   before(async () => {
     await Factory.initializeApplication(application);
-    const result = await protocol004.createRootKey({
-      identifier: _identifier,
-      password: _password
-    });
+    const result = await protocol004.createRootKey(
+      _identifier,
+      _password
+    );
     _keyParams = result.keyParams;
     _key = result.key;
   });
@@ -33,10 +33,10 @@ describe('004 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await application.protocolService.createRootKey({
-      identifier: _identifier,
-      password: _password
-    });
+    const result = await application.protocolService.createRootKey(
+      _identifier,
+      _password
+    );
 
     expect(result).to.have.property('key');
     expect(result).to.have.property('keyParams');
@@ -61,10 +61,10 @@ describe('004 protocol operations', () => {
       identifier: identifier,
       version: '004'
     });
-    const key = await protocol004.computeRootKey({
-      keyParams: keyParams,
-      password: password
-    });
+    const key = await protocol004.computeRootKey(
+      password,
+      keyParams,
+    );
     expect(key.masterKey).to.equal('5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943');
     expect(key.serverPassword).to.equal('83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d');
     expect(key.dataAuthenticationKey).to.not.be.ok;
@@ -81,18 +81,18 @@ describe('004 protocol operations', () => {
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const additionalData = {foo: 'bar'};
-    const encString = await application.protocolService.defaultOperator().encryptString({
-      plaintext: text,
-      rawKey: rawKey,
-      nonce: nonce,
-      aad: additionalData
-    });
-    const decString = await application.protocolService.defaultOperator().decryptString({
-      ciphertext: encString,
-      rawKey: rawKey,
-      nonce: nonce,
-      aad: additionalData
-    });
+    const encString = await application.protocolService.defaultOperator().encryptString004(
+      text,
+      rawKey,
+      nonce,
+      additionalData
+    );
+    const decString = await application.protocolService.defaultOperator().decryptString004(
+      encString,
+      rawKey,
+      nonce,
+      additionalData
+    );
     expect(decString).to.equal(text);
   });
 
@@ -102,41 +102,42 @@ describe('004 protocol operations', () => {
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const aad = {foo: 'bar'};
     const nonmatchingAad = {foo: 'rab'};
-    const encString = await application.protocolService.defaultOperator().encryptString({
-      plaintext: text,
-      rawKey: rawKey,
+    const encString = await application.protocolService.defaultOperator().encryptString004(
+      text,
+      rawKey,
       nonce,
-      aad: aad
-    });
-    const decString = await application.protocolService.defaultOperator().decryptString({
-      ciphertext: encString,
-      rawKey: rawKey,
-      nonce: nonce,
-      aad: nonmatchingAad
-    });
+      aad
+    );
+    const decString = await application.protocolService.defaultOperator().decryptString004(
+      encString,
+      rawKey,
+      nonce,
+      nonmatchingAad
+    );
     expect(decString).to.not.be.ok;
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await application.protocolService.computeRootKey({
-      password: _password,
-      keyParams: _keyParams
-    });
+    const key = await application.protocolService.computeRootKey(
+      _password,
+      _keyParams
+    );
     expect(key.compare(_key)).to.be.true;
   });
 
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol004.createItemsKey();
-    const params = await protocol004.generateEncryptionParameters({
+    const params = await protocol004.generateEncryptedParameters(
       payload,
+      PayloadFormats.EncryptedString,
       key,
-      format: PayloadFormats.EncryptedString
-    });
-    const decrypted = await protocol004.generateDecryptedParameters({
-      encryptedParameters: params,
-      key: key
-    });
+    );
+    const decrypted = await protocol004.generateDecryptedParameters(
+      params,
+      key
+    );
+    expect(decrypted.errorDecrypted).to.not.be.ok;
     expect(decrypted.content).to.eql(payload.content);
   });
 });

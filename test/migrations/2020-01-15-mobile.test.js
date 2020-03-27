@@ -28,10 +28,10 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey({
-      identifier: identifier,
-      password: passcode
-    });
+    const passcodeResult = await operator003.createRootKey(
+      identifier,
+      passcode
+    );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeResult.keyParams.getPortableValue())
@@ -41,10 +41,10 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey({
-      identifier: identifier,
-      password: password
-    });
+    const accountResult = await operator003.createRootKey(
+      identifier,
+      password
+    );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountResult.keyParams.getPortableValue())
@@ -54,7 +54,7 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      version: SNProtocolOperator003.versionString(),
+      version: ProtocolVersions.V003,
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
@@ -75,11 +75,11 @@ describe('2020-01-15 mobile migration', () => {
         }
       }
     );
-    const encryptedKeyParams = await operator003.generateEncryptionParameters({
-      payload: keyPayload,
-      key: passcodeKey,
-      format: PayloadFormats.EncryptedString
-    });
+    const encryptedKeyParams = await operator003.generateEncryptedParameters(
+      keyPayload,
+      PayloadFormats.EncryptedString,
+      passcodeKey,
+    );
     const wrappedKey = CreateMaxPayloadFromAnyObject(
       keyPayload,
       null,
@@ -102,11 +102,11 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptionParameters({
-      payload: notePayload,
-      key: accountKey,
-      format: PayloadFormats.EncryptedString
-    });
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormats.EncryptedString,
+      accountKey,
+    );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       null,
@@ -157,7 +157,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
+    expect(rootKey.version).to.equal(ProtocolVersions.V003);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
@@ -193,10 +193,10 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey({
-      identifier: identifier,
-      password: passcode
-    });
+    const passcodeResult = await operator003.createRootKey(
+      identifier,
+      passcode
+    );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeResult.keyParams.getPortableValue())
@@ -222,11 +222,11 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptionParameters({
-      payload: notePayload,
-      key: passcodeKey,
-      format: PayloadFormats.EncryptedString
-    });
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormats.EncryptedString,
+      passcodeKey,
+    );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       null,
@@ -277,7 +277,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
+    expect(rootKey.version).to.equal(ProtocolVersions.V003);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
@@ -314,21 +314,21 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey({
-      identifier: identifier,
-      password: password
-    });
+    const accountResult = await operator003.createRootKey(
+      identifier,
+      password
+    );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountResult.keyParams.getPortableValue())
     );
     const accountKey = accountResult.key;
-    expect(accountKey.version).to.equal(SNProtocolOperator003.versionString());
+    expect(accountKey.version).to.equal(ProtocolVersions.V003);
     await application.deviceInterface.setKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      version: SNProtocolOperator003.versionString()
+      version: ProtocolVersions.V003
     });
     const biometricPrefs = {
       enabled: true,
@@ -345,11 +345,11 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptionParameters({
-      payload: notePayload,
-      key: accountKey,
-      format: PayloadFormats.EncryptedString
-    });
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormats.EncryptedString,
+      accountKey,
+    );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       null,
@@ -400,7 +400,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(SNProtocolOperator003.versionString());
+    expect(rootKey.version).to.equal(ProtocolVersions.V003);
     expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
 
     const keyParams = await application.storageService.getValue(
@@ -451,10 +451,10 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteParams = await operator003.generateEncryptionParameters({
-      payload: notePayload,
-      format: PayloadFormats.DecryptedBareObject
-    });
+    const noteParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormats.DecryptedBareObject
+    );
     const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       null,

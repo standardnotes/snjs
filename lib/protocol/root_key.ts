@@ -4,7 +4,7 @@ import { Uuid } from '@Lib/uuid';
 import { Copy } from '@Lib/utils';
 
 export type RootKeyContent = {
-  version: string;
+  version: ProtocolVersions;
   masterKey: string;
   serverPassword: string;
   dataAuthenticationKey?: string;
@@ -19,14 +19,14 @@ export class SNRootKey {
   public readonly uuid?: string
   public readonly content: RootKeyContent
 
-  static async Create(uuid: string, content: RootKeyContent) {
+  static async Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
       uuid = await Uuid.GenerateUuid();
     }
-    return new SNRootKey(uuid, content);
+    return new SNRootKey(content, uuid);
   }
 
-  constructor(uuid: string, content: RootKeyContent) {
+  constructor(content: RootKeyContent, uuid?: string) {
     this.uuid = uuid;
     this.content = Copy(content) as RootKeyContent;
 

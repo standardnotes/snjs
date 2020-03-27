@@ -14,8 +14,13 @@
         "isolatedModules": true,
         /** Import non-ES modules as default imports. */
         "esModuleInterop": true,
+        "types": [
+            "node",
+            "sncrypto"
+        ],
         "typeRoots": [
-            "./app/@types"
+            "./lib/@types",
+            "./node_modules/sncrypto"
         ],
         "baseUrl": "./",
         "paths": {

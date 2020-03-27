@@ -2,12 +2,12 @@ import { omitByCopy } from '@Lib/utils';
 import { ProtocolVersions, compareVersions } from '@Protocol/versions';
 
 export type KeyParamsContent = {
-  pw_cost: string
+  pw_cost: number
   pw_nonce: string
-  identifier: string
+  identifier?: string
   email?: string
-  pw_salt: string
-  version: string
+  pw_salt?: string
+  version: ProtocolVersions
 }
 
 export function CreateKeyParams(keyParams: KeyParamsContent) {

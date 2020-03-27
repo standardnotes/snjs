@@ -93,7 +93,7 @@ describe('keys', () => {
   it('should use root key for encryption of storage', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey({ identifier: email, password });
+    const result = await this.application.protocolService.createRootKey(email, password);
     this.application.keyManager.setNewRootKey({ key: result.key, keyParams: result.keyParams });
 
     const payload = CreateMaxPayloadFromAnyObject(
@@ -113,25 +113,25 @@ describe('keys', () => {
   it('changing root key should with passcode should re-wrap root key', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey({ identifier: email, password });
+    const result = await this.application.protocolService.createRootKey(email, password);
     await this.application.keyManager.setNewRootKey(result);
     await this.application.setPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
     const wrappingKeyParams = await this.application.keyManager.getRootKeyWrapperKeyParams();
-    const wrappingKey = await this.application.protocolService.computeRootKey({
-      password: password,
-      keyParams: wrappingKeyParams
-    });
+    const wrappingKey = await this.application.protocolService.computeRootKey(
+      password,
+      wrappingKeyParams
+    );
     await this.application.keyManager.unwrapRootKey({ wrappingKey: wrappingKey }).catch((error) => {
       expect(error).to.not.be.ok;
     });
 
     const newPassword = 'bar';
-    const newResult = await this.application.protocolService.createRootKey({
-      identifier: email,
-      password: newPassword
-    });
+    const newResult = await this.application.protocolService.createRootKey(
+      email,
+      newPassword
+    );
     await this.application.keyManager.setNewRootKey({
       ...newResult,
       wrappingKey: wrappingKey
@@ -314,7 +314,7 @@ describe('keys', () => {
       const itemsKeys = this.application.itemsKeyManager.allItemsKeys;
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
-      expect(newestItemsKey.version).to.equal(SNProtocolOperator003.versionString());
+      expect(newestItemsKey.version).to.equal(ProtocolVersions.V003);
       const rootKey = await this.application.keyManager.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);

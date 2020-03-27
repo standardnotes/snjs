@@ -58,10 +58,10 @@ export async function registerUserToApplication({ application, email, password, 
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
-  const { key, keyParams } = await operator.createRootKey({
-    identifier: identifier,
-    password: passcode
-  });
+  const { key, keyParams } = await operator.createRootKey(
+    identifier,
+    passcode
+  );
   await application.keyManager.setNewRootKeyWrapper({
     wrappingKey: key,
     keyParams: keyParams
@@ -78,10 +78,10 @@ export async function registerOldUser({ application, email, password, version })
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
-  const result = await operator.createRootKey({
-    identifier: email,
+  const result = await operator.createRootKey(
+    email,
     password
-  });
+  );
   const accountKey = result.key;
   const accountKeyParams = result.keyParams;
 

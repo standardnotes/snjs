@@ -11,6 +11,7 @@ export class EncryptionParameters extends PurePayload {
 
   static fields() {
     return [
+      PayloadFields.Uuid,
       PayloadFields.ItemsKeyId,
       PayloadFields.EncItemKey,
       PayloadFields.Content,
@@ -20,11 +21,7 @@ export class EncryptionParameters extends PurePayload {
       PayloadFields.WaitingForKey
     ];
   }
-
-  get isEncryptionParameters() {
-    return true;
-  }
-
+  
   getContentFormat() {
     if(typeof this.content === 'string') {
       if(this.content.startsWith(ProtocolVersions.V000Base64Decrypted)) {

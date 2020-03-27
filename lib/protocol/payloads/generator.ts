@@ -104,9 +104,6 @@ export function CopyEncryptionParameters(
   encryptionParameters: EncryptionParameters,
   override?: PayloadOverride
 ) {
-  if (!encryptionParameters.isEncryptionParameters) {
-    throw 'Attempting to copy encryption parameters from non-parameters object.';
-  }
   const rawParameters = pickByCopy(encryptionParameters, EncryptionParameters.fields());
   if (override) {
     deepMerge(rawParameters, Copy(override));

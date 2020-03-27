@@ -17,9 +17,7 @@ describe('001 protocol operations', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(application);
-    const result = await protocol001.createRootKey({
-      identifier: _identifier, password: _password
-    });
+    const result = await protocol001.createRootKey(_identifier, _password);
     _keyParams = result.keyParams;
     _key = result.key;
   });
@@ -39,7 +37,7 @@ describe('001 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol001.createRootKey({ identifier: _identifier, password: _password });
+    const result = await protocol001.createRootKey(_identifier, _password);
     expect(result).to.have.property('key');
     expect(result).to.have.property('keyParams');
 
@@ -60,10 +58,10 @@ describe('001 protocol operations', () => {
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol001.computeRootKey({
-      password: _password,
-      keyParams: _keyParams
-    });
+    const key = await protocol001.computeRootKey(
+      _password,
+      _keyParams
+    );
     expect(key.content).to.have.property('serverPassword');
     expect(key.content).to.have.property('masterKey');
     expect(key.compare(_key)).to.be.true;
@@ -72,11 +70,11 @@ describe('001 protocol operations', () => {
   it('generating encryption params includes items_key_id', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
-    const params = await protocol001.generateEncryptionParameters({
+    const params = await protocol001.generateEncryptedParameters(
       payload,
+      PayloadFormats.EncryptedString,
       key,
-      format: PayloadFormats.EncryptedString
-    });
+    );
     expect(params.content).to.be.ok;
     expect(params.enc_item_key).to.be.ok;
     expect(params.auth_hash).to.be.ok;
@@ -86,16 +84,16 @@ describe('001 protocol operations', () => {
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
-    const params = await protocol001.generateEncryptionParameters({
+    const params = await protocol001.generateEncryptedParameters(
       payload,
+      PayloadFormats.EncryptedString,
       key,
-      format: PayloadFormats.EncryptedString
-    });
+    );
 
-    const decrypted = await protocol001.generateDecryptedParameters({
-      encryptedParameters: params,
-      key: key
-    });
+    const decrypted = await protocol001.generateDecryptedParameters(
+      params,
+      key
+    );
     expect(decrypted.content).to.eql(payload.content);
   });
 });
