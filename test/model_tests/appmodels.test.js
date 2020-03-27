@@ -77,9 +77,11 @@ describe('app models', () => {
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
 
-    const mutated = CreateMaxPayloadFromAnyObject({
-      object: params1,
-      override: {
+    const mutated = CreateMaxPayloadFromAnyObject(
+      params1,
+      null,
+      null,
+      {
         content: {
           references: [{
             uuid: params2.uuid,
@@ -87,7 +89,7 @@ describe('app models', () => {
           }]
         }
       }
-    });
+    );
 
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutated],
@@ -110,10 +112,12 @@ describe('app models', () => {
 
   it('mapping item without uuid should not map it', async function() {
     const modelManager = this.application.modelManager;
-    const params = CreateMaxPayloadFromAnyObject({
-      object: Factory.createNoteParams(),
-      override: {uuid: null}
-    });
+    const params = CreateMaxPayloadFromAnyObject(
+      Factory.createNoteParams(),
+      null,
+      null,
+      {uuid: null}
+    );
 
     await modelManager.mapPayloadsToLocalItems({
       payloads: [params],
@@ -125,10 +129,12 @@ describe('app models', () => {
   it('mapping an item twice shouldnt cause problems', async function() {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    const mutated = CreateMaxPayloadFromAnyObject({
-      object: payload,
-      override: {content: {foo: 'bar'}}
-    });
+    const mutated = CreateMaxPayloadFromAnyObject(
+      payload,
+      null,
+      null,
+      {content: {foo: 'bar'}}
+    );
 
     let items = await modelManager.mapPayloadsToLocalItems({
       payloads: [mutated],
@@ -254,10 +260,12 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application);
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject({object: item1})
+      payload: CreateMaxPayloadFromAnyObject(item1),
+      source: PayloadSources.LocalSaved
     });
     expect(item2.referencingItemsCount).to.equal(1);
     await modelManager.mapPayloadToLocalItem({
+      source: PayloadSources.LocalSaved,
       payload: item1.payloadRepresentation({
         override: {
           deleted: true,
@@ -279,7 +287,8 @@ describe('app models', () => {
 
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject({object: item1})
+      payload: CreateMaxPayloadFromAnyObject(item1),
+      source: PayloadSources.LocalSaved
     });
 
     expect(item1.content.references.length).to.equal(1);
@@ -317,7 +326,8 @@ describe('app models', () => {
 
     item1.addItemAsRelationship(item2);
     await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject({object: item1})
+      payload: CreateMaxPayloadFromAnyObject(item1),
+      source: PayloadSources.LocalSaved
     });
 
     expect(item2.referencingItemsCount).to.equal(1);

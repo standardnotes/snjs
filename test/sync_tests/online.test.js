@@ -138,15 +138,15 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it('server extensions should not be encrypted for sync', async function () {
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const payload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentTypes.Mfa,
         content: {
           secret: '123'
         }
       }
-    });
+    );
     const results = await this.application.syncService.payloadsByPreparingForServer([payload]);
     const processed = results[0];
     expect(processed.getFormat()).to.equal(PayloadFormats.DecryptedBase64String);
@@ -282,12 +282,14 @@ describe('online syncing', () => {
       payload: note.payloadRepresentation(),
       intent: EncryptionIntents.Sync
     });
-    const errorred = CreateMaxPayloadFromAnyObject({
-      object: encrypted,
-      override: {
+    const errorred = CreateMaxPayloadFromAnyObject(
+      encrypted,
+      null,
+      null,
+      {
         errorDecrypting: true
       }
-    });
+    );
     const items = await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [errorred],
       source: PayloadSources.LocalChanged
@@ -558,13 +560,15 @@ describe('online syncing', () => {
     // client B
     await this.application.syncService.clearSyncPositionTokens();
     // Add the item back and say it's not deleted
-    const mutatedPayload = CreateMaxPayloadFromAnyObject({
-      object: originalPayload,
-      override: {
+    const mutatedPayload = CreateMaxPayloadFromAnyObject(
+      originalPayload,
+      null,
+      null,
+      {
         deleted: false,
         updated_at: Factory.yesterday()
       }
-    });
+    );
     await this.application.modelManager.mapPayloadsToLocalItems({
       payloads: [mutatedPayload],
       source: PayloadSources.LocalChanged
@@ -737,9 +741,7 @@ describe('online syncing', () => {
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const encryptedPayloads = rawPayloads.map((rawPayload) => {
-      return CreateMaxPayloadFromAnyObject({
-        object: rawPayload
-      });
+      return CreateMaxPayloadFromAnyObject(rawPayload);
     });
     const payloads = [];
     for (const payload of encryptedPayloads) {
@@ -968,7 +970,10 @@ describe('online syncing', () => {
     const itemCount = 6;
     for (let i = 0; i < itemCount; i++) {
       const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i / 2)]);
-      const item = await this.application.modelManager.mapPayloadToLocalItem({ payload });
+      const item = await this.application.modelManager.mapPayloadToLocalItem({ 
+        payload,
+        source: PayloadSources.LocalChanged
+      });
       await this.application.modelManager.setItemDirty(item, true);
     }
     this.expectedItemCount += itemCount;

@@ -62,8 +62,8 @@ describe('2020-01-15 mobile migration', () => {
     });
 
     /** Wrap account key with passcode key and store in storage */
-    const keyPayload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const keyPayload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: Factory.generateUuid(),
         content_type: 'SN|Mobile|EncryptedKeys',
         content: {
@@ -74,16 +74,18 @@ describe('2020-01-15 mobile migration', () => {
           }
         }
       }
-    });
+    );
     const encryptedKeyParams = await operator003.generateEncryptionParameters({
       payload: keyPayload,
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
     });
-    const wrappedKey = CreateMaxPayloadFromAnyObject({
-      object: keyPayload,
-      override: encryptedKeyParams
-    });
+    const wrappedKey = CreateMaxPayloadFromAnyObject(
+      keyPayload,
+      null,
+      null,
+      encryptedKeyParams
+    );
     await application.deviceInterface.setRawStorageValue(
       'encrypted_account_keys',
       JSON.stringify(wrappedKey)
@@ -105,10 +107,12 @@ describe('2020-01-15 mobile migration', () => {
       key: accountKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -223,10 +227,12 @@ describe('2020-01-15 mobile migration', () => {
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -344,10 +350,12 @@ describe('2020-01-15 mobile migration', () => {
       key: accountKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -447,10 +455,12 @@ describe('2020-01-15 mobile migration', () => {
       payload: notePayload,
       format: PayloadFormats.DecryptedBareObject
     });
-    const noteProcessedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteParams
-    });
+    const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload);
 
     /** Run migration */

@@ -61,12 +61,17 @@ describe('importing', () => {
      */
     const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
-    await modelManager.mapPayloadToLocalItem({ payload: notePayload });
-    this.expectedItemCount++;
-    const mutatedNote = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: { content: { title: `${Math.random()}` } }
+    await modelManager.mapPayloadToLocalItem({ 
+      payload: notePayload,
+      source: PayloadSources.LocalSaved
     });
+    this.expectedItemCount++;
+    const mutatedNote = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      { content: { title: `${Math.random()}` } }
+    );
     await this.application.importData({
       awaitSync: true,
       data: {
@@ -91,10 +96,12 @@ describe('importing', () => {
       payloads: pair,
       source: PayloadSources.LocalChanged
     });
-    const mutatedTag = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: { content: { references: [] } }
-    });
+    const mutatedTag = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      { content: { references: [] } }
+    );
     await this.application.importData({
       awaitSync: true,
       data: {
@@ -119,14 +126,18 @@ describe('importing', () => {
     this.expectedItemCount += 2;
     const note = modelManager.notes[0];
     const tag = modelManager.tags[0];
-    const mutatedNote = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: { content: { title: `${Math.random()}` } }
-    });
-    const mutatedTag = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: { content: { title: `${Math.random()}` } }
-    });
+    const mutatedNote = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      { content: { title: `${Math.random()}` } }
+    );
+    const mutatedTag = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      { content: { title: `${Math.random()}` } }
+    );
     await this.application.importData({
       awaitSync: true,
       data: {

@@ -63,24 +63,26 @@ describe('2020-01-15 web migration', () => {
       /** Legacy versions would store json strings inside of embedded storage */
       auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
     };
-    const storagePayload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const storagePayload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: await operator003.crypto.generateUUID(),
         content: {
           storage: embeddedStorage
         },
         content_type: ContentTypes.EncryptedStorage
       }
-    });
+    );
     const encryptionParams = await operator003.generateEncryptionParameters({
       payload: storagePayload,
       key: passcodeResult.key,
       format: PayloadFormats.EncryptedString
     });
-    const persistPayload = CreateMaxPayloadFromAnyObject({
-      object: storagePayload,
-      override: encryptionParams
-    });
+    const persistPayload = CreateMaxPayloadFromAnyObject(
+      storagePayload,
+      null,
+      null,
+      encryptionParams
+    );
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload)
@@ -93,10 +95,12 @@ describe('2020-01-15 web migration', () => {
       key: accountKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -211,24 +215,26 @@ describe('2020-01-15 web migration', () => {
     const embeddedStorage = {
       ...arbitraryValues
     };
-    const storagePayload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const storagePayload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: await operator003.crypto.generateUUID(),
         content: {
           storage: embeddedStorage
         },
         content_type: ContentTypes.EncryptedStorage
       }
-    });
+    );
     const encryptionParams = await operator003.generateEncryptionParameters({
       payload: storagePayload,
       key: passcodeResult.key,
       format: PayloadFormats.EncryptedString
     });
-    const persistPayload = CreateMaxPayloadFromAnyObject({
-      object: storagePayload,
-      override: encryptionParams
-    });
+    const persistPayload = CreateMaxPayloadFromAnyObject(
+      storagePayload,
+      null,
+      null,
+      encryptionParams
+    );
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload)
@@ -241,10 +247,12 @@ describe('2020-01-15 web migration', () => {
       key: passcodeKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -360,10 +368,12 @@ describe('2020-01-15 web migration', () => {
       key: accountKey,
       format: PayloadFormats.EncryptedString
     });
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteEncryptionParams
-    });
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteEncryptionParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
 
     /** Run migration */
@@ -475,10 +485,12 @@ describe('2020-01-15 web migration', () => {
       payload: notePayload,
       format: PayloadFormats.DecryptedBareObject
     });
-    const noteProcessedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: noteParams
-    });
+    const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      noteParams
+    );
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload);
 
     /** Run migration */

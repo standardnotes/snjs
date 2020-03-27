@@ -123,9 +123,9 @@ describe('storage manager', () => {
   it('storage with no account and no passcode should not be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: wrappedValue
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      wrappedValue
+    );
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   });
 
@@ -133,9 +133,9 @@ describe('storage manager', () => {
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: wrappedValue
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      wrappedValue
+    );
     expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   });
 
@@ -145,9 +145,9 @@ describe('storage manager', () => {
     await this.application.setValue('bar', 'foo');
     await this.application.removePasscode();
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: wrappedValue
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      wrappedValue
+    );
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);
 
@@ -171,9 +171,9 @@ describe('storage manager', () => {
     expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
 
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: wrappedValue
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      wrappedValue
+    );
     expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
   }).timeout(5000);
 
@@ -200,9 +200,9 @@ describe('storage manager', () => {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     await this.application.setValue('bar', 'foo');
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: wrappedValue
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      wrappedValue
+    );
     expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   });
   
@@ -233,7 +233,7 @@ describe('storage manager', () => {
     });
     const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
     /** Expect that we can decrypt wrapped root key with passcode key */
-    const payload = CreateMaxPayloadFromAnyObject({object: wrappedRootKey});
+    const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
     const decrypted = await this.application.protocolService.payloadByDecryptingPayload({
       payload: payload,
       key: passcodeKey

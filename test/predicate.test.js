@@ -32,9 +32,9 @@ const createItemParams = () => {
 };
 
 const createItem = () => {
-  const payload = CreateMaxPayloadFromAnyObject({
-    object: createItemParams()
-  });
+  const payload = CreateMaxPayloadFromAnyObject(
+    createItemParams()
+  );
   return new SNItem(payload);
 };
 
@@ -194,13 +194,17 @@ describe('predicates', () => {
 
   it('model manager predicate matching', async function () {
     const modelManager = this.application.modelManager;
-    const payload1 = CreateMaxPayloadFromAnyObject({ object: createItemParams() });
+    const payload1 = CreateMaxPayloadFromAnyObject(createItemParams());
     const item1 = await modelManager.mapPayloadToLocalItem({
-      payload: payload1
+      payload: payload1,
+      source: PayloadSources.LocalSaved
     });
     item1.updated_at = new Date();
 
-    await modelManager.mapItem({ item: item1 });
+    await modelManager.mapItem({
+      item: item1,
+      source: PayloadSources.LocalSaved
+    });
     const predicate = new SNPredicate('content.title', '=', 'ello');
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
@@ -267,8 +271,8 @@ describe('predicates', () => {
 
   it('model manager predicate matching 2', async function () {
     const modelManager = this.application.modelManager;
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const payload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: Uuid.GenerateUuidSynchronously(),
         content_type: 'Item',
         content: {
@@ -284,7 +288,7 @@ describe('predicates', () => {
           ]
         }
       }
-    });
+    );
 
     const item2 = (await modelManager.mapPayloadsToLocalItems({
       payloads: [payload],
@@ -311,7 +315,10 @@ describe('predicates', () => {
   it('false should compare true with undefined', async function () {
     const item = createItem();
     const modelManager = this.application.modelManager;
-    await modelManager.mapItem({ item: item });
+    await modelManager.mapItem({
+      item: item,
+      source: PayloadSources.LocalSaved
+    });
     const predicate = new SNPredicate('pinned', '=', false);
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(modelManager.allItems.length);
   });
@@ -327,7 +334,7 @@ describe('predicates', () => {
 
     item.content.title = 'abc';
     await modelManager.mapPayloadsToLocalItems({
-      payloads: [CreateMaxPayloadFromAnyObject({ object: item })],
+      payloads: [CreateMaxPayloadFromAnyObject(item)],
       source: PayloadSources.LocalChanged
     });
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);

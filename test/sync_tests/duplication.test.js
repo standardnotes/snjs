@@ -42,20 +42,23 @@ describe('duplication', () => {
         foo: 'bar'
       }
     };
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: params,
-      override: {
+    const payload = CreateMaxPayloadFromAnyObject(
+      params,
+      null,
+      null,
+      {
         dirty: true
       }
-    });
+    );
     return payload;
   }
 
   it('components should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentTypes.Component);
     const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload
-    })
+      payload: payload,
+      source: PayloadSources.LocalChanged
+    });
     this.expectedItemCount++;
     await this.application.syncService.sync();
 
@@ -70,8 +73,9 @@ describe('duplication', () => {
   it('items keys should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentTypes.ItemsKey);
     const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload
-    })
+      payload: payload,
+      source: PayloadSources.LocalChanged
+    });
     this.expectedItemCount++;
     await this.application.syncService.sync();
 

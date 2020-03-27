@@ -69,15 +69,15 @@ describe('protocol', () => {
   });
 
   it('decrypting 000 payload should succeed', async function () {
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: {
+    const payload = CreateMaxPayloadFromAnyObject(
+      {
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentTypes.Mfa,
         content: {
           secret: '123'
         }
       }
-    });
+    );
     const encrypted = await application.protocolService.payloadByEncryptingPayload({
       payload,
       intent: EncryptionIntents.SyncDecrypted

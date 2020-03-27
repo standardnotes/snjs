@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 describe('model manager mapping', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   });
@@ -28,14 +28,19 @@ describe('model manager mapping', () => {
 
   it('mapping nonexistent deleted item doesnt create it', async function () {
     const modelManager = this.application.modelManager;
-    const payload = CreateMaxPayloadFromAnyObject({
-      object: Factory.createNoteParams(),
-      override: {
+    const payload = CreateMaxPayloadFromAnyObject(
+      Factory.createNoteParams(),
+      null,
+      null,
+      {
         dirty: false,
         deleted: true
       }
+    );
+    await modelManager.mapPayloadToLocalItem({
+      payload: payload,
+      source: PayloadSources.LocalChanged
     });
-    await modelManager.mapPayloadToLocalItem({payload: payload});
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
@@ -49,10 +54,10 @@ describe('model manager mapping', () => {
     });
     const originalNote = modelManager.notes[0];
     expect(originalNote.content.title).to.equal(payload.content.title);
-    const mutated = CreateSourcedPayloadFromObject({
-      object: payload,
-      source: PayloadSources.RemoteSaved
-    });
+    const mutated = CreateSourcedPayloadFromObject(
+      payload,
+      PayloadSources.RemoteSaved
+    );
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutated],
       source: PayloadSources.LocalChanged
@@ -71,13 +76,15 @@ describe('model manager mapping', () => {
     this.expectedItemCount++;
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    const changedParams = CreateMaxPayloadFromAnyObject({
-      object: payload,
-      override: {
+    const changedParams = CreateMaxPayloadFromAnyObject(
+      payload,
+      null,
+      null,
+      {
         dirty: false,
         deleted: true
       }
-    });
+    );
     this.expectedItemCount--;
     await modelManager.mapPayloadsToLocalItems({
       payloads: [changedParams],
@@ -98,7 +105,7 @@ describe('model manager mapping', () => {
     const item = modelManager.allItems[0];
     item.deleted = true;
     await modelManager.setItemDirty(item, true);
-    const payload2 = CreateMaxPayloadFromAnyObject({object: item});
+    const payload2 = CreateMaxPayloadFromAnyObject(item);
     await modelManager.mapPayloadsToLocalItems({
       payloads: [payload2],
       source: PayloadSources.LocalChanged
@@ -115,10 +122,12 @@ describe('model manager mapping', () => {
     });
 
     const newTitle = 'updated title';
-    const mutated = CreateMaxPayloadFromAnyObject({
-      object: payload,
-      override: {content: {title: newTitle}}
-    });
+    const mutated = CreateMaxPayloadFromAnyObject(
+      payload,
+      null,
+      null,
+      { content: { title: newTitle } }
+    );
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutated],
       source: PayloadSources.LocalChanged
@@ -162,7 +171,7 @@ describe('model manager mapping', () => {
     const count = 10;
     this.expectedItemCount += count;
     const payloads = [];
-    for(let i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       payloads.push(Factory.createNotePayload());
     }
     await modelManager.mapPayloadsToLocalItems({

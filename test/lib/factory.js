@@ -103,21 +103,21 @@ export async function registerOldUser({ application, email, password, version })
 }
 
 export function createStorageItemPayload(contentType) {
-  return CreateMaxPayloadFromAnyObject({
-    object: createItemParams(contentType)
-  });
+  return CreateMaxPayloadFromAnyObject(
+    createItemParams(contentType)
+  );
 }
 
 export function createNotePayload() {
-  return CreateMaxPayloadFromAnyObject({ object: createNoteParams() });
+  return CreateMaxPayloadFromAnyObject(createNoteParams());
 }
 
 export function createStorageItemTagPayload() {
-  return CreateMaxPayloadFromAnyObject({ object: createTagParams() });
+  return CreateMaxPayloadFromAnyObject(createTagParams());
 }
 
 export function itemToStoragePayload(item) {
-  return CreateMaxPayloadFromAnyObject({ object: item });
+  return CreateMaxPayloadFromAnyObject(item);
 }
 
 export function createMappedNote(application) {
@@ -150,9 +150,9 @@ export async function createSyncedNote(application) {
 export async function getStoragePayloadsOfType(application, type) {
   const rawPayloads = await application.storageService.getAllRawPayloads();
   return rawPayloads.filter((rp) => rp.content_type === type).map((rp) => {
-    return CreateMaxPayloadFromAnyObject({
-      object: rp
-    });
+    return CreateMaxPayloadFromAnyObject(
+      rp
+    );
   });
 }
 
@@ -234,8 +234,8 @@ export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
   }];
   noteParams.content.references = [];
   return [
-    CreateMaxPayloadFromAnyObject({ object: noteParams }),
-    CreateMaxPayloadFromAnyObject({ object: tagParams })
+    CreateMaxPayloadFromAnyObject(noteParams),
+    CreateMaxPayloadFromAnyObject(tagParams)
   ];
 }
 

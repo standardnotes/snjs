@@ -2510,8 +2510,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
@@ -3186,11 +3186,8 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context8.prev = _context8.next) {
               case 0:
                 payload = _ref6.payload;
-                dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-                  payload: payload,
-                  override: {
-                    dirty: true
-                  }
+                dirtied = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
+                  dirty: true
                 });
                 _context8.next = 4;
                 return this.modelManager.mapPayloadToLocalItem({
@@ -3372,9 +3369,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createPayloadFromObject",
     value: function createPayloadFromObject(object) {
-      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-        object: object
-      });
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(object);
     }
     /** @access public */
 
@@ -6410,7 +6405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_31__["Uuid"]; });
 
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_32__["EncryptionIntents"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_32__["isLocalStorageIntent"]; });
@@ -6441,21 +6436,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Lib/services */ "./lib/services/index.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Lib_services__WEBPACK_IMPORTED_MODULE_36__["SyncEvents"]; });
 
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__["SNPureItemPayload"]; });
 
-/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.js");
+/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_38__["SNStorageItemPayload"]; });
 
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_39__["PayloadCollection"]; });
 
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__["CreateMaxPayloadFromAnyObject"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__["CreateSourcedPayloadFromObject"]; });
 
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["PayloadSources"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["isPayloadSourceRetrieved"]; });
@@ -6463,7 +6458,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__["ProtocolVersions"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__["PayloadFormats"]; });
 
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
@@ -6765,7 +6760,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migrations/migration */ "./lib/migrations/migration.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
@@ -6959,9 +6954,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   break;
                 }
 
-                encryptedStoragePayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: encryptedStorage
-                });
+                encryptedStoragePayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(encryptedStorage);
                 _context4.next = 13;
                 return this.webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedStoragePayload);
 
@@ -7205,9 +7198,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 delete storageValueStore.mk;
                 delete storageValueStore.pw;
                 delete storageValueStore.ak;
-                accountKeyPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: accountKey
-                });
+                accountKeyPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(accountKey);
 
                 if (!passcodeKey) {
                   _context7.next = 12;
@@ -7263,12 +7254,9 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 return this.application.protocolService.payloadByEncryptingPayload({
                   key: key,
                   intent: _Protocol__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntents"].LocalStoragePreferEncrypted,
-                  payload: Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-                    payload: decryptedStoragePayload,
-                    override: {
-                      content_type: _Models__WEBPACK_IMPORTED_MODULE_7__["ContentTypes"].EncryptedStorage,
-                      content: storageValueStore
-                    }
+                  payload: Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(decryptedStoragePayload, {
+                    content_type: _Models__WEBPACK_IMPORTED_MODULE_7__["ContentTypes"].EncryptedStorage,
+                    content: storageValueStore
                   })
                 });
 
@@ -7349,7 +7337,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 keychainValue = _context10.sent;
 
                 if (!rawPasscodeParams) {
-                  _context10.next = 57;
+                  _context10.next = 56;
                   break;
                 }
 
@@ -7426,9 +7414,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 passcodeKey = _context10.sent;
                 _context10.next = 24;
                 return this.application.protocolService.payloadByDecryptingPayload({
-                  payload: Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                    object: wrappedAccountKey
-                  }),
+                  payload: Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(wrappedAccountKey),
                   key: passcodeKey
                 });
 
@@ -7436,16 +7422,13 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 unwrappedAccountKey = _context10.sent;
                 accountKeyContent = unwrappedAccountKey.content.accountKeys;
                 defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(accountKeyContent.ak) ? _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V002;
-                newAccountKey = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-                  payload: unwrappedAccountKey,
-                  override: {
-                    content: {
-                      masterKey: accountKeyContent.mk,
-                      serverPassword: accountKeyContent.pw,
-                      dataAuthenticationKey: accountKeyContent.ak,
-                      version: accountKeyContent.version || defaultVersion,
-                      accountKeys: null
-                    }
+                newAccountKey = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(unwrappedAccountKey, {
+                  content: {
+                    masterKey: accountKeyContent.mk,
+                    serverPassword: accountKeyContent.pw,
+                    dataAuthenticationKey: accountKeyContent.ak,
+                    version: accountKeyContent.version || defaultVersion,
+                    accountKeys: null
                   }
                 });
                 _context10.next = 30;
@@ -7462,12 +7445,12 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 return this.application.deviceInterface.clearKeychainValue();
 
               case 34:
-                _context10.next = 55;
+                _context10.next = 54;
                 break;
 
               case 36:
                 if (wrappedAccountKey) {
-                  _context10.next = 55;
+                  _context10.next = 54;
                   break;
                 }
 
@@ -7489,38 +7472,35 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   content: _context10.t2,
                   content_type: _context10.t3
                 };
-                _context10.t5 = {
-                  object: _context10.t4
-                };
-                payload = (0, _context10.t0)(_context10.t5);
-                _context10.next = 51;
+                payload = (0, _context10.t0)(_context10.t4);
+                _context10.next = 50;
                 return this.application.protocolService.payloadByEncryptingPayload({
                   payload: payload,
                   key: _passcodeKey,
                   intent: _Protocol__WEBPACK_IMPORTED_MODULE_6__["EncryptionIntents"].LocalStoragePreferEncrypted
                 });
 
-              case 51:
+              case 50:
                 wrapped = _context10.sent;
                 rawStructure.wrapped = wrapped;
-                _context10.next = 55;
+                _context10.next = 54;
                 return this.application.deviceInterface.clearKeychainValue();
 
-              case 55:
-                _context10.next = 65;
+              case 54:
+                _context10.next = 64;
                 break;
 
-              case 57:
+              case 56:
                 /** No passcode, potentially account. Migrate keychain property keys. */
                 hasAccount = keychainValue && keychainValue.mk;
 
                 if (!hasAccount) {
-                  _context10.next = 65;
+                  _context10.next = 64;
                   break;
                 }
 
                 _defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isNullOrUndefined"])(keychainValue.ak) ? _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V003 : _Protocol__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V002;
-                _context10.next = 62;
+                _context10.next = 61;
                 return _Protocol__WEBPACK_IMPORTED_MODULE_6__["SNRootKey"].Create({
                   content: {
                     masterKey: keychainValue.mk,
@@ -7530,16 +7510,16 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   }
                 });
 
-              case 62:
+              case 61:
                 accountKey = _context10.sent;
-                _context10.next = 65;
+                _context10.next = 64;
                 return this.application.deviceInterface.setKeychainValue(accountKey.getPersistableValue());
 
-              case 65:
-                _context10.next = 67;
+              case 64:
+                _context10.next = 66;
                 return this.allPlatformHelperSetStorageStructure(rawStructure);
 
-              case 67:
+              case 66:
               case "end":
                 return _context10.stop();
             }
@@ -8785,9 +8765,7 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
      */
     value: function FromRaw(key) {
       var payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
-        object: {
-          content: key
-        }
+        content: key
       });
       return new SNItemsKey(payload);
     }
@@ -9120,7 +9098,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9168,39 +9146,33 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
     key: "systemSmartTags",
     value: function systemSmartTags() {
       var allNotes = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-        object: {
-          uuid: SYSTEM_TAG_ALL_NOTES,
-          dummy: true,
-          content: {
-            title: 'All notes',
-            isSystemTag: true,
-            isAllTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
-          }
+        uuid: SYSTEM_TAG_ALL_NOTES,
+        dummy: true,
+        content: {
+          title: 'All notes',
+          isSystemTag: true,
+          isAllTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
         }
       });
       var archived = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-        object: {
-          uuid: SYSTEM_TAG_ARCHIVED_NOTES,
-          dummy: true,
-          content: {
-            title: 'Archived',
-            isSystemTag: true,
-            isArchiveTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['archived', '=', true])
-          }
+        uuid: SYSTEM_TAG_ARCHIVED_NOTES,
+        dummy: true,
+        content: {
+          title: 'Archived',
+          isSystemTag: true,
+          isArchiveTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['archived', '=', true])
         }
       });
       var trash = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-        object: {
-          uuid: SYSTEM_TAG_TRASHED_NOTES,
-          dummy: true,
-          content: {
-            title: 'Trash',
-            isSystemTag: true,
-            isTrashTag: true,
-            predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content.trashed', '=', true])
-          }
+        uuid: SYSTEM_TAG_TRASHED_NOTES,
+        dummy: true,
+        content: {
+          title: 'Trash',
+          isSystemTag: true,
+          isTrashTag: true,
+          predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content.trashed', '=', true])
         }
       });
       return [new SNSmartTag(allNotes), new SNSmartTag(archived), new SNSmartTag(trash)];
@@ -9298,6 +9270,26 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
       Object.assign(superParams, params);
       return superParams;
     }
+    /** @todo this function seems like it shouldn't be neccessary, but currently causes failing tests if removed */
+
+  }, {
+    key: "updateLocalRelationships",
+    value: function updateLocalRelationships() {
+      var _this2 = this;
+
+      var references = this.content.references;
+      var uuids = references.map(function (ref) {
+        return ref.uuid;
+      });
+      this.notes.slice().forEach(function (note) {
+        if (!uuids.includes(note.uuid)) {
+          lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(_this2.notes, {
+            uuid: note.uuid
+          });
+          note.setIsNoLongerReferencedBy(_this2);
+        }
+      });
+    }
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
@@ -9323,10 +9315,10 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "isBeingRemovedLocally",
     value: function isBeingRemovedLocally() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.notes.forEach(function (note) {
-        note.setIsNoLongerReferencedBy(_this2);
+        note.setIsNoLongerReferencedBy(_this3);
       });
       this.notes.length = 0;
 
@@ -9841,10 +9833,7 @@ var SNItem = /*#__PURE__*/function () {
       var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
           override = _ref.override;
 
-      return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-        object: this,
-        override: override
-      });
+      return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(this, null, null, override);
     }
     /**
      * If creating from external payload, it may not include values for .references and .appData
@@ -10931,7 +10920,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["compareVersions"]; });
 
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["isDecryptedIntent"]; });
@@ -10967,9 +10956,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./lib/protocol/intents.js":
+/***/ "./lib/protocol/intents.ts":
 /*!*********************************!*\
-  !*** ./lib/protocol/intents.js ***!
+  !*** ./lib/protocol/intents.ts ***!
   \*********************************/
 /*! exports provided: EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -10981,20 +10970,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return isFileIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return isDecryptedIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return intentRequiresEncryption; });
-var EncryptionIntents = {
-  Sync: 0,
+var EncryptionIntents;
 
-  /** Permissible only for server extensions */
-  SyncDecrypted: 1,
-  LocalStorageEncrypted: 2,
-  LocalStorageDecrypted: 3,
+(function (EncryptionIntents) {
+  EncryptionIntents[EncryptionIntents["Sync"] = 0] = "Sync";
+  EncryptionIntents[EncryptionIntents["SyncDecrypted"] = 1] = "SyncDecrypted";
+  EncryptionIntents[EncryptionIntents["LocalStorageEncrypted"] = 2] = "LocalStorageEncrypted";
+  EncryptionIntents[EncryptionIntents["LocalStorageDecrypted"] = 3] = "LocalStorageDecrypted";
+  EncryptionIntents[EncryptionIntents["LocalStoragePreferEncrypted"] = 4] = "LocalStoragePreferEncrypted";
+  EncryptionIntents[EncryptionIntents["FileEncrypted"] = 5] = "FileEncrypted";
+  EncryptionIntents[EncryptionIntents["FileDecrypted"] = 6] = "FileDecrypted";
+  EncryptionIntents[EncryptionIntents["FilePreferEncrypted"] = 7] = "FilePreferEncrypted";
+})(EncryptionIntents || (EncryptionIntents = {}));
 
-  /** Store encrypted if possible, but decrypted if not */
-  LocalStoragePreferEncrypted: 4,
-  FileEncrypted: 5,
-  FileDecrypted: 6,
-  FilePreferEncrypted: 7
-};
+;
 function isLocalStorageIntent(intent) {
   return intent === EncryptionIntents.LocalStorageEncrypted || intent === EncryptionIntents.LocalStorageDecrypted || intent === EncryptionIntents.LocalStoragePreferEncrypted;
 }
@@ -11131,9 +11120,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Protocol_operator_operator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/operator/operator */ "./lib/protocol/operator/operator.js");
 /* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
 
@@ -11472,7 +11461,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
     key: "generateDecryptedParameters",
     value: function () {
       var _generateDecryptedParameters = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(_ref4) {
-        var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, _override, itemKey, _override2, ek, itemParams, _override3, content, _override4, _override5;
+        var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, _CopyEncryptionParame, itemKey, _CopyEncryptionParame2, ek, itemParams, _CopyEncryptionParame3, content, _CopyEncryptionParame4, _CopyEncryptionParame5;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
@@ -11512,10 +11501,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
                 }
 
                 console.error('Item key params UUID does not match item UUID');
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
-                }));
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame = {}, _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame)));
 
               case 13:
                 _context7.next = 15;
@@ -11530,10 +11516,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
                 }
 
                 console.error('Error decrypting parameters', encryptedParameters);
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
-                }));
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame2 = {}, _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame2)));
 
               case 19:
                 _context7.next = 21;
@@ -11548,10 +11531,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
                   break;
                 }
 
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override3)
-                }));
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame3 = {}, _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame3)));
 
               case 25:
                 _context7.next = 27;
@@ -11565,16 +11545,10 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
                   break;
                 }
 
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override4 = {}, _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override4)
-                }));
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame4 = {}, _defineProperty(_CopyEncryptionParame4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame4, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame4)));
 
               case 32:
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override5 = {}, _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _override5)
-                }));
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame5 = {}, _defineProperty(_CopyEncryptionParame5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_CopyEncryptionParame5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_CopyEncryptionParame5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_CopyEncryptionParame5, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _CopyEncryptionParame5)));
 
               case 33:
               case "end":
@@ -11693,9 +11667,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
 /* harmony import */ var _Protocol_operator_001_operator_001__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/operator/001/operator_001 */ "./lib/protocol/operator/001/operator_001.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
@@ -12139,7 +12113,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
     key: "generateDecryptedParameters",
     value: function () {
       var _generateDecryptedParameters = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref5) {
-        var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, itemKey, _override, ek, ak, itemParams, content, _override2, _override3, authParams;
+        var encryptedParameters, key, format, encryptedItemKey, itemKeyComponents, itemKey, _CopyEncryptionParame, ek, ak, itemParams, content, _CopyEncryptionParame2, _CopyEncryptionParame3, authParams;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
@@ -12191,10 +12165,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
                 }
 
                 console.error('Error decrypting item_key parameters', encryptedParameters);
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame = {}, _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame)));
 
               case 17:
                 _context9.next = 19;
@@ -12219,10 +12190,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
                   break;
                 }
 
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame2 = {}, _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame2)));
 
               case 31:
                 _context9.prev = 31;
@@ -12241,10 +12209,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
                 _context9.t2 = _context9["catch"](31);
 
               case 41:
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthParams, authParams), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _override3)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame3 = {}, _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthParams, authParams), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _CopyEncryptionParame3)));
 
               case 42:
               case "end":
@@ -12604,9 +12569,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Protocol_key_params__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/key_params */ "./lib/protocol/key_params.js");
 /* harmony import */ var _Protocol_operator_003_operator_003__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/operator/003/operator_003 */ "./lib/protocol/operator/003/operator_003.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Protocol_root_key__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Protocol/root_key */ "./lib/protocol/root_key.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -13029,7 +12994,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
      *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
      * items keys), or an ItemsKey (if encrypted regular items)
      * @param {PayloadFormat} format - The desired result format
-     * @returns {SNEncryptionParameters}
+     * @returns {EncryptionParameters}
      */
 
   }, {
@@ -13116,18 +13081,18 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
     /**
      * Converts encrypted parameters (a subset of a Payload) into decrypted counterpart.
      * @access public
-     * @param {SNEncryptionParameters} encryptedParameters - The encrypted payload object to decrypt
+     * @param {EncryptionParameters} encryptedParameters - The encrypted payload object to decrypt
      * @param {SNRootKey|SNItemsKey} key - The key to use to decrypt the payload. Can be either
      *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
      * items keys), or an ItemsKey (if encrypted regular items)
-     * @returns {SNEncryptionParameters}
+     * @returns {EncryptionParameters}
      */
 
   }, {
     key: "generateDecryptedParameters",
     value: function () {
       var _generateDecryptedParameters = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref8) {
-        var encryptedParameters, key, format, itemKeyComponents, itemKey, _override, contentComponents, content, _override2, _override3;
+        var encryptedParameters, key, format, itemKeyComponents, itemKey, _CopyEncryptionParame, contentComponents, content, _CopyEncryptionParame2, _CopyEncryptionParame3;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
@@ -13177,10 +13142,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
                 }
 
                 console.error('Error decrypting itemKey parameters', encryptedParameters);
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame = {}, _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame)));
 
               case 13:
                 /** Decrypt content payload. */
@@ -13204,16 +13166,10 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
                   break;
                 }
 
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override2 = {}, _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _override2)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame2 = {}, _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CopyEncryptionParame2, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, !encryptedParameters.errorDecrypting), _CopyEncryptionParame2)));
 
               case 21:
-                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: (_override3 = {}, _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_override3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _override3)
-                }));
+                return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, (_CopyEncryptionParame3 = {}, _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, JSON.parse(content)), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, false), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, encryptedParameters.errorDecrypting === true), _defineProperty(_CopyEncryptionParame3, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, false), _CopyEncryptionParame3)));
 
               case 22:
               case "end":
@@ -13344,8 +13300,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/items_key */ "./lib/models/app/items_key.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_5__);
@@ -13514,9 +13470,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
               case 2:
                 content = _context5.sent;
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: {
-                    content: content
-                  }
+                  content: content
                 });
                 itemsKey = new _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"](payload);
                 _context5.next = 7;
@@ -13644,11 +13598,8 @@ var SNProtocolOperator = /*#__PURE__*/function () {
                 decodedContent = encryptedParameters.content;
 
               case 20:
-                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyEncryptionParameters"])({
-                  encryptionParameters: encryptedParameters,
-                  override: {
-                    content: decodedContent
-                  }
+                return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyEncryptionParameters"])(encryptedParameters, {
+                  content: decodedContent
                 }));
 
               case 23:
@@ -13675,9 +13626,9 @@ var SNProtocolOperator = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/collection.js":
+/***/ "./lib/protocol/payloads/collection.ts":
 /*!*********************************************!*\
-  !*** ./lib/protocol/payloads/collection.js ***!
+  !*** ./lib/protocol/payloads/collection.ts ***!
   \*********************************************/
 /*! exports provided: PayloadCollection */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -13692,23 +13643,29 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 /**
  * A collection of payloads coming from a single source.
  */
-
 var PayloadCollection = /*#__PURE__*/function () {
   function PayloadCollection() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$payloads = _ref.payloads,
-        payloads = _ref$payloads === void 0 ? [] : _ref$payloads,
-        source = _ref.source;
+    var payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    var source = arguments.length > 1 ? arguments[1] : undefined;
 
     _classCallCheck(this, PayloadCollection);
 
+    _defineProperty(this, "source", void 0);
+
+    _defineProperty(this, "payloads", void 0);
+
+    _defineProperty(this, "payloadMap", void 0);
+
     this.source = source;
     this.payloadMap = {};
-    this.allPayloads = payloads;
+    this.payloads = payloads;
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
@@ -13741,7 +13698,7 @@ var PayloadCollection = /*#__PURE__*/function () {
   _createClass(PayloadCollection, [{
     key: "getAllPayloads",
     value: function getAllPayloads() {
-      return this.allPayloads;
+      return this.payloads;
     }
   }, {
     key: "findPayload",
@@ -13751,17 +13708,17 @@ var PayloadCollection = /*#__PURE__*/function () {
   }, {
     key: "concat",
     value: function concat(inCollection) {
-      var result = inCollection.allPayloads.slice();
+      var result = inCollection.getAllPayloads().slice();
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = this.allPayloads[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        for (var _iterator2 = this.payloads[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var ours = _step2.value;
 
           /** If the payload exists in incoming collection, don't add our version */
-          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(inCollection.allPayloads, 'uuid', ours.uuid)) {
+          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(inCollection.getAllPayloads(), 'uuid', ours.uuid)) {
             continue;
           }
 
@@ -13782,10 +13739,7 @@ var PayloadCollection = /*#__PURE__*/function () {
         }
       }
 
-      return new PayloadCollection({
-        payloads: result,
-        source: this.source
-      });
+      return new PayloadCollection(result, this.source);
     }
   }, {
     key: "payloadsThatReferencePayload",
@@ -13816,9 +13770,9 @@ var PayloadCollection = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/collection_set.js":
+/***/ "./lib/protocol/payloads/collection_set.ts":
 /*!*************************************************!*\
-  !*** ./lib/protocol/payloads/collection_set.js ***!
+  !*** ./lib/protocol/payloads/collection_set.ts ***!
   \*************************************************/
 /*! exports provided: PayloadCollectionSet */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -13832,14 +13786,16 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var PayloadCollectionSet = /*#__PURE__*/function () {
   /**
    * @param collections An array of PayloadCollection objects.
    */
-  function PayloadCollectionSet(_ref) {
-    var collections = _ref.collections;
-
+  function PayloadCollectionSet(collections) {
     _classCallCheck(this, PayloadCollectionSet);
+
+    _defineProperty(this, "collections", void 0);
 
     this.collections = collections;
     Object.freeze(this);
@@ -13872,11 +13828,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.js");
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -13952,10 +13908,7 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 5:
                 results = _context.sent;
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__["PayloadCollection"]({
-                  payloads: results,
-                  source: this.source
-                }));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__["PayloadCollection"](results, this.source));
 
               case 7:
               case "end":
@@ -14005,19 +13958,12 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-                leftPayload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])({
-                  payload: this.basePayload,
-                  override: {
-                    updated_at: updatedAt,
-                    dirty: true
-                  }
+                leftPayload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(this.basePayload, {
+                  updated_at: updatedAt,
+                  dirty: true
                 });
                 _context2.next = 10;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])({
-                  payload: this.applyPayload,
-                  baseCollection: this.baseCollection,
-                  isConflict: true
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
 
               case 10:
                 rightPayloads = _context2.sent;
@@ -14030,11 +13976,7 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 _context2.next = 15;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])({
-                  payload: this.basePayload,
-                  baseCollection: this.baseCollection,
-                  isConflict: true
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.basePayload, this.baseCollection, true);
 
               case 15:
                 leftPayloads = _context2.sent;
@@ -14049,14 +13991,11 @@ var ConflictDelta = /*#__PURE__*/function (_PayloadsDelta) {
 
                 refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["uniqCombineObjArrays"])(this.basePayload.content.references, this.applyPayload.content.references, ['uuid', 'content_type']);
                 _updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])({
-                  payload: this.basePayload,
-                  override: {
-                    updated_at: _updatedAt,
-                    dirty: true,
-                    content: {
-                      references: refs
-                    }
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(this.basePayload, {
+                  updated_at: _updatedAt,
+                  dirty: true,
+                  content: {
+                    references: refs
                   }
                 });
                 return _context2.abrupt("return", [payload]);
@@ -14203,8 +14142,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
 /* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -14259,7 +14198,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 4;
-                _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -14318,10 +14257,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(21);
 
               case 29:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"]({
-                  payloads: results,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].FileImport
-                }));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].FileImport));
 
               case 30:
               case "end":
@@ -14402,7 +14338,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 9:
                 deltaCollection = _context2.sent;
-                return _context2.abrupt("return", deltaCollection.allPayloads);
+                return _context2.abrupt("return", deltaCollection.getAllPayloads());
 
               case 11:
               case "end":
@@ -14435,7 +14371,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaClassForSource", function() { return DeltaClassForSource; });
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./lib/protocol/payloads/deltas/index.js");
 
 
@@ -14508,9 +14444,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -14565,7 +14501,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 4;
-                _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -14604,11 +14540,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 15:
                 _context.next = 17;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadsByDuplicating"])({
-                  payload: current,
-                  baseCollection: this.baseCollection,
-                  isConflict: true
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadsByDuplicating"])(current, this.baseCollection, true);
 
               case 17:
                 copyResults = _context.sent;
@@ -14654,10 +14586,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(28);
 
               case 36:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-                  payloads: results,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved
-                }));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved));
 
               case 37:
               case "end":
@@ -14694,9 +14623,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
 /* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -14792,7 +14721,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context2.prev = 4;
-                _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -14847,7 +14776,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 21:
                 deltaCollection = _context2.sent;
-                payloads = deltaCollection.allPayloads;
+                payloads = deltaCollection.getAllPayloads();
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, payloads);
 
               case 24:
@@ -14890,10 +14819,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.finish(33);
 
               case 41:
-                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"]({
-                  payloads: results,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved
-                }));
+                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved));
 
               case 42:
               case "end":
@@ -14930,7 +14856,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
                 _context3.prev = 4;
-                _iterator2 = this.applyCollection.allPayloads[Symbol.iterator]();
+                _iterator2 = this.applyCollection.getAllPayloads()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -14944,10 +14870,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient
                 });
                 _context3.next = 11;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByAlternatingUuid"])({
-                  baseCollection: this.baseCollection,
-                  payload: decrypted
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByAlternatingUuid"])(this.baseCollection, decrypted);
 
               case 11:
                 alternateResults = _context3.sent;
@@ -14993,10 +14916,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context3.finish(22);
 
               case 30:
-                return _context3.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"]({
-                  payloads: results,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved
-                }));
+                return _context3.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved));
 
               case 31:
               case "end":
@@ -15032,9 +14952,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -15095,7 +15015,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 5;
-                _iterator = this.applyCollection.allPayloads[Symbol.iterator]();
+                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
 
               case 7:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -15242,11 +15162,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 _context.next = 55;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadsByDuplicating"])({
-                  payload: _decrypted,
-                  baseCollection: this.baseCollection,
-                  isConflict: true
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadsByDuplicating"])(_decrypted, this.baseCollection, true);
 
               case 55:
                 copyResults = _context.sent;
@@ -15258,10 +15174,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 break;
 
               case 60:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-                  payloads: filtered.concat(conflictResults),
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved
-                }));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved));
 
               case 61:
               case "end":
@@ -15297,10 +15210,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -15345,7 +15258,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
     key: "resultingCollection",
     value: function () {
       var _resultingCollection = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _override, payload, current, deletedState, result;
+        var processed, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _CreateSourcedPayload, payload, current, deletedState, result;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -15357,7 +15270,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                 _iteratorError = undefined;
                 _context.prev = 4;
 
-                for (_iterator = this.applyCollection.allPayloads[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                for (_iterator = this.applyCollection.getAllPayloads()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                   payload = _step.value;
                   current = this.findBasePayload({
                     id: payload.uuid
@@ -15367,11 +15280,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                    */
 
                   deletedState = current ? current.deleted : payload.deleted;
-                  result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])({
-                    object: payload,
-                    source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved,
-                    override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["PayloadFields"].LastSyncEnd, new Date()), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["PayloadFields"].Deleted, deletedState), _override)
-                  });
+                  result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved, (_CreateSourcedPayload = {}, _defineProperty(_CreateSourcedPayload, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["PayloadFields"].LastSyncEnd, new Date()), _defineProperty(_CreateSourcedPayload, _Payloads_fields__WEBPACK_IMPORTED_MODULE_5__["PayloadFields"].Deleted, deletedState), _CreateSourcedPayload));
                   processed.push(result);
                 }
 
@@ -15409,10 +15318,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(12);
 
               case 20:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-                  payloads: processed,
-                  source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved
-                }));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](processed, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved));
 
               case 21:
               case "end":
@@ -15455,20 +15361,20 @@ var ConflictStrategies = {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/encryption_parameters.js":
+/***/ "./lib/protocol/payloads/encryption_parameters.ts":
 /*!********************************************************!*\
-  !*** ./lib/protocol/payloads/encryption_parameters.js ***!
+  !*** ./lib/protocol/payloads/encryption_parameters.ts ***!
   \********************************************************/
-/*! exports provided: SNEncryptionParameters */
+/*! exports provided: EncryptionParameters */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNEncryptionParameters", function() { return SNEncryptionParameters; });
-/* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionParameters", function() { return EncryptionParameters; });
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -15491,20 +15397,20 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var SNEncryptionParameters = /*#__PURE__*/function (_PurePayload) {
-  _inherits(SNEncryptionParameters, _PurePayload);
+var EncryptionParameters = /*#__PURE__*/function (_PurePayload) {
+  _inherits(EncryptionParameters, _PurePayload);
 
-  function SNEncryptionParameters() {
-    _classCallCheck(this, SNEncryptionParameters);
+  function EncryptionParameters() {
+    _classCallCheck(this, EncryptionParameters);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNEncryptionParameters).apply(this, arguments));
+    return _possibleConstructorReturn(this, _getPrototypeOf(EncryptionParameters).apply(this, arguments));
   }
 
-  _createClass(SNEncryptionParameters, [{
+  _createClass(EncryptionParameters, [{
     key: "getContentFormat",
     value: function getContentFormat() {
       if (typeof this.content === 'string') {
-        if (this.content.startsWith(_Protocol__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersions"].V000Base64Decrypted)) {
+        if (this.content.startsWith(_Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersions"].V000Base64Decrypted)) {
           return _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].DecryptedBase64String;
         } else {
           return _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__["PayloadFormats"].EncryptedString;
@@ -15525,14 +15431,14 @@ var SNEncryptionParameters = /*#__PURE__*/function (_PurePayload) {
     }
   }]);
 
-  return SNEncryptionParameters;
+  return EncryptionParameters;
 }(_Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__["PurePayload"]);
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/fields.js":
+/***/ "./lib/protocol/payloads/fields.ts":
 /*!*****************************************!*\
-  !*** ./lib/protocol/payloads/fields.js ***!
+  !*** ./lib/protocol/payloads/fields.ts ***!
   \*****************************************/
 /*! exports provided: PayloadFields */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15540,32 +15446,36 @@ var SNEncryptionParameters = /*#__PURE__*/function (_PurePayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadFields", function() { return PayloadFields; });
-var PayloadFields = {
-  Uuid: 'uuid',
-  ContentType: 'content_type',
-  ItemsKeyId: 'items_key_id',
-  EncItemKey: 'enc_item_key',
-  Content: 'content',
-  CreatedAt: 'created_at',
-  UpdatedAt: 'updated_at',
-  Deleted: 'deleted',
-  Legacy003AuthHash: 'auth_hash',
-  Legacy003AuthParams: 'auth_params',
-  Dirty: 'dirty',
-  DirtiedDate: 'dirtiedDate',
-  WaitingForKey: 'waitingForKey',
-  ErrorDecrypting: 'errorDecrypting',
-  ErrorDecryptingChanged: 'errorDecryptingValueChanged',
-  Dummy: 'dummy',
-  LastSyncBegan: 'lastSyncBegan',
-  LastSyncEnd: 'lastSyncEnd'
-};
+var PayloadFields;
+
+(function (PayloadFields) {
+  PayloadFields["Uuid"] = "uuid";
+  PayloadFields["ContentType"] = "content_type";
+  PayloadFields["ItemsKeyId"] = "items_key_id";
+  PayloadFields["EncItemKey"] = "enc_item_key";
+  PayloadFields["Content"] = "content";
+  PayloadFields["CreatedAt"] = "created_at";
+  PayloadFields["UpdatedAt"] = "updated_at";
+  PayloadFields["Deleted"] = "deleted";
+  PayloadFields["Legacy003AuthHash"] = "auth_hash";
+  PayloadFields["Legacy003AuthParams"] = "auth_params";
+  PayloadFields["Dirty"] = "dirty";
+  PayloadFields["DirtiedDate"] = "dirtiedDate";
+  PayloadFields["WaitingForKey"] = "waitingForKey";
+  PayloadFields["ErrorDecrypting"] = "errorDecrypting";
+  PayloadFields["ErrorDecryptingChanged"] = "errorDecryptingValueChanged";
+  PayloadFields["Dummy"] = "dummy";
+  PayloadFields["LastSyncBegan"] = "lastSyncBegan";
+  PayloadFields["LastSyncEnd"] = "lastSyncEnd";
+})(PayloadFields || (PayloadFields = {}));
+
+;
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/file_item_payload.js":
+/***/ "./lib/protocol/payloads/file_item_payload.ts":
 /*!****************************************************!*\
-  !*** ./lib/protocol/payloads/file_item_payload.js ***!
+  !*** ./lib/protocol/payloads/file_item_payload.ts ***!
   \****************************************************/
 /*! exports provided: SNFileItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15573,8 +15483,8 @@ var PayloadFields = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNFileItemPayload", function() { return SNFileItemPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -15616,9 +15526,9 @@ var SNFileItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/formats.js":
+/***/ "./lib/protocol/payloads/formats.ts":
 /*!******************************************!*\
-  !*** ./lib/protocol/payloads/formats.js ***!
+  !*** ./lib/protocol/payloads/formats.ts ***!
   \******************************************/
 /*! exports provided: PayloadFormats */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15626,17 +15536,21 @@ var SNFileItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return PayloadFormats; });
-var PayloadFormats = {
-  EncryptedString: 0,
-  DecryptedBareObject: 1,
-  DecryptedBase64String: 2
-};
+var PayloadFormats;
+
+(function (PayloadFormats) {
+  PayloadFormats[PayloadFormats["EncryptedString"] = 0] = "EncryptedString";
+  PayloadFormats[PayloadFormats["DecryptedBareObject"] = 1] = "DecryptedBareObject";
+  PayloadFormats[PayloadFormats["DecryptedBase64String"] = 2] = "DecryptedBase64String";
+})(PayloadFormats || (PayloadFormats = {}));
+
+;
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/functions.js":
+/***/ "./lib/protocol/payloads/functions.ts":
 /*!********************************************!*\
-  !*** ./lib/protocol/payloads/functions.js ***!
+  !*** ./lib/protocol/payloads/functions.ts ***!
   \********************************************/
 /*! exports provided: PayloadContentsEqual, PayloadsByDuplicating, PayloadsByAlternatingUuid */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -15651,7 +15565,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
@@ -15675,7 +15589,7 @@ function PayloadContentsEqual(payloadA, payloadB) {
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-function PayloadsByDuplicating(_x) {
+function PayloadsByDuplicating(_x, _x2, _x3) {
   return _PayloadsByDuplicating.apply(this, arguments);
 }
 /**
@@ -15686,18 +15600,17 @@ function PayloadsByDuplicating(_x) {
  */
 
 function _PayloadsByDuplicating() {
-  _PayloadsByDuplicating = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref) {
-    var payload, baseCollection, isConflict, results, override, copy, referencing, updatedReferencing;
+  _PayloadsByDuplicating = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(payload, baseCollection, isConflict) {
+    var results, override, copy, referencing, updatedReferencing;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            payload = _ref.payload, baseCollection = _ref.baseCollection, isConflict = _ref.isConflict;
             results = [];
-            _context.next = 4;
+            _context.next = 3;
             return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
 
-          case 4:
+          case 3:
             _context.t0 = _context.sent;
             override = {
               uuid: _context.t0,
@@ -15713,31 +15626,25 @@ function _PayloadsByDuplicating() {
               };
             }
 
-            copy = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-              payload: payload,
-              override: override
-            });
+            copy = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, override);
             results.push(copy);
             /**
              * Get the payloads that make reference to payload and add the copy.
              */
 
             referencing = baseCollection.payloadsThatReferencePayload(payload);
-            _context.next = 12;
-            return PayloadsByUpdatingReferences({
-              payloads: referencing,
-              add: [{
-                uuid: copy.uuid,
-                content_type: copy.content_type
-              }]
-            });
+            _context.next = 11;
+            return PayloadsByUpdatingReferences(referencing, [{
+              uuid: copy.uuid,
+              content_type: copy.content_type
+            }]);
 
-          case 12:
+          case 11:
             updatedReferencing = _context.sent;
             Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["extendArray"])(results, updatedReferencing);
             return _context.abrupt("return", results);
 
-          case 15:
+          case 14:
           case "end":
             return _context.stop();
         }
@@ -15747,18 +15654,17 @@ function _PayloadsByDuplicating() {
   return _PayloadsByDuplicating.apply(this, arguments);
 }
 
-function PayloadsByAlternatingUuid(_x2) {
+function PayloadsByAlternatingUuid(_x4, _x5) {
   return _PayloadsByAlternatingUuid.apply(this, arguments);
 }
 
 function _PayloadsByAlternatingUuid() {
-  _PayloadsByAlternatingUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(_ref2) {
-    var payload, baseCollection, results, copy, referencing, updatedReferencing, updatedSelf;
+  _PayloadsByAlternatingUuid = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(payload, baseCollection) {
+    var results, copy, referencing, updatedReferencing, updatedSelf;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            payload = _ref2.payload, baseCollection = _ref2.baseCollection;
             results = [];
             /**
             * We need to clone payload and give it a new uuid,
@@ -15767,20 +15673,16 @@ function _PayloadsByAlternatingUuid() {
 
             _context2.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"];
             _context2.t1 = payload;
-            _context2.next = 6;
+            _context2.next = 5;
             return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
 
-          case 6:
+          case 5:
             _context2.t2 = _context2.sent;
             _context2.t3 = {
               uuid: _context2.t2,
               dirty: true
             };
-            _context2.t4 = {
-              payload: _context2.t1,
-              override: _context2.t3
-            };
-            copy = (0, _context2.t0)(_context2.t4);
+            copy = (0, _context2.t0)(_context2.t1, _context2.t3);
             results.push(copy);
             /**
              * Get the payloads that make reference to payload and remove
@@ -15788,36 +15690,29 @@ function _PayloadsByAlternatingUuid() {
              */
 
             referencing = baseCollection.payloadsThatReferencePayload(payload);
-            _context2.next = 14;
-            return PayloadsByUpdatingReferences({
-              payloads: referencing,
-              add: [{
-                uuid: copy.uuid,
-                content_type: copy.content_type
-              }],
-              removeIds: [payload.uuid]
-            });
+            _context2.next = 12;
+            return PayloadsByUpdatingReferences(referencing, [{
+              uuid: copy.uuid,
+              content_type: copy.content_type
+            }], [payload.uuid]);
 
-          case 14:
+          case 12:
             updatedReferencing = _context2.sent;
             Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["extendArray"])(results, updatedReferencing);
-            updatedSelf = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-              payload: payload,
-              override: {
-                deleted: true,
+            updatedSelf = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
+              deleted: true,
 
-                /** Do not set as dirty; this item is non-syncable
-                  and should be immediately discarded */
-                dirty: false,
-                content: {
-                  references: []
-                }
+              /** Do not set as dirty; this item is non-syncable
+                and should be immediately discarded */
+              dirty: false,
+              content: {
+                references: []
               }
             });
             results.push(updatedSelf);
             return _context2.abrupt("return", results);
 
-          case 19:
+          case 17:
           case "end":
             return _context2.stop();
         }
@@ -15827,29 +15722,28 @@ function _PayloadsByAlternatingUuid() {
   return _PayloadsByAlternatingUuid.apply(this, arguments);
 }
 
-function PayloadsByUpdatingReferences(_x3) {
+function PayloadsByUpdatingReferences(_x6, _x7, _x8) {
   return _PayloadsByUpdatingReferences.apply(this, arguments);
 }
 
 function _PayloadsByUpdatingReferences() {
-  _PayloadsByUpdatingReferences = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(_ref3) {
-    var payloads, add, removeIds, results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, references, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, reference, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, id, result;
+  _PayloadsByUpdatingReferences = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(payloads, add, removeIds) {
+    var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, references, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, reference, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, id, result;
 
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            payloads = _ref3.payloads, add = _ref3.add, removeIds = _ref3.removeIds;
             results = [];
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _iteratorError = undefined;
-            _context3.prev = 5;
+            _context3.prev = 4;
             _iterator = payloads[Symbol.iterator]();
 
-          case 7:
+          case 6:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-              _context3.next = 55;
+              _context3.next = 54;
               break;
             }
 
@@ -15857,63 +15751,63 @@ function _PayloadsByUpdatingReferences() {
             references = payload.content.references.slice();
 
             if (!add) {
-              _context3.next = 30;
+              _context3.next = 29;
               break;
             }
 
             _iteratorNormalCompletion2 = true;
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
-            _context3.prev = 14;
+            _context3.prev = 13;
 
             for (_iterator2 = add[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
               reference = _step2.value;
               references.push(reference);
             }
 
-            _context3.next = 22;
+            _context3.next = 21;
             break;
 
-          case 18:
-            _context3.prev = 18;
-            _context3.t0 = _context3["catch"](14);
+          case 17:
+            _context3.prev = 17;
+            _context3.t0 = _context3["catch"](13);
             _didIteratorError2 = true;
             _iteratorError2 = _context3.t0;
 
-          case 22:
+          case 21:
+            _context3.prev = 21;
             _context3.prev = 22;
-            _context3.prev = 23;
 
             if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
               _iterator2.return();
             }
 
-          case 25:
-            _context3.prev = 25;
+          case 24:
+            _context3.prev = 24;
 
             if (!_didIteratorError2) {
-              _context3.next = 28;
+              _context3.next = 27;
               break;
             }
 
             throw _iteratorError2;
 
+          case 27:
+            return _context3.finish(24);
+
           case 28:
-            return _context3.finish(25);
+            return _context3.finish(21);
 
           case 29:
-            return _context3.finish(22);
-
-          case 30:
             if (!removeIds) {
-              _context3.next = 50;
+              _context3.next = 49;
               break;
             }
 
             _iteratorNormalCompletion3 = true;
             _didIteratorError3 = false;
             _iteratorError3 = undefined;
-            _context3.prev = 34;
+            _context3.prev = 33;
 
             for (_iterator3 = removeIds[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
               id = _step3.value;
@@ -15922,108 +15816,105 @@ function _PayloadsByUpdatingReferences() {
               });
             }
 
-            _context3.next = 42;
+            _context3.next = 41;
             break;
 
-          case 38:
-            _context3.prev = 38;
-            _context3.t1 = _context3["catch"](34);
+          case 37:
+            _context3.prev = 37;
+            _context3.t1 = _context3["catch"](33);
             _didIteratorError3 = true;
             _iteratorError3 = _context3.t1;
 
-          case 42:
+          case 41:
+            _context3.prev = 41;
             _context3.prev = 42;
-            _context3.prev = 43;
 
             if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
               _iterator3.return();
             }
 
-          case 45:
-            _context3.prev = 45;
+          case 44:
+            _context3.prev = 44;
 
             if (!_didIteratorError3) {
-              _context3.next = 48;
+              _context3.next = 47;
               break;
             }
 
             throw _iteratorError3;
 
+          case 47:
+            return _context3.finish(44);
+
           case 48:
-            return _context3.finish(45);
+            return _context3.finish(41);
 
           case 49:
-            return _context3.finish(42);
-
-          case 50:
-            result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])({
-              payload: payload,
-              override: {
-                dirty: true,
-                content: {
-                  references: references
-                }
+            result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
+              dirty: true,
+              content: {
+                references: references
               }
             });
             results.push(result);
 
-          case 52:
+          case 51:
             _iteratorNormalCompletion = true;
-            _context3.next = 7;
+            _context3.next = 6;
             break;
 
-          case 55:
-            _context3.next = 61;
+          case 54:
+            _context3.next = 60;
             break;
 
-          case 57:
-            _context3.prev = 57;
-            _context3.t2 = _context3["catch"](5);
+          case 56:
+            _context3.prev = 56;
+            _context3.t2 = _context3["catch"](4);
             _didIteratorError = true;
             _iteratorError = _context3.t2;
 
-          case 61:
+          case 60:
+            _context3.prev = 60;
             _context3.prev = 61;
-            _context3.prev = 62;
 
             if (!_iteratorNormalCompletion && _iterator.return != null) {
               _iterator.return();
             }
 
-          case 64:
-            _context3.prev = 64;
+          case 63:
+            _context3.prev = 63;
 
             if (!_didIteratorError) {
-              _context3.next = 67;
+              _context3.next = 66;
               break;
             }
 
             throw _iteratorError;
 
+          case 66:
+            return _context3.finish(63);
+
           case 67:
-            return _context3.finish(64);
+            return _context3.finish(60);
 
           case 68:
-            return _context3.finish(61);
-
-          case 69:
             return _context3.abrupt("return", results);
 
-          case 70:
+          case 69:
           case "end":
             return _context3.stop();
         }
       }
-    }, _callee3, null, [[5, 57, 61, 69], [14, 18, 22, 30], [23,, 25, 29], [34, 38, 42, 50], [43,, 45, 49], [62,, 64, 68]]);
+    }, _callee3, null, [[4, 56, 60, 68], [13, 17, 21, 29], [22,, 24, 28], [33, 37, 41, 49], [42,, 44, 48], [61,, 63, 67]]);
   }));
   return _PayloadsByUpdatingReferences.apply(this, arguments);
 }
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/generator.js":
+/***/ "./lib/protocol/payloads/generator.ts":
 /*!********************************************!*\
-  !*** ./lib/protocol/payloads/generator.js ***!
+  !*** ./lib/protocol/payloads/generator.ts ***!
   \********************************************/
 /*! exports provided: CreateMaxPayloadFromAnyObject, CreateIntentPayloadFromObject, CreateSourcedPayloadFromObject, CopyPayload, CreateEncryptionParameters, CopyEncryptionParameters, payloadClassForSource */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16037,18 +15928,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CopyEncryptionParameters", function() { return CopyEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "payloadClassForSource", function() { return payloadClassForSource; });
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.js");
-/* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.js");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.ts");
 
 
 
-function CreateMaxPayloadFromAnyObject(_ref) {
-  var object = _ref.object,
-      source = _ref.source,
-      intent = _ref.intent,
-      override = _ref.override;
 
+function CreateMaxPayloadFromAnyObject(object, source, intent, override) {
   if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(source)) {
     throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
   }
@@ -16057,40 +15945,19 @@ function CreateMaxPayloadFromAnyObject(_ref) {
     throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
   }
 
-  var payloadClass = _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNMaxItemPayload"];
-  return CreatePayload({
-    object: object,
-    payloadClass: payloadClass,
-    override: override
-  });
+  var payloadClass = _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNMaxItemPayload"];
+  return CreatePayload(object, payloadClass, override);
 }
-function CreateIntentPayloadFromObject(_ref2) {
-  var object = _ref2.object,
-      intent = _ref2.intent,
-      override = _ref2.override;
+function CreateIntentPayloadFromObject(object, intent, override) {
   var payloadClass = itemPayloadClassForIntent(intent);
-  return CreatePayload({
-    object: object,
-    payloadClass: payloadClass,
-    override: override
-  });
+  return CreatePayload(object, payloadClass, override);
 }
-function CreateSourcedPayloadFromObject(_ref3) {
-  var object = _ref3.object,
-      source = _ref3.source,
-      override = _ref3.override;
+function CreateSourcedPayloadFromObject(object, source, override) {
   var payloadClass = payloadClassForSource(source);
-  return CreatePayload({
-    object: object,
-    payloadClass: payloadClass,
-    override: override
-  });
+  return CreatePayload(object, payloadClass, override);
 }
 
-function CreatePayload(_ref4) {
-  var object = _ref4.object,
-      payloadClass = _ref4.payloadClass,
-      override = _ref4.override;
+function CreatePayload(object, payloadClass, override) {
   var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(object, payloadClass.fields());
 
   if (override) {
@@ -16105,9 +15972,7 @@ function CreatePayload(_ref4) {
   return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new payloadClass(rawPayload, true));
 }
 
-function CopyPayload(_ref5) {
-  var payload = _ref5.payload,
-      override = _ref5.override;
+function CopyPayload(payload, override) {
   var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(payload, payload.fields());
 
   if (override) {
@@ -16118,60 +15983,57 @@ function CopyPayload(_ref5) {
 }
 function CreateEncryptionParameters(rawParameters) {
   var copy = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(rawParameters);
-  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNEncryptionParameters"](copy, true));
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_3__["EncryptionParameters"](copy, true));
 }
-function CopyEncryptionParameters(_ref6) {
-  var encryptionParameters = _ref6.encryptionParameters,
-      override = _ref6.override;
-
+function CopyEncryptionParameters(encryptionParameters, override) {
   if (!encryptionParameters.isEncryptionParameters) {
     throw 'Attempting to copy encryption parameters from non-parameters object.';
   }
 
-  var rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(encryptionParameters, _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNEncryptionParameters"].fields());
+  var rawParameters = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(encryptionParameters, _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_3__["EncryptionParameters"].fields());
 
   if (override) {
     Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawParameters, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
   }
 
-  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNEncryptionParameters"](rawParameters, true));
+  return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(new _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_3__["EncryptionParameters"](rawParameters, true));
 }
 
 function itemPayloadClassForIntent(intent) {
-  if (intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileEncrypted || intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileDecrypted || intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FilePreferEncrypted) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNFileItemPayload"];
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FilePreferEncrypted) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNFileItemPayload"];
   }
 
-  if (intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStoragePreferEncrypted || intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageDecrypted || intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageEncrypted) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageEncrypted) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
   }
 
-  if (intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].Sync || intent === _Protocol__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].SyncDecrypted) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNServerItemPayload"];
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].SyncDecrypted) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNServerItemPayload"];
   } else {
     throw "No item payload class found for intent ".concat(intent);
   }
 }
 
 function payloadClassForSource(source) {
-  if (source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].FileImport) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNFileItemPayload"];
+  if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].FileImport) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNFileItemPayload"];
   }
 
-  if (source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ComponentRetrieved) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["RetrievedComponentPayload"];
+  if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ComponentRetrieved) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["RetrievedComponentPayload"];
   }
 
-  if (source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalRetrieved || source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalDirtied) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
+  if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalRetrieved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalDirtied) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNStorageItemPayload"];
   }
 
-  if (source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteRetrieved || source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictData || source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictUuid) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNServerItemPayload"];
+  if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteRetrieved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictData || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictUuid) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNServerItemPayload"];
   }
 
-  if (source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalSaved || source === _Payloads__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteSaved) {
-    return _Payloads__WEBPACK_IMPORTED_MODULE_0__["SNSavedServerItemPayload"];
+  if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalSaved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteSaved) {
+    return _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["SNSavedServerItemPayload"];
   } else {
     throw "No item payload class found for source ".concat(source);
   }
@@ -16183,18 +16045,18 @@ function payloadClassForSource(source) {
 /*!****************************************!*\
   !*** ./lib/protocol/payloads/index.js ***!
   \****************************************/
-/*! exports provided: PayloadCollection, PayloadCollectionSet, CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, payloadClassForSource, PayloadsByDuplicating, PayloadsByAlternatingUuid, PayloadFields, PayloadSources, PurePayload, PayloadFormats, SNPureItemPayload, SNStorageItemPayload, SNServerItemPayload, SNFileItemPayload, RetrievedComponentPayload, SNMaxItemPayload, SNSavedServerItemPayload, SNEncryptionParameters, ConflictStrategies, PayloadsDelta, DeltaFileImport, DeltaOutOfSync, DeltaRemoteConflicts, DeltaRemoteRetrieved, DeltaRemoteSaved, ConflictDelta */
+/*! exports provided: PayloadCollection, PayloadCollectionSet, CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, payloadClassForSource, PayloadsByDuplicating, PayloadsByAlternatingUuid, PayloadFields, PayloadSources, PurePayload, PayloadFormats, SNPureItemPayload, SNStorageItemPayload, SNServerItemPayload, SNFileItemPayload, RetrievedComponentPayload, SNMaxItemPayload, SNSavedServerItemPayload, EncryptionParameters, ConflictStrategies, PayloadsDelta, DeltaFileImport, DeltaOutOfSync, DeltaRemoteConflicts, DeltaRemoteRetrieved, DeltaRemoteSaved, ConflictDelta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collection */ "./lib/protocol/payloads/collection.js");
+/* harmony import */ var _collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _collection__WEBPACK_IMPORTED_MODULE_0__["PayloadCollection"]; });
 
-/* harmony import */ var _collection_set__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./collection_set */ "./lib/protocol/payloads/collection_set.js");
+/* harmony import */ var _collection_set__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./collection_set */ "./lib/protocol/payloads/collection_set.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollectionSet", function() { return _collection_set__WEBPACK_IMPORTED_MODULE_1__["PayloadCollectionSet"]; });
 
-/* harmony import */ var _generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["CreateEncryptionParameters"]; });
@@ -16209,46 +16071,46 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "payloadClassForSource", function() { return _generator__WEBPACK_IMPORTED_MODULE_2__["payloadClassForSource"]; });
 
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsByDuplicating", function() { return _Payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByDuplicating"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsByAlternatingUuid", function() { return _Payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByAlternatingUuid"]; });
 
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFields", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"]; });
 
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"]; });
 
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.js");
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_6__["PurePayload"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__["PayloadFormats"]; });
 
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_8__["SNPureItemPayload"]; });
 
-/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.js");
+/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_9__["SNStorageItemPayload"]; });
 
-/* harmony import */ var _Payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/server_item_payload */ "./lib/protocol/payloads/server_item_payload.js");
+/* harmony import */ var _Payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/server_item_payload */ "./lib/protocol/payloads/server_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNServerItemPayload", function() { return _Payloads_server_item_payload__WEBPACK_IMPORTED_MODULE_10__["SNServerItemPayload"]; });
 
-/* harmony import */ var _Payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/file_item_payload */ "./lib/protocol/payloads/file_item_payload.js");
+/* harmony import */ var _Payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/file_item_payload */ "./lib/protocol/payloads/file_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNFileItemPayload", function() { return _Payloads_file_item_payload__WEBPACK_IMPORTED_MODULE_11__["SNFileItemPayload"]; });
 
-/* harmony import */ var _Payloads_retrieved_component_payload__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/retrieved_component_payload */ "./lib/protocol/payloads/retrieved_component_payload.js");
+/* harmony import */ var _Payloads_retrieved_component_payload__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/retrieved_component_payload */ "./lib/protocol/payloads/retrieved_component_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RetrievedComponentPayload", function() { return _Payloads_retrieved_component_payload__WEBPACK_IMPORTED_MODULE_12__["RetrievedComponentPayload"]; });
 
-/* harmony import */ var _Payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/max_item_payload */ "./lib/protocol/payloads/max_item_payload.js");
+/* harmony import */ var _Payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/max_item_payload */ "./lib/protocol/payloads/max_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMaxItemPayload", function() { return _Payloads_max_item_payload__WEBPACK_IMPORTED_MODULE_13__["SNMaxItemPayload"]; });
 
-/* harmony import */ var _Payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/saved_server_item_payload */ "./lib/protocol/payloads/saved_server_item_payload.js");
+/* harmony import */ var _Payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/saved_server_item_payload */ "./lib/protocol/payloads/saved_server_item_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSavedServerItemPayload", function() { return _Payloads_saved_server_item_payload__WEBPACK_IMPORTED_MODULE_14__["SNSavedServerItemPayload"]; });
 
-/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptionParameters", function() { return _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__["SNEncryptionParameters"]; });
+/* harmony import */ var _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/encryption_parameters */ "./lib/protocol/payloads/encryption_parameters.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionParameters", function() { return _Payloads_encryption_parameters__WEBPACK_IMPORTED_MODULE_15__["EncryptionParameters"]; });
 
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas__WEBPACK_IMPORTED_MODULE_16__["ConflictStrategies"]; });
@@ -16287,9 +16149,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/max_item_payload.js":
+/***/ "./lib/protocol/payloads/max_item_payload.ts":
 /*!***************************************************!*\
-  !*** ./lib/protocol/payloads/max_item_payload.js ***!
+  !*** ./lib/protocol/payloads/max_item_payload.ts ***!
   \***************************************************/
 /*! exports provided: SNMaxItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16297,8 +16159,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNMaxItemPayload", function() { return SNMaxItemPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16342,9 +16204,9 @@ var SNMaxItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/pure_item_payload.js":
+/***/ "./lib/protocol/payloads/pure_item_payload.ts":
 /*!****************************************************!*\
-  !*** ./lib/protocol/payloads/pure_item_payload.js ***!
+  !*** ./lib/protocol/payloads/pure_item_payload.ts ***!
   \****************************************************/
 /*! exports provided: SNPureItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16352,9 +16214,9 @@ var SNMaxItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return SNPureItemPayload; });
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.js");
-/* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16393,14 +16255,14 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
      * to properly handle .content intricacies.
      */
     value: function compareContentFields(otherPayload) {
-      var left = new _Models__WEBPACK_IMPORTED_MODULE_2__["SNItem"](this);
-      var right = new _Models__WEBPACK_IMPORTED_MODULE_2__["SNItem"](otherPayload);
+      var left = new _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"](this);
+      var right = new _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"](otherPayload);
       return left.isItemContentEqualWith(right);
     }
   }, {
     key: "version",
     get: function get() {
-      return this.content.substring(0, _Protocol__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].VersionLength);
+      return this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].VersionLength);
     }
     /**
      * Whether a payload can be discarded and removed from storage.
@@ -16412,11 +16274,6 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
     get: function get() {
       return this.deleted && !this.dirty;
     }
-  }], [{
-    key: "fields",
-    value: function fields() {
-      throw 'Must override SNPureItemPayload.fields';
-    }
   }]);
 
   return SNPureItemPayload;
@@ -16424,9 +16281,9 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/pure_payload.js":
+/***/ "./lib/protocol/payloads/pure_payload.ts":
 /*!***********************************************!*\
-  !*** ./lib/protocol/payloads/pure_payload.js ***!
+  !*** ./lib/protocol/payloads/pure_payload.ts ***!
   \***********************************************/
 /*! exports provided: PurePayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16436,13 +16293,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return PurePayload; });
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -16464,14 +16322,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * Payloads also have a content format. Formats can either be 
  * DecryptedBase64String, EncryptedString, or DecryptedBareObject.
  */
-
 var PurePayload = /*#__PURE__*/function () {
   function PurePayload(rawPayload, isFromGenerator) {
     _classCallCheck(this, PurePayload);
-
-    if (rawPayload.isItem) {
-      throw 'Cannot create payload from item directly';
-    }
 
     if (!isFromGenerator) {
       throw 'Do not construct payloads directly. Use generator functions';
@@ -16484,7 +16337,7 @@ var PurePayload = /*#__PURE__*/function () {
     var _iteratorError = undefined;
 
     try {
-      for (var _iterator = this.constructor.fields()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      for (var _iterator = this.fields()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var field = _step.value;
         var value = rawPayload[field];
 
@@ -16511,15 +16364,17 @@ var PurePayload = /*#__PURE__*/function () {
   _createClass(PurePayload, [{
     key: "mergedWith",
     value: function mergedWith(otherPayload) {
-      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])({
-        payload: this,
-        override: otherPayload
-      });
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])(this, otherPayload);
     }
   }, {
     key: "fields",
     value: function fields() {
       return this.constructor.fields();
+    }
+  }, {
+    key: "getField",
+    value: function getField(field) {
+      return this[field];
     }
   }, {
     key: "getFormat",
@@ -16564,9 +16419,9 @@ var PurePayload = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/retrieved_component_payload.js":
+/***/ "./lib/protocol/payloads/retrieved_component_payload.ts":
 /*!**************************************************************!*\
-  !*** ./lib/protocol/payloads/retrieved_component_payload.js ***!
+  !*** ./lib/protocol/payloads/retrieved_component_payload.ts ***!
   \**************************************************************/
 /*! exports provided: RetrievedComponentPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16574,8 +16429,8 @@ var PurePayload = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RetrievedComponentPayload", function() { return RetrievedComponentPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16620,9 +16475,9 @@ var RetrievedComponentPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/saved_server_item_payload.js":
+/***/ "./lib/protocol/payloads/saved_server_item_payload.ts":
 /*!************************************************************!*\
-  !*** ./lib/protocol/payloads/saved_server_item_payload.js ***!
+  !*** ./lib/protocol/payloads/saved_server_item_payload.ts ***!
   \************************************************************/
 /*! exports provided: SNSavedServerItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16630,8 +16485,8 @@ var RetrievedComponentPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSavedServerItemPayload", function() { return SNSavedServerItemPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16680,9 +16535,9 @@ var SNSavedServerItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/server_item_payload.js":
+/***/ "./lib/protocol/payloads/server_item_payload.ts":
 /*!******************************************************!*\
-  !*** ./lib/protocol/payloads/server_item_payload.js ***!
+  !*** ./lib/protocol/payloads/server_item_payload.ts ***!
   \******************************************************/
 /*! exports provided: SNServerItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16690,8 +16545,8 @@ var SNSavedServerItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNServerItemPayload", function() { return SNServerItemPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16733,9 +16588,9 @@ var SNServerItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/sources.js":
+/***/ "./lib/protocol/payloads/sources.ts":
 /*!******************************************!*\
-  !*** ./lib/protocol/payloads/sources.js ***!
+  !*** ./lib/protocol/payloads/sources.ts ***!
   \******************************************/
 /*! exports provided: PayloadSources, isPayloadSourceRetrieved */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16744,53 +16599,37 @@ var SNServerItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return PayloadSources; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return isPayloadSourceRetrieved; });
-var PayloadSources = {
-  RemoteRetrieved: 1,
-  RemoteSaved: 2,
+var PayloadSources;
 
-  /* The payload returned by offline sync operation */
-  LocalSaved: 3,
-  LocalRetrieved: 4,
-  LocalDirtied: 5,
+(function (PayloadSources) {
+  PayloadSources[PayloadSources["RemoteRetrieved"] = 1] = "RemoteRetrieved";
+  PayloadSources[PayloadSources["RemoteSaved"] = 2] = "RemoteSaved";
+  PayloadSources[PayloadSources["LocalSaved"] = 3] = "LocalSaved";
+  PayloadSources[PayloadSources["LocalRetrieved"] = 4] = "LocalRetrieved";
+  PayloadSources[PayloadSources["LocalDirtied"] = 5] = "LocalDirtied";
+  PayloadSources[PayloadSources["ComponentRetrieved"] = 6] = "ComponentRetrieved";
+  PayloadSources[PayloadSources["DesktopInstalled"] = 7] = "DesktopInstalled";
+  PayloadSources[PayloadSources["RemoteActionRetrieved"] = 8] = "RemoteActionRetrieved";
+  PayloadSources[PayloadSources["FileImport"] = 9] = "FileImport";
+  PayloadSources[PayloadSources["RemoteConflict"] = 10] = "RemoteConflict";
+  PayloadSources[PayloadSources["ImportConflict"] = 11] = "ImportConflict";
+  PayloadSources[PayloadSources["SaveOrSaving"] = 12] = "SaveOrSaving";
+  PayloadSources[PayloadSources["DecryptedTransient"] = 13] = "DecryptedTransient";
+  PayloadSources[PayloadSources["ConflictUuid"] = 14] = "ConflictUuid";
+  PayloadSources[PayloadSources["ConflictData"] = 15] = "ConflictData";
+  PayloadSources[PayloadSources["LocalChanged"] = 16] = "LocalChanged";
+})(PayloadSources || (PayloadSources = {}));
 
-  /** Payloads retrieved from an external
-   extension/component */
-  ComponentRetrieved: 6,
-
-  /** When a component is installed by the desktop
-   and some of its values change */
-  DesktopInstalled: 7,
-
-  /** aciton-based Extensions like note history */
-  RemoteActionRetrieved: 8,
-  FileImport: 9,
-  RemoteConflict: 10,
-  ImportConflict: 11,
-
-  /** Payloads that are saved or saving in the
-   current sync request */
-  SaveOrSaving: 12,
-
-  /** Payloads that have been decrypted for the convenience
-   of consumers who can only work with decrypted formats. The
-   decrypted payloads exist in transient, ephemeral space, and
-   are not used in anyway. */
-  DecryptedTransient: 13,
-  ConflictUuid: 14,
-  ConflictData: 15,
-
-  /* Payload when a client modifies item property then maps it to update UI */
-  LocalChanged: 16
-};
+;
 function isPayloadSourceRetrieved(source) {
   return [PayloadSources.RemoteRetrieved, PayloadSources.ComponentRetrieved, PayloadSources.RemoteActionRetrieved].includes(source);
 }
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/storage_item_payload.js":
+/***/ "./lib/protocol/payloads/storage_item_payload.ts":
 /*!*******************************************************!*\
-  !*** ./lib/protocol/payloads/storage_item_payload.js ***!
+  !*** ./lib/protocol/payloads/storage_item_payload.ts ***!
   \*******************************************************/
 /*! exports provided: SNStorageItemPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16798,8 +16637,8 @@ function isPayloadSourceRetrieved(source) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return SNStorageItemPayload; });
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17085,7 +16924,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.js");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17579,9 +17418,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 response = _ref7.response, key = _ref7.key, passwordRequestHandler = _ref7.passwordRequestHandler;
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])({
-                  object: response.item
-                });
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])(response.item);
                 _context7.next = 4;
                 return this.protocolService.payloadByDecryptingPayload({
                   payload: payload,
@@ -21994,10 +21831,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           }
 
                           payloads = responseItems.map(function (responseItem) {
-                            return Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])({
-                              object: responseItem,
-                              source: _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved
-                            });
+                            return Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved);
                           });
                           _context2.next = 27;
                           return _this10.modelManager.mapPayloadsToLocalItems({
@@ -22208,10 +22042,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 responseItem = _step19.value;
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])({
-                  object: responseItem,
-                  source: _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteRetrieved
-                });
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteRetrieved);
                 item = Object(_Models__WEBPACK_IMPORTED_MODULE_6__["CreateItemFromPayload"])(payload);
 
                 if (responseItem.clientData) {
@@ -23595,7 +23426,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Services_history_history_session__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/history/history_session */ "./lib/services/history/history_session.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
@@ -24277,7 +24108,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return ItemHistoryEntry; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -24381,12 +24212,8 @@ var ItemHistoryEntry = /*#__PURE__*/function () {
         return false;
       }
 
-      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
-        object: this.item
-      }));
-      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
-        object: entry.item
-      }));
+      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(this.item));
+      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(entry.item));
       return lhs.isItemContentEqualWith(rhs);
     }
   }]);
@@ -24572,7 +24399,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -25881,9 +25708,7 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
                 * account keys are encrypted with wrappingKey. Here we validate
                 * by attempting to decrypt account keys.
                 */
-                wrappedKeyPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: wrappedRootKey
-                });
+                wrappedKeyPayload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(wrappedRootKey);
                 _context11.next = 11;
                 return this.protocolService.payloadByDecryptingPayload({
                   payload: wrappedKeyPayload,
@@ -25999,9 +25824,7 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
 
               case 8:
                 wrappedKey = _context13.sent;
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: wrappedKey
-                });
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(wrappedKey);
                 _context13.next = 12;
                 return this.protocolService.payloadByDecryptingPayload({
                   payload: payload,
@@ -26159,11 +25982,8 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
             switch (_context15.prev = _context15.next) {
               case 0:
                 wrappingKey = _ref5.wrappingKey;
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
-                  object: this.rootKey,
-                  override: {
-                    content: this.rootKey.getPersistableValue()
-                  }
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])(this.rootKey, null, null, {
+                  content: this.rootKey.getPersistableValue()
                 });
                 _context15.next = 4;
                 return this.protocolService.payloadByEncryptingPayload({
@@ -28109,12 +27929,9 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 92:
-                newCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]({
-                  payloads: allItems.map(function (item) {
-                    return item.payloadRepresentation();
-                  }),
-                  source: source
-                });
+                newCollection = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"](allItems.map(function (item) {
+                  return item.payloadRepresentation();
+                }), source);
                 this.masterCollection = this.masterCollection.concat(newCollection);
 
                 if (!(newItems.length > 0)) {
@@ -28273,9 +28090,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 globalOnly = _args11.length > 1 && _args11[1] !== undefined ? _args11[1] : false;
                 console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
                 payloads = items.map(function (item) {
-                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])({
-                    object: item
-                  });
+                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])(item);
                 });
                 _context11.next = 5;
                 return this.mapPayloadsToLocalItems({
@@ -28963,15 +28778,9 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to duplicate non-item object.';
 
               case 3:
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])({
-                  object: item
-                });
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["CreateMaxPayloadFromAnyObject"])(item);
                 _context18.next = 6;
-                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])({
-                  payload: payload,
-                  baseCollection: this.getMasterCollection(),
-                  isConflict: isConflict
-                });
+                return Object(_Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(payload, this.getMasterCollection(), isConflict);
 
               case 6:
                 payloads = _context18.sent;
@@ -29046,15 +28855,11 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                   content: _context19.t3
                 };
                 _context19.t5 = override;
-                _context19.t6 = {
-                  object: _context19.t4,
-                  override: _context19.t5
-                };
-                payload = (0, _context19.t0)(_context19.t6);
+                payload = (0, _context19.t0)(_context19.t4, null, null, _context19.t5);
                 item = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(payload);
 
                 if (!add) {
-                  _context19.next = 21;
+                  _context19.next = 20;
                   break;
                 }
 
@@ -29063,21 +28868,21 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
                 });
 
                 if (!needsSync) {
-                  _context19.next = 19;
+                  _context19.next = 18;
                   break;
                 }
 
-                _context19.next = 19;
+                _context19.next = 18;
                 return this.setItemDirty(item);
 
-              case 19:
-                _context19.next = 21;
+              case 18:
+                _context19.next = 20;
                 return this.notifyCreationObservers([item]);
 
-              case 21:
+              case 20:
                 return _context19.abrupt("return", item);
 
-              case 22:
+              case 21:
               case "end":
                 return _context19.stop();
             }
@@ -29667,10 +29472,7 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 delta = new _Payloads__WEBPACK_IMPORTED_MODULE_6__["DeltaFileImport"]({
                   baseCollection: this.getMasterCollection(),
-                  applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"]({
-                    payloads: payloads,
-                    source: _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].FileImport
-                  })
+                  applyCollection: new _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"](payloads, _Payloads__WEBPACK_IMPORTED_MODULE_6__["PayloadSources"].FileImport)
                 });
                 _context24.next = 3;
                 return delta.resultingCollection();
@@ -30017,7 +29819,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -30281,10 +30083,8 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton({
                   predicate: predicate,
                   createPayload: Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])({
-                    object: {
-                      content_type: contentType,
-                      content: {}
-                    }
+                    content_type: contentType,
+                    content: {}
                   })
                 }));
 
@@ -31461,11 +31261,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 throw 'Unable to generate encryption parameters';
 
               case 27:
-                return _context8.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateIntentPayloadFromObject"])({
-                  object: payload,
-                  override: encryptionParameters,
-                  intent: intent
-                }));
+                return _context8.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateIntentPayloadFromObject"])(payload, intent, encryptionParameters));
 
               case 28:
               case "end":
@@ -31647,12 +31443,9 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                  object: payload,
-                  override: {
-                    waitingForKey: true,
-                    errorDecrypting: true
-                  }
+                return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(payload, null, null, {
+                  waitingForKey: true,
+                  errorDecrypting: true
                 }));
 
               case 14:
@@ -31667,10 +31460,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
 
               case 19:
                 decryptedParameters = _context10.sent;
-                return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                  object: payload,
-                  override: decryptedParameters
-                }));
+                return _context10.abrupt("return", Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(payload, null, null, decryptedParameters));
 
               case 21:
               case "end":
@@ -31698,7 +31488,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
     key: "payloadsByDecryptingPayloads",
     value: function () {
       var _payloadsByDecryptingPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(_ref9) {
-        var payloads, key, decryptedPayloads, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, encryptedPayload, isDecryptable, decryptedPayload, _override;
+        var payloads, key, decryptedPayloads, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, encryptedPayload, isDecryptable, decryptedPayload, _CreateMaxPayloadFrom;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
@@ -31774,10 +31564,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
               case 28:
                 _context11.prev = 28;
                 _context11.t0 = _context11["catch"](21);
-                decryptedPayloads.push(Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                  object: encryptedPayload,
-                  override: (_override = {}, _defineProperty(_override, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_override, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecryptingChanged, !encryptedPayload.errorDecrypting), _override)
-                }));
+                decryptedPayloads.push(Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(encryptedPayload, null, null, (_CreateMaxPayloadFrom = {}, _defineProperty(_CreateMaxPayloadFrom, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecrypting, true), _defineProperty(_CreateMaxPayloadFrom, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"].ErrorDecryptingChanged, !encryptedPayload.errorDecrypting), _CreateMaxPayloadFrom)));
                 console.error('Error decrypting payload', encryptedPayload, _context11.t0);
 
               case 32:
@@ -31919,10 +31706,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 keyParams = data.keyParams || data.auth_params;
                 rawItems = data.items;
                 encryptedPayloads = rawItems.map(function (rawItem) {
-                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])({
-                    object: rawItem,
-                    source: _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].FileImport
-                  });
+                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].FileImport);
                 });
 
                 if (!keyParams) {
@@ -32038,9 +31822,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 }
 
                 payloads = items.map(function (item) {
-                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                    object: item
-                  });
+                  return Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(item);
                 });
                 _context14.next = 8;
                 return this.payloadsByEncryptingPayloads({
@@ -32291,10 +32073,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -32745,26 +32527,22 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                   uuid: _context4.t2,
                   dirty: true
                 };
-                _context4.t4 = {
-                  payload: _context4.t1,
-                  override: _context4.t3
-                };
-                dirtyPayload = (0, _context4.t0)(_context4.t4);
-                _context4.next = 23;
+                dirtyPayload = (0, _context4.t0)(_context4.t1, _context4.t3);
+                _context4.next = 22;
                 return this.modelManager.mapPayloadToLocalItem({
                   payload: dirtyPayload,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalChanged
                 });
 
-              case 23:
+              case 22:
                 item = _context4.sent;
-                _context4.next = 26;
+                _context4.next = 25;
                 return this.syncService.sync();
 
-              case 26:
+              case 25:
                 return _context4.abrupt("return", item);
 
-              case 27:
+              case 26:
               case "end":
                 return _context4.stop();
             }
@@ -33166,11 +32944,8 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to decrypt nonexistent wrapped value';
 
               case 3:
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                  object: wrappedValue,
-                  override: {
-                    content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].EncryptedStorage
-                  }
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(wrappedValue, null, null, {
+                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].EncryptedStorage
                 });
                 _context7.next = 6;
                 return this.protocolService.payloadByDecryptingPayload({
@@ -33270,23 +33045,20 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                   content: _context9.t2,
                   content_type: _context9.t3
                 };
-                _context9.t5 = {
-                  object: _context9.t4
-                };
-                payload = (0, _context9.t0)(_context9.t5);
-                _context9.next = 13;
+                payload = (0, _context9.t0)(_context9.t4);
+                _context9.next = 12;
                 return this.protocolService.payloadByEncryptingPayload({
                   payload: payload,
                   intent: _Protocol__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].LocalStoragePreferEncrypted
                 });
 
-              case 13:
+              case 12:
                 encryptedPayload = _context9.sent;
                 rawContent[ValueModesKeys.Wrapped] = encryptedPayload;
                 rawContent[ValueModesKeys.Unwrapped] = null;
                 return _context9.abrupt("return", rawContent);
 
-              case 17:
+              case 16:
               case "end":
                 return _context9.stop();
             }
@@ -33896,8 +33668,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AccountDownloader", function() { return AccountDownloader; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -33958,10 +33730,7 @@ var AccountDownloader = /*#__PURE__*/function () {
               case 2:
                 response = _context.sent;
                 encryptedPayloads = response.retrieved_items.map(function (rawRetrievedPayload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])({
-                    object: rawRetrievedPayload,
-                    source: _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved
-                  });
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(rawRetrievedPayload, _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
                 });
                 _context.next = 6;
                 return this.protocolService.payloadsByDecryptingPayloads({
@@ -34200,10 +33969,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/generator */ "./lib/protocol/payloads/deltas/generator.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection_set */ "./lib/protocol/payloads/collection_set.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection_set */ "./lib/protocol/payloads/collection_set.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -34239,15 +34008,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 
     this.response = response;
     this.baseCollection = baseCollection;
-    this.relatedCollectionSet = new _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__["PayloadCollectionSet"]({
-      collections: [new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-        payloads: decryptedResponsePayloads,
-        source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient
-      }), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-        payloads: payloadsSavedOrSaving,
-        source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving
-      })]
-    });
+    this.relatedCollectionSet = new _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__["PayloadCollectionSet"]([new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](decryptedResponsePayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloadsSavedOrSaving, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving)]);
   }
 
   _createClass(SyncResponseResolver, [{
@@ -34341,15 +34102,9 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 0:
                 rawItems = _ref2.rawItems, source = _ref2.source;
                 payloads = rawItems.map(function (rawItem) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])({
-                    object: rawItem,
-                    source: source
-                  });
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(rawItem, source);
                 });
-                collection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-                  payloads: payloads,
-                  source: source
-                });
+                collection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloads, source);
                 deltaClass = Object(_Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__["DeltaClassForSource"])(source); // eslint-disable-next-line new-cap
 
                 delta = new deltaClass({
@@ -34362,18 +34117,12 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 
               case 7:
                 resultCollection = _context2.sent;
-                updatedDirtyPayloads = resultCollection.allPayloads.map(function (payload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])({
-                    payload: payload,
-                    override: {
-                      dirty: _this.finalDirtyStateForPayload(payload)
-                    }
+                updatedDirtyPayloads = resultCollection.getAllPayloads().map(function (payload) {
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(payload, {
+                    dirty: _this.finalDirtyStateForPayload(payload)
                   });
                 });
-                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"]({
-                  payloads: updatedDirtyPayloads,
-                  source: source
-                }));
+                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](updatedDirtyPayloads, source));
 
               case 10:
               case "end":
@@ -34462,10 +34211,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OfflineSyncOperation", function() { return OfflineSyncOperation; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Services_sync_response__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/sync/response */ "./lib/services/sync/response.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
@@ -34514,13 +34263,9 @@ var OfflineSyncOperation = /*#__PURE__*/function () {
             switch (_context.prev = _context.next) {
               case 0:
                 responsePayloads = this.payloads.map(function (payload) {
-                  var _override;
+                  var _CreateSourcedPayload;
 
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])({
-                    object: payload,
-                    source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].LocalSaved,
-                    override: (_override = {}, _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dirty, false), _defineProperty(_override, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].LastSyncEnd, new Date()), _override)
-                  });
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].LocalSaved, (_CreateSourcedPayload = {}, _defineProperty(_CreateSourcedPayload, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dirty, false), _defineProperty(_CreateSourcedPayload, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].LastSyncEnd, new Date()), _CreateSourcedPayload));
                 });
                 /* Since we are simulating a server response, they should be pure JS objects */
 
@@ -34564,8 +34309,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncResponse", function() { return SyncResponse; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Services_api_keys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/keys */ "./lib/services/api/keys.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -34627,30 +34372,21 @@ var SyncResponse = /*#__PURE__*/function () {
     key: "savedPayloads",
     get: function get() {
       return this.rawSavedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])({
-          object: rawItem,
-          source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved
-        });
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved);
       });
     }
   }, {
     key: "retrievedPayloads",
     get: function get() {
       return this.rawRetrievedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])({
-          object: rawItem,
-          source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved
-        });
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
       });
     }
   }, {
     key: "conflictPayloads",
     get: function get() {
       return this.rawItemsFromConflicts.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])({
-          object: rawItem,
-          source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved
-        });
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
       });
     }
   }, {
@@ -34939,12 +34675,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/sync/account/operation */ "./lib/services/sync/account/operation.js");
 /* harmony import */ var _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/sync/offline/operation */ "./lib/services/sync/offline/operation.js");
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.js");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.js");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.js");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.js");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.js");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.js");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
@@ -35286,9 +35022,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 unsortedPayloads = rawPayloads.map(function (rawPayload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
-                    object: rawPayload
-                  });
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(rawPayload);
                 });
                 payloads = Object(_Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__["SortPayloadsByRecentAndContentPriority"])(unsortedPayloads, this.localLoadPriorty);
                 /** Decrypt and map items keys first */
@@ -35590,14 +35324,9 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to alternate uuid of non-item object';
 
               case 2:
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
-                  object: item
-                });
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item);
                 _context10.next = 5;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_14__["PayloadsByAlternatingUuid"])({
-                  payload: payload,
-                  baseCollection: this.modelManager.getMasterCollection()
-                });
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_14__["PayloadsByAlternatingUuid"])(payload, this.modelManager.getMasterCollection());
 
               case 5:
                 results = _context10.sent;
@@ -35731,11 +35460,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 30:
                 items = this.modelManager.allNondummyItems;
                 payloads = items.map(function (item) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
-                    object: item,
-                    override: {
-                      dirty: true
-                    }
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item, null, null, {
+                    dirty: true
                   });
                 });
                 _context11.next = 34;
@@ -35782,9 +35508,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 0:
                 items = this.modelManager.allItems;
                 payloads = items.map(function (item) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
-                    object: item
-                  });
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item);
                 });
                 return _context12.abrupt("return", this.persistPayloads({
                   decryptedPayloads: payloads
@@ -36833,12 +36557,12 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 if (!payloadClass.fields().includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadFields"].Content)) {
                   /** Before persisting, merge with current base value that has content field */
-                  payloadsToPersist = collection.allPayloads.map(function (payload) {
+                  payloadsToPersist = collection.getAllPayloads().map(function (payload) {
                     var base = masterCollection.findPayload(payload.uuid);
                     return base.mergedWith(payload);
                   });
                 } else {
-                  payloadsToPersist = collection.allPayloads;
+                  payloadsToPersist = collection.getAllPayloads();
                 }
 
                 _context22.next = 59;
@@ -37084,10 +36808,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 payloads = _context26.sent;
                 delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"]({
                   baseCollection: this.modelManager.getMasterCollection(),
-                  applyCollection: new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"]({
-                    payloads: payloads,
-                    source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved
-                  })
+                  applyCollection: new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved)
                 });
                 _context26.next = 7;
                 return delta.resultingCollection();

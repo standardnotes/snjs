@@ -19,9 +19,9 @@ describe('payload collections', () => {
 
   it('find', async () => {
     const payload = Factory.createNotePayload();
-    const collection = new PayloadCollection({
-      payloads: [payload]
-    });
+    const collection = new PayloadCollection(
+      [payload]
+    );
     expect(collection.findPayload(payload.uuid)).to.be.ok;
   });
 
@@ -29,9 +29,9 @@ describe('payload collections', () => {
     const payloads = Factory.createRelatedNoteTagPairPayload();
     const notePayload = payloads[0];
     const tagPayload = payloads[1];
-    const collection = new PayloadCollection({
-      payloads: [notePayload, tagPayload]
-    });
+    const collection = new PayloadCollection(
+      [notePayload, tagPayload]
+    );
     const referencing = collection.payloadsThatReferencePayload(notePayload);
     expect(referencing.length).to.equal(1);
   });

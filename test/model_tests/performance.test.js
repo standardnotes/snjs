@@ -51,7 +51,7 @@ describe('mapping performance', () => {
     }
 
     const payloads = Factory.shuffleArray(tags.concat(notes)).map((item) => {
-      return CreateMaxPayloadFromAnyObject({ object: item });
+      return CreateMaxPayloadFromAnyObject(item);
     });
 
     const t0 = performance.now();
@@ -117,9 +117,9 @@ describe('mapping performance', () => {
       notes.push(note);
     }
 
-    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject({
-      object: item
-    }));
+    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject(
+      item
+    ));
 
     const t0 = performance.now();
     // process items in separate batches, so as to trigger missed references

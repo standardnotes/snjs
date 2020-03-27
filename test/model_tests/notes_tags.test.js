@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 describe('notes and tags', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   });
@@ -15,15 +15,18 @@ describe('notes and tags', () => {
     await this.application.deinit();
   });
 
-  it('uses proper class for note', async function() {
+  it('uses proper class for note', async function () {
     const modelManager = this.application.modelManager;
     const payload = Factory.createNotePayload();
-    await modelManager.mapPayloadToLocalItem({payload});
+    await modelManager.mapPayloadToLocalItem({
+      payload,
+      source: PayloadSources.LocalChanged
+    });
     const note = modelManager.getItems(['Note'])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
 
-  it('properly constructs syncing params', async function() {
+  it('properly constructs syncing params', async function () {
     const note = new SNNote();
     const title = 'Foo';
     const text = 'Bar';
@@ -49,19 +52,27 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: {content: {references: null}}
-    });
-    const mutatedNote = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: {content: {references: [
-        {
-          uuid: tagPayload.uuid,
-          content_type: tagPayload.content_type
+    const mutatedTag = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      { content: { references: null } }
+    );
+    const mutatedNote = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      {
+        content: {
+          references: [
+            {
+              uuid: tagPayload.uuid,
+              content_type: tagPayload.content_type
+            }
+          ]
         }
-      ]}}
-    });
+      }
+    );
 
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutatedNote, mutatedTag],
@@ -76,7 +87,7 @@ describe('notes and tags', () => {
 
   it('creates relationship between note and tag', async function () {
     const modelManager = this.application.modelManager;
-    const pair = Factory.createRelatedNoteTagPairPayload({dirty: false});
+    const pair = Factory.createRelatedNoteTagPairPayload({ dirty: false });
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
@@ -134,10 +145,12 @@ describe('notes and tags', () => {
 
     await this.application.syncService.sync();
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: {content: {references: []}}
-    });
+    const mutatedTag = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      { content: { references: [] } }
+    );
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutatedTag],
       source: PayloadSources.LocalChanged
@@ -168,12 +181,14 @@ describe('notes and tags', () => {
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    const changedTagPayload = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: {
+    const changedTagPayload = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      {
         deleted: true
       }
-    });
+    );
     await modelManager.mapPayloadsToLocalItems({
       payloads: [changedTagPayload],
       source: PayloadSources.LocalChanged
@@ -207,10 +222,12 @@ describe('notes and tags', () => {
 
     expect(note.tagsString().length).to.not.equal(0);
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject({
-      object: tagPayload,
-      override: {content: {references: []}}
-    });
+    const mutatedTag = CreateMaxPayloadFromAnyObject(
+      tagPayload,
+      null,
+      null,
+      { content: { references: [] } }
+    );
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutatedTag],
       source: PayloadSources.LocalChanged
@@ -246,10 +263,10 @@ describe('notes and tags', () => {
 
     expect(tag.content.title).to.equal(newTitle);
 
-    const changedTagPayload = CreateSourcedPayloadFromObject({
-      object: tagPayload,
-      source: PayloadSources.RemoteSaved
-    });
+    const changedTagPayload = CreateSourcedPayloadFromObject(
+      tagPayload,
+      PayloadSources.RemoteSaved
+    );
 
     // simulate a save, which omits `content`
     await modelManager.mapPayloadsToLocalItems({
@@ -281,7 +298,7 @@ describe('notes and tags', () => {
 
     tag.removeItemAsRelationship(note);
 
-    const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
+    const newTagPayload = CreateMaxPayloadFromAnyObject(tag);
 
     await modelManager.mapPayloadsToLocalItems({
       payloads: [newTagPayload],
@@ -334,7 +351,7 @@ describe('notes and tags', () => {
       source: PayloadSources.LocalChanged
     });
     const note = modelManager.getItems(['Note'])[0];
-    const duplicateNote = await modelManager.duplicateItem({item: note, isConflict: true});
+    const duplicateNote = await modelManager.duplicateItem({ item: note, isConflict: true });
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
     expect(duplicateNote.tags.length).to.equal(note.tags.length);
   });
@@ -360,7 +377,7 @@ describe('notes and tags', () => {
     expect(note.tags.length).to.equal(1);
 
     await modelManager.setItemToBeDeleted(tag);
-    const newTagPayload = CreateMaxPayloadFromAnyObject({object: tag});
+    const newTagPayload = CreateMaxPayloadFromAnyObject(tag);
     await modelManager.mapPayloadsToLocalItems({
       payloads: [newTagPayload],
       source: PayloadSources.LocalChanged
@@ -395,13 +412,19 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    const mutatedPayload = CreateMaxPayloadFromAnyObject({
-      object: notePayload,
-      override: { content: { references: [{
-        content_type: tagPayload.content_type,
-        uuid: tagPayload.uuid
-      }] } }
-    });
+    const mutatedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      null,
+      null,
+      {
+        content: {
+          references: [{
+            content_type: tagPayload.content_type,
+            uuid: tagPayload.uuid
+          }]
+        }
+      }
+    );
 
     await modelManager.mapPayloadsToLocalItems({
       payloads: [mutatedPayload, tagPayload],

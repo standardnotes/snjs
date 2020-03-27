@@ -18,9 +18,7 @@ describe('singletons', () => {
         foo: 'bar'
       }
     };
-    return CreateMaxPayloadFromAnyObject({
-      object: params
-    });
+    return CreateMaxPayloadFromAnyObject(params);
   }
 
   before(async function () {
@@ -129,12 +127,12 @@ describe('singletons', () => {
     });
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton({
       predicate: predicate,
-      createPayload: CreateMaxPayloadFromAnyObject({
-        object: {
+      createPayload: CreateMaxPayloadFromAnyObject(
+        {
           content_type: contentType,
           content: {}
         }
-      })
+      )
     });
     this.expectedItemCount += 1;
 
@@ -242,7 +240,8 @@ describe('singletons', () => {
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload
+      payload: payload,
+      source: PayloadSources.LocalChanged
     });
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
@@ -262,7 +261,8 @@ describe('singletons', () => {
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload
+      payload: payload,
+      source: PayloadSources.LocalChanged
     });
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);

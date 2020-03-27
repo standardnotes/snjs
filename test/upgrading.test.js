@@ -105,7 +105,7 @@ describe('upgrading', () => {
     await this.application.upgradeProtocolVersion();
 
     const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
-    const payload = CreateMaxPayloadFromAnyObject({ object: wrappedRootKey });
+    const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
     expect(payload.version).to.equal(newVersion);
 
     expect(
