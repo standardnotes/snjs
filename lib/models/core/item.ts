@@ -17,7 +17,7 @@ export type ContentReference = {
   content_type: String
 }
 
-export type ContentObject = {
+export type ItemContent = {
   [key: string]: any
   references: ContentReference[]
 }
@@ -32,7 +32,7 @@ type Itemable<K extends keyof any, T> = {
 export class SNItem implements Itemable<PayloadFields, any>  {
 
   public uuid!: string
-  public content!: ContentObject
+  public content!: ItemContent
   public deleted!: boolean
   public content_type!: string
   public items_key_id!: string
@@ -56,7 +56,10 @@ export class SNItem implements Itemable<PayloadFields, any>  {
 
   private static sharedDateFormatter: Intl.DateTimeFormat
 
-  constructor(payload: PurePayload) {
+  constructor(authorized: boolean) {
+    if(!authorized) {
+      throw Error('Use CreateItemFromPayload to create items');
+    }
     this.content = {
       references: [],
       appData: {
@@ -64,67 +67,9 @@ export class SNItem implements Itemable<PayloadFields, any>  {
       }
     };
     this.resetLocalReferencePointers();
-    if (payload) {
-      if (!payload.isPayload) {
-        throw `Attempting to construct SNItem from non-payload object ${payload}.`;
-      }
-      this.updateFromPayload(payload);
-    }
-    if (!this.content_type) {
-      this.content_type = this.getDefaultContentType();
-    }
-    if (!this.uuid) {
-      if (Uuid.canGenSync()) {
-        this.uuid = Uuid.GenerateUuidSynchronously();
-      }
-    }
   }
 
-  public payloadRepresentation(override: PayloadOverride) {
-    return CreateMaxPayloadFromAnyObject(
-      this,
-      undefined,
-      undefined,
-      override
-    );
-  }
-
-  getDefaultContentType() {
-    return null;
-  }
-
-  /**
-   * If creating from external payload, it may not include values for .references and .appData
-   * Here we want to initialize these values with default values.
-   */
-  private populateDefaultContentValues() {
-    if (this.errorDecrypting || this.deleted) {
-      return;
-    }
-
-    if (!this.content.references) {
-      this.content.references = [];
-    }
-
-    if (!this.content.appData) {
-      this.content.appData = {
-        [DEFAULT_APP_DOMAIN]: {}
-      };
-    }
-  }
-
-  /**
-   * Consumers who create items without a syncronous UUID generation function
-   * must manually call this function when creating an item. The consumer must
-   * have previously called Uuid.SetGenerators.
-   */
-  public async initUUID() {
-    if (!this.uuid) {
-      this.uuid = await Uuid.GenerateUuid();
-    }
-  }
-
-  private updateFromPayload(payload: PurePayload) {
+  public updateFromPayload(payload: PurePayload) {
     if (!payload) {
       return;
     }
@@ -168,9 +113,62 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     this._client_updated_at = undefined;
 
     this.populateDefaultContentValues();
+
+    if (!this.content_type) {
+      this.content_type = this.getDefaultContentType()!;
+    }
+    if (!this.uuid) {
+      if (Uuid.canGenSync()) {
+        this.uuid = Uuid.GenerateUuidSynchronously();
+      }
+    }
   }
 
-  protected mapContentToLocalProperties(_: ContentObject) {
+  public payloadRepresentation(override: PayloadOverride) {
+    return CreateMaxPayloadFromAnyObject(
+      this,
+      undefined,
+      undefined,
+      override
+    );
+  }
+
+  protected getDefaultContentType() : string | null {
+    return null;
+  }
+
+  /**
+   * If creating from external payload, it may not include values for .references and .appData
+   * Here we want to initialize these values with default values.
+   */
+  private populateDefaultContentValues() {
+    if (this.errorDecrypting || this.deleted) {
+      return;
+    }
+
+    if (!this.content.references) {
+      this.content.references = [];
+    }
+
+    if (!this.content.appData) {
+      this.content.appData = {
+        [DEFAULT_APP_DOMAIN]: {}
+      };
+    }
+  }
+
+  /**
+   * Consumers who create items without a syncronous UUID generation function
+   * must manually call this function when creating an item. The consumer must
+   * have previously called Uuid.SetGenerators.
+   */
+  public async initUUID() {
+    if (!this.uuid) {
+      this.uuid = await Uuid.GenerateUuid();
+    }
+  }
+
+  protected mapContentToLocalProperties(_: ItemContent) {
     /** Optional override */
   }
 
@@ -267,31 +265,31 @@ export class SNItem implements Itemable<PayloadFields, any>  {
    * into memory here. We use this so that when `this` is deleted, we're able
    * to update the references of those other objects.
    */
-  setIsBeingReferencedBy(item: SNItem) {
+  protected setIsBeingReferencedBy(item: SNItem) {
     if (!this.referencingItems[item.uuid]) {
       this.referencingItems[item.uuid] = item;
     }
   }
 
-  setIsNoLongerReferencedBy(item: SNItem) {
+  public setIsNoLongerReferencedBy(item: SNItem) {
     delete this.referencingItems[item.uuid];
   }
 
-  removeReferenceWithUuid(uuid: string) {
+  protected removeReferenceWithUuid(uuid: string) {
     let references = this.content.references || [];
     references = references.filter((r) => r.uuid !== uuid);
     this.content.references = references;
     delete this.referencedItems[uuid];
   }
 
-  hasRelationshipWithItem(item: SNItem) {
+  public hasRelationshipWithItem(item: SNItem) {
     const target = this.content.references.find((r) => {
       return r.uuid === item.uuid;
     });
     return !isNullOrUndefined(target);
   }
 
-  isBeingRemovedLocally() {
+  protected isBeingRemovedLocally() {
     for (const uuid of Object.keys(this.referencedItems)) {
       const item = this.referencedItems[uuid];
       item.setIsNoLongerReferencedBy(this);
@@ -299,18 +297,23 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   }
 
   /** The number of items this item currently references */
-  get referencedItemsCount() {
+  private get referencedItemsCount() {
     return Object.keys(this.referencedItems).length;
   }
 
   /** The number of items that currently reference this item */
-  get referencingItemsCount() {
+  private get referencingItemsCount() {
     return Object.keys(this.referencingItems).length;
   }
 
-  get allReferencingItems() {
+  private get allReferencingItems() {
     return Object.keys(this.referencingItems)
       .map((uuid) => this.referencingItems[uuid]);
+  }
+
+  private get allReferencedItems() {
+    return Object.keys(this.referencedItems)
+      .map((uuid) => this.referencedItems[uuid]);
   }
 
   public resetLocalReferencePointers() {
@@ -319,7 +322,13 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   }
 
   public didCompleteMapping(_: PayloadSources) {
-    /** Optional override */
+    for (const item of this.allReferencedItems) {
+      item.referencingItemCompletedMapping(this);
+    }
+  }
+
+  public referencingItemCompletedMapping(item: SNItem) {
+
   }
 
   public setDomainDataItem(key: string, value: any, domain: string) {
@@ -341,7 +350,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     this.content.appData[domain] = data;
   }
 
-  getDomainDataItem(key: string, domain: string) {
+  public getDomainDataItem(key: string, domain: string) {
     if (!domain) {
       console.error('DEFAULT_APP_DOMAIN needs to be set.');
       return;
@@ -360,32 +369,32 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     }
   }
 
-  setAppDataItem(key: string, value: any) {
+  public setAppDataItem(key: string, value: any) {
     this.setDomainDataItem(key, value, DEFAULT_APP_DOMAIN);
   }
 
-  getAppDataItem(key: string) {
+  public getAppDataItem(key: string) {
     return this.getDomainDataItem(key, DEFAULT_APP_DOMAIN);
   }
 
-  get pinned() {
+  public get pinned() {
     return this.getAppDataItem('pinned');
   }
 
-  get archived() {
+  public get archived() {
     return this.getAppDataItem('archived');
   }
 
-  get locked() {
+  public get locked() {
     return this.getAppDataItem('locked');
   }
 
-  hasRawClientUpdatedAtValue() {
+  private hasRawClientUpdatedAtValue() {
     return this.getAppDataItem('client_updated_at') != null;
   }
 
   // eslint-disable-next-line camelcase
-  get client_updated_at() {
+  public get client_updated_at() {
     if (!this._client_updated_at) {
       const saved = this.getAppDataItem('client_updated_at');
       if (saved) {
@@ -398,7 +407,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   }
 
   // eslint-disable-next-line camelcase
-  set client_updated_at(date: Date) {
+  public set client_updated_at(date: Date) {
     this._client_updated_at = date;
     this.setAppDataItem('client_updated_at', date);
   }
@@ -409,22 +418,22 @@ export class SNItem implements Itemable<PayloadFields, any>  {
    * if one component has active = true and another component has active = false, 
    * it would be needless to duplicate them, so instead we ignore that value.
    */
-  contentKeysToIgnoreWhenCheckingEquality() {
+  public contentKeysToIgnoreWhenCheckingEquality() {
     return ['conflict_of'];
   }
 
   /** Same as `contentKeysToIgnoreWhenCheckingEquality`, but keys inside appData[Item.AppDomain] */
-  appDatacontentKeysToIgnoreWhenCheckingEquality() {
+  public appDatacontentKeysToIgnoreWhenCheckingEquality() {
     return ['client_updated_at'];
   }
 
-  getContentCopy() {
+  public getContentCopy() {
     const contentCopy = JSON.parse(JSON.stringify(this.content));
     return contentCopy;
   }
 
   /** Whether the item has never been synced to a server */
-  get neverSynced() {
+  public get neverSynced() {
     return !this.updated_at || this.updated_at.getTime() === 0;
   }
 
@@ -432,16 +441,16 @@ export class SNItem implements Itemable<PayloadFields, any>  {
    * Subclasses can override this getter to return true if they want only
    * one of this item to exist, depending on custom criteria.
    */
-  get isSingleton() {
+  public get isSingleton() {
     return false;
   }
 
   /** The predicate by which singleton items should be unique */
-  get singletonPredicate() {
+  public get singletonPredicate() : SNPredicate {
     throw 'Must override SNItem.singletonPredicate';
   }
 
-  get singletonStrategy() {
+  public get singletonStrategy() {
     return SingletonStrategies.KeepEarliest;
   }
 
@@ -483,31 +492,31 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   }
 
   public isItemContentEqualWith(otherItem: SNItem) {
-    return ItemContentsEqual({
-      leftContent: this.content,
-      rightContent: otherItem.content,
-      keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
-      appDataKeysToIgnore: this.appDatacontentKeysToIgnoreWhenCheckingEquality()
-    });
+    return ItemContentsEqual(
+      this.content,
+      otherItem.content,
+      this.contentKeysToIgnoreWhenCheckingEquality(),
+      this.appDatacontentKeysToIgnoreWhenCheckingEquality()
+    );
   }
 
   public satisfiesPredicate(predicate: SNPredicate) {
     return SNPredicate.ItemSatisfiesPredicate(this, predicate);
   }
 
-  createdAtString() {
+  public createdAtString() {
     return this.dateToLocalizedString(this.created_at);
   }
 
-  updatedAtString() {
+  public updatedAtString() {
     return this.dateToLocalizedString(this.client_updated_at);
   }
 
-  updatedAtTimestamp() {
+  public updatedAtTimestamp() {
     return this.updated_at.getTime();
   }
 
-  dateToLocalizedString(date: Date) {
+  private dateToLocalizedString(date: Date) {
     if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
       if (!SNItem.sharedDateFormatter) {
         const locale = (

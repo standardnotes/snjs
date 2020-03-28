@@ -35,7 +35,7 @@ const createItem = () => {
   const payload = CreateMaxPayloadFromAnyObject(
     createItemParams()
   );
-  return new SNItem(payload);
+  return CreateItemFromPayload(payload);
 };
 
 describe('predicates', () => {

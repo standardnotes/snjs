@@ -2,8 +2,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
-    'snjs.js': './lib/main.js',
-    'snjs.min.js': './lib/main.js'
+    'snjs.js': './lib/main.js'
   },
   resolve: {
     extensions: ['.ts', '.js'],

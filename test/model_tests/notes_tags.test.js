@@ -27,7 +27,7 @@ describe('notes and tags', () => {
   });
 
   it('properly constructs syncing params', async function () {
-    const note = new SNNote();
+    const note = await this.application.createTemplateItem({contentType: ContentTypes.Note});
     const title = 'Foo';
     const text = 'Bar';
     note.title = title;
@@ -37,7 +37,7 @@ describe('notes and tags', () => {
     expect(content.title).to.equal(title);
     expect(content.text).to.equal(text);
 
-    const tag = new SNTag();
+    const tag = await this.application.createTemplateItem({ contentType: ContentTypes.Tag });
     tag.title = title;
 
     expect(tag.collapseContent().title).to.equal(title);
@@ -219,6 +219,7 @@ describe('notes and tags', () => {
     });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
+    expect(tag.title).to.be.ok;
 
     expect(note.tagsString().length).to.not.equal(0);
 
@@ -240,6 +241,17 @@ describe('notes and tags', () => {
     expect(tag.notes.length).to.equal(0);
   });
 
+  it('creating basic note should have text set', async function () {
+    const note = await Factory.createMappedNote(this.application);
+    expect(note.title).to.be.ok;
+    expect(note.text).to.be.ok;
+  });
+
+  it('creating basic tag should have title', async function () {
+    const tag = await Factory.createMappedTag(this.application);
+    expect(tag.title).to.be.ok;
+  });
+
   it('resets cached note tags string when tag is renamed', async function () {
     const modelManager = this.application.modelManager;
 
@@ -253,7 +265,8 @@ describe('notes and tags', () => {
     });
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
-
+    expect(note.title).to.be.ok;
+    expect(tag.title).to.be.ok;
     expect(note.tagsString()).to.equal(`#${tagPayload.content.title}`);
 
     const newTitle = `${Math.random()}`;
@@ -473,7 +486,7 @@ describe('notes and tags', () => {
 
   it('setting a note dirty should collapse its properties into content', async function () {
     const modelManager = this.application.modelManager;
-    const note = new SNNote();
+    const note = await this.application.createTemplateItem({ contentType: ContentTypes.Note });
     note.title = 'Foo';
     expect(note.content.title).to.not.be.ok;
     await modelManager.setItemDirty(note);

@@ -2415,10 +2415,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 
@@ -6124,7 +6124,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNEncryptedStorage, SNComponent, SNEditor, SNComponentManager, ComponentActions, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, SNWebCrypto, SNModelManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentActions, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedActions, PrivilegeCredentials, SNWebCrypto, SNModelManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, TIMING_STRATEGY_RESOLVE_ON_NEXT, TIMING_STRATEGY_FORCE_SPAWN_NEW, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNKeyManager, KEY_MODE_ROOT_KEY_NONE, KEY_MODE_ROOT_KEY_ONLY, KEY_MODE_ROOT_KEY_PLUS_WRAPPER, KEY_MODE_WRAPPER_ONLY, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, CreateItemFromPayload, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6150,7 +6150,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_device_interface__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/device_interface */ "./lib/device_interface.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return _Lib_device_interface__WEBPACK_IMPORTED_MODULE_6__["DeviceInterface"]; });
 
-/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models */ "./lib/models/index.js");
+/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./models */ "./lib/models/index.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItem", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNItem"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNItemsKey"]; });
@@ -6168,8 +6168,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["Action"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNTheme"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNEncryptedStorage"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNComponent"]; });
 
@@ -6189,8 +6187,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/history/item_history_entry */ "./lib/services/history/item_history_entry.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemHistoryEntry", function() { return _Services_history_item_history_entry__WEBPACK_IMPORTED_MODULE_11__["ItemHistoryEntry"]; });
 
-/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/app/privileges */ "./lib/models/app/privileges.js");
+/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./models/app/privileges */ "./lib/models/app/privileges.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["SNPrivileges"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["ProtectedActions"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return _models_app_privileges__WEBPACK_IMPORTED_MODULE_12__["PrivilegeCredentials"]; });
 
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_13__);
@@ -6319,60 +6321,59 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_32__["intentRequiresEncryption"]; });
 
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_33__["ContentTypes"]; });
 
-/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_34__["ApplicationEvents"]; });
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_34__["CreateItemFromPayload"]; });
 
-/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Environments"]; });
+/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_35__["ApplicationEvents"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Platforms"]; });
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__["Environments"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["isEnvironmentWebOrDesktop"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__["Platforms"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["isEnvironmentMobile"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__["isEnvironmentWebOrDesktop"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["platformFromString"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__["isEnvironmentMobile"]; });
 
-/* harmony import */ var _Lib_services__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Lib/services */ "./lib/services/index.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Lib_services__WEBPACK_IMPORTED_MODULE_36__["SyncEvents"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_36__["platformFromString"]; });
 
-/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__["SNPureItemPayload"]; });
+/* harmony import */ var _Lib_services__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Lib/services */ "./lib/services/index.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Lib_services__WEBPACK_IMPORTED_MODULE_37__["SyncEvents"]; });
 
-/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_38__["SNStorageItemPayload"]; });
+/* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_38__["SNPureItemPayload"]; });
 
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_39__["PayloadCollection"]; });
+/* harmony import */ var _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Payloads/storage_item_payload */ "./lib/protocol/payloads/storage_item_payload.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNStorageItemPayload", function() { return _Payloads_storage_item_payload__WEBPACK_IMPORTED_MODULE_39__["SNStorageItemPayload"]; });
 
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__["CreateMaxPayloadFromAnyObject"]; });
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_40__["PayloadCollection"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_40__["CreateSourcedPayloadFromObject"]; });
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_41__["CreateMaxPayloadFromAnyObject"]; });
 
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["PayloadSources"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_41__["CreateSourcedPayloadFromObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_41__["isPayloadSourceRetrieved"]; });
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_42__["PayloadSources"]; });
 
-/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_42__["ProtocolVersions"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_42__["isPayloadSourceRetrieved"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__["PayloadFormats"]; });
+/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_43__["ProtocolVersions"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__["StorageKeys"]; });
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_44__["PayloadFormats"]; });
 
-/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_45__["StorageKeys"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["ProtectedActions"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PrivilegeCredentials"]; });
+/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_46__["BaseMigration"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_NONE"]; });
 
@@ -6381,6 +6382,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_HOUR"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_WEEK"]; });
+
 
 
 
@@ -6666,7 +6668,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.js");
@@ -6704,6 +6706,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -7697,7 +7700,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
     key: "createDefaultItemsKeyForAllPlatforms",
     value: function () {
       var _createDefaultItemsKeyForAllPlatforms = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14() {
-        var rootKey, rootKeyParams, itemsKey;
+        var rootKey, rootKeyParams, payload, itemsKey;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
@@ -7709,7 +7712,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 rootKey = _context14.sent;
 
                 if (!rootKey) {
-                  _context14.next = 14;
+                  _context14.next = 15;
                   break;
                 }
 
@@ -7718,26 +7721,30 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 6:
                 rootKeyParams = _context14.sent;
-                itemsKey = _Models__WEBPACK_IMPORTED_MODULE_7__["SNItemsKey"].FromRaw({
-                  itemsKey: rootKey.masterKey,
-                  dataAuthenticationKey: rootKey.dataAuthenticationKey,
-                  version: rootKeyParams.version
+                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
+                  content_type: _Models__WEBPACK_IMPORTED_MODULE_7__["ContentTypes"].ItemsKey,
+                  content: {
+                    itemsKey: rootKey.masterKey,
+                    dataAuthenticationKey: rootKey.dataAuthenticationKey,
+                    version: rootKeyParams.version
+                  }
                 });
-                _context14.next = 10;
+                itemsKey = Object(_Models__WEBPACK_IMPORTED_MODULE_7__["CreateItemFromPayload"])(payload);
+                _context14.next = 11;
                 return itemsKey.initUUID();
 
-              case 10:
-                _context14.next = 12;
+              case 11:
+                _context14.next = 13;
                 return this.application.modelManager.mapItem({
                   item: itemsKey,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].LocalChanged
                 });
 
-              case 12:
-                _context14.next = 14;
+              case 13:
+                _context14.next = 15;
                 return this.application.modelManager.setItemDirty(itemsKey);
 
-              case 14:
+              case 15:
               case "end":
                 return _context14.stop();
             }
@@ -7919,9 +7926,9 @@ var Migration = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/models/app/action.js":
+/***/ "./lib/models/app/action.ts":
 /*!**********************************!*\
-  !*** ./lib/models/app/action.js ***!
+  !*** ./lib/models/app/action.ts ***!
   \**********************************/
 /*! exports provided: Action */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -7933,6 +7940,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_0__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 /**
  * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
@@ -7940,6 +7949,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Action = function Action(json) {
   _classCallCheck(this, Action);
+
+  _defineProperty(this, "running", void 0);
+
+  _defineProperty(this, "error", void 0);
+
+  _defineProperty(this, "lastExecuted", void 0);
+
+  _defineProperty(this, "context", void 0);
 
   lodash_merge__WEBPACK_IMPORTED_MODULE_0___default()(this, json);
   this.running = false;
@@ -7952,9 +7969,9 @@ var Action = function Action(json) {
 
 /***/ }),
 
-/***/ "./lib/models/app/component.js":
+/***/ "./lib/models/app/component.ts":
 /*!*************************************!*\
-  !*** ./lib/models/app/component.js ***!
+  !*** ./lib/models/app/component.ts ***!
   \*************************************/
 /*! exports provided: ComponentAreas, SNComponent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -7963,9 +7980,10 @@ var Action = function Action(json) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentAreas", function() { return ComponentAreas; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return SNComponent; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7991,14 +8009,19 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var ComponentAreas = {
-  Editor: 'editor-editor',
-  Themes: 'themes',
-  EditorStack: 'editor-stack',
-  NoteTags: 'note-tags',
-  Rooms: 'rooms',
-  Modal: 'modal'
-};
+
+var ComponentAreas;
+
+(function (ComponentAreas) {
+  ComponentAreas["Editor"] = "editor-editor";
+  ComponentAreas["Themes"] = "themes";
+  ComponentAreas["EditorStack"] = "editor-stack";
+  ComponentAreas["NoteTags"] = "note-tags";
+  ComponentAreas["Rooms"] = "rooms";
+  ComponentAreas["Modal"] = "modal";
+})(ComponentAreas || (ComponentAreas = {}));
+
+;
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
@@ -8008,80 +8031,13 @@ var ComponentAreas = {
 var SNComponent = /*#__PURE__*/function (_SNItem) {
   _inherits(SNComponent, _SNItem);
 
-  function SNComponent(payload) {
-    var _this;
-
+  function SNComponent() {
     _classCallCheck(this, SNComponent);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNComponent).call(this, payload));
-
-    if (!_this.componentData) {
-      _this.componentData = {};
-    }
-
-    if (!_this.disassociatedItemIds) {
-      _this.disassociatedItemIds = [];
-    }
-
-    if (!_this.associatedItemIds) {
-      _this.associatedItemIds = [];
-    }
-
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNComponent).apply(this, arguments));
   }
 
   _createClass(SNComponent, [{
-    key: "mapContentToLocalProperties",
-    value: function mapContentToLocalProperties(content) {
-      _get(_getPrototypeOf(SNComponent.prototype), "mapContentToLocalProperties", this).call(this, content);
-      /**
-      * @legacy
-      * We don't want to set the url directly, as we'd like to phase it out.
-      * If the content.url exists, we'll transfer it to legacy_url. We'll only
-      * need to set this if content.hosted_url is blank, otherwise,
-      * hosted_url is the url replacement.
-      */
-
-
-      if (!content.hosted_url) {
-        this.legacy_url = content.url;
-      }
-
-      this.local_url = content.local_url;
-      this.hosted_url = content.hosted_url || content.url;
-      this.offlineOnly = content.offlineOnly;
-      this.name = content.name;
-      this.autoupdateDisabled = content.autoupdateDisabled;
-      this.package_info = content.package_info;
-      this.area = content.area;
-      this.permissions = content.permissions;
-
-      if (!this.permissions) {
-        this.permissions = [];
-      }
-
-      if (content.valid_until) {
-        this.valid_until = new Date(content.valid_until);
-      }
-      /** Custom data that a component can store in itself */
-
-
-      this.componentData = content.componentData || {};
-      /** Items that have requested a component to be disabled in its context */
-
-      this.disassociatedItemIds = content.disassociatedItemIds || [];
-      /** Items that have requested a component to be enabled in its context */
-
-      this.associatedItemIds = content.associatedItemIds || [];
-    }
-  }, {
-    key: "handleDeletedContent",
-    value: function handleDeletedContent() {
-      _get(_getPrototypeOf(SNComponent.prototype), "handleDeletedContent", this).call(this);
-
-      this.active = false;
-    }
-  }, {
     key: "structureParams",
     value: function structureParams() {
       var params = {
@@ -8109,7 +8065,16 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Component;
+    }
+    /** Custom data that a component can store in itself */
+
+  }, {
+    key: "handleDeletedContent",
+    value: function handleDeletedContent() {
+      _get(_getPrototypeOf(SNComponent.prototype), "handleDeletedContent", this).call(this);
+
+      this.active = false;
     }
     /** Do not duplicate components under most circumstances. Always keep original */
 
@@ -8120,7 +8085,7 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
         return _get(_getPrototypeOf(SNComponent.prototype), "strategyWhenConflictingWithItem", this).call(this, item);
       }
 
-      return _Payloads__WEBPACK_IMPORTED_MODULE_2__["ConflictStrategies"].KeepLeft;
+      return _Payloads_index__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeft;
     }
   }, {
     key: "isEditor",
@@ -8130,7 +8095,7 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "isTheme",
     value: function isTheme() {
-      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme || this.area === ComponentAreas.Themes;
+      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Theme || this.area === ComponentAreas.Themes;
     }
   }, {
     key: "isDefaultEditor",
@@ -8207,12 +8172,138 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
       return this.disassociatedItemIds.indexOf(item.uuid) !== -1;
     }
   }, {
+    key: "componentData",
+    get: function get() {
+      return this.content.componentData || {};
+    },
+    set: function set(componentData) {
+      this.content.componentData = componentData;
+    }
+    /** Items that have requested a component to be disabled in its context */
+
+  }, {
+    key: "disassociatedItemIds",
+    get: function get() {
+      return this.content.disassociatedItemIds || [];
+    },
+    set: function set(disassociatedItemIds) {
+      this.content.disassociatedItemIds = disassociatedItemIds;
+    }
+    /** Items that have requested a component to be enabled in its context */
+
+  }, {
+    key: "associatedItemIds",
+    get: function get() {
+      return this.content.associatedItemIds || [];
+    },
+    set: function set(associatedItemIds) {
+      this.content.associatedItemIds = associatedItemIds;
+    }
+  }, {
+    key: "local_url",
+    get: function get() {
+      return this.content.local_url;
+    },
+    set: function set(url) {
+      this.content.local_url = url;
+    }
+  }, {
+    key: "hosted_url",
+    get: function get() {
+      return this.content.hosted_url || this.content.url;
+    },
+    set: function set(url) {
+      this.content.hosted_url = url;
+    }
+  }, {
+    key: "offlineOnly",
+    get: function get() {
+      return this.content.offlineOnly;
+    },
+    set: function set(offlineOnly) {
+      this.content.offlineOnly = offlineOnly;
+    }
+  }, {
+    key: "name",
+    get: function get() {
+      return this.content.name;
+    },
+    set: function set(name) {
+      this.content.name = name;
+    }
+  }, {
+    key: "autoupdateDisabled",
+    get: function get() {
+      return this.content.autoupdateDisabled;
+    },
+    set: function set(autoupdateDisabled) {
+      this.content.autoupdateDisabled = autoupdateDisabled;
+    }
+  }, {
+    key: "package_info",
+    get: function get() {
+      return this.content.package_info;
+    },
+    set: function set(package_info) {
+      this.content.package_info = package_info;
+    }
+  }, {
+    key: "area",
+    get: function get() {
+      return this.content.area;
+    },
+    set: function set(area) {
+      this.content.area = area;
+    }
+  }, {
+    key: "permissions",
+    get: function get() {
+      return this.content.permissions || [];
+    },
+    set: function set(permissions) {
+      this.content.permissions = permissions;
+    }
+  }, {
+    key: "valid_until",
+    get: function get() {
+      var stringOrDate = this.content.valid_until;
+
+      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isString"])(stringOrDate)) {
+        this.content.valid_until = new Date(stringOrDate);
+      }
+
+      return this.content.valid_until;
+    },
+    set: function set(valid_until) {
+      this.content.valid_until = valid_until;
+    }
+  }, {
     key: "active",
     get: function get() {
       return this.content.active;
     },
     set: function set(active) {
       this.content.active = active;
+    }
+    /**
+    * @legacy
+    * We don't want to set the url directly, as we'd like to phase it out.
+    * If the content.url exists, we'll transfer it to legacy_url. We'll only
+    * need to set this if content.hosted_url is blank, otherwise,
+    * hosted_url is the url replacement.
+    */
+
+  }, {
+    key: "legacy_url",
+    get: function get() {
+      if (!this.content.hosted_url) {
+        return this.content.url;
+      }
+
+      return null;
+    },
+    set: function set(url) {
+      this.content.legacy_url = url;
     }
   }], [{
     key: "associativeAreas",
@@ -8222,13 +8313,13 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   }]);
 
   return SNComponent;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
 
 /***/ }),
 
-/***/ "./lib/models/app/editor.js":
+/***/ "./lib/models/app/editor.ts":
 /*!**********************************!*\
-  !*** ./lib/models/app/editor.js ***!
+  !*** ./lib/models/app/editor.ts ***!
   \**********************************/
 /*! exports provided: SNEditor */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -8236,16 +8327,9 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return SNEditor; });
-/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/map */ "./node_modules/lodash/map.js");
-/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_map__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8268,34 +8352,43 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-
-
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
 /**
- * Legacy
+ * @deprecated
  * Editor objects are depracated in favor of SNComponent objects
  */
 
 var SNEditor = /*#__PURE__*/function (_SNItem) {
   _inherits(SNEditor, _SNItem);
 
-  function SNEditor(payload) {
+  function SNEditor() {
+    var _getPrototypeOf2;
+
     var _this;
 
     _classCallCheck(this, SNEditor);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNEditor).call(this, payload));
-
-    if (!_this.notes) {
-      _this.notes = [];
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
 
-    if (!_this.data) {
-      _this.data = {};
-    }
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNEditor)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "notes", []);
+
+    _defineProperty(_assertThisInitialized(_this), "data", {});
+
+    _defineProperty(_assertThisInitialized(_this), "url", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "name", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "isDefault", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "systemEditor", void 0);
 
     return _this;
   }
@@ -8308,7 +8401,7 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
       this.url = content.url;
       this.name = content.name;
       this.data = content.data || {};
-      this.default = content.default;
+      this.isDefault = content.default;
       this.systemEditor = content.systemEditor;
     }
   }, {
@@ -8318,7 +8411,7 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
         url: this.url,
         name: this.name,
         data: this.data,
-        default: this.default,
+        default: this.isDefault,
         systemEditor: this.systemEditor
       };
 
@@ -8330,19 +8423,18 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "referenceParams",
     value: function referenceParams() {
-      var references = lodash_map__WEBPACK_IMPORTED_MODULE_0___default()(this.notes, function (note) {
+      return this.notes.map(function (note) {
         return {
           uuid: note.uuid,
           content_type: note.content_type
         };
       });
-      return references;
     }
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Note) {
-        if (!lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.notes, item)) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note) {
+        if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["existsInArray"])(this.notes, item)) {
           this.notes.push(item);
         }
       }
@@ -8352,41 +8444,16 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "removeItemAsRelationship",
     value: function removeItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Note) {
-        lodash_pull__WEBPACK_IMPORTED_MODULE_2___default()(this.notes, item);
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note) {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(this.notes, item);
       }
 
       _get(_getPrototypeOf(SNEditor.prototype), "removeItemAsRelationship", this).call(this, item);
     }
   }, {
-    key: "removeAndDirtyAllRelationships",
-    value: function removeAndDirtyAllRelationships() {
-      _get(_getPrototypeOf(SNEditor.prototype), "removeAndDirtyAllRelationships", this).call(this);
-
-      this.notes = [];
-    }
-  }, {
-    key: "removeReferencesNotPresentIn",
-    value: function removeReferencesNotPresentIn(references) {
-      var _this2 = this;
-
-      _get(_getPrototypeOf(SNEditor.prototype), "removeReferencesNotPresentIn", this).call(this, references);
-
-      var uuids = references.map(function (ref) {
-        return ref.uuid;
-      });
-      this.notes.forEach(function (note) {
-        if (!uuids.includes(note.uuid)) {
-          lodash_remove__WEBPACK_IMPORTED_MODULE_3___default()(_this2.notes, {
-            uuid: note.uuid
-          });
-        }
-      });
-    }
-  }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Editor;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor;
     }
   }, {
     key: "setData",
@@ -8408,13 +8475,13 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }]);
 
   return SNEditor;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_4__["SNItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
-/***/ "./lib/models/app/extension.js":
+/***/ "./lib/models/app/extension.ts":
 /*!*************************************!*\
-  !*** ./lib/models/app/extension.js ***!
+  !*** ./lib/models/app/extension.ts ***!
   \*************************************/
 /*! exports provided: SNActionsExtension */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -8425,8 +8492,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/omit */ "./node_modules/lodash/omit.js");
 /* harmony import */ var lodash_omit__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_omit__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./action */ "./lib/models/app/action.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _action__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./action */ "./lib/models/app/action.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8449,6 +8516,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -8460,22 +8529,30 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var SNActionsExtension = /*#__PURE__*/function (_SNItem) {
   _inherits(SNActionsExtension, _SNItem);
 
-  function SNActionsExtension(json) {
+  function SNActionsExtension() {
+    var _getPrototypeOf2;
+
     var _this;
 
     _classCallCheck(this, SNActionsExtension);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNActionsExtension).call(this, json));
-
-    if (json.actions) {
-      _this.actions = json.actions.map(function (action) {
-        return new _action__WEBPACK_IMPORTED_MODULE_3__["Action"](action);
-      });
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
 
-    if (!_this.actions) {
-      _this.actions = [];
-    }
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNActionsExtension)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "actions", []);
+
+    _defineProperty(_assertThisInitialized(_this), "description", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "name", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "url", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "package_info", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "supported_types", void 0);
 
     return _this;
   }
@@ -8546,7 +8623,7 @@ var SNActionsExtension = /*#__PURE__*/function (_SNItem) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return SNItemsKey; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -8633,20 +8710,6 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
 
       return this.content.dataAuthenticationKey;
     }
-  }], [{
-    key: "FromRaw",
-
-    /**
-     * Because this is a traditional SNItem, the constructor expects an object
-     * with a .content property. FromRaw allows you to send in an unwrapped
-     * raw key hash instead.
-     */
-    value: function FromRaw(key) {
-      var payload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
-        content: key
-      });
-      return new SNItemsKey(payload);
-    }
   }]);
 
   return SNItemsKey;
@@ -8654,9 +8717,9 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
 
 /***/ }),
 
-/***/ "./lib/models/app/note.js":
+/***/ "./lib/models/app/note.ts":
 /*!********************************!*\
-  !*** ./lib/models/app/note.js ***!
+  !*** ./lib/models/app/note.ts ***!
   \********************************/
 /*! exports provided: SNNote */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -8664,10 +8727,10 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return SNNote; });
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8690,37 +8753,37 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
-/** 
- * A note item
- * @extends SNItem
- */
+
+/** A note item */
 
 var SNNote = /*#__PURE__*/function (_SNItem) {
   _inherits(SNNote, _SNItem);
 
-  function SNNote(payload) {
+  function SNNote() {
+    var _getPrototypeOf2;
+
     var _this;
 
     _classCallCheck(this, SNNote);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNNote).call(this, payload));
-
-    if (!_this.text) {
-      /**
-      * Some external editors can't handle a null value for text.
-      * Notes created on mobile with no text have a null value for it,
-      * so we'll just set a default here.
-      */
-      _this.text = '';
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
 
-    if (!_this.tags) {
-      _this.tags = [];
-    }
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNNote)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "title", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "text", '');
+
+    _defineProperty(_assertThisInitialized(_this), "tags", []);
+
+    _defineProperty(_assertThisInitialized(_this), "savedTagsString", void 0);
 
     return _this;
   }
@@ -8728,7 +8791,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   _createClass(SNNote, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note;
     }
   }, {
     key: "mapContentToLocalProperties",
@@ -8761,7 +8824,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
        * Now, only tags contain references to notes. For old notes that may have references to tags,
        * we want to transfer them over to the tag.
        */
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
         item.addItemAsRelationship(this);
       }
 
@@ -8770,8 +8833,8 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag) {
-        if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(this.tags, 'uuid', item.uuid)) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+        if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["findInArray"])(this.tags, 'uuid', item.uuid)) {
           this.tags.push(item);
         }
       }
@@ -8785,15 +8848,15 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
     value: function setIsNoLongerReferencedBy(item) {
       _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerReferencedBy", this).call(this, item);
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag) {
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.tags, item);
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(this.tags, item);
       }
       /**
        * @legacy Two-way note-tag relationships need to be handled explicitly.
        */
 
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag && this.hasRelationshipWithItem(item)) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag && this.hasRelationshipWithItem(item)) {
         this.removeReferenceWithUuid(item.uuid);
         /** @todo Items shouldn't mark themselves dirty. */
 
@@ -8803,9 +8866,13 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
       this.clearSavedTagsString();
     }
   }, {
-    key: "tagDidCompleteMapping",
-    value: function tagDidCompleteMapping(_) {
-      this.clearSavedTagsString();
+    key: "referencingItemCompletedMapping",
+    value: function referencingItemCompletedMapping(item) {
+      _get(_getPrototypeOf(SNNote.prototype), "referencingItemCompletedMapping", this).call(this, item);
+
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+        this.clearSavedTagsString();
+      }
     }
   }, {
     key: "safeText",
@@ -8820,12 +8887,12 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "clearSavedTagsString",
     value: function clearSavedTagsString() {
-      this.savedTagsString = null;
+      this.savedTagsString = undefined;
     }
   }, {
     key: "tagsString",
     value: function tagsString() {
-      this.savedTagsString = _Models_app_tag__WEBPACK_IMPORTED_MODULE_3__["SNTag"].arrayToDisplayString(this.tags);
+      this.savedTagsString = _Models_app_tag__WEBPACK_IMPORTED_MODULE_1__["SNTag"].arrayToDisplayString(this.tags);
       return this.savedTagsString;
     }
   }], [{
@@ -8838,38 +8905,43 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   }]);
 
   return SNNote;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
-/***/ "./lib/models/app/privileges.js":
+/***/ "./lib/models/app/privileges.ts":
 /*!**************************************!*\
-  !*** ./lib/models/app/privileges.js ***!
+  !*** ./lib/models/app/privileges.ts ***!
   \**************************************/
-/*! exports provided: SNPrivileges */
+/*! exports provided: ProtectedActions, PrivilegeCredentials, SNPrivileges */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return ProtectedActions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return PrivilegeCredentials; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return SNPrivileges; });
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -8878,7 +8950,26 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+var ProtectedActions;
 
+(function (ProtectedActions) {
+  ProtectedActions["ManageExtensions"] = "ActionManageExtensions";
+  ProtectedActions["ManageBackups"] = "ActionManageBackups";
+  ProtectedActions["ViewProtectedNotes"] = "ActionViewProtectedNotes";
+  ProtectedActions["ManagePrivileges"] = "ActionManagePrivileges";
+  ProtectedActions["ManagePasscode"] = "ActionManagePasscode";
+  ProtectedActions["DeleteNote"] = "ActionDeleteNote";
+})(ProtectedActions || (ProtectedActions = {}));
+
+;
+var PrivilegeCredentials;
+
+(function (PrivilegeCredentials) {
+  PrivilegeCredentials["AccountPassword"] = "CredentialAccountPassword";
+  PrivilegeCredentials["LocalPasscode"] = "CredentialLocalPasscode";
+})(PrivilegeCredentials || (PrivilegeCredentials = {}));
+
+;
 /**
  * Privileges are a singleton object that store the preferences a user
  * may have configured for protecting certain actions.
@@ -8887,28 +8978,22 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var SNPrivileges = /*#__PURE__*/function (_SNItem) {
   _inherits(SNPrivileges, _SNItem);
 
-  _createClass(SNPrivileges, null, [{
-    key: "contentType",
-    value: function contentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Privileges;
-    }
-  }]);
-
-  function SNPrivileges(payload) {
-    var _this;
-
+  function SNPrivileges() {
     _classCallCheck(this, SNPrivileges);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNPrivileges).call(this, payload));
-
-    if (!_this.errorDecrypting && !_this.content.desktopPrivileges) {
-      _this.content.desktopPrivileges = {};
-    }
-
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(SNPrivileges).apply(this, arguments));
   }
 
   _createClass(SNPrivileges, [{
+    key: "mapContentToLocalProperties",
+    value: function mapContentToLocalProperties(content) {
+      _get(_getPrototypeOf(SNPrivileges.prototype), "mapContentToLocalProperties", this).call(this, content);
+
+      if (!this.errorDecrypting && !this.content.desktopPrivileges) {
+        this.content.desktopPrivileges = {};
+      }
+    }
+  }, {
     key: "setCredentialsForAction",
     value: function setCredentialsForAction(action, credentials) {
       this.content.desktopPrivileges[action] = credentials;
@@ -8953,7 +9038,7 @@ var SNPrivileges = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "singletonPredicate",
     get: function get() {
-      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SNPredicate"]('content_type', '=', this.content_type);
+      return new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]('content_type', '=', this.content_type);
     }
   }]);
 
@@ -8962,9 +9047,9 @@ var SNPrivileges = /*#__PURE__*/function (_SNItem) {
 
 /***/ }),
 
-/***/ "./lib/models/app/smartTag.js":
+/***/ "./lib/models/app/smartTag.ts":
 /*!************************************!*\
-  !*** ./lib/models/app/smartTag.js ***!
+  !*** ./lib/models/app/smartTag.ts ***!
   \************************************/
 /*! exports provided: SNSmartTag */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -8972,10 +9057,11 @@ var SNPrivileges = /*#__PURE__*/function (_SNItem) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return SNSmartTag; });
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../generator */ "./lib/models/generator.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8993,6 +9079,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -9053,7 +9140,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
           predicate: new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content.trashed', '=', true])
         }
       });
-      return [new SNSmartTag(allNotes), new SNSmartTag(archived), new SNSmartTag(trash)];
+      return [Object(_generator__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(allNotes), Object(_generator__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(archived), Object(_generator__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(trash)];
     }
   }]);
 
@@ -9062,9 +9149,9 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
 
 /***/ }),
 
-/***/ "./lib/models/app/tag.js":
+/***/ "./lib/models/app/tag.ts":
 /*!*******************************!*\
-  !*** ./lib/models/app/tag.js ***!
+  !*** ./lib/models/app/tag.ts ***!
   \*******************************/
 /*! exports provided: SNTag */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9072,11 +9159,9 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return SNTag; });
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9099,6 +9184,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -9111,16 +9197,22 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 var SNTag = /*#__PURE__*/function (_SNItem) {
   _inherits(SNTag, _SNItem);
 
-  function SNTag(payload) {
+  function SNTag() {
+    var _getPrototypeOf2;
+
     var _this;
 
     _classCallCheck(this, SNTag);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNTag).call(this, payload));
-
-    if (!_this.notes) {
-      _this.notes = [];
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNTag)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "title", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "notes", []);
 
     return _this;
   }
@@ -9128,7 +9220,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   _createClass(SNTag, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag;
     }
   }, {
     key: "mapContentToLocalProperties",
@@ -9162,7 +9254,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
       });
       this.notes.slice().forEach(function (note) {
         if (!uuids.includes(note.uuid)) {
-          lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(_this2.notes, {
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(_this2.notes, {
             uuid: note.uuid
           });
           note.setIsNoLongerReferencedBy(_this2);
@@ -9172,7 +9264,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note) {
         if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["findInArray"])(this.notes, 'uuid', item.uuid)) {
           this.notes.push(item);
         }
@@ -9183,8 +9275,8 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "removeItemAsRelationship",
     value: function removeItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note) {
-        lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(this.notes, {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note) {
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.notes, {
           uuid: item.uuid
         });
       }
@@ -9204,56 +9296,29 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
       _get(_getPrototypeOf(SNTag.prototype), "isBeingRemovedLocally", this).call(this);
     }
   }, {
-    key: "didCompleteMapping",
-    value: function didCompleteMapping(_) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.notes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var note = _step.value;
-          note.tagDidCompleteMapping(this);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }, {
     key: "isSmartTag",
     value: function isSmartTag() {
-      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].SmartTag;
+      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].SmartTag;
     }
   }], [{
     key: "arrayToDisplayString",
     value: function arrayToDisplayString(tags) {
       return tags.sort(function (a, b) {
-        return a.title > b.title;
-      }).map(function (tag, i) {
+        return a.title > b.title ? 1 : -1;
+      }).map(function (tag) {
         return '#' + tag.title;
       }).join(' ');
     }
   }]);
 
   return SNTag;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
 
 /***/ }),
 
-/***/ "./lib/models/app/theme.js":
+/***/ "./lib/models/app/theme.ts":
 /*!*********************************!*\
-  !*** ./lib/models/app/theme.js ***!
+  !*** ./lib/models/app/theme.ts ***!
   \*********************************/
 /*! exports provided: SNTheme */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9261,9 +9326,9 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return SNTheme; });
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9286,19 +9351,29 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
 var SNTheme = /*#__PURE__*/function (_SNComponent) {
   _inherits(SNTheme, _SNComponent);
 
-  function SNTheme(payload) {
+  function SNTheme() {
+    var _getPrototypeOf2;
+
     var _this;
 
     _classCallCheck(this, SNTheme);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SNTheme).call(this, payload));
-    _this.area = 'themes';
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNTheme)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "area", 'themes');
+
     return _this;
   }
 
@@ -9321,7 +9396,7 @@ var SNTheme = /*#__PURE__*/function (_SNComponent) {
         return _get(_getPrototypeOf(SNTheme.prototype), "strategyWhenConflictingWithItem", this).call(this, item);
       }
 
-      return _Payloads__WEBPACK_IMPORTED_MODULE_0__["ConflictStrategies"].KeepLeft;
+      return _Payloads_deltas__WEBPACK_IMPORTED_MODULE_0__["ConflictStrategies"].KeepLeft;
     }
   }, {
     key: "setMobileRules",
@@ -9375,9 +9450,9 @@ var SNTheme = /*#__PURE__*/function (_SNComponent) {
 
 /***/ }),
 
-/***/ "./lib/models/app/userPrefs.js":
+/***/ "./lib/models/app/userPrefs.ts":
 /*!*************************************!*\
-  !*** ./lib/models/app/userPrefs.js ***!
+  !*** ./lib/models/app/userPrefs.ts ***!
   \*************************************/
 /*! exports provided: SNUserPrefs */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9386,8 +9461,8 @@ var SNTheme = /*#__PURE__*/function (_SNComponent) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNUserPrefs", function() { return SNUserPrefs; });
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9440,9 +9515,9 @@ var SNUserPrefs = /*#__PURE__*/function (_SNItem) {
 
 /***/ }),
 
-/***/ "./lib/models/content_types.js":
+/***/ "./lib/models/content_types.ts":
 /*!*************************************!*\
-  !*** ./lib/models/content_types.js ***!
+  !*** ./lib/models/content_types.ts ***!
   \*************************************/
 /*! exports provided: ContentTypes, displayStringForContentType */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9453,109 +9528,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return displayStringForContentType; });
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ContentTypes = {
-  Item: 'SF|Item',
-  RootKey: 'SN|RootKey|NoSync',
-  ItemsKey: 'SN|ItemsKey',
-  EncryptedStorage: 'SN|EncryptedStorage',
-  Note: 'Note',
-  Tag: 'Tag',
-  SmartTag: 'SN|SmartTag',
-  Component: 'SN|Component',
-  Editor: 'SN|Editor',
-  ActionsExtension: 'Extension',
-  UserPrefs: 'SN|UserPreferences',
-  Privileges: 'SN|Privileges',
-  HistorySession: 'SN|HistorySession',
-  Theme: 'SN|Theme',
-  Mfa: 'SF|MFA',
-  ServerExtension: 'SF|Extension',
-  FilesafeCredentials: 'SN|FileSafe|Credentials',
-  FilesafeFileMetadata: 'SN|FileSafe|FileMetadata',
-  FilesafeIntegration: 'SN|FileSafe|Integration',
-  ExtensionRepo: 'SN|ExtensionRepo'
-};
-function displayStringForContentType(contentType) {
-  var _ContentTypes$Note$Co;
+var ContentTypes;
 
-  return (_ContentTypes$Note$Co = {}, _defineProperty(_ContentTypes$Note$Co, ContentTypes.Note, 'note'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Tag, 'tag'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.SmartTag, 'smart tag'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ActionsExtension, 'action-based extension'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Component, 'component'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Editor, 'editor'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Theme, 'theme'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.ServerExtension, 'server extension'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.Mfa, 'two-factor authentication setting'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeCredentials, 'FileSafe credential'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeFileMetadata, 'FileSafe file'), _defineProperty(_ContentTypes$Note$Co, ContentTypes.FilesafeIntegration, 'FileSafe integration'), _ContentTypes$Note$Co)[contentType];
+(function (ContentTypes) {
+  ContentTypes["Item"] = "SF|Item";
+  ContentTypes["RootKey"] = "SN|RootKey|NoSync";
+  ContentTypes["ItemsKey"] = "SN|ItemsKey";
+  ContentTypes["EncryptedStorage"] = "SN|EncryptedStorage";
+  ContentTypes["Note"] = "Note";
+  ContentTypes["Tag"] = "Tag";
+  ContentTypes["SmartTag"] = "SN|SmartTag";
+  ContentTypes["Component"] = "SN|Component";
+  ContentTypes["Editor"] = "SN|Editor";
+  ContentTypes["ActionsExtension"] = "Extension";
+  ContentTypes["UserPrefs"] = "SN|UserPreferences";
+  ContentTypes["Privileges"] = "SN|Privileges";
+  ContentTypes["HistorySession"] = "SN|HistorySession";
+  ContentTypes["Theme"] = "SN|Theme";
+  ContentTypes["Mfa"] = "SF|MFA";
+  ContentTypes["ServerExtension"] = "SF|Extension";
+  ContentTypes["FilesafeCredentials"] = "SN|FileSafe|Credentials";
+  ContentTypes["FilesafeFileMetadata"] = "SN|FileSafe|FileMetadata";
+  ContentTypes["FilesafeIntegration"] = "SN|FileSafe|Integration";
+  ContentTypes["ExtensionRepo"] = "SN|ExtensionRepo";
+})(ContentTypes || (ContentTypes = {}));
+
+;
+function displayStringForContentType(contentType) {
+  var _map;
+
+  var map = (_map = {}, _defineProperty(_map, ContentTypes.Note, 'note'), _defineProperty(_map, ContentTypes.Tag, 'tag'), _defineProperty(_map, ContentTypes.SmartTag, 'smart tag'), _defineProperty(_map, ContentTypes.ActionsExtension, 'action-based extension'), _defineProperty(_map, ContentTypes.Component, 'component'), _defineProperty(_map, ContentTypes.Editor, 'editor'), _defineProperty(_map, ContentTypes.Theme, 'theme'), _defineProperty(_map, ContentTypes.ServerExtension, 'server extension'), _defineProperty(_map, ContentTypes.Mfa, 'two-factor authentication setting'), _defineProperty(_map, ContentTypes.FilesafeCredentials, 'FileSafe credential'), _defineProperty(_map, ContentTypes.FilesafeFileMetadata, 'FileSafe file'), _defineProperty(_map, ContentTypes.FilesafeIntegration, 'FileSafe integration'), _map);
+  return map[contentType];
 }
 
 /***/ }),
 
-/***/ "./lib/models/core/encryptedStorage.js":
-/*!*********************************************!*\
-  !*** ./lib/models/core/encryptedStorage.js ***!
-  \*********************************************/
-/*! exports provided: SNEncryptedStorage */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return SNEncryptedStorage; });
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-
-/**
- * A local-only construct that is used to persist a collection of key-values.
- * This object is typically stored in a device's key/value store and not in the
- * device's database.
- */
-
-var SNEncryptedStorage = /*#__PURE__*/function (_SNItem) {
-  _inherits(SNEncryptedStorage, _SNItem);
-
-  function SNEncryptedStorage() {
-    _classCallCheck(this, SNEncryptedStorage);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNEncryptedStorage).apply(this, arguments));
-  }
-
-  _createClass(SNEncryptedStorage, [{
-    key: "mapContentToLocalProperties",
-    value: function mapContentToLocalProperties(content) {
-      _get(_getPrototypeOf(SNEncryptedStorage.prototype), "mapContentToLocalProperties", this).call(this, content);
-
-      this.storage = content.storage;
-    }
-  }, {
-    key: "getDefaultContentType",
-    value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].EncryptedStorage;
-    }
-  }]);
-
-  return SNEncryptedStorage;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"]);
-
-/***/ }),
-
-/***/ "./lib/models/core/functions.js":
+/***/ "./lib/models/core/functions.ts":
 /*!**************************************!*\
-  !*** ./lib/models/core/functions.js ***!
+  !*** ./lib/models/core/functions.ts ***!
   \**************************************/
 /*! exports provided: ItemContentsEqual, ItemContentsDiffer */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9565,20 +9575,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemContentsEqual", function() { return ItemContentsEqual; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemContentsDiffer", function() { return ItemContentsDiffer; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
+/* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/index */ "./lib/index.js");
 
 
-function ItemContentsEqual(_ref) {
-  var leftContent = _ref.leftContent,
-      rightContent = _ref.rightContent,
-      keysToIgnore = _ref.keysToIgnore,
-      appDataKeysToIgnore = _ref.appDataKeysToIgnore;
-
+function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysToIgnore) {
   /* Create copies of objects before running omit as not to modify source values directly. */
   leftContent = JSON.parse(JSON.stringify(leftContent));
 
   if (leftContent.appData) {
-    var domainData = leftContent.appData[_Lib__WEBPACK_IMPORTED_MODULE_1__["DEFAULT_APP_DOMAIN"]];
+    var domainData = leftContent.appData[_Lib_index__WEBPACK_IMPORTED_MODULE_1__["DEFAULT_APP_DOMAIN"]];
     Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(domainData, appDataKeysToIgnore);
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
@@ -9599,7 +9604,7 @@ function ItemContentsEqual(_ref) {
   rightContent = JSON.parse(JSON.stringify(rightContent));
 
   if (rightContent.appData) {
-    var _domainData = rightContent.appData[_Lib__WEBPACK_IMPORTED_MODULE_1__["DEFAULT_APP_DOMAIN"]];
+    var _domainData = rightContent.appData[_Lib_index__WEBPACK_IMPORTED_MODULE_1__["DEFAULT_APP_DOMAIN"]];
     Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitInPlace"])(_domainData, appDataKeysToIgnore);
 
     if (_domainData) {
@@ -9619,12 +9624,7 @@ function ItemContentsDiffer(item1, item2, excludeContentKeys) {
     excludeContentKeys = [];
   }
 
-  return !ItemContentsEqual({
-    leftContent: item1.content,
-    rightContent: item2.content,
-    keysToIgnore: item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-    appDataKeysToIgnore: item1.appDatacontentKeysToIgnoreWhenCheckingEquality()
-  });
+  return !ItemContentsEqual(item1.content, item2.content, item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys), item1.appDatacontentKeysToIgnoreWhenCheckingEquality());
 }
 
 /***/ }),
@@ -9643,8 +9643,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Models_core_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/functions */ "./lib/models/core/functions.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
+/* harmony import */ var _Models_core_functions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/functions */ "./lib/models/core/functions.ts");
 /* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/index */ "./lib/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -9683,7 +9683,7 @@ var SNItem = /*#__PURE__*/function () {
   /** @deprecated */
 
   /** @deprecated */
-  function SNItem(payload) {
+  function SNItem(authorized) {
     _classCallCheck(this, SNItem);
 
     _defineProperty(this, "uuid", void 0);
@@ -9728,101 +9728,18 @@ var SNItem = /*#__PURE__*/function () {
 
     _defineProperty(this, "referencingItems", void 0);
 
+    if (!authorized) {
+      throw Error('Use CreateItemFromPayload to create items');
+    }
+
     this.content = {
       references: [],
       appData: _defineProperty({}, _Lib_index__WEBPACK_IMPORTED_MODULE_5__["DEFAULT_APP_DOMAIN"], {})
     };
     this.resetLocalReferencePointers();
-
-    if (payload) {
-      if (!payload.isPayload) {
-        throw "Attempting to construct SNItem from non-payload object ".concat(payload, ".");
-      }
-
-      this.updateFromPayload(payload);
-    }
-
-    if (!this.content_type) {
-      this.content_type = this.getDefaultContentType();
-    }
-
-    if (!this.uuid) {
-      if (_Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].canGenSync()) {
-        this.uuid = _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuidSynchronously();
-      }
-    }
   }
 
   _createClass(SNItem, [{
-    key: "payloadRepresentation",
-    value: function payloadRepresentation(override) {
-      return Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(this, undefined, undefined, override);
-    }
-  }, {
-    key: "getDefaultContentType",
-    value: function getDefaultContentType() {
-      return null;
-    }
-    /**
-     * If creating from external payload, it may not include values for .references and .appData
-     * Here we want to initialize these values with default values.
-     */
-
-  }, {
-    key: "populateDefaultContentValues",
-    value: function populateDefaultContentValues() {
-      if (this.errorDecrypting || this.deleted) {
-        return;
-      }
-
-      if (!this.content.references) {
-        this.content.references = [];
-      }
-
-      if (!this.content.appData) {
-        this.content.appData = _defineProperty({}, _Lib_index__WEBPACK_IMPORTED_MODULE_5__["DEFAULT_APP_DOMAIN"], {});
-      }
-    }
-    /**
-     * Consumers who create items without a syncronous UUID generation function
-     * must manually call this function when creating an item. The consumer must
-     * have previously called Uuid.SetGenerators.
-     */
-
-  }, {
-    key: "initUUID",
-    value: function () {
-      var _initUUID = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (this.uuid) {
-                  _context.next = 4;
-                  break;
-                }
-
-                _context.next = 3;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuid();
-
-              case 3:
-                this.uuid = _context.sent;
-
-              case 4:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function initUUID() {
-        return _initUUID.apply(this, arguments);
-      }
-
-      return initUUID;
-    }()
-  }, {
     key: "updateFromPayload",
     value: function updateFromPayload(payload) {
       if (!payload) {
@@ -9901,7 +9818,86 @@ var SNItem = /*#__PURE__*/function () {
 
       this._client_updated_at = undefined;
       this.populateDefaultContentValues();
+
+      if (!this.content_type) {
+        this.content_type = this.getDefaultContentType();
+      }
+
+      if (!this.uuid) {
+        if (_Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].canGenSync()) {
+          this.uuid = _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuidSynchronously();
+        }
+      }
     }
+  }, {
+    key: "payloadRepresentation",
+    value: function payloadRepresentation(override) {
+      return Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(this, undefined, undefined, override);
+    }
+  }, {
+    key: "getDefaultContentType",
+    value: function getDefaultContentType() {
+      return null;
+    }
+    /**
+     * If creating from external payload, it may not include values for .references and .appData
+     * Here we want to initialize these values with default values.
+     */
+
+  }, {
+    key: "populateDefaultContentValues",
+    value: function populateDefaultContentValues() {
+      if (this.errorDecrypting || this.deleted) {
+        return;
+      }
+
+      if (!this.content.references) {
+        this.content.references = [];
+      }
+
+      if (!this.content.appData) {
+        this.content.appData = _defineProperty({}, _Lib_index__WEBPACK_IMPORTED_MODULE_5__["DEFAULT_APP_DOMAIN"], {});
+      }
+    }
+    /**
+     * Consumers who create items without a syncronous UUID generation function
+     * must manually call this function when creating an item. The consumer must
+     * have previously called Uuid.SetGenerators.
+     */
+
+  }, {
+    key: "initUUID",
+    value: function () {
+      var _initUUID = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (this.uuid) {
+                  _context.next = 4;
+                  break;
+                }
+
+                _context.next = 3;
+                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuid();
+
+              case 3:
+                this.uuid = _context.sent;
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function initUUID() {
+        return _initUUID.apply(this, arguments);
+      }
+
+      return initUUID;
+    }()
   }, {
     key: "mapContentToLocalProperties",
     value: function mapContentToLocalProperties(_) {}
@@ -10067,8 +10063,33 @@ var SNItem = /*#__PURE__*/function () {
   }, {
     key: "didCompleteMapping",
     value: function didCompleteMapping(_) {
-      /** Optional override */
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = this.allReferencedItems[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var item = _step2.value;
+          item.referencingItemCompletedMapping(this);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
     }
+  }, {
+    key: "referencingItemCompletedMapping",
+    value: function referencingItemCompletedMapping(item) {}
   }, {
     key: "setDomainDataItem",
     value: function setDomainDataItem(key, value, domain) {
@@ -10205,12 +10226,7 @@ var SNItem = /*#__PURE__*/function () {
   }, {
     key: "isItemContentEqualWith",
     value: function isItemContentEqualWith(otherItem) {
-      return Object(_Models_core_functions__WEBPACK_IMPORTED_MODULE_3__["ItemContentsEqual"])({
-        leftContent: this.content,
-        rightContent: otherItem.content,
-        keysToIgnore: this.contentKeysToIgnoreWhenCheckingEquality(),
-        appDataKeysToIgnore: this.appDatacontentKeysToIgnoreWhenCheckingEquality()
-      });
+      return Object(_Models_core_functions__WEBPACK_IMPORTED_MODULE_3__["ItemContentsEqual"])(this.content, otherItem.content, this.contentKeysToIgnoreWhenCheckingEquality(), this.appDatacontentKeysToIgnoreWhenCheckingEquality());
     }
   }, {
     key: "satisfiesPredicate",
@@ -10275,6 +10291,15 @@ var SNItem = /*#__PURE__*/function () {
 
       return Object.keys(this.referencingItems).map(function (uuid) {
         return _this.referencingItems[uuid];
+      });
+    }
+  }, {
+    key: "allReferencedItems",
+    get: function get() {
+      var _this2 = this;
+
+      return Object.keys(this.referencedItems).map(function (uuid) {
+        return _this2.referencedItems[uuid];
       });
     }
   }, {
@@ -10348,9 +10373,9 @@ _defineProperty(SNItem, "sharedDateFormatter", void 0);
 
 /***/ }),
 
-/***/ "./lib/models/core/predicate.js":
+/***/ "./lib/models/core/predicate.ts":
 /*!**************************************!*\
-  !*** ./lib/models/core/predicate.js ***!
+  !*** ./lib/models/core/predicate.ts ***!
   \**************************************/
 /*! exports provided: SNPredicate */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -10358,11 +10383,16 @@ _defineProperty(SNItem, "sharedDateFormatter", void 0);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPredicate", function() { return SNPredicate; });
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 /**
  * A local-only construct that defines a built query that can be used to 
@@ -10372,12 +10402,19 @@ var SNPredicate = /*#__PURE__*/function () {
   function SNPredicate(keypath, operator, value) {
     _classCallCheck(this, SNPredicate);
 
+    _defineProperty(this, "keypath", void 0);
+
+    _defineProperty(this, "operator", void 0);
+
+    _defineProperty(this, "value", void 0);
+
     this.keypath = keypath;
     this.operator = operator;
     this.value = value;
 
-    if (SNPredicate.IsRecursiveOperator(this.operator)) {
-      this.value = this.value.map(function (element) {
+    if (this.isRecursive()) {
+      var array = this.value;
+      this.value = array.map(function (element) {
         if (Array.isArray(element)) {
           return SNPredicate.FromArray(element);
         } else {
@@ -10387,7 +10424,22 @@ var SNPredicate = /*#__PURE__*/function () {
     }
   }
 
-  _createClass(SNPredicate, null, [{
+  _createClass(SNPredicate, [{
+    key: "isRecursive",
+    value: function isRecursive() {
+      return ['and', 'or'].includes(this.operator);
+    }
+  }, {
+    key: "arrayRepresentation",
+    value: function arrayRepresentation() {
+      return [this.keypath, this.operator, this.value];
+    }
+  }, {
+    key: "valueAsArray",
+    value: function valueAsArray() {
+      return this.value;
+    }
+  }], [{
     key: "CompoundPredicate",
     value: function CompoundPredicate(predicates) {
       return new SNPredicate('ignored', 'and', predicates);
@@ -10400,20 +10452,20 @@ var SNPredicate = /*#__PURE__*/function () {
   }, {
     key: "ObjectSatisfiesPredicate",
     value: function ObjectSatisfiesPredicate(object, predicate) {
-      // Predicates may not always be created using the official constructor
-      // so if it's still an array here, convert to object
+      /* Predicates may not always be created using the official constructor
+         so if it's still an array here, convert to object */
       if (Array.isArray(predicate)) {
         predicate = this.FromArray(predicate);
       }
 
-      if (SNPredicate.IsRecursiveOperator(predicate.operator)) {
+      if (predicate.isRecursive()) {
         if (predicate.operator === 'and') {
           var _iteratorNormalCompletion = true;
           var _didIteratorError = false;
           var _iteratorError = undefined;
 
           try {
-            for (var _iterator = predicate.value[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            for (var _iterator = predicate.valueAsArray()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var subPredicate = _step.value;
 
               if (!this.ObjectSatisfiesPredicate(object, subPredicate)) {
@@ -10444,7 +10496,7 @@ var SNPredicate = /*#__PURE__*/function () {
           var _iteratorError2 = undefined;
 
           try {
-            for (var _iterator2 = predicate.value[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            for (var _iterator2 = predicate.valueAsArray()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
               var _subPredicate = _step2.value;
 
               if (this.ObjectSatisfiesPredicate(object, _subPredicate)) {
@@ -10470,16 +10522,18 @@ var SNPredicate = /*#__PURE__*/function () {
         }
       }
 
-      var predicateValue = predicate.value;
+      var targetValue = predicate.value;
 
-      if (typeof predicateValue === 'string' && predicateValue.includes('.ago')) {
-        predicateValue = this.DateFromString(predicateValue);
+      if (typeof targetValue === 'string' && targetValue.includes('.ago')) {
+        targetValue = this.DateFromString(targetValue);
       }
 
       var valueAtKeyPath = predicate.keypath.split('.').reduce(function (previous, current) {
         return previous && previous[current];
       }, object);
-      var falseyValues = [false, '', null, undefined, NaN]; // If the value at keyPath is undefined, either because the property is nonexistent or the value is null.
+      var falseyValues = [false, '', null, undefined, NaN];
+      /* If the value at keyPath is undefined, either because the 
+        property is nonexistent or the value is null. */
 
       if (valueAtKeyPath === undefined) {
         if (predicate.operator === '!=') {
@@ -10490,55 +10544,61 @@ var SNPredicate = /*#__PURE__*/function () {
       }
 
       if (predicate.operator === '=') {
-        // Use array comparison
+        /* Use array comparison */
         if (Array.isArray(valueAtKeyPath)) {
-          return JSON.stringify(valueAtKeyPath) === JSON.stringify(predicateValue);
+          return JSON.stringify(valueAtKeyPath) === JSON.stringify(targetValue);
         } else {
-          return valueAtKeyPath === predicateValue;
+          return valueAtKeyPath === targetValue;
         }
       } else if (predicate.operator === '!=') {
         // Use array comparison
         if (Array.isArray(valueAtKeyPath)) {
-          return JSON.stringify(valueAtKeyPath) !== JSON.stringify(predicateValue);
+          return JSON.stringify(valueAtKeyPath) !== JSON.stringify(targetValue);
         } else {
-          return valueAtKeyPath !== predicateValue;
+          return valueAtKeyPath !== targetValue;
         }
       } else if (predicate.operator === '<') {
-        return valueAtKeyPath < predicateValue;
+        return valueAtKeyPath < targetValue;
       } else if (predicate.operator === '>') {
-        return valueAtKeyPath > predicateValue;
+        return valueAtKeyPath > targetValue;
       } else if (predicate.operator === '<=') {
-        return valueAtKeyPath <= predicateValue;
+        return valueAtKeyPath <= targetValue;
       } else if (predicate.operator === '>=') {
-        return valueAtKeyPath >= predicateValue;
+        return valueAtKeyPath >= targetValue;
       } else if (predicate.operator === 'startsWith') {
-        return valueAtKeyPath.startsWith(predicateValue);
+        return valueAtKeyPath.startsWith(targetValue);
       } else if (predicate.operator === 'in') {
-        return predicateValue.indexOf(valueAtKeyPath) !== -1;
+        return targetValue.indexOf(valueAtKeyPath) !== -1;
       } else if (predicate.operator === 'includes') {
-        return this.resolveIncludesPredicate(valueAtKeyPath, predicateValue);
+        return this.resolveIncludesPredicate(valueAtKeyPath, targetValue);
       } else if (predicate.operator === 'matches') {
-        var regex = new RegExp(predicateValue);
+        var regex = new RegExp(targetValue);
         return regex.test(valueAtKeyPath);
       }
 
       return false;
     }
+    /**
+     * @param itemValueArray Because we are resolving the `includes` operator, the given
+     * value should be an array.
+     * @param containsValue  The value we are checking to see if exists in itemValueArray
+     */
+
   }, {
     key: "resolveIncludesPredicate",
-    value: function resolveIncludesPredicate(valueAtKeyPath, predicateValue) {
-      // includes can be a string  or a predicate (in array form)
-      if (typeof predicateValue === 'string') {
-        // if string, simply check if the valueAtKeyPath includes the predicate value
-        return valueAtKeyPath.includes(predicateValue);
+    value: function resolveIncludesPredicate(itemValueArray, containsValue) {
+      // includes can be a string or a predicate (in array form)
+      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isString"])(containsValue)) {
+        // if string, simply check if the itemValueArray includes the predicate value
+        return itemValueArray.includes(containsValue);
       } else {
         // is a predicate array or predicate object
         var innerPredicate;
 
-        if (Array.isArray(predicateValue)) {
-          innerPredicate = SNPredicate.FromArray(predicateValue);
+        if (Array.isArray(containsValue)) {
+          innerPredicate = SNPredicate.FromArray(containsValue);
         } else {
-          innerPredicate = predicateValue;
+          innerPredicate = containsValue;
         }
 
         var _iteratorNormalCompletion3 = true;
@@ -10546,7 +10606,7 @@ var SNPredicate = /*#__PURE__*/function () {
         var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator3 = valueAtKeyPath[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          for (var _iterator3 = itemValueArray[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
             var obj = _step3.value;
 
             if (this.ObjectSatisfiesPredicate(obj, innerPredicate)) {
@@ -10612,10 +10672,13 @@ var SNPredicate = /*#__PURE__*/function () {
 
       return true;
     }
+    /**
+     * Predicate date strings are of form "x.days.ago" or "x.hours.ago"
+     */
+
   }, {
     key: "DateFromString",
     value: function DateFromString(string) {
-      // x.days.ago, x.hours.ago
       var comps = string.split('.');
       var unit = comps[1];
       var date = new Date();
@@ -10629,11 +10692,6 @@ var SNPredicate = /*#__PURE__*/function () {
 
       return date;
     }
-  }, {
-    key: "IsRecursiveOperator",
-    value: function IsRecursiveOperator(operator) {
-      return ['and', 'or'].includes(operator);
-    }
   }]);
 
   return SNPredicate;
@@ -10641,9 +10699,9 @@ var SNPredicate = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/models/generator.js":
+/***/ "./lib/models/generator.ts":
 /*!*********************************!*\
-  !*** ./lib/models/generator.js ***!
+  !*** ./lib/models/generator.ts ***!
   \*********************************/
 /*! exports provided: CreateItemFromPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -10651,32 +10709,34 @@ var SNPredicate = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return CreateItemFromPayload; });
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 var _ContentTypeClassMapp;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
-var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models__WEBPACK_IMPORTED_MODULE_0__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
+var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Tag, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ActionsExtension, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Privileges, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs, _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNUserPrefs"]), _ContentTypeClassMapp);
 function CreateItemFromPayload(payload) {
   if (!payload.isPayload) {
     throw 'Attempting to create item from non-payload object.';
   }
 
-  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models__WEBPACK_IMPORTED_MODULE_0__["SNItem"]; // eslint-disable-next-line new-cap
+  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models_index__WEBPACK_IMPORTED_MODULE_0__["SNItem"]; // eslint-disable-next-line new-cap
 
-  return new itemClass(payload);
+  var item = new itemClass(true);
+  item.updateFromPayload(payload);
+  return item;
 }
 
 /***/ }),
 
-/***/ "./lib/models/index.js":
+/***/ "./lib/models/index.ts":
 /*!*****************************!*\
-  !*** ./lib/models/index.js ***!
+  !*** ./lib/models/index.ts ***!
   \*****************************/
-/*! exports provided: SNItem, SingletonStrategies, SNItemsKey, SNPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SNPrivileges, SNSmartTag, SNTheme, SNEncryptedStorage, ContentTypes, displayStringForContentType, CreateItemFromPayload */
+/*! exports provided: SNItem, SingletonStrategies, SNItemsKey, SNPredicate, SNComponent, SNEditor, SNActionsExtension, Action, SNNote, SNTag, SNUserPrefs, SNPrivileges, SNSmartTag, SNTheme, ContentTypes, displayStringForContentType, CreateItemFromPayload */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10689,50 +10749,46 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/items_key */ "./lib/models/app/items_key.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNItemsKey", function() { return _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]; });
 
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPredicate", function() { return _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]; });
 
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return _Models_app_component__WEBPACK_IMPORTED_MODULE_3__["SNComponent"]; });
 
-/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.js");
+/* harmony import */ var _Models_app_editor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/app/editor */ "./lib/models/app/editor.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _Models_app_editor__WEBPACK_IMPORTED_MODULE_4__["SNEditor"]; });
 
-/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.js");
+/* harmony import */ var _Models_app_extension__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/app/extension */ "./lib/models/app/extension.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNActionsExtension", function() { return _Models_app_extension__WEBPACK_IMPORTED_MODULE_5__["SNActionsExtension"]; });
 
-/* harmony import */ var _Models_app_action__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/action */ "./lib/models/app/action.js");
+/* harmony import */ var _Models_app_action__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/action */ "./lib/models/app/action.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return _Models_app_action__WEBPACK_IMPORTED_MODULE_6__["Action"]; });
 
-/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.js");
+/* harmony import */ var _Models_app_note__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/note */ "./lib/models/app/note.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return _Models_app_note__WEBPACK_IMPORTED_MODULE_7__["SNNote"]; });
 
-/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.js");
+/* harmony import */ var _Models_app_tag__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Models/app/tag */ "./lib/models/app/tag.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTag", function() { return _Models_app_tag__WEBPACK_IMPORTED_MODULE_8__["SNTag"]; });
 
-/* harmony import */ var _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/app/userPrefs */ "./lib/models/app/userPrefs.js");
+/* harmony import */ var _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Models/app/userPrefs */ "./lib/models/app/userPrefs.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNUserPrefs", function() { return _Models_app_userPrefs__WEBPACK_IMPORTED_MODULE_9__["SNUserPrefs"]; });
 
-/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
+/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivileges", function() { return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_10__["SNPrivileges"]; });
 
-/* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.js");
+/* harmony import */ var _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/smartTag */ "./lib/models/app/smartTag.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return _Models_app_smartTag__WEBPACK_IMPORTED_MODULE_11__["SNSmartTag"]; });
 
-/* harmony import */ var _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/theme */ "./lib/models/app/theme.js");
+/* harmony import */ var _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/app/theme */ "./lib/models/app/theme.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__["SNTheme"]; });
 
-/* harmony import */ var _Models_core_encryptedStorage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/core/encryptedStorage */ "./lib/models/core/encryptedStorage.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEncryptedStorage", function() { return _Models_core_encryptedStorage__WEBPACK_IMPORTED_MODULE_13__["SNEncryptedStorage"]; });
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_13__["ContentTypes"]; });
 
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_14__["ContentTypes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_13__["displayStringForContentType"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_14__["displayStringForContentType"]; });
-
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_15__["CreateItemFromPayload"]; });
-
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_14__["CreateItemFromPayload"]; });
 
 
 
@@ -12951,12 +13007,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator", function() { return SNProtocolOperator; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/app/items_key */ "./lib/models/app/items_key.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -12970,6 +13027,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -13080,9 +13138,10 @@ var SNProtocolOperator = /*#__PURE__*/function () {
               case 2:
                 content = _context3.sent;
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
+                  content_type: _Root_lib_models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].ItemsKey,
                   content: content
                 });
-                itemsKey = new _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"](payload);
+                itemsKey = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(payload);
                 _context3.next = 7;
                 return itemsKey.initUUID();
 
@@ -13440,7 +13499,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConflictDelta", function() { return ConflictDelta; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 /* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
@@ -15119,7 +15178,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadsByAlternatingUuid", function() { return PayloadsByAlternatingUuid; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
@@ -15767,9 +15826,9 @@ var SNMaxItemPayload = /*#__PURE__*/function (_SNPureItemPayload) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPureItemPayload", function() { return SNPureItemPayload; });
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -15808,14 +15867,14 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
      * to properly handle .content intricacies.
      */
     value: function compareContentFields(otherPayload) {
-      var left = new _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"](this);
-      var right = new _Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"](otherPayload);
+      var left = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["CreateItemFromPayload"])(this);
+      var right = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["CreateItemFromPayload"])(otherPayload);
       return left.isItemContentEqualWith(right);
     }
   }, {
     key: "version",
     get: function get() {
-      return this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].VersionLength);
+      return this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__["ProtocolVersions"].VersionLength);
     }
     /**
      * Whether a payload can be discarded and removed from storage.
@@ -15830,7 +15889,7 @@ var SNPureItemPayload = /*#__PURE__*/function (_PurePayload) {
   }]);
 
   return SNPureItemPayload;
-}(_Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__["PurePayload"]);
+}(_Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_1__["PurePayload"]);
 
 /***/ }),
 
@@ -16245,7 +16304,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return SNRootKey; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -16475,7 +16534,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
@@ -20066,8 +20125,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.js");
@@ -22920,7 +22979,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateHistoryEntryForItem", function() { return CreateHistoryEntryForItem; });
 /* harmony import */ var _note_history_entry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./note_history_entry */ "./lib/services/history/note_history_entry.js");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
@@ -23638,11 +23697,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -23741,8 +23802,8 @@ var ItemHistoryEntry = /*#__PURE__*/function () {
         return false;
       }
 
-      var lhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(this.item));
-      var rhs = new _Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"](Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(entry.item));
+      var lhs = Object(_Root_lib_models__WEBPACK_IMPORTED_MODULE_3__["CreateItemFromPayload"])(Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(this.item));
+      var rhs = Object(_Root_lib_models__WEBPACK_IMPORTED_MODULE_3__["CreateItemFromPayload"])(Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])(entry.item));
       return lhs.isItemContentEqualWith(rhs);
     }
   }]);
@@ -23925,10 +23986,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _protocol_payloads__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../protocol/payloads */ "./lib/protocol/payloads/index.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -23956,6 +24018,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
 
 
 
@@ -24433,7 +24497,8 @@ var ItemsKeyManager = /*#__PURE__*/function (_PureService) {
     key: "createNewDefaultItemsKey",
     value: function () {
       var _createNewDefaultItemsKey = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8() {
-        var rootKey, operatorVersion, itemsKey, currentDefault, payload;
+        var rootKey, operatorVersion, itemsKey, _payload, currentDefault, payload;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
@@ -24446,54 +24511,58 @@ var ItemsKeyManager = /*#__PURE__*/function (_PureService) {
                 operatorVersion = rootKey ? rootKey.version : this.protocolService.getLatestVersion();
 
                 if (!(Object(_Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["compareVersions"])(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0)) {
-                  _context8.next = 10;
+                  _context8.next = 11;
                   break;
                 }
 
                 /** Create root key based items key */
-                itemsKey = _Models__WEBPACK_IMPORTED_MODULE_4__["SNItemsKey"].FromRaw({
-                  itemsKey: rootKey.masterKey,
-                  dataAuthenticationKey: rootKey.dataAuthenticationKey,
-                  version: operatorVersion
+                _payload = Object(_protocol_payloads__WEBPACK_IMPORTED_MODULE_8__["CreateMaxPayloadFromAnyObject"])({
+                  content_type: _Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].ItemsKey,
+                  content: {
+                    itemsKey: rootKey.masterKey,
+                    dataAuthenticationKey: rootKey.dataAuthenticationKey,
+                    version: operatorVersion
+                  }
                 });
-                _context8.next = 8;
+                itemsKey = Object(_Models__WEBPACK_IMPORTED_MODULE_4__["CreateItemFromPayload"])(_payload);
+                _context8.next = 9;
                 return itemsKey.initUUID();
 
-              case 8:
-                _context8.next = 13;
+              case 9:
+                _context8.next = 14;
                 break;
 
-              case 10:
-                _context8.next = 12;
+              case 11:
+                _context8.next = 13;
                 return this.protocolService.operatorForVersion(operatorVersion).createItemsKey();
 
-              case 12:
+              case 13:
                 itemsKey = _context8.sent;
 
-              case 13:
+              case 14:
                 currentDefault = this.getDefaultItemsKey();
 
                 if (!currentDefault) {
-                  _context8.next = 18;
+                  _context8.next = 19;
                   break;
                 }
 
                 currentDefault.content.isDefault = false;
-                _context8.next = 18;
+                _context8.next = 19;
                 return this.modelManager.setItemDirty(currentDefault);
 
-              case 18:
+              case 19:
                 itemsKey.content.isDefault = true;
                 payload = itemsKey.payloadRepresentation({
                   dirty: true
                 });
-                _context8.next = 22;
+                _context8.next = 23;
                 return this.modelManager.mapPayloadToLocalItem({
                   payload: payload,
                   source: _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalChanged
                 });
 
-              case 22:
+              case 23:
               case "end":
                 return _context8.stop();
             }
@@ -24538,7 +24607,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
 /* harmony import */ var _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/services/storage_service */ "./lib/services/storage_service.js");
@@ -26651,7 +26720,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -29278,13 +29347,11 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
 /*!*******************************************************!*\
   !*** ./lib/services/privileges/privileges_service.js ***!
   \*******************************************************/
-/*! exports provided: ProtectedActions, PrivilegeCredentials, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesService */
+/*! exports provided: PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtectedActions", function() { return ProtectedActions; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PrivilegeCredentials", function() { return PrivilegeCredentials; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return PRIVILEGE_SESSION_LENGTH_NONE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return PRIVILEGE_SESSION_LENGTH_ONE_HOUR; });
@@ -29293,10 +29360,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.js");
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
+/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -29330,18 +29398,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-var ProtectedActions = {
-  ManageExtensions: 'ActionManageExtensions',
-  ManageBackups: 'ActionManageBackups',
-  ViewProtectedNotes: 'ActionViewProtectedNotes',
-  ManagePrivileges: 'ActionManagePrivileges',
-  ManagePasscode: 'ActionManagePasscode',
-  DeleteNote: 'ActionDeleteNote'
-};
-var PrivilegeCredentials = {
-  AccountPassword: 'CredentialAccountPassword',
-  LocalPasscode: 'CredentialLocalPasscode'
-};
+
 var PRIVILEGE_SESSION_LENGTH_NONE = 0;
 var PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
 var PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
@@ -29405,10 +29462,10 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "loadDefaults",
     value: function loadDefaults() {
-      this.availableActions = Object.keys(ProtectedActions).map(function (key) {
-        return ProtectedActions[key];
+      this.availableActions = Object.keys(_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"]).map(function (key) {
+        return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"][key];
       });
-      this.availableCredentials = [PrivilegeCredentials.AccountPassword, PrivilegeCredentials.LocalPasscode];
+      this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode];
       this.sessionLengths = [PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK];
     }
   }, {
@@ -29456,7 +29513,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
 
                 credential = _step.value;
 
-                if (!(credential === PrivilegeCredentials.AccountPassword)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword)) {
                   _context.next = 19;
                   break;
                 }
@@ -29475,7 +29532,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 19:
-                if (!(credential === PrivilegeCredentials.LocalPasscode)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode)) {
                   _context.next = 24;
                   break;
                 }
@@ -29555,11 +29612,11 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                contentType = _Models_app_privileges__WEBPACK_IMPORTED_MODULE_2__["SNPrivileges"].contentType();
-                predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SNPredicate"]('content_type', '=', contentType);
+                contentType = _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Privileges;
+                predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]('content_type', '=', contentType);
                 return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton({
                   predicate: predicate,
-                  createPayload: Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])({
+                  createPayload: Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
                     content_type: contentType,
                     content: {}
                   })
@@ -29630,11 +29687,11 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
 
                 expiresAt = addSecondsToNow(length);
                 _context4.next = 4;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].PrivilegesExpirey, expiresAt);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey, expiresAt);
 
               case 4:
                 _context4.next = 6;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].PrivilegesSessionLength, length);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength, length);
 
               case 6:
               case "end":
@@ -29684,7 +29741,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].PrivilegesSessionLength);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength);
 
               case 2:
                 length = _context6.sent;
@@ -29723,7 +29780,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 _context7.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].PrivilegesExpirey);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey);
 
               case 2:
                 expiresAt = _context7.sent;
@@ -29941,7 +29998,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                if (!(credential === PrivilegeCredentials.AccountPassword)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword)) {
                   _context11.next = 8;
                   break;
                 }
@@ -29955,7 +30012,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return _context11.abrupt("return", valid);
 
               case 8:
-                if (!(credential === PrivilegeCredentials.LocalPasscode)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode)) {
                   _context11.next = 14;
                   break;
                 }
@@ -29986,11 +30043,11 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
     key: "displayInfoForCredential",
     value: function displayInfoForCredential(credential) {
       var metadata = {};
-      metadata[PrivilegeCredentials.AccountPassword] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword] = {
         label: 'Account Password',
         prompt: 'Please enter your account password.'
       };
-      metadata[PrivilegeCredentials.LocalPasscode] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode] = {
         label: 'Local Passcode',
         prompt: 'Please enter your local passcode.'
       };
@@ -30000,22 +30057,22 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
     key: "displayInfoForAction",
     value: function displayInfoForAction(action) {
       var metadata = {};
-      metadata[ProtectedActions.ManageExtensions] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageExtensions] = {
         label: 'Manage Extensions'
       };
-      metadata[ProtectedActions.ManageBackups] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageBackups] = {
         label: 'Download/Import Backups'
       };
-      metadata[ProtectedActions.ViewProtectedNotes] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ViewProtectedNotes] = {
         label: 'View Protected Notes'
       };
-      metadata[ProtectedActions.ManagePrivileges] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePrivileges] = {
         label: 'Manage Privileges'
       };
-      metadata[ProtectedActions.ManagePasscode] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePasscode] = {
         label: 'Manage Passcode'
       };
-      metadata[ProtectedActions.DeleteNote] = {
+      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].DeleteNote] = {
         label: 'Delete Notes'
       };
       return metadata[action];
@@ -31532,7 +31589,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.js");
+/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -32044,7 +32101,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
@@ -34138,8 +34195,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.js");
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.js");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 
@@ -36649,7 +36706,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.js ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36667,6 +36724,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lastElement", function() { return lastElement; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return extendArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return subtractFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "existsInArray", function() { return existsInArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return removeFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
@@ -36897,6 +36955,16 @@ function subtractFromArray(inArray, toSubtract) {
       }
     }
   }
+}
+/** 
+ * Determines if value exists in array, by reference
+ * @param {Array} inArray
+ * @param {any} value
+ * @returns {boolean}
+ */
+
+function existsInArray(inArray, value) {
+  return inArray.indexOf(value) >= 0;
 }
 /** 
  * Removes an object from the array by value 
@@ -38408,30 +38476,6 @@ module.exports = baseCreate;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseEach.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_baseEach.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseForOwn = __webpack_require__(/*! ./_baseForOwn */ "./node_modules/lodash/_baseForOwn.js"),
-    createBaseEach = __webpack_require__(/*! ./_createBaseEach */ "./node_modules/lodash/_createBaseEach.js");
-/**
- * The base implementation of `_.forEach` without support for iteratee shorthands.
- *
- * @private
- * @param {Array|Object} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array|Object} Returns `collection`.
- */
-
-
-var baseEach = createBaseEach(baseForOwn);
-module.exports = baseEach;
-
-/***/ }),
-
 /***/ "./node_modules/lodash/_baseFindIndex.js":
 /*!***********************************************!*\
   !*** ./node_modules/lodash/_baseFindIndex.js ***!
@@ -38540,33 +38584,6 @@ var createBaseFor = __webpack_require__(/*! ./_createBaseFor */ "./node_modules/
 
 var baseFor = createBaseFor();
 module.exports = baseFor;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_baseForOwn.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseForOwn.js ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseFor = __webpack_require__(/*! ./_baseFor */ "./node_modules/lodash/_baseFor.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
-/**
- * The base implementation of `_.forOwn` without support for iteratee shorthands.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Object} Returns `object`.
- */
-
-
-function baseForOwn(object, iteratee) {
-  return object && baseFor(object, iteratee, keys);
-}
-
-module.exports = baseForOwn;
 
 /***/ }),
 
@@ -39324,38 +39341,6 @@ function baseKeysIn(object) {
 }
 
 module.exports = baseKeysIn;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_baseMap.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseMap.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseEach = __webpack_require__(/*! ./_baseEach */ "./node_modules/lodash/_baseEach.js"),
-    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js");
-/**
- * The base implementation of `_.map` without support for iteratee shorthands.
- *
- * @private
- * @param {Array|Object} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- */
-
-
-function baseMap(collection, iteratee) {
-  var index = -1,
-      result = isArrayLike(collection) ? Array(collection.length) : [];
-  baseEach(collection, function (value, key, collection) {
-    result[++index] = iteratee(value, key, collection);
-  });
-  return result;
-}
-
-module.exports = baseMap;
 
 /***/ }),
 
@@ -40524,52 +40509,6 @@ function createAssigner(assigner) {
 }
 
 module.exports = createAssigner;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_createBaseEach.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_createBaseEach.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js");
-/**
- * Creates a `baseEach` or `baseEachRight` function.
- *
- * @private
- * @param {Function} eachFunc The function to iterate over a collection.
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-
-
-function createBaseEach(eachFunc, fromRight) {
-  return function (collection, iteratee) {
-    if (collection == null) {
-      return collection;
-    }
-
-    if (!isArrayLike(collection)) {
-      return eachFunc(collection, iteratee);
-    }
-
-    var length = collection.length,
-        index = fromRight ? length : -1,
-        iterable = Object(collection);
-
-    while (fromRight ? index-- : ++index < length) {
-      if (iteratee(iterable[index], index, iterable) === false) {
-        break;
-      }
-    }
-
-    return collection;
-  };
-}
-
-module.exports = createBaseEach;
 
 /***/ }),
 
@@ -44370,70 +44309,6 @@ function last(array) {
 }
 
 module.exports = last;
-
-/***/ }),
-
-/***/ "./node_modules/lodash/map.js":
-/*!************************************!*\
-  !*** ./node_modules/lodash/map.js ***!
-  \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
-    baseIteratee = __webpack_require__(/*! ./_baseIteratee */ "./node_modules/lodash/_baseIteratee.js"),
-    baseMap = __webpack_require__(/*! ./_baseMap */ "./node_modules/lodash/_baseMap.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js");
-/**
- * Creates an array of values by running each element in `collection` thru
- * `iteratee`. The iteratee is invoked with three arguments:
- * (value, index|key, collection).
- *
- * Many lodash methods are guarded to work as iteratees for methods like
- * `_.every`, `_.filter`, `_.map`, `_.mapValues`, `_.reject`, and `_.some`.
- *
- * The guarded methods are:
- * `ary`, `chunk`, `curry`, `curryRight`, `drop`, `dropRight`, `every`,
- * `fill`, `invert`, `parseInt`, `random`, `range`, `rangeRight`, `repeat`,
- * `sampleSize`, `slice`, `some`, `sortBy`, `split`, `take`, `takeRight`,
- * `template`, `trim`, `trimEnd`, `trimStart`, and `words`
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Collection
- * @param {Array|Object} collection The collection to iterate over.
- * @param {Function} [iteratee=_.identity] The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- * @example
- *
- * function square(n) {
- *   return n * n;
- * }
- *
- * _.map([4, 8], square);
- * // => [16, 64]
- *
- * _.map({ 'a': 4, 'b': 8 }, square);
- * // => [16, 64] (iteration order is not guaranteed)
- *
- * var users = [
- *   { 'user': 'barney' },
- *   { 'user': 'fred' }
- * ];
- *
- * // The `_.property` iteratee shorthand.
- * _.map(users, 'user');
- * // => ['barney', 'fred']
- */
-
-
-function map(collection, iteratee) {
-  var func = isArray(collection) ? arrayMap : baseMap;
-  return func(collection, baseIteratee(iteratee, 3));
-}
-
-module.exports = map;
 
 /***/ }),
 

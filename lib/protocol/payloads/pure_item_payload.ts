@@ -1,3 +1,4 @@
+import { CreateItemFromPayload } from '@Models/generator';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ProtocolVersions } from '@Protocol/versions';
 import { SNItem } from '@Models/core/item';
@@ -21,8 +22,8 @@ export class SNPureItemPayload extends PurePayload {
    * to properly handle .content intricacies.
    */
   compareContentFields(otherPayload: SNPureItemPayload) {
-    const left = new SNItem(this);
-    const right = new SNItem(otherPayload);
+    const left = CreateItemFromPayload(this);
+    const right = CreateItemFromPayload(otherPayload);
     return left.isItemContentEqualWith(right);
   }
 }

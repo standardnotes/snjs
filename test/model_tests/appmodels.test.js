@@ -39,13 +39,13 @@ describe('app models', () => {
 
   it('item content should be assigned', () => {
     const params = Factory.createNotePayload();
-    const item = new SNItem(params);
+    const item = CreateItemFromPayload(params);
     expect(item.content.title).to.equal(params.content.title);
   });
 
   it('should default updated_at to 1970 and created_at to the present', () => {
     const params = Factory.createNotePayload();
-    const item = new SNItem(params);
+    const item = CreateItemFromPayload(params);
     const epoch = new Date(0);
     expect(item.updated_at - epoch).to.equal(0);
     expect(item.created_at - epoch).to.be.above(0);

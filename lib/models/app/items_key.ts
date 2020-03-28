@@ -8,20 +8,6 @@ import { ProtocolVersions } from '@Protocol/versions';
  */
 export class SNItemsKey extends SNItem {
 
-  /**
-   * Because this is a traditional SNItem, the constructor expects an object
-   * with a .content property. FromRaw allows you to send in an unwrapped
-   * raw key hash instead.
-   */
-  static FromRaw(key: object) {
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        content: key
-      }
-    );
-    return new SNItemsKey(payload);
-  }
-
   getDefaultContentType() {
     return ContentTypes.ItemsKey;
   }

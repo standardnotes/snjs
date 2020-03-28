@@ -1,3 +1,4 @@
+import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
 import { SNRootKeyParams } from './../key_params';
 import { EncryptionParameters } from './../payloads/encryption_parameters';
@@ -11,6 +12,7 @@ import {
 } from '@Payloads/generator';
 import { ProtocolVersions } from '@Protocol/versions';
 import { base64Encode, base64Decode, SNPureCrypto } from 'sncrypto';
+import { ContentTypes } from '@Root/lib/models';
 
 export type RootKeyResponse = {
   key: SNRootKey,
@@ -87,11 +89,12 @@ export abstract class SNProtocolOperator {
     const content = await this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject(
       {
+        content_type: ContentTypes.ItemsKey,
         content: content
       }
     );
 
-    const itemsKey = new SNItemsKey(payload);
+    const itemsKey = CreateItemFromPayload(payload);
     await itemsKey.initUUID();
     return itemsKey;
   }
