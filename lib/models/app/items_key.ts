@@ -1,7 +1,7 @@
 import { SNItem } from '@Models/core/item';
 import { ContentTypes } from '@Models/content_types';
-import { CreateMaxPayloadFromAnyObject, ConflictStrategies } from '@Payloads';
-import { ProtocolVersions } from '@Protocol';
+import { CreateMaxPayloadFromAnyObject, ConflictStrategies } from '@Payloads/index';
+import { ProtocolVersions } from '@Protocol/versions';
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
@@ -22,15 +22,14 @@ export class SNItemsKey extends SNItem {
     return new SNItemsKey(payload);
   }
 
-  // eslint-disable-next-line camelcase
-  get content_type() {
+  getDefaultContentType() {
     return ContentTypes.ItemsKey;
   }
 
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem({ item }) {
+  strategyWhenConflictingWithItem(item: SNItem) {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem({ item });
+      return super.strategyWhenConflictingWithItem(item);
     }
 
     return ConflictStrategies.KeepLeft;

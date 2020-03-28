@@ -29,9 +29,7 @@ export class ConflictDelta {
   public async resultingCollection() {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
-    const strategy = tmpBaseItem.strategyWhenConflictingWithItem({
-      item: tmpApplyItem
-    });
+    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
     const results = await this.payloadsByHandlingStrategy(strategy);
     return new PayloadCollection(results, this.source);
   }

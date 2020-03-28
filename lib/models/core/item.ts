@@ -1,35 +1,78 @@
-import { deepMerge, hasGetter, Copy, isNullOrUndefined } from '@Lib/utils';
+import { PayloadSources } from '@Payloads/sources';
+import { PayloadOverride } from './../../protocol/payloads/override';
+import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { deepMerge, hasGetter, Copy, isNullOrUndefined, isString } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
-import { ConflictStrategies, CreateMaxPayloadFromAnyObject, PayloadFields } from '@Payloads';
-import { DEFAULT_APP_DOMAIN } from '@Lib';
+import { ConflictStrategies, CreateMaxPayloadFromAnyObject, PayloadFields } from '@Payloads/index';
+import { DEFAULT_APP_DOMAIN } from '@Lib/index';
 import { Uuid } from '@Lib/uuid';
 
-export const SingletonStrategies = {
-  KeepEarliest: 1
+export enum SingletonStrategies {
+  KeepEarliest = 1
+};
+
+export type ContentReference = {
+  uuid: String
+  content_type: String
+}
+
+export type ContentObject = {
+  [key: string]: any
+  references: ContentReference[]
+}
+
+type Itemable<K extends keyof any, T> = {
+  [P in K]: T;
 };
 
 /**
  * The most abstract item that any syncable item needs to extend from.
  */
-export class SNItem {
-  constructor(payload) {
+export class SNItem implements Itemable<PayloadFields, any>  {
+
+  public uuid!: string
+  public content!: ContentObject
+  public deleted!: boolean
+  public content_type!: string
+  public items_key_id!: string
+  public enc_item_key!: string
+  public created_at!: Date
+  public updated_at!: Date
+  public dirtiedDate!: Date
+  public dirty!: boolean
+  public dummy!: boolean
+  public errorDecrypting!: boolean
+  public waitingForKey!: boolean
+  public errorDecryptingValueChanged!: boolean
+  public lastSyncBegan!: Date
+  public lastSyncEnd!: Date
+  public auth_hash!: string /** @deprecated */
+  public auth_params!: any /** @deprecated */
+
+  private _client_updated_at?: Date
+  private referencedItems!: Record<string, SNItem>
+  private referencingItems!: Record<string, SNItem>
+
+  private static sharedDateFormatter: Intl.DateTimeFormat
+
+  constructor(payload: PurePayload) {
     this.content = {
       references: [],
       appData: {
         [DEFAULT_APP_DOMAIN]: {}
       }
     };
-
     this.resetLocalReferencePointers();
-
     if (payload) {
       if (!payload.isPayload) {
         throw `Attempting to construct SNItem from non-payload object ${payload}.`;
       }
       this.updateFromPayload(payload);
     }
-
+    if (!this.content_type) {
+      this.content_type = this.getDefaultContentType();
+    }
     if (!this.uuid) {
       if (Uuid.canGenSync()) {
         this.uuid = Uuid.GenerateUuidSynchronously();
@@ -37,20 +80,24 @@ export class SNItem {
     }
   }
 
-  payloadRepresentation({ override } = {}) {
+  public payloadRepresentation(override: PayloadOverride) {
     return CreateMaxPayloadFromAnyObject(
       this,
-      null,
-      null,
+      undefined,
+      undefined,
       override
     );
+  }
+
+  getDefaultContentType() {
+    return null;
   }
 
   /**
    * If creating from external payload, it may not include values for .references and .appData
    * Here we want to initialize these values with default values.
    */
-  populateDefaultContentValues() {
+  private populateDefaultContentValues() {
     if (this.errorDecrypting || this.deleted) {
       return;
     }
@@ -71,21 +118,19 @@ export class SNItem {
    * must manually call this function when creating an item. The consumer must
    * have previously called Uuid.SetGenerators.
    */
-  async initUUID() {
+  public async initUUID() {
     if (!this.uuid) {
-      this.uuid = await SNItem.GenerateUuid();
+      this.uuid = await Uuid.GenerateUuid();
     }
   }
 
-  updateFromPayload(payload) {
+  private updateFromPayload(payload: PurePayload) {
     if (!payload) {
       return;
     }
-
     const fieldsToCopy = [
       PayloadFields.Content
     ];
-
     for (const field of payload.fields()) {
       if (hasGetter(this, field)) {
         continue;
@@ -93,9 +138,9 @@ export class SNItem {
       const value = payload[field];
       if (fieldsToCopy.includes(field)) {
         const copy = Copy(value || null);
-        this[field] = copy;
+        (this as any)[field] = copy;
       } else {
-        this[field] = value;
+        (this as any)[field] = value;
       }
     }
 
@@ -105,13 +150,13 @@ export class SNItem {
       this.handleDeletedContent();
     }
 
-    if (this.dirtiedDate && typeof this.dirtiedDate === 'string') {
+    if (isString(this.dirtiedDate)) {
       this.dirtiedDate = new Date(this.dirtiedDate);
     }
-    if (this.lastSyncBegan && typeof this.lastSyncBegan === 'string') {
+    if (isString(this.lastSyncBegan)) {
       this.lastSyncBegan = new Date(this.lastSyncBegan);
     }
-    if (this.lastSyncEnd && typeof this.lastSyncEnd === 'string') {
+    if (isString(this.lastSyncEnd)) {
       this.lastSyncEnd = new Date(this.lastSyncEnd);
     }
     if (this.created_at) { this.created_at = new Date(this.created_at); }
@@ -120,12 +165,12 @@ export class SNItem {
     else { this.updated_at = new Date(0); } // Epoch
 
     /** Allows the getter to be re-invoked */
-    this._client_updated_at = null;
+    this._client_updated_at = undefined;
 
     this.populateDefaultContentValues();
   }
 
-  mapContentToLocalProperties(content) {
+  protected mapContentToLocalProperties(_: ContentObject) {
     /** Optional override */
   }
 
@@ -141,34 +186,31 @@ export class SNItem {
    * Since our own `structureParams` gets a real-time copy of our content,
    * it should be safe to merge the aggregate value back into our own content field.
    */
-  collapseContent() {
+  public collapseContent() {
     const contentCopy = this.structureParams();
     deepMerge(this.content, contentCopy);
     return contentCopy;
   }
 
-  structureParams() {
+  protected structureParams() {
     return this.getContentCopy() || {};
   }
 
-  /** Allows consumers to check if object is an SNItem subclass and not a generic JS object */
-  get isItem() {
-    return true;
-  }
-
   /* Allows the item to handle the case where the item is deleted and the content is null */
-  handleDeletedContent() {
+  protected handleDeletedContent() {
     /** Subclasses can override */
   }
 
-  setDirty({ dirty, updateClientDate, authorized }) {
+  public setDirty(
+    dirty: boolean,
+    updateClientDate: boolean,
+    authorized: boolean
+  ) {
     if (!authorized) {
       throw 'Do not call setDirty directly. Use modelManager.setItemDirty';
     }
-
     this.dirty = dirty;
     this.dirtiedDate = new Date();
-
     if (dirty && updateClientDate) {
       // Set the client modified date to now if marking the item as dirty
       this.client_updated_at = new Date();
@@ -176,7 +218,6 @@ export class SNItem {
       // if we don't have an explcit raw value, we initialize client_updated_at.
       this.client_updated_at = new Date(this.updated_at);
     }
-
     this.collapseContent();
   }
 
@@ -185,25 +226,24 @@ export class SNItem {
    * if they're in our content.references. If not, we remove them from
    * our memory state.
    */
-  updateLocalRelationships() {
+  public updateLocalRelationships() {
     const references = this.content.references;
     const uuids = references.map((ref) => { return ref.uuid; });
-    const existingUuids = Object.keys(this._referencedItems);
+    const existingUuids = Object.keys(this.referencedItems);
 
     for (const uuid of existingUuids) {
-      const ref = this._referencedItems[uuid];
+      const ref = this.referencedItems[uuid];
       if (!uuids.includes(ref.uuid)) {
-        delete this._referencedItems[uuid];
+        delete this.referencedItems[uuid];
         ref.setIsNoLongerReferencedBy(this);
       }
     }
   }
 
-  addItemAsRelationship(item) {
+  public addItemAsRelationship(item: SNItem) {
     item.setIsBeingReferencedBy(this);
-
-    if (!this._referencedItems[item.uuid]) {
-      this._referencedItems[item.uuid] = item;
+    if (!this.referencedItems[item.uuid]) {
+      this.referencedItems[item.uuid] = item;
     }
     if (this.hasRelationshipWithItem(item)) {
       return;
@@ -216,10 +256,10 @@ export class SNItem {
     this.content.references = references;
   }
 
-  removeItemAsRelationship(item) {
+  public removeItemAsRelationship(item: SNItem) {
     item.setIsNoLongerReferencedBy(this);
     this.removeReferenceWithUuid(item.uuid);
-    delete this._referencedItems[item.uuid];
+    delete this.referencedItems[item.uuid];
   }
 
   /**
@@ -227,24 +267,24 @@ export class SNItem {
    * into memory here. We use this so that when `this` is deleted, we're able
    * to update the references of those other objects.
    */
-  setIsBeingReferencedBy(item) {
-    if (!this._referencingItems[item.uuid]) {
-      this._referencingItems[item.uuid] = item;
+  setIsBeingReferencedBy(item: SNItem) {
+    if (!this.referencingItems[item.uuid]) {
+      this.referencingItems[item.uuid] = item;
     }
   }
 
-  setIsNoLongerReferencedBy(item) {
-    delete this._referencingItems[item.uuid];
+  setIsNoLongerReferencedBy(item: SNItem) {
+    delete this.referencingItems[item.uuid];
   }
 
-  removeReferenceWithUuid(uuid) {
+  removeReferenceWithUuid(uuid: string) {
     let references = this.content.references || [];
     references = references.filter((r) => r.uuid !== uuid);
     this.content.references = references;
-    delete this._referencedItems[uuid];
+    delete this.referencedItems[uuid];
   }
 
-  hasRelationshipWithItem(item) {
+  hasRelationshipWithItem(item: SNItem) {
     const target = this.content.references.find((r) => {
       return r.uuid === item.uuid;
     });
@@ -252,52 +292,47 @@ export class SNItem {
   }
 
   isBeingRemovedLocally() {
-    for (const uuid of Object.keys(this._referencedItems)) {
-      const item = this._referencedItems[uuid];
+    for (const uuid of Object.keys(this.referencedItems)) {
+      const item = this.referencedItems[uuid];
       item.setIsNoLongerReferencedBy(this);
     }
   }
 
   /** The number of items this item currently references */
   get referencedItemsCount() {
-    return Object.keys(this._referencedItems).length;
+    return Object.keys(this.referencedItems).length;
   }
 
   /** The number of items that currently reference this item */
   get referencingItemsCount() {
-    return Object.keys(this._referencingItems).length;
+    return Object.keys(this.referencingItems).length;
   }
 
   get allReferencingItems() {
-    return Object.keys(this._referencingItems)
-      .map((uuid) => this._referencingItems[uuid]);
+    return Object.keys(this.referencingItems)
+      .map((uuid) => this.referencingItems[uuid]);
   }
 
-  resetLocalReferencePointers() {
-    this._referencingItems = {};
-    this._referencedItems = {};
+  public resetLocalReferencePointers() {
+    this.referencingItems = {};
+    this.referencedItems = {};
   }
 
-  didCompleteMapping(source) {
+  public didCompleteMapping(_: PayloadSources) {
     /** Optional override */
   }
 
-  /* App Data */
-
-  setDomainDataItem(key, value, domain) {
+  public setDomainDataItem(key: string, value: any, domain: string) {
     if (!domain) {
       console.error('DEFAULT_APP_DOMAIN needs to be set.');
       return;
     }
-
     if (this.errorDecrypting) {
       return;
     }
-
     if (!this.content.appData) {
       this.content.appData = {};
     }
-
     let data = this.content.appData[domain];
     if (!data) {
       data = {};
@@ -306,7 +341,7 @@ export class SNItem {
     this.content.appData[domain] = data;
   }
 
-  getDomainDataItem(key, domain) {
+  getDomainDataItem(key: string, domain: string) {
     if (!domain) {
       console.error('DEFAULT_APP_DOMAIN needs to be set.');
       return;
@@ -325,11 +360,11 @@ export class SNItem {
     }
   }
 
-  setAppDataItem(key, value) {
+  setAppDataItem(key: string, value: any) {
     this.setDomainDataItem(key, value, DEFAULT_APP_DOMAIN);
   }
 
-  getAppDataItem(key) {
+  getAppDataItem(key: string) {
     return this.getDomainDataItem(key, DEFAULT_APP_DOMAIN);
   }
 
@@ -363,7 +398,7 @@ export class SNItem {
   }
 
   // eslint-disable-next-line camelcase
-  set client_updated_at(date) {
+  set client_updated_at(date: Date) {
     this._client_updated_at = date;
     this.setAppDataItem('client_updated_at', date);
   }
@@ -420,7 +455,7 @@ export class SNItem {
    * In the default implementation, we create a duplicate if content differs.
    * However, if they only differ by references, we KEEP_LEFT_MERGE_REFS.
    */
-  strategyWhenConflictingWithItem({ item }) {
+  public strategyWhenConflictingWithItem(item: SNItem) {
     if (this.errorDecrypting) {
       return ConflictStrategies.KeepLeftDuplicateRight;
     }
@@ -447,7 +482,7 @@ export class SNItem {
     }
   }
 
-  isItemContentEqualWith(otherItem) {
+  public isItemContentEqualWith(otherItem: SNItem) {
     return ItemContentsEqual({
       leftContent: this.content,
       rightContent: otherItem.content,
@@ -456,11 +491,9 @@ export class SNItem {
     });
   }
 
-  satisfiesPredicate(predicate) {
+  public satisfiesPredicate(predicate: SNPredicate) {
     return SNPredicate.ItemSatisfiesPredicate(this, predicate);
   }
-
-  /** Dates */
 
   createdAtString() {
     return this.dateToLocalizedString(this.created_at);
@@ -474,7 +507,7 @@ export class SNItem {
     return this.updated_at.getTime();
   }
 
-  dateToLocalizedString(date) {
+  dateToLocalizedString(date: Date) {
     if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
       if (!SNItem.sharedDateFormatter) {
         const locale = (
