@@ -39,13 +39,14 @@ describe('device authentication', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
           numPasscodeAttempts++;
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -87,13 +88,14 @@ describe('device authentication', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
           numPasscodeAttempts++;
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -145,13 +147,14 @@ describe('device authentication', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
           numPasscodeAttempts++;
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };

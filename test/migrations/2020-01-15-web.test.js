@@ -66,10 +66,10 @@ describe('2020-01-15 web migration', () => {
     const storagePayload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await operator003.crypto.generateUUID(),
+        content_type: ContentTypes.EncryptedStorage,
         content: {
           storage: embeddedStorage
         },
-        content_type: ContentTypes.EncryptedStorage
       }
     );
     const encryptionParams = await operator003.generateEncryptedParameters(
@@ -114,12 +114,13 @@ describe('2020-01-15 web migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -266,12 +267,13 @@ describe('2020-01-15 web migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -387,12 +389,13 @@ describe('2020-01-15 web migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };

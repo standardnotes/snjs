@@ -2595,7 +2595,7 @@ var SNApplication = /*#__PURE__*/function () {
     key: "setLaunchCallbacks",
     value: function setLaunchCallbacks(callbacks) {
       this.launchCallbacks = callbacks;
-      this.challengeService.setChallengeHandler(callbacks);
+      this.challengeService.challengeHandler = callbacks.receiveChallenge;
     }
     /**
      * Runs migrations, handles device authentication, unlocks application, and
@@ -5365,11 +5365,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createChallengeService",
     value: function createChallengeService() {
-      this.challengeService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["ChallengeService"]))({
-        storageService: this.storageService,
-        protocolService: this.protocolService,
-        keyManager: this.keyManager
-      });
+      this.challengeService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["ChallengeService"]))(this.storageService, this.keyManager);
       this.services.push(this.challengeService);
     }
   }, {
@@ -5834,7 +5830,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_api_http_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/api/http_service */ "./lib/services/api/http_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _services_api_http_service__WEBPACK_IMPORTED_MODULE_15__["SNHttpService"]; });
 
-/* harmony import */ var _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/challenge_service */ "./lib/services/challenge_service.js");
+/* harmony import */ var _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/challenge_service */ "./lib/services/challenge_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeService", function() { return _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__["ChallengeService"]; });
 
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
@@ -6600,7 +6596,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                newStructure = _Services__WEBPACK_IMPORTED_MODULE_8__["SNStorageService"].defaultValuesObject(rawStructure);
+                newStructure = _Services__WEBPACK_IMPORTED_MODULE_8__["SNStorageService"].defaultValuesObject(rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_10__["ValueModesKeys"].Wrapped], rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_10__["ValueModesKeys"].Unwrapped], rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_10__["ValueModesKeys"].Nonwrapped]);
                 newStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_10__["ValueModesKeys"].Unwrapped] = null;
                 _context5.next = 4;
                 return this.application.deviceInterface.setRawStorageValue(Object(_Lib__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.application.namespace, _Lib__WEBPACK_IMPORTED_MODULE_2__["RawStorageKeys"].StorageObject), JSON.stringify(newStructure));
@@ -18919,9 +18915,9 @@ var ApplicationService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/challenge_service.js":
+/***/ "./lib/services/challenge_service.ts":
 /*!*******************************************!*\
-  !*** ./lib/services/challenge_service.js ***!
+  !*** ./lib/services/challenge_service.ts ***!
   \*******************************************/
 /*! exports provided: ChallengeOrchestrator, ChallengeClient, ChallengeOperation, ChallengeService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -18967,84 +18963,57 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
 
 
 /** The orchestrator gives this object to the client */
-
 var ChallengeOrchestrator = /*#__PURE__*/function () {
+  /**
+   * Called by client to submit values to the orchestrator
+   */
+
+  /**
+   * Called by client to submit manual valid status for value
+   */
+
+  /**
+   * Cancels this challenge if permissible
+   */
+
   /**
    * Signatures for these functions match exactly the signatures
    * of the instance methods in this class.
    */
-  function ChallengeOrchestrator(_ref) {
-    var setClientFunctions = _ref.setClientFunctions,
-        submitValues = _ref.submitValues,
-        setValidationStatus = _ref.setValidationStatus,
-        cancel = _ref.cancel;
-
+  function ChallengeOrchestrator(setClientFunctions, submitValues, setValidationStatus, cancel) {
     _classCallCheck(this, ChallengeOrchestrator);
 
-    this.setClientFunctionsFn = setClientFunctions;
-    this.submitValuesFn = submitValues;
-    this.setValidationStatusFn = setValidationStatus;
-    this.cancelFn = cancel;
+    _defineProperty(this, "setClientFunctions", void 0);
+
+    _defineProperty(this, "submitValues", void 0);
+
+    _defineProperty(this, "setValidationStatus", void 0);
+
+    _defineProperty(this, "cancel", void 0);
+
+    this.setClientFunctions = setClientFunctions;
+    this.submitValues = submitValues;
+    this.setValidationStatus = setValidationStatus;
+    this.cancel = cancel;
   }
   /**
    * Called by client to configure callbacks
-   * @access public
    */
 
 
   _createClass(ChallengeOrchestrator, [{
     key: "setCallbacks",
-    value: function setCallbacks(_ref2) {
-      var onValidValue = _ref2.onValidValue,
-          onInvalidValue = _ref2.onInvalidValue,
-          onComplete = _ref2.onComplete,
-          onCancel = _ref2.onCancel;
-      this.setClientFunctionsFn({
-        onValidValue: onValidValue,
-        onInvalidValue: onInvalidValue,
-        onComplete: onComplete,
-        onCancel: onCancel
-      });
-    }
-    /**
-     * Called by client to submit values to the orchestrator
-     * @access public
-     * @param {Array.<ChallengeValue>} values 
-     */
-
-  }, {
-    key: "submitValues",
-    value: function submitValues(values) {
-      this.submitValuesFn(values);
-    }
-    /**
-     * Called by client to submit manual valid status for value
-     * @access public
-     * @param {ChallengeValue} value
-     * @param {boolean} valid
-     * @param {object} [artifacts]
-     */
-
-  }, {
-    key: "setValidationStatus",
-    value: function setValidationStatus(value, valid, artifacts) {
-      this.setValidationStatusFn(value, valid, artifacts);
-    }
-    /**
-     * Cancels this challenge if permissible
-     * @access public
-     */
-
-  }, {
-    key: "cancel",
-    value: function cancel() {
-      this.cancelFn();
+    value: function setCallbacks(onValidValue, onInvalidValue, onComplete, onCancel) {
+      this.setClientFunctions(onValidValue, onInvalidValue, onComplete, onCancel);
     }
   }]);
 
@@ -19052,91 +19021,73 @@ var ChallengeOrchestrator = /*#__PURE__*/function () {
 }();
 /** The client gives this object to the orchestrator */
 
-var ChallengeClient = /*#__PURE__*/function () {
-  /**
-   * Signatures for these functions match exactly the signatures
-   * of the instance methods in this class.
-   */
-  function ChallengeClient() {
-    var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        onValidValue = _ref3.onValidValue,
-        onInvalidValue = _ref3.onInvalidValue,
-        onComplete = _ref3.onComplete,
-        onCancel = _ref3.onCancel;
+var ChallengeClient =
+/**
+ * Called by the orchestrator to let the client know of a valid value
+ */
 
-    _classCallCheck(this, ChallengeClient);
+/**
+ * Called by the orchestrator to let the client know of an invalid value
+ */
 
-    this.onValidValueFn = onValidValue;
-    this.onInvalidValueFn = onInvalidValue;
-    this.onCompleteFn = onComplete;
-    this.onCancelFn = onCancel;
-  }
-  /** 
-   * Called by the orchestrator to let the client know of a valid value
-   * @access public 
-   * @param {ChallengeValue} value
-   */
+/** 
+ * Called by the orchestrator to let the client know the challenge has completed
+ * successfully.
+ */
 
+/** 
+ * Called by the orchestrator to let the client know the challenge was canceled
+ */
 
-  _createClass(ChallengeClient, [{
-    key: "onValidValue",
-    value: function onValidValue(value) {
-      this.onValidValueFn && this.onValidValueFn(value);
-    }
-    /** 
-     * Called by the orchestrator to let the client know of an invalid value
-     * @access public 
-     * @param {ChallengeValue} value
-     */
+/**
+ * Signatures for these functions match exactly the signatures
+ * of the instance methods in this class.
+ */
+function ChallengeClient(onValidValue, onInvalidValue, onComplete, onCancel) {
+  _classCallCheck(this, ChallengeClient);
 
-  }, {
-    key: "onInvalidValue",
-    value: function onInvalidValue(value) {
-      this.onInvalidValueFn && this.onInvalidValueFn(value);
-    }
-    /** 
-     * Called by the orchestrator to let the client know the challenge has completed
-     * successfully.
-     * @access public 
-     */
+  _defineProperty(this, "onValidValue", void 0);
 
-  }, {
-    key: "onComplete",
-    value: function onComplete() {
-      this.onCompleteFn && this.onCompleteFn();
-    }
-    /** 
-     * Called by the orchestrator to let the client know the challenge was canceled
-     * @access public 
-     */
+  _defineProperty(this, "onInvalidValue", void 0);
 
-  }, {
-    key: "onCancel",
-    value: function onCancel() {
-      this.onCancelFn && this.onCancelFn();
-    }
-  }]);
+  _defineProperty(this, "onComplete", void 0);
 
-  return ChallengeClient;
-}();
+  _defineProperty(this, "onCancel", void 0);
+
+  this.onValidValue = onValidValue || function (_) {};
+
+  this.onInvalidValue = onInvalidValue || function (_) {};
+
+  this.onComplete = onComplete || function () {};
+
+  this.onCancel = onCancel || function () {};
+};
 var ChallengeOperation = /*#__PURE__*/function () {
   function ChallengeOperation(challenge, validate) {
     _classCallCheck(this, ChallengeOperation);
 
+    _defineProperty(this, "challenge", void 0);
+
+    _defineProperty(this, "validate", void 0);
+
+    _defineProperty(this, "validValues", []);
+
+    _defineProperty(this, "invalidValues", []);
+
+    _defineProperty(this, "artifacts", {});
+
+    _defineProperty(this, "client", void 0);
+
+    _defineProperty(this, "resolve", void 0);
+
+    _defineProperty(this, "orchestrator", void 0);
+
     this.challenge = challenge;
     this.validate = validate;
-    this.validValues = [];
-    this.invalidValues = [];
-    this.artifacts = {};
-    /** Create default client in case client does not set callbacks */
-
-    this.client = new ChallengeClient();
   }
   /** 
-   * @access public
    * Sets the promise resolve function to be called 
    * when this challenge completes or cancels 
-   * @param {function} resolve
    */
 
 
@@ -19146,7 +19097,6 @@ var ChallengeOperation = /*#__PURE__*/function () {
       this.resolve = resolve;
     }
     /**
-     * @access public
      * Mark this challenge as complete, triggering the resolve function, 
      * as well as notifying the client
      */
@@ -19154,15 +19104,16 @@ var ChallengeOperation = /*#__PURE__*/function () {
   }, {
     key: "complete",
     value: function complete(response) {
+      var _this$client;
+
       if (!response) {
         response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](this.challenge, this.validValues, this.artifacts);
       }
 
       this.resolve(response);
-      this.getClient().onComplete();
+      (_this$client = this.client) === null || _this$client === void 0 ? void 0 : _this$client.onComplete();
     }
     /**
-     * @access public
      * Mark this challenge as canceled, triggering the resolve function with a null response,
      * as well as notifying the client.
      */
@@ -19170,12 +19121,13 @@ var ChallengeOperation = /*#__PURE__*/function () {
   }, {
     key: "cancel",
     value: function cancel() {
+      var _this$client2;
+
       this.resolve(null);
-      this.getClient().onCancel();
+      (_this$client2 = this.client) === null || _this$client2 === void 0 ? void 0 : _this$client2.onCancel();
     }
     /**
-     * @access public
-     * @returns {boolean} Returns true if the challenge has received all valid responses
+     * @returns Returns true if the challenge has received all valid responses
      */
 
   }, {
@@ -19184,57 +19136,19 @@ var ChallengeOperation = /*#__PURE__*/function () {
       return this.validValues.length === this.challenge.types.length;
     }
     /**
-     * @access public
      * Called by challenge orchestrator to set up the orchestrator object.
      * This object will be used by the client to communicate with us.
      */
 
   }, {
     key: "setOrchestratorFunctions",
-    value: function setOrchestratorFunctions(_ref4) {
-      var setClientFunctions = _ref4.setClientFunctions,
-          setValidationStatus = _ref4.setValidationStatus,
-          submitValues = _ref4.submitValues,
-          cancel = _ref4.cancel;
-      this.orchestrator = new ChallengeOrchestrator({
-        setClientFunctions: setClientFunctions,
-        setValidationStatus: setValidationStatus,
-        submitValues: submitValues,
-        cancel: cancel
-      });
-    }
-    /** @access private */
-
-  }, {
-    key: "getClient",
-    value: function getClient() {
-      return this.client;
-    }
-    /** @access public */
-
-  }, {
-    key: "getOrchestrator",
-    value: function getOrchestrator() {
-      return this.orchestrator;
-    }
-    /**
-     * @access public
-     * @param {ChallengeClient} client 
-     */
-
-  }, {
-    key: "setClient",
-    value: function setClient(client) {
-      this.client = client;
+    value: function setOrchestratorFunctions(setClientFunctions, setValidationStatus, submitValues, cancel) {
+      this.orchestrator = new ChallengeOrchestrator(setClientFunctions, submitValues, setValidationStatus, cancel);
     }
     /**
      * Sets the values validation status, as well as handles subsequent actions,
      * such as completing the operation if all valid values are supplied, as well as
      * notifying the client of this new value's validation status.
-     * @access public
-     * @param {ChallengeValue} value 
-     * @param {boolean} valid 
-     * @param {object} artifacts 
      */
 
   }, {
@@ -19263,9 +19177,13 @@ var ChallengeOperation = /*#__PURE__*/function () {
         this.complete();
       } else {
         if (valid) {
-          this.getClient().onValidValue(value);
+          var _this$client3;
+
+          (_this$client3 = this.client) === null || _this$client3 === void 0 ? void 0 : _this$client3.onValidValue(value);
         } else {
-          this.getClient().onInvalidValue(value);
+          var _this$client4;
+
+          (_this$client4 = this.client) === null || _this$client4 === void 0 ? void 0 : _this$client4.onInvalidValue(value);
         }
       }
     }
@@ -19276,20 +19194,23 @@ var ChallengeOperation = /*#__PURE__*/function () {
 var ChallengeService = /*#__PURE__*/function (_PureService) {
   _inherits(ChallengeService, _PureService);
 
-  function ChallengeService(_ref5) {
+  function ChallengeService(storageService, keyManager) {
     var _this;
-
-    var storageService = _ref5.storageService,
-        keyManager = _ref5.keyManager,
-        protocolService = _ref5.protocolService;
 
     _classCallCheck(this, ChallengeService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(ChallengeService).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "storageService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "keyManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "challengeOperations", {});
+
+    _defineProperty(_assertThisInitialized(_this), "challengeHandler", void 0);
+
     _this.storageService = storageService;
     _this.keyManager = keyManager;
-    _this.protocolService = protocolService;
-    _this.challengeOperations = {};
     return _this;
   }
   /** @override */
@@ -19298,25 +19219,14 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
   _createClass(ChallengeService, [{
     key: "deinit",
     value: function deinit() {
-      this.storageService = null;
-      this.keyManager = null;
-      this.protocolService = null;
-      this.challengeHandler = null;
+      this.storageService = undefined;
+      this.keyManager = undefined;
+      this.challengeHandler = undefined;
 
       _get(_getPrototypeOf(ChallengeService.prototype), "deinit", this).call(this);
     }
-    /** @access public */
-
-  }, {
-    key: "setChallengeHandler",
-    value: function setChallengeHandler(handler) {
-      this.challengeHandler = handler;
-    }
     /** 
-     * @access public 
-     * @param {Challenge} challenge
-     * @param {boolean} validate
-     * @param {object} orchestratorFill - An empty object which will be populated with
+     * @param orchestratorFill - An empty object which will be populated with
      * a .orchestrator property. The caller uses this funtion to communicate with us
      * via a selective API.
      */
@@ -19346,14 +19256,14 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                 }
 
                 if (orchestratorFill) {
-                  orchestratorFill.orchestrator = operation.getOrchestrator();
+                  orchestratorFill.orchestrator = operation.orchestrator;
                 }
 
                 return _context.abrupt("return", new Promise(function (resolve) {
                   operation.setResolver(resolve);
 
                   if (isNew) {
-                    _this2.challengeHandler.receiveChallenge(challenge, operation.getOrchestrator());
+                    _this2.challengeHandler(challenge, operation.orchestrator);
                   }
                 }));
 
@@ -19371,11 +19281,6 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
       return promptForChallengeResponse;
     }()
-    /**
-    * @access public
-    * @returns {object} {valid, artifacts}
-    */
-
   }, {
     key: "validateChallengeValue",
     value: function () {
@@ -19426,11 +19331,6 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
       return validateChallengeValue;
     }()
-    /**
-     * @access public
-     * @returns {Challenge}
-     */
-
   }, {
     key: "getLaunchChallenge",
     value: function () {
@@ -19441,20 +19341,16 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 types = [];
-                _context3.next = 3;
-                return this.keyManager.hasPasscode();
-
-              case 3:
-                hasPasscode = _context3.sent;
+                hasPasscode = this.keyManager.hasPasscode();
 
                 if (hasPasscode) {
                   types.push(_Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeType"].LocalPasscode);
                 }
 
-                _context3.next = 7;
+                _context3.next = 5;
                 return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].BiometricPrefs, _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__["StorageValueModes"].Nonwrapped);
 
-              case 7:
+              case 5:
                 biometricPrefs = _context3.sent;
                 biometricEnabled = biometricPrefs && biometricPrefs.enabled;
 
@@ -19463,16 +19359,16 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                 }
 
                 if (!(types.length > 0)) {
-                  _context3.next = 14;
+                  _context3.next = 12;
                   break;
                 }
 
                 return _context3.abrupt("return", new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["Challenge"](types, _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeReason"].ApplicationUnlock));
 
-              case 14:
+              case 12:
                 return _context3.abrupt("return", null);
 
-              case 15:
+              case 13:
               case "end":
                 return _context3.stop();
             }
@@ -19486,18 +19382,11 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
       return getLaunchChallenge;
     }()
-    /** 
-     * @access public 
-     * @returns {boolean}
-     */
-
   }, {
     key: "isPasscodeLocked",
     value: function isPasscodeLocked() {
       return this.keyManager.rootKeyNeedsUnwrapping();
     }
-    /** @access public */
-
   }, {
     key: "enableBiometrics",
     value: function () {
@@ -19525,64 +19414,40 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
       return enableBiometrics;
     }()
-    /** @access private */
-
   }, {
     key: "createChallengeOperation",
     value: function createChallengeOperation(challenge, validate) {
       var _this3 = this;
 
       var operation = new ChallengeOperation(challenge, validate);
-      operation.setOrchestratorFunctions({
-        setClientFunctions: function setClientFunctions(_ref6) {
-          var onValidValue = _ref6.onValidValue,
-              onInvalidValue = _ref6.onInvalidValue,
-              onComplete = _ref6.onComplete,
-              onCancel = _ref6.onCancel;
-          var client = new ChallengeClient({
-            onValidValue: onValidValue,
-            onInvalidValue: onInvalidValue,
-            onComplete: onComplete,
-            onCancel: onCancel
-          });
-          operation.setClient(client);
-        },
-        submitValues: function submitValues(values) {
-          _this3.submitValuesForChallenge(challenge, values);
-        },
-        setValidationStatus: function setValidationStatus(value, valid, artifacts) {
-          _this3.setValidationStatusForChallenge(challenge, value, valid, artifacts);
-        },
-        cancel: function cancel() {
-          _this3.cancelChallenge(challenge);
-        }
+      operation.setOrchestratorFunctions(function (onValidValue, onInvalidValue, onComplete, onCancel) {
+        var client = new ChallengeClient(onValidValue, onInvalidValue, onComplete, onCancel);
+        operation.client = client;
+      }, function (value, valid, artifacts) {
+        _this3.setValidationStatusForChallenge(challenge, value, valid, artifacts);
+      }, function (values) {
+        _this3.submitValuesForChallenge(challenge, values);
+      }, function () {
+        _this3.cancelChallenge(challenge);
       });
       this.setChallengeOperation(operation);
       return operation;
     }
-    /** @access private */
-
   }, {
     key: "getChallengeOperation",
     value: function getChallengeOperation(challenge) {
       return this.challengeOperations[challenge.id];
     }
-    /** @access private */
-
   }, {
     key: "setChallengeOperation",
     value: function setChallengeOperation(operation) {
       this.challengeOperations[operation.challenge.id] = operation;
     }
-    /** @access private */
-
   }, {
     key: "deleteChallengeOperation",
     value: function deleteChallengeOperation(operation) {
       delete this.challengeOperations[operation.challenge.id];
     }
-    /** @access private */
-
   }, {
     key: "cancelChallenge",
     value: function cancelChallenge(challenge) {
@@ -19590,13 +19455,11 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
       operation.cancel();
       this.deleteChallengeOperation(operation);
     }
-    /** @access private */
-
   }, {
     key: "submitValuesForChallenge",
     value: function () {
       var _submitValuesForChallenge = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(challenge, values) {
-        var operation, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, value, _ref7, valid, artifacts, response;
+        var operation, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, _ref, _valid, _artifacts, _response;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
@@ -19621,15 +19484,15 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                value = _step.value;
+                _value = _step.value;
                 _context5.next = 11;
-                return this.validateChallengeValue(value);
+                return this.validateChallengeValue(_value);
 
               case 11:
-                _ref7 = _context5.sent;
-                valid = _ref7.valid;
-                artifacts = _ref7.artifacts;
-                this.setValidationStatusForChallenge(challenge, value, valid, artifacts);
+                _ref = _context5.sent;
+                _valid = _ref.valid;
+                _artifacts = _ref.artifacts;
+                this.setValidationStatusForChallenge(challenge, _value, _valid, _artifacts);
 
               case 15:
                 _iteratorNormalCompletion = true;
@@ -19675,8 +19538,8 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 34:
-                response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](challenge, values, null);
-                operation.complete(response);
+                _response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](challenge, values, null);
+                operation.complete(_response);
 
               case 36:
               case "end":
@@ -19692,8 +19555,6 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
       return submitValuesForChallenge;
     }()
-    /** @access private */
-
   }, {
     key: "setValidationStatusForChallenge",
     value: function setValidationStatusForChallenge(challenge, value, valid, artifacts) {
@@ -23526,7 +23387,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TIMING_STRATEGY_FORCE_SPAWN_NEW", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_15__["TIMING_STRATEGY_FORCE_SPAWN_NEW"]; });
 
-/* harmony import */ var _Services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/challenge_service */ "./lib/services/challenge_service.js");
+/* harmony import */ var _Services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Services/challenge_service */ "./lib/services/challenge_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeService", function() { return _Services_challenge_service__WEBPACK_IMPORTED_MODULE_16__["ChallengeService"]; });
 
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.ts");
@@ -25459,7 +25320,6 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
     }()
     /**
      * @param {string} password  The password string to generate a root key from.
-     * @returns {object}  { valid, artifacts : { wrappingKey : object } }
      */
 
   }, {
@@ -25516,7 +25376,6 @@ var SNKeyManager = /*#__PURE__*/function (_PureService) {
     }()
     /**
      * @param {string} passcode  The passcode string to generate a root key from.
-     * @returns {object}  { valid, artifacts : { wrappingKey : object } }
      */
 
   }, {

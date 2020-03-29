@@ -246,12 +246,13 @@ describe('2020-01-15 mobile migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -369,12 +370,13 @@ describe('2020-01-15 mobile migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
@@ -474,12 +476,13 @@ describe('2020-01-15 mobile migration', () => {
       return values;
     };
     const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks({
-        onInvalidValue: (value) => {
+      orchestrator.setCallbacks(
+        undefined,
+        (value) => {
           const values = promptForValuesForTypes([value.type]);
           orchestrator.submitValues(values);
         },
-      });
+      );
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };

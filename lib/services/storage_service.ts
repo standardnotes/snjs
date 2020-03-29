@@ -264,7 +264,11 @@ export class SNStorageService extends PureService {
     unwrapped?: ValuesObjectRecord,
     nonwrapped?: ValuesObjectRecord
   ) {
-    return SNStorageService.defaultValuesObject(wrapped, unwrapped, nonwrapped);
+    return SNStorageService.defaultValuesObject(
+      wrapped,
+      unwrapped,
+      nonwrapped
+    );
   }
 
   public static defaultValuesObject(
@@ -278,7 +282,7 @@ export class SNStorageService extends PureService {
       [ValueModesKeys.Nonwrapped]: nonwrapped
     };
   }
-  
+
   private domainKeyForMode(mode: StorageValueModes) {
     if (mode === StorageValueModes.Default) {
       return ValueModesKeys.Unwrapped;
