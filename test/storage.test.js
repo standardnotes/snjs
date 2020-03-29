@@ -185,7 +185,7 @@ describe('storage manager', () => {
       password: this.password,
       ephemeral: true
     });
-    const accountKey = await this.application.keyManager.getRootKey();
+    const accountKey = await this.application.protocolService.getRootKey();
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
   });
 
@@ -217,27 +217,25 @@ describe('storage manager', () => {
     });
 
     /** Should not be wrapped root key yet */
-    expect(await this.application.keyManager.getWrappedRootKey()).to.not.be.ok;
+    expect(await this.application.protocolService.getWrappedRootKey()).to.not.be.ok;
     
     const passcode = '123';
     await this.application.setPasscode(passcode);
     await this.application.setValue('bar', 'foo');
     
     /** Root key should now be wrapped */
-    expect(await this.application.keyManager.getWrappedRootKey()).to.be.ok;
+    expect(await this.application.protocolService.getWrappedRootKey()).to.be.ok;
   
-    const accountKey = await this.application.keyManager.getRootKey();
+    const accountKey = await this.application.protocolService.getRootKey();
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
-    const passcodeKey = await this.application.keyManager.computeWrappingKey({
-      passcode: passcode
-    });
-    const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
+    const passcodeKey = await this.application.protocolService.computeWrappingKey(passcode);
+    const wrappedRootKey = await this.application.protocolService.getWrappedRootKey();
     /** Expect that we can decrypt wrapped root key with passcode key */
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
-    const decrypted = await this.application.protocolService.payloadByDecryptingPayload({
-      payload: payload,
-      key: passcodeKey
-    });
+    const decrypted = await this.application.protocolService.payloadByDecryptingPayload(
+      payload,
+      passcodeKey
+    );
     expect(decrypted.errorDecrypting).to.equal(false);
     expect(decrypted.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);

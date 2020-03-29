@@ -278,10 +278,10 @@ describe('online syncing', () => {
     await this.application.modelManager.setItemDirty(note, true);
     await this.application.syncService.sync(syncOptions);
 
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload({
-      payload: note.payloadRepresentation(),
-      intent: EncryptionIntents.Sync
-    });
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+      note.payloadRepresentation(),
+      EncryptionIntents.Sync
+    );
     const errorred = CreateMaxPayloadFromAnyObject(
       encrypted,
       null,
@@ -298,9 +298,7 @@ describe('online syncing', () => {
     expect(typeof mappedItem.content).to.equal('string');
 
     const decryptedPayload = await this.application.protocolService
-      .payloadByDecryptingPayload({
-        payload: errorred
-      });
+      .payloadByDecryptingPayload(errorred);
     const mappedItems2 = await this.application.modelManager.mapPayloadsToLocalItems(
       [decryptedPayload],
       PayloadSources.LocalChanged
@@ -747,9 +745,7 @@ describe('online syncing', () => {
     for (const payload of encryptedPayloads) {
       expect(payload.dirty).to.equal(true);
       const decrypted = await this.application.protocolService
-        .payloadByDecryptingPayload({
-          payload: payload
-        });
+        .payloadByDecryptingPayload(payload);
       payloads.push(decrypted);
     }
     await this.application.modelManager.mapPayloadsToLocalItems(

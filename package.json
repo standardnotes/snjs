@@ -27,6 +27,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
     "chai": "^4.2.0",
+    "circular-dependency-plugin": "^5.2.0",
     "connect": "^3.7.0",
     "copy-webpack-plugin": "5.1.1",
     "docdash": "^1.2.0",

@@ -1,3 +1,4 @@
+import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntents } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -7,7 +8,6 @@ import { CreateMaxPayloadFromAnyObject } from '@Payloads/index';
 import { ContentTypes } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
-import { SNProtocolService } from './protocol_service';
 import { DeviceInterface } from '../device_interface';
 
 export enum StoragePersistencePolicies {
@@ -44,6 +44,8 @@ type ValuesObject = {
   [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
 }
 
+type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntents) => Promise<PurePayload>
+
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
  * storage. It does so by relying on deviceInterface to save and retrieve raw values and payloads.
@@ -56,8 +58,8 @@ type ValuesObject = {
  */
 export class SNStorageService extends PureService {
 
-  private protocolService?: SNProtocolService
   private deviceInterface?: DeviceInterface
+  public encryptionDelegate?: EncryptionDelegate
   private namespace: string
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false
@@ -67,13 +69,11 @@ export class SNStorageService extends PureService {
   private values!: ValuesObject
 
   constructor(
-    protocolService: SNProtocolService,
     deviceInterface: DeviceInterface,
     namespace: string
   ) {
     super();
     this.deviceInterface = deviceInterface;
-    this.protocolService = protocolService;
     this.namespace = namespace;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
@@ -81,7 +81,7 @@ export class SNStorageService extends PureService {
 
   public deinit() {
     this.deviceInterface = undefined;
-    this.protocolService = undefined;
+    this.encryptionDelegate = undefined;
     super.deinit();
   }
 
@@ -170,10 +170,10 @@ export class SNStorageService extends PureService {
       }
     );
 
-    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload({
-      payload: payload,
-      key: key
-    });
+    const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(
+      payload,
+      key
+    );
     return decryptedPayload;
   }
 
@@ -204,10 +204,10 @@ export class SNStorageService extends PureService {
         content_type: ContentTypes.EncryptedStorage
       }
     );
-    const encryptedPayload = await this.protocolService!.payloadByEncryptingPayload({
-      payload: payload,
-      intent: EncryptionIntents.LocalStoragePreferEncrypted
-    });
+    const encryptedPayload = await this.encryptionDelegate!.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntents.LocalStoragePreferEncrypted
+    );
     rawContent[ValueModesKeys.Wrapped] = encryptedPayload;
     rawContent[ValueModesKeys.Unwrapped] = undefined;
     return rawContent;
@@ -320,13 +320,12 @@ export class SNStorageService extends PureService {
         /** If the payload is deleted and not dirty, remove it from db. */
         deleted.push(payload);
       } else {
-        const encrypted = await this.protocolService!.payloadByEncryptingPayload({
-          payload: payload,
-          intent:
-            this.encryptionPolicy === StorageEncryptionPolicies.Default
-              ? EncryptionIntents.LocalStoragePreferEncrypted
-              : EncryptionIntents.LocalStorageDecrypted
-        });
+        const encrypted = await this.encryptionDelegate!.payloadByEncryptingPayload(
+          payload,
+          this.encryptionPolicy === StorageEncryptionPolicies.Default
+            ? EncryptionIntents.LocalStoragePreferEncrypted
+            : EncryptionIntents.LocalStorageDecrypted
+        );
         nondeleted.push(encrypted);
       }
     }

@@ -1,3 +1,4 @@
+import { SNProtocolService } from './protocol_service';
 import { SNStorageService } from './storage_service';
 import { PureService } from '@Lib/services/pure_service';
 import { StorageKeys } from '@Lib/storage_keys';
@@ -10,7 +11,6 @@ import {
   ChallengeReason,
   ChallengeValue
 } from '@Lib/challenges';
-import { SNKeyManager } from './key_manager';
 
 type OrchestratorFill = {
   orchestrator: ChallengeOrchestrator
@@ -243,23 +243,23 @@ export class ChallengeOperation {
 export class ChallengeService extends PureService {
 
   private storageService?: SNStorageService
-  private keyManager?: SNKeyManager
+  private protocolService?: SNProtocolService
   private challengeOperations: Record<string, ChallengeOperation> = {}
   public challengeHandler?: ChallengeHandler
 
   constructor(
     storageService: SNStorageService,
-    keyManager: SNKeyManager,
+    protocolService: SNProtocolService,
   ) {
     super();
     this.storageService = storageService;
-    this.keyManager = keyManager;
+    this.protocolService = protocolService;
   }
 
   /** @override */
   public deinit() {
     this.storageService = undefined;
-    this.keyManager = undefined;
+    this.protocolService = undefined;
     this.challengeHandler = undefined;
     super.deinit();
   }
@@ -294,10 +294,10 @@ export class ChallengeService extends PureService {
   }
   public async validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse> {
     if (value.type === ChallengeType.LocalPasscode) {
-      return this.keyManager!.validatePasscode(value.value);
+      return this.protocolService!.validatePasscode(value.value);
     }
     else if (value.type === ChallengeType.AccountPassword) {
-      return this.keyManager!.validateAccountPassword(value.value);
+      return this.protocolService!.validateAccountPassword(value.value);
     }
     else if (value.type === ChallengeType.Biometric) {
       return { valid: value.value === true };
@@ -307,7 +307,7 @@ export class ChallengeService extends PureService {
 
   public async getLaunchChallenge() {
     const types = [];
-    const hasPasscode = this.keyManager!.hasPasscode();
+    const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
       types.push(ChallengeType.LocalPasscode);
     }
@@ -327,7 +327,7 @@ export class ChallengeService extends PureService {
   }
 
   public isPasscodeLocked() {
-    return this.keyManager!.rootKeyNeedsUnwrapping();
+    return this.protocolService!.rootKeyNeedsUnwrapping();
   }
 
   public async enableBiometrics() {

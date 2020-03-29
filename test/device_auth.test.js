@@ -23,7 +23,7 @@ describe('device authentication', () => {
     await application.setPasscode(passcode);
     expect(await application.hasPasscode()).to.equal(true);
     expect((await application.challengeService.getLaunchChallenge())).to.be.ok;
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
     /** Recreate application and initialize */
@@ -53,10 +53,10 @@ describe('device authentication', () => {
     await tmpApplication.prepareForLaunch({
       callbacks: { receiveChallenge }
     });
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
     await tmpApplication.launch({ awaitDatabaseLoad: true });
-    expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
-    expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await tmpApplication.deinit();
   }).timeout(10000);
 
@@ -69,7 +69,7 @@ describe('device authentication', () => {
     await application.challengeService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
     expect(((await application.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
     /** Recreate application and initialize */
@@ -104,11 +104,11 @@ describe('device authentication', () => {
         receiveChallenge: receiveChallenge
       }
     });
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
     expect(((await tmpApplication.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
     await tmpApplication.launch({ awaitDatabaseLoad: true });
-    expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
-    expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     tmpApplication.deinit();
   }).timeout(10000);
 
@@ -124,10 +124,10 @@ describe('device authentication', () => {
     const sampleStorageKey = 'foo';
     const sampleStorageValue = 'bar';
     await application.storageService.setValue(sampleStorageKey, sampleStorageValue);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     const passcode = 'foobar';
     await application.setPasscode(passcode);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
     expect(
       await application.hasPasscode()
     ).to.equal(true);
@@ -163,13 +163,13 @@ describe('device authentication', () => {
         receiveChallenge: receiveChallenge,
       }
     });
-    expect(await tmpApplication.keyManager.getRootKey()).to.not.be.ok;
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
     await tmpApplication.launch({ awaitDatabaseLoad: true });
     expect(
       await tmpApplication.storageService.getValue(sampleStorageKey)
     ).to.equal(sampleStorageValue);
-    expect(await tmpApplication.keyManager.getRootKey()).to.be.ok;
-    expect(tmpApplication.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
     tmpApplication.deinit();
   }).timeout(10000);
 });

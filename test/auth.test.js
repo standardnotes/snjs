@@ -32,7 +32,7 @@ describe('basic auth', () => {
       password: this.password
     });
     expect(response).to.be.ok;
-    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(5000);
 
   it('fails register new account with short password', async function () {
@@ -42,7 +42,7 @@ describe('basic auth', () => {
       password: password
     });
     expect(response.error).to.be.ok;
-    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
   }).timeout(5000);
 
   it('successfully logs out of account', async function () {
@@ -51,10 +51,10 @@ describe('basic auth', () => {
       password: this.password
     });
 
-    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
-    expect(this.application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
+    expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
+    expect(this.application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
   });
@@ -72,7 +72,7 @@ describe('basic auth', () => {
     });
     expect(response).to.be.ok;
     expect(response.error).to.not.be.ok;
-    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(20000);
 
   it('fails login with wrong password', async function () {
@@ -88,7 +88,7 @@ describe('basic auth', () => {
     });
     expect(response).to.be.ok;
     expect(response.error).to.be.ok;
-    expect(await this.application.keyManager.getRootKey()).to.not.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
   }).timeout(20000);
 
   it('fails to change to short password', async function () {
@@ -154,7 +154,7 @@ describe('basic auth', () => {
     // await Factory.sleep(0.5);
     expect(signinResponse).to.be.ok;
     expect(signinResponse.error).to.not.be.ok;
-    expect(await this.application.keyManager.getRootKey()).to.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(this.application.modelManager.invalidItems().length).to.equal(0);
   }).timeout(20000);
@@ -201,7 +201,7 @@ describe('basic auth', () => {
       });
       expect(signinResponse).to.be.ok;
       expect(signinResponse.error).to.not.be.ok;
-      expect(await this.application.keyManager.getRootKey()).to.be.ok;
+      expect(await this.application.protocolService.getRootKey()).to.be.ok;
     }
   }).timeout(30000);
 });

@@ -136,8 +136,8 @@ describe('2020-01-15 mobile migration', () => {
       awaitDatabaseLoad: true
     });
 
-    expect(application.keyManager.keyMode).to.equal(
-      KEY_MODE_ROOT_KEY_PLUS_WRAPPER
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
     );
 
     /** Should be decrypted */
@@ -153,12 +153,12 @@ describe('2020-01-15 mobile migration', () => {
     );
     expect(typeof keyParams).to.equal('object');
 
-    const rootKey = await application.keyManager.getRootKey();
+    const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
     expect(rootKey.version).to.equal(ProtocolVersions.V003);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_PLUS_WRAPPER);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
     expect(keychainValue).to.not.be.ok;
@@ -261,8 +261,8 @@ describe('2020-01-15 mobile migration', () => {
         receiveChallenge: receiveChallenge,
       }
     });
-    expect(application.keyManager.keyMode).to.equal(
-      KEY_MODE_WRAPPER_ONLY
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.WrapperOnly
     );
     await application.launch({
       awaitDatabaseLoad: true
@@ -274,12 +274,12 @@ describe('2020-01-15 mobile migration', () => {
     const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
-    const rootKey = await application.keyManager.getRootKey();
+    const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
     expect(rootKey.version).to.equal(ProtocolVersions.V003);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_WRAPPER_ONLY);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
     expect(keychainValue).to.not.be.ok;
@@ -389,8 +389,8 @@ describe('2020-01-15 mobile migration', () => {
       awaitDatabaseLoad: true
     });
 
-    expect(application.keyManager.keyMode).to.equal(
-      KEY_MODE_ROOT_KEY_ONLY
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyOnly
     );
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
@@ -398,12 +398,12 @@ describe('2020-01-15 mobile migration', () => {
     );
     const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
-    const rootKey = await application.keyManager.getRootKey();
+    const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.version).to.equal(ProtocolVersions.V003);
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_ONLY);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
       StorageKeys.RootKeyParams,
@@ -495,8 +495,8 @@ describe('2020-01-15 mobile migration', () => {
       awaitDatabaseLoad: true
     });
 
-    expect(application.keyManager.keyMode).to.equal(
-      KEY_MODE_ROOT_KEY_NONE
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyNone
     );
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
@@ -505,9 +505,9 @@ describe('2020-01-15 mobile migration', () => {
     const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).to.not.be.ok;
 
-    const rootKey = await application.keyManager.getRootKey();
+    const rootKey = await application.protocolService.getRootKey();
     expect(rootKey).to.not.be.ok;
-    expect(application.keyManager.keyMode).to.equal(KEY_MODE_ROOT_KEY_NONE);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
 
     /** Expect note is decrypted */
     expect(application.modelManager.notes.length).to.equal(1);

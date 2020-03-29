@@ -62,10 +62,10 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
     identifier,
     passcode
   );
-  await application.keyManager.setNewRootKeyWrapper({
-    wrappingKey: key,
-    keyParams: keyParams
-  });
+  await application.protocolService.setNewRootKeyWrapper(
+    key,
+    keyParams
+  );
   await application.rewriteItemsKeys();
   await application.syncService.sync();
 }
@@ -91,10 +91,10 @@ export async function registerOldUser({ application, email, password, version })
     keyParams: accountKeyParams
   });
   await application.sessionManager.handleAuthResponse(response);
-  await application.keyManager.setNewRootKey({
-    key: accountKey,
-    keyParams: accountKeyParams
-  });
+  await application.protocolService.setNewRootKey(
+    accountKey,
+    accountKeyParams
+  );
   application.notifyEvent(ApplicationEvents.SignedIn);
   await application.syncService.sync({
     mode: SyncModes.DownloadFirst

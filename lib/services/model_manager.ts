@@ -64,10 +64,10 @@ export class SNModelManager extends PureService {
   private mappingObservers: MappingObserver[] = []
   private creationObservers: CreationObserver[] = []
   private items: SNItem[] = []
-  private itemsKeys: SNItemsKey[] = []
-  private notes: SNNote[] = []
-  private tags: SNTag[] = []
-  private components: SNComponent[] = []
+  public itemsKeys: SNItemsKey[] = []
+  public notes: SNNote[] = []
+  public tags: SNTag[] = []
+  public components: SNComponent[] = []
   private itemsHash: Record<string, SNItem> = {}
   private resolveQueue: Record<string, SNItem[]> = {}
   private systemSmartTags: SNSmartTag[]

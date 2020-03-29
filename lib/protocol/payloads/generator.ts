@@ -95,7 +95,7 @@ export function CopyPayload(
   return deepFreeze(new (payload.constructor as any)(rawPayload, true));
 }
 
-export function CreateEncryptionParameters(rawParameters: RawEncryptionParameters) {
+export function CreateEncryptionParameters(rawParameters: RawEncryptionParameters | PurePayload) {
   const copy = Copy(rawParameters);
   return deepFreeze(new EncryptionParameters(copy, true));
 }

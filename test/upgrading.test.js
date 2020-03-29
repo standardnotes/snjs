@@ -68,13 +68,13 @@ describe('upgrading', () => {
     });
 
     expect(
-      (await this.application.keyManager.getRootKeyWrapperKeyParams()).version
+      (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
     ).to.equal(oldVersion);
     expect(
-      (await this.application.keyManager.getRootKeyParams()).version
+      (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(oldVersion);
     expect(
-      (await this.application.keyManager.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).version
     ).to.equal(oldVersion);
 
     const promptForValuesForTypes = (types) => {
@@ -105,26 +105,26 @@ describe('upgrading', () => {
     });
     await this.application.upgradeProtocolVersion();
 
-    const wrappedRootKey = await this.application.keyManager.getWrappedRootKey();
+    const wrappedRootKey = await this.application.protocolService.getWrappedRootKey();
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
     expect(payload.version).to.equal(newVersion);
 
     expect(
-      (await this.application.keyManager.getRootKeyWrapperKeyParams()).version
+      (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
     ).to.equal(newVersion);
     expect(
-      (await this.application.keyManager.getRootKeyParams()).version
+      (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(newVersion);
     expect(
-      (await this.application.keyManager.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).version
     ).to.equal(newVersion);
   }).timeout(5000);;
 
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
-    const itemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
+    const itemsKey = this.application.protocolService.getDefaultItemsKey();
     await this.application.modelManager.setItemToBeDeleted(itemsKey);
-    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(0);
+    expect(this.application.protocolService.allItemsKeys.length).to.equal(0);
 
     /** Register with 003 version */
     await Factory.registerOldUser({
@@ -134,13 +134,13 @@ describe('upgrading', () => {
       version: ProtocolVersions.V003
     });
 
-    expect(this.application.itemsKeyManager.allItemsKeys.length).to.equal(1);
+    expect(this.application.protocolService.allItemsKeys.length).to.equal(1);
 
     expect(
-      (await this.application.keyManager.getRootKeyParams()).version
+      (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(ProtocolVersions.V003);
     expect(
-      (await this.application.keyManager.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).version
     ).to.equal(ProtocolVersions.V003);
 
     /** Create note and ensure its encrypted with 003 */
@@ -160,13 +160,13 @@ describe('upgrading', () => {
 
     const latestVersion = this.application.protocolService.getLatestVersion();
     expect(
-      (await this.application.keyManager.getRootKeyParams()).version
+      (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(latestVersion);
     expect(
-      (await this.application.keyManager.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).version
     ).to.equal(latestVersion);
 
-    const defaultItemsKey = this.application.itemsKeyManager.getDefaultItemsKey();
+    const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
     expect(defaultItemsKey.version).to.equal(latestVersion);
 
     /** After change, note should now be encrypted with latest protocol version */

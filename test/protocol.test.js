@@ -63,7 +63,7 @@ describe('protocol', () => {
 
   it('decrypting already decrypted payload should return same payload', async function () {
     const payload = Factory.createNotePayload();
-    const result = await application.protocolService.payloadByDecryptingPayload({ payload });
+    const result = await application.protocolService.payloadByDecryptingPayload(payload);
     expect(payload).to.equal(result);
     expect(result.errorDecrypting).to.not.be.ok;
   });
@@ -78,14 +78,12 @@ describe('protocol', () => {
         }
       }
     );
-    const encrypted = await application.protocolService.payloadByEncryptingPayload({
+    const encrypted = await application.protocolService.payloadByEncryptingPayload(
       payload,
-      intent: EncryptionIntents.SyncDecrypted
-    });
+      EncryptionIntents.SyncDecrypted
+    );
     expect(encrypted.content.startsWith('000')).to.equal(true);
-    const decrypted = await application.protocolService.payloadByDecryptingPayload({
-      payload: encrypted
-    });
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted);
     expect(decrypted.errorDecrypting).to.not.be.ok;
     expect(decrypted.content.secret).to.equal(payload.content.secret);
   });
