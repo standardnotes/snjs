@@ -231,10 +231,10 @@ describe('keys', () => {
       .payloadByDecryptingPayload({
         payload: encryptedPayload
       });
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [decryptedPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [decryptedPayload],
+      PayloadSources.LocalChanged
+    );
 
     const note = this.application.modelManager.notes[0];
     expect(note.uuid).to.equal(notePayload.uuid);
@@ -244,10 +244,10 @@ describe('keys', () => {
     const keyPayload = CreateMaxPayloadFromAnyObject(
       itemsKey
     );
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [keyPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [keyPayload],
+      PayloadSources.LocalChanged
+    );
 
     /**
      * Sleeping is required to trigger asyncronous protocolService.decryptItemsWaitingForKeys,

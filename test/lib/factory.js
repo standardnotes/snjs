@@ -122,26 +122,26 @@ export function itemToStoragePayload(item) {
 
 export function createMappedNote(application) {
   const payload = createNotePayload();
-  return application.modelManager.mapPayloadToLocalItem({
+  return application.modelManager.mapPayloadToLocalItem(
     payload,
-    source: PayloadSources.LocalChanged
-  });
+    PayloadSources.LocalChanged
+  );
 }
 
 export function createMappedTag(application) {
   const payload = createStorageItemTagPayload();
-  return application.modelManager.mapPayloadToLocalItem({
+  return application.modelManager.mapPayloadToLocalItem(
     payload,
-    source: PayloadSources.LocalChanged
-  });
+    PayloadSources.LocalChanged
+  );
 }
 
 export async function createSyncedNote(application) {
   const payload = createNotePayload();
-  const note = await application.modelManager.mapPayloadToLocalItem({
+  const note = await application.modelManager.mapPayloadToLocalItem(
     payload,
-    source: PayloadSources.LocalChanged
-  });
+    PayloadSources.LocalChanged
+  );
   await application.modelManager.setItemDirty(note, true);
   await application.syncService.sync();
   return note;

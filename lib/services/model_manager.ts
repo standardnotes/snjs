@@ -1,3 +1,10 @@
+import { PayloadOverride } from '@Payloads/override';
+import { PurePayload } from '@Payloads/pure_payload';
+import { SNComponent } from '@Models/app/component';
+import { SNTag } from '@Models/app/tag';
+import { SNNote } from './../models/app/note';
+import { SNItemsKey } from '@Models/app/items_key';
+import { SNItem, ItemContent } from '@Models/core/item';
 import remove from 'lodash/remove';
 import pull from 'lodash/pull';
 import { findInArray, isNullOrUndefined } from '@Lib/utils';
@@ -6,16 +13,41 @@ import {
   CreateItemFromPayload,
   SNPredicate,
   SNSmartTag
-} from '@Models';
+} from '@Models/index';
 import { PureService } from '@Lib/services/pure_service';
 import {
   PayloadSources,
   PayloadsByDuplicating,
   CreateMaxPayloadFromAnyObject,
   PayloadCollection,
-  DeltaFileImport
-} from '@Payloads';
+  DeltaFileImport,
+  PayloadFields
+} from '@Payloads/index';
 import { Uuid } from '@Lib/uuid';
+
+type CreationCallback = (
+  items: SNItem[],
+  source: PayloadSources,
+  sourceKey?: string
+) => Promise<void>
+
+type CreationObserver = {
+  callback: CreationCallback
+}
+
+type MappingCallback = (
+  allItems: SNItem[],
+  validItems?: SNItem[],
+  deletedItems?: SNItem[],
+  source?: PayloadSources,
+  sourceKey?: string
+) => Promise<void>
+
+type MappingObserver = {
+  types: ContentTypes | ContentTypes[]
+  priority: number
+  callback: MappingCallback
+}
 
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
@@ -28,41 +60,42 @@ import { Uuid } from '@Lib/uuid';
  * applications 'stream' items to display in the interface.
  */
 export class SNModelManager extends PureService {
+
+  private mappingObservers: MappingObserver[] = []
+  private creationObservers: CreationObserver[] = []
+  private items: SNItem[] = []
+  private itemsKeys: SNItemsKey[] = []
+  private notes: SNNote[] = []
+  private tags: SNTag[] = []
+  private components: SNComponent[] = []
+  private itemsHash: Record<string, SNItem> = {}
+  private resolveQueue: Record<string, SNItem[]> = {}
+  private systemSmartTags: SNSmartTag[]
+  public masterCollection: PayloadCollection
+
   constructor() {
     super();
-    this.mappingObservers = [];
-    this.creationObservers = [];
-    this.items = [];
-    this.itemsKeys = [];
-    this.notes = [];
-    this.tags = [];
-    this.components = [];
-    this.itemsHash = {};
-    this.resolveQueue = {};
     this.masterCollection = new PayloadCollection();
     this.systemSmartTags = SNSmartTag.systemSmartTags();
   }
 
   /**
-   * @access public
    * Our payload collection keeps the latest mapped payload for every payload
    * that passes through our mapping function. Use this to query current state
    * as needed to make decisions, like about duplication or uuid alteration.
    */
-  getMasterCollection() {
+  public getMasterCollection() {
     return this.masterCollection;
   }
 
-  /** @access public */
-  deinit() {
+  public deinit() {
     super.deinit();
     this.creationObservers.length = 0;
     this.mappingObservers.length = 0;
     this.resetState();
   }
 
-  /** @access private */
-  resetState() {
+  private resetState() {
     this.items.length = 0;
     this.itemsKeys.length = 0;
     this.notes.length = 0;
@@ -79,45 +112,32 @@ export class SNModelManager extends PureService {
    * is properly reconciled.
    * The alternative to calling this function is to modify an item directly, then
    * to call one of the mapping functions to propagate the new values.
-   * @access public
-   * @param {object} item
-   * @param {object} properties - Key/value object of new values to set
+   * @param properties - Key/value object of new values to set
    */
-  async setItemProperties({ item, properties }) {
-    return this.setItemsProperties({ items: [item], properties });
-  }
-
-  /** @access public */
-  async setItemsProperties({ items, properties }) {
-    const keys = Object.keys(properties);
+  public async setItemsProperties(items: SNItem[], properties: Record<string, any>) {
+    const keys = Object.keys(properties) as PayloadFields[];
     for (const item of items) {
       for (const key of keys) {
-        item[key] = properties[key];
+        (item as any)[key] = properties[key];
       }
     }
-    await this.mapItems({
-      items,
-      source: PayloadSources.LocalChanged
-    });
+    await this.mapItems(items, PayloadSources.LocalChanged);
   }
 
   /**
    * Modifies an item and marks it as dirty
-   * @access public
    * @param {object} item
    * @param {function} modifier - An async function that modifies item internals
    */
-  async modifyItem({ item, modifier }) {
-    return this.modifyItems({ items: [item], modifier });
+  public async modifyItem(item: SNItem, modifier: () => Promise<void>) {
+    return this.modifyItems([item], modifier);
   }
 
   /**
   * Modifies multiple items and marks them as dirty
-  * @access public
-  * @param {object} items
-  * @param {function} modifier - An async function that modifies items internals
+  * @param modifier - An async function that modifies items internals
   */
-  async modifyItems({ items, modifier }) {
+  public async modifyItems(items: SNItem[], modifier: () => Promise<void>) {
     await modifier();
     await this.setItemsDirty(items, true);
   }
@@ -125,71 +145,69 @@ export class SNModelManager extends PureService {
   /**
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
-   * @access public
    */
-  async mapCollectionToLocalItems({ collection, sourceKey }) {
-    return this.mapPayloadsToLocalItems({
-      payloads: collection.getAllPayloads(),
-      source: collection.source,
-      sourceKey: sourceKey
-    });
+  public async mapCollectionToLocalItems(collection: PayloadCollection, sourceKey?: string) {
+    return this.mapPayloadsToLocalItems(
+      collection.getAllPayloads(),
+      collection.source!,
+      sourceKey
+    );
   }
 
   /**
    * One of many mapping helpers available.
    * This function maps an item object to propagate its values.
-   * @access public
    */
-  async mapItem({ item, source, sourceKey }) {
-    const items = await this.mapItems({
-      items: [item],
+  public async mapItem(item: SNItem, source: PayloadSources, sourceKey?: string) {
+    const items = await this.mapItems(
+      [item],
       source,
       sourceKey
-    });
+    );
     return items[0];
   }
 
   /**
    * One of many mapping helpers available.
    * This function maps an array of items
-   * @access public
    */
-  async mapItems({ items, source, sourceKey }) {
+  public async mapItems(items: SNItem[], source: PayloadSources, sourceKey?: string) {
     /** 
      * Insert the items first. This way, if one of the input items is a template item,
      * unmanaged item, and we run it through the mapper, we don't want the mapper to create
      * a new object reference, but instead use the one supplied to this function.
      */
-    this.insertItems({ items: items });
+    this.insertItems(items);
     const payloads = items.map((item) => item.payloadRepresentation());
-    return this.mapPayloadsToLocalItems({
-      payloads: payloads,
-      source: source,
-      sourceKey: sourceKey
-    });
+    return this.mapPayloadsToLocalItems(
+      payloads,
+      source,
+      sourceKey
+    );
   }
 
   /**
    * One of many mapping helpers available.
    * This function maps a payload to an item
-   * @access public
-   * @returns {object} The mapped item
+   * @returns The mapped item
    */
-  async mapPayloadToLocalItem({ payload, source }) {
-    const items = await this.mapPayloadsToLocalItems({
-      payloads: [payload],
-      source: source
-    });
+  public async mapPayloadToLocalItem(payload: PurePayload, source: PayloadSources) {
+    const items = await this.mapPayloadsToLocalItems(
+      [payload],
+      source
+    );
     return items[0];
   }
 
   /**
    * This function maps multiple payloads to items, and is the authoratative mapping
-   * function that all other mapping helpers rely on.
-   * @access public
-   * @returns {object} The mapped item
+   * function that all other mapping helpers rely on
    */
-  async mapPayloadsToLocalItems({ payloads, source, sourceKey }) {
+  public async mapPayloadsToLocalItems(
+    payloads: PurePayload[],
+    source: PayloadSources,
+    sourceKey?: string
+  ) {
     if (!payloads) {
       throw Error('Payloads cannot be null');
     }
@@ -198,7 +216,11 @@ export class SNModelManager extends PureService {
     }
     const itemsToNotifyObserversOf = [];
     const newItems = [];
-    const processed = {};
+    type ProcessedElement = {
+      item: SNItem
+      payload: PurePayload
+    }
+    const processed: Record<string, ProcessedElement> = {};
     /** First loop should process payloads and add items only; no relationship handling. */
     for (const payload of payloads) {
       if (!payload) {
@@ -240,10 +262,7 @@ export class SNModelManager extends PureService {
         item.updateFromPayload(payload);
       } else {
         item = CreateItemFromPayload(payload);
-        this.insertItems({
-          items: [item],
-          globalOnly: isDirtyDeleted
-        });
+        this.insertItems([item], isDirtyDeleted);
         newItems.push(item);
       }
       itemsToNotifyObserversOf.push(item);
@@ -262,9 +281,7 @@ export class SNModelManager extends PureService {
       if (payload.content) {
         await this.resolveReferencesForItem(item);
       }
-      const interestedItems = this.popItemsInterestedInMissingItem({
-        item: item
-      });
+      const interestedItems = this.popItemsInterestedInMissingItem(item);
       for (const interestedItem of interestedItems) {
         interestedItem.addItemAsRelationship(item);
       }
@@ -286,17 +303,15 @@ export class SNModelManager extends PureService {
    * Inserts an item to be managed by model manager state, but does not map the item.
    * Access to this function should be restricted to use by consumers that explicitely
    * know what this function is used for.
-   * @access public 
    */
-  insertItem({ item }) {
-    this.insertItems({ items: [item] });
+  public insertItem(item: SNItem) {
+    this.insertItems([item]);
   }
 
   /** 
    * Similiar to `insertItem` but for many items.
-   * @access public 
    */
-  insertItems({ items, globalOnly }) {
+  public insertItems(items: SNItem[], globalOnly?: boolean) {
     for (const item of items) {
       if (this.itemsHash[item.uuid]) {
         continue;
@@ -312,16 +327,16 @@ export class SNModelManager extends PureService {
         continue;
       }
       if (item.content_type === ContentTypes.ItemsKey) {
-        this.itemsKeys.unshift(item);
+        this.itemsKeys.unshift(item as SNItemsKey);
       }
       else if (item.content_type === ContentTypes.Tag) {
-        this.tags.unshift(item);
+        this.tags.unshift(item as SNTag);
       }
       else if (item.content_type === ContentTypes.Note) {
-        this.notes.unshift(item);
+        this.notes.unshift(item as SNNote);
       }
       else if (item.content_type === ContentTypes.Component) {
-        this.components.unshift(item);
+        this.components.unshift(item as SNComponent);
       }
     }
   }
@@ -329,42 +344,33 @@ export class SNModelManager extends PureService {
   /**
    * Adds items to model management.
    * @deprecated Use `insertItem` instead.
-   * @param globalOnly  Whether the item should only be added to main .items
-   *                    array, and not individual item arrays like .notes,
-   *                    .tags, .components, etc.
    */
-  async addItem(item, globalOnly = false) {
-    return this.addItems([item], globalOnly);
+  async addItem(item: SNItem) {
+    return this.addItems([item]);
   }
 
   /**
    * @deprecated Use `insertItems` instead.
    */
-  async addItems(items, globalOnly = false) {
+  async addItems(items: SNItem[]) {
     console.warn('ModelManager.addItems is depracated. Use mapPayloadsToLocalItems instead.');
     const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
-    await this.mapPayloadsToLocalItems({
-      payloads: payloads,
-      source: PayloadSources.LocalChanged
-    });
+    return this.mapPayloadsToLocalItems(payloads, PayloadSources.LocalChanged);
   }
 
-  /** @access private */
-  resolveRelationshipWhenItemAvailable({ interestedItem, missingItemId }) {
+  private resolveRelationshipWhenItemAvailable(interestedItem: SNItem, missingItemId: string) {
     const interestedItems = this.resolveQueue[missingItemId] || [];
     interestedItems.push(interestedItem);
     this.resolveQueue[missingItemId] = interestedItems;
   }
 
-  /** @access private */
-  popItemsInterestedInMissingItem({ item }) {
+  private popItemsInterestedInMissingItem(item: SNItem) {
     const interestedItems = this.resolveQueue[item.uuid];
     delete this.resolveQueue[item.uuid];
     return interestedItems || [];
   }
 
-  /** @access private */
-  async resolveReferencesForItem(item, markReferencesDirty = false) {
+  public async resolveReferencesForItem(item: SNItem, markReferencesDirty = false) {
     if (item.errorDecrypting) {
       return;
     }
@@ -391,58 +397,51 @@ export class SNModelManager extends PureService {
         }
       } else {
         const referenceId = referencesIds[index];
-        this.resolveRelationshipWhenItemAvailable({
-          interestedItem: item,
-          missingItemId: referenceId
-        });
+        this.resolveRelationshipWhenItemAvailable(item, referenceId);
       }
     }
   }
 
   /** 
    * Notifies observers when an item has been created 
-   * @access public
-   * @param {object} observer
-   * @param {function} observer.callback
-   * @param {Array.<object>} observer.callback.items
-   * @param {PayloadSource} observer.callback.source
-   * @param {string} observer.callback.sourceKey
-   * @returns {function} A function to remove the observer
    */
-  addCreationObserver(observer) {
+  public addCreationObserver(callback: CreationCallback) {
+    const observer: CreationObserver = { callback };
     this.creationObservers.push(observer);
     return () => {
       remove(this.creationObservers, observer);
     };
   }
 
-  /** @access private */
-  async notifyCreationObservers(items, source, sourceKey) {
+  private async notifyCreationObservers(
+    items: SNItem[],
+    source: PayloadSources,
+    sourceKey?: string
+  ) {
     for (const observer of this.creationObservers) {
-      await observer.callback({
-        items: items,
-        source: source,
-        sourceKey: sourceKey
-      });
+      await observer.callback(items, source, sourceKey);
     }
   }
 
   /** 
    * Notifies observers when an item has been mapped.
-   * @param {Array.<string>} types - An array of content types to listen for
-   * @param {function} callback
-   * @param {Array.<object>} callback.items
-   * @param {PayloadSource} callback.source
-   * @param {string} callback.sourceKey
-   * @param {number} priority - The lower the priority, the earlier the function is called 
+   * @param types - An array of content types to listen for
+   * @param priority - The lower the priority, the earlier the function is called 
    *  wrt to other observers
-   * @returns {function} A function to remove the observer
    */
-  addMappingObserver(types, callback, priority = 1) {
+  public addMappingObserver(
+    types: ContentTypes | ContentTypes[],
+    callback: MappingCallback,
+    priority = 1
+  ) {
     if (!Array.isArray(types)) {
       types = [types];
     }
-    const observer = { types, priority, callback };
+    const observer: MappingObserver = {
+      types,
+      priority,
+      callback
+    };
     this.mappingObservers.push(observer);
     return () => {
       pull(this.mappingObservers, observer);
@@ -450,17 +449,20 @@ export class SNModelManager extends PureService {
   }
 
   /** 
-   * @access public
    * This function is mostly for internal use, but can be used externally by consumers who
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
-  async notifyMappingObservers(items, source, sourceKey) {
+  public async notifyMappingObservers(
+    items: SNItem[],
+    source: PayloadSources,
+    sourceKey?: string
+  ) {
     const observers = this.mappingObservers.sort((a, b) => {
       return a.priority < b.priority ? -1 : 1;
     });
     for (const observer of observers) {
       const allRelevantItems =
-        observer.types.includes('*')
+        observer.types.includes(ContentTypes.Any)
           ? items
           : items.filter((item) => {
             return observer.types.includes(item.content_type);
@@ -489,66 +491,70 @@ export class SNModelManager extends PureService {
   /**
    * Sets the item as needing sync. The item is then run through the mapping function,
    * and propagated to mapping observers.
-   * @access public
-   * @param {object} item
-   * @param {boolean} dirty
-   * @param {boolean} updateClientDate - Whether to update the item's "user modified date"
-   * @param {PayloadSource} source
-   * @param {string} sourceKey
+   * @param updateClientDate - Whether to update the item's "user modified date"
    */
-  async setItemDirty(item, dirty = true, updateClientDate, source, sourceKey) {
+  public async setItemDirty(
+    item: SNItem,
+    dirty = true,
+    updateClientDate = false,
+    source?: PayloadSources,
+    sourceKey?: string
+  ) {
     return this.setItemsDirty([item], dirty, updateClientDate, source, sourceKey);
   }
 
   /**
-   * @access public
    * Similar to `setItemDirty`, but acts on an array of items as the first param.
    */
-  async setItemsDirty(items, dirty = true, updateClientDate, source, sourceKey) {
+  public async setItemsDirty(
+    items: SNItem[],
+    dirty = true,
+    updateClientDate = false,
+    source?: PayloadSources,
+    sourceKey?: string
+  ) {
     for (const item of items) {
       item.setDirty(dirty, updateClientDate, true);
     }
-    return this.mapItems({
-      items: items,
-      source: source || PayloadSources.LocalDirtied,
-      sourceKey: sourceKey
-    });
+    return this.mapItems(
+      items,
+      source || PayloadSources.LocalDirtied,
+      sourceKey
+    );
   }
 
   /**
    * Duplicates an item and maps it, thus propagating the item to observers.
-   * @access public
-   * @param {object} params
-   * @param {Item} params.item
-   * @param {boolean} params.isConflict - Whether to mark the duplicate as a conflict
+   * @param isConflict - Whether to mark the duplicate as a conflict
    *    of the original.
    */
-  async duplicateItem({ item, isConflict }) {
+  public async duplicateItem(item: SNItem, isConflict = false) {
     const payload = CreateMaxPayloadFromAnyObject(item);
     const payloads = await PayloadsByDuplicating(
       payload,
       this.getMasterCollection(),
       isConflict,
     );
-    const results = await this.mapPayloadsToLocalItems({
-      payloads: payloads,
-      source: PayloadSources.LocalChanged
-    });
+    const results = await this.mapPayloadsToLocalItems(
+      payloads,
+      PayloadSources.LocalChanged
+    );
     const copy = results.find((p) => p.uuid === payloads[0].uuid);
     return copy;
   }
 
   /**
    * Creates an item and conditionally maps it and marks it as dirty.
-   * @access public
-   * @param {object} params
-   * @param {string} params.contentType
-   * @param {object} params.content
-   * @param {boolean} params.add - Whether to insert the item to model manager state.
-   * @param {boolean} params.needsSync - Whether to mark the item as needing sync
-   * @returns {Item} The created item
+   * @param add - Whether to insert the item to model manager state.
+   * @param needsSync - Whether to mark the item as needing sync
    */
-  async createItem({ contentType, content, add, needsSync, override }) {
+  public async createItem(
+    contentType: ContentTypes,
+    content: ItemContent,
+    add = false,
+    needsSync = false,
+    override?: PayloadOverride
+  ) {
     if (!contentType) {
       throw 'Attempting to create item with no contentType';
     }
@@ -558,28 +564,25 @@ export class SNModelManager extends PureService {
         content_type: contentType,
         content: content || {}
       },
-      null,
-      null,
+      undefined,
+      undefined,
       override
     );
     const item = CreateItemFromPayload(payload);
     if (add) {
-      this.insertItem({ item: item });
+      this.insertItem(item);
       if (needsSync) {
         await this.setItemDirty(item);
       }
-      await this.notifyCreationObservers(
-        [item]
-      );
+      await this.notifyCreationObservers([item], PayloadSources.LocalChanged);
     }
     return item;
   }
 
   /**
    * Returns an array of items that need to be synced.
-   * @returns {Array.<Item>}
    */
-  getDirtyItems() {
+  public getDirtyItems() {
     return this.items.filter((item) => {
       /* An item that has an error decrypting can be synced only if it is being deleted.
         Otherwise, we don't want to send corrupt content up to the server. */
@@ -590,10 +593,8 @@ export class SNModelManager extends PureService {
   /**
    * Marks the item as deleted and needing sync.
    * Removes the item from respective content arrays (this.notes, this.tags, etc.)
-   * @access public
-   * @param {Item} item 
    */
-  async setItemToBeDeleted(item) {
+  public async setItemToBeDeleted(item: SNItem) {
     item.deleted = true;
     if (!item.dummy) {
       await this.setItemDirty(item, true);
@@ -604,23 +605,17 @@ export class SNModelManager extends PureService {
 
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
-   * @access public
-   * @param {Array.<Item>} items
    */
-  async setItemsToBeDeleted(items) {
+  public async setItemsToBeDeleted(items: SNItem[]) {
     for (const item of items) {
       await this.setItemToBeDeleted(item);
     }
   }
 
-  /**
-   * @access private
-   * @param {Item} item 
-   */
-  async handleReferencesForItemDeletion(item) {
+  private async handleReferencesForItemDeletion(item: SNItem) {
     /* Handle direct relationships */
     if (!item.errorDecrypting) {
-      for (const reference of item.content.references) {
+      for (const reference of item.content.references!) {
         const relationship = this.findItem(reference.uuid);
         if (relationship) {
           item.removeItemAsRelationship(relationship);
@@ -631,32 +626,27 @@ export class SNModelManager extends PureService {
         }
       }
     }
-
     /* Handle indirect relationships */
     const referencingItems = item.allReferencingItems;
     for (const referencingItem of referencingItems) {
       referencingItem.removeItemAsRelationship(item);
       await this.setItemDirty(referencingItem, true);
     }
-
     item.resetLocalReferencePointers();
   }
 
   /**
    * Removes an item directly from local state, without setting it as deleted or
    * as needing sync. This is typically called after a deleted item has been fully synced.
-   * @access public
-   * @param {Item} item 
    */
-  async removeItemLocally(item) {
+  public async removeItemLocally(item: SNItem) {
     remove(this.items, { uuid: item.uuid });
     delete this.itemsHash[item.uuid];
     this.removeItemFromRespectiveArray(item);
     item.isBeingRemovedLocally();
   }
 
-  /** @access private */
-  removeItemFromRespectiveArray(item) {
+  private removeItemFromRespectiveArray(item: SNItem) {
     if (item.content_type === ContentTypes.Tag) {
       remove(this.tags, { uuid: item.uuid });
     } else if (item.content_type === ContentTypes.Note) {
@@ -670,17 +660,15 @@ export class SNModelManager extends PureService {
 
   /** 
    * Returns a detached array of all items
-   * @access public 
    */
-  get allItems() {
+  public get allItems() {
     return this.items.slice();
   }
 
   /**
    * Returns a detached array of all items which are not dummys
-   * @access public
    */
-  get allNondummyItems() {
+  public get allNondummyItems() {
     return this.items.filter((item) => {
       return !item.dummy;
     });
@@ -688,9 +676,8 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns a detached array of all items which are not deleted
-   * @access public
    */
-  get nonDeletedItems() {
+  public get nonDeletedItems() {
     return this.items.filter((item) => {
       return !item.dummy && !item.deleted;
     });
@@ -698,25 +685,20 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns all items of a certain type
-   * @access public
-   * @param {string|Array.<string>} contentType - A string or array of strings representing
-   *    content types. Use '*' for all content types.
+   * @param contentType - A string or array of strings representing
+   *    content types.
    */
-  getItems(contentType) {
+  public getItems(contentType: ContentTypes | ContentTypes[]): SNItem[] {
     if (Array.isArray(contentType)) {
       return this.allItems.filter((item) => {
-        return !item.dummy && (
-          contentType.includes(item.content_type) ||
-          contentType.includes('*')
-        );
+        return !item.dummy && contentType.includes(item.content_type);
       });
     }
     const managed = this.managedItemsForContentType(contentType);
     return managed || this.getItems([contentType]);
   }
 
-  /** @access private */
-  managedItemsForContentType(contentType) {
+  private managedItemsForContentType(contentType: ContentTypes): SNItem[] | null {
     if (contentType === ContentTypes.Note) {
       return this.notes.slice();
     } else if (contentType === ContentTypes.Component) {
@@ -729,9 +711,8 @@ export class SNModelManager extends PureService {
 
   /** 
    * Returns all items that have not been able to decrypt.
-   * @access public 
    */
-  invalidItems() {
+  public invalidItems() {
     return this.allItems.filter((item) => {
       return item.errorDecrypting;
     });
@@ -739,9 +720,8 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns all items which are properly decrypted
-   * @param {string} contentType 
    */
-  validItemsForContentType(contentType) {
+  validItemsForContentType(contentType: ContentTypes) {
     const managed = this.managedItemsForContentType(contentType);
     const items = managed || this.allItems;
     return items.filter((item) => {
@@ -755,21 +735,17 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns an item for a given id
-   * @access public
-   * @param {string} itemId 
    */
-  findItem(itemId) {
+  findItem(itemId: string) {
     return this.itemsHash[itemId];
   }
 
   /**
    * Returns all items matching given ids
-   * @access public
-   * @param {Array.<string>} ids 
-   * @param {boolean} includeBlanks - Whether to include a null array element where a 
+   * @param includeBlanks - Whether to include a null array element where a 
    *  result could not be found. If true, ids.length and results.length will always be the same.
    */
-  findItems(ids, includeBlanks = false) {
+  public findItems(ids: string[], includeBlanks = false) {
     const results = [];
     for (const id of ids) {
       const item = this.itemsHash[id];
@@ -782,28 +758,23 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns all items matching a given predicate
-   * @access public
-   * @param {SNPredicate} predicate 
    */
-  itemsMatchingPredicate(predicate) {
+  public itemsMatchingPredicate(predicate: SNPredicate) {
     return this.itemsMatchingPredicates([predicate]);
   }
 
   /**
   * Returns all items matching an array of predicates
-  * @access public
-  * @param {Array.<SNPredicate>} predicates
   */
-  itemsMatchingPredicates(predicates) {
+  public itemsMatchingPredicates(predicates: SNPredicate[]) {
     return this.filterItemsWithPredicates(this.allItems, predicates);
   }
 
   /**
    * Performs actual predicate filtering for public methods above.
    * Does not return deleted items.
-   * @access private
    */
-  filterItemsWithPredicates(items, predicates) {
+  private filterItemsWithPredicates(items: SNItem[], predicates: SNPredicate[]) {
     const results = items.filter((item) => {
       if (item.deleted) {
         return false;
@@ -821,11 +792,9 @@ export class SNModelManager extends PureService {
   /**
    * Imports an array of payloads from an external source (such as a backup file)
    * and marks the items as dirty.
-   * @access public
-   * @param {Array.<Payload>} payloads 
-   * @returns {Array.<Item>} Resulting items
+   * @returns Resulting items
    */
-  async importPayloads(payloads) {
+  public async importPayloads(payloads: PurePayload[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
       new PayloadCollection(
@@ -834,9 +803,7 @@ export class SNModelManager extends PureService {
       )
     );
     const collection = await delta.resultingCollection();
-    const items = await this.mapCollectionToLocalItems({
-      collection: collection
-    });
+    const items = await this.mapCollectionToLocalItems(collection);
     for (const item of items) {
       await this.setItemDirty(item, true, false);
       item.deleted = false;
@@ -846,9 +813,8 @@ export class SNModelManager extends PureService {
 
   /**
    * The number of notes currently managed
-   * @access public
    */
-  noteCount() {
+  public noteCount() {
     return this.notes.filter((n) => !n.dummy).length;
   }
 
@@ -856,51 +822,42 @@ export class SNModelManager extends PureService {
    * Immediately removes all items from mapping state and notifies observers
    * Used primarily when signing into an account and wanting to discard any current
    * local data.
-   * @access public
    */
-  removeAllItemsFromMemory() {
+  public removeAllItemsFromMemory() {
     for (const item of this.items) {
       item.deleted = true;
     }
-    this.notifyMappingObservers(this.items);
+    this.notifyMappingObservers(this.items, PayloadSources.LocalChanged);
     this.resetState();
   }
 
   /**
    * Finds the first tag matching a given title
-   * @access public
-   * @param {string} title
-   * @returns {Tag|null}
    */
-  findTagByTitle(title) {
-    return findInArray(this.tags, 'title', title);
+  public findTagByTitle(title: string) {
+    return findInArray(this.tags, 'title', title as any);
   }
 
   /**
   * Finds or creates a tag with a given title
-  * @access public
-  * @param {string} title
-  * @returns {Promise<Tag>}
   */
-  async findOrCreateTagByTitle(title) {
+  public async findOrCreateTagByTitle(title: string) {
     let tag = this.findTagByTitle(title);
     if (!tag) {
-      tag = await this.createItem({
-        contentType: 'Tag',
-        content: { title: title },
-        add: true,
-        needsSync: true
-      });
+      tag = await this.createItem(
+        ContentTypes.Tag,
+        { title: title } as ItemContent,
+        true,
+        true
+      );
     }
     return tag;
   }
 
   /**
    * Returns all notes matching the smart tag
-   * @access public
-   * @param {SmartTag} smartTag 
    */
-  notesMatchingSmartTag(smartTag) {
+  public notesMatchingSmartTag(smartTag: SNSmartTag) {
     const contentTypePredicate = new SNPredicate('content_type', '=', 'Note');
     const predicates = [contentTypePredicate, smartTag.content.predicate];
     if (!smartTag.content.isTrashTag) {
@@ -913,38 +870,34 @@ export class SNModelManager extends PureService {
 
   /**
    * Returns the smart tag corresponding to the "Trash" tag.
-   * @access public
    */
-  trashSmartTag() {
+  public trashSmartTag() {
     return this.systemSmartTags.find((tag) => tag.content.isTrashTag);
   }
 
   /**
    * Returns all items currently in the trash
-   * @access public
    */
-  trashedItems() {
-    return this.notesMatchingSmartTag(this.trashSmartTag());
+  public trashedItems() {
+    return this.notesMatchingSmartTag(this.trashSmartTag()!);
   }
 
   /**
    * Permanently deletes any items currently in the trash. Consumer must manually call sync.
-   * @access public
    */
-  async emptyTrash() {
+  public async emptyTrash() {
     const notes = this.trashedItems();
     return this.setItemsToBeDeleted(notes);
   }
 
   /**
    * Returns all smart tags, sorted by title.
-   * @access public
    */
-  getSmartTags() {
-    const userTags = this.validItemsForContentType(ContentTypes.SmartTag)
+  public getSmartTags() {
+    const userTags: SNSmartTag[] = this.validItemsForContentType(ContentTypes.SmartTag)
       .sort((a, b) => {
         return a.content.title < b.content.title ? -1 : 1;
-      });
+      }) as SNSmartTag[];
     return this.systemSmartTags.concat(userTags);
   }
 }

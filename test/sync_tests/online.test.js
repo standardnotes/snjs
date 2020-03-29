@@ -98,7 +98,7 @@ describe('online syncing', () => {
     });
     /** Throw in some random syncs to cause trouble */
     const syncCount = 30;
-    for(let i = 0; i < syncCount; i++) {
+    for (let i = 0; i < syncCount; i++) {
       this.application.sync();
       await Factory.sleep(0.01);
     }
@@ -290,10 +290,10 @@ describe('online syncing', () => {
         errorDecrypting: true
       }
     );
-    const items = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [errorred],
-      source: PayloadSources.LocalChanged
-    });
+    const items = await this.application.modelManager.mapPayloadsToLocalItems(
+      [errorred],
+      PayloadSources.LocalChanged
+    );
     const mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal('string');
 
@@ -301,10 +301,10 @@ describe('online syncing', () => {
       .payloadByDecryptingPayload({
         payload: errorred
       });
-    const mappedItems2 = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [decryptedPayload],
-      source: PayloadSources.LocalChanged
-    });
+    const mappedItems2 = await this.application.modelManager.mapPayloadsToLocalItems(
+      [decryptedPayload],
+      PayloadSources.LocalChanged
+    );
     const mappedItem2 = mappedItems2[0];
     expect(typeof mappedItem2.content).to.equal('object');
     expect(mappedItem2.content.title).to.equal(originalTitle);
@@ -569,10 +569,10 @@ describe('online syncing', () => {
         updated_at: Factory.yesterday()
       }
     );
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [mutatedPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [mutatedPayload],
+      PayloadSources.LocalChanged
+    );
     const resultNote = this.application.modelManager.findItem(note.uuid);
     expect(resultNote.uuid).to.equal(note.uuid);
     await this.application.modelManager.setItemDirty(resultNote);
@@ -633,13 +633,13 @@ describe('online syncing', () => {
     expect(note.dirty).to.equal(false);
     this.expectedItemCount++;
 
-    await this.application.modelManager.modifyItem({
-      item: note,
-      modifier: () => {
+    await this.application.modelManager.modifyItem(
+      note,
+      () => {
         note.text = 'Stale text';
         note.updated_at = Factory.yesterday();
       }
-    });
+    );
 
     await this.application.syncService.sync(syncOptions);
     expect(note.dirty).to.equal(false);
@@ -687,12 +687,12 @@ describe('online syncing', () => {
         didCompleteRelevantSync = true;
         const response = data;
         const matching = response.savedPayloads.find((p) => p.uuid === note.uuid);
-        if(matching) {
+        if (matching) {
           success = false;
         }
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst});
+    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
     expect(success).to.equal(true);
   }).timeout(10000);
@@ -701,7 +701,7 @@ describe('online syncing', () => {
     /** The singleton manager may delete items are download first. We dont want those uploaded to server. */
     const note = await Factory.createMappedNote(this.application);
     await this.application.modelManager.setItemDirty(note, true);
-    
+
     let success = true;
     let didCompleteRelevantSync = false;
     let beginCheckingResponse = false;
@@ -752,10 +752,10 @@ describe('online syncing', () => {
         });
       payloads.push(decrypted);
     }
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: payloads,
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      payloads,
+      PayloadSources.LocalChanged
+    );
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     const foundNote = this.application.modelManager.findItem(note.uuid);
     expect(foundNote.dirty).to.equal(true);
@@ -763,24 +763,25 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it('duplicating an item should maintian its relationships', async function () {
-    const payload1 = Factory.createStorageItemPayload('Foo');
-    const payload2 = Factory.createStorageItemPayload('Bar');
+    const payload1 = Factory.createStorageItemPayload(ContentTypes.ServerExtension);
+    const payload2 = Factory.createStorageItemPayload(ContentTypes.UserPrefs);
 
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [payload1, payload2],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [payload1, payload2],
+      PayloadSources.LocalChanged
+    );
     this.expectedItemCount += 2;
+    const fooItem = this.application.modelManager.getItems(ContentTypes.ServerExtension)[0];
+    const barItem = this.application.modelManager.getItems(ContentTypes.UserPrefs)[0];
+    expect(fooItem).to.be.ok;
+    expect(barItem).to.be.ok;
 
-    const fooItem = this.application.modelManager.getItems('Foo')[0];
-    const barItem = this.application.modelManager.getItems('Bar')[0];
-
-    await this.application.modelManager.modifyItems({
-      items: [fooItem, barItem],
-      modifier: () => {
+    await this.application.modelManager.modifyItems(
+      [fooItem, barItem],
+      () => {
         fooItem.addItemAsRelationship(barItem);
       }
-    });
+    );
 
     expect(barItem.referencingItemsCount).to.equal(1);
     expect(barItem.allReferencingItems).to.include(fooItem);
@@ -788,15 +789,15 @@ describe('online syncing', () => {
     await this.application.syncService.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
-    await this.application.modelManager.modifyItem({
-      item: fooItem,
-      modifier: () => {
+    await this.application.modelManager.modifyItem(
+      fooItem,
+      () => {
         fooItem.content.title = `${Math.random()}`;
         fooItem.updated_at = Factory.yesterday();
       }
-    });
+    );
 
-    await this.application.syncService.sync(syncOptions);
+    await this.application.syncService.sync({...syncOptions, awaitAll: true});
 
     // fooItem should now be conflicted and a copy created
     this.expectedItemCount++;
@@ -804,7 +805,7 @@ describe('online syncing', () => {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    const fooItems = this.application.modelManager.getItems('Foo');
+    const fooItems = this.application.modelManager.getItems(ContentTypes.ServerExtension);
     const fooItem2 = fooItems[1];
 
     expect(fooItem2.content.conflict_of).to.equal(fooItem.uuid);
@@ -820,7 +821,6 @@ describe('online syncing', () => {
     expect(barItem.content.references.length).to.equal(0);
 
     expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
-
     for (const item of this.application.modelManager.allItems) {
       expect(item.dirty).to.not.be.ok;
     }
@@ -970,10 +970,10 @@ describe('online syncing', () => {
     const itemCount = 6;
     for (let i = 0; i < itemCount; i++) {
       const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i / 2)]);
-      const item = await this.application.modelManager.mapPayloadToLocalItem({ 
+      const item = await this.application.modelManager.mapPayloadToLocalItem(
         payload,
-        source: PayloadSources.LocalChanged
-      });
+        PayloadSources.LocalChanged
+      );
       await this.application.modelManager.setItemDirty(item, true);
     }
     this.expectedItemCount += itemCount;
@@ -1148,14 +1148,14 @@ describe('online syncing', () => {
     // Now do a regular sync with no latency.
     this.application.syncService.ut_endLatencySimulator();
     const midSync = this.application.syncService.sync(syncOptions);
-    
+
     await slowSync;
     await midSync;
 
     expect(note.dirty).to.equal(false);
     expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan);
     expect(note.content.text).to.equal(text);
-    
+
     // client B
     await this.application.modelManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
@@ -1198,7 +1198,7 @@ describe('online syncing', () => {
   it('retreiving a remote deleted item should succeed', async function () {
     const note = await Factory.createSyncedNote(this.application);
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
-    await this.application.deleteItem({item: note});
+    await this.application.deleteItem({ item: note });
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
     await this.application.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);

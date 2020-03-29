@@ -19,10 +19,10 @@ describe('items', () => {
   it('setting an item as dirty should update its client updated at', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params],
+      PayloadSources.LocalChanged
+    );
     const item = modelManager.items[0];
     const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
@@ -34,10 +34,10 @@ describe('items', () => {
   it('setting an item as dirty with option to skip client updated at', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params],
+      PayloadSources.LocalChanged
+    );
     const item = modelManager.items[0];
     const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
@@ -49,10 +49,10 @@ describe('items', () => {
   it('properly pins, archives, and locks', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params],
+      PayloadSources.LocalChanged
+    );
 
     const item = modelManager.items[0];
     expect(item.pinned).to.not.be.ok;
@@ -71,10 +71,10 @@ describe('items', () => {
     const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params1, params2],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params1, params2],
+      PayloadSources.LocalChanged
+    );
 
     const item1 = modelManager.notes[0];
     const item2 = modelManager.notes[1];
@@ -116,10 +116,10 @@ describe('items', () => {
     const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params1, params2],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params1, params2],
+      PayloadSources.LocalChanged
+    );
 
     const item1 = modelManager.notes[0];
     const item2 = modelManager.notes[1];

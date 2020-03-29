@@ -1,4 +1,5 @@
 export enum ContentTypes {
+  Any = '*',
   Item = 'SF|Item',
   RootKey = 'SN|RootKey|NoSync',
   ItemsKey = 'SN|ItemsKey',

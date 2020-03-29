@@ -2,7 +2,7 @@ import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
 type PredicateType = string[] | SNPredicate
 type PredicateArray = Array<string[]> | SNPredicate[] 
-type PredicateValue = string | Date | PredicateArray;
+type PredicateValue = string | Date | boolean | PredicateArray;
 
 /**
  * A local-only construct that defines a built query that can be used to 

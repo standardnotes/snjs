@@ -58,7 +58,7 @@ describe('app models', () => {
     await sharedApplication.modelManager.addItem(sharedCreatedItem);
     expect(sharedApplication.modelManager.allItems.length).to.equal(sharedItemCount);
     expect(sharedApplication.modelManager.getItems([sharedCreatedItem.content_type]).length).to.equal(1);
-    expect(sharedApplication.modelManager.validItemsForContentType([sharedCreatedItem.content_type]).length).to.equal(1);
+    expect(sharedApplication.modelManager.validItemsForContentType(sharedCreatedItem.content_type).length).to.equal(1);
   });
 
   it('find added item', () => {
@@ -91,14 +91,14 @@ describe('app models', () => {
       }
     );
 
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [mutated],
-      source: PayloadSources.LocalChanged
-    });
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params2],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [mutated],
+      PayloadSources.LocalChanged
+    );
+    await modelManager.mapPayloadsToLocalItems(
+      [params2],
+      PayloadSources.LocalChanged
+    );
 
     const item1 = modelManager.findItem(params1.uuid);
     const item2 = modelManager.findItem(params2.uuid);
@@ -119,10 +119,10 @@ describe('app models', () => {
       { uuid: null }
     );
 
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [params],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [params],
+      PayloadSources.LocalChanged
+    );
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
 
@@ -136,17 +136,17 @@ describe('app models', () => {
       { content: { foo: 'bar' } }
     );
 
-    let items = await modelManager.mapPayloadsToLocalItems({
-      payloads: [mutated],
-      source: PayloadSources.LocalChanged
-    });
+    let items = await modelManager.mapPayloadsToLocalItems(
+      [mutated],
+      PayloadSources.LocalChanged
+    );
     let item = items[0];
     expect(item).to.not.be.null;
 
-    items = await modelManager.mapPayloadsToLocalItems({
-      payloads: [mutated],
-      source: PayloadSources.LocalChanged
-    });
+    items = await modelManager.mapPayloadsToLocalItems(
+      [mutated],
+      PayloadSources.LocalChanged
+    );
     item = items[0];
 
     expect(item.content.foo).to.equal('bar');
@@ -164,10 +164,10 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1);
 
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [updatedPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [updatedPayload],
+      PayloadSources.LocalChanged
+    );
 
     expect(item1.content.references.length).to.equal(1);
   });
@@ -186,10 +186,10 @@ describe('app models', () => {
     // damage references of one object
     item1.content.references = [];
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [updatedPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [updatedPayload],
+      PayloadSources.LocalChanged
+    );
 
     expect(item1.content.references.length).to.equal(0);
     expect(item2.content.references.length).to.equal(1);
@@ -220,7 +220,7 @@ describe('app models', () => {
   it('properly duplicates item with no relationships', async function () {
     const modelManager = this.application.modelManager;
     const item = await Factory.createMappedNote(this.application);
-    const duplicate = await modelManager.duplicateItem({ item });
+    const duplicate = await modelManager.duplicateItem(item);
     expect(duplicate.uuid).to.not.equal(item.uuid);
     expect(item.isItemContentEqualWith(duplicate)).to.equal(true);
     expect(item.created_at.toISOString()).to.equal(duplicate.created_at.toISOString());
@@ -238,7 +238,7 @@ describe('app models', () => {
     expect(item1.referencedItemsCount).to.equal(1);
     expect(item2.referencingItemsCount).to.equal(1);
 
-    const duplicate = await modelManager.duplicateItem({ item: item1 });
+    const duplicate = await modelManager.duplicateItem(item1);
     expect(duplicate.uuid).to.not.equal(item1.uuid);
     expect(item1.referencedItemsCount).to.equal(1);
     expect(duplicate.referencingItemsCount).to.equal(item1.referencingItemsCount);
@@ -259,22 +259,22 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject(item1),
-      source: PayloadSources.LocalSaved
-    });
+    await modelManager.mapPayloadToLocalItem(
+      CreateMaxPayloadFromAnyObject(item1),
+      PayloadSources.LocalSaved
+    );
     expect(item2.referencingItemsCount).to.equal(1);
-    await modelManager.mapPayloadToLocalItem({
-      source: PayloadSources.LocalSaved,
-      payload: item1.payloadRepresentation(
+    await modelManager.mapPayloadToLocalItem(
+      item1.payloadRepresentation(
         {
           deleted: true,
           content: {
             references: []
           }
         }
-      )
-    });
+      ),
+      PayloadSources.LocalSaved,
+    );
     expect(item2.referencingItemsCount).to.equal(0);
     expect(item1.referencingItemsCount).to.equal(0);
     expect(item1.referencedItemsCount).to.equal(0);
@@ -286,10 +286,10 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject(item1),
-      source: PayloadSources.LocalSaved
-    });
+    await modelManager.mapPayloadToLocalItem(
+      CreateMaxPayloadFromAnyObject(item1),
+      PayloadSources.LocalSaved
+    );
 
     expect(item1.content.references.length).to.equal(1);
     expect(item1.referencedItemsCount).to.equal(1);
@@ -324,10 +324,10 @@ describe('app models', () => {
     this.expectedItemCount += 2;
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem({
-      payload: CreateMaxPayloadFromAnyObject(item1),
-      source: PayloadSources.LocalSaved
-    });
+    await modelManager.mapPayloadToLocalItem(
+      CreateMaxPayloadFromAnyObject(item1),
+      PayloadSources.LocalSaved
+    );
 
     expect(item2.referencingItemsCount).to.equal(1);
 
@@ -359,7 +359,7 @@ describe('app models', () => {
 
     expect(tag.content.references.length).to.equal(1);
 
-    const noteCopy = await modelManager.duplicateItem({ item: note });
+    const noteCopy = await modelManager.duplicateItem(note);
     expect(note.uuid).to.not.equal(noteCopy.uuid);
 
     expect(modelManager.notes.length).to.equal(2);

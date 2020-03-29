@@ -85,10 +85,10 @@ describe('singletons', () => {
     const privs3 = createPrivsPayload();
 
     this.expectedItemCount++;
-    const items = await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [privs1, privs2, privs3],
-      source: PayloadSources.LocalChanged
-    });
+    const items = await this.application.modelManager.mapPayloadsToLocalItems(
+      [privs1, privs2, privs3],
+      PayloadSources.LocalChanged
+    );
     await this.application.modelManager.setItemsDirty(items);
     await this.application.syncService.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
@@ -239,10 +239,10 @@ describe('singletons', () => {
 
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload,
-      source: PayloadSources.LocalChanged
-    });
+    const item = await this.application.modelManager.mapPayloadToLocalItem(
+      payload,
+      PayloadSources.LocalChanged
+    );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
     /** Set after sync so that it syncs properly */
@@ -260,10 +260,10 @@ describe('singletons', () => {
 
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload,
-      source: PayloadSources.LocalChanged
-    });
+    const item = await this.application.modelManager.mapPayloadToLocalItem(
+      payload,
+      PayloadSources.LocalChanged
+    );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
     const predicate = new SNPredicate('content_type', '=', item.content_type);

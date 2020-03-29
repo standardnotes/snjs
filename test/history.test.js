@@ -145,10 +145,10 @@ describe('session history', () => {
           text: Factory.randomString(100)
         })
       );
-      const item = await this.modelManager.mapPayloadToLocalItem({ 
+      const item = await this.modelManager.mapPayloadToLocalItem(
         payload,
-        source: PayloadSources.LocalChanged
-      });
+        PayloadSources.LocalChanged
+      );
       await this.application.modelManager.setItemDirty(item);
       await this.application.syncService.sync();
       const itemHistory = this.historyManager.historyForItem(item);

@@ -45,10 +45,10 @@ describe('notes + tags syncing', async function() {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [notePayload, tagPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [notePayload, tagPayload],
+      PayloadSources.LocalChanged
+    );
     const note = this.application.modelManager.getItems(['Note'])[0];
     const tag = this.application.modelManager.getItems(['Tag'])[0];
     expect(this.application.modelManager.notes.length).to.equal(1);
@@ -72,10 +72,10 @@ describe('notes + tags syncing', async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [notePayload, tagPayload],
-      source: PayloadSources.LocalChanged
-    });
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [notePayload, tagPayload],
+      PayloadSources.LocalChanged
+    );
     const originalNote = this.application.modelManager.notes[0];
     const originalTag = this.application.modelManager.tags[0];
     await this.application.modelManager.setItemsDirty([originalNote, originalTag]);
@@ -113,13 +113,13 @@ describe('notes + tags syncing', async function() {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await this.application.modelManager.mapPayloadsToLocalItems({
-      payloads: [
+    await this.application.modelManager.mapPayloadsToLocalItems(
+      [
         notePayload, 
         tagPayload
       ],
-      source: PayloadSources.LocalChanged
-    });
+      PayloadSources.LocalChanged
+    );
     const note = this.application.modelManager.notes[0];
     const tag = this.application.modelManager.tags[0];
     expect(note.referencingItemsCount).to.equal(1);

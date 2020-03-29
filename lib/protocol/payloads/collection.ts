@@ -11,11 +11,11 @@ interface PayloadMap {
  */
 export class PayloadCollection {
 
-  readonly source: PayloadSources
+  readonly source?: PayloadSources
   readonly payloads: Array<PurePayload>
   readonly payloadMap: PayloadMap
 
-  constructor(payloads: Array<PurePayload> = [], source: PayloadSources) {
+  constructor(payloads: Array<PurePayload> = [], source?: PayloadSources) {
     this.source = source;
     this.payloadMap = {};
     this.payloads = payloads;

@@ -55,10 +55,10 @@ describe('duplication', () => {
 
   it('components should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentTypes.Component);
-    const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload,
-      source: PayloadSources.LocalChanged
-    });
+    const item = await this.application.modelManager.mapPayloadToLocalItem(
+      payload,
+      PayloadSources.LocalChanged
+    );
     this.expectedItemCount++;
     await this.application.syncService.sync();
 
@@ -72,10 +72,10 @@ describe('duplication', () => {
 
   it('items keys should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentTypes.ItemsKey);
-    const item = await this.application.modelManager.mapPayloadToLocalItem({
-      payload: payload,
-      source: PayloadSources.LocalChanged
-    });
+    const item = await this.application.modelManager.mapPayloadToLocalItem(
+      payload,
+      PayloadSources.LocalChanged
+    );
     this.expectedItemCount++;
     await this.application.syncService.sync();
 

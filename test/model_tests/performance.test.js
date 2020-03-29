@@ -60,10 +60,10 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({
-        payloads: subArray,
-        source: PayloadSources.LocalChanged
-      });
+      await modelManager.mapPayloadsToLocalItems(
+        subArray,
+        PayloadSources.LocalChanged
+      );
       currentIndex += batchSize;
     }
 
@@ -127,10 +127,10 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.mapPayloadsToLocalItems({
-        payloads: subArray,
-        source: PayloadSources.LocalChanged
-      });
+      await modelManager.mapPayloadsToLocalItems(
+        subArray,
+        PayloadSources.LocalChanged
+      );
       currentIndex += batchSize;
     }
 

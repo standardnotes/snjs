@@ -59,7 +59,7 @@ export class SNTag extends SNItem {
     super.removeItemAsRelationship(item);
   }
 
-  protected isBeingRemovedLocally() {
+  public isBeingRemovedLocally() {
     this.notes.forEach((note) => {
       note.setIsNoLongerReferencedBy(this);
     });

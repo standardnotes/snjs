@@ -195,16 +195,16 @@ describe('predicates', () => {
   it('model manager predicate matching', async function () {
     const modelManager = this.application.modelManager;
     const payload1 = CreateMaxPayloadFromAnyObject(createItemParams());
-    const item1 = await modelManager.mapPayloadToLocalItem({
-      payload: payload1,
-      source: PayloadSources.LocalSaved
-    });
+    const item1 = await modelManager.mapPayloadToLocalItem(
+      payload1,
+      PayloadSources.LocalSaved
+    );
     item1.updated_at = new Date();
 
-    await modelManager.mapItem({
-      item: item1,
-      source: PayloadSources.LocalSaved
-    });
+    await modelManager.mapItem(
+      item1,
+      PayloadSources.LocalSaved
+    );
     const predicate = new SNPredicate('content.title', '=', 'ello');
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
@@ -290,10 +290,10 @@ describe('predicates', () => {
       }
     );
 
-    const item2 = (await modelManager.mapPayloadsToLocalItems({
-      payloads: [payload],
-      source: PayloadSources.LocalChanged
-    }))[0];
+    const item2 = (await modelManager.mapPayloadsToLocalItems(
+      [payload],
+      PayloadSources.LocalChanged
+    ))[0];
 
     expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'includes', 'bar'])).length).to.equal(1);
     expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'in', ['sobar']])).length).to.equal(1);
@@ -315,10 +315,10 @@ describe('predicates', () => {
   it('false should compare true with undefined', async function () {
     const item = createItem();
     const modelManager = this.application.modelManager;
-    await modelManager.mapItem({
-      item: item,
-      source: PayloadSources.LocalSaved
-    });
+    await modelManager.mapItem(
+      item,
+      PayloadSources.LocalSaved
+    );
     const predicate = new SNPredicate('pinned', '=', false);
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(modelManager.allItems.length);
   });
@@ -333,10 +333,10 @@ describe('predicates', () => {
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = 'abc';
-    await modelManager.mapPayloadsToLocalItems({
-      payloads: [CreateMaxPayloadFromAnyObject(item)],
-      source: PayloadSources.LocalChanged
-    });
+    await modelManager.mapPayloadsToLocalItems(
+      [CreateMaxPayloadFromAnyObject(item)],
+      PayloadSources.LocalChanged
+    );
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   });
 });

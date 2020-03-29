@@ -1,3 +1,4 @@
+import { ContentTypes } from '@Models/content_types';
 import { PayloadSources } from '@Payloads/sources';
 import { PayloadOverride } from './../../protocol/payloads/override';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -13,13 +14,13 @@ export enum SingletonStrategies {
 };
 
 export type ContentReference = {
-  uuid: String
-  content_type: String
+  uuid: string
+  content_type: string
 }
 
 export type ItemContent = {
   [key: string]: any
-  references: ContentReference[]
+  references?: ContentReference[]
 }
 
 type Itemable<K extends keyof any, T> = {
@@ -34,7 +35,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   public uuid!: string
   public content!: ItemContent
   public deleted!: boolean
-  public content_type!: string
+  public content_type!: ContentTypes
   public items_key_id!: string
   public enc_item_key!: string
   public created_at!: Date
@@ -124,7 +125,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     }
   }
 
-  public payloadRepresentation(override: PayloadOverride) {
+  public payloadRepresentation(override?: PayloadOverride) {
     return CreateMaxPayloadFromAnyObject(
       this,
       undefined,
@@ -289,7 +290,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     return !isNullOrUndefined(target);
   }
 
-  protected isBeingRemovedLocally() {
+  public isBeingRemovedLocally() {
     for (const uuid of Object.keys(this.referencedItems)) {
       const item = this.referencedItems[uuid];
       item.setIsNoLongerReferencedBy(this);
@@ -306,7 +307,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     return Object.keys(this.referencingItems).length;
   }
 
-  private get allReferencingItems() {
+  public get allReferencingItems() {
     return Object.keys(this.referencingItems)
       .map((uuid) => this.referencingItems[uuid]);
   }
