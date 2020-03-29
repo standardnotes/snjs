@@ -6,11 +6,11 @@ import { Environments, Platforms } from '../../lib/platforms.js';
 export const TestTimeout = 10000;
 
 export function createApplication(namespace, environment, platform) {
-  const deviceInterface = new WebDeviceInterface({
+  const deviceInterface = new WebDeviceInterface(
     namespace,
-    timeout: setTimeout.bind(window),
-    interval: setInterval.bind(window)
-  });
+    setTimeout.bind(window),
+    setInterval.bind(window)
+  );
   return new SNApplication({
     namespace: namespace,
     deviceInterface: deviceInterface,
