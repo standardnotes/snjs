@@ -1,44 +1,43 @@
 import { removeFromArray } from '@Lib/utils';
+import { ApplicationStages } from '@Lib/stages';
 
-export class PureService {
+type EventObserver = (eventName: string, data: any) => Promise<void>
 
-  constructor() {
-    this.eventObservers = [];
-  }
+export abstract class PureService {
 
-  addEventObserver(observer) {
+  private eventObservers: EventObserver[] = []
+  public loggingEnabled = false
+
+  public addEventObserver(observer: EventObserver) {
     this.eventObservers.push(observer);
     return () => {
       removeFromArray(this.eventObservers, observer);
     };
   }
 
-  async notifyEvent(eventName, data) {
+  protected async notifyEvent(eventName: string, data: any) {
     for (const observer of this.eventObservers) {
       await observer(eventName, data || {});
     }
   }
 
   /** 
-   * @access public
    * Called by application before restart. 
    * Subclasses should deregister any observers/timers 
    */
-  deinit() {
-    /* Optional override */
+  public deinit() {
     this.eventObservers.length = 0;
   }
 
   /**
-  * @access public
   * Application instances will call this function directly when they arrive
   * at a certain migratory state.
   */
-  async handleApplicationStage(stage) {
+  public async handleApplicationStage(stage: ApplicationStages) {
 
   }
 
-  log(message, ...args) {
+  log(message: string, ...args: any[]) {
     if (this.loggingEnabled) {
       const date = new Date();
       const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');
@@ -50,5 +49,4 @@ export class PureService {
       }
     }
   }
-
 }

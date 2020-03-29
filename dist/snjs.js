@@ -5201,9 +5201,7 @@ var SNApplication = /*#__PURE__*/function () {
         return;
       }
 
-      this.alertService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNAlertService"]))({
-        deviceInterface: this.deviceInterface
-      });
+      this.alertService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNAlertService"]))(this.deviceInterface);
       this.services.push(this.alertService);
     }
   }, {
@@ -5839,7 +5837,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/challenge_service */ "./lib/services/challenge_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeService", function() { return _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__["ChallengeService"]; });
 
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureService", function() { return _Services_pure_service__WEBPACK_IMPORTED_MODULE_17__["PureService"]; });
 
 /* harmony import */ var _Services_application_service__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Services/application_service */ "./lib/services/application_service.js");
@@ -5886,7 +5884,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_23__["SNMigrationService"]; });
 
-/* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.js");
+/* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _services_alert_service__WEBPACK_IMPORTED_MODULE_24__["SNAlertService"]; });
 
 /* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.js");
@@ -16163,7 +16161,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
@@ -16415,14 +16413,11 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
               case 0:
                 action = _ref3.action, passwordRequestHandler = _ref3.passwordRequestHandler;
                 return _context3.abrupt("return", new Promise(function (resolve, reject) {
-                  _this2.alertService.confirm({
-                    text: "Are you sure you want to replace the current note contents with this action's results?",
-                    onConfirm: function onConfirm() {
-                      _this2.runConfirmedGetAction({
-                        action: action,
-                        passwordRequestHandler: passwordRequestHandler
-                      }).then(resolve);
-                    }
+                  _this2.alertService.confirm("Are you sure you want to replace the current note contents with this action's results?", undefined, undefined, undefined, function () {
+                    _this2.runConfirmedGetAction({
+                      action: action,
+                      passwordRequestHandler: passwordRequestHandler
+                    }).then(resolve);
                   });
                 }));
 
@@ -16461,9 +16456,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                     message: 'An issue occurred while processing this action. Please try again.'
                   };
 
-                  _this3.alertService.alert({
-                    text: error.message
-                  });
+                  _this3.alertService.alert(error.message);
 
                   action.error = true;
                   return {
@@ -16621,9 +16614,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                     message: 'An issue occurred while processing this action. Please try again.'
                   };
 
-                  _this4.alertService.alert({
-                    text: error.message
-                  });
+                  _this4.alertService.alert(error.message);
 
                   action.error = true;
                   return {
@@ -16683,9 +16674,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                  * In some cases revisions were missing auth params. 
                  * Instruct the user to email us to get this remedied. 
                  */
-                this.alertService.alert({
-                  text: "We were unable to decrypt this revision using your current keys, \n            and this revision is missing metadata that would allow us to try different \n            keys to decrypt it. This can likely be fixed with some manual intervention. \n            Please email hello@standardnotes.org for assistance."
-                });
+                this.alertService.alert("We were unable to decrypt this revision using your current keys, \n        and this revision is missing metadata that would allow us to try different \n        keys to decrypt it. This can likely be fixed with some manual intervention. \n        Please email hello@standardnotes.org for assistance.");
                 return _context7.abrupt("return", null);
 
               case 10:
@@ -16846,9 +16835,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                   action.error = true;
                   console.error('Action error response:', response);
 
-                  _this5.alertService.alert({
-                    text: 'An issue occurred while processing this action. Please try again.'
-                  });
+                  _this5.alertService.alert('An issue occurred while processing this action. Please try again.');
 
                   return {
                     response: response
@@ -16934,9 +16921,9 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/alert_service.js":
+/***/ "./lib/services/alert_service.ts":
 /*!***************************************!*\
-  !*** ./lib/services/alert_service.js ***!
+  !*** ./lib/services/alert_service.ts ***!
   \***************************************/
 /*! exports provided: SNAlertService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16946,7 +16933,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return SNAlertService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -16975,46 +16962,47 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 /**
  * Can be subclassed to provide custom alert/confirm implementation.
  * Defaults to using browser alert() and confirm().
  */
-
 var SNAlertService = /*#__PURE__*/function (_PureService) {
   _inherits(SNAlertService, _PureService);
 
-  function SNAlertService(_ref) {
+  function SNAlertService(deviceInterface) {
     var _this;
-
-    var deviceInterface = _ref.deviceInterface;
 
     _classCallCheck(this, SNAlertService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNAlertService).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "deviceInterface", void 0);
+
     _this.deviceInterface = deviceInterface;
     return _this;
   }
-  /** @override */
-
 
   _createClass(SNAlertService, [{
     key: "deinit",
     value: function deinit() {
-      this.deviceInterface = null;
+      this.deviceInterface = undefined;
 
       _get(_getPrototypeOf(SNAlertService.prototype), "deinit", this).call(this);
     }
   }, {
     key: "alert",
     value: function () {
-      var _alert = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(params) {
+      var _alert = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(text, title, closeButtonText, onClose) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 return _context.abrupt("return", new Promise(function (resolve, reject) {
-                  window.alert(params.text);
+                  window.alert(text);
                   resolve();
                 }));
 
@@ -17026,7 +17014,7 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
         }, _callee);
       }));
 
-      function alert(_x) {
+      function alert(_x, _x2, _x3, _x4) {
         return _alert.apply(this, arguments);
       }
 
@@ -17035,13 +17023,13 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "confirm",
     value: function () {
-      var _confirm = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(params) {
+      var _confirm = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(text, title, confirmButtonText, cancelButtonText, onConfirm, onCancel, destructive) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 return _context2.abrupt("return", new Promise(function (resolve, reject) {
-                  if (window.confirm(params.text)) {
+                  if (window.confirm(text)) {
                     resolve();
                   } else {
                     // eslint-disable-next-line prefer-promise-reject-errors
@@ -17057,7 +17045,7 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
         }, _callee2);
       }));
 
-      function confirm(_x2) {
+      function confirm(_x5, _x6, _x7, _x8, _x9, _x10, _x11) {
         return _confirm.apply(this, arguments);
       }
 
@@ -17086,7 +17074,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/keys */ "./lib/services/api/keys.js");
 /* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.js");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 
@@ -17632,7 +17620,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return SNHttpService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -18052,9 +18040,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return SNSessionManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.js");
+/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/api/session */ "./lib/services/api/session.js");
 /* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.js");
@@ -18126,15 +18114,11 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
     _classCallCheck(this, SNSessionManager);
 
-    if (!storageService || !protocolService) {
-      throw 'Invalid SessionManager construction';
-    }
-
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSessionManager).call(this));
     _this.protocolService = protocolService;
     _this.storageService = storageService;
     _this.apiService = apiService;
-    _this.alertService = alertService || new _Services_alert_service__WEBPACK_IMPORTED_MODULE_3__["SNAlertService"]();
+    _this.alertService = alertService;
     return _this;
   }
 
@@ -18461,11 +18445,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 ;
                 message = _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_VERSION"];
                 _context7.next = 25;
-                return this.alertService.confirm({
-                  title: _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_TITLE"],
-                  text: message,
-                  confirmButtonText: _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_IGNORE"]
-                }).catch(function () {
+                return this.alertService.confirm(message, _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_TITLE"], _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_IGNORE"]).catch(function () {
                   /* No-op */
                 });
 
@@ -18733,7 +18713,7 @@ __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApplicationService", function() { return ApplicationService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 
 
@@ -18954,7 +18934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeService", function() { return ChallengeService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -19750,7 +19730,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
@@ -20479,9 +20459,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
 
       if (!component.window) {
-        this.alertService.alert({
-          text: "Standard Notes is trying to communicate with ".concat(component.name, ", \n        but an error is occurring. Please restart this extension and try again.")
-        });
+        this.alertService.alert("Standard Notes is trying to communicate with ".concat(component.name, ", \n        but an error is occurring. Please restart this extension and try again."));
       }
       /* Mobile messaging requires json */
 
@@ -20576,18 +20554,14 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
       if (!component) {
         this.log('Component not defined for message, returning', message);
-        this.alertService.alert({
-          text: 'An extension is trying to communicate with Standard Notes,' + 'but there is an error establishing a bridge. Please restart the app and try again.'
-        });
+        this.alertService.alert('An extension is trying to communicate with Standard Notes,' + 'but there is an error establishing a bridge. Please restart the app and try again.');
         return;
       }
 
       var readwriteActions = [ComponentActions.SaveItems, ComponentActions.AssociateItem, ComponentActions.DeassociateItem, ComponentActions.CreateItem, ComponentActions.CreateItems, ComponentActions.DeleteItems, ComponentActions.SetComponentData];
 
       if (component.readonly && readwriteActions.includes(message.action)) {
-        this.alertService.alert({
-          text: "The extension ".concat(component.name, " is trying to save, but it is in a locked state and cannot accept changes.")
-        });
+        this.alertService.alert("The extension ".concat(component.name, " is trying to save, but it is in a locked state and cannot accept changes."));
         return;
       }
 
@@ -21039,10 +21013,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                             itemNoun = lockedCount === 1 ? 'item' : 'items';
                             auxVerb = lockedCount === 1 ? 'is' : 'are';
 
-                            _this10.alertService.alert({
-                              title: 'Items Locked',
-                              text: "".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited.")
-                            });
+                            _this10.alertService.alert("".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited."), 'Items Locked');
                           }
 
                           payloads = responseItems.map(function (responseItem) {
@@ -21076,9 +21047,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           }
 
                           // An item this extension is trying to save was possibly removed locally, notify user
-                          _this10.alertService.alert({
-                            text: "The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again.")
-                          });
+                          _this10.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again."));
 
                           return _context2.abrupt("continue", 43);
 
@@ -21354,9 +21323,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 reply = null;
                 didConfirm = true;
                 _context6.next = 6;
-                return _this13.alertService.confirm({
-                  text: "Are you sure you want to delete ".concat(itemsData.length, " ").concat(noun, "?")
-                }).catch(function () {
+                return _this13.alertService.confirm("Are you sure you want to delete ".concat(itemsData.length, " ").concat(noun, "?")).catch(function () {
                   didConfirm = false;
                 });
 
@@ -21387,9 +21354,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                _this13.alertService.alert({
-                  text: 'The item you are trying to delete cannot be found.'
-                });
+                _this13.alertService.alert('The item you are trying to delete cannot be found.');
 
                 return _context6.abrupt("continue", 24);
 
@@ -22633,7 +22598,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return SNHistoryManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Services_history_history_session__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/history/history_session */ "./lib/services/history/history_session.js");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
@@ -23507,7 +23472,7 @@ var NoteHistoryEntry = /*#__PURE__*/function (_ItemHistoryEntry) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.js");
+/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__["SNAlertService"]; });
 
 /* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
@@ -23604,7 +23569,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemsKeyManager", function() { return ItemsKeyManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/events */ "./lib/events.js");
 /* harmony import */ var _Services_key_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/key_manager */ "./lib/services/key_manager.js");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
@@ -24222,7 +24187,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNKeyManager", function() { return SNKeyManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
@@ -25781,7 +25746,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_migrations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migrations */ "./lib/migrations/index.js");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib */ "./lib/index.js");
 /* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.js");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
@@ -26339,7 +26304,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
 
@@ -28794,7 +28759,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return SNPrivilegesService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
@@ -29548,7 +29513,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return SNProtocolService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! sncrypto */ "../sncrypto/dist/sncrypto.js");
 /* harmony import */ var sncrypto__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(sncrypto__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.js");
@@ -30819,9 +30784,9 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/pure_service.js":
+/***/ "./lib/services/pure_service.ts":
 /*!**************************************!*\
-  !*** ./lib/services/pure_service.js ***!
+  !*** ./lib/services/pure_service.ts ***!
   \**************************************/
 /*! exports provided: PureService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -30844,12 +30809,16 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 var PureService = /*#__PURE__*/function () {
   function PureService() {
     _classCallCheck(this, PureService);
 
-    this.eventObservers = [];
+    _defineProperty(this, "eventObservers", []);
+
+    _defineProperty(this, "loggingEnabled", false);
   }
 
   _createClass(PureService, [{
@@ -30942,7 +30911,6 @@ var PureService = /*#__PURE__*/function () {
       return notifyEvent;
     }()
     /** 
-     * @access public
      * Called by application before restart. 
      * Subclasses should deregister any observers/timers 
      */
@@ -30950,11 +30918,9 @@ var PureService = /*#__PURE__*/function () {
   }, {
     key: "deinit",
     value: function deinit() {
-      /* Optional override */
       this.eventObservers.length = 0;
     }
     /**
-    * @access public
     * Application instances will call this function directly when they arrive
     * at a certain migratory state.
     */
@@ -31020,7 +30986,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return SNSingletonManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
@@ -31524,7 +31490,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/index */ "./lib/index.js");
 /* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
@@ -33567,7 +33533,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.js");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.js");
 /* harmony import */ var _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/sync/sync_op_status */ "./lib/services/sync/sync_op_status.js");
 /* harmony import */ var _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/sync/sync_state */ "./lib/services/sync/sync_state.js");

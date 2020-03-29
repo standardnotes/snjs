@@ -334,7 +334,7 @@ describe('online syncing', () => {
 
       // Download all items from the server, which will include this note.
       await this.application.syncService.clearSyncPositionTokens();
-      await this.application.syncService.sync(syncOptions);
+      await this.application.syncService.sync({...syncOptions, awaitAll: true});
 
       // We expect this item to be duplicated
       this.expectedItemCount++;
