@@ -110,9 +110,7 @@ describe('online syncing', () => {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.markAllItemsAsNeedingSync({
-      alternateUuids: true
-    });
+    await this.application.syncService.markAllItemsAsNeedingSync(true);
     await this.application.sync();
 
     const notes = this.application.modelManager.notes;
@@ -167,7 +165,7 @@ describe('online syncing', () => {
     const promises = [];
     for (let i = 0; i < syncCount; i++) {
       promises.push(this.application.syncService.sync({
-        timingStrategy: TIMING_STRATEGY_RESOLVE_ON_NEXT
+        queueStrategy: SyncQueueStrategy.ResolveOnNext
       }).then(() => {
         successes++;
       }));
@@ -201,7 +199,7 @@ describe('online syncing', () => {
     for (let i = 0; i < syncCount; i++) {
       promises.push(
         this.application.syncService.sync({
-          timingStrategy: TIMING_STRATEGY_FORCE_SPAWN_NEW
+          queueStrategy: SyncQueueStrategy.ForceSpawnNew
         }).then(() => {
           successes++;
         })
@@ -728,9 +726,7 @@ describe('online syncing', () => {
   it('marking an item dirty then saving to disk should retain that dirty state when restored', async function () {
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.markAllItemsAsNeedingSync({
-      alternateUuids: false
-    });
+    await this.application.syncService.markAllItemsAsNeedingSync(false);
 
     this.application.modelManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();

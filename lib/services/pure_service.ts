@@ -15,7 +15,7 @@ export abstract class PureService {
     };
   }
 
-  protected async notifyEvent(eventName: string, data: any) {
+  protected async notifyEvent(eventName: string, data?: any) {
     for (const observer of this.eventObservers) {
       await observer(eventName, data || {});
     }

@@ -100,7 +100,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private modelManager?: SNModelManager
   private deviceInterface?: DeviceInterface
   private storageService?: SNStorageService
-  private crypto?: SNPureCrypto
+  public crypto?: SNPureCrypto
   private operators: Record<string, SNProtocolOperator> = {}
   private keyMode = KeyMode.RootKeyNone
   private keyObservers: KeyChangeObserver[] = []

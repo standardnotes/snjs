@@ -17,3 +17,6 @@ export enum SyncEvents {
   DatabaseWriteError = 'database-write-error',
   DatabaseReadError = 'database-read-error'
 };
+
+
+export type SyncEventReceiver = (event: SyncEvents) => void;
