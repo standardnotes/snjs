@@ -5215,10 +5215,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createSingletonManager",
     value: function createSingletonManager() {
-      this.singletonManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNSingletonManager"]))({
-        modelManager: this.modelManager,
-        syncService: this.syncService
-      });
+      this.singletonManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNSingletonManager"]))(this.modelManager, this.syncService);
       this.services.push(this.singletonManager);
     }
   }, {
@@ -5864,7 +5861,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/privileges/privileges_service */ "./lib/services/privileges/privileges_service.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["SNPrivilegesService"]; });
 
-/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.js");
+/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__["SNSingletonManager"]; });
 
 /* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.js");
@@ -23286,7 +23283,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__["SNModelManager"]; });
 
-/* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.js");
+/* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__["SNSingletonManager"]; });
 
 /* harmony import */ var _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_service */ "./lib/services/actions_service.js");
@@ -26624,13 +26621,10 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
               case 0:
                 contentType = _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].Privileges;
                 predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"]('content_type', '=', contentType);
-                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton({
-                  predicate: predicate,
-                  createPayload: Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                    content_type: contentType,
-                    content: {}
-                  })
-                }));
+                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton(predicate, Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
+                  content_type: contentType,
+                  content: {}
+                })));
 
               case 3:
               case "end":
@@ -30261,9 +30255,9 @@ var PureService = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/services/singleton_manager.js":
+/***/ "./lib/services/singleton_manager.ts":
 /*!*******************************************!*\
-  !*** ./lib/services/singleton_manager.js ***!
+  !*** ./lib/services/singleton_manager.ts ***!
   \*******************************************/
 /*! exports provided: SNSingletonManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -30274,7 +30268,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
@@ -30308,6 +30302,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -30328,47 +30325,50 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
  *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we 
  *    intitially create the item.
  */
-
 var SNSingletonManager = /*#__PURE__*/function (_PureService) {
   _inherits(SNSingletonManager, _PureService);
 
-  function SNSingletonManager(_ref) {
+  function SNSingletonManager(modelManager, syncService) {
     var _this;
-
-    var modelManager = _ref.modelManager,
-        syncService = _ref.syncService;
 
     _classCallCheck(this, SNSingletonManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSingletonManager).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "modelManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "syncService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "resolveQueue", []);
+
+    _defineProperty(_assertThisInitialized(_this), "registeredPredicates", []);
+
+    _defineProperty(_assertThisInitialized(_this), "removeCreationObserver", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "removeSyncObserver", void 0);
+
     _this.modelManager = modelManager;
     _this.syncService = syncService;
 
     _this.addObservers();
 
-    _this.resolveQueue = [];
-    _this.registeredPredicates = [];
     return _this;
   }
-  /** @override */
-
 
   _createClass(SNSingletonManager, [{
     key: "deinit",
     value: function deinit() {
-      this.syncService = null;
-      this.modelManager = null;
+      this.syncService = undefined;
+      this.modelManager = undefined;
       this.resolveQueue.length = 0;
       this.registeredPredicates.length = 0;
       this.removeCreationObserver();
       this.removeSyncObserver();
-      this.removeCreationObserver = null;
-      this.removeSyncObserver = null;
+      this.removeCreationObserver = undefined;
+      this.removeSyncObserver = undefined;
 
       _get(_getPrototypeOf(SNSingletonManager.prototype), "deinit", this).call(this);
     }
-    /** @access private */
-
   }, {
     key: "popResolveQueue",
     value: function popResolveQueue() {
@@ -30384,7 +30384,6 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
      * downloaded, the singleton will be errorDecrypting, and would be mishandled in the 
      * overall singleton logic. By waiting for a full sync to complete, we can be sure that 
      * all items keys have been downloaded.
-     * @access private
      */
 
   }, {
@@ -30392,24 +30391,15 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
     value: function addObservers() {
       var _this2 = this;
 
-      this.removeCreationObserver = this.modelManager.addCreationObserver(function (items) {
-        _this2.resolveQueue = _this2.resolveQueue.concat(items);
-      });
-      this.removeSyncObserver = this.syncService.addEventObserver( /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(eventName) {
+      this.removeCreationObserver = this.modelManager.addCreationObserver( /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(items) {
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  if (!(eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].DownloadFirstSyncCompleted || eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].FullSyncCompleted)) {
-                    _context.next = 3;
-                    break;
-                  }
+                  _this2.resolveQueue = _this2.resolveQueue.concat(items);
 
-                  _context.next = 3;
-                  return _this2.resolveSingletonsForItems(_this2.popResolveQueue(), eventName);
-
-                case 3:
+                case 1:
                 case "end":
                   return _context.stop();
               }
@@ -30418,6 +30408,32 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
         }));
 
         return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }());
+      this.removeSyncObserver = this.syncService.addEventObserver( /*#__PURE__*/function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(eventName) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  if (!(eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].DownloadFirstSyncCompleted || eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].FullSyncCompleted)) {
+                    _context2.next = 3;
+                    break;
+                  }
+
+                  _context2.next = 3;
+                  return _this2.resolveSingletonsForItems(_this2.popResolveQueue(), eventName);
+
+                case 3:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2);
+        }));
+
+        return function (_x2) {
           return _ref2.apply(this, arguments);
         };
       }());
@@ -30426,7 +30442,6 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
      * Predicates registered are automatically observed. If global item state changes
      * such that the item(s) match the predicate, procedures will be followed such that
      * the end result is that only 1 item remains, and the others are deleted.
-     * @access public
      */
 
   }, {
@@ -30434,8 +30449,6 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
     value: function registerPredicate(predicate) {
       this.registeredPredicates.push(predicate);
     }
-    /** @access private */
-
   }, {
     key: "validItemsMatchingPredicate",
     value: function validItemsMatchingPredicate(predicate) {
@@ -30443,19 +30456,17 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
         return !item.errorDecrypting;
       });
     }
-    /** @access private */
-
   }, {
     key: "resolveSingletonsForItems",
     value: function () {
-      var _resolveSingletonsForItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(items, eventSource) {
+      var _resolveSingletonsForItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(items, eventSource) {
         var _this3 = this;
 
         var matchesForRegisteredPredicate, matchesForSelfPredicate, matches, handled, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, item, matchingItems;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 matchesForRegisteredPredicate = function matchesForRegisteredPredicate(item) {
                   var _iteratorNormalCompletion = true;
@@ -30508,80 +30519,77 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion2 = true;
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
-                _context2.prev = 7;
+                _context3.prev = 7;
                 _iterator2 = items[Symbol.iterator]();
 
               case 9:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context2.next = 22;
+                  _context3.next = 22;
                   break;
                 }
 
                 item = _step2.value;
 
                 if (!handled.includes(item)) {
-                  _context2.next = 13;
+                  _context3.next = 13;
                   break;
                 }
 
-                return _context2.abrupt("continue", 19);
+                return _context3.abrupt("continue", 19);
 
               case 13:
                 matchingItems = matches(item);
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["extendArray"])(handled, matchingItems || []);
 
                 if (!(!matchingItems || matchingItems.length <= 1)) {
-                  _context2.next = 17;
+                  _context3.next = 17;
                   break;
                 }
 
-                return _context2.abrupt("continue", 19);
+                return _context3.abrupt("continue", 19);
 
               case 17:
-                _context2.next = 19;
-                return this.handleStrategy({
-                  items: matchingItems,
-                  strategy: item.singletonStrategy
-                });
+                _context3.next = 19;
+                return this.handleStrategy(matchingItems, item.singletonStrategy);
 
               case 19:
                 _iteratorNormalCompletion2 = true;
-                _context2.next = 9;
+                _context3.next = 9;
                 break;
 
               case 22:
-                _context2.next = 28;
+                _context3.next = 28;
                 break;
 
               case 24:
-                _context2.prev = 24;
-                _context2.t0 = _context2["catch"](7);
+                _context3.prev = 24;
+                _context3.t0 = _context3["catch"](7);
                 _didIteratorError2 = true;
-                _iteratorError2 = _context2.t0;
+                _iteratorError2 = _context3.t0;
 
               case 28:
-                _context2.prev = 28;
-                _context2.prev = 29;
+                _context3.prev = 28;
+                _context3.prev = 29;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                   _iterator2.return();
                 }
 
               case 31:
-                _context2.prev = 31;
+                _context3.prev = 31;
 
                 if (!_didIteratorError2) {
-                  _context2.next = 34;
+                  _context3.next = 34;
                   break;
                 }
 
                 throw _iteratorError2;
 
               case 34:
-                return _context2.finish(31);
+                return _context3.finish(31);
 
               case 35:
-                return _context2.finish(28);
+                return _context3.finish(28);
 
               case 36:
                 /** 
@@ -30603,39 +30611,35 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
 
               case 37:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[7, 24, 28, 36], [29,, 31, 35]]);
+        }, _callee3, this, [[7, 24, 28, 36], [29,, 31, 35]]);
       }));
 
-      function resolveSingletonsForItems(_x2, _x3) {
+      function resolveSingletonsForItems(_x3, _x4) {
         return _resolveSingletonsForItems.apply(this, arguments);
       }
 
       return resolveSingletonsForItems;
     }()
-    /** @access private */
-
   }, {
     key: "handleStrategy",
     value: function () {
-      var _handleStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(_ref3) {
-        var items, strategy, earliestFirst, deleteItems;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+      var _handleStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(items, strategy) {
+        var earliestFirst, deleteItems;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                items = _ref3.items, strategy = _ref3.strategy;
-
-                if (!(strategy !== _Models__WEBPACK_IMPORTED_MODULE_2__["SingletonStrategies"].KeepEarliest)) {
-                  _context3.next = 3;
+                if (!(strategy !== _Models_index__WEBPACK_IMPORTED_MODULE_2__["SingletonStrategies"].KeepEarliest)) {
+                  _context4.next = 2;
                   break;
                 }
 
                 throw 'Unhandled singleton strategy';
 
-              case 3:
+              case 2:
                 earliestFirst = items.sort(function (a, b) {
                   /** -1: a comes first, 1: b comes first */
                   if (a.errorDecrypting) {
@@ -30649,97 +30653,10 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                   return a.created_at < b.created_at ? -1 : 1;
                 });
                 deleteItems = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["arrayByRemovingFromIndex"])(earliestFirst, 0);
-                _context3.next = 7;
+                _context4.next = 6;
                 return this.modelManager.setItemsToBeDeleted(deleteItems);
 
-              case 7:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function handleStrategy(_x4) {
-        return _handleStrategy.apply(this, arguments);
-      }
-
-      return handleStrategy;
-    }()
-    /** @access public */
-
-  }, {
-    key: "findOrCreateSingleton",
-    value: function () {
-      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(_ref4) {
-        var predicate, createPayload, items, refreshedItems, errorDecrypting, dirtyPayload, item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                predicate = _ref4.predicate, createPayload = _ref4.createPayload;
-                items = this.validItemsMatchingPredicate(predicate);
-
-                if (!(items.length > 0)) {
-                  _context4.next = 4;
-                  break;
-                }
-
-                return _context4.abrupt("return", items[0]);
-
-              case 4:
-                if (this.syncService.getLastSyncDate()) {
-                  _context4.next = 7;
-                  break;
-                }
-
-                _context4.next = 7;
-                return this.syncService.sync();
-
-              case 7:
-                /** Check again */
-                refreshedItems = this.validItemsMatchingPredicate(predicate);
-
-                if (!(refreshedItems.length > 0)) {
-                  _context4.next = 10;
-                  break;
-                }
-
-                return _context4.abrupt("return", refreshedItems[0]);
-
-              case 10:
-                /** Delete any items that are errored */
-                errorDecrypting = this.modelManager.itemsMatchingPredicate(predicate).filter(function (item) {
-                  return item.errorDecrypting;
-                });
-                _context4.next = 13;
-                return this.modelManager.setItemsToBeDeleted(errorDecrypting);
-
-              case 13:
-                _context4.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"];
-                _context4.t1 = createPayload;
-                _context4.next = 17;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
-
-              case 17:
-                _context4.t2 = _context4.sent;
-                _context4.t3 = {
-                  uuid: _context4.t2,
-                  dirty: true
-                };
-                dirtyPayload = (0, _context4.t0)(_context4.t1, _context4.t3);
-                _context4.next = 22;
-                return this.modelManager.mapPayloadToLocalItem(dirtyPayload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalChanged);
-
-              case 22:
-                item = _context4.sent;
-                _context4.next = 25;
-                return this.syncService.sync();
-
-              case 25:
-                return _context4.abrupt("return", item);
-
-              case 26:
+              case 6:
               case "end":
                 return _context4.stop();
             }
@@ -30747,7 +30664,91 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
         }, _callee4, this);
       }));
 
-      function findOrCreateSingleton(_x5) {
+      function handleStrategy(_x5, _x6) {
+        return _handleStrategy.apply(this, arguments);
+      }
+
+      return handleStrategy;
+    }()
+  }, {
+    key: "findOrCreateSingleton",
+    value: function () {
+      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(predicate, createPayload) {
+        var items, refreshedItems, errorDecrypting, dirtyPayload, item;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                items = this.validItemsMatchingPredicate(predicate);
+
+                if (!(items.length > 0)) {
+                  _context5.next = 3;
+                  break;
+                }
+
+                return _context5.abrupt("return", items[0]);
+
+              case 3:
+                if (this.syncService.getLastSyncDate()) {
+                  _context5.next = 6;
+                  break;
+                }
+
+                _context5.next = 6;
+                return this.syncService.sync();
+
+              case 6:
+                /** Check again */
+                refreshedItems = this.validItemsMatchingPredicate(predicate);
+
+                if (!(refreshedItems.length > 0)) {
+                  _context5.next = 9;
+                  break;
+                }
+
+                return _context5.abrupt("return", refreshedItems[0]);
+
+              case 9:
+                /** Delete any items that are errored */
+                errorDecrypting = this.modelManager.itemsMatchingPredicate(predicate).filter(function (item) {
+                  return item.errorDecrypting;
+                });
+                _context5.next = 12;
+                return this.modelManager.setItemsToBeDeleted(errorDecrypting);
+
+              case 12:
+                _context5.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"];
+                _context5.t1 = createPayload;
+                _context5.next = 16;
+                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
+
+              case 16:
+                _context5.t2 = _context5.sent;
+                _context5.t3 = {
+                  uuid: _context5.t2,
+                  dirty: true
+                };
+                dirtyPayload = (0, _context5.t0)(_context5.t1, _context5.t3);
+                _context5.next = 21;
+                return this.modelManager.mapPayloadToLocalItem(dirtyPayload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalChanged);
+
+              case 21:
+                item = _context5.sent;
+                _context5.next = 24;
+                return this.syncService.sync();
+
+              case 24:
+                return _context5.abrupt("return", item);
+
+              case 25:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function findOrCreateSingleton(_x7, _x8) {
         return _findOrCreateSingleton.apply(this, arguments);
       }
 

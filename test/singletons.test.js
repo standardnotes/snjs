@@ -125,15 +125,15 @@ describe('singletons', () => {
         mode: SyncModes.DownloadFirst
       });
     });
-    const userPreferences = await this.application.singletonManager.findOrCreateSingleton({
-      predicate: predicate,
-      createPayload: CreateMaxPayloadFromAnyObject(
+    const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
+      predicate,
+      CreateMaxPayloadFromAnyObject(
         {
           content_type: contentType,
           content: {}
         }
       )
-    });
+    );
     this.expectedItemCount += 1;
 
     expect(userPreferences).to.be.ok;
@@ -249,10 +249,10 @@ describe('singletons', () => {
     item.errorDecrypting = true;
 
     const predicate = new SNPredicate('content_type', '=', item.content_type);
-    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
-      predicate: predicate,
-      createPayload: payload
-    });
+    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
+      predicate,
+      payload
+    );
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
@@ -267,16 +267,16 @@ describe('singletons', () => {
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
     const predicate = new SNPredicate('content_type', '=', item.content_type);
-    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton({
-      predicate: predicate,
-      createPayload: payload
-    });
+    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
+      predicate,
+      payload
+    );
     await this.application.syncService.alternateUuidForItem(resolvedItem);
     await this.application.syncService.sync(syncOptions);
-    const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton({
-      predicate: predicate,
-      createPayload: payload
-    });
+    const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton(
+      predicate,
+      payload
+    );
     expect(resolvedItem.uuid).to.equal(item.uuid);
     expect(resolvedItem2.uuid).to.not.equal(resolvedItem.uuid);
     expect(resolvedItem.deleted).to.equal(true);
