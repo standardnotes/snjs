@@ -45,7 +45,7 @@ export abstract class DeviceInterface {
 
   abstract async getAllRawStorageKeyValues() : Promise<Record<string, any>[]>;
 
-  abstract async setRawStorageValue(key: string, value: string) : Promise<void>;
+  abstract async setRawStorageValue(key: string, value: any) : Promise<void>;
 
   abstract async removeRawStorageValue(key: string) : Promise<void>;
 

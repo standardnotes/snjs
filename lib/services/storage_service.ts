@@ -38,7 +38,7 @@ export enum ValueModesKeys {
 
 type ValuesObjectRecord = Record<string, any>
 
-type ValuesObject = {
+export type StorageValuesObject = {
   [ValueModesKeys.Wrapped]: ValuesObjectRecord
   [ValueModesKeys.Unwrapped]?: ValuesObjectRecord
   [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
@@ -66,7 +66,7 @@ export class SNStorageService extends PureService {
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicies
 
-  private values!: ValuesObject
+  private values!: StorageValuesObject
 
   constructor(
     deviceInterface: DeviceInterface,
@@ -116,7 +116,7 @@ export class SNStorageService extends PureService {
     this.setInitialValues(payload);
   }
 
-  private async persistAsValueToDisk(value: ValuesObject) {
+  private async persistAsValueToDisk(value: StorageValuesObject) {
     await this.deviceInterface!.setRawStorageValue(
       this.getPersistenceKey(),
       JSON.stringify(value)
@@ -127,7 +127,7 @@ export class SNStorageService extends PureService {
    * Called by platforms with the value they load from disk,
    * after they handle initializeFromDisk
    */
-  private setInitialValues(values?: ValuesObject) {
+  private setInitialValues(values?: StorageValuesObject) {
     if (!values) {
       values = this.defaultValuesObject();
     }
@@ -280,7 +280,7 @@ export class SNStorageService extends PureService {
       [ValueModesKeys.Wrapped]: wrapped,
       [ValueModesKeys.Unwrapped]: unwrapped,
       [ValueModesKeys.Nonwrapped]: nonwrapped
-    };
+    } as StorageValuesObject;
   }
 
   private domainKeyForMode(mode: StorageValueModes) {

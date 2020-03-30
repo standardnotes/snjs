@@ -12,8 +12,8 @@ import {
   ChallengeValue
 } from '@Lib/challenges';
 
-type OrchestratorFill = {
-  orchestrator: ChallengeOrchestrator
+export type OrchestratorFill = {
+  orchestrator?: ChallengeOrchestrator
 }
 type ChallengeValidationResponse = {
   valid: boolean

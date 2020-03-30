@@ -306,9 +306,6 @@ export class SNSyncService extends PureService {
       );
     }
     this.databaseLoaded = true;
-    this.notifyEvent(
-      SyncEvents.LocalDataLoaded
-    );
     this.opStatus!.setDatabaseLoadStatus(0, 0, true);
   }
 
@@ -660,7 +657,7 @@ export class SNSyncService extends PureService {
        * been dirtied (like conflicts), and the caller may want to await the
        * full resolution of these items.
        */
-      return this.sync({ source: SyncSources.MoreDirtyItems });
+      await this.sync({ source: SyncSources.MoreDirtyItems });
     } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
       if (this.state!.needsSync && operation.done) {
         this.log('Syncing again from integrity check');

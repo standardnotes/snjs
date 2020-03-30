@@ -72,7 +72,7 @@ function CreatePayload(
   object: object,
   payloadClass: typeof PurePayload,
   override?: PayloadOverride
-) {
+): PurePayload {
   const rawPayload = pickByCopy(object, payloadClass.fields());
   if (override) {
     if (!isObject(override)) {
@@ -87,7 +87,7 @@ function CreatePayload(
 export function CopyPayload(
   payload: PurePayload,
   override?: PayloadOverride
-) {
+): PurePayload {
   const rawPayload = pickByCopy(payload, payload.fields());
   if (override) {
     deepMerge(rawPayload, Copy(override));
@@ -95,7 +95,9 @@ export function CopyPayload(
   return deepFreeze(new (payload.constructor as any)(rawPayload, true));
 }
 
-export function CreateEncryptionParameters(rawParameters: RawEncryptionParameters | PurePayload) {
+export function CreateEncryptionParameters(
+  rawParameters: RawEncryptionParameters | PurePayload
+): EncryptionParameters {
   const copy = Copy(rawParameters);
   return deepFreeze(new EncryptionParameters(copy, true));
 }
@@ -103,7 +105,7 @@ export function CreateEncryptionParameters(rawParameters: RawEncryptionParameter
 export function CopyEncryptionParameters(
   encryptionParameters: EncryptionParameters,
   override?: PayloadOverride
-) {
+): EncryptionParameters {
   const rawParameters = pickByCopy(encryptionParameters, EncryptionParameters.fields());
   if (override) {
     deepMerge(rawParameters, Copy(override));

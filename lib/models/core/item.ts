@@ -134,7 +134,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     );
   }
 
-  protected getDefaultContentType() : string | null {
+  protected getDefaultContentType() : ContentTypes | null {
     return null;
   }
 
@@ -227,7 +227,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
    */
   public updateLocalRelationships() {
     const references = this.content.references;
-    const uuids = references.map((ref) => { return ref.uuid; });
+    const uuids = references!.map((ref) => { return ref.uuid; });
     const existingUuids = Object.keys(this.referencedItems);
 
     for (const uuid of existingUuids) {
@@ -284,7 +284,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   }
 
   public hasRelationshipWithItem(item: SNItem) {
-    const target = this.content.references.find((r) => {
+    const target = this.content.references!.find((r) => {
       return r.uuid === item.uuid;
     });
     return !isNullOrUndefined(target);
