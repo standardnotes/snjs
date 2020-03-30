@@ -85,11 +85,11 @@ export async function registerOldUser({ application, email, password, version })
   const accountKey = result.key;
   const accountKeyParams = result.keyParams;
 
-  const response = await application.apiService.register({
-    email: email,
-    serverPassword: accountKey.serverPassword,
-    keyParams: accountKeyParams
-  });
+  const response = await application.apiService.register(
+    email,
+    accountKey.serverPassword,
+    accountKeyParams
+  );
   await application.sessionManager.handleAuthResponse(response);
   await application.protocolService.setNewRootKey(
     accountKey,

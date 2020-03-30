@@ -58,15 +58,15 @@ export class AccountSyncOperation {
 
   async run() : Promise<void> {
     const payloads = this.popPayloads(this.upLimit);
-    const rawResponse = await this.apiService.sync({
-      payloads: payloads,
-      lastSyncToken: this.lastSyncToken,
-      paginationToken: this.paginationToken,
-      limit: this.downLimit,
-      checkIntegrity: this.checkIntegrity,
-      contentType: null,
-      customEvent: null
-    });
+    const rawResponse = await this.apiService.sync(
+      payloads,
+      this.lastSyncToken,
+      this.paginationToken,
+      this.downLimit,
+      this.checkIntegrity,
+      undefined,
+      undefined
+    );
     const response = new SyncResponse(rawResponse);
 
     this.responses.push(response);

@@ -40,15 +40,15 @@ export class AccountDownloader {
    * but won't do anything with them other than decrypting and creating respective objects.
    */
   async run() : Promise<PurePayload[]> {
-    const response = await this.apiService.sync({
-      payloads: null,
-      lastSyncToken: this.progress.lastSyncToken!,
-      paginationToken: this.progress.paginationToken!,
-      limit: this.limit || 500,
-      contentType: this.contentType,
-      customEvent: this.customEvent,
-      checkIntegrity: false
-    });
+    const response = await this.apiService.sync(
+      [],
+      this.progress.lastSyncToken!,
+      this.progress.paginationToken!,
+      this.limit || 500,
+      false,
+      this.contentType,
+      this.customEvent,
+    );
     const encryptedPayloads = response.retrieved_items.map((rawPayload: any) => {
       return CreateSourcedPayloadFromObject(
         rawPayload,

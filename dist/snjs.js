@@ -4407,10 +4407,7 @@ var SNApplication = /*#__PURE__*/function () {
               case 8:
                 this.lockSyncing();
                 _context36.next = 11;
-                return this.sessionManager.register({
-                  email: email,
-                  password: password
-                });
+                return this.sessionManager.register(email, password);
 
               case 11:
                 result = _context36.sent;
@@ -4520,13 +4517,7 @@ var SNApplication = /*#__PURE__*/function () {
                 /** Prevent a timed sync from occuring while signing in. */
                 this.lockSyncing();
                 _context37.next = 11;
-                return this.sessionManager.signIn({
-                  email: email,
-                  password: password,
-                  strict: strict,
-                  mfaKeyPath: mfaKeyPath,
-                  mfaCode: mfaCode
-                });
+                return this.sessionManager.signIn(email, password, strict, mfaKeyPath, mfaCode);
 
               case 11:
                 result = _context37.sent;
@@ -4650,11 +4641,7 @@ var SNApplication = /*#__PURE__*/function () {
                 currentKeyParams = _context38.sent;
                 this.lockSyncing();
                 _context38.next = 14;
-                return this.sessionManager.changePassword({
-                  currentPassword: currentPassword,
-                  currentKeyParams: currentKeyParams,
-                  newPassword: newPassword
-                });
+                return this.sessionManager.changePassword(currentPassword, currentKeyParams, newPassword);
 
               case 14:
                 result = _context38.sent;
@@ -5171,10 +5158,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createApiService",
     value: function createApiService() {
-      this.apiService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNApiService"]))({
-        storageService: this.storageService,
-        httpService: this.httpService
-      });
+      this.apiService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNApiService"]))(this.httpService, this.storageService);
       this.services.push(this.apiService);
     }
   }, {
@@ -5244,13 +5228,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createSessionManager",
     value: function createSessionManager() {
-      this.sessionManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNSessionManager"]))({
-        storageService: this.storageService,
-        alertService: this.alertService,
-        protocolService: this.protocolService,
-        apiService: this.apiService,
-        timeout: this.deviceInterface.timeout
-      });
+      this.sessionManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNSessionManager"]))(this.storageService, this.apiService, this.alertService, this.protocolService);
       this.services.push(this.sessionManager);
     }
   }, {
@@ -5786,7 +5764,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_model_manager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/model_manager */ "./lib/services/model_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNModelManager", function() { return _services_model_manager__WEBPACK_IMPORTED_MODULE_14__["SNModelManager"]; });
 
-/* harmony import */ var _services_api_http_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/api/http_service */ "./lib/services/api/http_service.js");
+/* harmony import */ var _services_api_http_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/api/http_service */ "./lib/services/api/http_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _services_api_http_service__WEBPACK_IMPORTED_MODULE_15__["SNHttpService"]; });
 
 /* harmony import */ var _services_challenge_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/challenge_service */ "./lib/services/challenge_service.ts");
@@ -5831,7 +5809,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncQueueStrategy", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_21__["SyncQueueStrategy"]; });
 
-/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.js");
+/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_22__["SNSessionManager"]; });
 
 /* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.js");
@@ -5849,7 +5827,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__["SNSingletonManager"]; });
 
-/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.js");
+/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_28__["SNApiService"]; });
 
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./utils */ "./lib/utils.js");
@@ -6243,7 +6221,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.ts");
-/* harmony import */ var _Services_api_session__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/api/session */ "./lib/services/api/session.js");
+/* harmony import */ var _Services_api_session__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/api/session */ "./lib/services/api/session.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -16971,9 +16949,9 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/api/api_service.js":
+/***/ "./lib/services/api/api_service.ts":
 /*!*****************************************!*\
-  !*** ./lib/services/api/api_service.js ***!
+  !*** ./lib/services/api/api_service.ts ***!
   \*****************************************/
 /*! exports provided: SNApiService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16986,7 +16964,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
 /* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/keys */ "./lib/services/api/keys.ts");
-/* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.js");
+/* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.ts");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
@@ -16997,8 +16975,6 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -17024,6 +17000,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -17039,15 +17017,27 @@ var API_VERSION = '20200115';
 var SNApiService = /*#__PURE__*/function (_PureService) {
   _inherits(SNApiService, _PureService);
 
-  function SNApiService(_ref) {
+  function SNApiService(httpService, storageService) {
     var _this;
-
-    var httpService = _ref.httpService,
-        storageService = _ref.storageService;
 
     _classCallCheck(this, SNApiService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNApiService).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "httpService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "storageService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "host", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "session", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "registering", false);
+
+    _defineProperty(_assertThisInitialized(_this), "authenticating", false);
+
+    _defineProperty(_assertThisInitialized(_this), "changing", false);
+
     _this.httpService = httpService;
     _this.storageService = storageService;
     return _this;
@@ -17058,10 +17048,10 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   _createClass(SNApiService, [{
     key: "deinit",
     value: function deinit() {
-      this.httpService = null;
-      this.storageService = null;
-      this.host = null;
-      this.session = null;
+      this.httpService = undefined;
+      this.storageService = undefined;
+      this.host = undefined;
+      this.session = undefined;
 
       _get(_getPrototypeOf(SNApiService.prototype), "deinit", this).call(this);
     }
@@ -17145,8 +17135,6 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
       return getHost;
     }()
-    /** @access public */
-
   }, {
     key: "setSession",
     value: function setSession(session) {
@@ -17205,35 +17193,23 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
       var params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(inParams, _defineProperty({}, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].ApiVersion, API_VERSION));
       return params;
     }
-    /** 
-     * @access public 
-     */
-
   }, {
-    key: "errorResponseFromString",
-    value: function errorResponseFromString(message) {
+    key: "createErrorResponse",
+    value: function createErrorResponse(message) {
       return {
         error: {
           message: message
         }
       };
     }
-    /**
-     * @access private
-     */
-
   }, {
-    key: "errorResponseFromResponse",
-    value: function errorResponseFromResponse(response, message) {
-      this.log("".concat(message, ": ").concat(response));
-
-      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isObject"])(response)) {
-        return response;
-      } else if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["isString"])(response)) {
-        return this.errorResponseFromString(response);
-      } else {
-        return this.errorResponseFromString(message);
+    key: "errorResponseWithFallbackMessage",
+    value: function errorResponseWithFallbackMessage(response, message) {
+      if (!response.error.message) {
+        response.error.message = message;
       }
+
+      return response;
     }
     /**
      * @param mfaKeyPath  The params path the server expects for authentication against
@@ -17245,19 +17221,18 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getAccountKeyParams",
     value: function () {
-      var _getAccountKeyParams = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(_ref2) {
+      var _getAccountKeyParams = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(email, mfaKeyPath, mfaCode) {
         var _this2 = this;
 
-        var email, mfaKeyPath, mfaCode, url, params, response;
+        var url, params, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                email = _ref2.email, mfaKeyPath = _ref2.mfaKeyPath, mfaCode = _ref2.mfaCode;
-                _context5.next = 3;
+                _context5.next = 2;
                 return this.path(REQUEST_PATH_KEY_PARAMS);
 
-              case 3:
+              case 2:
                 url = _context5.sent;
                 params = this.params({
                   email: email
@@ -17267,19 +17242,16 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   params[mfaKeyPath] = mfaCode;
                 }
 
-                _context5.next = 8;
-                return this.httpService.getAbsolute({
-                  url: url,
-                  params: params
-                }).catch(function (errorResponse) {
-                  return _this2.errorResponseFromResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
+                _context5.next = 7;
+                return this.httpService.getAbsolute(url, params).catch(function (errorResponse) {
+                  return _this2.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
-              case 8:
+              case 7:
                 response = _context5.sent;
                 return _context5.abrupt("return", response);
 
-              case 10:
+              case 9:
               case "end":
                 return _context5.stop();
             }
@@ -17287,7 +17259,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee5, this);
       }));
 
-      function getAccountKeyParams(_x3) {
+      function getAccountKeyParams(_x3, _x4, _x5) {
         return _getAccountKeyParams.apply(this, arguments);
       }
 
@@ -17296,48 +17268,43 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(_ref3) {
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(email, serverPassword, keyParams) {
         var _this3 = this;
 
-        var email, serverPassword, keyParams, url, params, response;
+        var url, params, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                email = _ref3.email, serverPassword = _ref3.serverPassword, keyParams = _ref3.keyParams;
-
                 if (!this.registering) {
-                  _context6.next = 3;
+                  _context6.next = 2;
                   break;
                 }
 
-                return _context6.abrupt("return", this.errorResponseFromString(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
+                return _context6.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
 
-              case 3:
+              case 2:
                 this.registering = true;
-                _context6.next = 6;
+                _context6.next = 5;
                 return this.path(REQUEST_PATH_REGISTER);
 
-              case 6:
+              case 5:
                 url = _context6.sent;
                 params = this.params(_objectSpread({
                   password: serverPassword,
                   email: email
                 }, keyParams.getPortableValue()));
-                _context6.next = 10;
-                return this.httpService.postAbsolute({
-                  url: url,
-                  params: params
-                }).catch(function (errorResponse) {
-                  return _this3.errorResponseFromResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
+                _context6.next = 9;
+                return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
+                  return _this3.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
                 });
 
-              case 10:
+              case 9:
                 response = _context6.sent;
                 this.registering = false;
                 return _context6.abrupt("return", response);
 
-              case 13:
+              case 12:
               case "end":
                 return _context6.stop();
             }
@@ -17345,7 +17312,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee6, this);
       }));
 
-      function register(_x4) {
+      function register(_x6, _x7, _x8) {
         return _register.apply(this, arguments);
       }
 
@@ -17354,40 +17321,40 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "signIn",
     value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(_ref4) {
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(email, serverPassword, mfaKeyPath, mfaCode) {
         var _this4 = this;
 
-        var email, serverPassword, mfaKeyPath, mfaCode, url, params, response;
+        var url, params, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                email = _ref4.email, serverPassword = _ref4.serverPassword, mfaKeyPath = _ref4.mfaKeyPath, mfaCode = _ref4.mfaCode;
-
                 if (!this.authenticating) {
-                  _context7.next = 3;
+                  _context7.next = 2;
                   break;
                 }
 
-                return _context7.abrupt("return", this.errorResponseFromString(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
+                return _context7.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
 
-              case 3:
+              case 2:
                 this.authenticating = true;
-                _context7.next = 6;
+                _context7.next = 5;
                 return this.path(REQUEST_PATH_LOGIN);
 
-              case 6:
+              case 5:
                 url = _context7.sent;
-                params = this.params(_defineProperty({
+                params = this.params({
                   email: email,
                   password: serverPassword
-                }, mfaKeyPath, mfaCode));
+                });
+
+                if (mfaKeyPath) {
+                  params[mfaKeyPath] = mfaCode;
+                }
+
                 _context7.next = 10;
-                return this.httpService.postAbsolute({
-                  url: url,
-                  params: params
-                }).catch(function (errorResponse) {
-                  return _this4.errorResponseFromResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
+                return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
+                  return _this4.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
               case 10:
@@ -17403,7 +17370,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee7, this);
       }));
 
-      function signIn(_x5) {
+      function signIn(_x9, _x10, _x11, _x12) {
         return _signIn.apply(this, arguments);
       }
 
@@ -17412,49 +17379,43 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(_ref5) {
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(currentServerPassword, newServerPassword, newKeyParams) {
         var _this5 = this;
 
-        var currentServerPassword, newServerPassword, newKeyParams, url, params, response;
+        var url, params, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                currentServerPassword = _ref5.currentServerPassword, newServerPassword = _ref5.newServerPassword, newKeyParams = _ref5.newKeyParams;
-
                 if (!this.changing) {
-                  _context8.next = 3;
+                  _context8.next = 2;
                   break;
                 }
 
-                return _context8.abrupt("return", this.errorResponseFromString(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
+                return _context8.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
 
-              case 3:
+              case 2:
                 this.changing = true;
-                _context8.next = 6;
+                _context8.next = 5;
                 return this.path(REQUEST_PATH_CHANGE_PW);
 
-              case 6:
+              case 5:
                 url = _context8.sent;
                 params = _objectSpread({
                   current_password: currentServerPassword,
                   new_password: newServerPassword
                 }, newKeyParams.getPortableValue());
-                _context8.next = 10;
-                return this.httpService.postAbsolute({
-                  url: url,
-                  params: params,
-                  authentication: this.session.token
-                }).catch(function (errorResponse) {
-                  return _this5.errorResponseFromResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]);
+                _context8.next = 9;
+                return this.httpService.postAbsolute(url, params, this.session.token).catch(function (errorResponse) {
+                  return _this5.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]);
                 });
 
-              case 10:
+              case 9:
                 response = _context8.sent;
                 this.changing = false;
                 return _context8.abrupt("return", response);
 
-              case 13:
+              case 12:
               case "end":
                 return _context8.stop();
             }
@@ -17462,7 +17423,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee8, this);
       }));
 
-      function changePassword(_x6) {
+      function changePassword(_x13, _x14, _x15) {
         return _changePassword.apply(this, arguments);
       }
 
@@ -17471,36 +17432,40 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref6) {
-        var _this$params2,
+      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(payloads, lastSyncToken, paginationToken, limit) {
+        var _this$params,
             _this6 = this;
 
-        var payloads, lastSyncToken, paginationToken, limit, checkIntegrity, contentType, customEvent, url, params, response;
+        var checkIntegrity,
+            contentType,
+            customEvent,
+            url,
+            params,
+            response,
+            _args9 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                payloads = _ref6.payloads, lastSyncToken = _ref6.lastSyncToken, paginationToken = _ref6.paginationToken, limit = _ref6.limit, checkIntegrity = _ref6.checkIntegrity, contentType = _ref6.contentType, customEvent = _ref6.customEvent;
-                _context9.next = 3;
+                checkIntegrity = _args9.length > 4 && _args9[4] !== undefined ? _args9[4] : false;
+                contentType = _args9.length > 5 ? _args9[5] : undefined;
+                customEvent = _args9.length > 6 ? _args9[6] : undefined;
+                _context9.next = 5;
                 return this.path(REQUEST_PATH_SYNC);
 
-              case 3:
+              case 5:
                 url = _context9.sent;
-                params = this.params((_this$params2 = {}, _defineProperty(_this$params2, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncPayloads, payloads), _defineProperty(_this$params2, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].LastSyncToken, lastSyncToken), _defineProperty(_this$params2, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].PaginationToken, paginationToken), _defineProperty(_this$params2, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params2, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncDlLimit, limit), _defineProperty(_this$params2, "content_type", contentType), _defineProperty(_this$params2, "event", customEvent), _this$params2));
-                _context9.next = 7;
-                return this.httpService.postAbsolute({
-                  url: url,
-                  params: params,
-                  authentication: this.session.token
-                }).catch(function (errorResponse) {
-                  return _this6.errorResponseFromResponse(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_SYNC_FAIL"]);
+                params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncPayloads, payloads), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
+                _context9.next = 9;
+                return this.httpService.postAbsolute(url, params, this.session.token).catch(function (errorResponse) {
+                  return _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_SYNC_FAIL"]);
                 });
 
-              case 7:
+              case 9:
                 response = _context9.sent;
                 return _context9.abrupt("return", response);
 
-              case 9:
+              case 11:
               case "end":
                 return _context9.stop();
             }
@@ -17508,7 +17473,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee9, this);
       }));
 
-      function sync(_x7) {
+      function sync(_x16, _x17, _x18, _x19) {
         return _sync.apply(this, arguments);
       }
 
@@ -17521,9 +17486,9 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/api/http_service.js":
+/***/ "./lib/services/api/http_service.ts":
 /*!******************************************!*\
-  !*** ./lib/services/api/http_service.js ***!
+  !*** ./lib/services/api/http_service.ts ***!
   \******************************************/
 /*! exports provided: SNHttpService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -17534,7 +17499,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17560,17 +17524,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
+var HttpVerb;
 
-var HTTP_VERB_GET = 'get';
-var HTTP_VERB_POST = 'post';
-var HTTP_VERB_PATCH = 'patch';
+(function (HttpVerb) {
+  HttpVerb["Get"] = "get";
+  HttpVerb["Post"] = "post";
+  HttpVerb["Patch"] = "patch";
+})(HttpVerb || (HttpVerb = {}));
+
 var REQUEST_READY_STATE_COMPLETED = 4;
 var HTTP_STATUS_MIN_SUCCESS = 200;
 var HTTP_STATUS_MAX_SUCCESS = 299;
+
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
-
 var SNHttpService = /*#__PURE__*/function (_PureService) {
   _inherits(SNHttpService, _PureService);
 
@@ -17583,21 +17551,14 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   _createClass(SNHttpService, [{
     key: "getAbsolute",
     value: function () {
-      var _getAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref) {
-        var url, params, authentication;
+      var _getAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(url, params, authentication) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                url = _ref.url, params = _ref.params, authentication = _ref.authentication;
-                return _context.abrupt("return", this.runHttp({
-                  verb: HTTP_VERB_GET,
-                  url: url,
-                  params: params,
-                  authentication: authentication
-                }));
+                return _context.abrupt("return", this.runHttp(HttpVerb.Get, url, params, authentication));
 
-              case 2:
+              case 1:
               case "end":
                 return _context.stop();
             }
@@ -17605,7 +17566,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee, this);
       }));
 
-      function getAbsolute(_x) {
+      function getAbsolute(_x, _x2, _x3) {
         return _getAbsolute.apply(this, arguments);
       }
 
@@ -17614,21 +17575,14 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "postAbsolute",
     value: function () {
-      var _postAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(_ref2) {
-        var url, params, authentication;
+      var _postAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(url, params, authentication) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                url = _ref2.url, params = _ref2.params, authentication = _ref2.authentication;
-                return _context2.abrupt("return", this.runHttp({
-                  verb: HTTP_VERB_POST,
-                  url: url,
-                  params: params,
-                  authentication: authentication
-                }));
+                return _context2.abrupt("return", this.runHttp(HttpVerb.Post, url, params, authentication));
 
-              case 2:
+              case 1:
               case "end":
                 return _context2.stop();
             }
@@ -17636,7 +17590,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee2, this);
       }));
 
-      function postAbsolute(_x2) {
+      function postAbsolute(_x4, _x5, _x6) {
         return _postAbsolute.apply(this, arguments);
       }
 
@@ -17645,21 +17599,14 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "patchAbsolute",
     value: function () {
-      var _patchAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(_ref3) {
-        var url, params, authentication;
+      var _patchAbsolute = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(url, params, authentication) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                url = _ref3.url, params = _ref3.params, authentication = _ref3.authentication;
-                return _context3.abrupt("return", this.runHttp({
-                  verb: HTTP_VERB_PATCH,
-                  url: url,
-                  params: params,
-                  authentication: authentication
-                }));
+                return _context3.abrupt("return", this.runHttp(HttpVerb.Patch, url, params, authentication));
 
-              case 2:
+              case 1:
               case "end":
                 return _context3.stop();
             }
@@ -17667,7 +17614,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee3, this);
       }));
 
-      function patchAbsolute(_x3) {
+      function patchAbsolute(_x7, _x8, _x9) {
         return _patchAbsolute.apply(this, arguments);
       }
 
@@ -17676,26 +17623,16 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "runHttp",
     value: function () {
-      var _runHttp = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(_ref4) {
-        var verb, url, params, authentication, request;
+      var _runHttp = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(verb, url, params, authentication) {
+        var request;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                verb = _ref4.verb, url = _ref4.url, params = _ref4.params, authentication = _ref4.authentication;
-                request = this.createRequest({
-                  verb: verb,
-                  url: url,
-                  params: params,
-                  authentication: authentication
-                });
-                return _context4.abrupt("return", this.runRequest({
-                  request: request,
-                  verb: verb,
-                  params: params
-                }));
+                request = this.createRequest(verb, url, params, authentication);
+                return _context4.abrupt("return", this.runRequest(request, verb, params));
 
-              case 3:
+              case 2:
               case "end":
                 return _context4.stop();
             }
@@ -17703,7 +17640,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee4, this);
       }));
 
-      function runHttp(_x4) {
+      function runHttp(_x10, _x11, _x12, _x13) {
         return _runHttp.apply(this, arguments);
       }
 
@@ -17711,14 +17648,10 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
     }()
   }, {
     key: "createRequest",
-    value: function createRequest(_ref5) {
-      var verb = _ref5.verb,
-          url = _ref5.url,
-          params = _ref5.params,
-          authentication = _ref5.authentication;
+    value: function createRequest(verb, url, params, authentication) {
       var request = new XMLHttpRequest();
 
-      if (verb === HTTP_VERB_GET && Object.keys(params).length > 0) {
+      if (verb === HttpVerb.Get && Object.keys(params).length > 0) {
         url = this.urlForUrlAndParams(url, params);
       }
 
@@ -17734,28 +17667,26 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "runRequest",
     value: function () {
-      var _runRequest = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(_ref6) {
+      var _runRequest = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(request, verb, params) {
         var _this = this;
 
-        var request, verb, params;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                request = _ref6.request, verb = _ref6.verb, params = _ref6.params;
                 return _context5.abrupt("return", new Promise(function (resolve, reject) {
                   request.onreadystatechange = function () {
                     _this.stateChangeHandlerForRequest(request, resolve, reject);
                   };
 
-                  if (verb === HTTP_VERB_POST || verb === HTTP_VERB_PATCH) {
+                  if (verb === HttpVerb.Post || verb === HttpVerb.Patch) {
                     request.send(JSON.stringify(params));
                   } else {
                     request.send();
                   }
                 }));
 
-              case 2:
+              case 1:
               case "end":
                 return _context5.stop();
             }
@@ -17763,7 +17694,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee5);
       }));
 
-      function runRequest(_x5) {
+      function runRequest(_x14, _x15, _x16) {
         return _runRequest.apply(this, arguments);
       }
 
@@ -17776,41 +17707,25 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         return;
       }
 
-      var response = request.responseText;
-
-      if (response) {
-        try {
-          response = JSON.parse(response); // eslint-disable-next-line no-empty
-        } catch (e) {}
-      }
-
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isObject"])(response)) {
-        response = {};
-      }
-
       var httpStatus = request.status;
+      var response = {
+        status: httpStatus
+      };
+
+      try {
+        var body = JSON.parse(request.responseText);
+        Object.assign(response, body);
+      } catch (error) {}
 
       if (httpStatus >= HTTP_STATUS_MIN_SUCCESS && httpStatus <= HTTP_STATUS_MAX_SUCCESS) {
-        response.status = httpStatus;
         resolve(response);
       } else {
-        console.error('Request error:', response);
-
-        if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"])(response)) {
-          response = {
-            error: {
-              message: response
-            }
-          };
-        }
-
         if (!response.error) {
           response.error = {
             status: httpStatus
           };
         }
 
-        response.status = httpStatus;
         reject(response);
       }
     }
@@ -17860,9 +17775,9 @@ var ApiEndpointParams;
 
 /***/ }),
 
-/***/ "./lib/services/api/messages.js":
+/***/ "./lib/services/api/messages.ts":
 /*!**************************************!*\
-  !*** ./lib/services/api/messages.js ***!
+  !*** ./lib/services/api/messages.ts ***!
   \**************************************/
 /*! exports provided: API_MESSAGE_GENERIC_INVALID_LOGIN, API_MESSAGE_GENERIC_REGISTRATION_FAIL, API_MESSAGE_GENERIC_CHANGE_PW_FAIL, API_MESSAGE_GENERIC_SYNC_FAIL, API_MESSAGE_REGISTRATION_IN_PROGRESS, API_MESSAGE_LOGIN_IN_PROGRESS, API_MESSAGE_CHANGE_PW_IN_PROGRESS, API_MESSAGE_FALLBACK_LOGIN_FAIL, UNSUPPORTED_PROTOCOL_VERSION, EXPIRED_PROTOCOL_VERSION, OUTDATED_PROTOCOL_VERSION, UNSUPPORTED_KEY_DERIVATION, INVALID_PASSWORD_COST, OUTDATED_PROTOCOL_ALERT_TITLE, OUTDATED_PROTOCOL_ALERT_IGNORE, InsufficientPasswordMessage, StrictSignInFailed */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -17910,9 +17825,9 @@ function StrictSignInFailed(current, latest) {
 
 /***/ }),
 
-/***/ "./lib/services/api/session.js":
+/***/ "./lib/services/api/session.ts":
 /*!*************************************!*\
-  !*** ./lib/services/api/session.js ***!
+  !*** ./lib/services/api/session.ts ***!
   \*************************************/
 /*! exports provided: Session */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -17926,6 +17841,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var Session = /*#__PURE__*/function () {
   _createClass(Session, null, [{
     key: "FromRaw",
@@ -17937,6 +17854,8 @@ var Session = /*#__PURE__*/function () {
   function Session(token) {
     _classCallCheck(this, Session);
 
+    _defineProperty(this, "token", void 0);
+
     this.token = token;
   }
 
@@ -17945,9 +17864,9 @@ var Session = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/services/api/session_manager.js":
+/***/ "./lib/services/api/session_manager.ts":
 /*!*********************************************!*\
-  !*** ./lib/services/api/session_manager.js ***!
+  !*** ./lib/services/api/session_manager.ts ***!
   \*********************************************/
 /*! exports provided: SNSessionManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -17959,10 +17878,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
-/* harmony import */ var _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/api/session */ "./lib/services/api/session.js");
-/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/api/session */ "./lib/services/api/session.ts");
+/* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17970,6 +17888,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
@@ -17989,8 +17909,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -17999,39 +17918,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var MINIMUM_PASSWORD_LENGTH = 8;
 
-var SessionManagerResponse = function SessionManagerResponse(_ref) {
-  var response = _ref.response,
-      keyParams = _ref.keyParams,
-      rootKey = _ref.rootKey;
-
-  _classCallCheck(this, SessionManagerResponse);
-
-  this.response = response;
-  this.keyParams = keyParams;
-  this.rootKey = rootKey;
-  Object.freeze(this);
-};
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-
-
 var SNSessionManager = /*#__PURE__*/function (_PureService) {
   _inherits(SNSessionManager, _PureService);
 
-  function SNSessionManager(_ref2) {
+  function SNSessionManager(storageService, apiService, alertService, protocolService) {
     var _this;
-
-    var storageService = _ref2.storageService,
-        apiService = _ref2.apiService,
-        alertService = _ref2.alertService,
-        protocolService = _ref2.protocolService;
 
     _classCallCheck(this, SNSessionManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNSessionManager).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "storageService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "apiService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "alertService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "protocolService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "user", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "session", void 0);
+
     _this.protocolService = protocolService;
     _this.storageService = storageService;
     _this.apiService = apiService;
@@ -18042,10 +17955,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
   _createClass(SNSessionManager, [{
     key: "deinit",
     value: function deinit() {
-      this.protocolService = null;
-      this.storageService = null;
-      this.apiService = null;
-      this.alertService = null;
+      this.protocolService = undefined;
+      this.storageService = undefined;
+      this.apiService = undefined;
+      this.alertService = undefined;
+      this.user = undefined;
+      this.session = undefined;
 
       _get(_getPrototypeOf(SNSessionManager.prototype), "deinit", this).call(this);
     }
@@ -18059,7 +17974,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].User);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User);
 
               case 2:
                 this.user = _context.sent;
@@ -18070,7 +17985,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context.next = 6;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].LegacyUuid);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].LegacyUuid);
 
               case 6:
                 uuid = _context.sent;
@@ -18083,7 +17998,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
               case 8:
                 _context.next = 10;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].Session);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session);
 
               case 10:
                 rawSession = _context.sent;
@@ -18094,7 +18009,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context.next = 14;
-                return this.setSession(_Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__["Session"].FromRaw(rawSession));
+                return this.setSession(_Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"].FromRaw(rawSession));
 
               case 14:
               case "end":
@@ -18110,8 +18025,6 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
       return initializeFromDisk;
     }()
-    /** @access private */
-
   }, {
     key: "setSession",
     value: function () {
@@ -18152,8 +18065,6 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
     value: function getUser() {
       return this.user;
     }
-    /** @access public */
-
   }, {
     key: "signOut",
     value: function () {
@@ -18162,8 +18073,8 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                this.user = null;
-                this.session = null;
+                this.user = undefined;
+                this.session = undefined;
 
               case 2:
               case "end":
@@ -18179,48 +18090,37 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
       return signOut;
     }()
-    /**
-     * @access public
-     * @returns {SessionManagerResponse}
-     */
-
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(_ref3) {
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(email, password) {
         var _this2 = this;
 
-        var email, password, result, serverPassword, keyParams, rootKey;
+        var result, serverPassword, keyParams, rootKey;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                email = _ref3.email, password = _ref3.password;
-
                 if (!(password.length < MINIMUM_PASSWORD_LENGTH)) {
-                  _context5.next = 3;
+                  _context5.next = 2;
                   break;
                 }
 
-                return _context5.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH))
-                }));
+                return _context5.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH))
+                });
 
-              case 3:
-                _context5.next = 5;
+              case 2:
+                _context5.next = 4;
                 return this.protocolService.createRootKey(email, password);
 
-              case 5:
+              case 4:
                 result = _context5.sent;
                 serverPassword = result.key.serverPassword;
                 keyParams = result.keyParams;
                 rootKey = result.key;
-                return _context5.abrupt("return", this.apiService.register({
-                  email: email,
-                  serverPassword: serverPassword,
-                  keyParams: keyParams
-                }).then( /*#__PURE__*/function () {
-                  var _ref4 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(response) {
+                return _context5.abrupt("return", this.apiService.register(email, serverPassword, keyParams).then( /*#__PURE__*/function () {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(response) {
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
                       while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -18229,11 +18129,11 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                             return _this2.handleAuthResponse(response);
 
                           case 2:
-                            return _context4.abrupt("return", new SessionManagerResponse({
+                            return _context4.abrupt("return", {
                               response: response,
                               keyParams: keyParams,
                               rootKey: rootKey
-                            }));
+                            });
 
                           case 3:
                           case "end":
@@ -18243,12 +18143,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                     }, _callee4);
                   }));
 
-                  return function (_x3) {
-                    return _ref4.apply(this, arguments);
+                  return function (_x4) {
+                    return _ref.apply(this, arguments);
                   };
                 }()));
 
-              case 10:
+              case 9:
               case "end":
                 return _context5.stop();
             }
@@ -18256,45 +18156,42 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
         }, _callee5, this);
       }));
 
-      function register(_x2) {
+      function register(_x2, _x3) {
         return _register.apply(this, arguments);
       }
 
       return register;
     }()
-    /**
-     * @access public
-     * @returns {SessionManagerResponse}
-     */
-
   }, {
     key: "signIn",
     value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(_ref5) {
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(email, password) {
         var _this3 = this;
 
-        var email, password, strict, mfaKeyPath, mfaCode, paramsResponse, keyParams, minimum, message, confirmed, latest, _ref6, rootKey, serverPassword;
+        var strict,
+            mfaKeyPath,
+            mfaCode,
+            paramsResponse,
+            rawKeyParams,
+            keyParams,
+            minimum,
+            message,
+            confirmed,
+            latest,
+            _ref2,
+            rootKey,
+            serverPassword,
+            _args7 = arguments;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                email = _ref5.email, password = _ref5.password, strict = _ref5.strict, mfaKeyPath = _ref5.mfaKeyPath, mfaCode = _ref5.mfaCode;
-
-                if (!(!email || !password)) {
-                  _context7.next = 3;
-                  break;
-                }
-
-                throw Error('Email and password must be supplied during sign in');
-
-              case 3:
+                strict = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : false;
+                mfaKeyPath = _args7.length > 3 ? _args7[3] : undefined;
+                mfaCode = _args7.length > 4 ? _args7[4] : undefined;
                 _context7.next = 5;
-                return this.apiService.getAccountKeyParams({
-                  email: email,
-                  mfaKeyPath: mfaKeyPath,
-                  mfaCode: mfaCode
-                });
+                return this.apiService.getAccountKeyParams(email, mfaKeyPath, mfaCode);
 
               case 5:
                 paramsResponse = _context7.sent;
@@ -18304,45 +18201,53 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
+                return _context7.abrupt("return", {
                   response: paramsResponse
-                }));
+                });
 
               case 8:
-                keyParams = this.protocolService.createKeyParams(paramsResponse);
+                rawKeyParams = {
+                  pw_cost: paramsResponse.pw_cost,
+                  pw_nonce: paramsResponse.pw_nonce,
+                  identifier: paramsResponse.identifier,
+                  email: paramsResponse.email,
+                  pw_salt: paramsResponse.pw_salt,
+                  version: paramsResponse.version
+                };
+                keyParams = this.protocolService.createKeyParams(rawKeyParams);
 
                 if (!(!keyParams || !keyParams.version)) {
-                  _context7.next = 11;
+                  _context7.next = 12;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["API_MESSAGE_FALLBACK_LOGIN_FAIL"])
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_FALLBACK_LOGIN_FAIL"])
+                });
 
-              case 11:
+              case 12:
                 if (this.protocolService.supportedVersions().includes(keyParams.version)) {
-                  _context7.next = 17;
+                  _context7.next = 18;
                   break;
                 }
 
                 if (!this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
-                  _context7.next = 16;
+                  _context7.next = 17;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["UNSUPPORTED_PROTOCOL_VERSION"])
-                }));
-
-              case 16:
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["EXPIRED_PROTOCOL_VERSION"])
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["UNSUPPORTED_PROTOCOL_VERSION"])
+                });
 
               case 17:
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["EXPIRED_PROTOCOL_VERSION"])
+                });
+
+              case 18:
                 if (!this.protocolService.isProtocolVersionOutdated(keyParams.version)) {
-                  _context7.next = 28;
+                  _context7.next = 29;
                   break;
                 }
 
@@ -18350,63 +18255,63 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 minimum = this.protocolService.costMinimumForVersion(keyParams.version);
 
                 if (!(keyParams.kdfIterations < minimum)) {
-                  _context7.next = 21;
+                  _context7.next = 22;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["INVALID_PASSWORD_COST"])
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["INVALID_PASSWORD_COST"])
+                });
 
-              case 21:
+              case 22:
                 ;
-                message = _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_VERSION"];
-                _context7.next = 25;
-                return this.alertService.confirm(message, _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_TITLE"], _messages__WEBPACK_IMPORTED_MODULE_6__["OUTDATED_PROTOCOL_ALERT_IGNORE"]).catch(function () {
+                message = _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_VERSION"];
+                _context7.next = 26;
+                return this.alertService.confirm(message, _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_ALERT_TITLE"], _messages__WEBPACK_IMPORTED_MODULE_5__["OUTDATED_PROTOCOL_ALERT_IGNORE"]).catch(function () {
                   /* No-op */
                 });
 
-              case 25:
+              case 26:
                 confirmed = _context7.sent;
 
                 if (confirmed) {
-                  _context7.next = 28;
+                  _context7.next = 29;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString()
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_FALLBACK_LOGIN_FAIL"])
+                });
 
-              case 28:
+              case 29:
                 if (this.protocolService.platformSupportsKeyDerivation(keyParams)) {
-                  _context7.next = 30;
+                  _context7.next = 31;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["UNSUPPORTED_KEY_DERIVATION"])
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["UNSUPPORTED_KEY_DERIVATION"])
+                });
 
-              case 30:
+              case 31:
                 if (!strict) {
-                  _context7.next = 34;
+                  _context7.next = 35;
                   break;
                 }
 
                 latest = this.protocolService.getLatestVersion();
 
                 if (!(keyParams.version !== latest)) {
-                  _context7.next = 34;
+                  _context7.next = 35;
                   break;
                 }
 
-                return _context7.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["StrictSignInFailed"](keyParams.version, latest))
-                }));
+                return _context7.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["StrictSignInFailed"](keyParams.version, latest))
+                });
 
-              case 34:
-                _context7.next = 36;
+              case 35:
+                _context7.next = 37;
                 return this.protocolService.computeRootKey(password, keyParams).then(function (rootKey) {
                   return {
                     rootKey: rootKey,
@@ -18414,17 +18319,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                   };
                 });
 
-              case 36:
-                _ref6 = _context7.sent;
-                rootKey = _ref6.rootKey;
-                serverPassword = _ref6.serverPassword;
-                return _context7.abrupt("return", this.apiService.signIn({
-                  email: email,
-                  serverPassword: serverPassword,
-                  mfaKeyPath: mfaKeyPath,
-                  mfaCode: mfaCode
-                }).then( /*#__PURE__*/function () {
-                  var _ref7 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(response) {
+              case 37:
+                _ref2 = _context7.sent;
+                rootKey = _ref2.rootKey;
+                serverPassword = _ref2.serverPassword;
+                return _context7.abrupt("return", this.apiService.signIn(email, serverPassword, mfaKeyPath, mfaCode).then( /*#__PURE__*/function () {
+                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(response) {
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
                       while (1) {
                         switch (_context6.prev = _context6.next) {
@@ -18433,11 +18333,11 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                             return _this3.handleAuthResponse(response);
 
                           case 2:
-                            return _context6.abrupt("return", new SessionManagerResponse({
+                            return _context6.abrupt("return", {
                               response: response,
                               keyParams: keyParams,
                               rootKey: rootKey
-                            }));
+                            });
 
                           case 3:
                           case "end":
@@ -18447,12 +18347,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                     }, _callee6);
                   }));
 
-                  return function (_x5) {
-                    return _ref7.apply(this, arguments);
+                  return function (_x7) {
+                    return _ref3.apply(this, arguments);
                   };
                 }()));
 
-              case 40:
+              case 41:
               case "end":
                 return _context7.stop();
             }
@@ -18460,50 +18360,43 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
         }, _callee7, this);
       }));
 
-      function signIn(_x4) {
+      function signIn(_x5, _x6) {
         return _signIn.apply(this, arguments);
       }
 
       return signIn;
     }()
-    /**
-     * @access public
-     * @returns {SessionManagerResponse}
-     */
-
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(_ref8) {
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(currentPassword, currentKeyParams, newPassword) {
         var _this4 = this;
 
-        var currentPassword, currentKeyParams, newPassword, currentServerPassword, email, _ref9, newServerPassword, newRootKey, newKeyParams;
+        var currentServerPassword, email, _ref4, newServerPassword, newRootKey, newKeyParams;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                currentPassword = _ref8.currentPassword, currentKeyParams = _ref8.currentKeyParams, newPassword = _ref8.newPassword;
-
                 if (!(newPassword.length < MINIMUM_PASSWORD_LENGTH)) {
-                  _context9.next = 3;
+                  _context9.next = 2;
                   break;
                 }
 
-                return _context9.abrupt("return", new SessionManagerResponse({
-                  response: this.apiService.errorResponseFromString(_messages__WEBPACK_IMPORTED_MODULE_6__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH))
-                }));
+                return _context9.abrupt("return", {
+                  response: this.apiService.createErrorResponse(_messages__WEBPACK_IMPORTED_MODULE_5__["InsufficientPasswordMessage"](MINIMUM_PASSWORD_LENGTH))
+                });
 
-              case 3:
-                _context9.next = 5;
+              case 2:
+                _context9.next = 4;
                 return this.protocolService.computeRootKey(currentPassword, currentKeyParams).then(function (key) {
                   return key.serverPassword;
                 });
 
-              case 5:
+              case 4:
                 currentServerPassword = _context9.sent;
                 email = this.user.email;
-                _context9.next = 9;
+                _context9.next = 8;
                 return this.protocolService.createRootKey(email, newPassword).then(function (result) {
                   return {
                     newRootKey: result.key,
@@ -18512,17 +18405,13 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                   };
                 });
 
-              case 9:
-                _ref9 = _context9.sent;
-                newServerPassword = _ref9.newServerPassword;
-                newRootKey = _ref9.newRootKey;
-                newKeyParams = _ref9.newKeyParams;
-                return _context9.abrupt("return", this.apiService.changePassword({
-                  currentServerPassword: currentServerPassword,
-                  newServerPassword: newServerPassword,
-                  newKeyParams: newKeyParams
-                }).then( /*#__PURE__*/function () {
-                  var _ref10 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(response) {
+              case 8:
+                _ref4 = _context9.sent;
+                newServerPassword = _ref4.newServerPassword;
+                newRootKey = _ref4.newRootKey;
+                newKeyParams = _ref4.newKeyParams;
+                return _context9.abrupt("return", this.apiService.changePassword(currentServerPassword, newServerPassword, newKeyParams).then( /*#__PURE__*/function () {
+                  var _ref5 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(response) {
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
                       while (1) {
                         switch (_context8.prev = _context8.next) {
@@ -18531,11 +18420,11 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                             return _this4.handleAuthResponse(response);
 
                           case 2:
-                            return _context8.abrupt("return", new SessionManagerResponse({
+                            return _context8.abrupt("return", {
                               response: response,
                               keyParams: newKeyParams,
                               rootKey: newRootKey
-                            }));
+                            });
 
                           case 3:
                           case "end":
@@ -18545,12 +18434,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                     }, _callee8);
                   }));
 
-                  return function (_x7) {
-                    return _ref10.apply(this, arguments);
+                  return function (_x11) {
+                    return _ref5.apply(this, arguments);
                   };
                 }()));
 
-              case 14:
+              case 13:
               case "end":
                 return _context9.stop();
             }
@@ -18558,14 +18447,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
         }, _callee9, this);
       }));
 
-      function changePassword(_x6) {
+      function changePassword(_x8, _x9, _x10) {
         return _changePassword.apply(this, arguments);
       }
 
       return changePassword;
     }()
-    /** @access private */
-
   }, {
     key: "handleAuthResponse",
     value: function () {
@@ -18586,12 +18473,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 user = response.user;
                 this.user = user;
                 _context10.next = 6;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].User, user);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user);
 
               case 6:
-                session = new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_5__["Session"](response.token);
+                session = new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"](response.token);
                 _context10.next = 9;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"].Session, session);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session, session);
 
               case 9:
                 _context10.next = 11;
@@ -18605,7 +18492,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
         }, _callee10, this);
       }));
 
-      function handleAuthResponse(_x8) {
+      function handleAuthResponse(_x12) {
         return _handleAuthResponse.apply(this, arguments);
       }
 
@@ -23257,16 +23144,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/alert_service */ "./lib/services/alert_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _Services_alert_service__WEBPACK_IMPORTED_MODULE_0__["SNAlertService"]; });
 
-/* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.js");
+/* harmony import */ var _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Services/api/session_manager */ "./lib/services/api/session_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _Services_api_session_manager__WEBPACK_IMPORTED_MODULE_1__["SNSessionManager"]; });
 
-/* harmony import */ var _Services_api_api_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/api_service */ "./lib/services/api/api_service.js");
+/* harmony import */ var _Services_api_api_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/api_service */ "./lib/services/api/api_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _Services_api_api_service__WEBPACK_IMPORTED_MODULE_2__["SNApiService"]; });
 
 /* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__["SNComponentManager"]; });
 
-/* harmony import */ var _Services_api_http_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/api/http_service */ "./lib/services/api/http_service.js");
+/* harmony import */ var _Services_api_http_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/api/http_service */ "./lib/services/api/http_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _Services_api_http_service__WEBPACK_IMPORTED_MODULE_4__["SNHttpService"]; });
 
 /* harmony import */ var _Services_model_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/model_manager */ "./lib/services/model_manager.ts");
@@ -31865,15 +31752,7 @@ var AccountDownloader = /*#__PURE__*/function () {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.apiService.sync({
-                  payloads: null,
-                  lastSyncToken: this.progress.lastSyncToken,
-                  paginationToken: this.progress.paginationToken,
-                  limit: this.limit || 500,
-                  contentType: this.contentType,
-                  customEvent: this.customEvent,
-                  checkIntegrity: false
-                });
+                return this.apiService.sync([], this.progress.lastSyncToken, this.progress.paginationToken, this.limit || 500, false, this.contentType, this.customEvent);
 
               case 2:
                 response = _context.sent;
@@ -32013,15 +31892,7 @@ var AccountSyncOperation = /*#__PURE__*/function () {
               case 0:
                 payloads = this.popPayloads(this.upLimit);
                 _context.next = 3;
-                return this.apiService.sync({
-                  payloads: payloads,
-                  lastSyncToken: this.lastSyncToken,
-                  paginationToken: this.paginationToken,
-                  limit: this.downLimit,
-                  checkIntegrity: this.checkIntegrity,
-                  contentType: null,
-                  customEvent: null
-                });
+                return this.apiService.sync(payloads, this.lastSyncToken, this.paginationToken, this.downLimit, this.checkIntegrity, undefined, undefined);
 
               case 3:
                 rawResponse = _context.sent;

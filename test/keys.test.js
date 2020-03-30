@@ -88,7 +88,7 @@ describe('keys', () => {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.protocolService.allItemsKeys.length).to.equal(1);
-  });
+  }).timeout(5000);
 
   it('should use root key for encryption of storage', async function () {
     const email = 'foo';
