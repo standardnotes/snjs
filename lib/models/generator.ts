@@ -1,3 +1,5 @@
+import { ItemContent } from '@Models/core/item';
+import { deepMerge, Copy } from '@Lib/utils';
 import { PurePayload } from '@Payloads/pure_payload';
 import * as itemClasses from '@Models/index';
 import { ContentTypes } from '@Models/content_types';
@@ -24,4 +26,15 @@ export function CreateItemFromPayload(payload: PurePayload) {
   const item = new itemClass(true);
   item.updateFromPayload(payload);
   return item;
+}
+
+/**
+ * Builds item .content based on values and populates with other default required
+ * fields if necessary.
+ */
+export function BuildItemContent(values: Record<string, any>) {
+  return {
+    references: [],
+    ...Copy(values),
+  }
 }

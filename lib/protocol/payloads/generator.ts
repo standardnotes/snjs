@@ -30,11 +30,9 @@ export function CreateMaxPayloadFromAnyObject(
   if (!isNullOrUndefined(source as any)) {
     throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
   }
-
   if (!isNullOrUndefined(intent as any)) {
     throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
   }
-
   const payloadClass = SNMaxItemPayload;
   return CreatePayload(
     object,

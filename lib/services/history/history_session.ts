@@ -1,4 +1,4 @@
-import { AnyObject } from './../../index';
+import { AnyRecord } from '@Lib/types';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemHistory } from '@Services/history/item_history';
@@ -34,7 +34,7 @@ export class HistorySession {
     }
   }
 
-  static FromJson(historySessionJson?: AnyObject) {
+  static FromJson(historySessionJson?: AnyRecord) {
     if(historySessionJson) {
       const content = historySessionJson.content;
       const uuids = Object.keys(content.itemUUIDToItemHistoryMapping);

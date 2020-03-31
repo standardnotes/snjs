@@ -23,7 +23,7 @@ export { SNComponentManager, ComponentActions } from './services/component_manag
 export { HistorySession } from '@Services/history/history_session';
 export { ItemHistory } from '@Services/history/item_history';
 export { ItemHistoryEntry } from '@Services/history/item_history_entry';
-export { SNPrivileges, ProtectedActions, PrivilegeCredentials } from './models/app/privileges';
+export { SNPrivileges, ProtectedActions, PrivilegeCredential as PrivilegeCredentials } from './models/app/privileges';
 export { SNWebCrypto } from 'sncrypto';
 export { SNModelManager } from './services/model_manager';
 export { SNHttpService } from './services/api/http_service';

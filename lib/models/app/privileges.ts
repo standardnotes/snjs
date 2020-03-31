@@ -1,4 +1,4 @@
-import pull from 'lodash/pull';
+import { removeFromArray } from '@Lib/utils';
 import { SNItem, ItemContent } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
@@ -11,7 +11,7 @@ export enum ProtectedActions {
   DeleteNote = 'ActionDeleteNote',
 };
 
-export enum PrivilegeCredentials {
+export enum PrivilegeCredential {
   AccountPassword = 'CredentialAccountPassword',
   LocalPasscode = 'CredentialLocalPasscode'
 };
@@ -37,15 +37,15 @@ export class SNPrivileges extends SNItem {
     return new SNPredicate('content_type', '=', this.content_type);
   }
 
-  setCredentialsForAction(action: ProtectedActions, credentials: PrivilegeCredentials) {
+  setCredentialsForAction(action: ProtectedActions, credentials: PrivilegeCredential[]) {
     this.content.desktopPrivileges[action] = credentials;
   }
 
-  getCredentialsForAction(action: ProtectedActions): PrivilegeCredentials[] {
+  getCredentialsForAction(action: ProtectedActions): PrivilegeCredential[] {
     return this.content.desktopPrivileges[action] || [];
   }
 
-  toggleCredentialForAction(action: ProtectedActions, credential: PrivilegeCredentials) {
+  toggleCredentialForAction(action: ProtectedActions, credential: PrivilegeCredential) {
     if(this.isCredentialRequiredForAction(action, credential)) {
       this.removeCredentialForAction(action, credential);
     } else {
@@ -53,17 +53,17 @@ export class SNPrivileges extends SNItem {
     }
   }
 
-  removeCredentialForAction(action: ProtectedActions, credential: PrivilegeCredentials) {
-    pull(this.content.desktopPrivileges[action], credential);
+  removeCredentialForAction(action: ProtectedActions, credential: PrivilegeCredential) {
+    removeFromArray(this.content.desktopPrivileges[action], credential);
   }
 
-  addCredentialForAction(action: ProtectedActions, credential: PrivilegeCredentials) {
+  addCredentialForAction(action: ProtectedActions, credential: PrivilegeCredential) {
     const credentials = this.getCredentialsForAction(action);
     credentials.push(credential);
     this.setCredentialsForAction(action, credentials);
   }
 
-  isCredentialRequiredForAction(action: ProtectedActions, credential: PrivilegeCredentials) {
+  isCredentialRequiredForAction(action: ProtectedActions, credential: PrivilegeCredential) {
     const credentialsRequired = this.getCredentialsForAction(action);
     return credentialsRequired.includes(credential);
   }

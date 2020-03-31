@@ -9,7 +9,7 @@ import { SNPredicate } from '@Models/core/predicate';
 import { StorageKeys } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentTypes } from '@Root/lib/models';
-import { ProtectedActions, PrivilegeCredentials, SNPrivileges } from '@Models/app/privileges';
+import { ProtectedActions, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
 
 export enum PrivilegeSessionLength {
   None = 0,
@@ -18,14 +18,14 @@ export enum PrivilegeSessionLength {
   OneWeek = 604800,
 }
 
-type CredentialAuthMapping = Partial<Record<PrivilegeCredentials, string>>
+type CredentialAuthMapping = Partial<Record<PrivilegeCredential, string>>
 
 const CredentialsMetadata = {
-  [PrivilegeCredentials.AccountPassword] : {
+  [PrivilegeCredential.AccountPassword] : {
     label: 'Account Password',
     prompt: 'Please enter your account password.'
   },
-  [PrivilegeCredentials.LocalPasscode] : {
+  [PrivilegeCredential.LocalPasscode] : {
     label: 'Local Passcode',
     prompt: 'Please enter your local passcode.'
   }
@@ -70,7 +70,7 @@ export class SNPrivilegesService extends PureService {
   private sessionManager?: SNSessionManager
 
   private availableActions: ProtectedActions[] = []
-  private availableCredentials: PrivilegeCredentials[] = []
+  private availableCredentials: PrivilegeCredential[] = []
   private sessionLengths: PrivilegeSessionLength[] = []
 
   constructor(
@@ -107,8 +107,8 @@ export class SNPrivilegesService extends PureService {
     });
 
     this.availableCredentials = [
-      PrivilegeCredentials.AccountPassword,
-      PrivilegeCredentials.LocalPasscode
+      PrivilegeCredential.AccountPassword,
+      PrivilegeCredential.LocalPasscode
     ];
 
     this.sessionLengths = [
@@ -135,12 +135,12 @@ export class SNPrivilegesService extends PureService {
     const credentials = privileges.getCredentialsForAction(action);
     const netCredentials = [];
     for (const credential of credentials) {
-      if (credential === PrivilegeCredentials.AccountPassword) {
+      if (credential === PrivilegeCredential.AccountPassword) {
         const isOnline = await this.sessionManager!.online();
         if (isOnline) {
           netCredentials.push(credential);
         }
-      } else if (credential === PrivilegeCredentials.LocalPasscode) {
+      } else if (credential === PrivilegeCredential.LocalPasscode) {
         const hasPasscode = await this.protocolService!.hasRootKeyWrapper();
         if (hasPasscode) {
           netCredentials.push(credential);
@@ -255,19 +255,19 @@ export class SNPrivilegesService extends PureService {
   }
 
   async verifyAuthenticationParameters(
-    credential: PrivilegeCredentials,
+    credential: PrivilegeCredential,
     value: string
   ) {
-    if (credential === PrivilegeCredentials.AccountPassword) {
+    if (credential === PrivilegeCredential.AccountPassword) {
       const { valid } = await this.protocolService!.validateAccountPassword(value);
       return valid;
-    } else if (credential === PrivilegeCredentials.LocalPasscode) {
+    } else if (credential === PrivilegeCredential.LocalPasscode) {
       const { valid } = await this.protocolService!.validatePasscode(value);
       return valid;
     }
   }
 
-  displayInfoForCredential(credential: PrivilegeCredentials) {
+  displayInfoForCredential(credential: PrivilegeCredential) {
     return CredentialsMetadata[credential];
   }
 

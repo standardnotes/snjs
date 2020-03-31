@@ -24,6 +24,7 @@ import {
   PayloadFields
 } from '@Payloads/index';
 import { Uuid } from '@Lib/uuid';
+import { BuildItemContent } from '../models/generator';
 
 type CreationCallback = (
   items: SNItem[],
@@ -846,7 +847,7 @@ export class SNModelManager extends PureService {
     if (!tag) {
       tag = await this.createItem(
         ContentTypes.Tag,
-        { title: title } as ItemContent,
+        BuildItemContent({ title }),
         true,
         true
       );

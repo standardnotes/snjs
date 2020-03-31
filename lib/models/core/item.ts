@@ -20,7 +20,7 @@ export type ContentReference = {
 
 export type ItemContent = {
   [key: string]: any
-  references?: ContentReference[]
+  references: ContentReference[]
 }
 
 type Itemable<K extends keyof any, T> = {

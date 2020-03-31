@@ -27,7 +27,7 @@ export class SNSmartTag extends SNTag {
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
-          predicate: new SNPredicate.FromArray(['content_type', '=', ContentTypes.Note])
+          predicate: SNPredicate.FromArray(['content_type', '=', ContentTypes.Note])
         }
       }
     );
@@ -39,7 +39,7 @@ export class SNSmartTag extends SNTag {
           title: 'Archived',
           isSystemTag: true,
           isArchiveTag: true,
-          predicate: new SNPredicate.FromArray(['archived', '=', true])
+          predicate: SNPredicate.FromArray(['archived', '=', JSON.stringify(true)])
         }
       }
     );
@@ -51,7 +51,7 @@ export class SNSmartTag extends SNTag {
           title: 'Trash',
           isSystemTag: true,
           isTrashTag: true,
-          predicate: new SNPredicate.FromArray(['content.trashed', '=', true])
+          predicate: SNPredicate.FromArray(['content.trashed', '=', JSON.stringify(true)])
         }
       }
     );

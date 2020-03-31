@@ -1,6 +1,6 @@
 import { SNItem, ItemContent } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { findInArray, removeFromArray } from '@Lib/utils';
+import { findInArray, removeFromArray, filterFromArray } from '@Lib/utils';
 import { ContentTypes } from '@Models/content_types';
 
 /**
@@ -37,7 +37,7 @@ export class SNTag extends SNItem {
     const uuids = references.map((ref) => ref.uuid);
     this.notes.slice().forEach((note) => {
       if (!uuids.includes(note.uuid)) {
-        removeFromArray(this.notes, { uuid: note.uuid });
+        filterFromArray(this.notes, { uuid: note.uuid });
         note.setIsNoLongerReferencedBy(this);
       }
     });
@@ -54,7 +54,7 @@ export class SNTag extends SNItem {
 
   public removeItemAsRelationship(item: SNItem) {
     if (item.content_type === ContentTypes.Note) {
-      removeFromArray(this.notes, { uuid: item.uuid });
+      filterFromArray(this.notes, { uuid: item.uuid });
     }
     super.removeItemAsRelationship(item);
   }

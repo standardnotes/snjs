@@ -20,5 +20,3 @@ export {
   RawStorageKeys,
   namespacedKey,
 } from '@Lib/storage_keys';
-
-export type AnyObject = Record<string, any>
