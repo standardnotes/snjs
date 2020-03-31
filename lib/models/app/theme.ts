@@ -1,11 +1,11 @@
 import { SNItem } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
 import { ContentTypes } from '@Models/content_types';
-import { SNComponent } from '@Models/app/component';
+import { SNComponent, ComponentAreas } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
 
-  public area: string = 'themes'
+  public area: ComponentAreas = ComponentAreas.Themes
 
   isLayerable() {
     return this.package_info && this.package_info.layerable;

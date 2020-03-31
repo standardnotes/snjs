@@ -540,7 +540,7 @@ export class SNModelManager extends PureService {
       PayloadSources.LocalChanged
     );
     const copy = results.find((p) => p.uuid === payloads[0].uuid);
-    return copy;
+    return copy!;
   }
 
   /**

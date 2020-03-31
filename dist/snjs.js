@@ -5175,14 +5175,7 @@ var SNApplication = /*#__PURE__*/function () {
         return;
       }
 
-      this.componentManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNComponentManager"]))({
-        modelManager: this.modelManager,
-        syncService: this.syncService,
-        alertService: this.alertService,
-        timeout: this.deviceInterface.timeout,
-        environment: this.environment,
-        platform: this.platform
-      });
+      this.componentManager = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNComponentManager"]))(this.modelManager, this.syncService, this.alertService, this.environment, this.platform, this.deviceInterface.timeout);
       this.services.push(this.componentManager);
     }
   }, {
@@ -5729,7 +5722,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return _models__WEBPACK_IMPORTED_MODULE_7__["SNEditor"]; });
 
-/* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.js");
+/* harmony import */ var _services_component_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/component_manager */ "./lib/services/component_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_8__["SNComponentManager"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ComponentActions", function() { return _services_component_manager__WEBPACK_IMPORTED_MODULE_8__["ComponentActions"]; });
@@ -7498,6 +7491,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -7511,6 +7506,7 @@ var ComponentAreas;
   ComponentAreas["NoteTags"] = "note-tags";
   ComponentAreas["Rooms"] = "rooms";
   ComponentAreas["Modal"] = "modal";
+  ComponentAreas["Any"] = "*";
 })(ComponentAreas || (ComponentAreas = {}));
 
 ;
@@ -7524,9 +7520,27 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   _inherits(SNComponent, _SNItem);
 
   function SNComponent() {
+    var _getPrototypeOf2;
+
+    var _this;
+
     _classCallCheck(this, SNComponent);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SNComponent).apply(this, arguments));
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "window", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "hidden", false);
+
+    _defineProperty(_assertThisInitialized(_this), "readonly", false);
+
+    _defineProperty(_assertThisInitialized(_this), "sessionKey", void 0);
+
+    return _this;
   }
 
   _createClass(SNComponent, [{
@@ -8864,7 +8878,7 @@ var SNTheme = /*#__PURE__*/function (_SNComponent) {
 
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SNTheme)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
-    _defineProperty(_assertThisInitialized(_this), "area", 'themes');
+    _defineProperty(_assertThisInitialized(_this), "area", _Models_app_component__WEBPACK_IMPORTED_MODULE_2__["ComponentAreas"].Themes);
 
     return _this;
   }
@@ -19356,9 +19370,9 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/component_manager.js":
+/***/ "./lib/services/component_manager.ts":
 /*!*******************************************!*\
-  !*** ./lib/services/component_manager.js ***!
+  !*** ./lib/services/component_manager.ts ***!
   \*******************************************/
 /*! exports provided: ComponentActions, SNComponentManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -19376,8 +19390,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
 /* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
@@ -19426,51 +19440,78 @@ var DESKTOP_URL_PREFIX = 'sn://';
 var LOCAL_HOST = 'localhost';
 var CUSTOM_LOCAL_HOST = 'sn.local';
 var ANDROID_LOCAL_HOST = '10.0.2.2';
-var ComponentActions = {
-  SetSize: 'set-size',
-  StreamItems: 'stream-items',
-  StreamContextItem: 'stream-context-item',
-  SaveItems: 'save-items',
-  SelectItem: 'select-item',
-  AssociateItem: 'associate-item',
-  DeassociateItem: 'deassociate-item',
-  ClearSelection: 'clear-selection',
-  CreateItem: 'create-item',
-  CreateItems: 'create-items',
-  DeleteItems: 'delete-items',
-  SetComponentData: 'set-component-data',
-  InstallLocalComponent: 'install-local-component',
-  ToggleActivateComponent: 'toggle-activate-component',
-  RequestPermissions: 'request-permissions',
-  PresentConflictResolution: 'present-conflict-resolution',
-  DuplicateItem: 'duplicate-item',
-  ComponentRegistered: 'component-registered',
-  ActivateThemes: 'themes',
-  Reply: 'reply'
-};
+var ComponentActions;
+
+(function (ComponentActions) {
+  ComponentActions["SetSize"] = "set-size";
+  ComponentActions["StreamItems"] = "stream-items";
+  ComponentActions["StreamContextItem"] = "stream-context-item";
+  ComponentActions["SaveItems"] = "save-items";
+  ComponentActions["SelectItem"] = "select-item";
+  ComponentActions["AssociateItem"] = "associate-item";
+  ComponentActions["DeassociateItem"] = "deassociate-item";
+  ComponentActions["ClearSelection"] = "clear-selection";
+  ComponentActions["CreateItem"] = "create-item";
+  ComponentActions["CreateItems"] = "create-items";
+  ComponentActions["DeleteItems"] = "delete-items";
+  ComponentActions["SetComponentData"] = "set-component-data";
+  ComponentActions["InstallLocalComponent"] = "install-local-component";
+  ComponentActions["ToggleActivateComponent"] = "toggle-activate-component";
+  ComponentActions["RequestPermissions"] = "request-permissions";
+  ComponentActions["PresentConflictResolution"] = "present-conflict-resolution";
+  ComponentActions["DuplicateItem"] = "duplicate-item";
+  ComponentActions["ComponentRegistered"] = "component-registered";
+  ComponentActions["ActivateThemes"] = "themes";
+  ComponentActions["Reply"] = "reply";
+  ComponentActions["SaveSuccess"] = "save-success";
+  ComponentActions["SaveError"] = "save-error";
+})(ComponentActions || (ComponentActions = {}));
+
+;
+/* This domain will be used to save context item client data */
+
+var ClientDataDomain = 'org.standardnotes.sn.components';
+
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
  * and other components. The component manager primarily deals with iframes, and orchestrates
  * sending and receiving messages to and from frames via the postMessage API.
  */
-
 var SNComponentManager = /*#__PURE__*/function (_PureService) {
   _inherits(SNComponentManager, _PureService);
 
-  function SNComponentManager(_ref) {
+  function SNComponentManager(modelManager, syncService, alertService, environment, platform, timeout) {
     var _this;
-
-    var modelManager = _ref.modelManager,
-        syncService = _ref.syncService,
-        alertService = _ref.alertService,
-        timeout = _ref.timeout,
-        environment = _ref.environment,
-        platform = _ref.platform;
 
     _classCallCheck(this, SNComponentManager);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNComponentManager).call(this));
-    /* This domain will be used to save context item client data */
+
+    _defineProperty(_assertThisInitialized(_this), "modelManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "syncService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "alertService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "environment", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "platform", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "timeout", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "desktopManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "removeMappingObserver", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "streamObservers", []);
+
+    _defineProperty(_assertThisInitialized(_this), "contextStreamObservers", []);
+
+    _defineProperty(_assertThisInitialized(_this), "activeComponents", []);
+
+    _defineProperty(_assertThisInitialized(_this), "permissionDialogs", []);
+
+    _defineProperty(_assertThisInitialized(_this), "handlers", []);
 
     _defineProperty(_assertThisInitialized(_this), "detectFocusChange", function () {
       var _iteratorNormalCompletion = true;
@@ -19521,20 +19562,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
     });
 
-    SNComponentManager.ClientDataDomain = 'org.standardnotes.sn.components';
     _this.timeout = timeout || setTimeout.bind(window);
     _this.modelManager = modelManager;
     _this.syncService = syncService;
     _this.alertService = alertService;
     _this.environment = environment;
     _this.platform = platform;
-    _this.isDesktop = _this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Desktop;
-    _this.isMobile = _this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile;
-    _this.streamObservers = [];
-    _this.contextStreamObservers = [];
-    _this.activeComponents = [];
-    _this.permissionDialogs = [];
-    _this.handlers = [];
 
     _this.configureForGeneralUsage();
 
@@ -19544,10 +19577,17 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
     return _this;
   }
-  /** @override */
-
 
   _createClass(SNComponentManager, [{
+    key: "componentsForArea",
+    value: function componentsForArea(area) {
+      return this.components.filter(function (component) {
+        return component.area === area;
+      });
+    }
+    /** @override */
+
+  }, {
     key: "deinit",
     value: function deinit() {
       _get(_getPrototypeOf(SNComponentManager.prototype), "deinit", this).call(this);
@@ -19557,9 +19597,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       this.activeComponents.length = 0;
       this.permissionDialogs.length = 0;
       this.handlers.length = 0;
-      this.modelManager = null;
-      this.syncService = null;
-      this.alertService = null;
+      this.modelManager = undefined;
+      this.syncService = undefined;
+      this.alertService = undefined;
       this.removeMappingObserver();
       this.removeMappingObserver = null;
 
@@ -19580,8 +19620,8 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function configureForGeneralUsage() {
       var _this2 = this;
 
-      this.removeMappingObserver = this.modelManager.addMappingObserver(_Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Any, /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(allItems, _, __, source, sourceKey) {
+      this.removeMappingObserver = this.modelManager.addMappingObserver(_Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Any, /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(allItems, _, __, source, sourceKey) {
           var syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, component, activeComponent;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
@@ -19589,14 +19629,14 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
               switch (_context.prev = _context.next) {
                 case 0:
                   syncedComponents = allItems.filter(function (item) {
-                    return item.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component || item.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme;
+                    return item.content_type === _Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component || item.content_type === _Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme;
                   });
                   /**
                    * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid 
                    * recursion caused by the component being modified and saved after it is updated.
                   */
 
-                  if (syncedComponents.length > 0 && source !== _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved) {
+                  if (syncedComponents.length > 0 && source !== _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved) {
                     /* Ensure any component in our data is installed by the system */
                     if (_this2.isDesktop) {
                       _this2.desktopManager.syncComponentsInstallation(syncedComponents);
@@ -19684,7 +19724,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   /* LocalChanged is not interesting to send to observers. For local changes,
                   we wait until the item is set to dirty before notifying observers, where the mapping
                   source would be PayloadSources.LocalDirtied */
-                  if (source !== _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalChanged) {
+                  if (source !== _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalChanged) {
                     _this2.notifyStreamObservers(allItems, source, sourceKey);
                   }
 
@@ -19697,7 +19737,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         }));
 
         return function (_x, _x2, _x3, _x4, _x5) {
-          return _ref2.apply(this, arguments);
+          return _ref.apply(this, arguments);
         };
       }());
     }
@@ -19781,7 +19821,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             for (var _iterator5 = _this3.handlers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               var handler = _step5.value;
 
-              if (!handler.areas.includes(observer.component.area) && !handler.areas.includes('*')) {
+              if (!handler.areas.includes(observer.component.area) && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
                 continue;
               }
 
@@ -19932,10 +19972,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var data = {
         themes: urls
       };
-      this.sendMessageToComponent(component, {
+      var message = {
         action: ComponentActions.ActivateThemes,
         data: data
-      });
+      };
+      this.sendMessageToComponent(component, message);
     }
   }, {
     key: "contextItemDidChangeInArea",
@@ -19948,7 +19989,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator7 = this.handlers[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
           var handler = _step7.value;
 
-          if (handler.areas.includes(area) === false && !handler.areas.includes('*')) {
+          if (handler.areas.includes(area) === false && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
             continue;
           }
 
@@ -20030,24 +20071,17 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "jsonForItem",
     value: function jsonForItem(item, component, source) {
+      var isMetadatUpdate = source === _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalSaved;
       var params = {
         uuid: item.uuid,
         content_type: item.content_type,
         created_at: item.created_at,
         updated_at: item.updated_at,
-        deleted: item.deleted
+        deleted: item.deleted,
+        isMetadataUpdate: isMetadatUpdate,
+        content: item.collapseContent(),
+        clientData: item.getDomainDataItem(component.getClientDataKey(), ClientDataDomain) || {}
       };
-      params.content = item.collapseContent();
-      params.clientData = item.getDomainDataItem(component.getClientDataKey(), SNComponentManager.ClientDataDomain) || {};
-      /** isMetadataUpdate implies that the extension should make reference of updated 
-       * metadata, but not update content values as they may be stale relative to what the 
-       * extension currently has. Changes are always metadata updates if the mapping source 
-       * is PayloadSources.RemoteSaved || source === PayloadSources.LocalSaved. */
-
-      if (source && (source === _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved || source === _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalSaved)) {
-        params.isMetadataUpdate = true;
-      }
-
       this.removePrivatePropertiesFromResponseItems([params], component);
       return params;
     }
@@ -20057,14 +20091,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var _this6 = this;
 
       this.log('Web|componentManager|sendItemsInReply', component, items, message);
-      var response = {
-        items: {}
-      };
+      var responseData = {};
       var mapped = items.map(function (item) {
         return _this6.jsonForItem(item, component, source);
       });
-      response.items = mapped;
-      this.replyToMessage(component, message, response);
+      responseData.items = mapped;
+      this.replyToMessage(component, message, responseData);
     }
   }, {
     key: "sendContextItemInReply",
@@ -20109,18 +20141,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       /* Mobile messaging requires json */
 
 
-      if (this.isMobile) {
-        message = JSON.stringify(message);
-      }
-
-      component.window.postMessage(message, origin);
-    }
-  }, {
-    key: "componentsForArea",
-    value: function componentsForArea(area) {
-      return this.components.filter(function (component) {
-        return component.area === area;
-      });
+      component.window.postMessage(this.isMobile ? JSON.stringify(message) : message, origin);
     }
   }, {
     key: "urlForComponent",
@@ -20224,7 +20245,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         this.handleSaveItemsMessage(component, message);
       } else if (message.action === ComponentActions.ToggleActivateComponent) {
         var componentToToggle = this.modelManager.findItem(message.data.uuid);
-        this.handleToggleComponentMessage(component, componentToToggle, message);
+        this.handleToggleComponentMessage(componentToToggle, message);
       } else if (message.action === ComponentActions.RequestPermissions) {
         this.handleRequestPermissionsMessage(component, message);
       } else if (message.action === ComponentActions.InstallLocalComponent) {
@@ -20241,7 +20262,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         var _loop4 = function _loop4() {
           var handler = _step10.value;
 
-          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes('*'))) {
+          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any))) {
             _this7.timeout(function () {
               handler.actionHandler(component, message.action, message.data);
             });
@@ -20269,7 +20290,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "removePrivatePropertiesFromResponseItems",
     value: function removePrivatePropertiesFromResponseItems(responseItems, component) {
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var includeUrls = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       if (component) {
         /* System extensions can bypass this step */
@@ -20282,10 +20303,8 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
       var privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
 
-      if (options) {
-        if (options.includeUrls) {
-          privateContentProperties = privateContentProperties.concat(['url', 'hosted_url', 'local_url']);
-        }
+      if (includeUrls) {
+        privateContentProperties = privateContentProperties.concat(['url', 'hosted_url', 'local_url']);
       }
 
       var _iteratorNormalCompletion11 = true;
@@ -20366,7 +20385,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         try {
           for (var _iterator13 = message.data.content_types[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
             var contentType = _step13.value;
-            items = items.concat(_this8.modelManager.validItemsForContentType(contentType));
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_9__["extendArray"])(items, items.concat(_this8.modelManager.validItemsForContentType(contentType)));
           }
         } catch (err) {
           _didIteratorError13 = true;
@@ -20576,8 +20595,8 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
               case 32:
                 /* Check to see if additional privileges are required */
                 if (pendingResponseItems.length > 0) {
-                  requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(pendingResponseItems.map(function (i) {
-                    return i.content_type;
+                  requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(pendingResponseItems.map(function (item) {
+                    return item.content_type;
                   })).sort();
                   requiredPermissions.push({
                     name: ComponentActions.StreamItems,
@@ -20592,15 +20611,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
                         case 0:
-                          _this10.removePrivatePropertiesFromResponseItems(responseItems, component, {
-                            includeUrls: true,
-                            incoming: true
-                          });
+                          _this10.removePrivatePropertiesFromResponseItems(responseItems, component, true);
                           /* Filter locked items */
 
 
-                          ids = responseItems.map(function (i) {
-                            return i.uuid;
+                          ids = responseItems.map(function (item) {
+                            return item.uuid;
                           });
                           items = _this10.modelManager.findItems(ids);
                           lockedCount = 0;
@@ -20662,10 +20678,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           }
 
                           payloads = responseItems.map(function (responseItem) {
-                            return Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved);
+                            return Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved);
                           });
                           _context2.next = 27;
-                          return _this10.modelManager.mapPayloadsToLocalItems(payloads, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid);
+                          return _this10.modelManager.mapPayloadsToLocalItems(payloads, _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid);
 
                         case 27:
                           localItems = _context2.sent;
@@ -20692,7 +20708,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           }
 
                           // An item this extension is trying to save was possibly removed locally, notify user
-                          _this10.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist. Please restart this extension and try again."));
+                          _this10.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist .") + "Please restart this extension and try again.");
 
                           return _context2.abrupt("continue", 43);
 
@@ -20703,11 +20719,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           }
 
                           if (responseItem.clientData) {
-                            _item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
+                            _item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, ClientDataDomain);
                           }
 
                           _context2.next = 43;
-                          return _this10.modelManager.setItemDirty(_item, true, true, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid);
+                          return _this10.modelManager.setItemDirty(_item, true, true, _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].ComponentRetrieved, component.uuid);
 
                         case 43:
                           _iteratorNormalCompletion18 = true;
@@ -20752,17 +20768,17 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           _this10.syncService.sync().then(function () {
                             /* Allow handlers to be notified when a save begins and ends, to update the UI */
                             var saveMessage = Object.assign({}, message);
-                            saveMessage.action = 'save-success';
+                            saveMessage.action = ComponentActions.SaveSuccess;
 
                             _this10.replyToMessage(component, message, {});
 
                             _this10.handleMessage(component, saveMessage);
                           }).catch(function () {
                             var saveMessage = Object.assign({}, message);
-                            saveMessage.action = 'save-error';
+                            saveMessage.action = ComponentActions.SaveError;
 
                             _this10.replyToMessage(component, message, {
-                              error: 'save-error'
+                              error: ComponentActions.SaveError
                             });
 
                             _this10.handleMessage(component, saveMessage);
@@ -20847,9 +20863,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this12.removePrivatePropertiesFromResponseItems(responseItems, component, {
-                  incoming: true
-                });
+                _this12.removePrivatePropertiesFromResponseItems(responseItems, component);
 
                 processedItems = [];
                 _iteratorNormalCompletion19 = true;
@@ -20865,11 +20879,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 responseItem = _step19.value;
-                payload = Object(_Payloads__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteRetrieved);
-                item = Object(_Models__WEBPACK_IMPORTED_MODULE_6__["CreateItemFromPayload"])(payload);
+                payload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteRetrieved);
+                item = Object(_Models_index__WEBPACK_IMPORTED_MODULE_6__["CreateItemFromPayload"])(payload);
 
                 if (responseItem.clientData) {
-                  item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, SNComponentManager.ClientDataDomain);
+                  item.setDomainDataItem(component.getClientDataKey(), responseItem.clientData, ClientDataDomain);
                 }
 
                 _this12.modelManager.addItem(item);
@@ -20949,8 +20963,8 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function handleDeleteItemsMessage(component, message) {
       var _this13 = this;
 
-      var requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(message.data.items.map(function (i) {
-        return i.content_type;
+      var requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(message.data.items.map(function (item) {
+        return item.content_type;
       })).sort();
       var requiredPermissions = [{
         name: ComponentActions.StreamItems,
@@ -21004,7 +21018,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 return _context6.abrupt("continue", 24);
 
               case 18:
-                if (![_Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme].includes(model.content_type)) {
+                if (![_Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme].includes(model.content_type)) {
                   _context6.next = 21;
                   break;
                 }
@@ -21019,7 +21033,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
               case 23:
                 /* Currently extensions are not notified of association until a full server sync completes.
                    We manually notify observers. */
-                _this13.modelManager.notifyMappingObservers([model], _Payloads__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved);
+                _this13.modelManager.notifyMappingObservers([model], _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].RemoteSaved);
 
               case 24:
                 _iteratorNormalCompletion20 = true;
@@ -21125,7 +21139,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     }
   }, {
     key: "handleToggleComponentMessage",
-    value: function handleToggleComponentMessage(sourceComponent, targetComponent, message) {
+    value: function handleToggleComponentMessage(targetComponent, message) {
       this.toggleComponent(targetComponent);
     }
   }, {
@@ -21134,7 +21148,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var _toggleComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(component) {
         var _this16 = this;
 
-        var activeThemes;
+        var theme, activeThemes;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
@@ -21145,7 +21159,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 this.openModalComponent(component);
-                _context9.next = 18;
+                _context9.next = 19;
                 break;
 
               case 4:
@@ -21158,26 +21172,28 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 return this.deactivateComponent(component);
 
               case 7:
-                _context9.next = 18;
+                _context9.next = 19;
                 break;
 
               case 9:
-                if (!(component.content_type === _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme)) {
-                  _context9.next = 16;
+                if (!(component.content_type === _Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme)) {
+                  _context9.next = 17;
                   break;
                 }
 
+                theme = component;
                 /* Deactive currently active theme if new theme is not layerable */
+
                 activeThemes = this.getActiveThemes();
                 /* Activate current before deactivating others, so as not to flicker */
 
-                _context9.next = 13;
+                _context9.next = 14;
                 return this.activateComponent(component);
 
-              case 13:
-                if (!component.isLayerable()) {
+              case 14:
+                if (!theme.isLayerable()) {
                   setTimeout( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8() {
-                    var _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, theme;
+                    var _iteratorNormalCompletion21, _didIteratorError21, _iteratorError21, _iterator21, _step21, candidate;
 
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
                       while (1) {
@@ -21195,15 +21211,15 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                               break;
                             }
 
-                            theme = _step21.value;
+                            candidate = _step21.value;
 
-                            if (!(theme && !theme.isLayerable())) {
+                            if (!(candidate && !candidate.isLayerable())) {
                               _context8.next = 10;
                               break;
                             }
 
                             _context8.next = 10;
-                            return _this16.deactivateComponent(theme);
+                            return _this16.deactivateComponent(candidate);
 
                           case 10:
                             _iteratorNormalCompletion21 = true;
@@ -21253,14 +21269,14 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   })), 10);
                 }
 
-                _context9.next = 18;
+                _context9.next = 19;
                 break;
 
-              case 16:
-                _context9.next = 18;
+              case 17:
+                _context9.next = 19;
                 return this.activateComponent(component);
 
-              case 18:
+              case 19:
               case "end":
                 return _context9.stop();
             }
@@ -21375,11 +21391,28 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
 
       if (requiredPermissions.length > 0) {
-        this.promptForPermissions(component, requiredPermissions, function (approved) {
-          if (approved) {
-            runFunction();
-          }
-        });
+        this.promptForPermissions(component, requiredPermissions, /*#__PURE__*/function () {
+          var _ref8 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(approved) {
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
+              while (1) {
+                switch (_context10.prev = _context10.next) {
+                  case 0:
+                    if (approved) {
+                      runFunction();
+                    }
+
+                  case 1:
+                  case "end":
+                    return _context10.stop();
+                }
+              }
+            }, _callee10);
+          }));
+
+          return function (_x9) {
+            return _ref8.apply(this, arguments);
+          };
+        }());
       } else {
         runFunction();
       }
@@ -21389,142 +21422,143 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function promptForPermissions(component, permissions, callback) {
       var _this17 = this;
 
-      var params = {};
-      params.component = component;
-      params.permissions = permissions;
-      params.permissionsString = this.permissionsStringForPermissions(permissions, component);
-      params.actionBlock = callback;
+      var params = {
+        component: component,
+        permissions: permissions,
+        permissionsString: this.permissionsStringForPermissions(permissions, component),
+        actionBlock: callback,
+        callback: function () {
+          var _callback = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(approved) {
+            var _iteratorNormalCompletion24, _didIteratorError24, _iteratorError24, _loop6, _iterator24, _step24;
 
-      params.callback = /*#__PURE__*/function () {
-        var _ref9 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(approved) {
-          var _iteratorNormalCompletion24, _didIteratorError24, _iteratorError24, _loop6, _iterator24, _step24;
-
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
-            while (1) {
-              switch (_context10.prev = _context10.next) {
-                case 0:
-                  if (!approved) {
-                    _context10.next = 24;
-                    break;
-                  }
-
-                  _iteratorNormalCompletion24 = true;
-                  _didIteratorError24 = false;
-                  _iteratorError24 = undefined;
-                  _context10.prev = 4;
-
-                  _loop6 = function _loop6() {
-                    var permission = _step24.value;
-                    var matchingPermission = component.permissions.find(function (candidate) {
-                      return candidate.name === permission.name;
-                    });
-
-                    if (!matchingPermission) {
-                      component.permissions.push(permission);
-                    } else {
-                      /* Permission already exists, but content_types may have been expanded */
-                      var contentTypes = matchingPermission.content_types || [];
-                      matchingPermission.content_types = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(contentTypes.concat(permission.content_types));
-                    }
-                  };
-
-                  for (_iterator24 = permissions[Symbol.iterator](); !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {
-                    _loop6();
-                  }
-
-                  _context10.next = 13;
-                  break;
-
-                case 9:
-                  _context10.prev = 9;
-                  _context10.t0 = _context10["catch"](4);
-                  _didIteratorError24 = true;
-                  _iteratorError24 = _context10.t0;
-
-                case 13:
-                  _context10.prev = 13;
-                  _context10.prev = 14;
-
-                  if (!_iteratorNormalCompletion24 && _iterator24.return != null) {
-                    _iterator24.return();
-                  }
-
-                case 16:
-                  _context10.prev = 16;
-
-                  if (!_didIteratorError24) {
-                    _context10.next = 19;
-                    break;
-                  }
-
-                  throw _iteratorError24;
-
-                case 19:
-                  return _context10.finish(16);
-
-                case 20:
-                  return _context10.finish(13);
-
-                case 21:
-                  _context10.next = 23;
-                  return _this17.modelManager.setItemDirty(component, true);
-
-                case 23:
-                  _this17.syncService.sync();
-
-                case 24:
-                  _this17.permissionDialogs = _this17.permissionDialogs.filter(function (pendingDialog) {
-                    /* Remove self */
-                    if (pendingDialog === params) {
-                      pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
-                      return false;
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+              while (1) {
+                switch (_context11.prev = _context11.next) {
+                  case 0:
+                    if (!approved) {
+                      _context11.next = 24;
+                      break;
                     }
 
-                    var containsObjectSubset = function containsObjectSubset(source, target) {
-                      return !target.some(function (val) {
-                        return !source.find(function (candidate) {
-                          return JSON.stringify(candidate) === JSON.stringify(val);
-                        });
+                    _iteratorNormalCompletion24 = true;
+                    _didIteratorError24 = false;
+                    _iteratorError24 = undefined;
+                    _context11.prev = 4;
+
+                    _loop6 = function _loop6() {
+                      var permission = _step24.value;
+                      var matchingPermission = component.permissions.find(function (candidate) {
+                        return candidate.name === permission.name;
                       });
+
+                      if (!matchingPermission) {
+                        component.permissions.push(permission);
+                      } else {
+                        /* Permission already exists, but content_types may have been expanded */
+                        var contentTypes = matchingPermission.content_types || [];
+                        matchingPermission.content_types = lodash_uniq__WEBPACK_IMPORTED_MODULE_2___default()(contentTypes.concat(permission.content_types));
+                      }
                     };
 
-                    if (pendingDialog.component === component) {
-                      /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
-                      if (pendingDialog.permissions === permissions || containsObjectSubset(permissions, pendingDialog.permissions)) {
-                        /* If approved, run the action block. Otherwise, if canceled, cancel any 
-                        pending ones as well, since the user was explicit in their intentions */
-                        if (approved) {
-                          pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
-                        }
-
-                        return false;
-                      }
+                    for (_iterator24 = permissions[Symbol.iterator](); !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {
+                      _loop6();
                     }
 
-                    return true;
-                  });
+                    _context11.next = 13;
+                    break;
 
-                  if (_this17.permissionDialogs.length > 0) {
-                    _this17.presentPermissionsDialog(_this17.permissionDialogs[0]);
-                  }
+                  case 9:
+                    _context11.prev = 9;
+                    _context11.t0 = _context11["catch"](4);
+                    _didIteratorError24 = true;
+                    _iteratorError24 = _context11.t0;
 
-                case 26:
-                case "end":
-                  return _context10.stop();
+                  case 13:
+                    _context11.prev = 13;
+                    _context11.prev = 14;
+
+                    if (!_iteratorNormalCompletion24 && _iterator24.return != null) {
+                      _iterator24.return();
+                    }
+
+                  case 16:
+                    _context11.prev = 16;
+
+                    if (!_didIteratorError24) {
+                      _context11.next = 19;
+                      break;
+                    }
+
+                    throw _iteratorError24;
+
+                  case 19:
+                    return _context11.finish(16);
+
+                  case 20:
+                    return _context11.finish(13);
+
+                  case 21:
+                    _context11.next = 23;
+                    return _this17.modelManager.setItemDirty(component, true);
+
+                  case 23:
+                    _this17.syncService.sync();
+
+                  case 24:
+                    _this17.permissionDialogs = _this17.permissionDialogs.filter(function (pendingDialog) {
+                      /* Remove self */
+                      if (pendingDialog === params) {
+                        pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
+                        return false;
+                      }
+
+                      var containsObjectSubset = function containsObjectSubset(source, target) {
+                        return !target.some(function (val) {
+                          return !source.find(function (candidate) {
+                            return JSON.stringify(candidate) === JSON.stringify(val);
+                          });
+                        });
+                      };
+
+                      if (pendingDialog.component === component) {
+                        /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
+                        if (pendingDialog.permissions === permissions || containsObjectSubset(permissions, pendingDialog.permissions)) {
+                          /* If approved, run the action block. Otherwise, if canceled, cancel any 
+                          pending ones as well, since the user was explicit in their intentions */
+                          if (approved) {
+                            pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
+                          }
+
+                          return false;
+                        }
+                      }
+
+                      return true;
+                    });
+
+                    if (_this17.permissionDialogs.length > 0) {
+                      _this17.presentPermissionsDialog(_this17.permissionDialogs[0]);
+                    }
+
+                  case 26:
+                  case "end":
+                    return _context11.stop();
+                }
               }
-            }
-          }, _callee10, null, [[4, 9, 13, 21], [14,, 16, 20]]);
-        }));
+            }, _callee11, null, [[4, 9, 13, 21], [14,, 16, 20]]);
+          }));
 
-        return function (_x9) {
-          return _ref9.apply(this, arguments);
-        };
-      }();
+          function callback(_x10) {
+            return _callback.apply(this, arguments);
+          }
+
+          return callback;
+        }()
+      };
       /** 
        * Since these calls are asyncronous, multiple dialogs may be requested at the same time. 
        * We only want to present one and trigger all callbacks based on one modal result
        */
-
 
       var existingDialog = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.permissionDialogs, {
         component: component
@@ -21547,8 +21581,6 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function openModalComponent(component) {
       throw 'Must override SNComponentManager.presentPermissionsDialog';
     }
-    /** @access public */
-
   }, {
     key: "registerHandler",
     value: function registerHandler(handler) {
@@ -21574,10 +21606,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "registerComponentWindow",
     value: function () {
-      var _registerComponentWindow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(component, componentWindow) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+      var _registerComponentWindow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(component, componentWindow) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 if (component.window === componentWindow) {
                   this.log('Web|componentManager', 'attempting to re-register same component window.');
@@ -21585,11 +21617,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
                 this.log('Web|componentManager|registerComponentWindow', component);
                 component.window = componentWindow;
-                _context11.next = 5;
+                _context12.next = 5;
                 return _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
 
               case 5:
-                component.sessionKey = _context11.sent;
+                component.sessionKey = _context12.sent;
                 this.sendMessageToComponent(component, {
                   action: ComponentActions.ComponentRegistered,
                   sessionKey: component.sessionKey,
@@ -21609,13 +21641,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 9:
               case "end":
-                return _context11.stop();
+                return _context12.stop();
             }
           }
-        }, _callee11, this);
+        }, _callee12, this);
       }));
 
-      function registerComponentWindow(_x10, _x11) {
+      function registerComponentWindow(_x11, _x12) {
         return _registerComponentWindow.apply(this, arguments);
       }
 
@@ -21624,7 +21656,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "activateComponent",
     value: function () {
-      var _activateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(component) {
+      var _activateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(component) {
         var dontSync,
             didChange,
             _iteratorNormalCompletion25,
@@ -21633,13 +21665,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             _iterator25,
             _step25,
             handler,
-            _args12 = arguments;
+            _args13 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                dontSync = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : false;
+                dontSync = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : false;
                 didChange = component.active !== true;
                 component.active = true;
 
@@ -21650,56 +21682,56 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion25 = true;
                 _didIteratorError25 = false;
                 _iteratorError25 = undefined;
-                _context12.prev = 7;
+                _context13.prev = 7;
 
                 for (_iterator25 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done); _iteratorNormalCompletion25 = true) {
                   handler = _step25.value;
 
-                  if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
+                  if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
                     handler.activationHandler && handler.activationHandler(component);
                   }
                 }
 
-                _context12.next = 15;
+                _context13.next = 15;
                 break;
 
               case 11:
-                _context12.prev = 11;
-                _context12.t0 = _context12["catch"](7);
+                _context13.prev = 11;
+                _context13.t0 = _context13["catch"](7);
                 _didIteratorError25 = true;
-                _iteratorError25 = _context12.t0;
+                _iteratorError25 = _context13.t0;
 
               case 15:
-                _context12.prev = 15;
-                _context12.prev = 16;
+                _context13.prev = 15;
+                _context13.prev = 16;
 
                 if (!_iteratorNormalCompletion25 && _iterator25.return != null) {
                   _iterator25.return();
                 }
 
               case 18:
-                _context12.prev = 18;
+                _context13.prev = 18;
 
                 if (!_didIteratorError25) {
-                  _context12.next = 21;
+                  _context13.next = 21;
                   break;
                 }
 
                 throw _iteratorError25;
 
               case 21:
-                return _context12.finish(18);
+                return _context13.finish(18);
 
               case 22:
-                return _context12.finish(15);
+                return _context13.finish(15);
 
               case 23:
                 if (!(didChange && !dontSync)) {
-                  _context12.next = 27;
+                  _context13.next = 27;
                   break;
                 }
 
-                _context12.next = 26;
+                _context13.next = 26;
                 return this.modelManager.setItemDirty(component, true);
 
               case 26:
@@ -21712,13 +21744,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 28:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+        }, _callee13, this, [[7, 11, 15, 23], [16,, 18, 22]]);
       }));
 
-      function activateComponent(_x12) {
+      function activateComponent(_x13) {
         return _activateComponent.apply(this, arguments);
       }
 
@@ -21727,7 +21759,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "deactivateComponent",
     value: function () {
-      var _deactivateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(component) {
+      var _deactivateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(component) {
         var dontSync,
             didChange,
             _iteratorNormalCompletion26,
@@ -21736,70 +21768,70 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             _iterator26,
             _step26,
             handler,
-            _args13 = arguments;
+            _args14 = arguments;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                dontSync = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : false;
+                dontSync = _args14.length > 1 && _args14[1] !== undefined ? _args14[1] : false;
                 didChange = component.active !== false;
                 component.active = false;
-                component.sessionKey = null;
+                component.sessionKey = undefined;
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_9__["removeFromArray"])(this.activeComponents, component);
                 _iteratorNormalCompletion26 = true;
                 _didIteratorError26 = false;
                 _iteratorError26 = undefined;
-                _context13.prev = 8;
+                _context14.prev = 8;
 
                 for (_iterator26 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion26 = (_step26 = _iterator26.next()).done); _iteratorNormalCompletion26 = true) {
                   handler = _step26.value;
 
-                  if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
+                  if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
                     handler.activationHandler && handler.activationHandler(component);
                   }
                 }
 
-                _context13.next = 16;
+                _context14.next = 16;
                 break;
 
               case 12:
-                _context13.prev = 12;
-                _context13.t0 = _context13["catch"](8);
+                _context14.prev = 12;
+                _context14.t0 = _context14["catch"](8);
                 _didIteratorError26 = true;
-                _iteratorError26 = _context13.t0;
+                _iteratorError26 = _context14.t0;
 
               case 16:
-                _context13.prev = 16;
-                _context13.prev = 17;
+                _context14.prev = 16;
+                _context14.prev = 17;
 
                 if (!_iteratorNormalCompletion26 && _iterator26.return != null) {
                   _iterator26.return();
                 }
 
               case 19:
-                _context13.prev = 19;
+                _context14.prev = 19;
 
                 if (!_didIteratorError26) {
-                  _context13.next = 22;
+                  _context14.next = 22;
                   break;
                 }
 
                 throw _iteratorError26;
 
               case 22:
-                return _context13.finish(19);
+                return _context14.finish(19);
 
               case 23:
-                return _context13.finish(16);
+                return _context14.finish(16);
 
               case 24:
                 if (!(didChange && !dontSync)) {
-                  _context13.next = 28;
+                  _context14.next = 28;
                   break;
                 }
 
-                _context13.next = 27;
+                _context14.next = 27;
                 return this.modelManager.setItemDirty(component, true);
 
               case 27:
@@ -21819,13 +21851,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 31:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this, [[8, 12, 16, 24], [17,, 19, 23]]);
+        }, _callee14, this, [[8, 12, 16, 24], [17,, 19, 23]]);
       }));
 
-      function deactivateComponent(_x13) {
+      function deactivateComponent(_x14) {
         return _deactivateComponent.apply(this, arguments);
       }
 
@@ -21834,62 +21866,62 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "reloadComponent",
     value: function () {
-      var _reloadComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(component) {
+      var _reloadComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(component) {
         var _this19 = this;
 
         var _iteratorNormalCompletion27, _didIteratorError27, _iteratorError27, _iterator27, _step27, handler;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 /* Do soft deactivate */
                 component.active = false;
                 _iteratorNormalCompletion27 = true;
                 _didIteratorError27 = false;
                 _iteratorError27 = undefined;
-                _context14.prev = 4;
+                _context15.prev = 4;
 
                 for (_iterator27 = this.handlers[Symbol.iterator](); !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
                   handler = _step27.value;
 
-                  if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
+                  if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
                     handler.activationHandler && handler.activationHandler(component);
                   }
                 }
 
-                _context14.next = 12;
+                _context15.next = 12;
                 break;
 
               case 8:
-                _context14.prev = 8;
-                _context14.t0 = _context14["catch"](4);
+                _context15.prev = 8;
+                _context15.t0 = _context15["catch"](4);
                 _didIteratorError27 = true;
-                _iteratorError27 = _context14.t0;
+                _iteratorError27 = _context15.t0;
 
               case 12:
-                _context14.prev = 12;
-                _context14.prev = 13;
+                _context15.prev = 12;
+                _context15.prev = 13;
 
                 if (!_iteratorNormalCompletion27 && _iterator27.return != null) {
                   _iterator27.return();
                 }
 
               case 15:
-                _context14.prev = 15;
+                _context15.prev = 15;
 
                 if (!_didIteratorError27) {
-                  _context14.next = 18;
+                  _context15.next = 18;
                   break;
                 }
 
                 throw _iteratorError27;
 
               case 18:
-                return _context14.finish(15);
+                return _context15.finish(15);
 
               case 19:
-                return _context14.finish(12);
+                return _context15.finish(12);
 
               case 20:
                 this.streamObservers = this.streamObservers.filter(function (o) {
@@ -21905,7 +21937,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 /* Do soft activate */
 
 
-                return _context14.abrupt("return", new Promise(function (resolve, reject) {
+                return _context15.abrupt("return", new Promise(function (resolve, reject) {
                   _this19.timeout(function () {
                     component.active = true;
                     var _iteratorNormalCompletion28 = true;
@@ -21916,7 +21948,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                       for (var _iterator28 = _this19.handlers[Symbol.iterator](), _step28; !(_iteratorNormalCompletion28 = (_step28 = _iterator28.next()).done); _iteratorNormalCompletion28 = true) {
                         var handler = _step28.value;
 
-                        if (handler.areas.includes(component.area) || handler.areas.includes('*')) {
+                        if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Any)) {
                           handler.activationHandler && handler.activationHandler(component);
                           resolve();
                         }
@@ -21953,13 +21985,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 24:
               case "end":
-                return _context14.stop();
+                return _context15.stop();
             }
           }
-        }, _callee14, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+        }, _callee15, this, [[4, 8, 12, 20], [13,, 15, 19]]);
       }));
 
-      function reloadComponent(_x14) {
+      function reloadComponent(_x15) {
         return _reloadComponent.apply(this, arguments);
       }
 
@@ -21968,12 +22000,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "deleteComponent",
     value: function () {
-      var _deleteComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(component) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+      var _deleteComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(component) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
-                _context15.next = 2;
+                _context16.next = 2;
                 return this.modelManager.setItemToBeDeleted(component);
 
               case 2:
@@ -21981,13 +22013,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 3:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
-      function deleteComponent(_x15) {
+      function deleteComponent(_x16) {
         return _deleteComponent.apply(this, arguments);
       }
 
@@ -22129,6 +22161,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
     }
   }, {
+    key: "getDefaultEditor",
+    value: function getDefaultEditor() {
+      throw 'Must override';
+    }
+  }, {
     key: "permissionsStringForPermissions",
     value: function permissionsStringForPermissions(permissions, component) {
       var finalString = '';
@@ -22153,7 +22190,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       permissions.forEach(function (permission, index) {
         if (permission.name === ComponentActions.StreamItems) {
           var types = permission.content_types.map(function (type) {
-            var desc = Object(_Models__WEBPACK_IMPORTED_MODULE_6__["displayStringForContentType"])(type);
+            var desc = Object(_Models_index__WEBPACK_IMPORTED_MODULE_6__["displayStringForContentType"])(type);
 
             if (desc) {
               return desc + 's';
@@ -22181,16 +22218,26 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           var _mapping;
 
           var mapping = (_mapping = {}, _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].EditorStack, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].NoteTags, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_7__["ComponentAreas"].Editor, 'working note'), _mapping);
-          finalString += addSeparator(index, permissionsCount, true);
+          finalString += addSeparator(index, permissionsCount);
           finalString += mapping[component.area];
         }
       });
       return finalString + '.';
     }
   }, {
+    key: "isDesktop",
+    get: function get() {
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Desktop;
+    }
+  }, {
+    key: "isMobile",
+    get: function get() {
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile;
+    }
+  }, {
     key: "components",
     get: function get() {
-      return this.modelManager.getItems([_Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component, _Models__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme]);
+      return this.modelManager.getItems([_Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_6__["ContentTypes"].Theme]);
     }
   }]);
 
@@ -23126,7 +23173,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_api_api_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/api/api_service */ "./lib/services/api/api_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _Services_api_api_service__WEBPACK_IMPORTED_MODULE_2__["SNApiService"]; });
 
-/* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.js");
+/* harmony import */ var _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/component_manager */ "./lib/services/component_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return _Services_component_manager__WEBPACK_IMPORTED_MODULE_3__["SNComponentManager"]; });
 
 /* harmony import */ var _Services_api_http_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/api/http_service */ "./lib/services/api/http_service.ts");

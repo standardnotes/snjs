@@ -48,6 +48,7 @@
     "sncrypto": "github:standardnotes/sncrypto#7d20eeb50a38d0a33da5dce27476c3bf07967f50",
     "ts-loader": "^6.2.2",
     "typescript": "^3.8.3",
+    "typescript-eslint": "0.0.1-alpha.0",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
   }

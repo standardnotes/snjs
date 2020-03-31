@@ -10,7 +10,8 @@ export enum ComponentAreas {
   EditorStack = 'editor-stack',
   NoteTags = 'note-tags',
   Rooms = 'rooms',
-  Modal = 'modal'
+  Modal = 'modal',
+  Any = '*'
 };
 
 /**
@@ -19,6 +20,12 @@ export enum ComponentAreas {
  * only by its url.
  */
 export class SNComponent extends SNItem {
+
+  /** Component Manager properties */
+  public window?: Window
+  public hidden = false
+  public readonly = false
+  public sessionKey?: string
 
   structureParams() {
     const params = {
@@ -115,7 +122,7 @@ export class SNComponent extends SNItem {
   get area() {
     return this.content.area;
   }
-  set area(area: string) {
+  set area(area: ComponentAreas) {
     this.content.area = area;
   }
 
