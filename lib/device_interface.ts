@@ -76,4 +76,6 @@ export abstract class DeviceInterface {
 
   abstract async clearKeychainValue() : Promise<void>;
 
+  abstract openUrl(url: string): void;
+
 }

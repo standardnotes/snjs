@@ -1,8 +1,21 @@
-import { PayloadSources } from '@Payloads';
-import { EncryptionIntents } from '@Protocol';
+import { PurePayload } from '@Payloads/pure_payload';
+import { SNRootKey } from '@Protocol/root_key';
+import { SNItemsKey } from '@Models/app/items_key';
+import { SNActionsExtension } from './../models/app/extension';
+import { SNItem } from '@Models/core/item';
+import { SNSyncService } from './sync/sync_service';
+import { SNProtocolService } from './protocol_service';
+import { SNModelManager } from './model_manager';
+import { SNHttpService, HttpResponse } from './api/http_service';
+import { SNAlertService } from './alert_service';
+import { PayloadSources } from '@Payloads/sources';
+import { EncryptionIntents } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
-import { ContentTypes, Action } from '@Models';
+import { ContentTypes, Action } from '@Models/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { DeviceInterface } from '../device_interface';
+
+type PasswordRequestHandler = () => Promise<string>
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -19,14 +32,23 @@ import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends PureService {
-  constructor({
-    alertService,
-    deviceInterface,
-    httpService,
-    modelManager,
-    protocolService,
-    syncService,
-  }) {
+
+  private alertService?: SNAlertService
+  private deviceInterface?: DeviceInterface
+  private httpService?: SNHttpService
+  private modelManager?: SNModelManager
+  private protocolService?: SNProtocolService
+  private syncService?: SNSyncService
+  private previousPasswords: string[] = []
+
+  constructor(
+    alertService: SNAlertService,
+    deviceInterface: DeviceInterface,
+    httpService: SNHttpService,
+    modelManager: SNModelManager,
+    protocolService: SNProtocolService,
+    syncService: SNSyncService,
+  ) {
     super();
     this.alertService = alertService;
     this.deviceInterface = deviceInterface;
@@ -38,22 +60,23 @@ export class SNActionsService extends PureService {
   }
 
   /** @override */
-  deinit() {
-    this.alertService = null;
-    this.deviceInterface = null;
-    this.httpService = null;
-    this.modelManager = null;
-    this.protocolService = null;
-    this.syncService = null;
+  public deinit() {
+    this.alertService = undefined;
+    this.deviceInterface = undefined;
+    this.httpService = undefined;
+    this.modelManager = undefined;
+    this.protocolService = undefined;
+    this.syncService = undefined;
     this.previousPasswords.length = 0;
     super.deinit();
   }
 
-  getExtensions() {
-    return this.modelManager.validItemsForContentType(ContentTypes.ActionsExtension);
+  public getExtensions(): SNActionsExtension[] {
+    return this.modelManager!
+      .validItemsForContentType(ContentTypes.ActionsExtension) as SNActionsExtension[];
   }
 
-  extensionsInContextOfItem(item) {
+  public extensionsInContextOfItem(item: SNItem) {
     return this.getExtensions().filter((ext) => {
       return ext.supported_types.includes(item.content_type) ||
         ext.actionsWithContextForItem(item).length > 0;
@@ -66,15 +89,15 @@ export class SNActionsService extends PureService {
    * relevant just to this item. The response extension is not saved, 
    * just displayed as a one-time thing.
   */
-  async loadExtensionInContextOfItem(extension, item) {
+  public async loadExtensionInContextOfItem(extension: SNActionsExtension, item: SNItem) {
     const params = {
       content_type: item.content_type,
       item_uuid: item.uuid
     };
-    return this.httpService.getAbsolute({
-      url: extension.url,
-      params: params
-    }).then((response) => {
+    return this.httpService!.getAbsolute(
+      extension.url,
+      params
+    ).then((response) => {
       if (response.description) {
         extension.description = response.description;
       }
@@ -82,7 +105,7 @@ export class SNActionsService extends PureService {
         extension.supported_types = response.supported_types;
       }
       if (response.actions) {
-        extension.actions = response.actions.map((action) => {
+        extension.actions = response.actions.map((action: any) => {
           return new Action(action);
         });
       } else {
@@ -95,19 +118,19 @@ export class SNActionsService extends PureService {
     });
   }
 
-  async runAction({
-    action,
-    item,
-    passwordRequestHandler
-  }) {
+  public async runAction(
+    action: Action,
+    item: SNItem,
+    passwordRequestHandler: PasswordRequestHandler
+  ) {
     action.running = true;
     let result;
     switch (action.verb) {
       case 'get':
-        result = await this.handleGetAction({ action, passwordRequestHandler });
+        result = await this.handleGetAction(action, passwordRequestHandler);
         break;
       case 'render':
-        result = await this.handleRenderAction({ action, passwordRequestHandler });
+        result = await this.handleRenderAction(action, passwordRequestHandler);
         break;
       case 'show':
         result = await this.handleShowAction(action);
@@ -124,60 +147,58 @@ export class SNActionsService extends PureService {
     return result;
   }
 
-  async handleGetAction({ action, passwordRequestHandler }) {
+  private async handleGetAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
     return new Promise((resolve, reject) => {
-      this.alertService.confirm(
+      this.alertService!.confirm(
         "Are you sure you want to replace the current note contents with this action's results?",
         undefined,
         undefined,
         undefined,
         () => {
-          this.runConfirmedGetAction({ action, passwordRequestHandler }).then(resolve);
+          this.runConfirmedGetAction(action, passwordRequestHandler).then(resolve);
         }
       );
     });
   }
 
-  async runConfirmedGetAction({ action, passwordRequestHandler }) {
-    const response = await this.httpService.getAbsolute({ url: action.url }).catch((response) => {
-      const error = (response && response.error)
-        || { message: 'An issue occurred while processing this action. Please try again.' };
-      this.alertService.alert(error.message);
-      action.error = true;
-      return { error: error };
-    });
+  private async runConfirmedGetAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
+    const response = await this.httpService!.getAbsolute(action.url)
+      .catch((response) => {
+        const error = (response && response.error)
+          || { message: 'An issue occurred while processing this action. Please try again.' };
+        this.alertService!.alert(error.message);
+        action.error = true;
+        return { error: error } as HttpResponse;
+      });
     if (response.error) {
       return response;
     }
-
     action.error = false;
-    const payload = await this.payloadByDecryptingResponse({
+    const payload = await this.payloadByDecryptingResponse(
       response,
       passwordRequestHandler
-    });
-    const items = await this.modelManager.mapPayload({
-      payload: payload,
-      source: PayloadSources.RemoteActionRetrieved
-    });
-    for (const mappedItem of items) {
-      this.modelManager.setItemDirty(mappedItem, true);
-    }
-    this.syncService.sync();
+    );
+    const item = await this.modelManager!.mapPayloadToLocalItem(
+      payload!,
+      PayloadSources.RemoteActionRetrieved
+    );
+    this.modelManager!.setItemDirty(item, true);
+    this.syncService!.sync();
     return {
       response: response,
       item: response.item
     };
   }
 
-  async handleRenderAction({ action, passwordRequestHandler }) {
-    return this.httpService.getAbsolute({ url: action.url }).then(async (response) => {
+  private async handleRenderAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
+    return this.httpService!.getAbsolute(action.url).then(async (response) => {
       action.error = false;
-      const payload = await this.payloadByDecryptingResponse({
+      const payload = await this.payloadByDecryptingResponse(
         response,
         passwordRequestHandler
-      });
+      );
       if (payload) {
-        const item = this.modelManager.createItem(
+        const item = this.modelManager!.createItem(
           payload.contentType,
           payload.content
         );
@@ -189,16 +210,20 @@ export class SNActionsService extends PureService {
     }).catch((response) => {
       const error = (response && response.error)
         || { message: 'An issue occurred while processing this action. Please try again.' };
-      this.alertService.alert(error.message);
+      this.alertService!.alert(error.message);
       action.error = true;
       return { error: error };
     });
   }
 
 
-  async payloadByDecryptingResponse({ response, key, passwordRequestHandler }) {
+  private async payloadByDecryptingResponse(
+    response: HttpResponse,
+    passwordRequestHandler: PasswordRequestHandler,
+    key?: SNRootKey,
+  ) : Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
+    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
       payload,
       key
     );
@@ -210,33 +235,33 @@ export class SNActionsService extends PureService {
        * In some cases revisions were missing auth params. 
        * Instruct the user to email us to get this remedied. 
        */
-      this.alertService.alert(
+      this.alertService!.alert(
         `We were unable to decrypt this revision using your current keys, 
         and this revision is missing metadata that would allow us to try different 
         keys to decrypt it. This can likely be fixed with some manual intervention. 
         Please email hello@standardnotes.org for assistance.`
       );
-      return null;
+      return undefined;
     }
     /* Try previous passwords */
-    const triedPasswords = [];
+    const triedPasswords: string[] = [];
     for (const passwordCandidate of this.previousPasswords) {
       if (triedPasswords.includes(passwordCandidate)) {
         continue;
       }
       triedPasswords.push(passwordCandidate);
-      const key = await this.protocolService.computeRootKey(
+      const key = await this.protocolService!.computeRootKey(
         passwordCandidate,
         response.auth_params
       );
       if (!key) {
         continue;
       }
-      const nestedResponse = await this.payloadByDecryptingResponse({
+      const nestedResponse: any = await this.payloadByDecryptingResponse(
         response,
+        passwordRequestHandler,
         key,
-        passwordRequestHandler
-      });
+      );
       if (nestedResponse) {
         return nestedResponse;
       }
@@ -244,42 +269,42 @@ export class SNActionsService extends PureService {
     /** Prompt for other passwords */
     const password = await passwordRequestHandler();
     this.previousPasswords.push(password);
-    return this.payloadByDecryptingResponse({
+    return this.payloadByDecryptingResponse(
       response,
+      passwordRequestHandler,
       key,
-      passwordRequestHandler
-    });
+    );
   }
 
-  async handlePostAction(action, item) {
+  private async handlePostAction(action: Action, item: SNItem) {
     const decrypted = action.access_type === 'decrypted';
-    const itemParams = await this.outgoingPayloadForItem({ item, decrypted });
+    const itemParams = await this.outgoingPayloadForItem(item, decrypted);
     const params = {
       items: [itemParams]
     };
-    return this.httpService.postAbsolute({ url: action.url, params: params }).then((response) => {
+    return this.httpService!.postAbsolute(action.url, params).then((response) => {
       action.error = false;
       return { response: response };
     }).catch((response) => {
       action.error = true;
       console.error('Action error response:', response);
-      this.alertService.alert(
+      this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'
       );
       return { response: response };
     });
   }
 
-  async handleShowAction(action) {
-    this.deviceInterface.openUrl(action.url);
+  private async handleShowAction(action: Action) {
+    this.deviceInterface!.openUrl(action.url);
     return { response: null };
   }
 
-  async outgoingPayloadForItem({ item, decrypted = false }) {
+  private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
     const intent = decrypted
       ? EncryptionIntents.FileDecrypted
       : EncryptionIntents.FileEncrypted;
-    return this.protocolService.payloadByEncryptingPayload(
+    return this.protocolService!.payloadByEncryptingPayload(
       item.payloadRepresentation(),
       intent
     );

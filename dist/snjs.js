@@ -7444,6 +7444,12 @@ var Action = function Action(json) {
 
   _defineProperty(this, "context", void 0);
 
+  _defineProperty(this, "verb", void 0);
+
+  _defineProperty(this, "url", void 0);
+
+  _defineProperty(this, "access_type", void 0);
+
   lodash_merge__WEBPACK_IMPORTED_MODULE_0___default()(this, json);
   this.running = false;
   this.error = false;
@@ -16116,9 +16122,9 @@ function compareVersions(a, b) {
 
 /***/ }),
 
-/***/ "./lib/services/actions_service.js":
+/***/ "./lib/services/actions_service.ts":
 /*!*****************************************!*\
-  !*** ./lib/services/actions_service.js ***!
+  !*** ./lib/services/actions_service.ts ***!
   \*****************************************/
 /*! exports provided: SNActionsService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -16128,10 +16134,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return SNActionsService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Protocol__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol */ "./lib/protocol/index.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models */ "./lib/models/index.ts");
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
@@ -16161,6 +16167,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -16180,23 +16189,30 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
  * `post`: sends an item's data to a remote service. This is used for example by Listed
  *       to allow publishing a note to a user's blog.
  */
-
 var SNActionsService = /*#__PURE__*/function (_PureService) {
   _inherits(SNActionsService, _PureService);
 
-  function SNActionsService(_ref) {
+  function SNActionsService(alertService, deviceInterface, httpService, modelManager, protocolService, syncService) {
     var _this;
-
-    var alertService = _ref.alertService,
-        deviceInterface = _ref.deviceInterface,
-        httpService = _ref.httpService,
-        modelManager = _ref.modelManager,
-        protocolService = _ref.protocolService,
-        syncService = _ref.syncService;
 
     _classCallCheck(this, SNActionsService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNActionsService).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "alertService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "deviceInterface", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "httpService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "modelManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "protocolService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "syncService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "previousPasswords", []);
+
     _this.alertService = alertService;
     _this.deviceInterface = deviceInterface;
     _this.httpService = httpService;
@@ -16212,12 +16228,12 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   _createClass(SNActionsService, [{
     key: "deinit",
     value: function deinit() {
-      this.alertService = null;
-      this.deviceInterface = null;
-      this.httpService = null;
-      this.modelManager = null;
-      this.protocolService = null;
-      this.syncService = null;
+      this.alertService = undefined;
+      this.deviceInterface = undefined;
+      this.httpService = undefined;
+      this.modelManager = undefined;
+      this.protocolService = undefined;
+      this.syncService = undefined;
       this.previousPasswords.length = 0;
 
       _get(_getPrototypeOf(SNActionsService.prototype), "deinit", this).call(this);
@@ -16225,7 +16241,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getExtensions",
     value: function getExtensions() {
-      return this.modelManager.validItemsForContentType(_Models__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].ActionsExtension);
+      return this.modelManager.validItemsForContentType(_Models_index__WEBPACK_IMPORTED_MODULE_4__["ContentTypes"].ActionsExtension);
     }
   }, {
     key: "extensionsInContextOfItem",
@@ -16254,10 +16270,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                   content_type: item.content_type,
                   item_uuid: item.uuid
                 };
-                return _context.abrupt("return", this.httpService.getAbsolute({
-                  url: extension.url,
-                  params: params
-                }).then(function (response) {
+                return _context.abrupt("return", this.httpService.getAbsolute(extension.url, params).then(function (response) {
                   if (response.description) {
                     extension.description = response.description;
                   }
@@ -16268,7 +16281,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
 
                   if (response.actions) {
                     extension.actions = response.actions.map(function (action) {
-                      return new _Models__WEBPACK_IMPORTED_MODULE_4__["Action"](action);
+                      return new _Models_index__WEBPACK_IMPORTED_MODULE_4__["Action"](action);
                     });
                   } else {
                     extension.actions = [];
@@ -16297,65 +16310,58 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "runAction",
     value: function () {
-      var _runAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(_ref2) {
-        var action, item, passwordRequestHandler, result;
+      var _runAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(action, item, passwordRequestHandler) {
+        var result;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                action = _ref2.action, item = _ref2.item, passwordRequestHandler = _ref2.passwordRequestHandler;
                 action.running = true;
                 _context2.t0 = action.verb;
-                _context2.next = _context2.t0 === 'get' ? 5 : _context2.t0 === 'render' ? 9 : _context2.t0 === 'show' ? 13 : _context2.t0 === 'post' ? 17 : 21;
+                _context2.next = _context2.t0 === 'get' ? 4 : _context2.t0 === 'render' ? 8 : _context2.t0 === 'show' ? 12 : _context2.t0 === 'post' ? 16 : 20;
                 break;
 
-              case 5:
-                _context2.next = 7;
-                return this.handleGetAction({
-                  action: action,
-                  passwordRequestHandler: passwordRequestHandler
-                });
+              case 4:
+                _context2.next = 6;
+                return this.handleGetAction(action, passwordRequestHandler);
 
-              case 7:
+              case 6:
                 result = _context2.sent;
-                return _context2.abrupt("break", 22);
+                return _context2.abrupt("break", 21);
 
-              case 9:
-                _context2.next = 11;
-                return this.handleRenderAction({
-                  action: action,
-                  passwordRequestHandler: passwordRequestHandler
-                });
+              case 8:
+                _context2.next = 10;
+                return this.handleRenderAction(action, passwordRequestHandler);
 
-              case 11:
+              case 10:
                 result = _context2.sent;
-                return _context2.abrupt("break", 22);
+                return _context2.abrupt("break", 21);
 
-              case 13:
-                _context2.next = 15;
+              case 12:
+                _context2.next = 14;
                 return this.handleShowAction(action);
 
-              case 15:
+              case 14:
                 result = _context2.sent;
-                return _context2.abrupt("break", 22);
+                return _context2.abrupt("break", 21);
 
-              case 17:
-                _context2.next = 19;
+              case 16:
+                _context2.next = 18;
                 return this.handlePostAction(action, item);
 
-              case 19:
+              case 18:
                 result = _context2.sent;
-                return _context2.abrupt("break", 22);
+                return _context2.abrupt("break", 21);
+
+              case 20:
+                return _context2.abrupt("break", 21);
 
               case 21:
-                return _context2.abrupt("break", 22);
-
-              case 22:
                 action.lastExecuted = new Date();
                 action.running = false;
                 return _context2.abrupt("return", result);
 
-              case 25:
+              case 24:
               case "end":
                 return _context2.stop();
             }
@@ -16363,7 +16369,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee2, this);
       }));
 
-      function runAction(_x3) {
+      function runAction(_x3, _x4, _x5) {
         return _runAction.apply(this, arguments);
       }
 
@@ -16372,25 +16378,20 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleGetAction",
     value: function () {
-      var _handleGetAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(_ref3) {
+      var _handleGetAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(action, passwordRequestHandler) {
         var _this2 = this;
 
-        var action, passwordRequestHandler;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                action = _ref3.action, passwordRequestHandler = _ref3.passwordRequestHandler;
                 return _context3.abrupt("return", new Promise(function (resolve, reject) {
                   _this2.alertService.confirm("Are you sure you want to replace the current note contents with this action's results?", undefined, undefined, undefined, function () {
-                    _this2.runConfirmedGetAction({
-                      action: action,
-                      passwordRequestHandler: passwordRequestHandler
-                    }).then(resolve);
+                    _this2.runConfirmedGetAction(action, passwordRequestHandler).then(resolve);
                   });
                 }));
 
-              case 2:
+              case 1:
               case "end":
                 return _context3.stop();
             }
@@ -16398,7 +16399,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee3);
       }));
 
-      function handleGetAction(_x4) {
+      function handleGetAction(_x6, _x7) {
         return _handleGetAction.apply(this, arguments);
       }
 
@@ -16407,20 +16408,16 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "runConfirmedGetAction",
     value: function () {
-      var _runConfirmedGetAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(_ref4) {
+      var _runConfirmedGetAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(action, passwordRequestHandler) {
         var _this3 = this;
 
-        var action, passwordRequestHandler, response, payload, items, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, mappedItem;
-
+        var response, payload, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                action = _ref4.action, passwordRequestHandler = _ref4.passwordRequestHandler;
-                _context4.next = 3;
-                return this.httpService.getAbsolute({
-                  url: action.url
-                }).catch(function (response) {
+                _context4.next = 2;
+                return this.httpService.getAbsolute(action.url).catch(function (response) {
                   var error = response && response.error || {
                     message: 'An issue occurred while processing this action. Please try again.'
                   };
@@ -16433,93 +16430,44 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                   };
                 });
 
-              case 3:
+              case 2:
                 response = _context4.sent;
 
                 if (!response.error) {
-                  _context4.next = 6;
+                  _context4.next = 5;
                   break;
                 }
 
                 return _context4.abrupt("return", response);
 
-              case 6:
+              case 5:
                 action.error = false;
-                _context4.next = 9;
-                return this.payloadByDecryptingResponse({
-                  response: response,
-                  passwordRequestHandler: passwordRequestHandler
-                });
+                _context4.next = 8;
+                return this.payloadByDecryptingResponse(response, passwordRequestHandler);
 
-              case 9:
+              case 8:
                 payload = _context4.sent;
-                _context4.next = 12;
-                return this.modelManager.mapPayload({
-                  payload: payload,
-                  source: _Payloads__WEBPACK_IMPORTED_MODULE_1__["PayloadSources"].RemoteActionRetrieved
-                });
+                _context4.next = 11;
+                return this.modelManager.mapPayloadToLocalItem(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSources"].RemoteActionRetrieved);
 
-              case 12:
-                items = _context4.sent;
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
-                _context4.prev = 16;
-
-                for (_iterator = items[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  mappedItem = _step.value;
-                  this.modelManager.setItemDirty(mappedItem, true);
-                }
-
-                _context4.next = 24;
-                break;
-
-              case 20:
-                _context4.prev = 20;
-                _context4.t0 = _context4["catch"](16);
-                _didIteratorError = true;
-                _iteratorError = _context4.t0;
-
-              case 24:
-                _context4.prev = 24;
-                _context4.prev = 25;
-
-                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                  _iterator.return();
-                }
-
-              case 27:
-                _context4.prev = 27;
-
-                if (!_didIteratorError) {
-                  _context4.next = 30;
-                  break;
-                }
-
-                throw _iteratorError;
-
-              case 30:
-                return _context4.finish(27);
-
-              case 31:
-                return _context4.finish(24);
-
-              case 32:
+              case 11:
+                item = _context4.sent;
+                this.modelManager.setItemDirty(item, true);
                 this.syncService.sync();
                 return _context4.abrupt("return", {
                   response: response,
                   item: response.item
                 });
 
-              case 34:
+              case 15:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4, this, [[16, 20, 24, 32], [25,, 27, 31]]);
+        }, _callee4, this);
       }));
 
-      function runConfirmedGetAction(_x5) {
+      function runConfirmedGetAction(_x8, _x9) {
         return _runConfirmedGetAction.apply(this, arguments);
       }
 
@@ -16528,19 +16476,15 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "handleRenderAction",
     value: function () {
-      var _handleRenderAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(_ref5) {
+      var _handleRenderAction = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(action, passwordRequestHandler) {
         var _this4 = this;
 
-        var action, passwordRequestHandler;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                action = _ref5.action, passwordRequestHandler = _ref5.passwordRequestHandler;
-                return _context6.abrupt("return", this.httpService.getAbsolute({
-                  url: action.url
-                }).then( /*#__PURE__*/function () {
-                  var _ref6 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(response) {
+                return _context6.abrupt("return", this.httpService.getAbsolute(action.url).then( /*#__PURE__*/function () {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(response) {
                     var payload, item;
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
                       while (1) {
@@ -16548,10 +16492,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                           case 0:
                             action.error = false;
                             _context5.next = 3;
-                            return _this4.payloadByDecryptingResponse({
-                              response: response,
-                              passwordRequestHandler: passwordRequestHandler
-                            });
+                            return _this4.payloadByDecryptingResponse(response, passwordRequestHandler);
 
                           case 3:
                             payload = _context5.sent;
@@ -16575,8 +16516,8 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                     }, _callee5);
                   }));
 
-                  return function (_x7) {
-                    return _ref6.apply(this, arguments);
+                  return function (_x12) {
+                    return _ref.apply(this, arguments);
                   };
                 }()).catch(function (response) {
                   var error = response && response.error || {
@@ -16591,7 +16532,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                   };
                 }));
 
-              case 2:
+              case 1:
               case "end":
                 return _context6.stop();
             }
@@ -16599,7 +16540,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee6, this);
       }));
 
-      function handleRenderAction(_x6) {
+      function handleRenderAction(_x10, _x11) {
         return _handleRenderAction.apply(this, arguments);
       }
 
@@ -16608,31 +16549,30 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "payloadByDecryptingResponse",
     value: function () {
-      var _payloadByDecryptingResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(_ref7) {
-        var response, key, passwordRequestHandler, payload, decryptedPayload, triedPasswords, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, passwordCandidate, _key, nestedResponse, password;
+      var _payloadByDecryptingResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(response, passwordRequestHandler, key) {
+        var payload, decryptedPayload, triedPasswords, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, passwordCandidate, _key, nestedResponse, password;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                response = _ref7.response, key = _ref7.key, passwordRequestHandler = _ref7.passwordRequestHandler;
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])(response.item);
-                _context7.next = 4;
+                _context7.next = 3;
                 return this.protocolService.payloadByDecryptingPayload(payload, key);
 
-              case 4:
+              case 3:
                 decryptedPayload = _context7.sent;
 
                 if (decryptedPayload.errorDecrypting) {
-                  _context7.next = 7;
+                  _context7.next = 6;
                   break;
                 }
 
                 return _context7.abrupt("return", decryptedPayload);
 
-              case 7:
+              case 6:
                 if (response.auth_params) {
-                  _context7.next = 10;
+                  _context7.next = 9;
                   break;
                 }
 
@@ -16641,126 +16581,118 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
                  * Instruct the user to email us to get this remedied. 
                  */
                 this.alertService.alert("We were unable to decrypt this revision using your current keys, \n        and this revision is missing metadata that would allow us to try different \n        keys to decrypt it. This can likely be fixed with some manual intervention. \n        Please email hello@standardnotes.org for assistance.");
-                return _context7.abrupt("return", null);
+                return _context7.abrupt("return", undefined);
 
-              case 10:
+              case 9:
                 /* Try previous passwords */
                 triedPasswords = [];
-                _iteratorNormalCompletion2 = true;
-                _didIteratorError2 = false;
-                _iteratorError2 = undefined;
-                _context7.prev = 14;
-                _iterator2 = this.previousPasswords[Symbol.iterator]();
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context7.prev = 13;
+                _iterator = this.previousPasswords[Symbol.iterator]();
 
-              case 16:
-                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context7.next = 34;
+              case 15:
+                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                  _context7.next = 33;
                   break;
                 }
 
-                passwordCandidate = _step2.value;
+                passwordCandidate = _step.value;
 
                 if (!triedPasswords.includes(passwordCandidate)) {
-                  _context7.next = 20;
+                  _context7.next = 19;
                   break;
                 }
 
-                return _context7.abrupt("continue", 31);
+                return _context7.abrupt("continue", 30);
 
-              case 20:
+              case 19:
                 triedPasswords.push(passwordCandidate);
-                _context7.next = 23;
+                _context7.next = 22;
                 return this.protocolService.computeRootKey(passwordCandidate, response.auth_params);
 
-              case 23:
+              case 22:
                 _key = _context7.sent;
 
                 if (_key) {
-                  _context7.next = 26;
+                  _context7.next = 25;
                   break;
                 }
 
-                return _context7.abrupt("continue", 31);
+                return _context7.abrupt("continue", 30);
 
-              case 26:
-                _context7.next = 28;
-                return this.payloadByDecryptingResponse({
-                  response: response,
-                  key: _key,
-                  passwordRequestHandler: passwordRequestHandler
-                });
+              case 25:
+                _context7.next = 27;
+                return this.payloadByDecryptingResponse(response, passwordRequestHandler, _key);
 
-              case 28:
+              case 27:
                 nestedResponse = _context7.sent;
 
                 if (!nestedResponse) {
-                  _context7.next = 31;
+                  _context7.next = 30;
                   break;
                 }
 
                 return _context7.abrupt("return", nestedResponse);
 
-              case 31:
-                _iteratorNormalCompletion2 = true;
-                _context7.next = 16;
+              case 30:
+                _iteratorNormalCompletion = true;
+                _context7.next = 15;
                 break;
 
-              case 34:
-                _context7.next = 40;
+              case 33:
+                _context7.next = 39;
                 break;
 
-              case 36:
-                _context7.prev = 36;
-                _context7.t0 = _context7["catch"](14);
-                _didIteratorError2 = true;
-                _iteratorError2 = _context7.t0;
+              case 35:
+                _context7.prev = 35;
+                _context7.t0 = _context7["catch"](13);
+                _didIteratorError = true;
+                _iteratorError = _context7.t0;
 
-              case 40:
+              case 39:
+                _context7.prev = 39;
                 _context7.prev = 40;
-                _context7.prev = 41;
 
-                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                  _iterator2.return();
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
                 }
 
-              case 43:
-                _context7.prev = 43;
+              case 42:
+                _context7.prev = 42;
 
-                if (!_didIteratorError2) {
-                  _context7.next = 46;
+                if (!_didIteratorError) {
+                  _context7.next = 45;
                   break;
                 }
 
-                throw _iteratorError2;
+                throw _iteratorError;
+
+              case 45:
+                return _context7.finish(42);
 
               case 46:
-                return _context7.finish(43);
+                return _context7.finish(39);
 
               case 47:
-                return _context7.finish(40);
-
-              case 48:
-                _context7.next = 50;
+                _context7.next = 49;
                 return passwordRequestHandler();
 
-              case 50:
+              case 49:
                 password = _context7.sent;
                 this.previousPasswords.push(password);
-                return _context7.abrupt("return", this.payloadByDecryptingResponse({
-                  response: response,
-                  key: key,
-                  passwordRequestHandler: passwordRequestHandler
-                }));
+                return _context7.abrupt("return", this.payloadByDecryptingResponse(response, passwordRequestHandler, key));
 
-              case 53:
+              case 52:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[14, 36, 40, 48], [41,, 43, 47]]);
+        }, _callee7, this, [[13, 35, 39, 47], [40,, 42, 46]]);
       }));
 
-      function payloadByDecryptingResponse(_x8) {
+      function payloadByDecryptingResponse(_x13, _x14, _x15) {
         return _payloadByDecryptingResponse.apply(this, arguments);
       }
 
@@ -16779,20 +16711,14 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
               case 0:
                 decrypted = action.access_type === 'decrypted';
                 _context8.next = 3;
-                return this.outgoingPayloadForItem({
-                  item: item,
-                  decrypted: decrypted
-                });
+                return this.outgoingPayloadForItem(item, decrypted);
 
               case 3:
                 itemParams = _context8.sent;
                 params = {
                   items: [itemParams]
                 };
-                return _context8.abrupt("return", this.httpService.postAbsolute({
-                  url: action.url,
-                  params: params
-                }).then(function (response) {
+                return _context8.abrupt("return", this.httpService.postAbsolute(action.url, params).then(function (response) {
                   action.error = false;
                   return {
                     response: response
@@ -16816,7 +16742,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee8, this);
       }));
 
-      function handlePostAction(_x9, _x10) {
+      function handlePostAction(_x16, _x17) {
         return _handlePostAction.apply(this, arguments);
       }
 
@@ -16843,7 +16769,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee9, this);
       }));
 
-      function handleShowAction(_x11) {
+      function handleShowAction(_x18) {
         return _handleShowAction.apply(this, arguments);
       }
 
@@ -16852,15 +16778,16 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "outgoingPayloadForItem",
     value: function () {
-      var _outgoingPayloadForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(_ref8) {
-        var item, _ref8$decrypted, decrypted, intent;
-
+      var _outgoingPayloadForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(item) {
+        var decrypted,
+            intent,
+            _args10 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                item = _ref8.item, _ref8$decrypted = _ref8.decrypted, decrypted = _ref8$decrypted === void 0 ? false : _ref8$decrypted;
-                intent = decrypted ? _Protocol__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileDecrypted : _Protocol__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileEncrypted;
+                decrypted = _args10.length > 1 && _args10[1] !== undefined ? _args10[1] : false;
+                intent = decrypted ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileEncrypted;
                 return _context10.abrupt("return", this.protocolService.payloadByEncryptingPayload(item.payloadRepresentation(), intent));
 
               case 3:
@@ -16871,7 +16798,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
         }, _callee10, this);
       }));
 
-      function outgoingPayloadForItem(_x12) {
+      function outgoingPayloadForItem(_x19) {
         return _outgoingPayloadForItem.apply(this, arguments);
       }
 
@@ -17723,7 +17650,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
     value: function createRequest(verb, url, params, authentication) {
       var request = new XMLHttpRequest();
 
-      if (verb === HttpVerb.Get && Object.keys(params).length > 0) {
+      if (params && verb === HttpVerb.Get && Object.keys(params).length > 0) {
         url = this.urlForUrlAndParams(url, params);
       }
 
@@ -23338,7 +23265,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/singleton_manager */ "./lib/services/singleton_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _Services_singleton_manager__WEBPACK_IMPORTED_MODULE_6__["SNSingletonManager"]; });
 
-/* harmony import */ var _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_service */ "./lib/services/actions_service.js");
+/* harmony import */ var _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/actions_service */ "./lib/services/actions_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNActionsService", function() { return _Services_actions_service__WEBPACK_IMPORTED_MODULE_7__["SNActionsService"]; });
 
 /* harmony import */ var _Lib_services_migration_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/services/migration_service */ "./lib/services/migration_service.ts");

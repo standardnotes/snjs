@@ -24,19 +24,36 @@ type Params = Record<string, any>
  */
 export class SNHttpService extends PureService {
 
-  public async getAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse> {
+  public async getAbsolute(
+    url: string,
+    params?: Params,
+    authentication?: string
+  ): Promise<HttpResponse> {
     return this.runHttp(HttpVerb.Get, url, params, authentication);
   }
 
-  public async postAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse> {
+  public async postAbsolute(
+    url: string,
+    params: Params,
+    authentication?: string
+  ): Promise<HttpResponse> {
     return this.runHttp(HttpVerb.Post, url, params, authentication);
   }
 
-  public async patchAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse> {
+  public async patchAbsolute(
+    url: string,
+    params: Params,
+    authentication?: string
+  ): Promise<HttpResponse> {
     return this.runHttp(HttpVerb.Patch, url, params, authentication);
   }
 
-  private async runHttp(verb: HttpVerb, url: string, params: Params, authentication?: string): Promise<HttpResponse> {
+  private async runHttp(
+    verb: HttpVerb,
+    url: string,
+    params?: Params,
+    authentication?: string
+  ): Promise<HttpResponse> {
     const request = this.createRequest(
       verb,
       url,
@@ -46,9 +63,18 @@ export class SNHttpService extends PureService {
     return this.runRequest(request, verb, params);
   }
 
-  private createRequest(verb: HttpVerb, url: string, params: Params, authentication?: string) {
+  private createRequest(
+    verb: HttpVerb,
+    url: string,
+    params?: Params,
+    authentication?: string
+  ) {
     const request = new XMLHttpRequest();
-    if (verb === HttpVerb.Get && Object.keys(params).length > 0) {
+    if (
+      params &&
+      verb === HttpVerb.Get
+      && Object.keys(params).length > 0
+    ) {
       url = this.urlForUrlAndParams(url, params);
     }
     request.open(verb, url, true);
@@ -62,7 +88,7 @@ export class SNHttpService extends PureService {
   private async runRequest(
     request: XMLHttpRequest,
     verb: HttpVerb,
-    params: Params
+    params?: Params
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
