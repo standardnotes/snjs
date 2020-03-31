@@ -27,29 +27,29 @@ describe('basic auth', () => {
   });
 
   it('successfully register new account',  async function () {
-    const response = await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    const response = await this.application.register(
+      this.email,
+      this.password
+    );
     expect(response).to.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(5000);
 
   it('fails register new account with short password', async function () {
     const password = '123456';
-    const response = await this.application.register({
-      email: this.email,
-      password: password
-    });
+    const response = await this.application.register(
+      this.email,
+      password
+    );
     expect(response.error).to.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
   }).timeout(5000);
 
   it('successfully logs out of account', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
 
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
@@ -60,55 +60,57 @@ describe('basic auth', () => {
   });
 
   it('successfully logins to registered account', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    const response = await this.application.signIn({
-      email: this.email,
-      password: this.password,
-      awaitSync: true
-    });
+    const response = await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
     expect(response).to.be.ok;
     expect(response.error).to.not.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(20000);
 
   it('fails login with wrong password', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    const response = await this.application.signIn({
-      email: this.email,
-      password: 'wrongpassword',
-      awaitSync: true
-    });
+    const response = await this.application.signIn(
+      this.email,
+      'wrongpassword',
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
     expect(response).to.be.ok;
     expect(response.error).to.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
   }).timeout(20000);
 
   it('fails to change to short password', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
     const newPassword = '123456';
-    const response = await this.application.changePassword({
-      currentPassword: this.password,
-      newPassword: newPassword
-    });
+    const response = await this.application.changePassword(
+      this.password,
+      newPassword
+    );
     expect(response.error).to.be.ok;
   }).timeout(20000);
 
   it('successfully changes password', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
 
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
@@ -118,10 +120,10 @@ describe('basic auth', () => {
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
     const newPassword = 'newpassword';
-    const response = await this.application.changePassword({
-      currentPassword: this.password,
-      newPassword: newPassword
-    });
+    const response = await this.application.changePassword(
+      this.password,
+      newPassword
+    );
     /** New items key */
     this.expectedItemCount++;
 
@@ -140,16 +142,17 @@ describe('basic auth', () => {
     const note = this.application.modelManager.notes[0];
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    await this.application.saveItem({item: note});
+    await this.application.saveItem(note);
     this.expectedItemCount++;
   
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Should login with new password */
-    const signinResponse = await this.application.signIn({
-      email: this.email,
-      password: newPassword,
-      awaitSync: true
-    });
+    const signinResponse = await this.application.signIn(
+      this.email,
+      newPassword,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
 
     // await Factory.sleep(0.5);
     expect(signinResponse).to.be.ok;
@@ -160,10 +163,10 @@ describe('basic auth', () => {
   }).timeout(20000);
 
   it('changes password many times', async function () {
-    await this.application.register({
-      email: this.email,
-      password: this.password
-    });
+    await this.application.register(
+      this.email,
+      this.password
+    );
 
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
@@ -174,10 +177,10 @@ describe('basic auth', () => {
     let newPassword = Factory.randomString();
     let currentPassword = this.password;
     for(let i = 0; i < numTimesToChangePw; i++) {
-      await this.application.changePassword({
-        currentPassword: currentPassword,
-        newPassword: newPassword
-      });
+      await this.application.changePassword(
+        currentPassword,
+        newPassword
+      );
       /** New items key */
       this.expectedItemCount++;
 
@@ -194,11 +197,12 @@ describe('basic auth', () => {
       expect(this.application.modelManager.invalidItems().length).to.equal(0);
 
       /** Should login with new password */
-      const signinResponse = await this.application.signIn({
-        email: this.email,
-        password: currentPassword,
-        awaitSync: true
-      });
+      const signinResponse = await this.application.signIn(
+        this.email,
+        currentPassword,
+        undefined, undefined, undefined, undefined, undefined,
+        true
+      );
       expect(signinResponse).to.be.ok;
       expect(signinResponse.error).to.not.be.ok;
       expect(await this.application.protocolService.getRootKey()).to.be.ok;

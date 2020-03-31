@@ -355,7 +355,7 @@ describe('app models', () => {
     const tag = await Factory.createMappedTag(this.application);
     const note = await Factory.createMappedNote(this.application);
     tag.addItemAsRelationship(note);
-    await this.application.saveItem({ item: tag });
+    await this.application.saveItem(tag);
 
     expect(tag.content.references.length).to.equal(1);
 

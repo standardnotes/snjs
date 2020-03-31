@@ -69,7 +69,7 @@ export enum SyncSources {
   ResolveOutOfSync = 7
 };
 
-type SyncOptions = {
+export type SyncOptions = {
   queueStrategy?: SyncQueueStrategy
   mode?: SyncModes
   /** Whether the server should compute and return an integrity hash. */

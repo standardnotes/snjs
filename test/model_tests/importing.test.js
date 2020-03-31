@@ -37,12 +37,13 @@ describe('importing', () => {
     expect(note.content.references.length).to.equal(0);
     expect(note.tags.length).to.equal(1);
 
-    await this.application.importData({
-      awaitSync: true,
-      data: {
+    await this.application.importData(
+      {
         items: [notePayload, tagPayload]
-      }
-    });
+      },
+      undefined,
+      true,
+    );
 
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 
@@ -72,16 +73,17 @@ describe('importing', () => {
       null,
       { content: { title: `${Math.random()}` } }
     );
-    await this.application.importData({
-      awaitSync: true,
-      data: {
+    await this.application.importData(
+      {
         items: [
           mutatedNote,
           mutatedNote,
           mutatedNote
         ]
-      }
-    });
+      },
+      undefined,
+      true,
+    );
     this.expectedItemCount++;
     expect(modelManager.notes.length).to.equal(2);
     const imported = modelManager.notes.find((n) => n.uuid !== notePayload.uuid);
@@ -102,14 +104,15 @@ describe('importing', () => {
       null,
       { content: { references: [] } }
     );
-    await this.application.importData({
-      awaitSync: true,
-      data: {
+    await this.application.importData(
+      {
         items: [
           mutatedTag
         ]
-      }
-    });
+      },
+      undefined,
+      true,
+    );
     expect(modelManager.tags.length).to.equal(1);
     expect(modelManager.findItem(tagPayload.uuid).content.references.length).to.equal(1);
   });
@@ -138,15 +141,16 @@ describe('importing', () => {
       null,
       { content: { title: `${Math.random()}` } }
     );
-    await this.application.importData({
-      awaitSync: true,
-      data: {
+    await this.application.importData(
+      {
         items: [
           mutatedNote,
           mutatedTag
         ]
-      }
-    });
+      },
+      undefined,
+      true,
+    );
     this.expectedItemCount += 2;
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
 
@@ -189,7 +193,7 @@ describe('importing', () => {
       this.expectedItemCount += 2;
 
       tag.addItemAsRelationship(note);
-      await this.application.saveItem({ item: tag });
+      await this.application.saveItem(tag);
 
       const externalNote = Object.assign({},
         {
@@ -208,15 +212,16 @@ describe('importing', () => {
         }
       );
 
-      await this.application.importData({
-        awaitSync: true,
-        data: {
+      await this.application.importData(
+        {
           items: [
             externalNote,
             externalTag
           ]
-        }
-      });
+        },
+        undefined,
+        true,
+      );
       this.expectedItemCount += 1;
 
       /** We expect now that the total item count is 3, not 4. */

@@ -1,5 +1,9 @@
+import { SNRootKey } from '@Protocol/root_key';
 
-export type ChallengeArtifacts = Record<string, any>
+export type ChallengeArtifacts = {
+  wrappingKey?: SNRootKey
+  rootKey?: SNRootKey
+}
 
 export enum ChallengeType {
   LocalPasscode = 1,

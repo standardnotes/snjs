@@ -31,7 +31,7 @@ describe('session history', () => {
 
   async function setTextAndSync(application, item, text) {
     item.text = text;
-    await application.saveItem({ item });
+    await application.saveItem(item);
   }
 
   function deleteCharsFromString(string, amount) {
@@ -45,19 +45,19 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(1);
 
     /** Sync with same contents, should not create new entry */
-    await this.application.saveItem({ item });
+    await this.application.saveItem(item);
     expect(itemHistory.entries.length).to.equal(1);
 
     /** Sync with different contents, should create new entry */
     item.title = Math.random();
-    await this.application.saveItem({ item });
+    await this.application.saveItem(item);
     expect(itemHistory.entries.length).to.equal(2);
 
     this.historyManager.clearHistoryForItem(item);
     const newItemHistory = this.historyManager.historyForItem(item);
     expect(newItemHistory.entries.length).to.equal(0);
 
-    await this.application.saveItem({ item });
+    await this.application.saveItem(item);
     expect(newItemHistory.entries.length).to.equal(1);
 
     this.historyManager.clearAllHistory();

@@ -8,8 +8,8 @@ import { getGlobalScope } from '@Lib/utils';
  */
 export abstract class DeviceInterface {
 
-  private timeout: any
-  private interval: any
+  public timeout: any
+  public interval: any
   private namespace: string
 
   /**
@@ -56,9 +56,9 @@ export abstract class DeviceInterface {
    * New databases can be because of new sessions, or if the browser deleted it. 
    * In this case, callers should orchestrate with the server to redownload all items
    * from scratch.
-   * @returns {object} { isNewDatabase } - True if the database was newly created
+   * @returns { isNewDatabase } - True if the database was newly created
    */
-  abstract async openDatabase() : Promise<Record<string, boolean>>;
+  abstract async openDatabase() : Promise<{ isNewDatabase?: boolean } | undefined>
 
   abstract async getAllRawDatabasePayloads() : Promise<any[]>;
 

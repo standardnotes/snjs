@@ -54,11 +54,9 @@ const app = new SNApplication({
 
 ```javascript
  await app.prepareForLaunch({
-   callbacks: {
-     receiveChallenge: (challenge, orchestrator) => {
+  receiveChallenge: (challenge, orchestrator) => {
 
-     }
-   },
+  }
  });
  await application.launch();
 ```

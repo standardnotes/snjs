@@ -1,5 +1,6 @@
 import { removeFromArray } from '@Lib/utils';
 import { ApplicationStages } from '@Lib/stages';
+import { DeviceInterface } from '../device_interface';
 
 type EventObserver = (eventName: string, data: any) => Promise<void>
 
@@ -7,6 +8,7 @@ export abstract class PureService {
 
   private eventObservers: EventObserver[] = []
   public loggingEnabled = false
+  public deviceInterface?: DeviceInterface
 
   public addEventObserver(observer: EventObserver) {
     this.eventObservers.push(observer);
@@ -27,6 +29,7 @@ export abstract class PureService {
    */
   public deinit() {
     this.eventObservers.length = 0;
+    this.deviceInterface = undefined;
   }
 
   /**

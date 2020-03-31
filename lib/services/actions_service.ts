@@ -34,7 +34,6 @@ type PasswordRequestHandler = () => Promise<string>
 export class SNActionsService extends PureService {
 
   private alertService?: SNAlertService
-  private deviceInterface?: DeviceInterface
   private httpService?: SNHttpService
   private modelManager?: SNModelManager
   private protocolService?: SNProtocolService

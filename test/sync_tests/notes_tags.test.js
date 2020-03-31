@@ -134,7 +134,7 @@ describe('notes + tags syncing', async function() {
 
     tag.title = `${Math.random()}`;
     tag.updated_at = Factory.yesterday();
-    await this.application.saveItem({item: tag});
+    await this.application.saveItem(tag);
 
     // tag should now be conflicted and a copy created
     expect(this.application.modelManager.notes.length).to.equal(1);

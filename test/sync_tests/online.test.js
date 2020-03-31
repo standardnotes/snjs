@@ -33,11 +33,12 @@ describe('online syncing', () => {
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     };
     this.signIn = async () => {
-      await this.application.signIn({
-        email: this.email,
-        password: this.password,
-        awaitSync: true
-      });
+      await this.application.signIn(
+        this.email,
+        this.password,
+        undefined, undefined, undefined, undefined, undefined,
+        true
+      );
     };
   });
 
@@ -217,15 +218,16 @@ describe('online syncing', () => {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     this.application.syncService.addEventObserver((event, data) => {
       if (event === SyncEvents.SingleSyncCompleted) {
-        const note = this.application.findItem({ uuid: originalNote.uuid });
+        const note = this.application.findItem(originalNote.uuid);
         expect(note.dirty).to.not.be.ok;
       }
     });
-    await this.application.signIn({
-      email: this.email,
-      password: this.password,
-      awaitSync: true
-    });
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
   }).timeout(10000);
 
   it('allows me to save data after Ive signed out', async function () {
@@ -353,7 +355,7 @@ describe('online syncing', () => {
   it('should handle sync conflicts by duplicating differing data', async function () {
     // create an item and sync it
     const note = await Factory.createMappedNote(this.application);
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
     this.expectedItemCount++;
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
@@ -362,7 +364,7 @@ describe('online syncing', () => {
     // modify this item to have stale values
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
     // We expect this item to be duplicated
     this.expectedItemCount++;
     const allItems = this.application.modelManager.allItems;
@@ -376,13 +378,13 @@ describe('online syncing', () => {
 
   it('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application);
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
     this.expectedItemCount += 1;
 
     /** Create conflict for a note */
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
     this.expectedItemCount++;
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
 
@@ -397,15 +399,16 @@ describe('online syncing', () => {
 
   it('signing into account with pre-existing items', async function () {
     const note = await Factory.createMappedNote(this.application);
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
     this.expectedItemCount += 1;
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    await this.application.signIn({
-      email: this.email,
-      password: this.password,
-      awaitSync: true
-    });
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
 
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
@@ -1027,11 +1030,12 @@ describe('online syncing', () => {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
 
-    await this.application.signIn({
-      email: this.email,
-      password: this.password,
-      awaitSync: true
-    });
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
 
     this.application.syncService.ut_setDatabaseLoaded(false);
     const databasePayloads = await this.application.storageService.getAllRawPayloads();
@@ -1190,7 +1194,7 @@ describe('online syncing', () => {
   it('retreiving a remote deleted item should succeed', async function () {
     const note = await Factory.createSyncedNote(this.application);
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
-    await this.application.deleteItem({ item: note });
+    await this.application.deleteItem(note);
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
     await this.application.sync();
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);

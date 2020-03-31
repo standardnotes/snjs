@@ -32,9 +32,10 @@ export function CreateItemFromPayload(payload: PurePayload) {
  * Builds item .content based on values and populates with other default required
  * fields if necessary.
  */
-export function BuildItemContent(values: Record<string, any>) {
+export function BuildItemContent(values?: Record<string, any>) {
+  const copy = values ? Copy(values) : {}
   return {
     references: [],
-    ...Copy(values),
+    ...copy,
   }
 }

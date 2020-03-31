@@ -10,15 +10,15 @@ export function createApplication(namespace, environment, platform) {
     setTimeout.bind(window),
     setInterval.bind(window)
   );
-  return new SNApplication({
-    namespace: namespace,
-    deviceInterface: deviceInterface,
-    environment: environment || Environments.Web,
-    platform: platform || Platforms.MacWeb,
-    skipClasses: [
-      SNComponentManager
-    ]
-  });
+  return new SNApplication(
+    environment || Environments.Web,
+    platform || Platforms.MacWeb,
+    deviceInterface,
+    namespace,
+    undefined,
+    undefined,
+    [SNComponentManager]
+  );
 }
 
 export async function createAppWithRandNamespace(environment, platform) {
@@ -39,19 +39,17 @@ export async function createAndInitializeApplication(namespace, environment, pla
 
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
-    callbacks: {
-      receiveChallenge: () => {
-        throw 'Factory application shouldnt have challenges';
-      }
-    },
+    receiveChallenge: () => {
+      throw 'Factory application shouldnt have challenges';
+    }
   });
-  await application.launch({ awaitDatabaseLoad: true });
+  await application.launch(true);
 }
 
 export async function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
-  return application.register({ email, password, ephemeral, mergeLocal });
+  return application.register(email, password, ephemeral, mergeLocal);
 }
 
 export async function setOldVersionPasscode({ application, passcode, version }) {
@@ -163,13 +161,16 @@ export async function createManyMappedNotes(application, count) {
 }
 
 export async function loginToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
-  return application.signIn({
-    email: email,
-    password: password,
-    ephemeral: ephemeral,
-    mergeLocal: mergeLocal,
-    awaitSync: true
-  });
+  return application.signIn(
+    email,
+    password,
+    undefined,
+    ephemeral,
+    undefined, 
+    undefined,
+    mergeLocal,
+    true
+  );
 }
 
 /**

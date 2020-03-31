@@ -168,7 +168,7 @@ describe('keys', () => {
     const itemsKeys = this.application.protocolService.allItemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
-    await this.application.savePayload({ payload: notePayload });
+    await this.application.savePayload(notePayload);
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const rawNotePayload = rawPayloads.find((r) => r.content_type === 'Note');
@@ -381,10 +381,10 @@ describe('keys', () => {
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
 
-    await this.application.changePassword({
-      currentPassword: this.password,
-      newPassword: 'foobarfoo'
-    });
+    await this.application.changePassword(
+      this.password,
+      'foobarfoo'
+    );
 
     expect(this.application.protocolService.allItemsKeys.length).to.equal(2);
     const newDefaultItemsKey = this.application.protocolService.getDefaultItemsKey();

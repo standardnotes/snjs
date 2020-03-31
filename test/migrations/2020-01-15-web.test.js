@@ -125,13 +125,9 @@ describe('2020-01-15 web migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
     expect(application.sessionManager.online()).to.equal(true);
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyPlusWrapper
@@ -278,13 +274,9 @@ describe('2020-01-15 web migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.WrapperOnly
     );
@@ -400,13 +392,9 @@ describe('2020-01-15 web migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
     expect(application.sessionManager.online()).to.equal(true);
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyOnly
@@ -498,15 +486,11 @@ describe('2020-01-15 web migration', () => {
 
     /** Run migration */
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: (challenge) => {
-          return null;
-        }
+      receiveChallenge: (challenge) => {
+        return null;
       }
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
 
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyNone

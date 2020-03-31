@@ -46,7 +46,7 @@ import { StorageKeys } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
 
-type BackupFile = {
+export type BackupFile = {
   keyParams?: any
   auth_params?: any
   items: any[]
@@ -98,7 +98,6 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersions.V003;
 export class SNProtocolService extends PureService implements EncryptionDelegate {
 
   private modelManager?: SNModelManager
-  private deviceInterface?: DeviceInterface
   private storageService?: SNStorageService
   public crypto?: SNPureCrypto
   private operators: Record<string, SNProtocolOperator> = {}
@@ -575,7 +574,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * item.errorDecrypting = true and possibly item.waitingForKey = true.
    * Here we find such items, and attempt to decrypt them again.
    */
-  private async decryptErroredItems() {
+  public async decryptErroredItems() {
     const items = this.modelManager!.allItems.filter((item) => {
       return item.waitingForKey || item.errorDecrypting;
     });
@@ -598,7 +597,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async payloadsByDecryptingBackupFile(
     data: BackupFile,
-    password: string
+    password?: string
   ) {
     const keyParams = data.keyParams || data.auth_params;
     const rawItems = data.items;
@@ -611,7 +610,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     let decryptedPayloads;
     if (keyParams) {
       const key = await this.computeRootKey(
-        password,
+        password!,
         keyParams
       );
       decryptedPayloads = await this.payloadsByDecryptingPayloads(

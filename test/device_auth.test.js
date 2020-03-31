@@ -50,11 +50,9 @@ describe('device authentication', () => {
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
-    await tmpApplication.prepareForLaunch({
-      callbacks: { receiveChallenge }
-    });
+    await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch({ awaitDatabaseLoad: true });
+    await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
     expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await tmpApplication.deinit();
@@ -99,14 +97,10 @@ describe('device authentication', () => {
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
-    await tmpApplication.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge
-      }
-    });
+    await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
     expect(((await tmpApplication.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
-    await tmpApplication.launch({ awaitDatabaseLoad: true });
+    await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
     expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     tmpApplication.deinit();
@@ -159,12 +153,10 @@ describe('device authentication', () => {
       orchestrator.submitValues(initialValues);
     };
     await tmpApplication.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch({ awaitDatabaseLoad: true });
+    await tmpApplication.launch(true);
     expect(
       await tmpApplication.storageService.getValue(sampleStorageKey)
     ).to.equal(sampleStorageValue);

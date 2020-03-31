@@ -58,7 +58,6 @@ type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent
  */
 export class SNStorageService extends PureService {
 
-  private deviceInterface?: DeviceInterface
   public encryptionDelegate?: EncryptionDelegate
   private namespace: string
   /** Wait until application has been unlocked before trying to persist */

@@ -152,7 +152,7 @@ export class ChallengeOperation {
    * Sets the promise resolve function to be called 
    * when this challenge completes or cancels 
    */
-  public setResolver(resolve: (response: any) => void) {
+  public setResolver(resolve: (response: ChallengeResponse) => void) {
     this.resolve = resolve;
   }
 
@@ -272,8 +272,8 @@ export class ChallengeService extends PureService {
   public async promptForChallengeResponse(
     challenge: Challenge,
     validate = true,
-    orchestratorFill: OrchestratorFill
-  ) {
+    orchestratorFill?: OrchestratorFill
+  ) : Promise<ChallengeResponse> {
     let operation = this.getChallengeOperation(challenge);
     const isNew = !operation;
     if (!operation) {

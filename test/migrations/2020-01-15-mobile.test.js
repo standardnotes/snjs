@@ -130,11 +130,9 @@ describe('2020-01-15 mobile migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: { receiveChallenge }
+      receiveChallenge
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
 
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyPlusWrapper
@@ -257,16 +255,12 @@ describe('2020-01-15 mobile migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.WrapperOnly
     );
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
@@ -381,13 +375,9 @@ describe('2020-01-15 mobile migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
 
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyOnly
@@ -487,13 +477,9 @@ describe('2020-01-15 mobile migration', () => {
       orchestrator.submitValues(initialValues);
     };
     await application.prepareForLaunch({
-      callbacks: {
-        receiveChallenge: receiveChallenge,
-      }
+      receiveChallenge: receiveChallenge,
     });
-    await application.launch({
-      awaitDatabaseLoad: true
-    });
+    await application.launch(true);
 
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyNone

@@ -100,7 +100,7 @@ describe('upgrading', () => {
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
-    this.application.setLaunchCallbacks({
+    this.application.setLaunchCallback({
       receiveChallenge: receiveChallenge
     });
     await this.application.upgradeProtocolVersion();
@@ -153,10 +153,10 @@ describe('upgrading', () => {
     const notePayload003 = notePayloads[0];
     expect(notePayload003.version).to.equal(ProtocolVersions.V003);
 
-    await this.application.changePassword({
-      currentPassword: this.password,
-      newPassword: 'foobarfoo'
-    });
+    await this.application.changePassword(
+      this.password,
+      'foobarfoo'
+    );
 
     const latestVersion = this.application.protocolService.getLatestVersion();
     expect(
@@ -172,7 +172,7 @@ describe('upgrading', () => {
     /** After change, note should now be encrypted with latest protocol version */
 
     const note = this.application.modelManager.notes[0];
-    await this.application.saveItem({ item: note });
+    await this.application.saveItem(note);
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,

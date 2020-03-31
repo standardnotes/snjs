@@ -7,8 +7,6 @@ import { DeviceInterface } from '../device_interface';
  */
 export class SNAlertService extends PureService {
 
-  private deviceInterface?: DeviceInterface
-
   constructor(deviceInterface: DeviceInterface) {
     super();
     this.deviceInterface = deviceInterface;

@@ -45,11 +45,12 @@ describe('singletons', () => {
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     };
     this.signIn = async () => {
-      await this.application.signIn({
-        email: this.email,
-        password: this.password,
-        awaitSync: true
-      });
+      await this.application.signIn(
+        this.email,
+        this.password,
+        undefined, undefined, undefined, undefined, undefined,
+        true
+      );
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
     this.extPred = SNPredicate.CompoundPredicate([
@@ -57,16 +58,16 @@ describe('singletons', () => {
       new SNPredicate('package_info.identifier', '=', this.extManagerId)
     ]);
     this.createExtMgr = async () => {
-      return this.application.createManagedItem({
-        needsSync: true,
-        contentType: ContentTypes.Component,
-        content: {
+      return this.application.createManagedItem(
+        ContentTypes.Component,
+        {
           package_info: {
             name: 'Extensions',
             identifier: this.extManagerId
           }
-        }
-      });
+        },
+        true,
+      );
     };
   });
 
@@ -105,7 +106,7 @@ describe('singletons', () => {
     await this.createExtMgr();
 
     expect(extManager).to.be.ok;
-    const refreshedExtMgr = this.application.findItem({ uuid: extManager.uuid });
+    const refreshedExtMgr = this.application.findItem(extManager.uuid);
     expect(refreshedExtMgr).to.be.ok;
     await this.application.sync(syncOptions);
     expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
@@ -137,7 +138,7 @@ describe('singletons', () => {
     this.expectedItemCount += 1;
 
     expect(userPreferences).to.be.ok;
-    const refreshedUserPrefs = this.application.findItem({ uuid: userPreferences.uuid });
+    const refreshedUserPrefs = this.application.findItem(userPreferences.uuid);
     expect(refreshedUserPrefs).to.be.ok;
     await this.application.sync(syncOptions);
     expect(this.application.modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);

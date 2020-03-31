@@ -551,7 +551,7 @@ export class SNModelManager extends PureService {
    */
   public async createItem(
     contentType: ContentTypes,
-    content: ItemContent,
+    content?: ItemContent,
     add = false,
     needsSync = false,
     override?: PayloadOverride
@@ -563,7 +563,7 @@ export class SNModelManager extends PureService {
       {
         uuid: await Uuid.GenerateUuid(),
         content_type: contentType,
-        content: content || {}
+        content: BuildItemContent(content)
       },
       undefined,
       undefined,
