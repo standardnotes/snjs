@@ -1,3 +1,4 @@
+import { SessionHistoryPayload } from './session_history_payload';
 export { PayloadCollection } from './collection';
 export { PayloadCollectionSet } from './collection_set';
 export {
@@ -23,6 +24,7 @@ export { RetrievedComponentPayload } from '@Payloads/retrieved_component_payload
 export { SNMaxItemPayload } from '@Payloads/max_item_payload';
 export { SNSavedServerItemPayload } from '@Payloads/saved_server_item_payload';
 export { EncryptionParameters } from '@Payloads/encryption_parameters';
+export { SessionHistoryPayload } from '@Payloads/session_history_payload';
 
 export {
   ConflictStrategies,

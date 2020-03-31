@@ -28,6 +28,7 @@ export enum PayloadSources {
   ConflictData = 15,
   /* Payload when a client modifies item property then maps it to update UI */
   LocalChanged = 16,
+  SessionHistory = 17
 };
 
 export function isPayloadSourceRetrieved(source: PayloadSources) {

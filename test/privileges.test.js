@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('privileges', () => {
+describe('privileges', () => {
 
   before(async function () {
     localStorage.clear();

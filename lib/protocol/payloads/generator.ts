@@ -6,7 +6,8 @@ import {
   SNStorageItemPayload,
   RetrievedComponentPayload,
   PayloadSources,
-  PurePayload
+  PurePayload,
+  SessionHistoryPayload
 } from '@Payloads/index';
 import { EncryptionIntents } from '@Protocol/intents';
 import {
@@ -141,15 +142,15 @@ function itemPayloadClassForIntent(intent: EncryptionIntents) {
 }
 
 export function payloadClassForSource(source: PayloadSources) {
-  if ((
-    source === PayloadSources.FileImport
-  )) {
+  if (source === PayloadSources.FileImport) {
     return SNFileItemPayload;
   }
 
-  if ((
-    source === PayloadSources.ComponentRetrieved
-  )) {
+  if (source === PayloadSources.SessionHistory) {
+    return SessionHistoryPayload;
+  }
+
+  if (source === PayloadSources.ComponentRetrieved) {
     return RetrievedComponentPayload;
   }
 
