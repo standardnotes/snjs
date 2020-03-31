@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('privileges', () => {
+describe.only('privileges', () => {
 
   before(async function () {
     localStorage.clear();
@@ -54,10 +54,10 @@ describe('privileges', () => {
 
   it('handles session length', async function () {
     await this.privilegesService.setSessionLength(
-      PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES
+      PrivilegeSessionLength.FiveMinutes
     );
     const length = await this.privilegesService.getSelectedSessionLength();
-    expect(length).to.equal(PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES);
+    expect(length).to.equal(PrivilegeSessionLength.FiveMinutes);
     const expirey = await this.privilegesService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });

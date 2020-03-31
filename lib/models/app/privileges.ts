@@ -41,7 +41,7 @@ export class SNPrivileges extends SNItem {
     this.content.desktopPrivileges[action] = credentials;
   }
 
-  getCredentialsForAction(action: ProtectedActions) {
+  getCredentialsForAction(action: ProtectedActions): PrivilegeCredentials[] {
     return this.content.desktopPrivileges[action] || [];
   }
 

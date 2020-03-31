@@ -5113,7 +5113,7 @@ var SNApplication = /*#__PURE__*/function () {
       this.createChallengeService();
       this.createSingletonManager();
       this.createComponentManager();
-      this.createPrivilegesManager();
+      this.createPrivilegesService();
       this.createHistoryManager();
       this.createActionsManager();
     }
@@ -5305,16 +5305,9 @@ var SNApplication = /*#__PURE__*/function () {
       this.services.push(this.challengeService);
     }
   }, {
-    key: "createPrivilegesManager",
-    value: function createPrivilegesManager() {
-      this.privilegesService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNPrivilegesService"]))({
-        storageService: this.storageService,
-        protocolService: this.protocolService,
-        modelManager: this.modelManager,
-        syncService: this.syncService,
-        sessionManager: this.sessionManager,
-        singletonManager: this.singletonManager
-      });
+    key: "createPrivilegesService",
+    value: function createPrivilegesService() {
+      this.privilegesService = new (this.getClass(_Services__WEBPACK_IMPORTED_MODULE_7__["SNPrivilegesService"]))(this.modelManager, this.syncService, this.singletonManager, this.protocolService, this.storageService, this.sessionManager);
       this.services.push(this.privilegesService);
     }
   }, {
@@ -5671,7 +5664,7 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 /*!*********************!*\
   !*** ./lib/main.js ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentActions, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedActions, PrivilegeCredentials, SNWebCrypto, SNModelManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, CreateItemFromPayload, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentActions, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedActions, PrivilegeCredentials, SNWebCrypto, SNModelManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, CreateItemFromPayload, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5807,8 +5800,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_25__["SNHistoryManager"]; });
 
-/* harmony import */ var _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/privileges/privileges_service */ "./lib/services/privileges/privileges_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["SNPrivilegesService"]; });
+/* harmony import */ var _services_privileges_service__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/privileges_service */ "./lib/services/privileges_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_26__["SNPrivilegesService"]; });
 
 /* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_27__["SNSingletonManager"]; });
@@ -5911,13 +5904,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__["BaseMigration"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_NONE"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_HOUR"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return _services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PRIVILEGE_SESSION_LENGTH_ONE_WEEK"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_26__["PrivilegeSessionLength"]; });
 
 
 
@@ -23199,8 +23186,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_history_history_manager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/history/history_manager */ "./lib/services/history/history_manager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _Services_history_history_manager__WEBPACK_IMPORTED_MODULE_10__["SNHistoryManager"]; });
 
-/* harmony import */ var _Services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/privileges/privileges_service */ "./lib/services/privileges/privileges_service.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _Services_privileges_privileges_service__WEBPACK_IMPORTED_MODULE_11__["SNPrivilegesService"]; });
+/* harmony import */ var _Services_privileges_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/privileges_service */ "./lib/services/privileges_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _Services_privileges_service__WEBPACK_IMPORTED_MODULE_11__["SNPrivilegesService"]; });
 
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_12__["SyncEvents"]; });
@@ -26216,19 +26203,16 @@ var SNModelManager = /*#__PURE__*/function (_PureService) {
 
 /***/ }),
 
-/***/ "./lib/services/privileges/privileges_service.js":
-/*!*******************************************************!*\
-  !*** ./lib/services/privileges/privileges_service.js ***!
-  \*******************************************************/
-/*! exports provided: PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK, SNPrivilegesService */
+/***/ "./lib/services/privileges_service.ts":
+/*!********************************************!*\
+  !*** ./lib/services/privileges_service.ts ***!
+  \********************************************/
+/*! exports provided: PrivilegeSessionLength, SNPrivilegesService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_NONE", function() { return PRIVILEGE_SESSION_LENGTH_NONE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES", function() { return PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_HOUR", function() { return PRIVILEGE_SESSION_LENGTH_ONE_HOUR; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PRIVILEGE_SESSION_LENGTH_ONE_WEEK", function() { return PRIVILEGE_SESSION_LENGTH_ONE_WEEK; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return PrivilegeSessionLength; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return SNPrivilegesService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -26239,6 +26223,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
 /* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
 
+
+var _CredentialsMetadata, _ActionsMetadata;
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -26266,16 +26252,43 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
 
 
-var PRIVILEGE_SESSION_LENGTH_NONE = 0;
-var PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
-var PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
-var PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
+
+var PrivilegeSessionLength;
+
+(function (PrivilegeSessionLength) {
+  PrivilegeSessionLength[PrivilegeSessionLength["None"] = 0] = "None";
+  PrivilegeSessionLength[PrivilegeSessionLength["FiveMinutes"] = 300] = "FiveMinutes";
+  PrivilegeSessionLength[PrivilegeSessionLength["OneHour"] = 3600] = "OneHour";
+  PrivilegeSessionLength[PrivilegeSessionLength["OneWeek"] = 604800] = "OneWeek";
+})(PrivilegeSessionLength || (PrivilegeSessionLength = {}));
+
+var CredentialsMetadata = (_CredentialsMetadata = {}, _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword, {
+  label: 'Account Password',
+  prompt: 'Please enter your account password.'
+}), _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode, {
+  label: 'Local Passcode',
+  prompt: 'Please enter your local passcode.'
+}), _CredentialsMetadata);
+var ActionsMetadata = (_ActionsMetadata = {}, _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageExtensions, {
+  label: 'Manage Extensions'
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageBackups, {
+  label: 'Download/Import Backups'
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ViewProtectedNotes, {
+  label: 'View Protected Notes'
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePrivileges, {
+  label: 'Manage Privileges'
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePasscode, {
+  label: 'Manage Passcode'
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].DeleteNote, {
+  label: 'Delete Notes'
+}), _ActionsMetadata);
 /** 
  * Privileges allows certain actions within the application to require extra authentication.
  * For example, the privileges service exposes functions that allow the action of deleting
@@ -26289,19 +26302,31 @@ var PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
 var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
   _inherits(SNPrivilegesService, _PureService);
 
-  function SNPrivilegesService(_ref) {
+  function SNPrivilegesService(modelManager, syncService, singletonManager, protocolService, storageService, sessionManager) {
     var _this;
-
-    var modelManager = _ref.modelManager,
-        syncService = _ref.syncService,
-        singletonManager = _ref.singletonManager,
-        protocolService = _ref.protocolService,
-        storageService = _ref.storageService,
-        sessionManager = _ref.sessionManager;
 
     _classCallCheck(this, SNPrivilegesService);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNPrivilegesService).call(this));
+
+    _defineProperty(_assertThisInitialized(_this), "modelManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "syncService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "singletonManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "protocolService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "storageService", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "sessionManager", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "availableActions", []);
+
+    _defineProperty(_assertThisInitialized(_this), "availableCredentials", []);
+
+    _defineProperty(_assertThisInitialized(_this), "sessionLengths", []);
+
     _this.modelManager = modelManager;
     _this.syncService = syncService;
     _this.singletonManager = singletonManager;
@@ -26313,18 +26338,16 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
 
     return _this;
   }
-  /** @access public */
-
 
   _createClass(SNPrivilegesService, [{
     key: "deinit",
     value: function deinit() {
-      this.modelManager = null;
-      this.syncService = null;
-      this.singletonManager = null;
-      this.protocolService = null;
-      this.storageService = null;
-      this.sessionManager = null;
+      this.modelManager = undefined;
+      this.syncService = undefined;
+      this.singletonManager = undefined;
+      this.protocolService = undefined;
+      this.storageService = undefined;
+      this.sessionManager = undefined;
 
       _get(_getPrototypeOf(SNPrivilegesService.prototype), "deinit", this).call(this);
     }
@@ -26335,7 +26358,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
         return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"][key];
       });
       this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode];
-      this.sessionLengths = [PRIVILEGE_SESSION_LENGTH_NONE, PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES, PRIVILEGE_SESSION_LENGTH_ONE_HOUR, PRIVILEGE_SESSION_LENGTH_ONE_WEEK];
+      this.sessionLengths = [PrivilegeSessionLength.None, PrivilegeSessionLength.FiveMinutes, PrivilegeSessionLength.OneHour, PrivilegeSessionLength.OneWeek];
     }
   }, {
     key: "getAvailableActions",
@@ -26581,7 +26604,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                return _context5.abrupt("return", this.setSessionLength(PRIVILEGE_SESSION_LENGTH_NONE));
+                return _context5.abrupt("return", this.setSessionLength(PrivilegeSessionLength.None));
 
               case 1:
               case "end":
@@ -26620,7 +26643,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return _context6.abrupt("return", length);
 
               case 7:
-                return _context6.abrupt("return", PRIVILEGE_SESSION_LENGTH_NONE);
+                return _context6.abrupt("return", PrivilegeSessionLength.None);
 
               case 8:
               case "end":
@@ -26858,7 +26881,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
     key: "verifyAuthenticationParameters",
     value: function () {
       var _verifyAuthenticationParameters = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(credential, value) {
-        var _ref2, valid, _ref3, _valid;
+        var _ref, valid, _ref2, _valid;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
@@ -26873,8 +26896,8 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return this.protocolService.validateAccountPassword(value);
 
               case 3:
-                _ref2 = _context11.sent;
-                valid = _ref2.valid;
+                _ref = _context11.sent;
+                valid = _ref.valid;
                 return _context11.abrupt("return", valid);
 
               case 8:
@@ -26887,8 +26910,8 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return this.protocolService.validatePasscode(value);
 
               case 11:
-                _ref3 = _context11.sent;
-                _valid = _ref3.valid;
+                _ref2 = _context11.sent;
+                _valid = _ref2.valid;
                 return _context11.abrupt("return", _valid);
 
               case 14:
@@ -26908,55 +26931,27 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "displayInfoForCredential",
     value: function displayInfoForCredential(credential) {
-      var metadata = {};
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].AccountPassword] = {
-        label: 'Account Password',
-        prompt: 'Please enter your account password.'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredentials"].LocalPasscode] = {
-        label: 'Local Passcode',
-        prompt: 'Please enter your local passcode.'
-      };
-      return metadata[credential];
+      return CredentialsMetadata[credential];
     }
   }, {
     key: "displayInfoForAction",
     value: function displayInfoForAction(action) {
-      var metadata = {};
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageExtensions] = {
-        label: 'Manage Extensions'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManageBackups] = {
-        label: 'Download/Import Backups'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ViewProtectedNotes] = {
-        label: 'View Protected Notes'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePrivileges] = {
-        label: 'Manage Privileges'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].ManagePasscode] = {
-        label: 'Manage Passcode'
-      };
-      metadata[_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedActions"].DeleteNote] = {
-        label: 'Delete Notes'
-      };
-      return metadata[action];
+      return ActionsMetadata[action];
     }
   }, {
     key: "getSessionLengthOptions",
     value: function getSessionLengthOptions() {
       return [{
-        value: PRIVILEGE_SESSION_LENGTH_NONE,
+        value: PrivilegeSessionLength.None,
         label: "Don't Remember"
       }, {
-        value: PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES,
+        value: PrivilegeSessionLength.FiveMinutes,
         label: '5 Minutes'
       }, {
-        value: PRIVILEGE_SESSION_LENGTH_ONE_HOUR,
+        value: PrivilegeSessionLength.OneHour,
         label: '1 Hour'
       }, {
-        value: PRIVILEGE_SESSION_LENGTH_ONE_WEEK,
+        value: PrivilegeSessionLength.OneWeek,
         label: '1 Week'
       }];
     }

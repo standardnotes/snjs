@@ -1,14 +1,56 @@
+import { SNSessionManager } from './api/session_manager';
+import { SNStorageService } from '@Services/storage_service';
+import { SNProtocolService } from './protocol_service';
+import { SNSingletonManager } from './singleton_manager';
+import { SNSyncService } from './sync/sync_service';
+import { SNModelManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
 import { StorageKeys } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentTypes } from '@Root/lib/models';
-import { ProtectedActions, PrivilegeCredentials } from '@Models/app/privileges';
+import { ProtectedActions, PrivilegeCredentials, SNPrivileges } from '@Models/app/privileges';
 
-export const PRIVILEGE_SESSION_LENGTH_NONE = 0;
-export const PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES = 300;
-export const PRIVILEGE_SESSION_LENGTH_ONE_HOUR = 3600;
-export const PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
+export enum PrivilegeSessionLength {
+  None = 0,
+  FiveMinutes = 300,
+  OneHour = 3600,
+  OneWeek = 604800,
+}
+
+type CredentialAuthMapping = Partial<Record<PrivilegeCredentials, string>>
+
+const CredentialsMetadata = {
+  [PrivilegeCredentials.AccountPassword] : {
+    label: 'Account Password',
+    prompt: 'Please enter your account password.'
+  },
+  [PrivilegeCredentials.LocalPasscode] : {
+    label: 'Local Passcode',
+    prompt: 'Please enter your local passcode.'
+  }
+};
+
+const ActionsMetadata = {
+  [ProtectedActions.ManageExtensions]: {
+    label: 'Manage Extensions'
+  },
+  [ProtectedActions.ManageBackups]: {
+    label: 'Download/Import Backups'
+  },
+  [ProtectedActions.ViewProtectedNotes]: {
+    label: 'View Protected Notes'
+  },
+  [ProtectedActions.ManagePrivileges]: {
+    label: 'Manage Privileges'
+  },
+  [ProtectedActions.ManagePasscode]: {
+    label: 'Manage Passcode'
+  },
+  [ProtectedActions.DeleteNote]: {
+    label: 'Delete Notes'
+  },
+};
 
 /** 
  * Privileges allows certain actions within the application to require extra authentication.
@@ -20,14 +62,25 @@ export const PRIVILEGE_SESSION_LENGTH_ONE_WEEK = 604800;
  * the user has yet authenticated this action.
  */
 export class SNPrivilegesService extends PureService {
-  constructor({
-    modelManager,
-    syncService,
-    singletonManager,
-    protocolService,
-    storageService,
-    sessionManager
-  }) {
+  private modelManager?: SNModelManager
+  private syncService?: SNSyncService
+  private singletonManager?: SNSingletonManager
+  private protocolService?: SNProtocolService
+  private storageService?: SNStorageService
+  private sessionManager?: SNSessionManager
+
+  private availableActions: ProtectedActions[] = []
+  private availableCredentials: PrivilegeCredentials[] = []
+  private sessionLengths: PrivilegeSessionLength[] = []
+
+  constructor(
+    modelManager: SNModelManager,
+    syncService: SNSyncService,
+    singletonManager: SNSingletonManager,
+    protocolService: SNProtocolService,
+    storageService: SNStorageService,
+    sessionManager: SNSessionManager
+  ) {
     super();
     this.modelManager = modelManager;
     this.syncService = syncService;
@@ -38,20 +91,19 @@ export class SNPrivilegesService extends PureService {
     this.loadDefaults();
   }
 
-  /** @access public */
-  deinit() {
-    this.modelManager = null;
-    this.syncService = null;
-    this.singletonManager = null;
-    this.protocolService = null;
-    this.storageService = null;
-    this.sessionManager = null;
+  public deinit() {
+    this.modelManager = undefined;
+    this.syncService = undefined;
+    this.singletonManager = undefined;
+    this.protocolService = undefined;
+    this.storageService = undefined;
+    this.sessionManager = undefined;
     super.deinit();
   }
 
-  loadDefaults() {
+  private loadDefaults() {
     this.availableActions = Object.keys(ProtectedActions).map((key) => {
-      return ProtectedActions[key];
+      return (ProtectedActions as any)[key] as ProtectedActions;
     });
 
     this.availableCredentials = [
@@ -60,10 +112,10 @@ export class SNPrivilegesService extends PureService {
     ];
 
     this.sessionLengths = [
-      PRIVILEGE_SESSION_LENGTH_NONE,
-      PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES,
-      PRIVILEGE_SESSION_LENGTH_ONE_HOUR,
-      PRIVILEGE_SESSION_LENGTH_ONE_WEEK
+      PrivilegeSessionLength.None,
+      PrivilegeSessionLength.FiveMinutes,
+      PrivilegeSessionLength.OneHour,
+      PrivilegeSessionLength.OneWeek
     ];
   }
 
@@ -78,18 +130,18 @@ export class SNPrivilegesService extends PureService {
   /**
    * The credentials currently required to perform this action.
    */
-  async netCredentialsForAction(action) {
+  async netCredentialsForAction(action: ProtectedActions) {
     const privileges = await this.getPrivileges();
     const credentials = privileges.getCredentialsForAction(action);
     const netCredentials = [];
     for (const credential of credentials) {
       if (credential === PrivilegeCredentials.AccountPassword) {
-        const isOnline = await this.sessionManager.online();
+        const isOnline = await this.sessionManager!.online();
         if (isOnline) {
           netCredentials.push(credential);
         }
       } else if (credential === PrivilegeCredentials.LocalPasscode) {
-        const hasPasscode = await this.protocolService.hasRootKeyWrapper();
+        const hasPasscode = await this.protocolService!.hasRootKeyWrapper();
         if (hasPasscode) {
           netCredentials.push(credential);
         }
@@ -101,7 +153,7 @@ export class SNPrivilegesService extends PureService {
   async getPrivileges() {
     const contentType = ContentTypes.Privileges;
     const predicate = new SNPredicate('content_type', '=', contentType);
-    return this.singletonManager.findOrCreateSingleton(
+    return this.singletonManager!.findOrCreateSingleton(
       predicate,
       CreateMaxPayloadFromAnyObject(
         {
@@ -109,50 +161,49 @@ export class SNPrivilegesService extends PureService {
           content: {}
         }
       )
-    );
+    ) as Promise<SNPrivileges>;
   }
 
   async savePrivileges() {
     const privileges = await this.getPrivileges();
-    await this.modelManager.setItemDirty(privileges);
-    return this.syncService.sync();
+    await this.modelManager!.setItemDirty(privileges);
+    return this.syncService!.sync();
   }
 
-  async setSessionLength(length) {
-    const addSecondsToNow = function (seconds) {
+  async setSessionLength(length: PrivilegeSessionLength) {
+    const addSecondsToNow = (seconds: number) => {
       const date = new Date();
       date.setSeconds(date.getSeconds() + seconds);
       return date;
     };
-
     const expiresAt = addSecondsToNow(length);
-    await this.storageService.setValue(
+    await this.storageService!.setValue(
       StorageKeys.PrivilegesExpirey,
       expiresAt
     );
-    await this.storageService.setValue(
+    await this.storageService!.setValue(
       StorageKeys.PrivilegesSessionLength,
       length
     );
   }
 
   async clearSession() {
-    return this.setSessionLength(PRIVILEGE_SESSION_LENGTH_NONE);
+    return this.setSessionLength(PrivilegeSessionLength.None);
   }
 
   async getSelectedSessionLength() {
-    const length = await this.storageService.getValue(
+    const length = await this.storageService!.getValue(
       StorageKeys.PrivilegesSessionLength
     );
     if (length) {
       return length;
     } else {
-      return PRIVILEGE_SESSION_LENGTH_NONE;
+      return PrivilegeSessionLength.None;
     }
   }
 
   async getSessionExpirey() {
-    const expiresAt = await this.storageService.getValue(
+    const expiresAt = await this.storageService!.getValue(
       StorageKeys.PrivilegesExpirey
     );
     if (expiresAt) {
@@ -162,14 +213,14 @@ export class SNPrivilegesService extends PureService {
     }
   }
 
-  async actionHasPrivilegesConfigured(action) {
+  async actionHasPrivilegesConfigured(action: ProtectedActions) {
     return (await this.netCredentialsForAction(action)).length > 0;
   }
 
   /**
    * Whether the action requires present authentication.
    */
-  async actionRequiresPrivilege(action) {
+  async actionRequiresPrivilege(action: ProtectedActions) {
     const expiresAt = await this.getSessionExpirey();
     if (expiresAt > new Date()) {
       return false;
@@ -178,14 +229,17 @@ export class SNPrivilegesService extends PureService {
     return netCredentials.length > 0;
   }
 
-  async authenticateAction(action, credentialAuthMapping) {
+  async authenticateAction(
+    action: ProtectedActions,
+    credentialAuthMapping: CredentialAuthMapping
+  ) {
     const requiredCredentials = await this.netCredentialsForAction(action);
     const successfulCredentials = [];
     const failedCredentials = [];
     for (const credential of requiredCredentials) {
       const passesAuth = await this.verifyAuthenticationParameters(
         credential,
-        credentialAuthMapping[credential]
+        credentialAuthMapping[credential]!
       );
       if (passesAuth) {
         successfulCredentials.push(credential);
@@ -200,68 +254,43 @@ export class SNPrivilegesService extends PureService {
     };
   }
 
-  async verifyAuthenticationParameters(credential, value) {
+  async verifyAuthenticationParameters(
+    credential: PrivilegeCredentials,
+    value: string
+  ) {
     if (credential === PrivilegeCredentials.AccountPassword) {
-      const { valid } = await this.protocolService.validateAccountPassword(value);
+      const { valid } = await this.protocolService!.validateAccountPassword(value);
       return valid;
     } else if (credential === PrivilegeCredentials.LocalPasscode) {
-      const { valid } = await this.protocolService.validatePasscode(value);
+      const { valid } = await this.protocolService!.validatePasscode(value);
       return valid;
     }
   }
 
-  displayInfoForCredential(credential) {
-    const metadata = {};
-    metadata[PrivilegeCredentials.AccountPassword] = {
-      label: 'Account Password',
-      prompt: 'Please enter your account password.'
-    };
-    metadata[PrivilegeCredentials.LocalPasscode] = {
-      label: 'Local Passcode',
-      prompt: 'Please enter your local passcode.'
-    };
-    return metadata[credential];
+  displayInfoForCredential(credential: PrivilegeCredentials) {
+    return CredentialsMetadata[credential];
   }
 
-  displayInfoForAction(action) {
-    const metadata = {};
-    metadata[ProtectedActions.ManageExtensions] = {
-      label: 'Manage Extensions'
-    };
-    metadata[ProtectedActions.ManageBackups] = {
-      label: 'Download/Import Backups'
-    };
-    metadata[ProtectedActions.ViewProtectedNotes] = {
-      label: 'View Protected Notes'
-    };
-    metadata[ProtectedActions.ManagePrivileges] = {
-      label: 'Manage Privileges'
-    };
-    metadata[ProtectedActions.ManagePasscode] = {
-      label: 'Manage Passcode'
-    };
-    metadata[ProtectedActions.DeleteNote] = {
-      label: 'Delete Notes'
-    };
-    return metadata[action];
+  displayInfoForAction(action: ProtectedActions) {
+    return ActionsMetadata[action];
   }
 
   getSessionLengthOptions() {
     return [
       {
-        value: PRIVILEGE_SESSION_LENGTH_NONE,
+        value: PrivilegeSessionLength.None,
         label: "Don't Remember"
       },
       {
-        value: PRIVILEGE_SESSION_LENGTH_FIVE_MINUTES,
+        value: PrivilegeSessionLength.FiveMinutes,
         label: '5 Minutes'
       },
       {
-        value: PRIVILEGE_SESSION_LENGTH_ONE_HOUR,
+        value: PrivilegeSessionLength.OneHour,
         label: '1 Hour'
       },
       {
-        value: PRIVILEGE_SESSION_LENGTH_ONE_WEEK,
+        value: PrivilegeSessionLength.OneWeek,
         label: '1 Week'
       }
     ];
