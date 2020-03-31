@@ -32673,7 +32673,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.js");
+/* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.ts");
 /* harmony import */ var _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/sync/sync_op_status */ "./lib/services/sync/sync_op_status.ts");
 /* harmony import */ var _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/sync/sync_state */ "./lib/services/sync/sync_state.ts");
 /* harmony import */ var _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/sync/account/downloader */ "./lib/services/sync/account/downloader.ts");
@@ -34838,9 +34838,9 @@ var SyncState = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/services/sync/utils.js":
+/***/ "./lib/services/sync/utils.ts":
 /*!************************************!*\
-  !*** ./lib/services/sync/utils.js ***!
+  !*** ./lib/services/sync/utils.ts ***!
   \************************************/
 /*! exports provided: SortPayloadsByRecentAndContentPriority */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -34855,7 +34855,7 @@ __webpack_require__.r(__webpack_exports__);
   */
 function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
   return payloads.sort(function (a, b) {
-    var dateResult = new Date(b.updated_at) - new Date(a.updated_at);
+    var dateResult = new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
     var aPriority = 0;
     var bPriority = 0;
 
