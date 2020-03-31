@@ -9,7 +9,8 @@ import {
   ChallengeResponse,
   ChallengeType,
   ChallengeReason,
-  ChallengeValue
+  ChallengeValue,
+  ChallengeArtifacts
 } from '@Lib/challenges';
 
 export type OrchestratorFill = {
@@ -17,7 +18,7 @@ export type OrchestratorFill = {
 }
 type ChallengeValidationResponse = {
   valid: boolean
-  artifacts?: Artifacts
+  artifacts?: ChallengeArtifacts
 }
 type ChallengeHandler = (
   challenge: Challenge,
@@ -30,11 +31,10 @@ type SetClientFunctionsFunction = (
   onCancel?: () => void,
 ) => void;
 type SubmitValuesFunction = (values: ChallengeValue[]) => void;
-type Artifacts = Record<string, any>
 type SetValidationStatusFunction = (
   value: ChallengeValue,
   valid: boolean,
-  artifacts?: Artifacts
+  artifacts?: ChallengeArtifacts
 ) => void;
 type ValueCallback = (value: ChallengeValue) => void
 
@@ -138,7 +138,7 @@ export class ChallengeOperation {
   public validate: boolean
   public validValues: ChallengeValue[] = []
   public invalidValues: ChallengeValue[] = []
-  public artifacts: Artifacts = {}
+  public artifacts: ChallengeArtifacts = {}
   public client!: ChallengeClient
   private resolve!: (response: any) => void
   public orchestrator!: ChallengeOrchestrator
@@ -214,7 +214,7 @@ export class ChallengeOperation {
   public setValueStatus(
     value: ChallengeValue,
     valid: boolean,
-    artifacts?: Artifacts
+    artifacts?: ChallengeArtifacts
   ) {
     const valuesArray = valid ? this.validValues : this.invalidValues;
     const matching = valuesArray.find((v) => v.type === value.type);
@@ -294,10 +294,10 @@ export class ChallengeService extends PureService {
   }
   public async validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse> {
     if (value.type === ChallengeType.LocalPasscode) {
-      return this.protocolService!.validatePasscode(value.value);
+      return this.protocolService!.validatePasscode(value.value as string);
     }
     else if (value.type === ChallengeType.AccountPassword) {
-      return this.protocolService!.validateAccountPassword(value.value);
+      return this.protocolService!.validateAccountPassword(value.value as string);
     }
     else if (value.type === ChallengeType.Biometric) {
       return { valid: value.value === true };
@@ -355,7 +355,7 @@ export class ChallengeService extends PureService {
         );
         operation.client = client;
       },
-      (value: ChallengeValue, valid: boolean, artifacts?: Artifacts) => {
+      (value: ChallengeValue, valid: boolean, artifacts?: ChallengeArtifacts) => {
         this.setValidationStatusForChallenge(challenge, value, valid, artifacts);
       },
       (values: ChallengeValue[]) => {
@@ -395,7 +395,7 @@ export class ChallengeService extends PureService {
         this.setValidationStatusForChallenge(challenge, value, valid, artifacts);
       }
     } else {
-      const response = new ChallengeResponse(challenge, values, null);
+      const response = new ChallengeResponse(challenge, values);
       operation.complete(response);
     }
   }
@@ -404,7 +404,7 @@ export class ChallengeService extends PureService {
     challenge: Challenge,
     value: ChallengeValue,
     valid: boolean,
-    artifacts?: Artifacts
+    artifacts?: ChallengeArtifacts
   ) {
     const operation = this.getChallengeOperation(challenge);
     operation.setValueStatus(value, valid, artifacts);

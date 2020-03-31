@@ -185,7 +185,7 @@ export class Migration20200115 extends Migration {
       const orchestratorFill: OrchestratorFill = {};
       const response = await this.requestChallengeResponse(challenge, false, orchestratorFill);
       const value = response.getValueForType(ChallengeType.LocalPasscode);
-      const passcode = value.value;
+      const passcode = value.value as string;
       passcodeKey = await this.services.protocolService.computeRootKey(
         passcode,
         passcodeParams
@@ -325,7 +325,7 @@ export class Migration20200115 extends Migration {
         while (!passcodeKey! || passcodeKey!.serverPassword !== pwHash) {
           const response = await this.requestChallengeResponse(challenge, false, orchestratorFill);
           const value = response.getValueForType(ChallengeType.LocalPasscode);
-          const passcode = value.value;
+          const passcode = value.value as string;
           passcodeKey = await this.services.protocolService.computeRootKey(
             passcode,
             passcodeParams

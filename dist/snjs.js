@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./lib/main.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./lib/main.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -2420,7 +2420,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib */ "./lib/index.ts");
-/* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services */ "./lib/services/index.js");
+/* harmony import */ var _Services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services */ "./lib/services/index.ts");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -5354,31 +5354,58 @@ var SNApplication = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/challenges.js":
+/***/ "./lib/challenges.ts":
 /*!***************************!*\
-  !*** ./lib/challenges.js ***!
+  !*** ./lib/challenges.ts ***!
   \***************************/
-/*! exports provided: Challenge, ChallengeValue, ChallengeResponse, ChallengeType, ChallengeReason, challengeTypeToString */
+/*! exports provided: ChallengeType, ChallengeReason, Challenge, ChallengeValue, ChallengeResponse, challengeTypeToString */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeType", function() { return ChallengeType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return ChallengeReason; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Challenge", function() { return Challenge; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeValue", function() { return ChallengeValue; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return ChallengeResponse; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeType", function() { return ChallengeType; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return ChallengeReason; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "challengeTypeToString", function() { return challengeTypeToString; });
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var ChallengeType;
+
+(function (ChallengeType) {
+  ChallengeType[ChallengeType["LocalPasscode"] = 1] = "LocalPasscode";
+  ChallengeType[ChallengeType["AccountPassword"] = 2] = "AccountPassword";
+  ChallengeType[ChallengeType["Biometric"] = 3] = "Biometric";
+})(ChallengeType || (ChallengeType = {}));
+
+;
+/** The source of the challenge */
+
+var ChallengeReason;
+
+(function (ChallengeReason) {
+  ChallengeReason[ChallengeReason["ApplicationUnlock"] = 1] = "ApplicationUnlock";
+  ChallengeReason[ChallengeReason["ResaveRootKey"] = 2] = "ResaveRootKey";
+  ChallengeReason[ChallengeReason["ProtocolUpgrade"] = 3] = "ProtocolUpgrade";
+  ChallengeReason[ChallengeReason["Migration"] = 4] = "Migration";
+})(ChallengeReason || (ChallengeReason = {}));
+
+;
 var Challenge = function Challenge(types, reason) {
   _classCallCheck(this, Challenge);
+
+  _defineProperty(this, "types", void 0);
+
+  _defineProperty(this, "reason", void 0);
+
+  _defineProperty(this, "id", void 0);
 
   this.types = types;
   this.reason = reason;
@@ -5388,18 +5415,23 @@ var Challenge = function Challenge(types, reason) {
 var ChallengeValue = function ChallengeValue(type, value) {
   _classCallCheck(this, ChallengeValue);
 
+  _defineProperty(this, "type", void 0);
+
+  _defineProperty(this, "value", void 0);
+
   this.type = type;
   this.value = value;
   Object.freeze(this);
 };
 var ChallengeResponse = /*#__PURE__*/function () {
-  /**
-   * @param {Challenge} challenge 
-   * @param {string|boolean} value 
-   * @param {object} validationArtifacts
-   */
   function ChallengeResponse(challenge, values, artifacts) {
     _classCallCheck(this, ChallengeResponse);
+
+    _defineProperty(this, "challenge", void 0);
+
+    _defineProperty(this, "values", void 0);
+
+    _defineProperty(this, "artifacts", void 0);
 
     this.challenge = challenge;
     this.values = values;
@@ -5418,21 +5450,8 @@ var ChallengeResponse = /*#__PURE__*/function () {
 
   return ChallengeResponse;
 }();
-var ChallengeType = {
-  LocalPasscode: 1,
-  AccountPassword: 2,
-  Biometric: 3
-};
-/** The source of the challenge */
-
-var ChallengeReason = {
-  ApplicationUnlock: 1,
-  ResaveRootKey: 2,
-  ProtocolUpgrade: 3,
-  Migration: 4
-};
 /**
- * @returns {string} The UI-friendly title for this challenge
+ * @returns The UI-friendly title for this challenge
  */
 
 function challengeTypeToString(type) {
@@ -5626,7 +5645,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["isEnvironmentMobile"]; });
 
-/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
+/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenge", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["Challenge"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["ChallengeReason"]; });
@@ -5639,7 +5658,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeValue", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["ChallengeValue"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RawStorageKeys"]; });
@@ -5655,9 +5674,9 @@ var DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 
 /***/ }),
 
-/***/ "./lib/main.js":
+/***/ "./lib/main.ts":
 /*!*********************!*\
-  !*** ./lib/main.js ***!
+  !*** ./lib/main.ts ***!
   \*********************/
 /*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentActions, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedActions, PrivilegeCredentials, SNWebCrypto, SNModelManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypes, CreateItemFromPayload, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, SNPureItemPayload, SNStorageItemPayload, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSources, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -5761,7 +5780,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ValueModesKeys", function() { return _services_storage_service__WEBPACK_IMPORTED_MODULE_19__["ValueModesKeys"]; });
 
-/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
+/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Challenge", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["Challenge"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_20__["ChallengeReason"]; });
@@ -5865,7 +5884,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["platformFromString"]; });
 
-/* harmony import */ var _Lib_services__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Lib/services */ "./lib/services/index.js");
+/* harmony import */ var _Lib_services__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Lib/services */ "./lib/services/index.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Lib_services__WEBPACK_IMPORTED_MODULE_36__["SyncEvents"]; });
 
 /* harmony import */ var _Payloads_pure_item_payload__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Payloads/pure_item_payload */ "./lib/protocol/payloads/pure_item_payload.ts");
@@ -5893,7 +5912,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_43__["PayloadFormats"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_44__["StorageKeys"]; });
 
 /* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
@@ -5970,7 +5989,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_migrations_migration__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/migrations/migration */ "./lib/migrations/migration.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
@@ -6181,7 +6200,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 /* harmony import */ var _Protocol_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Protocol/index */ "./lib/protocol/index.ts");
 /* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
-/* harmony import */ var _Services_index__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/index */ "./lib/services/index.js");
+/* harmony import */ var _Services_index__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/index */ "./lib/services/index.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.ts");
 /* harmony import */ var _Services_api_session__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Services/api/session */ "./lib/services/api/session.ts");
@@ -17004,7 +17023,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.ts");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17915,7 +17934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/services/api/session */ "./lib/services/api/session.ts");
 /* harmony import */ var _messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./messages */ "./lib/services/api/messages.ts");
 
@@ -18776,10 +18795,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/storage_service */ "./lib/services/storage_service.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
-/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.js");
+/* harmony import */ var _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/challenges */ "./lib/challenges.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -19383,7 +19402,7 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 34:
-                _response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](challenge, values, null);
+                _response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](challenge, values);
                 operation.complete(_response);
 
               case 36:
@@ -22344,7 +22363,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Services_history_history_session__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/history/history_session */ "./lib/services/history/history_session.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -23273,9 +23292,9 @@ var NoteHistoryEntry = /*#__PURE__*/function (_ItemHistoryEntry) {
 
 /***/ }),
 
-/***/ "./lib/services/index.js":
+/***/ "./lib/services/index.ts":
 /*!*******************************!*\
-  !*** ./lib/services/index.js ***!
+  !*** ./lib/services/index.ts ***!
   \*******************************/
 /*! exports provided: SNAlertService, SNSessionManager, SNApiService, SNComponentManager, SNHttpService, SNModelManager, SNSingletonManager, SNActionsService, SNMigrationService, SNProtocolService, KeyMode, SNHistoryManager, SNPrivilegesService, SyncEvents, SNSyncService, SyncModes, SyncQueueStrategy, ChallengeService, SNStorageService, StorageEncryptionPolicies, StoragePersistencePolicies */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -23375,7 +23394,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/index */ "./lib/index.ts");
 /* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
 /* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.js");
 
 
@@ -26349,7 +26368,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
 /* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
@@ -27118,7 +27137,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_index__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Protocol/index */ "./lib/protocol/index.ts");
 /* harmony import */ var _protocol_operator_algorithms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../protocol/operator/algorithms */ "./lib/protocol/operator/algorithms.ts");
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.js");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 /* harmony import */ var _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/services/storage_service */ "./lib/services/storage_service.ts");
 
 
@@ -35071,9 +35090,9 @@ var ApplicationStages;
 
 /***/ }),
 
-/***/ "./lib/storage_keys.js":
+/***/ "./lib/storage_keys.ts":
 /*!*****************************!*\
-  !*** ./lib/storage_keys.js ***!
+  !*** ./lib/storage_keys.ts ***!
   \*****************************/
 /*! exports provided: RawStorageKeys, StorageKeys, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -35086,35 +35105,41 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Unmanaged keys stored in root storage
  */
-var RawStorageKeys = {
-  StorageObject: 'storage',
+var RawStorageKeys;
 
-  /** Raw storage keys exist outside of StorageManager domain */
-  LastMigrationTimestamp: 'last_migration_timestamp'
-};
+(function (RawStorageKeys) {
+  RawStorageKeys["StorageObject"] = "storage";
+  RawStorageKeys["LastMigrationTimestamp"] = "last_migration_timestamp";
+})(RawStorageKeys || (RawStorageKeys = {}));
+
+;
 /**
  * Keys used for retrieving and saving simple key/value pairs.
  * These keys are managed and are embedded inside RawStorageKeys.StorageObject
  */
 
-var StorageKeys = {
-  RootKeyParams: 'ROOT_KEY_PARAMS',
-  WrappedRootKey: 'WRAPPED_ROOT_KEY',
-  RootKeyWrapperKeyParams: 'ROOT_KEY_WRAPPER_KEY_PARAMS',
-  Session: 'session',
-  User: 'user',
-  ServerHost: 'server',
-  LegacyUuid: 'uuid',
-  LastSyncToken: 'syncToken',
-  PaginationToken: 'cursorToken',
-  BiometricPrefs: 'biometrics_prefs',
-  MobilePasscodeTiming: 'passcode_timing',
-  PrivilegesExpirey: 'SessionExpiresAtKey',
-  PrivilegesSessionLength: 'SessionLengthKey',
-  SessionHistoryPersistable: 'sessionHistory_persist',
-  SessionHistoryRevisions: 'sessionHistory_revisions',
-  SessionHistoryOptimize: 'sessionHistory_autoOptimize'
-};
+var StorageKeys;
+
+(function (StorageKeys) {
+  StorageKeys["RootKeyParams"] = "ROOT_KEY_PARAMS";
+  StorageKeys["WrappedRootKey"] = "WRAPPED_ROOT_KEY";
+  StorageKeys["RootKeyWrapperKeyParams"] = "ROOT_KEY_WRAPPER_KEY_PARAMS";
+  StorageKeys["Session"] = "session";
+  StorageKeys["User"] = "user";
+  StorageKeys["ServerHost"] = "server";
+  StorageKeys["LegacyUuid"] = "uuid";
+  StorageKeys["LastSyncToken"] = "syncToken";
+  StorageKeys["PaginationToken"] = "cursorToken";
+  StorageKeys["BiometricPrefs"] = "biometrics_prefs";
+  StorageKeys["MobilePasscodeTiming"] = "passcode_timing";
+  StorageKeys["PrivilegesExpirey"] = "SessionExpiresAtKey";
+  StorageKeys["PrivilegesSessionLength"] = "SessionLengthKey";
+  StorageKeys["SessionHistoryPersistable"] = "sessionHistory_persist";
+  StorageKeys["SessionHistoryRevisions"] = "sessionHistory_revisions";
+  StorageKeys["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
+})(StorageKeys || (StorageKeys = {}));
+
+;
 function namespacedKey(namespace, key) {
   if (namespace) {
     return "".concat(namespace, "-").concat(key);
