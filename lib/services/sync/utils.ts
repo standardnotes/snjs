@@ -7,16 +7,16 @@ import { PurePayload } from '@Payloads/pure_payload';
   * the earlier it will appear in the resulting sorted array.
   */
 export function SortPayloadsByRecentAndContentPriority(
-  payloads: PurePayload,
+  payloads: PurePayload[],
   priorityList: ContentTypes[]
 ) {
   return payloads.sort((a: PurePayload, b: PurePayload) => {
-    const dateResult = new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    const dateResult = new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime();
     let aPriority = 0;
     let bPriority = 0;
     if (priorityList) {
-      aPriority = priorityList.indexOf(a.content_type);
-      bPriority = priorityList.indexOf(b.content_type);
+      aPriority = priorityList.indexOf(a.content_type!);
+      bPriority = priorityList.indexOf(b.content_type!);
       if (aPriority === -1) {
         /** Not found in list, not prioritized. Set it to max value */
         aPriority = priorityList.length;

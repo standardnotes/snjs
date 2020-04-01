@@ -99,8 +99,6 @@ export {
 } from '@Lib/services';
 
 /** Payloads */
-export { SNPureItemPayload } from '@Payloads/pure_item_payload';
-export { SNStorageItemPayload } from '@Payloads/storage_item_payload';
 export { PayloadCollection } from '@Payloads/collection';
 export {
   CreateMaxPayloadFromAnyObject,

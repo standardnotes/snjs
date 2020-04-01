@@ -17,11 +17,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     */
     for (const received of this.applyCollection.getAllPayloads()) {
       const savedOrSaving = this.findRelatedPayload(
-        received.uuid,
+        received.uuid!,
         PayloadSources.SavedOrSaving
       );
       const decrypted = this.findRelatedPayload(
-        received.uuid,
+        received.uuid!,
         PayloadSources.DecryptedTransient
       );
       if (!decrypted) {
@@ -36,7 +36,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         conflicted.push(decrypted);
         continue;
       }
-      const base = this.findBasePayload(received.uuid);
+      const base = this.findBasePayload(received.uuid!);
       if (base && base.dirty) {
         conflicted.push(decrypted);
         continue;
@@ -52,13 +52,13 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     const conflictResults: Array<PurePayload> = [];
     for (const conflict of conflicted) {
       const decrypted = this.findRelatedPayload(
-        conflict.uuid,
+        conflict.uuid!,
         PayloadSources.DecryptedTransient
       );
       if (!decrypted) {
         continue;
       }
-      const current = this.findBasePayload(conflict.uuid);
+      const current = this.findBasePayload(conflict.uuid!);
       if (!current) {
         continue;
       }

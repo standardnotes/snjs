@@ -182,7 +182,7 @@ export class SNStorageService extends PureService {
     if (decryptedPayload.errorDecrypting) {
       throw 'Unable to decrypt storage.';
     }
-    this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.content);
+    this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
     delete this.values[ValueModesKeys.Wrapped];
   }
 
@@ -336,7 +336,7 @@ export class SNStorageService extends PureService {
 
   public async deletePayloads(payloads: PurePayload[]) {
     for (const payload of payloads) {
-      await this.deletePayloadWithId(payload.uuid);
+      await this.deletePayloadWithId(payload.uuid!);
     }
   }
 

@@ -4,6 +4,23 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+describe('payload generation', () => {
+  it('generates payload', async () => {
+    const payload = CreateMaxPayloadFromAnyObject(
+      {
+        uuid: 'foo',
+        content: {
+          title: 'All notes',
+          isSystemTag: true,
+          isAllTag: true,
+          predicate: SNPredicate.FromArray(['content_type', '=', ContentTypes.Note])
+        }
+      }
+    );
+    expect(payload).to.be.ok;
+  });
+});
+
 describe('payloads', () => {
   const sharedApplication = Factory.createApplication();
 

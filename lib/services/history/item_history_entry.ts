@@ -21,7 +21,7 @@ export class ItemHistoryEntry {
      * so be sure that the values are picked beforehand.
      */
 
-    let updated_at = payload.updated_at;
+    let updated_at = payload.updated_at!;
     if (isString(updated_at)) {
       updated_at = new Date(updated_at);
     }
@@ -39,14 +39,14 @@ export class ItemHistoryEntry {
     /** We'll try to compute the delta based on an assumed
      * content property of `text`, if it exists.
      */
-    if (this.payload.content[this.defaultContentKeyToDiffOn]) {
+    if (this.payload.contentObject[this.defaultContentKeyToDiffOn]) {
       if (previousEntry) {
         this.textCharDiffLength =
-          this.payload.content[this.defaultContentKeyToDiffOn].length
-        - previousEntry.payload.content[this.defaultContentKeyToDiffOn].length;
+          this.payload.contentObject[this.defaultContentKeyToDiffOn].length
+        - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
       } else {
         this.textCharDiffLength =
-          this.payload.content[this.defaultContentKeyToDiffOn].length;
+          this.payload.contentObject[this.defaultContentKeyToDiffOn].length;
       }
     }
   }

@@ -1,5 +1,6 @@
 import omit from 'lodash/omit';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
+import { PayloadContent } from '@Payloads/generator';
 import { ContentTypes } from '@Models/content_types';
 import { Action } from './action';
 
@@ -24,7 +25,7 @@ export class SNActionsExtension extends SNItem {
     });
   }
 
-  mapContentToLocalProperties(content: ItemContent) {
+  mapContentToLocalProperties(content: PayloadContent) {
     super.mapContentToLocalProperties(content);
     this.description = content.description;
     this.url = content.url;

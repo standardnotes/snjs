@@ -29,8 +29,8 @@ export class OfflineSyncOperation {
         payload,
         PayloadSources.LocalSaved,
         {
-          [PayloadFields.Dirty]: false,
-          [PayloadFields.LastSyncEnd]: new Date()
+          dirty: false,
+          lastSyncEnd: new Date()
         }
       );
     });

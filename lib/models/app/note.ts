@@ -1,6 +1,6 @@
 import { SNItem } from '@Models/core/item';
 import { SNTag } from '@Models/app/tag';
-import { ItemContent } from './../core/item';
+import { PayloadContent } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { removeFromArray, findInArray } from '@Lib/utils';
 import { ContentTypes } from '@Models/content_types';
@@ -20,7 +20,7 @@ export class SNNote extends SNItem {
     return ContentTypes.Note;
   }
 
-  mapContentToLocalProperties(content: ItemContent) {
+  mapContentToLocalProperties(content: PayloadContent) {
     super.mapContentToLocalProperties(content);
     this.title = content.title;
     this.text = content.text;

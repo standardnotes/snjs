@@ -1,5 +1,6 @@
 import { removeFromArray } from '@Lib/utils';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
+import { PayloadContent } from '@Payloads/generator';
 import { SNPredicate } from '@Models/core/predicate';
 
 export enum ProtectedActions {
@@ -22,7 +23,7 @@ export enum PrivilegeCredential {
  */
 export class SNPrivileges extends SNItem {
   
-  mapContentToLocalProperties(content: ItemContent) {
+  mapContentToLocalProperties(content: PayloadContent) {
     super.mapContentToLocalProperties(content);
       if(!this.errorDecrypting && !this.content.desktopPrivileges) {
         this.content.desktopPrivileges = {};

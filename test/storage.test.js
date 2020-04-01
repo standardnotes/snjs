@@ -126,7 +126,7 @@ describe('storage manager', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue
     );
-    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+    expect(payload.format).to.equal(PayloadFormats.DecryptedBareObject);
   });
 
   it('storage aftering adding passcode should be encrypted', async function () {
@@ -136,7 +136,7 @@ describe('storage manager', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue
     );
-    expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+    expect(payload.format).to.equal(PayloadFormats.EncryptedString);
   });
 
   it('storage aftering adding passcode then removing passcode should not be encrypted', async function () {
@@ -148,7 +148,7 @@ describe('storage manager', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue
     );
-    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+    expect(payload.format).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
@@ -174,7 +174,7 @@ describe('storage manager', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue
     );
-    expect(payload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+    expect(payload.format).to.equal(PayloadFormats.EncryptedString);
   }).timeout(5000);
 
   it('adding account should encrypt storage with account keys', async function () {
@@ -203,7 +203,7 @@ describe('storage manager', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue
     );
-    expect(payload.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+    expect(payload.format).to.equal(PayloadFormats.DecryptedBareObject);
   });
   
   it('adding account then passcode should encrypt storage with account keys', async function () {
@@ -237,7 +237,7 @@ describe('storage manager', () => {
       passcodeKey
     );
     expect(decrypted.errorDecrypting).to.equal(false);
-    expect(decrypted.getFormat()).to.equal(PayloadFormats.DecryptedBareObject);
+    expect(decrypted.format).to.equal(PayloadFormats.DecryptedBareObject);
   }).timeout(5000);
 
   it('disabling storage encryption should store items without encryption', async function () {

@@ -198,8 +198,8 @@ export class SNActionsService extends PureService {
       );
       if (payload) {
         const item = this.modelManager!.createItem(
-          payload.contentType,
-          payload.content
+          payload.content_type!,
+          payload.contentObject
         );
         return {
           response: response,

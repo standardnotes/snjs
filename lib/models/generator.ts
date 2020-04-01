@@ -1,4 +1,5 @@
-import { ItemContent } from '@Models/core/item';
+import { DEFAULT_APP_DOMAIN } from '@Lib/index';
+import { PayloadContent } from '@Payloads/generator';
 import { deepMerge, Copy } from '@Lib/utils';
 import { PurePayload } from '@Payloads/pure_payload';
 import * as itemClasses from '@Models/index';
@@ -18,10 +19,7 @@ const ContentTypeClassMapping: Record<any, any> = {
 };
 
 export function CreateItemFromPayload(payload: PurePayload) {
-  if (!payload.isPayload) {
-    throw 'Attempting to create item from non-payload object.';
-  }
-  const itemClass = ContentTypeClassMapping[payload.content_type] || itemClasses.SNItem;
+  const itemClass = ContentTypeClassMapping[payload.content_type!] || itemClasses.SNItem;
   // eslint-disable-next-line new-cap
   const item = new itemClass(true);
   item.updateFromPayload(payload);
@@ -36,6 +34,9 @@ export function BuildItemContent(values?: Record<string, any>) {
   const copy = values ? Copy(values) : {}
   return {
     references: [],
+    appData: {
+      [DEFAULT_APP_DOMAIN]: {}
+    },
     ...copy,
   }
 }

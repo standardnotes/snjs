@@ -1,10 +1,11 @@
-import { PayloadOverride } from '@Payloads/override';
+import { PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNComponent } from '@Models/app/component';
 import { SNTag } from '@Models/app/tag';
 import { SNNote } from './../models/app/note';
 import { SNItemsKey } from '@Models/app/items_key';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
+import { PayloadContent } from '@Payloads/generator';
 import remove from 'lodash/remove';
 import pull from 'lodash/pull';
 import { findInArray, isNullOrUndefined } from '@Lib/utils';
@@ -115,7 +116,7 @@ export class SNModelManager extends PureService {
    * to call one of the mapping functions to propagate the new values.
    * @param properties - Key/value object of new values to set
    */
-  public async setItemsProperties(items: SNItem[], properties: Record<string, any>) {
+  public async setItemsProperties(items: SNItem[], properties: Partial<Record<PayloadFields, any>>) {
     const keys = Object.keys(properties) as PayloadFields[];
     for (const item of items) {
       for (const key of keys) {
@@ -227,9 +228,6 @@ export class SNModelManager extends PureService {
       if (!payload) {
         console.error('Payload is null');
         continue;
-      }
-      if (!payload.isPayload) {
-        throw 'Attempting to map non-payload object into local model.';
       }
       if (!payload.uuid || !payload.content_type) {
         console.error('Payload is corrupt:', payload);
@@ -551,7 +549,7 @@ export class SNModelManager extends PureService {
    */
   public async createItem(
     contentType: ContentTypes,
-    content?: ItemContent,
+    content?: PayloadContent,
     add = false,
     needsSync = false,
     override?: PayloadOverride

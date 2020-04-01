@@ -1,10 +1,8 @@
-import { EncryptionParameters } from './../../payloads/encryption_parameters';
 import { SNItemsKey } from '@Models/app/items_key';
 import { SNRootKeyParams } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { CreateKeyParams } from '@Protocol/key_params';
-import { PayloadFields } from '@Payloads/fields';
 import { PayloadFormats } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersions } from '@Protocol/versions';
@@ -107,20 +105,20 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     const authHash = await this.crypto.hmac256(ciphertext, ak);
     return CreateEncryptionParameters(
       {
-        [PayloadFields.Uuid]: payload.getField(PayloadFields.Uuid),
-        [PayloadFields.ItemsKeyId]: key instanceof SNItemsKey ? key.uuid : null,
-        [PayloadFields.Content]: ciphertext,
-        [PayloadFields.EncItemKey]: encItemKey,
-        [PayloadFields.Legacy003AuthHash]: authHash,
+        uuid: payload.uuid,
+        items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+        content: ciphertext,
+        enc_item_key: encItemKey!,
+        auth_hash: authHash!,
       }
     );
   }
 
   public async generateDecryptedParameters(
-    encryptedParameters: EncryptionParameters,
+    encryptedParameters: PurePayload,
     key?: SNItemsKey | SNRootKey
   ) {
-    const format = encryptedParameters.getContentFormat();
+    const format = encryptedParameters.format;
     if ((
       format === PayloadFormats.DecryptedBareObject ||
       format === PayloadFormats.DecryptedBase64String
@@ -147,14 +145,14 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     }
     const ek = await this.firstHalfOfKey(itemKey);
     const itemParams = this.encryptionComponentsFromString(
-      encryptedParameters.content,
+      encryptedParameters.contentString,
       ek
     );
     const content = await this.decryptString(
@@ -165,18 +163,18 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     } else {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.Content]: JSON.parse(content),
-          [PayloadFields.ErrorDecrypting]: false,
-          [PayloadFields.ErrorDecryptingChanged]: encryptedParameters.errorDecrypting === true,
-          [PayloadFields.WaitingForKey]: false,
+          content: JSON.parse(content),
+          errorDecrypting: false,
+          errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+          waitingForKey: false,
         }
       );
     }

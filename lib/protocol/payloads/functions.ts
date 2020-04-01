@@ -1,12 +1,11 @@
-import { PayloadFields } from '@Payloads/fields';
+import { ContentReference } from './generator';
 import { PayloadCollection } from '@Payloads/collection';
 import { CreateItemFromPayload } from '@Models/generator';
 import remove from 'lodash/remove';
-import { CopyPayload } from '@Payloads/generator';
+import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { extendArray } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { PurePayload } from '@Payloads/pure_payload';
-import { PayloadOverride } from '@Payloads/override';
 
 export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload) {
   const itemA = CreateItemFromPayload(payloadA);
@@ -50,8 +49,8 @@ export async function PayloadsByDuplicating(
   const updatedReferencing = await PayloadsByUpdatingReferences(
     referencing,
     [{
-      uuid: copy.uuid,
-      content_type: copy.content_type
+      uuid: copy.uuid!,
+      content_type: copy.content_type!
     }]
   );
   extendArray(results, updatedReferencing);
@@ -91,10 +90,10 @@ export async function PayloadsByAlternatingUuid(
   const updatedReferencing = await PayloadsByUpdatingReferences(
     referencing,
     [{
-      uuid: copy.uuid,
-      content_type: copy.content_type
+      uuid: copy.uuid!,
+      content_type: copy.content_type!
     }],
-    [payload.uuid]
+    [payload.uuid!]
   );
 
   extendArray(results, updatedReferencing);
@@ -117,13 +116,13 @@ export async function PayloadsByAlternatingUuid(
 }
 
 async function PayloadsByUpdatingReferences(
-  payloads: Array<PurePayload>,
-  add: Array<object>,
-  removeIds?: Array<string>
+  payloads: PurePayload[],
+  add: ContentReference[],
+  removeIds?: string[]
 ) {
   const results = [];
   for (const payload of payloads) {
-    const references = payload.content.references.slice();
+    const references = payload.contentObject.references.slice();
     if (add) {
       for (const reference of add) {
         references.push(reference);

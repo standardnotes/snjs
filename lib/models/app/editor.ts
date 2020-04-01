@@ -1,5 +1,6 @@
 import { SNNote } from './note';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
+import { PayloadContent } from '@Payloads/generator';
 import { ContentTypes } from '@Models/content_types';
 import { existsInArray, removeFromArray } from '@Lib/utils';
 
@@ -16,7 +17,7 @@ export class SNEditor extends SNItem {
   public isDefault!: boolean
   public systemEditor!: boolean
 
-  mapContentToLocalProperties(content: ItemContent) {
+  mapContentToLocalProperties(content: PayloadContent) {
     super.mapContentToLocalProperties(content);
     this.url = content.url;
     this.name = content.name;

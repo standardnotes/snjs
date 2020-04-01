@@ -20,7 +20,7 @@ export class PayloadCollection {
     this.payloadMap = {};
     this.payloads = payloads;
     for (const payload of payloads) {
-      this.payloadMap[payload.uuid] = payload;
+      this.payloadMap[payload.uuid!] = payload;
     }
     Object.freeze(this);
   }
@@ -53,7 +53,7 @@ export class PayloadCollection {
         continue;
       }
       const references = findInArray(
-        candidate.content.references,
+        candidate.contentObject.references,
         'uuid',
         payload.uuid
       );

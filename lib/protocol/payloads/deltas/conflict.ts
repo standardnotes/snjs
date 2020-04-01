@@ -43,8 +43,8 @@ export class ConflictDelta {
     }
     if (strategy === ConflictStrategies.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
-        this.basePayload.updated_at,
-        this.applyPayload.updated_at
+        this.basePayload.updated_at!,
+        this.applyPayload.updated_at!
       );
       const leftPayload = CopyPayload(
         this.basePayload,
@@ -73,13 +73,13 @@ export class ConflictDelta {
 
     if (strategy === ConflictStrategies.KeepLeftMergeRefs) {
       const refs = uniqCombineObjArrays(
-        this.basePayload.content.references,
-        this.applyPayload.content.references,
+        this.basePayload.contentObject.references,
+        this.applyPayload.contentObject.references,
         ['uuid', 'content_type']
       );
       const updatedAt = greaterOfTwoDates(
-        this.basePayload.updated_at,
-        this.applyPayload.updated_at
+        this.basePayload.updated_at!,
+        this.applyPayload.updated_at!
       );
       const payload = CopyPayload(
         this.basePayload,

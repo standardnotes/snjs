@@ -112,7 +112,7 @@ export class SyncResponseResolver {
   }
 
   private finalDirtyStateForPayload(payload: PurePayload) {
-    const current = this.baseCollection.findPayload(payload.uuid);
+    const current = this.baseCollection.findPayload(payload.uuid!);
     /**
      * `current` can be null in the case of new
      * items that haven't yet been mapped
@@ -120,7 +120,7 @@ export class SyncResponseResolver {
     let stillDirty;
     if (current) {
       /** Marking items dirty after lastSyncBegan will cause them to sync again. */
-      stillDirty = current.dirtiedDate > current.lastSyncBegan;
+      stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
     } else {
       /** Forward whatever value any delta resolver may have set */
       stillDirty = payload.dirty;

@@ -5,7 +5,7 @@ import { BackupFile } from './services/protocol_service';
 import { EncryptionIntents } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ChallengeResponse } from './challenges';
@@ -15,7 +15,7 @@ import { SNPureCrypto } from 'sncrypto';
 import { Environments, Platforms } from './platforms';
 import { removeFromArray, isNullOrUndefined } from '@Lib/utils';
 import { ContentTypes } from '@Models/content_types';
-import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSources } from '@Payloads/sources';
 import { CreateItemFromPayload } from '@Models/generator';
 import {
@@ -364,7 +364,7 @@ export class SNApplication {
    */
   public async createManagedItem(
     contentType: ContentTypes,
-    content: ItemContent,
+    content: PayloadContent,
     needsSync = false,
     override?: PurePayload
   ) {
@@ -384,7 +384,7 @@ export class SNApplication {
    */
   public async createTemplateItem(
     contentType: ContentTypes,
-    content?: ItemContent
+    content?: PayloadContent
   ) {
     const item = await this.modelManager!.createItem(
       contentType,

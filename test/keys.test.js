@@ -81,7 +81,7 @@ describe('keys', () => {
           payload,
           EncryptionIntents.LocalStoragePreferEncrypted
         );
-      expect(processedPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+      expect(processedPayload.format).to.equal(PayloadFormats.EncryptedString);
     });
 
   it('has root key and one items key after registering user', async function () {
@@ -281,7 +281,7 @@ describe('keys', () => {
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject(
       itemsKeyRawPayload
     );
-    expect(itemsKeyPayload.getFormat()).to.equal(PayloadFormats.EncryptedString);
+    expect(itemsKeyPayload.format).to.equal(PayloadFormats.EncryptedString);
   });
 
   it('correctly validates local passcode', async function () {

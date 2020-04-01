@@ -29,7 +29,7 @@ export class DeltaFileImport extends PayloadsDelta {
      * would contain the most recent value.
      */
     let current = currentResults.find((candidate) => {
-      return candidate.content.conflict_of === payload.uuid;
+      return candidate.contentObject.conflict_of === payload.uuid;
     });
     /**
      * If no latest conflict, find by uuid directly.
@@ -43,7 +43,7 @@ export class DeltaFileImport extends PayloadsDelta {
      * If not found in current results, use the base value.
      */
     if (!current) {
-      current = this.findBasePayload(payload.uuid);
+      current = this.findBasePayload(payload.uuid!);
     }
     /**
      * If the current doesn't exist, we're creating a new item from payload.

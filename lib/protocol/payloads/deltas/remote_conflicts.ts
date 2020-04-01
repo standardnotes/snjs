@@ -21,14 +21,14 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
   private async collectionsByHandlingDataConflicts() {
     const results = [];
     for (const payload of this.applyCollection.getAllPayloads()) {
-      const current = this.findBasePayload(payload.uuid);
+      const current = this.findBasePayload(payload.uuid!);
       /** Could be deleted */
       if (!current) {
         results.push(payload);
         continue;
       }
       const decrypted = this.findRelatedPayload(
-        payload.uuid,
+        payload.uuid!,
         PayloadSources.DecryptedTransient
       );
       if (!decrypted) {
@@ -61,7 +61,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
     const results: Array<PurePayload> = [];
     for (const payload of this.applyCollection.getAllPayloads()) {
       const decrypted = this.findRelatedPayload(
-        payload.uuid,
+        payload.uuid!,
         PayloadSources.DecryptedTransient
       );
       const alternateResults = await PayloadsByAlternatingUuid(

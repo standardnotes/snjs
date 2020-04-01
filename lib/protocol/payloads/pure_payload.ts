@@ -1,13 +1,10 @@
-import { PayloadOverride } from '@Payloads/override';
+import { PayloadFields } from '@Payloads/index';
+import { ContentTypes } from '@Models/content_types';
+import { CreateItemFromPayload } from '@Models/generator';
 import { ProtocolVersions } from '@Protocol/versions';
-import { isNullOrUndefined, isString, isObject } from '@Lib/utils';
-import { CopyPayload } from '@Payloads/generator';
+import { isNullOrUndefined, isString, isObject, Copy, deepFreeze } from '@Lib/utils';
+import { CopyPayload, PayloadOverride, RawPayload, PayloadContent } from '@Payloads/generator';
 import { PayloadFormats } from '@Payloads/formats';
-import { PayloadFields } from '@Payloads/fields';
-
-export type RawPayload = {
-  [key: string]: any
-}
 
 /**
  * A payload is a vehicle in which item data is transported or persisted.
@@ -26,19 +23,101 @@ export type RawPayload = {
  * DecryptedBase64String, EncryptedString, or DecryptedBareObject.
  */
 export class PurePayload {
-  [index: string]: any;
+  /** When constructed, the payload takes in an array of fields that the input raw payload
+   * contains. These fields allow consumers to determine whether a given payload has an actual
+   * undefined value for payload.content, for example, or whether the payload was constructed
+   * to omit that field altogether (as in the case of server saved payloads) */
+  readonly fields: PayloadFields[]
+  readonly uuid?: string
+  readonly content_type?: ContentTypes
+  readonly content?: PayloadContent | string
+  readonly deleted?: boolean
+  readonly items_key_id?: string
+  readonly enc_item_key?: string
+  readonly created_at?: Date
+  readonly updated_at?: Date
+  readonly dirtiedDate?: Date
+  readonly dirty?: boolean
+  readonly dummy?: boolean
+  readonly errorDecrypting?: boolean
+  readonly waitingForKey?: boolean
+  readonly errorDecryptingValueChanged?: boolean
+  readonly lastSyncBegan?: Date
+  readonly lastSyncEnd?: Date
+  /** @deprecated */
+  readonly auth_hash?: string
+  /** @deprecated */
+  readonly auth_params?: any
 
-  constructor(rawPayload: RawPayload, isFromGenerator: boolean) {
-    if (!isFromGenerator) {
-      throw 'Do not construct payloads directly. Use generator functions';
-    }
-    /** Set all required fields on our instance of payload */
-    for (const field of this.fields()) {
-      const value = rawPayload[field];
-      if (!isNullOrUndefined(value)) {
-        this[field] = value;
+  readonly format: PayloadFormats
+  readonly version?: ProtocolVersions
+
+  constructor(rawPayload: RawPayload, fields: PayloadFields[]) {
+    this.fields = fields;
+    this.uuid = rawPayload.uuid;
+    this.content_type = rawPayload.content_type;
+    this.content = rawPayload.content;
+    this.deleted = rawPayload.deleted;
+    this.items_key_id = rawPayload.items_key_id;
+    this.enc_item_key = rawPayload.enc_item_key;
+    this.created_at = rawPayload.created_at;
+    this.updated_at = rawPayload.updated_at;
+    this.dirtiedDate = rawPayload.dirtiedDate;
+    this.dirty = rawPayload.dirty;
+    this.dummy = rawPayload.dummy;
+    this.errorDecrypting = rawPayload.errorDecrypting;
+    this.waitingForKey = rawPayload.waitingForKey;
+    this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
+    this.lastSyncBegan = rawPayload.lastSyncBegan;
+    this.lastSyncEnd = rawPayload.lastSyncEnd;
+    this.auth_hash = rawPayload.auth_hash;
+    this.auth_params = rawPayload.auth_params;
+    if (isString(this.content)) {
+      if ((this.content as string).startsWith(ProtocolVersions.V000Base64Decrypted)) {
+        this.format = PayloadFormats.DecryptedBase64String;
+      } else {
+        this.format = PayloadFormats.EncryptedString;
       }
+    } else if (isObject(this.content)) {
+      this.format = PayloadFormats.DecryptedBareObject;
+    } else {
+      this.format = PayloadFormats.Deleted;
     }
+    if (isString(this.content)) {
+      this.version = (this.content as string).substring(
+        0,
+        ProtocolVersions.VersionLength
+      ) as ProtocolVersions;
+    } else if(this.content){
+      this.version = (this.content as PayloadContent).version;
+    }
+    // deepFreeze(this);
+  }
+
+  get decoded() {
+    return this.format === PayloadFormats.DecryptedBareObject;
+  }
+
+  get encoded() {
+    return (
+      this.format === PayloadFormats.EncryptedString ||
+      this.format === PayloadFormats.DecryptedBase64String
+    );
+  }
+
+  get contentObject() {
+    if(this.format !== PayloadFormats.DecryptedBareObject) {
+      debugger;
+      throw Error('Attempting to access non-object content as object');
+    }
+    return this.content as PayloadContent;
+  }
+
+  get contentString() {
+    if (this.format === PayloadFormats.DecryptedBareObject) {
+      throw Error('Attempting to access non-string content as string');
+    }
+    return this.content as string;
   }
 
   mergedWith(otherPayload: PurePayload) {
@@ -48,42 +127,21 @@ export class PurePayload {
     );
   }
 
-  fields() {
-    return (this.constructor as typeof PurePayload).fields();
+  /**
+   * Whether a payload can be discarded and removed from storage.
+   * This value is true if a payload is marked as deleted and not dirty.
+   */
+  get discardable() {
+    return this.deleted && !this.dirty;
   }
 
-  static fields() : Array<PayloadFields> {
-    throw 'Must override PurePayload.fields';
-  }
-
-  getField(field: PayloadFields) {
-    return this[field] as PayloadFields;
-  }
-
-  get version() {
-    if (isString(this.content)) {
-      return this.content.substring(0, ProtocolVersions.VersionLength);
-    } else {
-      return this.content.version;
-    }
-  }
-
-  getFormat() {
-    if (isString(this.content)) {
-      if (this.content.startsWith(ProtocolVersions.V000Base64Decrypted)) {
-        return PayloadFormats.DecryptedBase64String;
-      } else {
-        return PayloadFormats.EncryptedString;
-      }
-    } else if (isObject(this.content)) {
-      return PayloadFormats.DecryptedBareObject;
-    } else {
-      throw 'Unhandle content format for payload.getFormat()';
-    }
-  }
-
-  /** Allows consumers to check if object they are inspecting is a generic object or an actual payload */
-  get isPayload() {
-    return true;
+  /**
+   * Compares the .content fields for equality, creating new SNItem objects
+   * to properly handle .content intricacies.
+   */
+  compareContentFields(otherPayload: PurePayload) {
+    const left = CreateItemFromPayload(this);
+    const right = CreateItemFromPayload(otherPayload);
+    return left.isItemContentEqualWith(right);
   }
 }

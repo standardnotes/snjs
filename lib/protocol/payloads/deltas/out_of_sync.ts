@@ -16,7 +16,7 @@ export class DeltaOutOfSync extends PayloadsDelta {
        * This is also neccessary to map the updated_at value from the server
        */
       results.push(payload);
-      const current = this.findBasePayload(payload.uuid);
+      const current = this.findBasePayload(payload.uuid!);
       if (!current) {
         continue;
       }

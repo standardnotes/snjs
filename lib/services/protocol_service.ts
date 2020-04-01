@@ -1,3 +1,4 @@
+import { RootKeyContent } from './../protocol/root_key';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvents } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
@@ -425,7 +426,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (!key && intentRequiresEncryption(intent)) {
       throw 'Attempting to generate encrypted payload with no key.';
     }
-    if (payload.getFormat() !== PayloadFormats.DecryptedBareObject) {
+    if (payload.format !== PayloadFormats.DecryptedBareObject) {
       throw 'Attempting to encrypt already encrypted payload.';
     }
     if (!payload.content) {
@@ -486,7 +487,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (!payload.content) {
       throw 'Attempting to decrypt payload that has no content.';
     }
-    const format = payload.getFormat();
+    const format = payload.format;
     if (format === PayloadFormats.DecryptedBareObject) {
       return payload;
     }
@@ -530,9 +531,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         decryptedPayloads.push(encryptedPayload);
         continue;
       }
-      if (!encryptedPayload.isPayload) {
-        throw 'Attempting to decrypt non-payload object in payloadsByDecryptingPayloads.';
-      }
       /**
        * We still want to decrypt deleted payloads if they have content in case
        * they were marked as dirty but not yet synced.
@@ -558,8 +556,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
           undefined,
           undefined,
           {
-            [PayloadFields.ErrorDecrypting]: true,
-            [PayloadFields.ErrorDecryptingChanged]: !encryptedPayload.errorDecrypting
+            errorDecrypting: true,
+            errorDecryptingValueChanged: !encryptedPayload.errorDecrypting
           }
         ));
         console.error('Error decrypting payload', encryptedPayload, e);
@@ -859,7 +857,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw Error('Unable to decrypt root key with provided wrapping key.');
     } else {
       this.rootKey = await SNRootKey.Create(
-        decrypted.content,
+        decrypted.contentObject as any,
         decrypted.uuid
       );
       await this.notifyObserversOfKeyChange();
@@ -1091,7 +1089,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (isNullOrUndefined(intent)) {
       throw 'Intent must be supplied when looking up key for encryption of item.';
     }
-    if (this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
+    if (this.contentTypeUsesRootKeyEncryption(payload.content_type!)) {
       const rootKey = await this.getRootKey();
       if (!rootKey) {
         if (intentRequiresEncryption(intent)) {
@@ -1116,7 +1114,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns The key object to use for decrypting this payload.
   */
   private async keyToUseForDecryptionOfPayload(payload: PurePayload) {
-    if (this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
+    if (this.contentTypeUsesRootKeyEncryption(payload.content_type!)) {
       return this.getRootKey();
     }
     if (payload.items_key_id) {

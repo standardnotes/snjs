@@ -1,10 +1,11 @@
-import { ItemContent, SNItem } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
+import { PayloadContent } from '@Payloads/generator';
 import { omitInPlace } from '@Lib/utils';
 import { DEFAULT_APP_DOMAIN } from '@Lib/index';
 
 export function ItemContentsEqual(
-  leftContent: ItemContent,
-  rightContent: ItemContent,
+  leftContent: PayloadContent,
+  rightContent: PayloadContent,
   keysToIgnore: string[],
   appDataKeysToIgnore: string[]
 ) {

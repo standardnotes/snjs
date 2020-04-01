@@ -1,6 +1,6 @@
 import { ContentTypes } from '@Models/content_types';
 import { PayloadSources } from '@Payloads/sources';
-import { PayloadOverride } from './../../protocol/payloads/override';
+import { PayloadContent, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { deepMerge, hasGetter, Copy, isNullOrUndefined, isString } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
@@ -13,16 +13,6 @@ export enum SingletonStrategies {
   KeepEarliest = 1
 };
 
-export type ContentReference = {
-  uuid: string
-  content_type: string
-}
-
-export type ItemContent = {
-  [key: string]: any
-  references: ContentReference[]
-}
-
 type Itemable<K extends keyof any, T> = {
   [P in K]: T;
 };
@@ -33,7 +23,7 @@ type Itemable<K extends keyof any, T> = {
 export class SNItem implements Itemable<PayloadFields, any>  {
 
   public uuid!: string
-  public content!: ItemContent
+  public content!: PayloadContent
   public deleted!: boolean
   public content_type!: ContentTypes
   public items_key_id!: string
@@ -77,7 +67,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     const fieldsToCopy = [
       PayloadFields.Content
     ];
-    for (const field of payload.fields()) {
+    for (const field of payload.fields) {
       if (hasGetter(this, field)) {
         continue;
       }
@@ -169,7 +159,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     }
   }
 
-  protected mapContentToLocalProperties(_: ItemContent) {
+  protected mapContentToLocalProperties(_: PayloadContent) {
     /** Optional override */
   }
 

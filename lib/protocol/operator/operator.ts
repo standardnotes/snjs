@@ -1,7 +1,6 @@
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
 import { SNRootKeyParams } from './../key_params';
-import { EncryptionParameters } from './../payloads/encryption_parameters';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PayloadFormats } from '@Payloads/formats';
@@ -140,18 +139,18 @@ export abstract class SNProtocolOperator {
   * items keys), or an ItemsKey (if encrypted regular items)
   */
   public async generateDecryptedParameters(
-    encryptedParameters: EncryptionParameters,
+    encryptedParameters: PurePayload,
     key?: SNItemsKey | SNRootKey,
   ) {
-    const format = encryptedParameters.getContentFormat();
+    const format = encryptedParameters.format;
     if (format === PayloadFormats.DecryptedBareObject) {
       /** No decryption required */
       return encryptedParameters;
     }
     else if (format === PayloadFormats.DecryptedBase64String) {
-      const contentString = encryptedParameters.content.substring(
+      const contentString = encryptedParameters.contentString.substring(
         ProtocolVersions.VersionLength,
-        encryptedParameters.content.length
+        encryptedParameters.contentString.length
       );
       let decodedContent;
       try {

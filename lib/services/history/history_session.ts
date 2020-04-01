@@ -50,7 +50,7 @@ export class HistorySession {
   }
 
   addEntryForPayload(payload: PurePayload) {
-    const itemHistory = this.historyForItem(payload.uuid);
+    const itemHistory = this.historyForItem(payload.uuid!);
     return itemHistory.addHistoryEntryForItem(payload);
   }
 

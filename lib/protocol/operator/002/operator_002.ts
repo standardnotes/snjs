@@ -1,12 +1,10 @@
 import { ItemsKeyContent } from './../operator';
-import { EncryptionParameters } from './../../payloads/encryption_parameters';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
 import { SNRootKeyParams } from './../../key_params';
 import { V002Algorithm } from './../algorithms';
 import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
-import { PayloadFields } from '@Payloads/fields';
 import { PayloadFormats } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersions } from '@Protocol/versions';
@@ -139,7 +137,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       itemKey,
       key.itemsKey,
       key.dataAuthenticationKey,
-      payload.uuid,
+      payload.uuid!,
       key.version
     );
     /** Encrypt content */
@@ -149,24 +147,24 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       JSON.stringify(payload.content),
       ek,
       ak,
-      payload.uuid,
+      payload.uuid!,
       key.version
     );
     return CreateEncryptionParameters(
       {
-        [PayloadFields.Uuid]: payload.getField(PayloadFields.Uuid),
-        [PayloadFields.ItemsKeyId]: key instanceof SNItemsKey ? key.uuid : null,
-        [PayloadFields.Content]: ciphertext,
-        [PayloadFields.EncItemKey]: encItemKey
+        uuid: payload.uuid,
+        items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+        content: ciphertext,
+        enc_item_key: encItemKey
       }
     );
   }
 
   public async generateDecryptedParameters(
-    encryptedParameters: EncryptionParameters,
+    encryptedParameters: PurePayload,
     key?: SNItemsKey | SNRootKey
   ) {
-    const format = encryptedParameters.getContentFormat();
+    const format = encryptedParameters.format;
     if ((
       format === PayloadFormats.DecryptedBareObject ||
       format === PayloadFormats.DecryptedBase64String
@@ -200,8 +198,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     }
@@ -209,7 +207,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const ek = await this.firstHalfOfKey(itemKey);
     const ak = await this.secondHalfOfKey(itemKey);
     const itemParams = this.encryptionComponentsFromString002(
-      encryptedParameters.content,
+      encryptedParameters.contentString,
       ek,
       ak
     );
@@ -225,8 +223,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     } else {
@@ -238,11 +236,11 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.Content]: JSON.parse(content),
-          [PayloadFields.Legacy003AuthParams]: authParams,
-          [PayloadFields.ErrorDecrypting]: false,
-          [PayloadFields.ErrorDecryptingChanged]: encryptedParameters.errorDecrypting === true,
-          [PayloadFields.WaitingForKey]: false,
+          content: JSON.parse(content),
+          auth_params: authParams,
+          errorDecrypting: false,
+          errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+          waitingForKey: false,
         }
       );
     }

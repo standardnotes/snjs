@@ -18,7 +18,7 @@ import { PayloadFields } from '@Payloads/fields';
 import { PayloadSources } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
-import { CreateMaxPayloadFromAnyObject, payloadClassForSource } from '@Payloads/generator';
+import { CreateMaxPayloadFromAnyObject, payloadFieldsForSource } from '@Payloads/generator';
 import { EncryptionIntents } from '@Protocol/intents';
 import { ContentTypes } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
@@ -460,7 +460,7 @@ export class SNSyncService extends PureService {
       payloads,
       (payload) => {
         return (
-          this.nonEncryptedTypes.includes(payload.content_type)
+          this.nonEncryptedTypes.includes(payload.content_type!)
             ? EncryptionIntents.SyncDecrypted
             : EncryptionIntents.Sync
         );
@@ -569,7 +569,7 @@ export class SNSyncService extends PureService {
     await this.modelManager!.setItemsProperties(
       items,
       {
-        [PayloadFields.LastSyncBegan]: beginDate
+        lastSyncBegan: beginDate
       }
     );
 
@@ -746,7 +746,7 @@ export class SNSyncService extends PureService {
     /** Before persisting, merge with current base value that has content field */
     const masterCollection = this.modelManager!.getMasterCollection();
     const payloadsToPersist = payloadsToMap.map((payload) => {
-      const base = masterCollection.findPayload(payload.uuid);
+      const base = masterCollection.findPayload(payload.uuid!);
       return base.mergedWith(payload);
     });
     await this.persistPayloads(payloadsToPersist);
@@ -789,7 +789,7 @@ export class SNSyncService extends PureService {
 
     const decryptedPayloads = [];
     for (const payload of response.allProcessedPayloads) {
-      if (payload.deleted || !payload.fields().includes(PayloadFields.Content)) {
+      if (payload.deleted || !payload.fields.includes(PayloadFields.Content)) {
         /* Deleted payloads, and some payload types
           do not contiain content (like remote saved) */
         continue;
@@ -809,11 +809,11 @@ export class SNSyncService extends PureService {
     for (const collection of collections) {
       await this.modelManager!.mapCollectionToLocalItems(collection);
       let payloadsToPersist;
-      const payloadClass = payloadClassForSource(collection.source!);
-      if (!payloadClass.fields().includes(PayloadFields.Content)) {
+      const fields = payloadFieldsForSource(collection.source!);
+      if (!fields.includes(PayloadFields.Content)) {
         /** Before persisting, merge with current base value that has content field */
         payloadsToPersist = collection.getAllPayloads().map((payload) => {
-          const base = masterCollection.findPayload(payload.uuid);
+          const base = masterCollection.findPayload(payload.uuid!);
           return base.mergedWith(payload);
         });
       } else {

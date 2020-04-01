@@ -1,6 +1,5 @@
 import { isString } from '@Lib/utils';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { SNItem, ItemContent } from '@Models/core/item';
+import { SNItem } from '@Models/core/item';
 import { ContentTypes } from '@Models/content_types';
 import { ConflictStrategies } from '@Payloads/index';
 

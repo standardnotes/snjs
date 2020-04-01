@@ -1,4 +1,3 @@
-import { EncryptionParameters } from './../../payloads/encryption_parameters';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
 import { SNRootKeyParams } from './../../key_params';
@@ -6,7 +5,6 @@ import { V004Algorithm } from './../algorithms';
 import { ItemsKeyContent } from './../operator';
 import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
-import { PayloadFields } from '@Payloads/fields';
 import { PayloadFormats } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersions } from '@Protocol/versions';
@@ -145,7 +143,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     if (format !== PayloadFormats.EncryptedString) {
       throw `Unsupport format for generateEncryptedParameters ${format}`;
     }
-    if (!payload.getField(PayloadFields.Uuid)) {
+    if (!payload.uuid) {
       throw 'payload.uuid cannot be null';
     }
     if (!key || !key.itemsKey) {
@@ -167,19 +165,19 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     );
     return CreateEncryptionParameters(
       {
-        [PayloadFields.Uuid]: payload.getField(PayloadFields.Uuid),
-        [PayloadFields.ItemsKeyId]: key instanceof SNItemsKey ? key.uuid : null,
-        [PayloadFields.Content]: encryptedContentString,
-        [PayloadFields.EncItemKey]: encryptedItemKey
+        uuid: payload.uuid,
+        items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+        content: encryptedContentString,
+        enc_item_key: encryptedItemKey
       }
     );
   }
 
   public async generateDecryptedParameters(
-    encryptedParameters: EncryptionParameters,
+    encryptedParameters: PurePayload,
     key?: SNItemsKey | SNRootKey
   ) {
-    const format = encryptedParameters.getContentFormat();
+    const format = encryptedParameters.format;
     if ((
       format === PayloadFormats.DecryptedBareObject ||
       format === PayloadFormats.DecryptedBase64String
@@ -194,7 +192,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     }
     /** Decrypt item_key payload. */
     const itemKeyComponents = this.deconstructEncryptedPayloadString(
-      encryptedParameters.enc_item_key
+      encryptedParameters.enc_item_key!
     );
     const itemKey = await this.decryptString004(
       itemKeyComponents.ciphertext,
@@ -207,14 +205,14 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     }
     /** Decrypt content payload. */
     const contentComponents = this.deconstructEncryptedPayloadString(
-      encryptedParameters.content
+      encryptedParameters.contentString
     );
     const content = await this.decryptString004(
       contentComponents.ciphertext,
@@ -226,18 +224,18 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.ErrorDecrypting]: true,
-          [PayloadFields.ErrorDecryptingChanged]: !encryptedParameters.errorDecrypting
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
         }
       );
     } else {
       return CopyEncryptionParameters(
         encryptedParameters,
         {
-          [PayloadFields.Content]: JSON.parse(content),
-          [PayloadFields.ErrorDecrypting]: false,
-          [PayloadFields.ErrorDecryptingChanged]: encryptedParameters.errorDecrypting === true,
-          [PayloadFields.WaitingForKey]: false,
+          content: JSON.parse(content),
+          errorDecrypting: false,
+          errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+          waitingForKey: false,
         }
       );
     }

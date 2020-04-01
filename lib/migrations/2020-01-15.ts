@@ -100,7 +100,7 @@ export class Migration20200115 extends Migration {
       newStorageRawStructure.nonwrapped[
         StorageKeys.RootKeyWrapperKeyParams
       ] = passcodeParams.getPortableValue();
-      const rawStorageValueStore = Copy(decryptedStoragePayload.content.storage);
+      const rawStorageValueStore = Copy(decryptedStoragePayload.contentObject.storage);
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
@@ -350,7 +350,7 @@ export class Migration20200115 extends Migration {
           CreateMaxPayloadFromAnyObject(wrappedAccountKey),
           passcodeKey
         );
-        const accountKeyContent = unwrappedAccountKey.content.accountKeys;
+        const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
         const defaultVersion = !isNullOrUndefined(accountKeyContent.ak)
           ? ProtocolVersions.V003
           : ProtocolVersions.V002;
