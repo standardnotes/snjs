@@ -1,4 +1,4 @@
-export enum ConflictStrategies {
+export enum ConflictStrategy {
   KeepLeft = 1,
   KeepRight = 2,
   KeepLeftDuplicateRight = 3,

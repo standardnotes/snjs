@@ -1,4 +1,4 @@
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 
 export class PayloadCollectionSet {
@@ -12,7 +12,7 @@ export class PayloadCollectionSet {
     Object.freeze(this);
   }
 
-  collectionForSource(source: PayloadSources) {
+  collectionForSource(source: PayloadSource) {
     return this.collections.find(collection => {
       return collection.source === source;
     });

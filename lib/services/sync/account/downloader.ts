@@ -1,7 +1,7 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
-import { PayloadSources } from '@Lib/protocol/payloads/sources';
+import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { SNApiService } from '../../api/api_service';
 import { SNProtocolService } from '../../protocol_service';
 
@@ -15,7 +15,7 @@ export class AccountDownloader {
 
   private apiService: SNApiService
   private protocolService: SNProtocolService
-  private contentType?: ContentTypes
+  private contentType?: ContentType
   private customEvent?: string
   private limit?: number
   private progress: Progress
@@ -23,7 +23,7 @@ export class AccountDownloader {
   constructor(
     apiService: SNApiService,
     protocolService: SNProtocolService,
-    contentType?: ContentTypes,
+    contentType?: ContentType,
     customEvent?: string,
     limit?: number
   ) {
@@ -52,7 +52,7 @@ export class AccountDownloader {
     const encryptedPayloads = response.retrieved_items.map((rawPayload: any) => {
       return CreateSourcedPayloadFromObject(
         rawPayload,
-        PayloadSources.RemoteRetrieved
+        PayloadSource.RemoteRetrieved
       );
     });
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(

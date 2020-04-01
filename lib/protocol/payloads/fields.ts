@@ -1,4 +1,4 @@
-export enum PayloadFields {
+export enum PayloadField {
   Uuid = 'uuid',
   ContentType = 'content_type',
   ItemsKeyId = 'items_key_id',

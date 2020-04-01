@@ -1,5 +1,5 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
 
@@ -35,6 +35,6 @@ export class DeltaOutOfSync extends PayloadsDelta {
       );
       extendArray(results, copyResults);
     }
-    return new PayloadCollection(results, PayloadSources.RemoteRetrieved);
+    return new PayloadCollection(results, PayloadSource.RemoteRetrieved);
   }
 }

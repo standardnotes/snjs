@@ -1,10 +1,10 @@
-export enum Environments {
+export enum Environment {
   Web = 1,
   Desktop = 2,
   Mobile = 3
 };
 
-export enum Platforms {
+export enum Platform {
   Ios = 1,
   Android = 2,
   MacWeb = 3,
@@ -17,46 +17,46 @@ export enum Platforms {
 
 export function platformFromString(string: string) {
   const map = {
-    'mac-web': Platforms.MacWeb,
-    'mac-desktop': Platforms.MacDesktop,
-    'linux-web': Platforms.LinuxWeb,
-    'linux-desktop': Platforms.LinuxDesktop,
-    'windows-web': Platforms.WindowsWeb,
-    'windows-desktop': Platforms.WindowsDesktop,
-    'ios': Platforms.Ios,
-    'android': Platforms.Android,
+    'mac-web': Platform.MacWeb,
+    'mac-desktop': Platform.MacDesktop,
+    'linux-web': Platform.LinuxWeb,
+    'linux-desktop': Platform.LinuxDesktop,
+    'windows-web': Platform.WindowsWeb,
+    'windows-desktop': Platform.WindowsDesktop,
+    'ios': Platform.Ios,
+    'android': Platform.Android,
   };
   return (map as any)[string];
 }
 
-export function platformToString(platform: Platforms) {
+export function platformToString(platform: Platform) {
   const map = {
-    [Platforms.MacWeb]: 'mac-web',
-    [Platforms.MacDesktop]: 'mac-desktop',
-    [Platforms.LinuxWeb]: 'linux-web',
-    [Platforms.LinuxDesktop]: 'linux-desktop',
-    [Platforms.WindowsWeb]: 'windows-web',
-    [Platforms.WindowsDesktop]: 'windows-desktop',
-    [Platforms.Ios]: 'ios',
-    [Platforms.Android]: 'android',
+    [Platform.MacWeb]: 'mac-web',
+    [Platform.MacDesktop]: 'mac-desktop',
+    [Platform.LinuxWeb]: 'linux-web',
+    [Platform.LinuxDesktop]: 'linux-desktop',
+    [Platform.WindowsWeb]: 'windows-web',
+    [Platform.WindowsDesktop]: 'windows-desktop',
+    [Platform.Ios]: 'ios',
+    [Platform.Android]: 'android',
   };
   return map[platform];
 }
 
-export function environmentToString(environment: Environments) {
+export function environmentToString(environment: Environment) {
   const map = {
-    [Environments.Web]: 'web',
-    [Environments.Desktop]: 'desktop',
-    [Environments.Mobile]: 'mobile',
+    [Environment.Web]: 'web',
+    [Environment.Desktop]: 'desktop',
+    [Environment.Mobile]: 'mobile',
   };
   return map[environment];
 }
 
-export function isEnvironmentWebOrDesktop(environment: Environments) {
-  return environment === Environments.Web ||
-    environment === Environments.Desktop;
+export function isEnvironmentWebOrDesktop(environment: Environment) {
+  return environment === Environment.Web ||
+    environment === Environment.Desktop;
 }
 
-export function isEnvironmentMobile(environment: Environments) {
-  return environment === Environments.Mobile;
+export function isEnvironmentMobile(environment: Environment) {
+  return environment === Environment.Mobile;
 }

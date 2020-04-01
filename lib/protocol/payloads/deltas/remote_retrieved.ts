@@ -1,5 +1,5 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 
@@ -18,11 +18,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     for (const received of this.applyCollection.getAllPayloads()) {
       const savedOrSaving = this.findRelatedPayload(
         received.uuid!,
-        PayloadSources.SavedOrSaving
+        PayloadSource.SavedOrSaving
       );
       const decrypted = this.findRelatedPayload(
         received.uuid!,
-        PayloadSources.DecryptedTransient
+        PayloadSource.DecryptedTransient
       );
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted retrieved item */
@@ -53,7 +53,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     for (const conflict of conflicted) {
       const decrypted = this.findRelatedPayload(
         conflict.uuid!,
-        PayloadSources.DecryptedTransient
+        PayloadSource.DecryptedTransient
       );
       if (!decrypted) {
         continue;
@@ -75,7 +75,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
 
     return new PayloadCollection(
       filtered.concat(conflictResults),
-      PayloadSources.RemoteRetrieved
+      PayloadSource.RemoteRetrieved
     );
   }
 }

@@ -1,6 +1,6 @@
 import { Migration } from '@Lib/migrations/migration';
-import { namespacedKey, RawStorageKeys } from '@Lib/storage_keys';
-import { ApplicationStages } from '@Lib/stages';
+import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
+import { ApplicationStage } from '@Lib/stages';
 import { isNullOrUndefined } from '@Lib/utils';
 
 export class BaseMigration extends Migration {
@@ -10,7 +10,7 @@ export class BaseMigration extends Migration {
   }
 
   protected registerStageHandlers() {
-    this.registerStageHandler(ApplicationStages.PreparingForLaunch_0, async () => {
+    this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
       await this.migrateMigrationTimestampAllPlatforms();
       this.markDone();
     });
@@ -43,7 +43,7 @@ export class BaseMigration extends Migration {
         break;
       }
     }
-    const newKey = namespacedKey(this.services.namespace, RawStorageKeys.LastMigrationTimestamp);
+    const newKey = namespacedKey(this.services.namespace, RawStorageKey.LastMigrationTimestamp);
     const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
     const hasNewStructure = !isNullOrUndefined(lastDate);
     if (!hasNewStructure && hasLegacyValue) {

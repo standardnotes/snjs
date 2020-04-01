@@ -1,4 +1,4 @@
-export enum PayloadSources {
+export enum PayloadSource {
   RemoteRetrieved = 1,
   RemoteSaved = 2,
   /* The payload returned by offline sync operation */
@@ -31,10 +31,10 @@ export enum PayloadSources {
   SessionHistory = 17
 };
 
-export function isPayloadSourceRetrieved(source: PayloadSources) {
+export function isPayloadSourceRetrieved(source: PayloadSource) {
   return [
-    PayloadSources.RemoteRetrieved,
-    PayloadSources.ComponentRetrieved,
-    PayloadSources.RemoteActionRetrieved
+    PayloadSource.RemoteRetrieved,
+    PayloadSource.ComponentRetrieved,
+    PayloadSource.RemoteActionRetrieved
   ].includes(source);
 }

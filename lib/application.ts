@@ -2,7 +2,7 @@ import { SyncEvents } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
 import { BackupFile } from './services/protocol_service';
-import { EncryptionIntents } from '@Protocol/intents';
+import { EncryptionIntent } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
 import { SNItem } from '@Models/core/item';
@@ -12,11 +12,11 @@ import { ChallengeResponse } from './challenges';
 import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto';
-import { Environments, Platforms } from './platforms';
+import { Environment, Platform } from './platforms';
 import { removeFromArray, isNullOrUndefined } from '@Lib/utils';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { CreateItemFromPayload } from '@Models/generator';
 import {
   ApplicationEvents,
@@ -67,8 +67,8 @@ type ApplicationObserver = {
 }
 type ItemStream = (
   items: SNItem[],
-  contentTypes: ContentTypes[],
-  source?: PayloadSources,
+  contentTypes: ContentType[],
+  source?: PayloadSource,
   sourceKey?: string
 ) => void
 type ObserverRemover = () => void
@@ -76,8 +76,8 @@ type ObserverRemover = () => void
 /** The main entrypoint of an application. */
 export class SNApplication {
 
-  public environment: Environments
-  public platform: Platforms
+  public environment: Environment
+  public platform: Platform
   public namespace: string
   private swapClasses?: any[]
   private skipClasses?: any[]
@@ -131,8 +131,8 @@ export class SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    */
   constructor(
-    environment: Environments,
-    platform: Platforms,
+    environment: Environment,
+    platform: Platform,
     deviceInterface: DeviceInterface,
     namespace?: string,
     crypto?: SNPureCrypto,
@@ -332,7 +332,7 @@ export class SNApplication {
     );
     await this.modelManager!.mapPayloadToLocalItem(
       dirtied,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.syncService!.sync();
   }
@@ -354,7 +354,7 @@ export class SNApplication {
   /**
    * Takes the values of the input item and emits it onto global state.
    */
-  public async mergeItem(item: SNItem, source: PayloadSources) {
+  public async mergeItem(item: SNItem, source: PayloadSource) {
     return this.modelManager!.mapItem(item, source);
   }
 
@@ -363,7 +363,7 @@ export class SNApplication {
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createManagedItem(
-    contentType: ContentTypes,
+    contentType: ContentType,
     content: PayloadContent,
     needsSync = false,
     override?: PurePayload
@@ -383,7 +383,7 @@ export class SNApplication {
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createTemplateItem(
-    contentType: ContentTypes,
+    contentType: ContentType,
     content?: PayloadContent
   ) {
     const item = await this.modelManager!.createItem(
@@ -459,11 +459,11 @@ export class SNApplication {
     return this.modelManager!.trashedItems();
   }
 
-  public getItems(contentType: ContentTypes | ContentTypes[]) {
+  public getItems(contentType: ContentType | ContentType[]) {
     return this.modelManager!.getItems(contentType);
   }
 
-  public getDisplayableItems(contentType: ContentTypes) {
+  public getDisplayableItems(contentType: ContentType) {
     return this.modelManager!.validItemsForContentType(contentType);
   }
 
@@ -492,7 +492,7 @@ export class SNApplication {
    * Begin streaming items to display in the UI.
    */
   public streamItems(
-    contentType: ContentTypes | ContentTypes[],
+    contentType: ContentType | ContentType[],
     stream: ItemStream
   ) {
     const observer = this.modelManager!.addMappingObserver(
@@ -632,7 +632,7 @@ export class SNApplication {
    */
   public async createBackupFile(
     subItems: SNItem[],
-    intent: EncryptionIntents,
+    intent: EncryptionIntent,
     returnIfEmpty = false
   ) {
     return this.protocolService!.createBackupFile(subItems, intent, returnIfEmpty);
@@ -1155,7 +1155,7 @@ export class SNApplication {
     this.historyManager = new (this.getClass(SNHistoryManager))(
       this.modelManager,
       this.storageService,
-      [ContentTypes.Note],
+      [ContentType.Note],
       this.deviceInterface!.timeout
     );
     this.services.push(this.historyManager!);

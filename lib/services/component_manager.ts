@@ -18,7 +18,7 @@ import {
 import { ComponentAreas, SNComponent } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
 import { Copy, isString, extendArray, removeFromArray } from '@Lib/utils';
-import { Platforms, Environments, platformToString, environmentToString } from '@Lib/platforms';
+import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';
@@ -131,8 +131,8 @@ export class SNComponentManager extends PureService {
   private modelManager?: SNModelManager
   private syncService?: SNSyncService
   private alertService?: SNAlertService
-  private environment: Environments
-  private platform: Platforms
+  private environment: Environment
+  private platform: Platform
   private timeout: any
   private desktopManager: any
 
@@ -147,8 +147,8 @@ export class SNComponentManager extends PureService {
     modelManager: SNModelManager,
     syncService: SNSyncService,
     alertService: SNAlertService,
-    environment: Environments,
-    platform: Platforms,
+    environment: Environment,
+    platform: Platform,
     timeout: any,
   ) {
     super();
@@ -159,17 +159,17 @@ export class SNComponentManager extends PureService {
     this.environment = environment;
     this.platform = platform;
     this.configureForGeneralUsage();
-    if (environment !== Environments.Mobile) {
+    if (environment !== Environment.Mobile) {
       this.configureForNonMobileUsage();
     }
   }
 
   get isDesktop() {
-    return this.environment === Environments.Desktop;
+    return this.environment === Environment.Desktop;
   }
 
   get isMobile() {
-    return this.environment === Environments.Mobile;
+    return this.environment === Environment.Mobile;
   }
 
   get components() {
@@ -552,7 +552,7 @@ export class SNComponentManager extends PureService {
     } else {
       let url = component.hosted_url || component.legacy_url;
       if (this.isMobile) {
-        const localReplacement = this.platform === Platforms.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+        const localReplacement = this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
         url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement);
       }
       return url;

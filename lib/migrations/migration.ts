@@ -1,7 +1,7 @@
 import { MigrationServices } from './types';
 import { OrchestratorFill } from './../services/challenge_service';
 import { SNApplication } from '../application';
-import { ApplicationStages } from '../stages';
+import { ApplicationStage } from '../stages';
 import { Challenge, ChallengeResponse } from '../challenges';
 
 type StageHandler = () => Promise<void>
@@ -16,7 +16,7 @@ export abstract class Migration {
 
   protected services: MigrationServices
   private challengeResponder?: MigrationChallengeHandler
-  private stageHandlers: Partial<Record<ApplicationStages, StageHandler>> = {}
+  private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {}
   private onDoneHandler?: () => void
 
   constructor(
@@ -34,7 +34,7 @@ export abstract class Migration {
 
   protected abstract registerStageHandlers(): void;
 
-  protected registerStageHandler(stage: ApplicationStages, handler: StageHandler) {
+  protected registerStageHandler(stage: ApplicationStage, handler: StageHandler) {
     this.stageHandlers[stage] = handler;
   }
 
@@ -47,7 +47,7 @@ export abstract class Migration {
     this.onDoneHandler = callback;
   }
 
-  async handleStage(stage: ApplicationStages) {
+  async handleStage(stage: ApplicationStage) {
     const handler = this.stageHandlers[stage];
     if (handler) {
       await handler();

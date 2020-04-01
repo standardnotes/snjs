@@ -1,12 +1,12 @@
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { SNStorageService } from '@Services/index';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { SNModelManager } from './../model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { HistorySession } from '@Services/history/history_session';
-import { PayloadSources } from '@Payloads/sources';
-import { StorageKeys } from '@Lib/storage_keys';
+import { PayloadSource } from '@Payloads/sources';
+import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 
 const PERSIST_TIMEOUT = 2000;
@@ -22,7 +22,7 @@ export class SNHistoryManager extends PureService {
 
   private modelManager?: SNModelManager
   private storageService?: SNStorageService
-  private contentTypes: ContentTypes[] = []
+  private contentTypes: ContentType[] = []
   private timeout: any
   private historySession?: HistorySession
   private removeMappingObserver: any
@@ -33,7 +33,7 @@ export class SNHistoryManager extends PureService {
   constructor(
     modelManager: SNModelManager,
     storageService: SNStorageService,
-    contentTypes: ContentTypes[],
+    contentTypes: ContentType[],
     timeout: any
   ) {
     super();
@@ -58,15 +58,15 @@ export class SNHistoryManager extends PureService {
 
   async initializeFromDisk() {
     this.persistable = await this.storageService!.getValue(
-      StorageKeys.SessionHistoryPersistable
+      StorageKey.SessionHistoryPersistable
     );
     this.historySession = await this.storageService!.getValue(
-      StorageKeys.SessionHistoryRevisions
+      StorageKey.SessionHistoryRevisions
     ).then((historyValue) => {
       return HistorySession.FromJson(historyValue);
     });
     const autoOptimize = await this.storageService!.getValue(
-      StorageKeys.SessionHistoryOptimize
+      StorageKey.SessionHistoryOptimize
     );
     if (isNullOrUndefined(autoOptimize)) {
       /** Default to true */
@@ -81,7 +81,7 @@ export class SNHistoryManager extends PureService {
     this.removeMappingObserver = this.modelManager!.addMappingObserver(
       this.contentTypes,
       async (allItems, _, __, source, ___) => {
-        if (source === PayloadSources.LocalDirtied) {
+        if (source === PayloadSource.LocalDirtied) {
           return;
         }
         for (const item of allItems) {
@@ -110,7 +110,7 @@ export class SNHistoryManager extends PureService {
       return;
     }
     this.storageService!.setValue(
-      StorageKeys.SessionHistoryRevisions,
+      StorageKey.SessionHistoryRevisions,
       this.historySession
     );
   }
@@ -120,7 +120,7 @@ export class SNHistoryManager extends PureService {
   }
 
   async addHistoryEntryForItem(item: SNItem) {
-    const payload = CreateSourcedPayloadFromObject(item, PayloadSources.SessionHistory)
+    const payload = CreateSourcedPayloadFromObject(item, PayloadSource.SessionHistory)
     const entry = this.historySession!.addEntryForPayload(payload);
     if (this.autoOptimize) {
       this.historySession!.optimizeHistoryForItem(item.uuid);
@@ -152,7 +152,7 @@ export class SNHistoryManager extends PureService {
   async clearAllHistory() {
     this.historySession!.clearAllHistory();
     return this.storageService!.removeValue(
-      StorageKeys.SessionHistoryRevisions
+      StorageKey.SessionHistoryRevisions
     );
   }
 
@@ -160,17 +160,17 @@ export class SNHistoryManager extends PureService {
     this.persistable = !this.persistable;
     if (this.persistable) {
       this.storageService!.setValue(
-        StorageKeys.SessionHistoryPersistable,
+        StorageKey.SessionHistoryPersistable,
         true
       );
       this.saveToDisk();
     } else {
       this.storageService!.setValue(
-        StorageKeys.SessionHistoryPersistable,
+        StorageKey.SessionHistoryPersistable,
         false
       );
       return this.storageService!.removeValue(
-        StorageKeys.SessionHistoryRevisions
+        StorageKey.SessionHistoryRevisions
       );
     }
   }
@@ -179,12 +179,12 @@ export class SNHistoryManager extends PureService {
     this.autoOptimize = !this.autoOptimize;
     if (this.autoOptimize) {
       this.storageService!.setValue(
-        StorageKeys.SessionHistoryOptimize,
+        StorageKey.SessionHistoryOptimize,
         true
       );
     } else {
       this.storageService!.setValue(
-        StorageKeys.SessionHistoryOptimize,
+        StorageKey.SessionHistoryOptimize,
         false
       );
     }

@@ -2,7 +2,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { SyncResponse } from '@Services/sync/response';
 
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadCollectionSet } from '@Payloads/collection_set';
 import { CreateSourcedPayloadFromObject, CopyPayload } from '@Payloads/generator';
@@ -30,11 +30,11 @@ export class SyncResponseResolver {
     this.relatedCollectionSet = new PayloadCollectionSet([
       new PayloadCollection(
         decryptedResponsePayloads,
-        PayloadSources.DecryptedTransient
+        PayloadSource.DecryptedTransient
       ),
       new PayloadCollection(
         payloadsSavedOrSaving,
-        PayloadSources.SavedOrSaving
+        PayloadSource.SavedOrSaving
       )
     ]);
   }
@@ -44,7 +44,7 @@ export class SyncResponseResolver {
 
     const collectionRetrieved = await this.collectionByProcessingRawItems(
       this.response.rawRetrievedItems,
-      PayloadSources.RemoteRetrieved
+      PayloadSource.RemoteRetrieved
     );
     if (collectionRetrieved.getAllPayloads().length > 0) {
       collections.push(collectionRetrieved);
@@ -52,7 +52,7 @@ export class SyncResponseResolver {
 
     const collectionSaved = await this.collectionByProcessingRawItems(
       this.response.rawSavedItems,
-      PayloadSources.RemoteSaved
+      PayloadSource.RemoteSaved
     );
     if (collectionSaved.getAllPayloads().length > 0) {
       collections.push(collectionSaved);
@@ -60,7 +60,7 @@ export class SyncResponseResolver {
 
     const collectionUuidConflicts = await this.collectionByProcessingRawItems(
       this.response.rawUuidConflictItems,
-      PayloadSources.ConflictUuid
+      PayloadSource.ConflictUuid
     );
 
     if (collectionUuidConflicts.getAllPayloads().length > 0) {
@@ -69,7 +69,7 @@ export class SyncResponseResolver {
 
     const collectionDataConflicts = await this.collectionByProcessingRawItems(
       this.response.rawDataConflictItems,
-      PayloadSources.ConflictData
+      PayloadSource.ConflictData
     );
     if (collectionDataConflicts.getAllPayloads().length > 0) {
       collections.push(collectionDataConflicts);
@@ -78,7 +78,7 @@ export class SyncResponseResolver {
     return collections;
   }
 
-  private async collectionByProcessingRawItems(rawItems: any[], source: PayloadSources) {
+  private async collectionByProcessingRawItems(rawItems: any[], source: PayloadSource) {
     const payloads = rawItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,

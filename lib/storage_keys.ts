@@ -1,7 +1,7 @@
 /**
  * Unmanaged keys stored in root storage
  */
-export enum RawStorageKeys {
+export enum RawStorageKey {
   StorageObject = 'storage',
   /** Raw storage keys exist outside of StorageManager domain */
   LastMigrationTimestamp = 'last_migration_timestamp',
@@ -11,7 +11,7 @@ export enum RawStorageKeys {
  * Keys used for retrieving and saving simple key/value pairs.
  * These keys are managed and are embedded inside RawStorageKeys.StorageObject
  */
-export enum StorageKeys {
+export enum StorageKey {
   RootKeyParams = 'ROOT_KEY_PARAMS',
   WrappedRootKey = 'WRAPPED_ROOT_KEY',
   RootKeyWrapperKeyParams = 'ROOT_KEY_WRAPPER_KEY_PARAMS',

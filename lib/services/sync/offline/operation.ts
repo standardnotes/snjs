@@ -1,8 +1,8 @@
 import { PurePayload } from '@Payloads/pure_payload';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SyncSignal, ResponseSignalReceiver } from '@Services/sync/signals';
-import { PayloadFields } from '@Payloads/fields';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadField } from '@Payloads/fields';
+import { PayloadSource } from '@Payloads/sources';
 import { SyncResponse } from '@Services/sync/response';
 import { Copy } from '@Lib/utils';
 
@@ -27,7 +27,7 @@ export class OfflineSyncOperation {
     const responsePayloads = this.payloads.map((payload) => {
       return CreateSourcedPayloadFromObject(
         payload,
-        PayloadSources.LocalSaved,
+        PayloadSource.LocalSaved,
         {
           dirty: false,
           lastSyncEnd: new Date()

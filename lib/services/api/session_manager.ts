@@ -7,7 +7,7 @@ import { HttpResponse } from './http_service';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
 import { SNAlertService } from '@Services/alert_service';
-import { StorageKeys } from '@Lib/storage_keys';
+import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
 
@@ -63,16 +63,16 @@ export class SNSessionManager extends PureService {
   }
 
   public async initializeFromDisk() {
-    this.user = await this.storageService!.getValue(StorageKeys.User);
+    this.user = await this.storageService!.getValue(StorageKey.User);
     if (!this.user) {
       /** @legacy Check for uuid. */
-      const uuid = await this.storageService!.getValue(StorageKeys.LegacyUuid);
+      const uuid = await this.storageService!.getValue(StorageKey.LegacyUuid);
       if (uuid) {
         this.user = { uuid: uuid };
       }
     }
 
-    const rawSession = await this.storageService!.getValue(StorageKeys.Session);
+    const rawSession = await this.storageService!.getValue(StorageKey.Session);
     if (rawSession) {
       await this.setSession(Session.FromRaw(rawSession));
     }
@@ -282,9 +282,9 @@ export class SNSessionManager extends PureService {
     }
     const user = response.user;
     this.user = user;
-    await this.storageService!.setValue(StorageKeys.User, user);
+    await this.storageService!.setValue(StorageKey.User, user);
     const session = new Session(response.token);
-    await this.storageService!.setValue(StorageKeys.Session, session);
+    await this.storageService!.setValue(StorageKey.Session, session);
     await this.setSession(session);
   }
 }

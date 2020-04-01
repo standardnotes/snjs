@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
@@ -13,7 +13,7 @@ export class DeltaFileImport extends PayloadsDelta {
       const payloads = await this.payloadsByHandlingPayload(payload, results);
       extendArray(results, payloads);
     }
-    return new PayloadCollection(results, PayloadSources.FileImport);
+    return new PayloadCollection(results, PayloadSource.FileImport);
   }
 
   private async payloadsByHandlingPayload(
@@ -56,7 +56,7 @@ export class DeltaFileImport extends PayloadsDelta {
       this.baseCollection,
       current,
       payload,
-      PayloadSources.FileImport
+      PayloadSource.FileImport
     );
     const deltaCollection = await delta.resultingCollection();
     return deltaCollection.getAllPayloads();

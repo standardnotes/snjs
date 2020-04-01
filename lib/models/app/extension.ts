@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import { SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { Action } from './action';
 
 /**
@@ -40,7 +40,7 @@ export class SNActionsExtension extends SNItem {
   }
 
   getDefaultContentType() {
-    return ContentTypes.ActionsExtension;
+    return ContentType.ActionsExtension;
   }
 
   structureParams() {

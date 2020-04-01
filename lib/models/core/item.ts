@@ -1,5 +1,5 @@
-import { ContentTypes } from '@Models/content_types';
-import { PayloadSources } from '@Payloads/sources';
+import { ContentType } from '@Models/content_types';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadContent, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { deepMerge, hasGetter, Copy, isNullOrUndefined, isString } from '@Lib/utils';
@@ -25,7 +25,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
   public uuid!: string
   public content!: PayloadContent
   public deleted!: boolean
-  public content_type!: ContentTypes
+  public content_type!: ContentType
   public items_key_id!: string
   public enc_item_key!: string
   public created_at!: Date
@@ -124,7 +124,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     );
   }
 
-  protected getDefaultContentType() : ContentTypes | null {
+  protected getDefaultContentType() : ContentType | null {
     return null;
   }
 
@@ -312,7 +312,7 @@ export class SNItem implements Itemable<PayloadFields, any>  {
     this.referencedItems = {};
   }
 
-  public didCompleteMapping(_: PayloadSources) {
+  public didCompleteMapping(_: PayloadSource) {
     for (const item of this.allReferencedItems) {
       item.referencingItemCompletedMapping(this);
     }

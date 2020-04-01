@@ -1,15 +1,15 @@
 import { Session } from './session';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
 import { SNHttpService, HttpResponse } from './http_service';
 import merge from 'lodash/merge';
-import { ApiEndpointParams } from '@Services/api/keys';
+import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
 import { isObject, isString, joinPaths } from '@Lib/utils';
-import { StorageKeys } from '@Lib/storage_keys';
+import { StorageKey } from '@Lib/storage_keys';
 
 const REQUEST_PATH_KEY_PARAMS = '/auth/params';
 const REQUEST_PATH_REGISTER = '/auth';
@@ -45,13 +45,13 @@ export class SNApiService extends PureService {
   }
 
   public async loadHost() {
-    const storedValue = await this.storageService!.getValue(StorageKeys.ServerHost);
+    const storedValue = await this.storageService!.getValue(StorageKey.ServerHost);
     this.host = storedValue || (window as any)._default_sync_server;
   }
 
   public async setHost(host: string) {
     this.host = host;
-    await this.storageService!.setValue(StorageKeys.ServerHost, host);
+    await this.storageService!.setValue(StorageKey.ServerHost, host);
   }
 
   public async getHost() {
@@ -75,7 +75,7 @@ export class SNApiService extends PureService {
 
   private params(inParams: any) {
     const params = merge(inParams, {
-      [ApiEndpointParams.ApiVersion]: API_VERSION
+      [ApiEndpointParam.ApiVersion]: API_VERSION
     });
     return params;
   }
@@ -208,16 +208,16 @@ export class SNApiService extends PureService {
     paginationToken: string,
     limit: number,
     checkIntegrity = false,
-    contentType?: ContentTypes,
+    contentType?: ContentType,
     customEvent?: string
   ) {
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
-      [ApiEndpointParams.SyncPayloads]: payloads,
-      [ApiEndpointParams.LastSyncToken]: lastSyncToken,
-      [ApiEndpointParams.PaginationToken]: paginationToken,
-      [ApiEndpointParams.IntegrityCheck]: checkIntegrity,
-      [ApiEndpointParams.SyncDlLimit]: limit,
+      [ApiEndpointParam.SyncPayloads]: payloads,
+      [ApiEndpointParam.LastSyncToken]: lastSyncToken,
+      [ApiEndpointParam.PaginationToken]: paginationToken,
+      [ApiEndpointParam.IntegrityCheck]: checkIntegrity,
+      [ApiEndpointParam.SyncDlLimit]: limit,
       content_type: contentType,
       event: customEvent
     });

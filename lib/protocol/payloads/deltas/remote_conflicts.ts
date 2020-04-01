@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { extendArray } from '@Lib/utils';
@@ -9,9 +9,9 @@ import { PurePayload } from '../pure_payload';
 export class DeltaRemoteConflicts extends PayloadsDelta {
 
   public async resultingCollection() {
-    if (this.applyCollection.source === PayloadSources.ConflictUuid) {
+    if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts();
-    } else if (this.applyCollection.source === PayloadSources.ConflictData) {
+    } else if (this.applyCollection.source === PayloadSource.ConflictData) {
       return this.collectionsByHandlingDataConflicts();
     } else {
       throw `Unhandled conflict type ${this.applyCollection.source}`;
@@ -29,7 +29,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       }
       const decrypted = this.findRelatedPayload(
         payload.uuid!,
-        PayloadSources.DecryptedTransient
+        PayloadSource.DecryptedTransient
       );
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted payload */
@@ -43,13 +43,13 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         this.baseCollection,
         current,
         decrypted,
-        PayloadSources.ConflictData
+        PayloadSource.ConflictData
       );
       const deltaCollection = await delta.resultingCollection();
       const payloads = deltaCollection.getAllPayloads();
       extendArray(results, payloads);
     }
-    return new PayloadCollection(results, PayloadSources.RemoteRetrieved);
+    return new PayloadCollection(results, PayloadSource.RemoteRetrieved);
   }
 
   /**
@@ -62,7 +62,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
     for (const payload of this.applyCollection.getAllPayloads()) {
       const decrypted = this.findRelatedPayload(
         payload.uuid!,
-        PayloadSources.DecryptedTransient
+        PayloadSource.DecryptedTransient
       );
       const alternateResults = await PayloadsByAlternatingUuid(
         decrypted!,
@@ -71,6 +71,6 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       extendArray(results, alternateResults);
     }
 
-    return new PayloadCollection(results, PayloadSources.RemoteRetrieved);
+    return new PayloadCollection(results, PayloadSource.RemoteRetrieved);
   }
 }

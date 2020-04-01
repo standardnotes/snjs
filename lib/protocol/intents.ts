@@ -1,4 +1,4 @@
-export enum EncryptionIntents {
+export enum EncryptionIntent {
   Sync = 0,
   /** Permissible only for server extensions */
   SyncDecrypted = 1,
@@ -11,37 +11,37 @@ export enum EncryptionIntents {
   FilePreferEncrypted = 7,
 };
 
-export function isLocalStorageIntent(intent: EncryptionIntents) {
+export function isLocalStorageIntent(intent: EncryptionIntent) {
   return (
-    intent === EncryptionIntents.LocalStorageEncrypted ||
-    intent === EncryptionIntents.LocalStorageDecrypted ||
-    intent === EncryptionIntents.LocalStoragePreferEncrypted
+    intent === EncryptionIntent.LocalStorageEncrypted ||
+    intent === EncryptionIntent.LocalStorageDecrypted ||
+    intent === EncryptionIntent.LocalStoragePreferEncrypted
   );
 }
 
-export function isFileIntent(intent: EncryptionIntents) {
+export function isFileIntent(intent: EncryptionIntent) {
   return (
-    intent === EncryptionIntents.FileEncrypted ||
-    intent === EncryptionIntents.FileDecrypted ||
-    intent === EncryptionIntents.FilePreferEncrypted
+    intent === EncryptionIntent.FileEncrypted ||
+    intent === EncryptionIntent.FileDecrypted ||
+    intent === EncryptionIntent.FilePreferEncrypted
   );
 }
 
-export function isDecryptedIntent(intent: EncryptionIntents) {
+export function isDecryptedIntent(intent: EncryptionIntent) {
   return (
-    intent === EncryptionIntents.SyncDecrypted ||
-    intent === EncryptionIntents.LocalStorageDecrypted ||
-    intent === EncryptionIntents.FileDecrypted
+    intent === EncryptionIntent.SyncDecrypted ||
+    intent === EncryptionIntent.LocalStorageDecrypted ||
+    intent === EncryptionIntent.FileDecrypted
   );
 }
 
 /**
  * @returns {boolean}  True if the intent requires encryption.
  */
-export function intentRequiresEncryption(intent: EncryptionIntents) {
+export function intentRequiresEncryption(intent: EncryptionIntent) {
   return (
-    intent === EncryptionIntents.Sync ||
-    intent === EncryptionIntents.LocalStorageEncrypted ||
-    intent === EncryptionIntents.FileEncrypted
+    intent === EncryptionIntent.Sync ||
+    intent === EncryptionIntent.LocalStorageEncrypted ||
+    intent === EncryptionIntent.FileEncrypted
   );
 }

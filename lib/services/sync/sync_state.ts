@@ -1,4 +1,4 @@
-import { SyncEvents, SyncEventReceiver } from '@Lib/services/sync/events';
+import { SyncEvent, SyncEventReceiver } from '@Lib/services/sync/events';
 
 export class SyncState {
 
@@ -56,14 +56,14 @@ export class SyncState {
     if (isInSync) {
       if (this.outOfSync) {
         this.outOfSync = false;
-        this.receiver(SyncEvents.ExitOutOfSync);
+        this.receiver(SyncEvent.ExitOutOfSync);
       }
       this.discordance = 0;
     } else {
       this.discordance++;
       if (this.discordance >= this.maxDiscordance && !this.outOfSync) {
         this.outOfSync = true;
-        this.receiver(SyncEvents.EnterOutOfSync);
+        this.receiver(SyncEvent.EnterOutOfSync);
       }
     }
   }

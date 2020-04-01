@@ -14,7 +14,7 @@ import {
   ApplicationStages
 } from '@Lib/index';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/index';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import {
   Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
 } from '@Lib/utils';
@@ -516,7 +516,7 @@ export class Migration20200115 extends Migration {
       await itemsKey.initUUID();
       await this.services.modelManager.mapItem(
         itemsKey,
-        PayloadSources.LocalChanged
+        PayloadSource.LocalChanged
       );
       await this.services.modelManager.setItemDirty(itemsKey);
     }

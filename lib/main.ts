@@ -75,21 +75,21 @@ export {
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
-  EncryptionIntents,
+  EncryptionIntent as EncryptionIntents,
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
   intentRequiresEncryption
 } from '@Protocol/intents';
-export { ContentTypes } from '@Models/content_types';
+export { ContentType as ContentTypes } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';
 
 export {
   ApplicationEvents
 } from '@Lib/events';
 export {
-  Environments,
-  Platforms,
+  Environment as Environments,
+  Platform as Platforms,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile,
   platformFromString
@@ -105,16 +105,16 @@ export {
   CreateSourcedPayloadFromObject
 } from '@Payloads/generator';
 export {
-  PayloadSources,
+  PayloadSource as PayloadSources,
   isPayloadSourceRetrieved
 } from '@Lib/protocol/payloads/sources';
-export { ProtocolVersions } from '@Lib/protocol/versions';
+export { ProtocolVersion as ProtocolVersions } from '@Lib/protocol/versions';
 export {
-  PayloadFormats,
+  PayloadFormat as PayloadFormats,
 } from '@Payloads/formats';
 
 export {
-  StorageKeys,
+  StorageKey as StorageKeys,
 } from '@Lib/storage_keys';
 
 /** Migrations */

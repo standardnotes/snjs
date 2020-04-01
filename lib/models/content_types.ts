@@ -1,4 +1,4 @@
-export enum ContentTypes {
+export enum ContentType {
   Any = '*',
   Item = 'SF|Item',
   RootKey = 'SN|RootKey|NoSync',
@@ -22,20 +22,20 @@ export enum ContentTypes {
   ExtensionRepo = 'SN|ExtensionRepo'
 };
 
-export function displayStringForContentType(contentType: ContentTypes) {
+export function displayStringForContentType(contentType: ContentType) {
   const map: Record<any, string> = {
-    [ContentTypes.Note] : 'note',
-    [ContentTypes.Tag] : 'tag',
-    [ContentTypes.SmartTag] : 'smart tag',
-    [ContentTypes.ActionsExtension] : 'action-based extension',
-    [ContentTypes.Component] : 'component',
-    [ContentTypes.Editor] : 'editor',
-    [ContentTypes.Theme] : 'theme',
-    [ContentTypes.ServerExtension] : 'server extension',
-    [ContentTypes.Mfa] : 'two-factor authentication setting',
-    [ContentTypes.FilesafeCredentials]: 'FileSafe credential',
-    [ContentTypes.FilesafeFileMetadata]: 'FileSafe file',
-    [ContentTypes.FilesafeIntegration]: 'FileSafe integration'
+    [ContentType.Note] : 'note',
+    [ContentType.Tag] : 'tag',
+    [ContentType.SmartTag] : 'smart tag',
+    [ContentType.ActionsExtension] : 'action-based extension',
+    [ContentType.Component] : 'component',
+    [ContentType.Editor] : 'editor',
+    [ContentType.Theme] : 'theme',
+    [ContentType.ServerExtension] : 'server extension',
+    [ContentType.Mfa] : 'two-factor authentication setting',
+    [ContentType.FilesafeCredentials]: 'FileSafe credential',
+    [ContentType.FilesafeFileMetadata]: 'FileSafe file',
+    [ContentType.FilesafeIntegration]: 'FileSafe integration'
   };
   return map[contentType];
 }

@@ -42,8 +42,8 @@ import {
   EncryptionIntents
 } from '@Protocol/index';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ContentTypes } from '@Models/content_types';
-import { StorageKeys } from '@Lib/storage_keys';
+import { ContentType } from '@Models/content_types';
+import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
 
@@ -136,7 +136,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       writable: true
     });
     this.removeMappingObserver = this.modelManager.addMappingObserver(
-      [ContentTypes.ItemsKey],
+      [ContentType.ItemsKey],
       async () => {
         await this.decryptErroredItems();
       }
@@ -739,7 +739,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async getRootKeyWrapperKeyParams() {
     const rawKeyParams = await this.storageService!.getValue(
-      StorageKeys.RootKeyWrapperKeyParams,
+      StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
     if (!rawKeyParams) {
@@ -753,7 +753,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   private async getWrappedRootKey() {
     return this.storageService!.getValue(
-      StorageKeys.WrappedRootKey,
+      StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
   }
@@ -780,7 +780,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async getAccountKeyParams() {
     const rawKeyParams = await this.storageService!.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     if (!rawKeyParams) {
@@ -892,7 +892,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         );
       }
       await this.storageService!.setValue(
-        StorageKeys.RootKeyWrapperKeyParams,
+        StorageKey.RootKeyWrapperKeyParams,
         keyParams.getPortableValue(),
         StorageValueModes.Nonwrapped
       );
@@ -921,7 +921,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       wrappingKey,
     );
     await this.storageService!.setValue(
-      StorageKeys.WrappedRootKey,
+      StorageKey.WrappedRootKey,
       wrappedKey,
       StorageValueModes.Nonwrapped
     );
@@ -944,11 +944,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       this.keyMode = KeyMode.RootKeyOnly;
     }
     await this.storageService!.removeValue(
-      StorageKeys.WrappedRootKey,
+      StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
     await this.storageService!.removeValue(
-      StorageKeys.RootKeyWrapperKeyParams,
+      StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
     if (this.keyMode === KeyMode.RootKeyOnly) {
@@ -990,7 +990,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     this.rootKey = key;
     await this.storageService!.setValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       keyParams.getPortableValue(),
       StorageValueModes.Nonwrapped
     );
@@ -1019,15 +1019,15 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async clearLocalKeyState() {
     await this.deviceInterface!.clearKeychainValue();
     await this.storageService!.removeValue(
-      StorageKeys.WrappedRootKey,
+      StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
     await this.storageService!.removeValue(
-      StorageKeys.RootKeyWrapperKeyParams,
+      StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
     await this.storageService!.removeValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     this.keyMode = KeyMode.RootKeyNone;
@@ -1071,10 +1071,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * - An SNItemsKey object
    * - An encrypted storage object (local)
    */
-  public contentTypeUsesRootKeyEncryption(contentType: ContentTypes) {
+  public contentTypeUsesRootKeyEncryption(contentType: ContentType) {
     return (
-      contentType === ContentTypes.ItemsKey ||
-      contentType === ContentTypes.EncryptedStorage
+      contentType === ContentType.ItemsKey ||
+      contentType === ContentType.EncryptedStorage
     );
   }
 
@@ -1280,7 +1280,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
       /** Create root key based items key */
       const payload = CreateMaxPayloadFromAnyObject({
-        content_type: ContentTypes.ItemsKey,
+        content_type: ContentType.ItemsKey,
         content: {
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,

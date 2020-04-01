@@ -1,5 +1,5 @@
 import { omitByCopy } from '@Lib/utils';
-import { ProtocolVersions, compareVersions } from '@Protocol/versions';
+import { ProtocolVersion, compareVersions } from '@Protocol/versions';
 
 export type KeyParamsContent = {
   pw_cost: number
@@ -7,7 +7,7 @@ export type KeyParamsContent = {
   identifier?: string
   email?: string
   pw_salt?: string
-  version: ProtocolVersions
+  version: ProtocolVersion
 }
 
 export function CreateKeyParams(keyParams: KeyParamsContent) {
@@ -66,7 +66,7 @@ export class SNRootKeyParams {
      * locally depending on the version.
      * Versions <= 002 had dynamic kdfIterations, so these values must be transfered.
      */
-    if(compareVersions(this.version, ProtocolVersions.V003) >= 0) {
+    if(compareVersions(this.version, ProtocolVersion.V003) >= 0) {
       return omitByCopy(this.content, ['pw_cost']);
     } else {
       return this.content;

@@ -1,5 +1,5 @@
 import { removeFromArray } from '@Lib/utils';
-import { ApplicationStages } from '@Lib/stages';
+import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 
 type EventObserver = (eventName: string, data: any) => Promise<void>
@@ -36,7 +36,7 @@ export abstract class PureService {
   * Application instances will call this function directly when they arrive
   * at a certain migratory state.
   */
-  public async handleApplicationStage(stage: ApplicationStages) {
+  public async handleApplicationStage(stage: ApplicationStage) {
 
   }
 

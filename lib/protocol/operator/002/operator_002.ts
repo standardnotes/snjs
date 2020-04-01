@@ -5,9 +5,9 @@ import { SNRootKeyParams } from './../../key_params';
 import { V002Algorithm } from './../algorithms';
 import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
-import { PayloadFormats } from '@Payloads/formats';
+import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { base64Decode } from 'sncrypto';
 
@@ -18,7 +18,7 @@ import { base64Decode } from 'sncrypto';
 export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   get version() {
-    return ProtocolVersions.V002;
+    return ProtocolVersion.V002;
   }
 
   protected async generateNewItemsKeyContent() {
@@ -80,7 +80,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     encryptionKey: string,
     authKey: string,
     uuid: string,
-    version: ProtocolVersions
+    version: ProtocolVersion
   ) {
     const iv = await this.crypto.generateRandomKey(V002Algorithm.EncryptionIvLength);
     const contentCiphertext = await this.encryptString002(string, encryptionKey, iv);
@@ -111,16 +111,16 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   public async generateEncryptedParameters(
     payload: PurePayload,
-    format: PayloadFormats,
+    format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
   ) {
     if ((
-      format === PayloadFormats.DecryptedBareObject ||
-      format === PayloadFormats.DecryptedBase64String
+      format === PayloadFormat.DecryptedBareObject ||
+      format === PayloadFormat.DecryptedBase64String
     )) {
       return super.generateEncryptedParameters(payload, format, key);
     }
-    if (format !== PayloadFormats.EncryptedString) {
+    if (format !== PayloadFormat.EncryptedString) {
       throw `Unsupport format for generateEncryptedParameters ${format}`;
     }
     if (!key || !key.itemsKey) {
@@ -166,8 +166,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   ) {
     const format = encryptedParameters.format;
     if ((
-      format === PayloadFormats.DecryptedBareObject ||
-      format === PayloadFormats.DecryptedBase64String
+      format === PayloadFormat.DecryptedBareObject ||
+      format === PayloadFormat.DecryptedBase64String
     )) {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }

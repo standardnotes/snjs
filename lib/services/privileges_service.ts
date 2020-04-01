@@ -6,7 +6,7 @@ import { SNSyncService } from './sync/sync_service';
 import { SNModelManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
-import { StorageKeys } from '@Lib/storage_keys';
+import { StorageKey } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentTypes } from '@Root/lib/models';
 import { ProtectedActions, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
@@ -178,11 +178,11 @@ export class SNPrivilegesService extends PureService {
     };
     const expiresAt = addSecondsToNow(length);
     await this.storageService!.setValue(
-      StorageKeys.PrivilegesExpirey,
+      StorageKey.PrivilegesExpirey,
       expiresAt
     );
     await this.storageService!.setValue(
-      StorageKeys.PrivilegesSessionLength,
+      StorageKey.PrivilegesSessionLength,
       length
     );
   }
@@ -193,7 +193,7 @@ export class SNPrivilegesService extends PureService {
 
   async getSelectedSessionLength() {
     const length = await this.storageService!.getValue(
-      StorageKeys.PrivilegesSessionLength
+      StorageKey.PrivilegesSessionLength
     );
     if (length) {
       return length;
@@ -204,7 +204,7 @@ export class SNPrivilegesService extends PureService {
 
   async getSessionExpirey() {
     const expiresAt = await this.storageService!.getValue(
-      StorageKeys.PrivilegesExpirey
+      StorageKey.PrivilegesExpirey
     );
     if (expiresAt) {
       return new Date(expiresAt);

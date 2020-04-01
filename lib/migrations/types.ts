@@ -1,4 +1,4 @@
-import { Environments } from './../platforms';
+import { Environment } from './../platforms';
 import { SNModelManager } from './../services/model_manager';
 import { SNStorageService } from '@Services/storage_service';
 import { SNProtocolService } from './../services/protocol_service';
@@ -10,6 +10,6 @@ export type MigrationServices = {
   deviceInterface: DeviceInterface,
   storageService: SNStorageService,
   modelManager: SNModelManager,
-  environment: Environments
+  environment: Environment
   namespace: string
 }

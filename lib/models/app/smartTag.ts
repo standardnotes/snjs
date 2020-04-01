@@ -1,5 +1,5 @@
 import { SNTag } from '@Models/app/tag';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { SNPredicate } from '@Models/core/predicate';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { CreateItemFromPayload } from '../generator';
@@ -15,7 +15,7 @@ const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
 export class SNSmartTag extends SNTag {
   
   getDefaultContentType() {
-    return ContentTypes.SmartTag;
+    return ContentType.SmartTag;
   }
 
   static systemSmartTags() {
@@ -27,7 +27,7 @@ export class SNSmartTag extends SNTag {
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
-          predicate: SNPredicate.FromArray(['content_type', '=', ContentTypes.Note])
+          predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
         }
       }
     );

@@ -1,9 +1,9 @@
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import {
   PayloadSources,
   PurePayload,
 } from '@Payloads/index';
-import { EncryptionIntents } from '@Protocol/intents';
+import { EncryptionIntent } from '@Protocol/intents';
 import {
   Copy,
   deepMerge,
@@ -11,7 +11,7 @@ import {
   isObject,
   pickByCopy,
 } from '@Lib/utils';
-import { PayloadFields } from '@Payloads/fields';
+import { PayloadField } from '@Payloads/fields';
 
 export type ContentReference = {
   uuid: string
@@ -24,12 +24,12 @@ export type PayloadContent = {
 }
 
 export type PayloadOverride = {
-  [key in PayloadFields]?: any;
+  [key in PayloadField]?: any;
 } | PurePayload
 
 export type RawPayload = {
   uuid?: string
-  content_type?: ContentTypes
+  content_type?: ContentType
   content?: PayloadContent | string
   deleted?: boolean
   items_key_id?: string
@@ -51,30 +51,30 @@ export type RawPayload = {
 
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.ItemsKeyId,
-  PayloadFields.EncItemKey,
-  PayloadFields.Content,
-  PayloadFields.CreatedAt,
-  PayloadFields.UpdatedAt,
-  PayloadFields.Deleted,
-  PayloadFields.Legacy003AuthHash,
-  PayloadFields.Legacy003AuthParams,
-  PayloadFields.Dirty,
-  PayloadFields.DirtiedDate,
-  PayloadFields.ErrorDecrypting,
-  PayloadFields.ErrorDecryptingChanged,
-  PayloadFields.WaitingForKey,
-  PayloadFields.Dummy,
-  PayloadFields.LastSyncBegan,
-  PayloadFields.LastSyncEnd,
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.ItemsKeyId,
+  PayloadField.EncItemKey,
+  PayloadField.Content,
+  PayloadField.CreatedAt,
+  PayloadField.UpdatedAt,
+  PayloadField.Deleted,
+  PayloadField.Legacy003AuthHash,
+  PayloadField.Legacy003AuthParams,
+  PayloadField.Dirty,
+  PayloadField.DirtiedDate,
+  PayloadField.ErrorDecrypting,
+  PayloadField.ErrorDecryptingChanged,
+  PayloadField.WaitingForKey,
+  PayloadField.Dummy,
+  PayloadField.LastSyncBegan,
+  PayloadField.LastSyncEnd,
 ]
 
 export function CreateMaxPayloadFromAnyObject(
   object: object,
   source?: PayloadSources,
-  intent?: EncryptionIntents,
+  intent?: EncryptionIntent,
   override?: PayloadOverride
 ) {
   if (!isNullOrUndefined(source as any)) {
@@ -92,7 +92,7 @@ export function CreateMaxPayloadFromAnyObject(
 
 export function CreateIntentPayloadFromObject(
   object: any,
-  intent: EncryptionIntents,
+  intent: EncryptionIntent,
   override?: PayloadOverride
 ) {
   const payloadFields = payloadFieldsForIntent(intent);
@@ -118,7 +118,7 @@ export function CreateSourcedPayloadFromObject(
 
 function CreatePayload(
   object: object,
-  fields: PayloadFields[],
+  fields: PayloadField[],
   override?: PayloadOverride
 ): PurePayload {
   const rawPayload = pickByCopy(object, fields);
@@ -146,14 +146,14 @@ export function CopyPayload(
 }
 
 const EncryptionParametersFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ItemsKeyId,
-  PayloadFields.EncItemKey,
-  PayloadFields.Content,
-  PayloadFields.Legacy003AuthHash,
-  PayloadFields.ErrorDecrypting,
-  PayloadFields.ErrorDecryptingChanged,
-  PayloadFields.WaitingForKey
+  PayloadField.Uuid,
+  PayloadField.ItemsKeyId,
+  PayloadField.EncItemKey,
+  PayloadField.Content,
+  PayloadField.Legacy003AuthHash,
+  PayloadField.ErrorDecrypting,
+  PayloadField.ErrorDecryptingChanged,
+  PayloadField.WaitingForKey
 ];
 
 export function CreateEncryptionParameters(raw: RawPayload | PurePayload): PurePayload {
@@ -175,58 +175,58 @@ export function CopyEncryptionParameters(
 }
 
 const FilePayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.ItemsKeyId,
-  PayloadFields.EncItemKey,
-  PayloadFields.Content,
-  PayloadFields.CreatedAt,
-  PayloadFields.UpdatedAt,
-  PayloadFields.Legacy003AuthHash
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.ItemsKeyId,
+  PayloadField.EncItemKey,
+  PayloadField.Content,
+  PayloadField.CreatedAt,
+  PayloadField.UpdatedAt,
+  PayloadField.Legacy003AuthHash
 ]
 
 const StoragePayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.ItemsKeyId,
-  PayloadFields.EncItemKey,
-  PayloadFields.Content,
-  PayloadFields.CreatedAt,
-  PayloadFields.UpdatedAt,
-  PayloadFields.Deleted,
-  PayloadFields.Legacy003AuthHash,
-  PayloadFields.Legacy003AuthParams,
-  PayloadFields.Dirty,
-  PayloadFields.DirtiedDate,
-  PayloadFields.ErrorDecrypting,
-  PayloadFields.WaitingForKey
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.ItemsKeyId,
+  PayloadField.EncItemKey,
+  PayloadField.Content,
+  PayloadField.CreatedAt,
+  PayloadField.UpdatedAt,
+  PayloadField.Deleted,
+  PayloadField.Legacy003AuthHash,
+  PayloadField.Legacy003AuthParams,
+  PayloadField.Dirty,
+  PayloadField.DirtiedDate,
+  PayloadField.ErrorDecrypting,
+  PayloadField.WaitingForKey
 ]
 
 const ServerPayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.ItemsKeyId,
-  PayloadFields.EncItemKey,
-  PayloadFields.Content,
-  PayloadFields.CreatedAt,
-  PayloadFields.UpdatedAt,
-  PayloadFields.Deleted,
-  PayloadFields.Legacy003AuthHash
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.ItemsKeyId,
+  PayloadField.EncItemKey,
+  PayloadField.Content,
+  PayloadField.CreatedAt,
+  PayloadField.UpdatedAt,
+  PayloadField.Deleted,
+  PayloadField.Legacy003AuthHash
 ]
 
 const SessionHistoryPayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.Content,
-  PayloadFields.UpdatedAt,
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.Content,
+  PayloadField.UpdatedAt,
 ]
 
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
 const ComponentRetrievedPayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.Content,
-  PayloadFields.CreatedAt
+  PayloadField.Uuid,
+  PayloadField.Content,
+  PayloadField.CreatedAt
 ]
 
 /**
@@ -236,34 +236,34 @@ const ComponentRetrievedPayloadFields = [
  * nothing else.
  */
 const ServerSavedPayloadFields = [
-  PayloadFields.Uuid,
-  PayloadFields.ContentType,
-  PayloadFields.UpdatedAt,
-  PayloadFields.Deleted,
-  PayloadFields.Dirty,
-  PayloadFields.LastSyncEnd
+  PayloadField.Uuid,
+  PayloadField.ContentType,
+  PayloadField.UpdatedAt,
+  PayloadField.Deleted,
+  PayloadField.Dirty,
+  PayloadField.LastSyncEnd
 ]
 
-function payloadFieldsForIntent(intent: EncryptionIntents) {
+function payloadFieldsForIntent(intent: EncryptionIntent) {
   if ((
-    intent === EncryptionIntents.FileEncrypted ||
-    intent === EncryptionIntents.FileDecrypted ||
-    intent === EncryptionIntents.FilePreferEncrypted
+    intent === EncryptionIntent.FileEncrypted ||
+    intent === EncryptionIntent.FileDecrypted ||
+    intent === EncryptionIntent.FilePreferEncrypted
   )) {
     return FilePayloadFields;
   }
 
   if ((
-    intent === EncryptionIntents.LocalStoragePreferEncrypted ||
-    intent === EncryptionIntents.LocalStorageDecrypted ||
-    intent === EncryptionIntents.LocalStorageEncrypted
+    intent === EncryptionIntent.LocalStoragePreferEncrypted ||
+    intent === EncryptionIntent.LocalStorageDecrypted ||
+    intent === EncryptionIntent.LocalStorageEncrypted
   )) {
     return StoragePayloadFields;
   }
 
   if ((
-    intent === EncryptionIntents.Sync ||
-    intent === EncryptionIntents.SyncDecrypted
+    intent === EncryptionIntent.Sync ||
+    intent === EncryptionIntent.SyncDecrypted
   )) {
     return ServerPayloadFields;
   } else {

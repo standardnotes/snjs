@@ -2,7 +2,7 @@ import { SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { findInArray, removeFromArray, filterFromArray } from '@Lib/utils';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 
 /**
  * Allows organization of notes into groups. A tag can have many notes, and a note
@@ -14,7 +14,7 @@ export class SNTag extends SNItem {
   public notes: SNItem[] = []
 
   getDefaultContentType() {
-    return ContentTypes.Tag;
+    return ContentType.Tag;
   }
 
   protected mapContentToLocalProperties(content: PayloadContent) {
@@ -45,7 +45,7 @@ export class SNTag extends SNItem {
   }
 
   public addItemAsRelationship(item: SNItem) {
-    if (item.content_type === ContentTypes.Note) {
+    if (item.content_type === ContentType.Note) {
       if (!findInArray(this.notes, 'uuid', item.uuid as any)) {
         this.notes.push(item);
       }
@@ -54,7 +54,7 @@ export class SNTag extends SNItem {
   }
 
   public removeItemAsRelationship(item: SNItem) {
-    if (item.content_type === ContentTypes.Note) {
+    if (item.content_type === ContentType.Note) {
       filterFromArray(this.notes, { uuid: item.uuid });
     }
     super.removeItemAsRelationship(item);
@@ -70,7 +70,7 @@ export class SNTag extends SNItem {
   }
 
   public isSmartTag() {
-    return this.content_type === ContentTypes.SmartTag;
+    return this.content_type === ContentType.SmartTag;
   }
 
   public static arrayToDisplayString(tags: SNTag[]) {

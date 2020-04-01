@@ -2,7 +2,7 @@ import { V003Algorithm } from './../algorithms';
 import { SNRootKeyParams } from './../../key_params';
 import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 
 /**
  * @deprecated
@@ -13,7 +13,7 @@ import { ProtocolVersions } from '@Protocol/versions';
 export class SNProtocolOperator003 extends SNProtocolOperator002 {
 
   get version() {
-    return ProtocolVersions.V003;
+    return ProtocolVersion.V003;
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
@@ -59,7 +59,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
 
   private async generateSalt(
     identifier: string,
-    version: ProtocolVersions,
+    version: ProtocolVersion,
     cost: number,
     nonce: string
   ) {

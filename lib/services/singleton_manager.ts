@@ -7,8 +7,8 @@ import { SingletonStrategies } from '@Models/index';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
 import { CopyPayload } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
-import { SyncEvents } from '@Services/sync/events';
-import { PayloadSources } from '@Payloads/sources';
+import { SyncEvent } from '@Services/sync/events';
+import { PayloadSource } from '@Payloads/sources';
 import { SNSyncService } from './sync/sync_service';
 
 /**
@@ -76,8 +76,8 @@ export class SNSingletonManager extends PureService {
     );
     this.removeSyncObserver = this.syncService!.addEventObserver(async (eventName) => {
       if (
-        eventName === SyncEvents.DownloadFirstSyncCompleted ||
-        eventName === SyncEvents.FullSyncCompleted
+        eventName === SyncEvent.DownloadFirstSyncCompleted ||
+        eventName === SyncEvent.FullSyncCompleted
       ) {
         await this.resolveSingletonsForItems(
           this.popResolveQueue(),
@@ -103,7 +103,7 @@ export class SNSingletonManager extends PureService {
       });
   }
 
-  private async resolveSingletonsForItems(items: SNItem[], eventSource: SyncEvents) {
+  private async resolveSingletonsForItems(items: SNItem[], eventSource: SyncEvent) {
     const matchesForRegisteredPredicate = (item: SNItem) => {
       for (const predicate of this.registeredPredicates) {
         if (item.satisfiesPredicate(predicate)) {
@@ -146,7 +146,7 @@ export class SNSingletonManager extends PureService {
      * as a sync request will automatically be made as part of the second phase
      * of a download-first request.
      */
-    if (handled.length > 0 && eventSource === SyncEvents.FullSyncCompleted) {
+    if (handled.length > 0 && eventSource === SyncEvent.FullSyncCompleted) {
       /** 
        * Do not await. We want any local-side changes to 
        * be awaited but the actual sync shouldn't be since it's non-essential
@@ -202,7 +202,7 @@ export class SNSingletonManager extends PureService {
     );
     const item = await this.modelManager!.mapPayloadToLocalItem(
       dirtyPayload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.syncService!.sync();
     return item;

@@ -3,7 +3,7 @@ import { SNTag } from '@Models/app/tag';
 import { PayloadContent } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { removeFromArray, findInArray } from '@Lib/utils';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 
 /** A note item */
 export class SNNote extends SNItem {
@@ -17,7 +17,7 @@ export class SNNote extends SNItem {
   private savedTagsString?: string
 
   getDefaultContentType() {
-    return ContentTypes.Note;
+    return ContentType.Note;
   }
 
   mapContentToLocalProperties(content: PayloadContent) {
@@ -45,14 +45,14 @@ export class SNNote extends SNItem {
      * Now, only tags contain references to notes. For old notes that may have references to tags,
      * we want to transfer them over to the tag.
      */
-    if (item.content_type === ContentTypes.Tag) {
+    if (item.content_type === ContentType.Tag) {
       item.addItemAsRelationship(this);
     }
     super.addItemAsRelationship(item);
   }
 
   setIsBeingReferencedBy(item: SNItem) {
-    if (item.content_type === ContentTypes.Tag) {
+    if (item.content_type === ContentType.Tag) {
       if (!findInArray(this.tags, 'uuid', item.uuid as any)) {
         this.tags.push(item);
       }
@@ -63,14 +63,14 @@ export class SNNote extends SNItem {
 
   setIsNoLongerReferencedBy(item: SNItem) {
     super.setIsNoLongerReferencedBy(item);
-    if (item.content_type === ContentTypes.Tag) {
+    if (item.content_type === ContentType.Tag) {
       removeFromArray(this.tags, item);
     }
 
     /**
      * @legacy Two-way note-tag relationships need to be handled explicitly.
      */
-    if (item.content_type === ContentTypes.Tag && this.hasRelationshipWithItem(item)) {
+    if (item.content_type === ContentType.Tag && this.hasRelationshipWithItem(item)) {
       this.removeReferenceWithUuid(item.uuid);
       /** @todo Items shouldn't mark themselves dirty. */
       /** @legacy this.setDirty(true); */
@@ -87,7 +87,7 @@ export class SNNote extends SNItem {
 
   public referencingItemCompletedMapping(item: SNItem) {
     super.referencingItemCompletedMapping(item);
-    if (item.content_type === ContentTypes.Tag) {
+    if (item.content_type === ContentType.Tag) {
       this.clearSavedTagsString();
     }
   }

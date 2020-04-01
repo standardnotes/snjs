@@ -5,7 +5,7 @@ import * as migrationImports from '@Lib/migrations';
 import { ApplicationEvents, ApplicationStages, SyncEvents } from '@Lib/index';
 import { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 import { PureService } from '@Services/pure_service';
-import { namespacedKey, RawStorageKeys } from '@Lib/storage_keys';
+import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined, lastElement } from '@Lib/utils';
 
 /**
@@ -119,7 +119,7 @@ export class SNMigrationService extends PureService {
   getTimeStampKey() {
     return namespacedKey(
       this.services!.namespace,
-      RawStorageKeys.LastMigrationTimestamp
+      RawStorageKey.LastMigrationTimestamp
     );
   }
 

@@ -8,8 +8,8 @@ import { SNProtocolService } from './protocol_service';
 import { SNModelManager } from './model_manager';
 import { SNHttpService, HttpResponse } from './api/http_service';
 import { SNAlertService } from './alert_service';
-import { PayloadSources } from '@Payloads/sources';
-import { EncryptionIntents } from '@Protocol/intents';
+import { PayloadSource } from '@Payloads/sources';
+import { EncryptionIntent } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
 import { ContentTypes, Action } from '@Models/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
@@ -179,7 +179,7 @@ export class SNActionsService extends PureService {
     );
     const item = await this.modelManager!.mapPayloadToLocalItem(
       payload!,
-      PayloadSources.RemoteActionRetrieved
+      PayloadSource.RemoteActionRetrieved
     );
     this.modelManager!.setItemDirty(item, true);
     this.syncService!.sync();
@@ -301,8 +301,8 @@ export class SNActionsService extends PureService {
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
     const intent = decrypted
-      ? EncryptionIntents.FileDecrypted
-      : EncryptionIntents.FileEncrypted;
+      ? EncryptionIntent.FileDecrypted
+      : EncryptionIntent.FileEncrypted;
     return this.protocolService!.payloadByEncryptingPayload(
       item.payloadRepresentation(),
       intent

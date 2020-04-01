@@ -1,7 +1,7 @@
 import { SNItem } from '@Models/core/item';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { CreateMaxPayloadFromAnyObject, ConflictStrategies } from '@Payloads/index';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
@@ -9,7 +9,7 @@ import { ProtocolVersions } from '@Protocol/versions';
 export class SNItemsKey extends SNItem {
 
   getDefaultContentType() {
-    return ContentTypes.ItemsKey;
+    return ContentType.ItemsKey;
   }
 
   /** Do not duplicate items keys. Always keep original */
@@ -38,7 +38,7 @@ export class SNItemsKey extends SNItem {
   }
 
   get dataAuthenticationKey() {
-    if (this.version === ProtocolVersions.V004) {
+    if (this.version === ProtocolVersion.V004) {
       throw 'Attempting to access legacy data authentication key.';
     }
     return this.content.dataAuthenticationKey;

@@ -1,4 +1,4 @@
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollectionSet } from '@Payloads/collection_set';
 import { PayloadCollection } from '@Payloads/collection';
 /**
@@ -50,7 +50,7 @@ export class PayloadsDelta {
     return this.baseCollection.findPayload(id);
   }
 
-  protected findRelatedPayload(id: string, source: PayloadSources) {
+  protected findRelatedPayload(id: string, source: PayloadSource) {
     const collection = this.relatedCollectionSet?.collectionForSource(source);
     return collection?.findPayload(id);
   }

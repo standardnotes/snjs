@@ -1,8 +1,8 @@
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PurePayload } from '@Payloads/pure_payload';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadCollection } from '@Payloads/collection';
-import { ConflictStrategies } from '@Payloads/deltas/strategies';
+import { ConflictStrategy } from '@Payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
@@ -12,13 +12,13 @@ export class ConflictDelta {
   private readonly baseCollection: PayloadCollection
   private readonly basePayload: PurePayload
   private readonly applyPayload: PurePayload
-  private readonly source: PayloadSources
+  private readonly source: PayloadSource
 
   constructor(
     baseCollection: PayloadCollection,
     basePayload: PurePayload,
     applyPayload: PurePayload,
-    source: PayloadSources
+    source: PayloadSource
   ) {
     this.baseCollection = baseCollection;
     this.basePayload = basePayload;
@@ -34,14 +34,14 @@ export class ConflictDelta {
     return new PayloadCollection(results, this.source);
   }
 
-  private async payloadsByHandlingStrategy(strategy: ConflictStrategies) {
-    if (strategy === ConflictStrategies.KeepLeft) {
+  private async payloadsByHandlingStrategy(strategy: ConflictStrategy) {
+    if (strategy === ConflictStrategy.KeepLeft) {
       return [this.basePayload];
     }
-    if (strategy === ConflictStrategies.KeepRight) {
+    if (strategy === ConflictStrategy.KeepRight) {
       return [this.applyPayload];
     }
-    if (strategy === ConflictStrategies.KeepLeftDuplicateRight) {
+    if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.updated_at!,
         this.applyPayload.updated_at!
@@ -61,7 +61,7 @@ export class ConflictDelta {
       return [leftPayload].concat(rightPayloads);
     }
 
-    if (strategy === ConflictStrategies.DuplicateLeftKeepRight) {
+    if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
       const leftPayloads = await PayloadsByDuplicating(
         this.basePayload,
         this.baseCollection,
@@ -71,7 +71,7 @@ export class ConflictDelta {
       return leftPayloads.concat([rightPayload]);
     }
 
-    if (strategy === ConflictStrategies.KeepLeftMergeRefs) {
+    if (strategy === ConflictStrategy.KeepLeftMergeRefs) {
       const refs = uniqCombineObjArrays(
         this.basePayload.contentObject.references,
         this.applyPayload.contentObject.references,

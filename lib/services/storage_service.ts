@@ -1,11 +1,11 @@
 import { EncryptionDelegate } from './encryption_delegate';
-import { EncryptionIntents } from '@Protocol/intents';
+import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
 import { ApplicationStages, RawStorageKeys, namespacedKey } from '@Lib/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/index';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';
@@ -44,7 +44,7 @@ export type StorageValuesObject = {
   [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
 }
 
-type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntents) => Promise<PurePayload>
+type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent) => Promise<PurePayload>
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -165,7 +165,7 @@ export class SNStorageService extends PureService {
       undefined,
       undefined,
       {
-        content_type: ContentTypes.EncryptedStorage
+        content_type: ContentType.EncryptedStorage
       }
     );
 
@@ -200,12 +200,12 @@ export class SNStorageService extends PureService {
       {
         uuid: await Uuid.GenerateUuid(),
         content: valuesToWrap,
-        content_type: ContentTypes.EncryptedStorage
+        content_type: ContentType.EncryptedStorage
       }
     );
     const encryptedPayload = await this.encryptionDelegate!.payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.LocalStoragePreferEncrypted
+      EncryptionIntent.LocalStoragePreferEncrypted
     );
     rawContent[ValueModesKeys.Wrapped] = encryptedPayload;
     rawContent[ValueModesKeys.Unwrapped] = undefined;
@@ -322,8 +322,8 @@ export class SNStorageService extends PureService {
         const encrypted = await this.encryptionDelegate!.payloadByEncryptingPayload(
           payload,
           this.encryptionPolicy === StorageEncryptionPolicies.Default
-            ? EncryptionIntents.LocalStoragePreferEncrypted
-            : EncryptionIntents.LocalStorageDecrypted
+            ? EncryptionIntent.LocalStoragePreferEncrypted
+            : EncryptionIntent.LocalStorageDecrypted
         );
         nondeleted.push(encrypted);
       }

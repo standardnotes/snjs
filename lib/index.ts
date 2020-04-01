@@ -1,9 +1,9 @@
 export const DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 export { ApplicationEvents, SyncEvents, applicationEventForSyncEvent } from '@Lib/events';
-export { ApplicationStages } from '@Lib/stages';
+export { ApplicationStage as ApplicationStages } from '@Lib/stages';
 export {
-  Environments,
-  Platforms,
+  Environment as Environments,
+  Platform as Platforms,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile
 } from '@Lib/platforms';
@@ -16,7 +16,7 @@ export {
   ChallengeValue
 } from '@Lib/challenges';
 export {
-  StorageKeys,
-  RawStorageKeys,
+  StorageKey as StorageKeys,
+  RawStorageKey as RawStorageKeys,
   namespacedKey,
 } from '@Lib/storage_keys';

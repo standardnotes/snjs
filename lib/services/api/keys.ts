@@ -1,4 +1,4 @@
-export enum ApiEndpointParams {
+export enum ApiEndpointParam {
   LastSyncToken = 'sync_token',
   PaginationToken = 'cursor_token',
   IntegrityCheck = 'compute_integrity',

@@ -1,10 +1,10 @@
 import { PayloadFields } from '@Payloads/index';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 import { isNullOrUndefined, isString, isObject, Copy, deepFreeze } from '@Lib/utils';
 import { CopyPayload, PayloadOverride, RawPayload, PayloadContent } from '@Payloads/generator';
-import { PayloadFormats } from '@Payloads/formats';
+import { PayloadFormat } from '@Payloads/formats';
 
 /**
  * A payload is a vehicle in which item data is transported or persisted.
@@ -29,7 +29,7 @@ export class PurePayload {
    * to omit that field altogether (as in the case of server saved payloads) */
   readonly fields: PayloadFields[]
   readonly uuid?: string
-  readonly content_type?: ContentTypes
+  readonly content_type?: ContentType
   readonly content?: PayloadContent | string
   readonly deleted?: boolean
   readonly items_key_id?: string
@@ -49,8 +49,8 @@ export class PurePayload {
   /** @deprecated */
   readonly auth_params?: any
 
-  readonly format: PayloadFormats
-  readonly version?: ProtocolVersions
+  readonly format: PayloadFormat
+  readonly version?: ProtocolVersion
 
   constructor(rawPayload: RawPayload, fields: PayloadFields[]) {
     this.fields = fields;
@@ -73,21 +73,21 @@ export class PurePayload {
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
     if (isString(this.content)) {
-      if ((this.content as string).startsWith(ProtocolVersions.V000Base64Decrypted)) {
-        this.format = PayloadFormats.DecryptedBase64String;
+      if ((this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)) {
+        this.format = PayloadFormat.DecryptedBase64String;
       } else {
-        this.format = PayloadFormats.EncryptedString;
+        this.format = PayloadFormat.EncryptedString;
       }
     } else if (isObject(this.content)) {
-      this.format = PayloadFormats.DecryptedBareObject;
+      this.format = PayloadFormat.DecryptedBareObject;
     } else {
-      this.format = PayloadFormats.Deleted;
+      this.format = PayloadFormat.Deleted;
     }
     if (isString(this.content)) {
       this.version = (this.content as string).substring(
         0,
-        ProtocolVersions.VersionLength
-      ) as ProtocolVersions;
+        ProtocolVersion.VersionLength
+      ) as ProtocolVersion;
     } else if(this.content){
       this.version = (this.content as PayloadContent).version;
     }
@@ -95,18 +95,18 @@ export class PurePayload {
   }
 
   get decoded() {
-    return this.format === PayloadFormats.DecryptedBareObject;
+    return this.format === PayloadFormat.DecryptedBareObject;
   }
 
   get encoded() {
     return (
-      this.format === PayloadFormats.EncryptedString ||
-      this.format === PayloadFormats.DecryptedBase64String
+      this.format === PayloadFormat.EncryptedString ||
+      this.format === PayloadFormat.DecryptedBase64String
     );
   }
 
   get contentObject() {
-    if(this.format !== PayloadFormats.DecryptedBareObject) {
+    if(this.format !== PayloadFormat.DecryptedBareObject) {
       debugger;
       throw Error('Attempting to access non-object content as object');
     }
@@ -114,7 +114,7 @@ export class PurePayload {
   }
 
   get contentString() {
-    if (this.format === PayloadFormats.DecryptedBareObject) {
+    if (this.format === PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access non-string content as string');
     }
     return this.content as string;

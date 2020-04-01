@@ -1,6 +1,6 @@
 import { isNullOrUndefined, deepFreeze } from '@Lib/utils';
-import { ApiEndpointParams } from '@Services/api/keys';
-import { PayloadSources } from '@Payloads/sources';
+import { ApiEndpointParam } from '@Services/api/keys';
+import { PayloadSource } from '@Payloads/sources';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 
 const SYNC_CONFLICT_TYPE_CONFLICTING_DATA = 'sync_conflict';
@@ -8,9 +8,9 @@ const SYNC_CONFLICT_TYPE_UUID_CONFLICT = 'uuid_conflict';
 
 type RawSyncResponse = {
   error?: any
-  [ApiEndpointParams.LastSyncToken]?: string
-  [ApiEndpointParams.PaginationToken]?: string
-  [ApiEndpointParams.IntegrityResult]?: string
+  [ApiEndpointParam.LastSyncToken]?: string
+  [ApiEndpointParam.PaginationToken]?: string
+  [ApiEndpointParam.IntegrityResult]?: string
   retrieved_items?: any[]
   saved_items?: any[]
   conflicts?: any[]
@@ -39,15 +39,15 @@ export class SyncResponse {
   }
 
   get lastSyncToken() {
-    return this.rawResponse[ApiEndpointParams.LastSyncToken];
+    return this.rawResponse[ApiEndpointParam.LastSyncToken];
   }
 
   get paginationToken() {
-    return this.rawResponse[ApiEndpointParams.PaginationToken];
+    return this.rawResponse[ApiEndpointParam.PaginationToken];
   }
 
   get integrityHash() {
-    return this.rawResponse[ApiEndpointParams.IntegrityResult];
+    return this.rawResponse[ApiEndpointParam.IntegrityResult];
   }
 
   get checkIntegrity() {
@@ -72,7 +72,7 @@ export class SyncResponse {
     return this.rawSavedItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
-        PayloadSources.RemoteSaved
+        PayloadSource.RemoteSaved
       );
     });
   }
@@ -81,7 +81,7 @@ export class SyncResponse {
     return this.rawRetrievedItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
-        PayloadSources.RemoteRetrieved
+        PayloadSource.RemoteRetrieved
       );
     });
   }
@@ -90,7 +90,7 @@ export class SyncResponse {
     return this.rawItemsFromConflicts.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
-        PayloadSources.RemoteRetrieved
+        PayloadSource.RemoteRetrieved
       );
     });
   }

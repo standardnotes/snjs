@@ -1,5 +1,5 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 
@@ -15,7 +15,7 @@ export class DeltaRemoteSaved extends PayloadsDelta {
       const deletedState = current ? current.deleted : payload.deleted;
       const result = CreateSourcedPayloadFromObject(
         payload,
-        PayloadSources.RemoteSaved,
+        PayloadSource.RemoteSaved,
         {
           lastSyncEnd: new Date(),
           deleted: deletedState
@@ -23,6 +23,6 @@ export class DeltaRemoteSaved extends PayloadsDelta {
       );
       processed.push(result);
     }
-    return new PayloadCollection(processed, PayloadSources.RemoteSaved);
+    return new PayloadCollection(processed, PayloadSource.RemoteSaved);
   }
 }

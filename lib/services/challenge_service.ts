@@ -1,7 +1,7 @@
 import { SNProtocolService } from './protocol_service';
 import { SNStorageService } from './storage_service';
 import { PureService } from '@Lib/services/pure_service';
-import { StorageKeys } from '@Lib/storage_keys';
+import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Services/storage_service';
 import { removeFromArray } from '@Lib/utils';
 import {
@@ -312,7 +312,7 @@ export class ChallengeService extends PureService {
       types.push(ChallengeType.LocalPasscode);
     }
     const biometricPrefs = await this.storageService!.getValue(
-      StorageKeys.BiometricPrefs,
+      StorageKey.BiometricPrefs,
       StorageValueModes.Nonwrapped
     );
     const biometricEnabled = biometricPrefs && biometricPrefs.enabled;
@@ -332,7 +332,7 @@ export class ChallengeService extends PureService {
 
   public async enableBiometrics() {
     await this.storageService!.setValue(
-      StorageKeys.BiometricPrefs,
+      StorageKey.BiometricPrefs,
       { enabled: true },
       StorageValueModes.Nonwrapped
     );

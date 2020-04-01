@@ -1,4 +1,4 @@
-export enum SyncEvents {
+export enum SyncEvent {
   /** A full sync can consist of many round-trips to the server */
   FullSyncCompleted = 'sync =full-completed',
   /** A single sync is just one round-trip to the server completion */
@@ -19,4 +19,4 @@ export enum SyncEvents {
 };
 
 
-export type SyncEventReceiver = (event: SyncEvents) => void;
+export type SyncEventReceiver = (event: SyncEvent) => void;

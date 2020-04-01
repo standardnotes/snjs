@@ -3122,7 +3122,7 @@ var SNApplication = /*#__PURE__*/function () {
                   dirty: true
                 });
                 _context9.next = 3;
-                return this.modelManager.mapPayloadToLocalItem(dirtied, _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"].LocalChanged);
+                return this.modelManager.mapPayloadToLocalItem(dirtied, _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSource"].LocalChanged);
 
               case 3:
                 _context9.next = 5;
@@ -5200,7 +5200,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createHistoryManager",
     value: function createHistoryManager() {
-      this.historyManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNHistoryManager"]))(this.modelManager, this.storageService, [_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note], this.deviceInterface.timeout);
+      this.historyManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNHistoryManager"]))(this.modelManager, this.storageService, [_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note], this.deviceInterface.timeout);
       this.services.push(this.historyManager);
     }
   }, {
@@ -5457,7 +5457,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return ApplicationEvents; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "applicationEventForSyncEvent", function() { return applicationEventForSyncEvent; });
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"]; });
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -5489,9 +5489,9 @@ var ApplicationEvents;
 
 ;
 function applicationEventForSyncEvent(syncEvent) {
-  var _SyncEvents$FullSyncC;
+  var _SyncEvent$FullSyncCo;
 
-  return (_SyncEvents$FullSyncC = {}, _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].FullSyncCompleted, ApplicationEvents.CompletedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncError, ApplicationEvents.FailedSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong, ApplicationEvents.HighLatencySync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].EnterOutOfSync, ApplicationEvents.EnteredOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].ExitOutOfSync, ApplicationEvents.ExitedOutOfSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataLoaded, ApplicationEvents.LocalDataLoaded), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].MajorDataChange, ApplicationEvents.MajorDataChange), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataIncrementalLoad, ApplicationEvents.LocalDataIncrementalLoad), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged, ApplicationEvents.SyncStatusChanged), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncWillBegin, ApplicationEvents.WillSync), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].InvalidSession, ApplicationEvents.InvalidSyncSession), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].DatabaseReadError, ApplicationEvents.LocalDatabaseReadError), _defineProperty(_SyncEvents$FullSyncC, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].DatabaseWriteError, ApplicationEvents.LocalDatabaseWriteError), _SyncEvents$FullSyncC)[syncEvent];
+  return (_SyncEvent$FullSyncCo = {}, _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].FullSyncCompleted, ApplicationEvents.CompletedSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncError, ApplicationEvents.FailedSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncTakingTooLong, ApplicationEvents.HighLatencySync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].EnterOutOfSync, ApplicationEvents.EnteredOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].ExitOutOfSync, ApplicationEvents.ExitedOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataLoaded, ApplicationEvents.LocalDataLoaded), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].MajorDataChange, ApplicationEvents.MajorDataChange), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataIncrementalLoad, ApplicationEvents.LocalDataIncrementalLoad), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged, ApplicationEvents.SyncStatusChanged), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncWillBegin, ApplicationEvents.WillSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].InvalidSession, ApplicationEvents.InvalidSyncSession), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseReadError, ApplicationEvents.LocalDatabaseReadError), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseWriteError, ApplicationEvents.LocalDatabaseWriteError), _SyncEvent$FullSyncCo)[syncEvent];
 }
 
 /***/ }),
@@ -5514,12 +5514,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "applicationEventForSyncEvent", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_0__["applicationEventForSyncEvent"]; });
 
 /* harmony import */ var _Lib_stages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/stages */ "./lib/stages.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationStages", function() { return _Lib_stages__WEBPACK_IMPORTED_MODULE_1__["ApplicationStages"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationStages", function() { return _Lib_stages__WEBPACK_IMPORTED_MODULE_1__["ApplicationStage"]; });
 
 /* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["Environments"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["Environment"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["Platforms"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["Platform"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_2__["isEnvironmentWebOrDesktop"]; });
 
@@ -5539,9 +5539,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ChallengeValue", function() { return _Lib_challenges__WEBPACK_IMPORTED_MODULE_3__["ChallengeValue"]; });
 
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKeys"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["StorageKey"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RawStorageKeys"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["RawStorageKey"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"]; });
 
@@ -5734,7 +5734,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_30__["Uuid"]; });
 
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_31__["EncryptionIntents"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_31__["EncryptionIntent"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_31__["isLocalStorageIntent"]; });
 
@@ -5745,7 +5745,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_31__["intentRequiresEncryption"]; });
 
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_32__["ContentTypes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_32__["ContentType"]; });
 
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_33__["CreateItemFromPayload"]; });
@@ -5754,9 +5754,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvents", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_34__["ApplicationEvents"]; });
 
 /* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Environments"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Environment"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Platforms"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["Platform"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_35__["isEnvironmentWebOrDesktop"]; });
 
@@ -5776,18 +5776,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_38__["CreateSourcedPayloadFromObject"]; });
 
 /* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_39__["PayloadSources"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_39__["PayloadSource"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_39__["isPayloadSourceRetrieved"]; });
 
 /* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_40__["ProtocolVersions"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_40__["ProtocolVersion"]; });
 
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_41__["PayloadFormats"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_41__["PayloadFormat"]; });
 
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_42__["StorageKeys"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_42__["StorageKey"]; });
 
 /* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_43__["BaseMigration"]; });
@@ -5906,7 +5906,7 @@ var BaseMigration = /*#__PURE__*/function (_Migration) {
     value: function registerStageHandlers() {
       var _this = this;
 
-      this.registerStageHandler(_Lib_stages__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].PreparingForLaunch_0, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      this.registerStageHandler(_Lib_stages__WEBPACK_IMPORTED_MODULE_3__["ApplicationStage"].PreparingForLaunch_0, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -5982,7 +5982,7 @@ var BaseMigration = /*#__PURE__*/function (_Migration) {
                 break;
 
               case 14:
-                newKey = Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.services.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RawStorageKeys"].LastMigrationTimestamp);
+                newKey = Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["namespacedKey"])(this.services.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["RawStorageKey"].LastMigrationTimestamp);
                 _context2.next = 17;
                 return this.services.deviceInterface.getRawStorageValue(newKey);
 
@@ -7108,7 +7108,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 11:
                 _context14.next = 13;
-                return this.services.modelManager.mapItem(itemsKey, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].LocalChanged);
+                return this.services.modelManager.mapItem(itemsKey, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalChanged);
 
               case 13:
                 _context14.next = 15;
@@ -7450,7 +7450,7 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Component;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Component;
     }
     /** Custom data that a component can store in itself */
 
@@ -7480,7 +7480,7 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "isTheme",
     value: function isTheme() {
-      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Theme || this.area === ComponentAreas.Themes;
+      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme || this.area === ComponentAreas.Themes;
     }
   }, {
     key: "isDefaultEditor",
@@ -7818,7 +7818,7 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Note) {
         if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["existsInArray"])(this.notes, item)) {
           this.notes.push(item);
         }
@@ -7829,7 +7829,7 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "removeItemAsRelationship",
     value: function removeItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Note) {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(this.notes, item);
       }
 
@@ -7838,7 +7838,7 @@ var SNEditor = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Editor;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Editor;
     }
   }, {
     key: "setData",
@@ -7969,7 +7969,7 @@ var SNActionsExtension = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].ActionsExtension;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].ActionsExtension;
     }
   }, {
     key: "structureParams",
@@ -8053,7 +8053,7 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
   _createClass(SNItemsKey, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].ItemsKey;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].ItemsKey;
     }
     /** Do not duplicate items keys. Always keep original */
 
@@ -8089,7 +8089,7 @@ var SNItemsKey = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "dataAuthenticationKey",
     get: function get() {
-      if (this.version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__["ProtocolVersions"].V004) {
+      if (this.version === _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__["ProtocolVersion"].V004) {
         throw 'Attempting to access legacy data authentication key.';
       }
 
@@ -8176,7 +8176,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   _createClass(SNNote, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note;
     }
   }, {
     key: "mapContentToLocalProperties",
@@ -8209,7 +8209,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
        * Now, only tags contain references to notes. For old notes that may have references to tags,
        * we want to transfer them over to the tag.
        */
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag) {
         item.addItemAsRelationship(this);
       }
 
@@ -8218,7 +8218,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "setIsBeingReferencedBy",
     value: function setIsBeingReferencedBy(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag) {
         if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["findInArray"])(this.tags, 'uuid', item.uuid)) {
           this.tags.push(item);
         }
@@ -8233,7 +8233,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
     value: function setIsNoLongerReferencedBy(item) {
       _get(_getPrototypeOf(SNNote.prototype), "setIsNoLongerReferencedBy", this).call(this, item);
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag) {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(this.tags, item);
       }
       /**
@@ -8241,7 +8241,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
        */
 
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag && this.hasRelationshipWithItem(item)) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag && this.hasRelationshipWithItem(item)) {
         this.removeReferenceWithUuid(item.uuid);
         /** @todo Items shouldn't mark themselves dirty. */
 
@@ -8255,7 +8255,7 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
     value: function referencingItemCompletedMapping(item) {
       _get(_getPrototypeOf(SNNote.prototype), "referencingItemCompletedMapping", this).call(this, item);
 
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag) {
         this.clearSavedTagsString();
       }
     }
@@ -8489,7 +8489,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
   _createClass(SNSmartTag, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].SmartTag;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].SmartTag;
     }
   }], [{
     key: "systemSmartTags",
@@ -8501,7 +8501,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
-          predicate: _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Note])
+          predicate: _Models_core_predicate__WEBPACK_IMPORTED_MODULE_2__["SNPredicate"].FromArray(['content_type', '=', _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Note])
         }
       });
       var archived = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateMaxPayloadFromAnyObject"])({
@@ -8604,7 +8604,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   _createClass(SNTag, [{
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Tag;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Tag;
     }
   }, {
     key: "mapContentToLocalProperties",
@@ -8648,7 +8648,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "addItemAsRelationship",
     value: function addItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Note) {
         if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["findInArray"])(this.notes, 'uuid', item.uuid)) {
           this.notes.push(item);
         }
@@ -8659,7 +8659,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "removeItemAsRelationship",
     value: function removeItemAsRelationship(item) {
-      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note) {
+      if (item.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Note) {
         Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["filterFromArray"])(this.notes, {
           uuid: item.uuid
         });
@@ -8682,7 +8682,7 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
   }, {
     key: "isSmartTag",
     value: function isSmartTag() {
-      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].SmartTag;
+      return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].SmartTag;
     }
   }], [{
     key: "arrayToDisplayString",
@@ -8769,7 +8769,7 @@ var SNTheme = /*#__PURE__*/function (_SNComponent) {
   }, {
     key: "getDefaultContentType",
     value: function getDefaultContentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].Theme;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Theme;
     }
     /** Do not duplicate under most circumstances. Always keep original */
 
@@ -8890,7 +8890,7 @@ var SNUserPrefs = /*#__PURE__*/function (_SNItem) {
   }], [{
     key: "contentType",
     value: function contentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].UserPrefs;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].UserPrefs;
     }
   }]);
 
@@ -8903,46 +8903,46 @@ var SNUserPrefs = /*#__PURE__*/function (_SNItem) {
 /*!*************************************!*\
   !*** ./lib/models/content_types.ts ***!
   \*************************************/
-/*! exports provided: ContentTypes, displayStringForContentType */
+/*! exports provided: ContentType, displayStringForContentType */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return ContentTypes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return displayStringForContentType; });
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ContentTypes;
+var ContentType;
 
-(function (ContentTypes) {
-  ContentTypes["Any"] = "*";
-  ContentTypes["Item"] = "SF|Item";
-  ContentTypes["RootKey"] = "SN|RootKey|NoSync";
-  ContentTypes["ItemsKey"] = "SN|ItemsKey";
-  ContentTypes["EncryptedStorage"] = "SN|EncryptedStorage";
-  ContentTypes["Note"] = "Note";
-  ContentTypes["Tag"] = "Tag";
-  ContentTypes["SmartTag"] = "SN|SmartTag";
-  ContentTypes["Component"] = "SN|Component";
-  ContentTypes["Editor"] = "SN|Editor";
-  ContentTypes["ActionsExtension"] = "Extension";
-  ContentTypes["UserPrefs"] = "SN|UserPreferences";
-  ContentTypes["Privileges"] = "SN|Privileges";
-  ContentTypes["HistorySession"] = "SN|HistorySession";
-  ContentTypes["Theme"] = "SN|Theme";
-  ContentTypes["Mfa"] = "SF|MFA";
-  ContentTypes["ServerExtension"] = "SF|Extension";
-  ContentTypes["FilesafeCredentials"] = "SN|FileSafe|Credentials";
-  ContentTypes["FilesafeFileMetadata"] = "SN|FileSafe|FileMetadata";
-  ContentTypes["FilesafeIntegration"] = "SN|FileSafe|Integration";
-  ContentTypes["ExtensionRepo"] = "SN|ExtensionRepo";
-})(ContentTypes || (ContentTypes = {}));
+(function (ContentType) {
+  ContentType["Any"] = "*";
+  ContentType["Item"] = "SF|Item";
+  ContentType["RootKey"] = "SN|RootKey|NoSync";
+  ContentType["ItemsKey"] = "SN|ItemsKey";
+  ContentType["EncryptedStorage"] = "SN|EncryptedStorage";
+  ContentType["Note"] = "Note";
+  ContentType["Tag"] = "Tag";
+  ContentType["SmartTag"] = "SN|SmartTag";
+  ContentType["Component"] = "SN|Component";
+  ContentType["Editor"] = "SN|Editor";
+  ContentType["ActionsExtension"] = "Extension";
+  ContentType["UserPrefs"] = "SN|UserPreferences";
+  ContentType["Privileges"] = "SN|Privileges";
+  ContentType["HistorySession"] = "SN|HistorySession";
+  ContentType["Theme"] = "SN|Theme";
+  ContentType["Mfa"] = "SF|MFA";
+  ContentType["ServerExtension"] = "SF|Extension";
+  ContentType["FilesafeCredentials"] = "SN|FileSafe|Credentials";
+  ContentType["FilesafeFileMetadata"] = "SN|FileSafe|FileMetadata";
+  ContentType["FilesafeIntegration"] = "SN|FileSafe|Integration";
+  ContentType["ExtensionRepo"] = "SN|ExtensionRepo";
+})(ContentType || (ContentType = {}));
 
 ;
 function displayStringForContentType(contentType) {
   var _map;
 
-  var map = (_map = {}, _defineProperty(_map, ContentTypes.Note, 'note'), _defineProperty(_map, ContentTypes.Tag, 'tag'), _defineProperty(_map, ContentTypes.SmartTag, 'smart tag'), _defineProperty(_map, ContentTypes.ActionsExtension, 'action-based extension'), _defineProperty(_map, ContentTypes.Component, 'component'), _defineProperty(_map, ContentTypes.Editor, 'editor'), _defineProperty(_map, ContentTypes.Theme, 'theme'), _defineProperty(_map, ContentTypes.ServerExtension, 'server extension'), _defineProperty(_map, ContentTypes.Mfa, 'two-factor authentication setting'), _defineProperty(_map, ContentTypes.FilesafeCredentials, 'FileSafe credential'), _defineProperty(_map, ContentTypes.FilesafeFileMetadata, 'FileSafe file'), _defineProperty(_map, ContentTypes.FilesafeIntegration, 'FileSafe integration'), _map);
+  var map = (_map = {}, _defineProperty(_map, ContentType.Note, 'note'), _defineProperty(_map, ContentType.Tag, 'tag'), _defineProperty(_map, ContentType.SmartTag, 'smart tag'), _defineProperty(_map, ContentType.ActionsExtension, 'action-based extension'), _defineProperty(_map, ContentType.Component, 'component'), _defineProperty(_map, ContentType.Editor, 'editor'), _defineProperty(_map, ContentType.Theme, 'theme'), _defineProperty(_map, ContentType.ServerExtension, 'server extension'), _defineProperty(_map, ContentType.Mfa, 'two-factor authentication setting'), _defineProperty(_map, ContentType.FilesafeCredentials, 'FileSafe credential'), _defineProperty(_map, ContentType.FilesafeFileMetadata, 'FileSafe file'), _defineProperty(_map, ContentType.FilesafeIntegration, 'FileSafe integration'), _map);
   return map[contentType];
 }
 
@@ -10111,7 +10111,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Note, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Tag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ItemsKey, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].SmartTag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].ActionsExtension, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Editor, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Theme, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].Privileges, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentTypes"].UserPrefs, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNUserPrefs"]), _ContentTypeClassMapp);
+var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].ItemsKey, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].SmartTag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].ActionsExtension, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Editor, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Privileges, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].UserPrefs, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNUserPrefs"]), _ContentTypeClassMapp);
 function CreateItemFromPayload(payload) {
   var itemClass = ContentTypeClassMapping[payload.content_type] || _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNItem"]; // eslint-disable-next-line new-cap
 
@@ -10185,7 +10185,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return _Models_app_theme__WEBPACK_IMPORTED_MODULE_12__["SNTheme"]; });
 
 /* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_13__["ContentTypes"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentTypes", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_13__["ContentType"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "displayStringForContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_13__["displayStringForContentType"]; });
 
@@ -10214,13 +10214,13 @@ __webpack_require__.r(__webpack_exports__);
 /*!**************************!*\
   !*** ./lib/platforms.ts ***!
   \**************************/
-/*! exports provided: Environments, Platforms, platformFromString, platformToString, environmentToString, isEnvironmentWebOrDesktop, isEnvironmentMobile */
+/*! exports provided: Environment, Platform, platformFromString, platformToString, environmentToString, isEnvironmentWebOrDesktop, isEnvironmentMobile */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Environments", function() { return Environments; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Platforms", function() { return Platforms; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Environment", function() { return Environment; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Platform", function() { return Platform; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return platformFromString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "platformToString", function() { return platformToString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environmentToString", function() { return environmentToString; });
@@ -10228,59 +10228,59 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return isEnvironmentMobile; });
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var Environments;
+var Environment;
 
-(function (Environments) {
-  Environments[Environments["Web"] = 1] = "Web";
-  Environments[Environments["Desktop"] = 2] = "Desktop";
-  Environments[Environments["Mobile"] = 3] = "Mobile";
-})(Environments || (Environments = {}));
+(function (Environment) {
+  Environment[Environment["Web"] = 1] = "Web";
+  Environment[Environment["Desktop"] = 2] = "Desktop";
+  Environment[Environment["Mobile"] = 3] = "Mobile";
+})(Environment || (Environment = {}));
 
 ;
-var Platforms;
+var Platform;
 
-(function (Platforms) {
-  Platforms[Platforms["Ios"] = 1] = "Ios";
-  Platforms[Platforms["Android"] = 2] = "Android";
-  Platforms[Platforms["MacWeb"] = 3] = "MacWeb";
-  Platforms[Platforms["MacDesktop"] = 4] = "MacDesktop";
-  Platforms[Platforms["WindowsWeb"] = 5] = "WindowsWeb";
-  Platforms[Platforms["WindowsDesktop"] = 6] = "WindowsDesktop";
-  Platforms[Platforms["LinuxWeb"] = 7] = "LinuxWeb";
-  Platforms[Platforms["LinuxDesktop"] = 8] = "LinuxDesktop";
-})(Platforms || (Platforms = {}));
+(function (Platform) {
+  Platform[Platform["Ios"] = 1] = "Ios";
+  Platform[Platform["Android"] = 2] = "Android";
+  Platform[Platform["MacWeb"] = 3] = "MacWeb";
+  Platform[Platform["MacDesktop"] = 4] = "MacDesktop";
+  Platform[Platform["WindowsWeb"] = 5] = "WindowsWeb";
+  Platform[Platform["WindowsDesktop"] = 6] = "WindowsDesktop";
+  Platform[Platform["LinuxWeb"] = 7] = "LinuxWeb";
+  Platform[Platform["LinuxDesktop"] = 8] = "LinuxDesktop";
+})(Platform || (Platform = {}));
 
 ;
 function platformFromString(string) {
   var map = {
-    'mac-web': Platforms.MacWeb,
-    'mac-desktop': Platforms.MacDesktop,
-    'linux-web': Platforms.LinuxWeb,
-    'linux-desktop': Platforms.LinuxDesktop,
-    'windows-web': Platforms.WindowsWeb,
-    'windows-desktop': Platforms.WindowsDesktop,
-    'ios': Platforms.Ios,
-    'android': Platforms.Android
+    'mac-web': Platform.MacWeb,
+    'mac-desktop': Platform.MacDesktop,
+    'linux-web': Platform.LinuxWeb,
+    'linux-desktop': Platform.LinuxDesktop,
+    'windows-web': Platform.WindowsWeb,
+    'windows-desktop': Platform.WindowsDesktop,
+    'ios': Platform.Ios,
+    'android': Platform.Android
   };
   return map[string];
 }
 function platformToString(platform) {
   var _map;
 
-  var map = (_map = {}, _defineProperty(_map, Platforms.MacWeb, 'mac-web'), _defineProperty(_map, Platforms.MacDesktop, 'mac-desktop'), _defineProperty(_map, Platforms.LinuxWeb, 'linux-web'), _defineProperty(_map, Platforms.LinuxDesktop, 'linux-desktop'), _defineProperty(_map, Platforms.WindowsWeb, 'windows-web'), _defineProperty(_map, Platforms.WindowsDesktop, 'windows-desktop'), _defineProperty(_map, Platforms.Ios, 'ios'), _defineProperty(_map, Platforms.Android, 'android'), _map);
+  var map = (_map = {}, _defineProperty(_map, Platform.MacWeb, 'mac-web'), _defineProperty(_map, Platform.MacDesktop, 'mac-desktop'), _defineProperty(_map, Platform.LinuxWeb, 'linux-web'), _defineProperty(_map, Platform.LinuxDesktop, 'linux-desktop'), _defineProperty(_map, Platform.WindowsWeb, 'windows-web'), _defineProperty(_map, Platform.WindowsDesktop, 'windows-desktop'), _defineProperty(_map, Platform.Ios, 'ios'), _defineProperty(_map, Platform.Android, 'android'), _map);
   return map[platform];
 }
 function environmentToString(environment) {
   var _map2;
 
-  var map = (_map2 = {}, _defineProperty(_map2, Environments.Web, 'web'), _defineProperty(_map2, Environments.Desktop, 'desktop'), _defineProperty(_map2, Environments.Mobile, 'mobile'), _map2);
+  var map = (_map2 = {}, _defineProperty(_map2, Environment.Web, 'web'), _defineProperty(_map2, Environment.Desktop, 'desktop'), _defineProperty(_map2, Environment.Mobile, 'mobile'), _map2);
   return map[environment];
 }
 function isEnvironmentWebOrDesktop(environment) {
-  return environment === Environments.Web || environment === Environments.Desktop;
+  return environment === Environment.Web || environment === Environment.Desktop;
 }
 function isEnvironmentMobile(environment) {
-  return environment === Environments.Mobile;
+  return environment === Environment.Mobile;
 }
 
 /***/ }),
@@ -10295,12 +10295,12 @@ function isEnvironmentMobile(environment) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersions"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersion"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["compareVersions"]; });
 
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["isDecryptedIntent"]; });
 
@@ -10339,45 +10339,45 @@ __webpack_require__.r(__webpack_exports__);
 /*!*********************************!*\
   !*** ./lib/protocol/intents.ts ***!
   \*********************************/
-/*! exports provided: EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption */
+/*! exports provided: EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntents", function() { return EncryptionIntents; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return EncryptionIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return isLocalStorageIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return isFileIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return isDecryptedIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return intentRequiresEncryption; });
-var EncryptionIntents;
+var EncryptionIntent;
 
-(function (EncryptionIntents) {
-  EncryptionIntents[EncryptionIntents["Sync"] = 0] = "Sync";
-  EncryptionIntents[EncryptionIntents["SyncDecrypted"] = 1] = "SyncDecrypted";
-  EncryptionIntents[EncryptionIntents["LocalStorageEncrypted"] = 2] = "LocalStorageEncrypted";
-  EncryptionIntents[EncryptionIntents["LocalStorageDecrypted"] = 3] = "LocalStorageDecrypted";
-  EncryptionIntents[EncryptionIntents["LocalStoragePreferEncrypted"] = 4] = "LocalStoragePreferEncrypted";
-  EncryptionIntents[EncryptionIntents["FileEncrypted"] = 5] = "FileEncrypted";
-  EncryptionIntents[EncryptionIntents["FileDecrypted"] = 6] = "FileDecrypted";
-  EncryptionIntents[EncryptionIntents["FilePreferEncrypted"] = 7] = "FilePreferEncrypted";
-})(EncryptionIntents || (EncryptionIntents = {}));
+(function (EncryptionIntent) {
+  EncryptionIntent[EncryptionIntent["Sync"] = 0] = "Sync";
+  EncryptionIntent[EncryptionIntent["SyncDecrypted"] = 1] = "SyncDecrypted";
+  EncryptionIntent[EncryptionIntent["LocalStorageEncrypted"] = 2] = "LocalStorageEncrypted";
+  EncryptionIntent[EncryptionIntent["LocalStorageDecrypted"] = 3] = "LocalStorageDecrypted";
+  EncryptionIntent[EncryptionIntent["LocalStoragePreferEncrypted"] = 4] = "LocalStoragePreferEncrypted";
+  EncryptionIntent[EncryptionIntent["FileEncrypted"] = 5] = "FileEncrypted";
+  EncryptionIntent[EncryptionIntent["FileDecrypted"] = 6] = "FileDecrypted";
+  EncryptionIntent[EncryptionIntent["FilePreferEncrypted"] = 7] = "FilePreferEncrypted";
+})(EncryptionIntent || (EncryptionIntent = {}));
 
 ;
 function isLocalStorageIntent(intent) {
-  return intent === EncryptionIntents.LocalStorageEncrypted || intent === EncryptionIntents.LocalStorageDecrypted || intent === EncryptionIntents.LocalStoragePreferEncrypted;
+  return intent === EncryptionIntent.LocalStorageEncrypted || intent === EncryptionIntent.LocalStorageDecrypted || intent === EncryptionIntent.LocalStoragePreferEncrypted;
 }
 function isFileIntent(intent) {
-  return intent === EncryptionIntents.FileEncrypted || intent === EncryptionIntents.FileDecrypted || intent === EncryptionIntents.FilePreferEncrypted;
+  return intent === EncryptionIntent.FileEncrypted || intent === EncryptionIntent.FileDecrypted || intent === EncryptionIntent.FilePreferEncrypted;
 }
 function isDecryptedIntent(intent) {
-  return intent === EncryptionIntents.SyncDecrypted || intent === EncryptionIntents.LocalStorageDecrypted || intent === EncryptionIntents.FileDecrypted;
+  return intent === EncryptionIntent.SyncDecrypted || intent === EncryptionIntent.LocalStorageDecrypted || intent === EncryptionIntent.FileDecrypted;
 }
 /**
  * @returns {boolean}  True if the intent requires encryption.
  */
 
 function intentRequiresEncryption(intent) {
-  return intent === EncryptionIntents.Sync || intent === EncryptionIntents.LocalStorageEncrypted || intent === EncryptionIntents.FileEncrypted;
+  return intent === EncryptionIntent.Sync || intent === EncryptionIntent.LocalStorageEncrypted || intent === EncryptionIntent.FileEncrypted;
 }
 
 /***/ }),
@@ -10442,7 +10442,7 @@ var SNRootKeyParams = /*#__PURE__*/function () {
        * locally depending on the version.
        * Versions <= 002 had dynamic kdfIterations, so these values must be transfered.
        */
-      if (Object(_Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["compareVersions"])(this.version, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].V003) >= 0) {
+      if (Object(_Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["compareVersions"])(this.version, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersion"].V003) >= 0) {
         return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["omitByCopy"])(this.content, ['pw_cost']);
       } else {
         return this.content;
@@ -10729,7 +10729,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBase64String)) {
                   _context6.next = 2;
                   break;
                 }
@@ -10737,7 +10737,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
                 return _context6.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator001.prototype), "generateEncryptedParameters", this).call(this, payload, format, key));
 
               case 2:
-                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].EncryptedString)) {
+                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].EncryptedString)) {
                   _context6.next = 4;
                   break;
                 }
@@ -10817,7 +10817,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 0:
                 format = encryptedParameters.format;
 
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBase64String)) {
                   _context7.next = 3;
                   break;
                 }
@@ -10903,9 +10903,9 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
   }, {
     key: "encryptionComponentsFromString",
     value: function encryptionComponentsFromString(string, encryptionKey) {
-      var encryptionVersion = string.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].VersionLength);
+      var encryptionVersion = string.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersion"].VersionLength);
       return {
-        ciphertext: string.substring(_Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].VersionLength, string.length),
+        ciphertext: string.substring(_Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersion"].VersionLength, string.length),
         version: encryptionVersion,
         key: encryptionKey
       };
@@ -10957,7 +10957,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
   }, {
     key: "version",
     get: function get() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersions"].V001;
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_6__["ProtocolVersion"].V001;
     }
   }]);
 
@@ -11314,7 +11314,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBase64String)) {
                   _context8.next = 2;
                   break;
                 }
@@ -11322,7 +11322,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
                 return _context8.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator002.prototype), "generateEncryptedParameters", this).call(this, payload, format, key));
 
               case 2:
-                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].EncryptedString)) {
+                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].EncryptedString)) {
                   _context8.next = 4;
                   break;
                 }
@@ -11395,7 +11395,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 0:
                 format = encryptedParameters.format;
 
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBase64String)) {
                   _context9.next = 3;
                   break;
                 }
@@ -11571,7 +11571,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
   }, {
     key: "version",
     get: function get() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V002;
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V002;
     }
   }]);
 
@@ -11764,7 +11764,7 @@ var SNProtocolOperator003 = /*#__PURE__*/function (_SNProtocolOperator) {
   }, {
     key: "version",
     get: function get() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersions"].V003;
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersion"].V003;
     }
   }]);
 
@@ -12147,7 +12147,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBase64String)) {
                   _context8.next = 2;
                   break;
                 }
@@ -12155,7 +12155,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
                 return _context8.abrupt("return", _get(_getPrototypeOf(SNProtocolOperator004.prototype), "generateEncryptedParameters", this).call(this, payload, format, key));
 
               case 2:
-                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].EncryptedString)) {
+                if (!(format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].EncryptedString)) {
                   _context8.next = 4;
                   break;
                 }
@@ -12229,7 +12229,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 0:
                 format = encryptedParameters.format;
 
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBareObject || format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__["PayloadFormat"].DecryptedBase64String)) {
                   _context9.next = 3;
                   break;
                 }
@@ -12369,7 +12369,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
   }, {
     key: "version",
     get: function get() {
-      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V004;
+      return _Protocol_versions__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V004;
     }
   }]);
 
@@ -12619,7 +12619,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormats"].DecryptedBareObject)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormat"].DecryptedBareObject)) {
                   _context4.next = 4;
                   break;
                 }
@@ -12629,7 +12629,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
                 }));
 
               case 4:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormat"].DecryptedBase64String)) {
                   _context4.next = 13;
                   break;
                 }
@@ -12640,7 +12640,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
 
               case 8:
                 base64String = _context4.sent;
-                content = _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersions"].V000Base64Decrypted + base64String;
+                content = _Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersion"].V000Base64Decrypted + base64String;
                 return _context4.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateEncryptionParameters"])({
                   content: content
                 }));
@@ -12681,7 +12681,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
               case 0:
                 format = encryptedParameters.format;
 
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormats"].DecryptedBareObject)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormat"].DecryptedBareObject)) {
                   _context5.next = 5;
                   break;
                 }
@@ -12689,12 +12689,12 @@ var SNProtocolOperator = /*#__PURE__*/function () {
                 return _context5.abrupt("return", encryptedParameters);
 
               case 5:
-                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormats"].DecryptedBase64String)) {
+                if (!(format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_2__["PayloadFormat"].DecryptedBase64String)) {
                   _context5.next = 20;
                   break;
                 }
 
-                contentString = encryptedParameters.contentString.substring(_Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersions"].VersionLength, encryptedParameters.contentString.length);
+                contentString = encryptedParameters.contentString.substring(_Protocol_versions__WEBPACK_IMPORTED_MODULE_4__["ProtocolVersion"].VersionLength, encryptedParameters.contentString.length);
                 _context5.prev = 7;
                 _context5.next = 10;
                 return Object(sncrypto__WEBPACK_IMPORTED_MODULE_5__["base64Decode"])(contentString);
@@ -13025,7 +13025,7 @@ var ConflictDelta = /*#__PURE__*/function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeft)) {
+                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategy"].KeepLeft)) {
                   _context2.next = 2;
                   break;
                 }
@@ -13033,7 +13033,7 @@ var ConflictDelta = /*#__PURE__*/function () {
                 return _context2.abrupt("return", [this.basePayload]);
 
               case 2:
-                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepRight)) {
+                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategy"].KeepRight)) {
                   _context2.next = 4;
                   break;
                 }
@@ -13041,7 +13041,7 @@ var ConflictDelta = /*#__PURE__*/function () {
                 return _context2.abrupt("return", [this.applyPayload]);
 
               case 4:
-                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeftDuplicateRight)) {
+                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategy"].KeepLeftDuplicateRight)) {
                   _context2.next = 11;
                   break;
                 }
@@ -13059,7 +13059,7 @@ var ConflictDelta = /*#__PURE__*/function () {
                 return _context2.abrupt("return", [leftPayload].concat(rightPayloads));
 
               case 11:
-                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].DuplicateLeftKeepRight)) {
+                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategy"].DuplicateLeftKeepRight)) {
                   _context2.next = 17;
                   break;
                 }
@@ -13073,7 +13073,7 @@ var ConflictDelta = /*#__PURE__*/function () {
                 return _context2.abrupt("return", leftPayloads.concat([rightPayload]));
 
               case 17:
-                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategies"].KeepLeftMergeRefs)) {
+                if (!(strategy === _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_3__["ConflictStrategy"].KeepLeftMergeRefs)) {
                   _context2.next = 22;
                   break;
                 }
@@ -13350,7 +13350,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(21);
 
               case 29:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].FileImport));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].FileImport));
 
               case 30:
               case "end":
@@ -13417,7 +13417,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.abrupt("return", [payload]);
 
               case 5:
-                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].FileImport);
+                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].FileImport);
                 _context2.next = 8;
                 return delta.resultingCollection();
 
@@ -13461,11 +13461,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function DeltaClassForSource(source) {
-  if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteRetrieved) {
+  if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].RemoteRetrieved) {
     return _index__WEBPACK_IMPORTED_MODULE_1__["DeltaRemoteRetrieved"];
-  } else if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteSaved) {
+  } else if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].RemoteSaved) {
     return _index__WEBPACK_IMPORTED_MODULE_1__["DeltaRemoteSaved"];
-  } else if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictData || source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictUuid) {
+  } else if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].ConflictData || source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].ConflictUuid) {
     return _index__WEBPACK_IMPORTED_MODULE_1__["DeltaRemoteConflicts"];
   }
 }
@@ -13503,7 +13503,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsDelta", function() { return _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_6__["PayloadsDelta"]; });
 
 /* harmony import */ var _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__["ConflictStrategies"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_7__["ConflictStrategy"]; });
 
 
 
@@ -13669,7 +13669,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(28);
 
               case 36:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
 
               case 37:
               case "end":
@@ -13757,7 +13757,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(this.applyCollection.source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].ConflictUuid)) {
+                if (!(this.applyCollection.source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ConflictUuid)) {
                   _context.next = 4;
                   break;
                 }
@@ -13765,7 +13765,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.abrupt("return", this.collectionsByHandlingUuidConflicts());
 
               case 4:
-                if (!(this.applyCollection.source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].ConflictData)) {
+                if (!(this.applyCollection.source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ConflictData)) {
                   _context.next = 8;
                   break;
                 }
@@ -13825,7 +13825,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.abrupt("continue", 24);
 
               case 12:
-                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient);
+                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].DecryptedTransient);
 
                 if (decrypted) {
                   _context2.next = 18;
@@ -13844,7 +13844,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.abrupt("continue", 24);
 
               case 18:
-                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].ConflictData);
+                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__["ConflictDelta"](this.baseCollection, current, decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ConflictData);
                 _context2.next = 21;
                 return delta.resultingCollection();
 
@@ -13893,7 +13893,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.finish(33);
 
               case 41:
-                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved));
+                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
 
               case 42:
               case "end":
@@ -13939,7 +13939,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 payload = _step2.value;
-                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].DecryptedTransient);
+                decrypted = this.findRelatedPayload(payload.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].DecryptedTransient);
                 _context3.next = 11;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByAlternatingUuid"])(decrypted, this.baseCollection);
 
@@ -13987,7 +13987,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context3.finish(22);
 
               case 30:
-                return _context3.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].RemoteRetrieved));
+                return _context3.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
 
               case 31:
               case "end":
@@ -14095,8 +14095,8 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 received = _step.value;
-                savedOrSaving = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving);
-                decrypted = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient);
+                savedOrSaving = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].SavedOrSaving);
+                decrypted = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient);
 
                 if (decrypted) {
                   _context.next = 16;
@@ -14192,7 +14192,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 conflict = _conflicted[_i];
-                _decrypted = this.findRelatedPayload(conflict.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient);
+                _decrypted = this.findRelatedPayload(conflict.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient);
 
                 if (_decrypted) {
                   _context.next = 48;
@@ -14232,7 +14232,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 break;
 
               case 60:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
 
               case 61:
               case "end":
@@ -14332,7 +14332,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                    */
 
                   deletedState = current ? current.deleted : payload.deleted;
-                  result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved, {
+                  result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved, {
                     lastSyncEnd: new Date(),
                     deleted: deletedState
                   });
@@ -14373,7 +14373,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(12);
 
               case 20:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](processed, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved));
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](processed, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved));
 
               case 21:
               case "end":
@@ -14400,21 +14400,21 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
 /*!****************************************************!*\
   !*** ./lib/protocol/payloads/deltas/strategies.ts ***!
   \****************************************************/
-/*! exports provided: ConflictStrategies */
+/*! exports provided: ConflictStrategy */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return ConflictStrategies; });
-var ConflictStrategies;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategy", function() { return ConflictStrategy; });
+var ConflictStrategy;
 
-(function (ConflictStrategies) {
-  ConflictStrategies[ConflictStrategies["KeepLeft"] = 1] = "KeepLeft";
-  ConflictStrategies[ConflictStrategies["KeepRight"] = 2] = "KeepRight";
-  ConflictStrategies[ConflictStrategies["KeepLeftDuplicateRight"] = 3] = "KeepLeftDuplicateRight";
-  ConflictStrategies[ConflictStrategies["DuplicateLeftKeepRight"] = 4] = "DuplicateLeftKeepRight";
-  ConflictStrategies[ConflictStrategies["KeepLeftMergeRefs"] = 5] = "KeepLeftMergeRefs";
-})(ConflictStrategies || (ConflictStrategies = {}));
+(function (ConflictStrategy) {
+  ConflictStrategy[ConflictStrategy["KeepLeft"] = 1] = "KeepLeft";
+  ConflictStrategy[ConflictStrategy["KeepRight"] = 2] = "KeepRight";
+  ConflictStrategy[ConflictStrategy["KeepLeftDuplicateRight"] = 3] = "KeepLeftDuplicateRight";
+  ConflictStrategy[ConflictStrategy["DuplicateLeftKeepRight"] = 4] = "DuplicateLeftKeepRight";
+  ConflictStrategy[ConflictStrategy["KeepLeftMergeRefs"] = 5] = "KeepLeftMergeRefs";
+})(ConflictStrategy || (ConflictStrategy = {}));
 
 ;
 
@@ -14424,34 +14424,34 @@ var ConflictStrategies;
 /*!*****************************************!*\
   !*** ./lib/protocol/payloads/fields.ts ***!
   \*****************************************/
-/*! exports provided: PayloadFields */
+/*! exports provided: PayloadField */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadFields", function() { return PayloadFields; });
-var PayloadFields;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return PayloadField; });
+var PayloadField;
 
-(function (PayloadFields) {
-  PayloadFields["Uuid"] = "uuid";
-  PayloadFields["ContentType"] = "content_type";
-  PayloadFields["ItemsKeyId"] = "items_key_id";
-  PayloadFields["EncItemKey"] = "enc_item_key";
-  PayloadFields["Content"] = "content";
-  PayloadFields["CreatedAt"] = "created_at";
-  PayloadFields["UpdatedAt"] = "updated_at";
-  PayloadFields["Deleted"] = "deleted";
-  PayloadFields["Legacy003AuthHash"] = "auth_hash";
-  PayloadFields["Legacy003AuthParams"] = "auth_params";
-  PayloadFields["Dirty"] = "dirty";
-  PayloadFields["DirtiedDate"] = "dirtiedDate";
-  PayloadFields["WaitingForKey"] = "waitingForKey";
-  PayloadFields["ErrorDecrypting"] = "errorDecrypting";
-  PayloadFields["ErrorDecryptingChanged"] = "errorDecryptingValueChanged";
-  PayloadFields["Dummy"] = "dummy";
-  PayloadFields["LastSyncBegan"] = "lastSyncBegan";
-  PayloadFields["LastSyncEnd"] = "lastSyncEnd";
-})(PayloadFields || (PayloadFields = {}));
+(function (PayloadField) {
+  PayloadField["Uuid"] = "uuid";
+  PayloadField["ContentType"] = "content_type";
+  PayloadField["ItemsKeyId"] = "items_key_id";
+  PayloadField["EncItemKey"] = "enc_item_key";
+  PayloadField["Content"] = "content";
+  PayloadField["CreatedAt"] = "created_at";
+  PayloadField["UpdatedAt"] = "updated_at";
+  PayloadField["Deleted"] = "deleted";
+  PayloadField["Legacy003AuthHash"] = "auth_hash";
+  PayloadField["Legacy003AuthParams"] = "auth_params";
+  PayloadField["Dirty"] = "dirty";
+  PayloadField["DirtiedDate"] = "dirtiedDate";
+  PayloadField["WaitingForKey"] = "waitingForKey";
+  PayloadField["ErrorDecrypting"] = "errorDecrypting";
+  PayloadField["ErrorDecryptingChanged"] = "errorDecryptingValueChanged";
+  PayloadField["Dummy"] = "dummy";
+  PayloadField["LastSyncBegan"] = "lastSyncBegan";
+  PayloadField["LastSyncEnd"] = "lastSyncEnd";
+})(PayloadField || (PayloadField = {}));
 
 ;
 
@@ -14461,20 +14461,20 @@ var PayloadFields;
 /*!******************************************!*\
   !*** ./lib/protocol/payloads/formats.ts ***!
   \******************************************/
-/*! exports provided: PayloadFormats */
+/*! exports provided: PayloadFormat */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return PayloadFormats; });
-var PayloadFormats;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return PayloadFormat; });
+var PayloadFormat;
 
-(function (PayloadFormats) {
-  PayloadFormats[PayloadFormats["EncryptedString"] = 0] = "EncryptedString";
-  PayloadFormats[PayloadFormats["DecryptedBareObject"] = 1] = "DecryptedBareObject";
-  PayloadFormats[PayloadFormats["DecryptedBase64String"] = 2] = "DecryptedBase64String";
-  PayloadFormats[PayloadFormats["Deleted"] = 3] = "Deleted";
-})(PayloadFormats || (PayloadFormats = {}));
+(function (PayloadFormat) {
+  PayloadFormat[PayloadFormat["EncryptedString"] = 0] = "EncryptedString";
+  PayloadFormat[PayloadFormat["DecryptedBareObject"] = 1] = "DecryptedBareObject";
+  PayloadFormat[PayloadFormat["DecryptedBase64String"] = 2] = "DecryptedBase64String";
+  PayloadFormat[PayloadFormat["Deleted"] = 3] = "Deleted";
+})(PayloadFormat || (PayloadFormat = {}));
 
 ;
 
@@ -14870,7 +14870,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /** The MaxItemPayload represents a payload with all possible fields */
-var MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dummy, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].LastSyncEnd];
+var MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dummy, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncEnd];
 function CreateMaxPayloadFromAnyObject(object, source, intent, override) {
   if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(source)) {
     throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
@@ -14918,21 +14918,21 @@ function CopyPayload(payload, override) {
 
   return new _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PurePayload"](rawPayload, payload.fields);
 }
-var EncryptionParametersFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey];
+var EncryptionParametersFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey];
 function CreateEncryptionParameters(raw) {
   return CreatePayload(raw, EncryptionParametersFields);
 }
 function CopyEncryptionParameters(raw, override) {
   return CreatePayload(raw, EncryptionParametersFields, override);
 }
-var FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthHash];
-var StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].WaitingForKey];
-var ServerPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Legacy003AuthHash];
-var SessionHistoryPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt];
+var FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash];
+var StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey];
+var ServerPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash];
+var SessionHistoryPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt];
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
 
-var ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].CreatedAt];
+var ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt];
 /**
  * The saved server item payload represents the payload we want to map
  * when mapping saved_items from the server. We only want to map the
@@ -14940,18 +14940,18 @@ var ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE
  * nothing else.
  */
 
-var ServerSavedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadFields"].LastSyncEnd];
+var ServerSavedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncEnd];
 
 function payloadFieldsForIntent(intent) {
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].FilePreferEncrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FilePreferEncrypted) {
     return FilePayloadFields;
   }
 
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageEncrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageEncrypted) {
     return StoragePayloadFields;
   }
 
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].SyncDecrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].SyncDecrypted) {
     return ServerPayloadFields;
   } else {
     throw "No payload fields found for intent ".concat(intent);
@@ -15024,16 +15024,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadsByAlternatingUuid", function() { return _Payloads_functions__WEBPACK_IMPORTED_MODULE_3__["PayloadsByAlternatingUuid"]; });
 
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFields", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadFields"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFields", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"]; });
 
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSources"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSource"]; });
 
 /* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_6__["PurePayload"]; });
 
 /* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__["PayloadFormats"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormats", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_7__["PayloadFormat"]; });
 
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictStrategies", function() { return _Payloads_deltas__WEBPACK_IMPORTED_MODULE_8__["ConflictStrategies"]; });
@@ -15184,19 +15184,19 @@ var PurePayload = /*#__PURE__*/function () {
     this.auth_params = rawPayload.auth_params;
 
     if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"])(this.content)) {
-      if (this.content.startsWith(_Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].V000Base64Decrypted)) {
-        this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBase64String;
+      if (this.content.startsWith(_Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersion"].V000Base64Decrypted)) {
+        this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBase64String;
       } else {
-        this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].EncryptedString;
+        this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].EncryptedString;
       }
     } else if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isObject"])(this.content)) {
-      this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject;
+      this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject;
     } else {
-      this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].Deleted;
+      this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].Deleted;
     }
 
     if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isString"])(this.content)) {
-      this.version = this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersions"].VersionLength);
+      this.version = this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersion"].VersionLength);
     } else if (this.content) {
       this.version = this.content.version;
     } // deepFreeze(this);
@@ -15228,17 +15228,17 @@ var PurePayload = /*#__PURE__*/function () {
   }, {
     key: "decoded",
     get: function get() {
-      return this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject;
+      return this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject;
     }
   }, {
     key: "encoded",
     get: function get() {
-      return this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].EncryptedString || this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBase64String;
+      return this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].EncryptedString || this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBase64String;
     }
   }, {
     key: "contentObject",
     get: function get() {
-      if (this.format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject) {
+      if (this.format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject) {
         debugger;
         throw Error('Attempting to access non-object content as object');
       }
@@ -15248,7 +15248,7 @@ var PurePayload = /*#__PURE__*/function () {
   }, {
     key: "contentString",
     get: function get() {
-      if (this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormats"].DecryptedBareObject) {
+      if (this.format === _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject) {
         throw Error('Attempting to access non-string content as string');
       }
 
@@ -15270,38 +15270,38 @@ var PurePayload = /*#__PURE__*/function () {
 /*!******************************************!*\
   !*** ./lib/protocol/payloads/sources.ts ***!
   \******************************************/
-/*! exports provided: PayloadSources, isPayloadSourceRetrieved */
+/*! exports provided: PayloadSource, isPayloadSourceRetrieved */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadSources", function() { return PayloadSources; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return PayloadSource; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return isPayloadSourceRetrieved; });
-var PayloadSources;
+var PayloadSource;
 
-(function (PayloadSources) {
-  PayloadSources[PayloadSources["RemoteRetrieved"] = 1] = "RemoteRetrieved";
-  PayloadSources[PayloadSources["RemoteSaved"] = 2] = "RemoteSaved";
-  PayloadSources[PayloadSources["LocalSaved"] = 3] = "LocalSaved";
-  PayloadSources[PayloadSources["LocalRetrieved"] = 4] = "LocalRetrieved";
-  PayloadSources[PayloadSources["LocalDirtied"] = 5] = "LocalDirtied";
-  PayloadSources[PayloadSources["ComponentRetrieved"] = 6] = "ComponentRetrieved";
-  PayloadSources[PayloadSources["DesktopInstalled"] = 7] = "DesktopInstalled";
-  PayloadSources[PayloadSources["RemoteActionRetrieved"] = 8] = "RemoteActionRetrieved";
-  PayloadSources[PayloadSources["FileImport"] = 9] = "FileImport";
-  PayloadSources[PayloadSources["RemoteConflict"] = 10] = "RemoteConflict";
-  PayloadSources[PayloadSources["ImportConflict"] = 11] = "ImportConflict";
-  PayloadSources[PayloadSources["SavedOrSaving"] = 12] = "SavedOrSaving";
-  PayloadSources[PayloadSources["DecryptedTransient"] = 13] = "DecryptedTransient";
-  PayloadSources[PayloadSources["ConflictUuid"] = 14] = "ConflictUuid";
-  PayloadSources[PayloadSources["ConflictData"] = 15] = "ConflictData";
-  PayloadSources[PayloadSources["LocalChanged"] = 16] = "LocalChanged";
-  PayloadSources[PayloadSources["SessionHistory"] = 17] = "SessionHistory";
-})(PayloadSources || (PayloadSources = {}));
+(function (PayloadSource) {
+  PayloadSource[PayloadSource["RemoteRetrieved"] = 1] = "RemoteRetrieved";
+  PayloadSource[PayloadSource["RemoteSaved"] = 2] = "RemoteSaved";
+  PayloadSource[PayloadSource["LocalSaved"] = 3] = "LocalSaved";
+  PayloadSource[PayloadSource["LocalRetrieved"] = 4] = "LocalRetrieved";
+  PayloadSource[PayloadSource["LocalDirtied"] = 5] = "LocalDirtied";
+  PayloadSource[PayloadSource["ComponentRetrieved"] = 6] = "ComponentRetrieved";
+  PayloadSource[PayloadSource["DesktopInstalled"] = 7] = "DesktopInstalled";
+  PayloadSource[PayloadSource["RemoteActionRetrieved"] = 8] = "RemoteActionRetrieved";
+  PayloadSource[PayloadSource["FileImport"] = 9] = "FileImport";
+  PayloadSource[PayloadSource["RemoteConflict"] = 10] = "RemoteConflict";
+  PayloadSource[PayloadSource["ImportConflict"] = 11] = "ImportConflict";
+  PayloadSource[PayloadSource["SavedOrSaving"] = 12] = "SavedOrSaving";
+  PayloadSource[PayloadSource["DecryptedTransient"] = 13] = "DecryptedTransient";
+  PayloadSource[PayloadSource["ConflictUuid"] = 14] = "ConflictUuid";
+  PayloadSource[PayloadSource["ConflictData"] = 15] = "ConflictData";
+  PayloadSource[PayloadSource["LocalChanged"] = 16] = "LocalChanged";
+  PayloadSource[PayloadSource["SessionHistory"] = 17] = "SessionHistory";
+})(PayloadSource || (PayloadSource = {}));
 
 ;
 function isPayloadSourceRetrieved(source) {
-  return [PayloadSources.RemoteRetrieved, PayloadSources.ComponentRetrieved, PayloadSources.RemoteActionRetrieved].includes(source);
+  return [PayloadSource.RemoteRetrieved, PayloadSource.ComponentRetrieved, PayloadSource.RemoteActionRetrieved].includes(source);
 }
 
 /***/ }),
@@ -15400,9 +15400,9 @@ var SNRootKey = /*#__PURE__*/function () {
          * If there's no version stored, it must be either 001 or 002.
          * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
          */
-        this.content.version = _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__["ProtocolVersions"].V002;
+        this.content.version = _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__["ProtocolVersion"].V002;
       } else {
-        this.content.version = _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__["ProtocolVersions"].V001;
+        this.content.version = _Protocol_versions__WEBPACK_IMPORTED_MODULE_2__["ProtocolVersion"].V001;
       }
     }
 
@@ -15487,7 +15487,7 @@ var SNRootKey = /*#__PURE__*/function () {
   }], [{
     key: "contentType",
     value: function contentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentTypes"].RootKey;
+      return _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].RootKey;
     }
   }]);
 
@@ -15500,23 +15500,23 @@ var SNRootKey = /*#__PURE__*/function () {
 /*!**********************************!*\
   !*** ./lib/protocol/versions.ts ***!
   \**********************************/
-/*! exports provided: ProtocolVersions, compareVersions */
+/*! exports provided: ProtocolVersion, compareVersions */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return ProtocolVersions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return ProtocolVersion; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return compareVersions; });
-var ProtocolVersions;
+var ProtocolVersion;
 
-(function (ProtocolVersions) {
-  ProtocolVersions["V000Base64Decrypted"] = "000";
-  ProtocolVersions["V001"] = "001";
-  ProtocolVersions["V002"] = "002";
-  ProtocolVersions["V003"] = "003";
-  ProtocolVersions["V004"] = "004";
-  ProtocolVersions[ProtocolVersions["VersionLength"] = 3] = "VersionLength";
-})(ProtocolVersions || (ProtocolVersions = {}));
+(function (ProtocolVersion) {
+  ProtocolVersion["V000Base64Decrypted"] = "000";
+  ProtocolVersion["V001"] = "001";
+  ProtocolVersion["V002"] = "002";
+  ProtocolVersion["V003"] = "003";
+  ProtocolVersion["V004"] = "004";
+  ProtocolVersion[ProtocolVersion["VersionLength"] = 3] = "VersionLength";
+})(ProtocolVersion || (ProtocolVersion = {}));
 
 ;
 /**
@@ -15857,7 +15857,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
               case 8:
                 payload = _context4.sent;
                 _context4.next = 11;
-                return this.modelManager.mapPayloadToLocalItem(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSources"].RemoteActionRetrieved);
+                return this.modelManager.mapPayloadToLocalItem(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSource"].RemoteActionRetrieved);
 
               case 11:
                 item = _context4.sent;
@@ -16196,7 +16196,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 decrypted = _args10.length > 1 && _args10[1] !== undefined ? _args10[1] : false;
-                intent = decrypted ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntents"].FileEncrypted;
+                intent = decrypted ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].FileDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].FileEncrypted;
                 return _context10.abrupt("return", this.protocolService.payloadByEncryptingPayload(item.payloadRepresentation(), intent));
 
               case 3:
@@ -16468,7 +16468,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__["StorageKeys"].ServerHost);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__["StorageKey"].ServerHost);
 
               case 2:
                 storedValue = _context.sent;
@@ -16498,7 +16498,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
               case 0:
                 this.host = host;
                 _context2.next = 3;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__["StorageKeys"].ServerHost, host);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_6__["StorageKey"].ServerHost, host);
 
               case 3:
               case "end":
@@ -16593,7 +16593,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "params",
     value: function params(inParams) {
-      var params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(inParams, _defineProperty({}, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].ApiVersion, API_VERSION));
+      var params = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(inParams, _defineProperty({}, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].ApiVersion, API_VERSION));
       return params;
     }
   }, {
@@ -16858,7 +16858,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
               case 5:
                 url = _context9.sent;
-                params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncPayloads, payloads), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParams"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
+                params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].SyncPayloads, payloads), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_2__["ApiEndpointParam"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
                 _context9.next = 9;
                 return this.httpService.postAbsolute(url, params, this.session.token).catch(function (errorResponse) {
                   return _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_3__["API_MESSAGE_GENERIC_SYNC_FAIL"]);
@@ -17156,23 +17156,23 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
 /*!**********************************!*\
   !*** ./lib/services/api/keys.ts ***!
   \**********************************/
-/*! exports provided: ApiEndpointParams */
+/*! exports provided: ApiEndpointParam */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApiEndpointParams", function() { return ApiEndpointParams; });
-var ApiEndpointParams;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApiEndpointParam", function() { return ApiEndpointParam; });
+var ApiEndpointParam;
 
-(function (ApiEndpointParams) {
-  ApiEndpointParams["LastSyncToken"] = "sync_token";
-  ApiEndpointParams["PaginationToken"] = "cursor_token";
-  ApiEndpointParams["IntegrityCheck"] = "compute_integrity";
-  ApiEndpointParams["IntegrityResult"] = "integrity_hash";
-  ApiEndpointParams["SyncDlLimit"] = "limit";
-  ApiEndpointParams["SyncPayloads"] = "items";
-  ApiEndpointParams["ApiVersion"] = "api";
-})(ApiEndpointParams || (ApiEndpointParams = {}));
+(function (ApiEndpointParam) {
+  ApiEndpointParam["LastSyncToken"] = "sync_token";
+  ApiEndpointParam["PaginationToken"] = "cursor_token";
+  ApiEndpointParam["IntegrityCheck"] = "compute_integrity";
+  ApiEndpointParam["IntegrityResult"] = "integrity_hash";
+  ApiEndpointParam["SyncDlLimit"] = "limit";
+  ApiEndpointParam["SyncPayloads"] = "items";
+  ApiEndpointParam["ApiVersion"] = "api";
+})(ApiEndpointParam || (ApiEndpointParam = {}));
 
 ;
 
@@ -17377,7 +17377,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].User);
 
               case 2:
                 this.user = _context.sent;
@@ -17388,7 +17388,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context.next = 6;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].LegacyUuid);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].LegacyUuid);
 
               case 6:
                 uuid = _context.sent;
@@ -17401,7 +17401,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
               case 8:
                 _context.next = 10;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].Session);
 
               case 10:
                 rawSession = _context.sent;
@@ -17876,12 +17876,12 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 user = response.user;
                 this.user = user;
                 _context10.next = 6;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].User, user);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].User, user);
 
               case 6:
                 session = new _Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"](response.token);
                 _context10.next = 9;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].Session, session);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].Session, session);
 
               case 9:
                 _context10.next = 11;
@@ -18566,7 +18566,7 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context3.next = 5;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].BiometricPrefs, _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__["StorageValueModes"].Nonwrapped);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["StorageKey"].BiometricPrefs, _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__["StorageValueModes"].Nonwrapped);
 
               case 5:
                 biometricPrefs = _context3.sent;
@@ -18614,7 +18614,7 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["StorageKeys"].BiometricPrefs, {
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_2__["StorageKey"].BiometricPrefs, {
                   enabled: true
                 }, _Services_storage_service__WEBPACK_IMPORTED_MODULE_3__["StorageValueModes"].Nonwrapped);
 
@@ -18991,7 +18991,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
     _this.configureForGeneralUsage();
 
-    if (environment !== _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile) {
+    if (environment !== _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environment"].Mobile) {
       _this.configureForNonMobileUsage();
     }
 
@@ -19577,7 +19577,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         var url = component.hosted_url || component.legacy_url;
 
         if (this.isMobile) {
-          var localReplacement = this.platform === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Platforms"].Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+          var localReplacement = this.platform === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Platform"].Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
           url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement);
         }
 
@@ -21647,12 +21647,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "isDesktop",
     get: function get() {
-      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Desktop;
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environment"].Desktop;
     }
   }, {
     key: "isMobile",
     get: function get() {
-      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environments"].Mobile;
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_10__["Environment"].Mobile;
     }
   }, {
     key: "components",
@@ -21685,7 +21685,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 function CreateHistoryEntryForPayload(payload) {
-  var mapping = _defineProperty({}, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentTypes"].Note, _note_history_entry__WEBPACK_IMPORTED_MODULE_1__["NoteHistoryEntry"]);
+  var mapping = _defineProperty({}, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Note, _note_history_entry__WEBPACK_IMPORTED_MODULE_1__["NoteHistoryEntry"]);
 
   var type = payload[_Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadFields"].ContentType];
   var historyItemClass = mapping[type];
@@ -21825,19 +21825,19 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryPersistable);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryPersistable);
 
               case 2:
                 this.persistable = _context.sent;
                 _context.next = 5;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryRevisions).then(function (historyValue) {
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryRevisions).then(function (historyValue) {
                   return _Services_history_history_session__WEBPACK_IMPORTED_MODULE_3__["HistorySession"].FromJson(historyValue);
                 });
 
               case 5:
                 this.historySession = _context.sent;
                 _context.next = 8;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryOptimize);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryOptimize);
 
               case 8:
                 autoOptimize = _context.sent;
@@ -21878,7 +21878,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  if (!(source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].LocalDirtied)) {
+                  if (!(source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalDirtied)) {
                     _context2.next = 2;
                     break;
                   }
@@ -21975,7 +21975,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
                 return _context3.abrupt("return");
 
               case 2:
-                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryRevisions, this.historySession);
+                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryRevisions, this.historySession);
 
               case 3:
               case "end":
@@ -22007,7 +22007,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(item, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSources"].SessionHistory);
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(item, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].SessionHistory);
                 entry = this.historySession.addEntryForPayload(payload);
 
                 if (this.autoOptimize) {
@@ -22083,7 +22083,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 this.historySession.clearAllHistory();
-                return _context6.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryRevisions));
+                return _context6.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryRevisions));
 
               case 2:
               case "end":
@@ -22114,14 +22114,14 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryPersistable, true);
+                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryPersistable, true);
                 this.saveToDisk();
                 _context7.next = 8;
                 break;
 
               case 6:
-                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryPersistable, false);
-                return _context7.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryRevisions));
+                this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryPersistable, false);
+                return _context7.abrupt("return", this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryRevisions));
 
               case 8:
               case "end":
@@ -22148,9 +22148,9 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
                 this.autoOptimize = !this.autoOptimize;
 
                 if (this.autoOptimize) {
-                  this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryOptimize, true);
+                  this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryOptimize, true);
                 } else {
-                  this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKeys"].SessionHistoryOptimize, false);
+                  this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["StorageKey"].SessionHistoryOptimize, false);
                 }
 
               case 2:
@@ -22694,7 +22694,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _Services_privileges_service__WEBPACK_IMPORTED_MODULE_11__["SNPrivilegesService"]; });
 
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_12__["SyncEvents"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_12__["SyncEvent"]; });
 
 /* harmony import */ var _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Services/sync/sync_service */ "./lib/services/sync/sync_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return _Services_sync_sync_service__WEBPACK_IMPORTED_MODULE_13__["SNSyncService"]; });
@@ -23098,7 +23098,7 @@ var SNMigrationService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getTimeStampKey",
     value: function getTimeStampKey() {
-      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["namespacedKey"])(this.services.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["RawStorageKeys"].LastMigrationTimestamp);
+      return Object(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["namespacedKey"])(this.services.namespace, _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_5__["RawStorageKey"].LastMigrationTimestamp);
     }
   }, {
     key: "getLastMigrationTimestamp",
@@ -26074,11 +26074,11 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
 
                 expiresAt = addSecondsToNow(length);
                 _context4.next = 4;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey, expiresAt);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].PrivilegesExpirey, expiresAt);
 
               case 4:
                 _context4.next = 6;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength, length);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].PrivilegesSessionLength, length);
 
               case 6:
               case "end":
@@ -26128,7 +26128,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesSessionLength);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].PrivilegesSessionLength);
 
               case 2:
                 length = _context6.sent;
@@ -26167,7 +26167,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 _context7.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKeys"].PrivilegesExpirey);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].PrivilegesExpirey);
 
               case 2:
                 expiresAt = _context7.sent;
@@ -26612,7 +26612,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
       enumerable: false,
       writable: true
     });
-    _this.removeMappingObserver = _this.modelManager.addMappingObserver([_Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentTypes"].ItemsKey], /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+    _this.removeMappingObserver = _this.modelManager.addMappingObserver([_Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey], /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -28031,7 +28031,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
             switch (_context21.prev = _context21.next) {
               case 0:
                 _context21.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 2:
                 rawKeyParams = _context21.sent;
@@ -28072,7 +28072,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context22.prev = _context22.next) {
               case 0:
-                return _context22.abrupt("return", this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped));
+                return _context22.abrupt("return", this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped));
 
               case 1:
               case "end":
@@ -28147,7 +28147,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
             switch (_context24.prev = _context24.next) {
               case 0:
                 _context24.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 2:
                 rawKeyParams = _context24.sent;
@@ -28420,7 +28420,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
 
               case 20:
                 _context28.next = 22;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyWrapperKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyWrapperKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 22:
                 _context28.next = 24;
@@ -28470,7 +28470,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
               case 3:
                 wrappedKey = _context29.sent;
                 _context29.next = 6;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].WrappedRootKey, wrappedKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].WrappedRootKey, wrappedKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 6:
               case "end":
@@ -28514,11 +28514,11 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context30.next = 5;
-                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 5:
                 _context30.next = 7;
-                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 7:
                 if (!(this.keyMode === KeyMode.RootKeyOnly)) {
@@ -28613,7 +28613,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
               case 16:
                 this.rootKey = key;
                 _context31.next = 19;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyParams, keyParams.getPortableValue(), _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 19:
                 if (!(this.keyMode === KeyMode.RootKeyOnly)) {
@@ -28712,15 +28712,15 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 _context33.next = 4;
-                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].WrappedRootKey, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 4:
                 _context33.next = 6;
-                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyWrapperKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 6:
                 _context33.next = 8;
-                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKeys"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
+                return this.storageService.removeValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_12__["StorageKey"].RootKeyParams, _Lib_services_storage_service__WEBPACK_IMPORTED_MODULE_13__["StorageValueModes"].Nonwrapped);
 
               case 8:
                 this.keyMode = KeyMode.RootKeyNone;
@@ -28867,7 +28867,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "contentTypeUsesRootKeyEncryption",
     value: function contentTypeUsesRootKeyEncryption(contentType) {
-      return contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentTypes"].ItemsKey || contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentTypes"].EncryptedStorage;
+      return contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey || contentType === _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].EncryptedStorage;
     }
     /**
      * Determines which key to use for encryption of the payload
@@ -29345,7 +29345,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
 
                 /** Create root key based items key */
                 _payload2 = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_7__["CreateMaxPayloadFromAnyObject"])({
-                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentTypes"].ItemsKey,
+                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey,
                   content: {
                     itemsKey: rootKey.masterKey,
                     dataAuthenticationKey: rootKey.dataAuthenticationKey,
@@ -29768,7 +29768,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  if (!(eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].DownloadFirstSyncCompleted || eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].FullSyncCompleted)) {
+                  if (!(eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvent"].DownloadFirstSyncCompleted || eventName === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvent"].FullSyncCompleted)) {
                     _context2.next = 3;
                     break;
                   }
@@ -29949,7 +29949,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                  * as a sync request will automatically be made as part of the second phase
                  * of a download-first request.
                  */
-                if (handled.length > 0 && eventSource === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvents"].FullSyncCompleted) {
+                if (handled.length > 0 && eventSource === _Services_sync_events__WEBPACK_IMPORTED_MODULE_6__["SyncEvent"].FullSyncCompleted) {
                   /** 
                    * Do not await. We want any local-side changes to 
                    * be awaited but the actual sync shouldn't be since it's non-essential
@@ -30081,7 +30081,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                 };
                 dirtyPayload = (0, _context5.t0)(_context5.t1, _context5.t3);
                 _context5.next = 21;
-                return this.modelManager.mapPayloadToLocalItem(dirtyPayload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSources"].LocalChanged);
+                return this.modelManager.mapPayloadToLocalItem(dirtyPayload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_7__["PayloadSource"].LocalChanged);
 
               case 21:
                 item = _context5.sent;
@@ -30481,7 +30481,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 payload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(wrappedValue, undefined, undefined, {
-                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].EncryptedStorage
+                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentType"].EncryptedStorage
                 });
                 _context7.next = 5;
                 return this.encryptionDelegate.payloadByDecryptingPayload(payload, key);
@@ -30568,7 +30568,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
               case 5:
                 _context9.t1 = _context9.sent;
                 _context9.t2 = valuesToWrap;
-                _context9.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentTypes"].EncryptedStorage;
+                _context9.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentType"].EncryptedStorage;
                 _context9.t4 = {
                   uuid: _context9.t1,
                   content: _context9.t2,
@@ -30576,7 +30576,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 };
                 payload = (0, _context9.t0)(_context9.t4);
                 _context9.next = 12;
-                return this.encryptionDelegate.payloadByEncryptingPayload(payload, _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStoragePreferEncrypted);
+                return this.encryptionDelegate.payloadByEncryptingPayload(payload, _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted);
 
               case 12:
                 encryptedPayload = _context9.sent;
@@ -30914,7 +30914,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
 
               case 15:
                 _context17.next = 17;
-                return this.encryptionDelegate.payloadByEncryptingPayload(_payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStoragePreferEncrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntents"].LocalStorageDecrypted);
+                return this.encryptionDelegate.payloadByEncryptingPayload(_payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageDecrypted);
 
               case 17:
                 encrypted = _context17.sent;
@@ -31230,7 +31230,7 @@ var AccountDownloader = /*#__PURE__*/function () {
               case 2:
                 response = _context.sent;
                 encryptedPayloads = response.retrieved_items.map(function (rawPayload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(rawPayload, _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(rawPayload, _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
                 });
                 _context.next = 6;
                 return this.protocolService.payloadsByDecryptingPayloads(encryptedPayloads);
@@ -31520,7 +31520,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 
     this.response = response;
     this.baseCollection = baseCollection;
-    this.relatedCollectionSet = new _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__["PayloadCollectionSet"]([new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](decryptedResponsePayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].DecryptedTransient), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloadsSavedOrSaving, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].SavedOrSaving)]);
+    this.relatedCollectionSet = new _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__["PayloadCollectionSet"]([new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](decryptedResponsePayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloadsSavedOrSaving, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].SavedOrSaving)]);
   }
 
   _createClass(SyncResponseResolver, [{
@@ -31534,7 +31534,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 0:
                 collections = [];
                 _context.next = 3;
-                return this.collectionByProcessingRawItems(this.response.rawRetrievedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
+                return this.collectionByProcessingRawItems(this.response.rawRetrievedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
 
               case 3:
                 collectionRetrieved = _context.sent;
@@ -31544,7 +31544,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 }
 
                 _context.next = 7;
-                return this.collectionByProcessingRawItems(this.response.rawSavedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved);
+                return this.collectionByProcessingRawItems(this.response.rawSavedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
 
               case 7:
                 collectionSaved = _context.sent;
@@ -31554,7 +31554,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 }
 
                 _context.next = 11;
-                return this.collectionByProcessingRawItems(this.response.rawUuidConflictItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].ConflictUuid);
+                return this.collectionByProcessingRawItems(this.response.rawUuidConflictItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictUuid);
 
               case 11:
                 collectionUuidConflicts = _context.sent;
@@ -31564,7 +31564,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 }
 
                 _context.next = 15;
-                return this.collectionByProcessingRawItems(this.response.rawDataConflictItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].ConflictData);
+                return this.collectionByProcessingRawItems(this.response.rawDataConflictItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictData);
 
               case 15:
                 collectionDataConflicts = _context.sent;
@@ -31665,31 +31665,31 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 /*!*************************************!*\
   !*** ./lib/services/sync/events.ts ***!
   \*************************************/
-/*! exports provided: SyncEvents */
+/*! exports provided: SyncEvent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncEvents", function() { return SyncEvents; });
-var SyncEvents;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncEvent", function() { return SyncEvent; });
+var SyncEvent;
 
-(function (SyncEvents) {
-  SyncEvents["FullSyncCompleted"] = "sync =full-completed";
-  SyncEvents["SingleSyncCompleted"] = "sync =single-completed";
-  SyncEvents["SyncWillBegin"] = "sync =will-begin";
-  SyncEvents["DownloadFirstSyncCompleted"] = "sync =download-first-completed";
-  SyncEvents["SyncTakingTooLong"] = "sync =taking-too-long";
-  SyncEvents["SyncError"] = "sync =error";
-  SyncEvents["InvalidSession"] = "sync =invalid-session";
-  SyncEvents["MajorDataChange"] = "major-data-change";
-  SyncEvents["LocalDataIncrementalLoad"] = "local-data-incremental-load";
-  SyncEvents["LocalDataLoaded"] = "local-data-loaded";
-  SyncEvents["EnterOutOfSync"] = "enter-out-of-sync";
-  SyncEvents["ExitOutOfSync"] = "exit-out-of-sync";
-  SyncEvents["StatusChanged"] = "status-changed";
-  SyncEvents["DatabaseWriteError"] = "database-write-error";
-  SyncEvents["DatabaseReadError"] = "database-read-error";
-})(SyncEvents || (SyncEvents = {}));
+(function (SyncEvent) {
+  SyncEvent["FullSyncCompleted"] = "sync =full-completed";
+  SyncEvent["SingleSyncCompleted"] = "sync =single-completed";
+  SyncEvent["SyncWillBegin"] = "sync =will-begin";
+  SyncEvent["DownloadFirstSyncCompleted"] = "sync =download-first-completed";
+  SyncEvent["SyncTakingTooLong"] = "sync =taking-too-long";
+  SyncEvent["SyncError"] = "sync =error";
+  SyncEvent["InvalidSession"] = "sync =invalid-session";
+  SyncEvent["MajorDataChange"] = "major-data-change";
+  SyncEvent["LocalDataIncrementalLoad"] = "local-data-incremental-load";
+  SyncEvent["LocalDataLoaded"] = "local-data-loaded";
+  SyncEvent["EnterOutOfSync"] = "enter-out-of-sync";
+  SyncEvent["ExitOutOfSync"] = "exit-out-of-sync";
+  SyncEvent["StatusChanged"] = "status-changed";
+  SyncEvent["DatabaseWriteError"] = "database-write-error";
+  SyncEvent["DatabaseReadError"] = "database-read-error";
+})(SyncEvent || (SyncEvent = {}));
 
 ;
 
@@ -31757,7 +31757,7 @@ var OfflineSyncOperation = /*#__PURE__*/function () {
             switch (_context.prev = _context.next) {
               case 0:
                 responsePayloads = this.payloads.map(function (payload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSources"].LocalSaved, {
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CreateSourcedPayloadFromObject"])(payload, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].LocalSaved, {
                     dirty: false,
                     lastSyncEnd: new Date()
                   });
@@ -31847,17 +31847,17 @@ var SyncResponse = /*#__PURE__*/function () {
   }, {
     key: "lastSyncToken",
     get: function get() {
-      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].LastSyncToken];
+      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParam"].LastSyncToken];
     }
   }, {
     key: "paginationToken",
     get: function get() {
-      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].PaginationToken];
+      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParam"].PaginationToken];
     }
   }, {
     key: "integrityHash",
     get: function get() {
-      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParams"].IntegrityResult];
+      return this.rawResponse[_Services_api_keys__WEBPACK_IMPORTED_MODULE_1__["ApiEndpointParam"].IntegrityResult];
     }
   }, {
     key: "checkIntegrity",
@@ -31880,21 +31880,21 @@ var SyncResponse = /*#__PURE__*/function () {
     key: "savedPayloads",
     get: function get() {
       return this.rawSavedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteSaved);
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
       });
     }
   }, {
     key: "retrievedPayloads",
     get: function get() {
       return this.rawRetrievedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
       });
     }
   }, {
     key: "conflictPayloads",
     get: function get() {
       return this.rawItemsFromConflicts.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSources"].RemoteRetrieved);
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
       });
     }
   }, {
@@ -32051,13 +32051,13 @@ var SyncOpStatus = /*#__PURE__*/function () {
     value: function setUploadStatus(completed, total) {
       this.completedUpload = completed;
       this.totalUpload = total;
-      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged);
+      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged);
     }
   }, {
     key: "setDownloadStatus",
     value: function setDownloadStatus(downloaded) {
       this.downloaded += downloaded;
-      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged);
+      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged);
     }
   }, {
     key: "setDatabaseLoadStatus",
@@ -32067,9 +32067,9 @@ var SyncOpStatus = /*#__PURE__*/function () {
       this.databaseLoadDone = done;
 
       if (done) {
-        this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataLoaded);
+        this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataLoaded);
       } else {
-        this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].LocalDataIncrementalLoad);
+        this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataIncrementalLoad);
       }
     }
   }, {
@@ -32111,7 +32111,7 @@ var SyncOpStatus = /*#__PURE__*/function () {
 
       this.timingMonitor = this.interval(function () {
         if (_this.secondsSinceSyncStart > HEALTHY_SYNC_DURATION_THRESHOLD_S) {
-          _this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].SyncTakingTooLong);
+          _this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncTakingTooLong);
 
           _this.stopTimingMonitor();
         }
@@ -32153,7 +32153,7 @@ var SyncOpStatus = /*#__PURE__*/function () {
       this.syncing = false;
       this.error = null;
       this.stopTimingMonitor();
-      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvents"].StatusChanged);
+      this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged);
     }
   }, {
     key: "syncInProgress",
@@ -32361,9 +32361,9 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
     _defineProperty(_assertThisInitialized(_this), "_simulate_latency", void 0);
 
-    _defineProperty(_assertThisInitialized(_this), "localLoadPriorty", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].ItemsKey, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].UserPrefs, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].Privileges, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].Component, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].Theme]);
+    _defineProperty(_assertThisInitialized(_this), "localLoadPriorty", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].UserPrefs, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Privileges, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Component, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Theme]);
 
-    _defineProperty(_assertThisInitialized(_this), "nonEncryptedTypes", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].ServerExtension]);
+    _defineProperty(_assertThisInitialized(_this), "nonEncryptedTypes", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ServerExtension]);
 
     _this.sessionManager = sessionManager;
     _this.protocolService = protocolService;
@@ -32561,7 +32561,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 /** Decrypt and map items keys first */
 
                 itemsKeysPayloads = payloads.filter(function (payload) {
-                  return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentTypes"].ItemsKey;
+                  return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey;
                 });
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(payloads, itemsKeysPayloads);
                 _context3.next = 8;
@@ -32570,7 +32570,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 8:
                 decryptedItemsKeys = _context3.sent;
                 _context3.next = 11;
-                return this.modelManager.mapPayloadsToLocalItems(decryptedItemsKeys, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalRetrieved);
+                return this.modelManager.mapPayloadsToLocalItems(decryptedItemsKeys, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalRetrieved);
 
               case 11:
                 /** Map in batches to give interface a chance to update */
@@ -32593,7 +32593,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 20:
                 decrypted = _context3.sent;
                 _context3.next = 23;
-                return this.modelManager.mapPayloadsToLocalItems(decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalRetrieved);
+                return this.modelManager.mapPayloadsToLocalItems(decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalRetrieved);
 
               case 23:
                 this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].LocalDataIncrementalLoad);
@@ -32826,7 +32826,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 3:
                 results = _context10.sent;
                 _context10.next = 6;
-                return this.modelManager.mapPayloadsToLocalItems(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalChanged);
+                return this.modelManager.mapPayloadsToLocalItems(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
 
               case 6:
                 mapped = _context10.sent;
@@ -32942,7 +32942,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   });
                 });
                 _context11.next = 33;
-                return this.modelManager.mapPayloadsToLocalItems(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalChanged);
+                return this.modelManager.mapPayloadsToLocalItems(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
 
               case 33:
                 _context11.next = 35;
@@ -33068,7 +33068,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
       var _this7 = this;
 
       return this.protocolService.payloadsByEncryptingPayloads(payloads, function (payload) {
-        return _this7.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntents"].Sync;
+        return _this7.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntent"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntent"].Sync;
       });
     }
   }, {
@@ -33714,7 +33714,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 6:
                 _context19.next = 8;
-                return this.modelManager.mapPayloadsToLocalItems(payloadsToMap, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalSaved);
+                return this.modelManager.mapPayloadsToLocalItems(payloadsToMap, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalSaved);
 
               case 8:
                 this.opStatus.clearError();
@@ -33806,7 +33806,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 payload = _step3.value;
 
-                if (!(payload.deleted || !payload.fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadFields"].Content))) {
+                if (!(payload.deleted || !payload.fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadField"].Content))) {
                   _context21.next = 18;
                   break;
                 }
@@ -33888,7 +33888,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 payloadsToPersist = void 0;
                 fields = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["payloadFieldsForSource"])(collection.source);
 
-                if (!fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadFields"].Content)) {
+                if (!fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadField"].Content)) {
                   /** Before persisting, merge with current base value that has content field */
                   payloadsToPersist = collection.getAllPayloads().map(function (payload) {
                     var base = masterCollection.findPayload(payload.uuid);
@@ -33992,7 +33992,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   });
                 });
                 _context22.next = 3;
-                return this.modelManager.mapPayloadsToLocalItems(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].LocalChanged);
+                return this.modelManager.mapPayloadsToLocalItems(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
 
               case 3:
                 _context22.next = 5;
@@ -34116,7 +34116,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 3:
                 payloads = _context25.sent;
-                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSources"].RemoteRetrieved));
+                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].RemoteRetrieved));
                 _context25.next = 7;
                 return delta.resultingCollection();
 
@@ -34317,7 +34317,7 @@ var SyncState = /*#__PURE__*/function () {
                 if (isInSync) {
                   if (this.outOfSync) {
                     this.outOfSync = false;
-                    this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].ExitOutOfSync);
+                    this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].ExitOutOfSync);
                   }
 
                   this.discordance = 0;
@@ -34326,7 +34326,7 @@ var SyncState = /*#__PURE__*/function () {
 
                   if (this.discordance >= this.maxDiscordance && !this.outOfSync) {
                     this.outOfSync = true;
-                    this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvents"].EnterOutOfSync);
+                    this.receiver(_Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].EnterOutOfSync);
                   }
                 }
 
@@ -34410,24 +34410,24 @@ function SortPayloadsByRecentAndContentPriority(payloads, priorityList) {
 /*!***********************!*\
   !*** ./lib/stages.ts ***!
   \***********************/
-/*! exports provided: ApplicationStages */
+/*! exports provided: ApplicationStage */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApplicationStages", function() { return ApplicationStages; });
-var ApplicationStages;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApplicationStage", function() { return ApplicationStage; });
+var ApplicationStage;
 
-(function (ApplicationStages) {
-  ApplicationStages[ApplicationStages["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
-  ApplicationStages[ApplicationStages["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
-  ApplicationStages[ApplicationStages["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
-  ApplicationStages[ApplicationStages["Launched_10"] = 1] = "Launched_10";
-  ApplicationStages[ApplicationStages["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
-  ApplicationStages[ApplicationStages["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
-  ApplicationStages[ApplicationStages["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
-  ApplicationStages[ApplicationStages["SignedIn_30"] = 3] = "SignedIn_30";
-})(ApplicationStages || (ApplicationStages = {}));
+(function (ApplicationStage) {
+  ApplicationStage[ApplicationStage["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
+  ApplicationStage[ApplicationStage["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
+  ApplicationStage[ApplicationStage["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
+  ApplicationStage[ApplicationStage["Launched_10"] = 1] = "Launched_10";
+  ApplicationStage[ApplicationStage["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
+  ApplicationStage[ApplicationStage["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
+  ApplicationStage[ApplicationStage["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
+  ApplicationStage[ApplicationStage["SignedIn_30"] = 3] = "SignedIn_30";
+})(ApplicationStage || (ApplicationStage = {}));
 
 ;
 
@@ -34437,23 +34437,23 @@ var ApplicationStages;
 /*!*****************************!*\
   !*** ./lib/storage_keys.ts ***!
   \*****************************/
-/*! exports provided: RawStorageKeys, StorageKeys, namespacedKey */
+/*! exports provided: RawStorageKey, StorageKey, namespacedKey */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RawStorageKeys", function() { return RawStorageKeys; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageKeys", function() { return StorageKeys; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RawStorageKey", function() { return RawStorageKey; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return StorageKey; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return namespacedKey; });
 /**
  * Unmanaged keys stored in root storage
  */
-var RawStorageKeys;
+var RawStorageKey;
 
-(function (RawStorageKeys) {
-  RawStorageKeys["StorageObject"] = "storage";
-  RawStorageKeys["LastMigrationTimestamp"] = "last_migration_timestamp";
-})(RawStorageKeys || (RawStorageKeys = {}));
+(function (RawStorageKey) {
+  RawStorageKey["StorageObject"] = "storage";
+  RawStorageKey["LastMigrationTimestamp"] = "last_migration_timestamp";
+})(RawStorageKey || (RawStorageKey = {}));
 
 ;
 /**
@@ -34461,26 +34461,26 @@ var RawStorageKeys;
  * These keys are managed and are embedded inside RawStorageKeys.StorageObject
  */
 
-var StorageKeys;
+var StorageKey;
 
-(function (StorageKeys) {
-  StorageKeys["RootKeyParams"] = "ROOT_KEY_PARAMS";
-  StorageKeys["WrappedRootKey"] = "WRAPPED_ROOT_KEY";
-  StorageKeys["RootKeyWrapperKeyParams"] = "ROOT_KEY_WRAPPER_KEY_PARAMS";
-  StorageKeys["Session"] = "session";
-  StorageKeys["User"] = "user";
-  StorageKeys["ServerHost"] = "server";
-  StorageKeys["LegacyUuid"] = "uuid";
-  StorageKeys["LastSyncToken"] = "syncToken";
-  StorageKeys["PaginationToken"] = "cursorToken";
-  StorageKeys["BiometricPrefs"] = "biometrics_prefs";
-  StorageKeys["MobilePasscodeTiming"] = "passcode_timing";
-  StorageKeys["PrivilegesExpirey"] = "SessionExpiresAtKey";
-  StorageKeys["PrivilegesSessionLength"] = "SessionLengthKey";
-  StorageKeys["SessionHistoryPersistable"] = "sessionHistory_persist";
-  StorageKeys["SessionHistoryRevisions"] = "sessionHistory_revisions";
-  StorageKeys["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
-})(StorageKeys || (StorageKeys = {}));
+(function (StorageKey) {
+  StorageKey["RootKeyParams"] = "ROOT_KEY_PARAMS";
+  StorageKey["WrappedRootKey"] = "WRAPPED_ROOT_KEY";
+  StorageKey["RootKeyWrapperKeyParams"] = "ROOT_KEY_WRAPPER_KEY_PARAMS";
+  StorageKey["Session"] = "session";
+  StorageKey["User"] = "user";
+  StorageKey["ServerHost"] = "server";
+  StorageKey["LegacyUuid"] = "uuid";
+  StorageKey["LastSyncToken"] = "syncToken";
+  StorageKey["PaginationToken"] = "cursorToken";
+  StorageKey["BiometricPrefs"] = "biometrics_prefs";
+  StorageKey["MobilePasscodeTiming"] = "passcode_timing";
+  StorageKey["PrivilegesExpirey"] = "SessionExpiresAtKey";
+  StorageKey["PrivilegesSessionLength"] = "SessionLengthKey";
+  StorageKey["SessionHistoryPersistable"] = "sessionHistory_persist";
+  StorageKey["SessionHistoryRevisions"] = "sessionHistory_revisions";
+  StorageKey["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
+})(StorageKey || (StorageKey = {}));
 
 ;
 function namespacedKey(namespace, key) {

@@ -1,10 +1,10 @@
-import { ContentTypes } from '@Models/content_types';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ContentType } from '@Models/content_types';
+import { ProtocolVersion } from '@Protocol/versions';
 import { Uuid } from '@Lib/uuid';
 import { Copy } from '@Lib/utils';
 
 export type RootKeyContent = {
-  version: ProtocolVersions;
+  version: ProtocolVersion;
   masterKey: string;
   serverPassword: string;
   dataAuthenticationKey?: string;
@@ -36,9 +36,9 @@ export class SNRootKey {
          * If there's no version stored, it must be either 001 or 002.
          * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
          */
-        this.content.version = ProtocolVersions.V002;
+        this.content.version = ProtocolVersion.V002;
       } else {
-        this.content.version = ProtocolVersions.V001;
+        this.content.version = ProtocolVersion.V001;
       }
     }
 
@@ -50,7 +50,7 @@ export class SNRootKey {
   }
 
   public static contentType() {
-    return ContentTypes.RootKey;
+    return ContentType.RootKey;
   }
 
   public get version() {

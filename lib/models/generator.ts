@@ -3,19 +3,19 @@ import { PayloadContent } from '@Payloads/generator';
 import { deepMerge, Copy } from '@Lib/utils';
 import { PurePayload } from '@Payloads/pure_payload';
 import * as itemClasses from '@Models/index';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 
 const ContentTypeClassMapping: Record<any, any> = {
-  [ContentTypes.Note]: itemClasses.SNNote,
-  [ContentTypes.Tag]: itemClasses.SNTag,
-  [ContentTypes.ItemsKey]: itemClasses.SNItemsKey,
-  [ContentTypes.SmartTag]: itemClasses.SNSmartTag,
-  [ContentTypes.ActionsExtension]: itemClasses.SNActionsExtension,
-  [ContentTypes.Editor]: itemClasses.SNEditor,
-  [ContentTypes.Theme]: itemClasses.SNTheme,
-  [ContentTypes.Component]: itemClasses.SNComponent,
-  [ContentTypes.Privileges]: itemClasses.SNPrivileges,
-  [ContentTypes.UserPrefs]: itemClasses.SNUserPrefs
+  [ContentType.Note]: itemClasses.SNNote,
+  [ContentType.Tag]: itemClasses.SNTag,
+  [ContentType.ItemsKey]: itemClasses.SNItemsKey,
+  [ContentType.SmartTag]: itemClasses.SNSmartTag,
+  [ContentType.ActionsExtension]: itemClasses.SNActionsExtension,
+  [ContentType.Editor]: itemClasses.SNEditor,
+  [ContentType.Theme]: itemClasses.SNTheme,
+  [ContentType.Component]: itemClasses.SNComponent,
+  [ContentType.Privileges]: itemClasses.SNPrivileges,
+  [ContentType.UserPrefs]: itemClasses.SNUserPrefs
 };
 
 export function CreateItemFromPayload(payload: PurePayload) {

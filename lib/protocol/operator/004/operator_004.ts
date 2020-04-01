@@ -5,9 +5,9 @@ import { V004Algorithm } from './../algorithms';
 import { ItemsKeyContent } from './../operator';
 import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
-import { PayloadFormats } from '@Payloads/formats';
+import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { truncateHexString } from '@Lib/utils';
 
@@ -16,7 +16,7 @@ const PARTITION_CHARACTER = ':';
 export class SNProtocolOperator004 extends SNProtocolOperator003 {
 
   get version() {
-    return ProtocolVersions.V004;
+    return ProtocolVersion.V004;
   }
 
   protected async generateNewItemsKeyContent() {
@@ -131,16 +131,16 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
 
   public async generateEncryptedParameters(
     payload: PurePayload,
-    format: PayloadFormats,
+    format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
   ) {
     if ((
-      format === PayloadFormats.DecryptedBareObject ||
-      format === PayloadFormats.DecryptedBase64String
+      format === PayloadFormat.DecryptedBareObject ||
+      format === PayloadFormat.DecryptedBase64String
     )) {
       return super.generateEncryptedParameters(payload, format, key);
     }
-    if (format !== PayloadFormats.EncryptedString) {
+    if (format !== PayloadFormat.EncryptedString) {
       throw `Unsupport format for generateEncryptedParameters ${format}`;
     }
     if (!payload.uuid) {
@@ -179,8 +179,8 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   ) {
     const format = encryptedParameters.format;
     if ((
-      format === PayloadFormats.DecryptedBareObject ||
-      format === PayloadFormats.DecryptedBase64String
+      format === PayloadFormat.DecryptedBareObject ||
+      format === PayloadFormat.DecryptedBase64String
     )) {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }

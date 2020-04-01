@@ -1,18 +1,18 @@
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import {
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
   DeltaRemoteConflicts
 } from './index';
 
-export function DeltaClassForSource(source: PayloadSources) {
-  if(source === PayloadSources.RemoteRetrieved) {
+export function DeltaClassForSource(source: PayloadSource) {
+  if(source === PayloadSource.RemoteRetrieved) {
     return DeltaRemoteRetrieved;
-  } else if(source === PayloadSources.RemoteSaved) {
+  } else if(source === PayloadSource.RemoteSaved) {
     return DeltaRemoteSaved;
   } else if((
-    source === PayloadSources.ConflictData ||
-    source === PayloadSources.ConflictUuid
+    source === PayloadSource.ConflictData ||
+    source === PayloadSource.ConflictUuid
   )) {
     return DeltaRemoteConflicts;
   }

@@ -1,7 +1,7 @@
 import { SNNote } from './note';
 import { SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { existsInArray, removeFromArray } from '@Lib/utils';
 
 /**
@@ -47,7 +47,7 @@ export class SNEditor extends SNItem {
   }
 
   addItemAsRelationship(item: SNItem) {
-    if(item.content_type === ContentTypes.Note) {
+    if(item.content_type === ContentType.Note) {
       if (!existsInArray(this.notes, item)) {
         this.notes.push(item as SNNote);
       }
@@ -56,14 +56,14 @@ export class SNEditor extends SNItem {
   }
 
   removeItemAsRelationship(item: SNItem) {
-    if(item.content_type === ContentTypes.Note) {
+    if(item.content_type === ContentType.Note) {
       removeFromArray(this.notes, item);
     }
     super.removeItemAsRelationship(item);
   }
 
   getDefaultContentType()  {
-    return ContentTypes.Editor;
+    return ContentType.Editor;
   }
 
   setData(key: string, value: any) {

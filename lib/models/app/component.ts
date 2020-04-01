@@ -1,6 +1,6 @@
 import { isString } from '@Lib/utils';
 import { SNItem } from '@Models/core/item';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { ConflictStrategies } from '@Payloads/index';
 
 export enum ComponentAreas {
@@ -49,7 +49,7 @@ export class SNComponent extends SNItem {
   }
 
   getDefaultContentType() {
-    return ContentTypes.Component;
+    return ContentType.Component;
   }
 
   /** Custom data that a component can store in itself */
@@ -187,7 +187,7 @@ export class SNComponent extends SNItem {
 
   public isTheme() {
     return (
-      this.content_type === ContentTypes.Theme ||
+      this.content_type === ContentType.Theme ||
       this.area === ComponentAreas.Themes
     );
   }

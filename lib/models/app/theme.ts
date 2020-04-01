@@ -1,6 +1,6 @@
 import { SNItem } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { SNComponent, ComponentAreas } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
@@ -12,7 +12,7 @@ export class SNTheme extends SNComponent {
   }
 
   getDefaultContentType()  {
-    return ContentTypes.Theme;
+    return ContentType.Theme;
   }
 
   /** Do not duplicate under most circumstances. Always keep original */

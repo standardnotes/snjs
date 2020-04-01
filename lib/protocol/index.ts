@@ -1,6 +1,6 @@
-export { ProtocolVersions, compareVersions } from '@Protocol/versions';
+export { ProtocolVersion as ProtocolVersions, compareVersions } from '@Protocol/versions';
 export {
-  EncryptionIntents,
+  EncryptionIntent as EncryptionIntents,
   isDecryptedIntent,
   intentRequiresEncryption
 } from '@Protocol/intents';

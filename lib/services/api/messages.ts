@@ -1,4 +1,4 @@
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 export const API_MESSAGE_GENERIC_INVALID_LOGIN     = 'A server error occurred while trying to sign in. Please try again.';
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
 export const API_MESSAGE_GENERIC_CHANGE_PW_FAIL    = `Something went wrong while changing your password.
@@ -47,7 +47,7 @@ export function InsufficientPasswordMessage(minimum: number) {
          `;
 }
 
-export function StrictSignInFailed(current: ProtocolVersions, latest: ProtocolVersions) {
+export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion) {
   return `
           Strict Sign In has refused the server's sign-in parameters.
           The latest account version is ${latest}, but the server is reporting a 

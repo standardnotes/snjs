@@ -11,10 +11,10 @@ export {
 } from './generator';
 
 export { PayloadsByDuplicating, PayloadsByAlternatingUuid } from '@Payloads/functions';
-export { PayloadFields } from '@Payloads/fields';
-export { PayloadSources } from '@Payloads/sources';
+export { PayloadField as PayloadFields } from '@Payloads/fields';
+export { PayloadSource as PayloadSources } from '@Payloads/sources';
 export { PurePayload } from '@Payloads/pure_payload';
-export { PayloadFormats } from '@Payloads/formats';
+export { PayloadFormat as PayloadFormats } from '@Payloads/formats';
 
 export {
   ConflictStrategies,

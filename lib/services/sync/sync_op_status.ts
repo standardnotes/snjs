@@ -1,4 +1,4 @@
-import { SyncEvents, SyncEventReceiver } from '@Lib/services/sync/events';
+import { SyncEvent, SyncEventReceiver } from '@Lib/services/sync/events';
 
 const HEALTHY_SYNC_DURATION_THRESHOLD_S = 5;
 const TIMING_MONITOR_POLL_FREQUENCY_MS = 500;
@@ -36,12 +36,12 @@ export class SyncOpStatus {
   public setUploadStatus(completed: number, total: number) {
     this.completedUpload = completed;
     this.totalUpload = total;
-    this.receiver(SyncEvents.StatusChanged);
+    this.receiver(SyncEvent.StatusChanged);
   }
 
   public setDownloadStatus(downloaded: number) {
     this.downloaded += downloaded;
-    this.receiver(SyncEvents.StatusChanged);
+    this.receiver(SyncEvent.StatusChanged);
   }
 
   public setDatabaseLoadStatus(current: number, total: number, done: boolean) {
@@ -49,9 +49,9 @@ export class SyncOpStatus {
     this.databaseLoadTotal = total;
     this.databaseLoadDone = done;
     if (done) {
-      this.receiver(SyncEvents.LocalDataLoaded);
+      this.receiver(SyncEvent.LocalDataLoaded);
     } else {
-      this.receiver(SyncEvents.LocalDataIncrementalLoad);
+      this.receiver(SyncEvent.LocalDataIncrementalLoad);
     }
   }
 
@@ -93,7 +93,7 @@ export class SyncOpStatus {
     }
     this.timingMonitor = this.interval(() => {
       if (this.secondsSinceSyncStart > HEALTHY_SYNC_DURATION_THRESHOLD_S) {
-        this.receiver(SyncEvents.SyncTakingTooLong);
+        this.receiver(SyncEvent.SyncTakingTooLong);
         this.stopTimingMonitor();
       }
     }, TIMING_MONITOR_POLL_FREQUENCY_MS);
@@ -128,6 +128,6 @@ export class SyncOpStatus {
     this.syncing = false;
     this.error = null;
     this.stopTimingMonitor();
-    this.receiver(SyncEvents.StatusChanged);
+    this.receiver(SyncEvent.StatusChanged);
   }
 }

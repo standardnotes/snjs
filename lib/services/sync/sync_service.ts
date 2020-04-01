@@ -14,13 +14,13 @@ import { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 import { AccountSyncOperation } from '@Services/sync/account/operation';
 import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
-import { PayloadFields } from '@Payloads/fields';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadField } from '@Payloads/fields';
+import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject, payloadFieldsForSource } from '@Payloads/generator';
-import { EncryptionIntents } from '@Protocol/intents';
-import { ContentTypes } from '@Models/content_types';
+import { EncryptionIntent } from '@Protocol/intents';
+import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SyncSignal } from '@Services/sync/signals';
 import { StorageKeys, SyncEvents } from '@Lib/index';
@@ -125,11 +125,11 @@ export class SNSyncService extends PureService {
 
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
-    ContentTypes.ItemsKey,
-    ContentTypes.UserPrefs,
-    ContentTypes.Privileges,
-    ContentTypes.Component,
-    ContentTypes.Theme
+    ContentType.ItemsKey,
+    ContentType.UserPrefs,
+    ContentType.Privileges,
+    ContentType.Component,
+    ContentType.Theme
   ];
   /**
    * Non-encrypted types are items whose values a server must be able to read.
@@ -138,8 +138,8 @@ export class SNSyncService extends PureService {
    * needs to be able to read in order to enforce.
    */
   private readonly nonEncryptedTypes = [
-    ContentTypes.Mfa,
-    ContentTypes.ServerExtension
+    ContentType.Mfa,
+    ContentType.ServerExtension
   ];
 
   constructor(
@@ -273,14 +273,14 @@ export class SNSyncService extends PureService {
 
     /** Decrypt and map items keys first */
     const itemsKeysPayloads = payloads.filter((payload: PurePayload) => {
-      return payload.content_type === ContentTypes.ItemsKey;
+      return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
     const decryptedItemsKeys = await this.protocolService!
       .payloadsByDecryptingPayloads(itemsKeysPayloads);
     await this.modelManager!.mapPayloadsToLocalItems(
       decryptedItemsKeys,
-      PayloadSources.LocalRetrieved
+      PayloadSource.LocalRetrieved
     );
 
     /** Map in batches to give interface a chance to update */
@@ -294,7 +294,7 @@ export class SNSyncService extends PureService {
         .payloadsByDecryptingPayloads(batch);
       await this.modelManager!.mapPayloadsToLocalItems(
         decrypted,
-        PayloadSources.LocalRetrieved
+        PayloadSource.LocalRetrieved
       );
       this.notifyEvent(
         SyncEvents.LocalDataIncrementalLoad
@@ -357,7 +357,7 @@ export class SNSyncService extends PureService {
     );
     const mapped = await this.modelManager!.mapPayloadsToLocalItems(
       results,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.persistPayloads(results);
     return mapped[0];
@@ -394,7 +394,7 @@ export class SNSyncService extends PureService {
     });
     await this.modelManager!.mapPayloadsToLocalItems(
       payloads,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.persistPayloads(payloads);
   }
@@ -461,8 +461,8 @@ export class SNSyncService extends PureService {
       (payload) => {
         return (
           this.nonEncryptedTypes.includes(payload.content_type!)
-            ? EncryptionIntents.SyncDecrypted
-            : EncryptionIntents.Sync
+            ? EncryptionIntent.SyncDecrypted
+            : EncryptionIntent.Sync
         );
       }
     );
@@ -752,7 +752,7 @@ export class SNSyncService extends PureService {
     await this.persistPayloads(payloadsToPersist);
     await this.modelManager!.mapPayloadsToLocalItems(
       payloadsToMap,
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
 
     this.opStatus!.clearError();
@@ -789,7 +789,7 @@ export class SNSyncService extends PureService {
 
     const decryptedPayloads = [];
     for (const payload of response.allProcessedPayloads) {
-      if (payload.deleted || !payload.fields.includes(PayloadFields.Content)) {
+      if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
         /* Deleted payloads, and some payload types
           do not contiain content (like remote saved) */
         continue;
@@ -810,7 +810,7 @@ export class SNSyncService extends PureService {
       await this.modelManager!.mapCollectionToLocalItems(collection);
       let payloadsToPersist;
       const fields = payloadFieldsForSource(collection.source!);
-      if (!fields.includes(PayloadFields.Content)) {
+      if (!fields.includes(PayloadField.Content)) {
         /** Before persisting, merge with current base value that has content field */
         payloadsToPersist = collection.getAllPayloads().map((payload) => {
           const base = masterCollection.findPayload(payload.uuid!);
@@ -849,7 +849,7 @@ export class SNSyncService extends PureService {
     });
     await this.modelManager!.mapPayloadsToLocalItems(
       payloads,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.persistPayloads(payloads);
   }
@@ -898,7 +898,7 @@ export class SNSyncService extends PureService {
       this.modelManager!.getMasterCollection(),
       new PayloadCollection(
         payloads,
-        PayloadSources.RemoteRetrieved
+        PayloadSource.RemoteRetrieved
       )
     );
     const collection = await delta.resultingCollection();
@@ -910,7 +910,7 @@ export class SNSyncService extends PureService {
     });
   }
 
-  public async statelessDownloadAllItems(contentType?: ContentTypes, customEvent?: string) {
+  public async statelessDownloadAllItems(contentType?: ContentType, customEvent?: string) {
     const downloader = new AccountDownloader(
       this.apiService!,
       this.protocolService!,

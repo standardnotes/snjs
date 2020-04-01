@@ -1,5 +1,5 @@
 import { PayloadFields } from '@Payloads/index';
-import { ContentTypes } from '@Models/content_types';
+import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 /**
   * Sorts payloads according by most recently modified first, according to the priority,
@@ -8,7 +8,7 @@ import { PurePayload } from '@Payloads/pure_payload';
   */
 export function SortPayloadsByRecentAndContentPriority(
   payloads: PurePayload[],
-  priorityList: ContentTypes[]
+  priorityList: ContentType[]
 ) {
   return payloads.sort((a: PurePayload, b: PurePayload) => {
     const dateResult = new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime();

@@ -1,5 +1,5 @@
 import { findInArray } from '@Lib/utils';
-import { PayloadSources } from '@Payloads/sources';
+import { PayloadSource } from '@Payloads/sources';
 import { PurePayload } from '@Payloads/pure_payload';
 
 interface PayloadMap {
@@ -11,11 +11,11 @@ interface PayloadMap {
  */
 export class PayloadCollection {
 
-  readonly source?: PayloadSources
+  readonly source?: PayloadSource
   readonly payloads: Array<PurePayload>
   readonly payloadMap: PayloadMap
 
-  constructor(payloads: Array<PurePayload> = [], source?: PayloadSources) {
+  constructor(payloads: Array<PurePayload> = [], source?: PayloadSource) {
     this.source = source;
     this.payloadMap = {};
     this.payloads = payloads;

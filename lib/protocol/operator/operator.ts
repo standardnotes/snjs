@@ -3,13 +3,13 @@ import { SNRootKey } from './../root_key';
 import { SNRootKeyParams } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
-import { PayloadFormats } from '@Payloads/formats';
+import { PayloadFormat } from '@Payloads/formats';
 import {
   CreateEncryptionParameters,
   CopyEncryptionParameters,
   CreateMaxPayloadFromAnyObject
 } from '@Payloads/generator';
-import { ProtocolVersions } from '@Protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 import { base64Encode, base64Decode, SNPureCrypto } from 'sncrypto';
 import { ContentTypes } from '@Root/lib/models';
 
@@ -21,7 +21,7 @@ export type RootKeyResponse = {
 export type ItemsKeyContent = {
   itemsKey: string,
   dataAuthenticationKey?: string,
-  version: ProtocolVersions
+  version: ProtocolVersion
 }
 
 /**w
@@ -108,19 +108,19 @@ export abstract class SNProtocolOperator {
   */
   public async generateEncryptedParameters(
     payload: PurePayload,
-    format: PayloadFormats,
+    format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
   ) {
-    if (format === PayloadFormats.DecryptedBareObject) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return CreateEncryptionParameters(
         {
           content: payload.content
         }
       );
-    } else if (format === PayloadFormats.DecryptedBase64String) {
+    } else if (format === PayloadFormat.DecryptedBase64String) {
       const jsonString = JSON.stringify(payload.content);
       const base64String = await base64Encode(jsonString);
-      const content = ProtocolVersions.V000Base64Decrypted + base64String;
+      const content = ProtocolVersion.V000Base64Decrypted + base64String;
       return CreateEncryptionParameters(
         {
           content: content
@@ -143,13 +143,13 @@ export abstract class SNProtocolOperator {
     key?: SNItemsKey | SNRootKey,
   ) {
     const format = encryptedParameters.format;
-    if (format === PayloadFormats.DecryptedBareObject) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       /** No decryption required */
       return encryptedParameters;
     }
-    else if (format === PayloadFormats.DecryptedBase64String) {
+    else if (format === PayloadFormat.DecryptedBase64String) {
       const contentString = encryptedParameters.contentString.substring(
-        ProtocolVersions.VersionLength,
+        ProtocolVersion.VersionLength,
         encryptedParameters.contentString.length
       );
       let decodedContent;
