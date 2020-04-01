@@ -28,7 +28,12 @@ export enum PayloadSource {
   ConflictData = 15,
   /* Payload when a client modifies item property then maps it to update UI */
   LocalChanged = 16,
-  SessionHistory = 17
+  SessionHistory = 17,
+  /**
+   * Payloads with a source of Constructor means that the payload was created
+   * in isolated space by the caller, and does not yet have any app-related affiliation.
+   */
+  Constructor = 18
 };
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {

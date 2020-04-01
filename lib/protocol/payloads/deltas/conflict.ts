@@ -1,5 +1,4 @@
-import { PayloadSource } from '@Payloads/sources';
-import { PurePayload } from '@Payloads/pure_payload';
+import { SinglePayloadDelta } from './single_payload_delta';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadCollection } from '@Payloads/collection';
 import { ConflictStrategy } from '@Payloads/deltas/strategies';
@@ -7,24 +6,7 @@ import { CopyPayload } from '@Payloads/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 
-export class ConflictDelta {
-
-  private readonly baseCollection: PayloadCollection
-  private readonly basePayload: PurePayload
-  private readonly applyPayload: PurePayload
-  private readonly source: PayloadSource
-
-  constructor(
-    baseCollection: PayloadCollection,
-    basePayload: PurePayload,
-    applyPayload: PurePayload,
-    source: PayloadSource
-  ) {
-    this.baseCollection = baseCollection;
-    this.basePayload = basePayload;
-    this.applyPayload = applyPayload;
-    this.source = source;
-  }
+export class ConflictDelta extends SinglePayloadDelta {
 
   public async resultingCollection() {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);

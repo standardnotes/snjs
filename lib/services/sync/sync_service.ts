@@ -278,7 +278,7 @@ export class SNSyncService extends PureService {
     subtractFromArray(payloads, itemsKeysPayloads);
     const decryptedItemsKeys = await this.protocolService!
       .payloadsByDecryptingPayloads(itemsKeysPayloads);
-    await this.modelManager!.mapPayloadsToLocalItems(
+    await this.modelManager!.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
@@ -292,7 +292,7 @@ export class SNSyncService extends PureService {
       const batch = payloads.slice(currentPosition, currentPosition + batchSize);
       const decrypted = await this.protocolService!
         .payloadsByDecryptingPayloads(batch);
-      await this.modelManager!.mapPayloadsToLocalItems(
+      await this.modelManager!.emitPayloads(
         decrypted,
         PayloadSource.LocalRetrieved
       );
@@ -355,7 +355,7 @@ export class SNSyncService extends PureService {
       payload,
       this.modelManager!.getMasterCollection()
     );
-    const mapped = await this.modelManager!.mapPayloadsToLocalItems(
+    const mapped = await this.modelManager!.emitPayloads(
       results,
       PayloadSource.LocalChanged
     );
@@ -392,7 +392,7 @@ export class SNSyncService extends PureService {
         }
       );
     });
-    await this.modelManager!.mapPayloadsToLocalItems(
+    await this.modelManager!.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -566,7 +566,7 @@ export class SNSyncService extends PureService {
      * Setting this value means the item was 100% sent to the server.
      */
     const beginDate = new Date();
-    await this.modelManager!.setItemsProperties(
+    await this.modelManager!.changeItems(
       items,
       {
         lastSyncBegan: beginDate
@@ -750,7 +750,7 @@ export class SNSyncService extends PureService {
       return base.mergedWith(payload);
     });
     await this.persistPayloads(payloadsToPersist);
-    await this.modelManager!.mapPayloadsToLocalItems(
+    await this.modelManager!.emitPayloads(
       payloadsToMap,
       PayloadSource.LocalSaved
     );
@@ -807,7 +807,7 @@ export class SNSyncService extends PureService {
 
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      await this.modelManager!.mapCollectionToLocalItems(collection);
+      await this.modelManager!.emitCollection(collection);
       let payloadsToPersist;
       const fields = payloadFieldsForSource(collection.source!);
       if (!fields.includes(PayloadField.Content)) {
@@ -847,7 +847,7 @@ export class SNSyncService extends PureService {
         }
       );
     });
-    await this.modelManager!.mapPayloadsToLocalItems(
+    await this.modelManager!.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -902,7 +902,7 @@ export class SNSyncService extends PureService {
       )
     );
     const collection = await delta.resultingCollection();
-    await this.modelManager!.mapCollectionToLocalItems(collection);
+    await this.modelManager!.emitCollection(collection);
     await this.persistPayloads(collection.payloads);
     return this.sync({
       checkIntegrity: true,

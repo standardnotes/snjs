@@ -91,13 +91,13 @@ describe('app models', () => {
       }
     );
 
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [mutated],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params2],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     const item1 = modelManager.findItem(params1.uuid);
@@ -119,9 +119,9 @@ describe('app models', () => {
       { uuid: null }
     );
 
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
   });
@@ -136,16 +136,16 @@ describe('app models', () => {
       { content: { foo: 'bar' } }
     );
 
-    let items = await modelManager.mapPayloadsToLocalItems(
+    let items = await modelManager.emitPayloads(
       [mutated],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     let item = items[0];
     expect(item).to.not.be.null;
 
-    items = await modelManager.mapPayloadsToLocalItems(
+    items = await modelManager.emitPayloads(
       [mutated],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     item = items[0];
 
@@ -164,9 +164,9 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1);
 
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [updatedPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     expect(item1.content.references.length).to.equal(1);
@@ -186,9 +186,9 @@ describe('app models', () => {
     // damage references of one object
     item1.content.references = [];
     const updatedPayload = Factory.itemToStoragePayload(item1);
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [updatedPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     expect(item1.content.references.length).to.equal(0);
@@ -259,12 +259,12 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem(
+    await modelManager.emitPayload(
       CreateMaxPayloadFromAnyObject(item1),
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
     expect(item2.referencingItemsCount).to.equal(1);
-    await modelManager.mapPayloadToLocalItem(
+    await modelManager.emitPayload(
       item1.payloadRepresentation(
         {
           deleted: true,
@@ -273,7 +273,7 @@ describe('app models', () => {
           }
         }
       ),
-      PayloadSources.LocalSaved,
+      PayloadSource.LocalSaved,
     );
     expect(item2.referencingItemsCount).to.equal(0);
     expect(item1.referencingItemsCount).to.equal(0);
@@ -286,9 +286,9 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application);
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem(
+    await modelManager.emitPayload(
       CreateMaxPayloadFromAnyObject(item1),
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
 
     expect(item1.content.references.length).to.equal(1);
@@ -324,9 +324,9 @@ describe('app models', () => {
     this.expectedItemCount += 2;
 
     item1.addItemAsRelationship(item2);
-    await modelManager.mapPayloadToLocalItem(
+    await modelManager.emitPayload(
       CreateMaxPayloadFromAnyObject(item1),
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
 
     expect(item2.referencingItemsCount).to.equal(1);

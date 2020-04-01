@@ -1,4 +1,5 @@
-import { PayloadFields } from '@Payloads/index';
+import { PayloadSource } from '@Payloads/sources';
+import { PayloadField } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ProtocolVersion } from '@Protocol/versions';
@@ -27,7 +28,8 @@ export class PurePayload {
    * contains. These fields allow consumers to determine whether a given payload has an actual
    * undefined value for payload.content, for example, or whether the payload was constructed
    * to omit that field altogether (as in the case of server saved payloads) */
-  readonly fields: PayloadFields[]
+  readonly fields: PayloadField[]
+  readonly source: PayloadSource
   readonly uuid?: string
   readonly content_type?: ContentType
   readonly content?: PayloadContent | string
@@ -53,26 +55,30 @@ export class PurePayload {
   readonly format: PayloadFormat
   readonly version?: ProtocolVersion
 
-  constructor(rawPayload: RawPayload, fields: PayloadFields[]) {
+  constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource) {
     this.fields = fields;
+    this.source = source;
     this.uuid = rawPayload.uuid;
     this.content_type = rawPayload.content_type;
     this.content = rawPayload.content;
     this.deleted = rawPayload.deleted;
     this.items_key_id = rawPayload.items_key_id;
     this.enc_item_key = rawPayload.enc_item_key;
-    this.created_at = rawPayload.created_at;
-    this.updated_at = rawPayload.updated_at;
-    this.dirtiedDate = rawPayload.dirtiedDate;
+    /** Fallback to initializing with now date */
+    this.created_at = new Date(rawPayload.created_at || new Date());
+  /** Fallback to initializing with 0 epoch date */
+    this.updated_at = new Date(rawPayload.updated_at || new Date(0));
+    this.dirtiedDate = new Date(rawPayload.dirtiedDate!);
     this.dirty = rawPayload.dirty;
     this.dummy = rawPayload.dummy;
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
-    this.lastSyncBegan = rawPayload.lastSyncBegan;
-    this.lastSyncEnd = rawPayload.lastSyncEnd;
+    this.lastSyncBegan = new Date(rawPayload.lastSyncBegan!);
+    this.lastSyncEnd = new Date(rawPayload.lastSyncEnd!);
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
+    
     if (isString(this.content)) {
       if ((this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)) {
         this.format = PayloadFormat.DecryptedBase64String;
@@ -84,6 +90,7 @@ export class PurePayload {
     } else {
       this.format = PayloadFormat.Deleted;
     }
+    
     if (isString(this.content)) {
       this.version = (this.content as string).substring(
         0,
@@ -92,6 +99,7 @@ export class PurePayload {
     } else if(this.content){
       this.version = (this.content as PayloadContent).version;
     }
+
     deepFreeze(this);
   }
 
@@ -104,6 +112,10 @@ export class PurePayload {
       this.format === PayloadFormat.EncryptedString ||
       this.format === PayloadFormat.DecryptedBase64String
     );
+  }
+
+  get safeContent() {
+    return (this.content || {}) as PayloadContent;
   }
 
   get contentObject() {

@@ -18,9 +18,9 @@ import {
   CreateIntentPayloadFromObject,
   CreateSourcedPayloadFromObject,
   CreateMaxPayloadFromAnyObject,
-  PayloadSources,
+  PayloadSource,
   PayloadFormats,
-  PayloadFields
+  PayloadField
 } from '@Payloads/index';
 import {
   isWebEnvironment,
@@ -135,7 +135,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       enumerable: false,
       writable: true
     });
-    this.removeMappingObserver = this.modelManager.addMappingObserver(
+    this.removeMappingObserver = this.modelManager.addChangeObserver(
       [ContentType.ItemsKey],
       async () => {
         await this.decryptErroredItems();
@@ -583,9 +583,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return item.payloadRepresentation();
     });
     const decrypted = await this.payloadsByDecryptingPayloads(payloads);
-    await this.modelManager!.mapPayloadsToLocalItems(
+    await this.modelManager!.emitPayloads(
       decrypted,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
   }
 
@@ -602,7 +602,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const encryptedPayloads = rawItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
-        PayloadSources.FileImport,
+        PayloadSource.FileImport,
       );
     });
     let decryptedPayloads;
@@ -1304,9 +1304,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         dirty: true
       }
     );
-    await this.modelManager!.mapPayloadToLocalItem(
+    await this.modelManager!.emitPayload(
       payload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
   }
 }

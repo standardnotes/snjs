@@ -11,8 +11,8 @@ export {
 } from './generator';
 
 export { PayloadsByDuplicating, PayloadsByAlternatingUuid } from '@Payloads/functions';
-export { PayloadField as PayloadFields } from '@Payloads/fields';
-export { PayloadSource as PayloadSources } from '@Payloads/sources';
+export { PayloadField } from '@Payloads/fields';
+export { PayloadSource as PayloadSource } from '@Payloads/sources';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadFormat as PayloadFormats } from '@Payloads/formats';
 

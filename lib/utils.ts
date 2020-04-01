@@ -74,21 +74,24 @@ export function greaterOfTwoDates(dateA: Date, dateB: Date) {
  * @returns Array containing unique values
  */
 export function uniqCombineObjArrays(arrayA: any[], arrayB: any[], equalityKeys: string[]) {
-  return uniqWith(arrayA.concat(arrayB), (a, b) => {
-    for (const key of equalityKeys) {
-      if (a[key] !== b[key]) {
-        return false;
+  return uniqWith(
+    arrayA.concat(arrayB),
+    (a: any, b: any) => {
+      for (const key of equalityKeys) {
+        if (a[key] !== b[key]) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
-  });
+  );
 }
 
 /**
  * Returns a new array containing only unique values
  * @returns Array containing unique values
  */
-export function uniqueArray(array: any[]) {
+export function uniqueArray(array: any[]): any[] {
   return uniq(array);
 }
 
@@ -244,7 +247,7 @@ export function joinPaths(...args: string[]) {
  * Creates a copy of the input object by JSON stringifying the object
  * then JSON parsing the string.
  */
-export function Copy(object: AnyRecord) {
+export function Copy(object: any) {
   return JSON.parse(JSON.stringify(object));
 }
 

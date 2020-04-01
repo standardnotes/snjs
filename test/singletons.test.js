@@ -86,9 +86,9 @@ describe('singletons', () => {
     const privs3 = createPrivsPayload();
 
     this.expectedItemCount++;
-    const items = await this.application.modelManager.mapPayloadsToLocalItems(
+    const items = await this.application.modelManager.emitPayloads(
       [privs1, privs2, privs3],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     await this.application.modelManager.setItemsDirty(items);
     await this.application.syncService.sync(syncOptions);
@@ -240,9 +240,9 @@ describe('singletons', () => {
 
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem(
+    const item = await this.application.modelManager.emitPayload(
       payload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
@@ -261,9 +261,9 @@ describe('singletons', () => {
 
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem(
+    const item = await this.application.modelManager.emitPayload(
       payload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);

@@ -74,11 +74,11 @@ export class SNHistoryManager extends PureService {
     } else {
       this.autoOptimize = autoOptimize;
     }
-    this.addMappingObserver();
+    this.addChangeObserver();
   }
 
-  addMappingObserver() {
-    this.removeMappingObserver = this.modelManager!.addMappingObserver(
+  addChangeObserver() {
+    this.removeMappingObserver = this.modelManager!.addChangeObserver(
       this.contentTypes,
       async (allItems, _, __, source, ___) => {
         if (source === PayloadSource.LocalDirtied) {

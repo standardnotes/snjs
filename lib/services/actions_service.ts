@@ -177,7 +177,7 @@ export class SNActionsService extends PureService {
       response,
       passwordRequestHandler
     );
-    const item = await this.modelManager!.mapPayloadToLocalItem(
+    const item = await this.modelManager!.emitPayload(
       payload!,
       PayloadSource.RemoteActionRetrieved
     );

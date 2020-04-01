@@ -330,7 +330,7 @@ export class SNApplication {
         dirty: true
       }
     );
-    await this.modelManager!.mapPayloadToLocalItem(
+    await this.modelManager!.emitPayload(
       dirtied,
       PayloadSource.LocalChanged
     );
@@ -355,7 +355,7 @@ export class SNApplication {
    * Takes the values of the input item and emits it onto global state.
    */
   public async mergeItem(item: SNItem, source: PayloadSource) {
-    return this.modelManager!.mapItem(item, source);
+    return this.modelManager!.emitPayload(item.payloadRepresentation(), source);
   }
 
   /** 
@@ -495,7 +495,7 @@ export class SNApplication {
     contentType: ContentType | ContentType[],
     stream: ItemStream
   ) {
-    const observer = this.modelManager!.addMappingObserver(
+    const observer = this.modelManager!.addChangeObserver(
       contentType,
       async (allItems, _, __, source, sourceKey) => {
         const includedContentTypes = allItems.map((item) => item.content_type);

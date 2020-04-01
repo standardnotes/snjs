@@ -195,15 +195,15 @@ describe('predicates', () => {
   it('model manager predicate matching', async function () {
     const modelManager = this.application.modelManager;
     const payload1 = CreateMaxPayloadFromAnyObject(createItemParams());
-    const item1 = await modelManager.mapPayloadToLocalItem(
+    const item1 = await modelManager.emitPayload(
       payload1,
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
     item1.updated_at = new Date();
 
-    await modelManager.mapItem(
-      item1,
-      PayloadSources.LocalSaved
+    await modelManager.emitPayload(
+      item1.payloadRepresentation(),
+      PayloadSource.LocalSaved
     );
     const predicate = new SNPredicate('content.title', '=', 'ello');
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
@@ -290,9 +290,9 @@ describe('predicates', () => {
       }
     );
 
-    const item2 = (await modelManager.mapPayloadsToLocalItems(
+    const item2 = (await modelManager.emitPayloads(
       [payload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     ))[0];
 
     expect(modelManager.itemsMatchingPredicate(new SNPredicate('content.tags', 'includes', ['title', 'includes', 'bar'])).length).to.equal(1);
@@ -315,9 +315,9 @@ describe('predicates', () => {
   it('false should compare true with undefined', async function () {
     const item = createItem();
     const modelManager = this.application.modelManager;
-    await modelManager.mapItem(
-      item,
-      PayloadSources.LocalSaved
+    await modelManager.emitPayload(
+      item.payloadRepresentation(),
+      PayloadSource.LocalSaved
     );
     const predicate = new SNPredicate('pinned', '=', false);
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(modelManager.allItems.length);
@@ -333,9 +333,9 @@ describe('predicates', () => {
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     item.content.title = 'abc';
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [CreateMaxPayloadFromAnyObject(item)],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     expect(modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   });

@@ -105,7 +105,7 @@ export {
   CreateSourcedPayloadFromObject
 } from '@Payloads/generator';
 export {
-  PayloadSource as PayloadSources,
+  PayloadSource,
   isPayloadSourceRetrieved
 } from '@Lib/protocol/payloads/sources';
 export { ProtocolVersion as ProtocolVersions } from '@Lib/protocol/versions';

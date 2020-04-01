@@ -10,7 +10,7 @@ import remove from 'lodash/remove';
 import { PureService } from '@Lib/services/pure_service';
 import {
   CreateSourcedPayloadFromObject,
-  PayloadSources
+  PayloadSource
 } from '@Payloads/index';
 import {
   ContentTypes, displayStringForContentType, CreateItemFromPayload
@@ -49,6 +49,13 @@ export enum ComponentActions {
   SaveSuccess = 'save-success',
   SaveError = 'save-error'
 };
+
+type ComponentData = {
+  window?: Window
+  hidden: boolean
+  readonly: boolean
+  sessionKey?: string
+}
 
 /* This domain will be used to save context item client data */
 const ClientDataDomain = 'org.standardnotes.sn.components';
@@ -112,7 +119,7 @@ type ItemMessagePayload = {
   /** isMetadataUpdate implies that the extension should make reference of updated
   * metadata, but not update content values as they may be stale relative to what the
   * extension currently has. Changes are always metadata updates if the mapping source
-  * is PayloadSources.RemoteSaved || source === PayloadSources.LocalSaved. */
+  * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
   isMetadataUpdate: any
 };
 
@@ -211,7 +218,7 @@ export class SNComponentManager extends PureService {
   }
 
   configureForGeneralUsage() {
-    this.removeMappingObserver = this.modelManager!.addMappingObserver(
+    this.removeMappingObserver = this.modelManager!.addChangeObserver(
       ContentTypes.Any,
       async (allItems, _, __, source, sourceKey) => {
         const syncedComponents = allItems.filter((item) => {
@@ -223,7 +230,7 @@ export class SNComponentManager extends PureService {
          * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid 
          * recursion caused by the component being modified and saved after it is updated.
         */
-        if (syncedComponents.length > 0 && source !== PayloadSources.RemoteSaved) {
+        if (syncedComponents.length > 0 && source !== PayloadSource.RemoteSaved) {
           /* Ensure any component in our data is installed by the system */
           if (this.isDesktop) {
             this.desktopManager.syncComponentsInstallation(syncedComponents);
@@ -239,15 +246,15 @@ export class SNComponentManager extends PureService {
         }
         /* LocalChanged is not interesting to send to observers. For local changes,
         we wait until the item is set to dirty before notifying observers, where the mapping
-        source would be PayloadSources.LocalDirtied */
-        if (source !== PayloadSources.LocalChanged) {
+        source would be PayloadSource.LocalDirtied */
+        if (source !== PayloadSource.LocalChanged) {
           this.notifyStreamObservers(allItems, source, sourceKey);
         }
       }
     );
   }
 
-  notifyStreamObservers(allItems: SNItem[], source?: PayloadSources, sourceKey?: string) {
+  notifyStreamObservers(allItems: SNItem[], source?: PayloadSource, sourceKey?: string) {
     for (const observer of this.streamObservers) {
       if (sourceKey && sourceKey === observer.component.uuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
@@ -445,10 +452,10 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSources) {
+  jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSource) {
     const isMetadatUpdate =
-      source === PayloadSources.RemoteSaved ||
-      source === PayloadSources.LocalSaved;
+      source === PayloadSource.RemoteSaved ||
+      source === PayloadSource.LocalSaved;
     const params: ItemMessagePayload = {
       uuid: item.uuid,
       content_type: item.content_type,
@@ -473,7 +480,7 @@ export class SNComponentManager extends PureService {
     component: SNComponent,
     items: SNItem[],
     message: ComponentMessage,
-    source?: PayloadSources
+    source?: PayloadSource
   ) {
     this.log('Web|componentManager|sendItemsInReply', component, items, message);
     const responseData: MessageReplyData = {};
@@ -488,7 +495,7 @@ export class SNComponentManager extends PureService {
     component: SNComponent,
     item: SNItem,
     originalMessage: ComponentMessage,
-    source?: PayloadSources
+    source?: PayloadSource
   ) {
     this.log('Web|componentManager|sendContextItemInReply', component, item, originalMessage);
     const response: MessageReplyData = {
@@ -799,12 +806,12 @@ export class SNComponentManager extends PureService {
       const payloads = responseItems.map((responseItem: any) => {
         return CreateSourcedPayloadFromObject(
           responseItem,
-          PayloadSources.ComponentRetrieved
+          PayloadSource.ComponentRetrieved
         );
       });
-      const localItems = await this.modelManager!.mapPayloadsToLocalItems(
+      const localItems = await this.modelManager!.emitPayloads(
         payloads,
-        PayloadSources.ComponentRetrieved,
+        PayloadSource.ComponentRetrieved,
         component.uuid
       );
       for (const responseItem of responseItems) {
@@ -830,7 +837,7 @@ export class SNComponentManager extends PureService {
             item,
             true,
             true,
-            PayloadSources.ComponentRetrieved,
+            PayloadSource.ComponentRetrieved,
             component.uuid
           );
         }
@@ -887,7 +894,7 @@ export class SNComponentManager extends PureService {
       for (const responseItem of responseItems) {
         const payload = CreateSourcedPayloadFromObject(
           responseItem,
-          PayloadSources.RemoteRetrieved
+          PayloadSource.RemoteRetrieved
         );
         const item = CreateItemFromPayload(payload);
         if (responseItem.clientData) {
@@ -944,7 +951,7 @@ export class SNComponentManager extends PureService {
           await this.modelManager!.setItemToBeDeleted(model);
           /* Currently extensions are not notified of association until a full server sync completes.
              We manually notify observers. */
-          this.modelManager!.notifyMappingObservers([model], PayloadSources.RemoteSaved);
+          this.modelManager!.notifyChangeObservers([model], PayloadSource.RemoteSaved);
         }
         this.syncService!.sync();
         reply = { deleted: true };

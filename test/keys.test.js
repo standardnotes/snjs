@@ -230,9 +230,9 @@ describe('keys', () => {
 
     const decryptedPayload = await this.application.protocolService
       .payloadByDecryptingPayload(encryptedPayload);
-    await this.application.modelManager.mapPayloadsToLocalItems(
+    await this.application.modelManager.emitPayloads(
       [decryptedPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     const note = this.application.modelManager.notes[0];
@@ -243,9 +243,9 @@ describe('keys', () => {
     const keyPayload = CreateMaxPayloadFromAnyObject(
       itemsKey
     );
-    await this.application.modelManager.mapPayloadsToLocalItems(
+    await this.application.modelManager.emitPayloads(
       [keyPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     /**

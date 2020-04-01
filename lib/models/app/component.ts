@@ -1,3 +1,5 @@
+import { ItemTransformer } from './../../services/item_transformer';
+import { PurePayload } from '@Payloads/pure_payload';
 import { isString } from '@Lib/utils';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
@@ -20,156 +22,49 @@ export enum ComponentAreas {
  */
 export class SNComponent extends SNItem {
 
-  /** Component Manager properties */
-  public window?: Window
-  public hidden = false
-  public readonly = false
-  public sessionKey?: string
-
-  structureParams() {
-    const params = {
-      legacy_url: this.legacy_url,
-      hosted_url: this.hosted_url,
-      local_url: this.local_url,
-      valid_until: this.valid_until,
-      offlineOnly: this.offlineOnly,
-      name: this.name,
-      area: this.area,
-      package_info: this.package_info,
-      permissions: this.permissions,
-      active: this.active,
-      autoupdateDisabled: this.autoupdateDisabled,
-      componentData: this.componentData,
-      disassociatedItemIds: this.disassociatedItemIds,
-      associatedItemIds: this.associatedItemIds,
-    };
-    const superParams = super.structureParams();
-    Object.assign(superParams, params);
-    return superParams;
-  }
-
-  getDefaultContentType() {
-    return ContentType.Component;
-  }
-
-  /** Custom data that a component can store in itself */
-  get componentData() {
-    return this.content.componentData || {};
-  }
-  set componentData(componentData: Record<string, any>) {
-    this.content.componentData = componentData;
-  }
-  
+  public readonly componentData: Record<string, any>
   /** Items that have requested a component to be disabled in its context */
-  get disassociatedItemIds() : string[] {
-    return this.content.disassociatedItemIds || [];
-  }
-  set disassociatedItemIds(disassociatedItemIds: string[]) {
-    this.content.disassociatedItemIds = disassociatedItemIds;
-  }
-  
+  public readonly disassociatedItemIds: string[]
   /** Items that have requested a component to be enabled in its context */
-  get associatedItemIds(): string[] {
-    return this.content.associatedItemIds || [];
-  }
-  set associatedItemIds(associatedItemIds: string[]) {
-    this.content.associatedItemIds = associatedItemIds;
-  }
+  public readonly associatedItemIds: string[]
+  public readonly local_url: string
+  public readonly hosted_url: string
+  public readonly offlineOnly: boolean
+  public readonly name: string
+  public readonly autoupdateDisabled: boolean
+  public readonly package_info: any
+  public readonly area: ComponentAreas
+  public readonly permissions: any[]
+  public readonly valid_until: Date
+  public readonly active: boolean
+  public readonly legacy_url: string
 
-  get local_url() {
-    return this.content.local_url;
-  }
-  set local_url(url: string) {
-    this.content.local_url = url;
-  }
-
-  get hosted_url() {
-    return this.content.hosted_url || this.content.url;
-  }
-  set hosted_url(url: string) {
-    this.content.hosted_url = url;
-  }
-
-  get offlineOnly() {
-    return this.content.offlineOnly;
-  }
-  set offlineOnly(offlineOnly: boolean) {
-    this.content.offlineOnly = offlineOnly;
-  }
-
-  get name() {
-    return this.content.name;
-  }
-  set name(name: string) {
-    this.content.name = name;
-  }
-
-  get autoupdateDisabled() {
-    return this.content.autoupdateDisabled;
-  }
-  set autoupdateDisabled(autoupdateDisabled: boolean) {
-    this.content.autoupdateDisabled = autoupdateDisabled;
-  }
-
-  get package_info() {
-    return this.content.package_info;
-  }
-  set package_info(package_info: any) {
-    this.content.package_info = package_info;
-  }
-
-  get area() {
-    return this.content.area;
-  }
-  set area(area: ComponentAreas) {
-    this.content.area = area;
-  }
-
-  get permissions() {
-    return this.content.permissions || [];
-  }
-  set permissions(permissions: any[]) {
-    this.content.permissions = permissions;
-  }
-
-  get valid_until() {
-    const stringOrDate = this.content.valid_until;
-    if (isString(stringOrDate)) {
-      this.content.valid_until = new Date(stringOrDate);
-    }
-    return this.content.valid_until;
-  }
-  set valid_until(valid_until: Date) {
-    this.content.valid_until = valid_until;
-  }
-
-  get active() {
-    return this.content.active;
-  }
-  set active(active) {
-    this.content.active = active;
-  }
-  
-  /**
-  * @legacy
-  * We don't want to set the url directly, as we'd like to phase it out.
-  * If the content.url exists, we'll transfer it to legacy_url. We'll only
-  * need to set this if content.hosted_url is blank, otherwise,
-  * hosted_url is the url replacement.
-  */
-  get legacy_url() {
-    if(!this.content.hosted_url) {
-      return this.content.url;
-    }
-    return null;
-  }
-  set legacy_url(url) {
-    this.content.legacy_url = url;
-  }
-
-  protected handleDeletedContent() {
-    super.handleDeletedContent();
-    this.active = false;
+  constructor(payload: PurePayload) {
+    super(payload);
+    /** Custom data that a component can store in itself */
+    this.componentData = this.payload.safeContent.componentData || {};
+    this.legacy_url = this.payload.safeContent.legacy_url;
+    this.hosted_url = this.payload.safeContent.hosted_url || this.payload.safeContent.url;
+    this.local_url = this.payload.safeContent.local_url;
+    this.valid_until = new Date(this.payload.safeContent.valid_until);
+    this.offlineOnly = this.payload.safeContent.offlineOnly;
+    this.name = this.payload.safeContent.name;
+    this.area = this.payload.safeContent.area;
+    this.package_info = this.payload.safeContent.package_info;
+    this.permissions = this.payload.safeContent.permissions || [];
+    this.active = this.payload.safeContent.active;
+    this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled;
+    this.componentData = this.payload.safeContent.componentData;
+    this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || [];
+    this.associatedItemIds = this.payload.safeContent.associatedItemIds || [];
+    /**
+    * @legacy
+    * We don't want to set the url directly, as we'd like to phase it out.
+    * If the content.url exists, we'll transfer it to legacy_url. We'll only
+    * need to set this if content.hosted_url is blank, otherwise,
+    * hosted_url is the url replacement.
+    */
+    this.legacy_url = !this.payload.safeContent.hosted_url ? this.payload.safeContent.url : undefined;
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
@@ -196,19 +91,12 @@ export class SNComponent extends SNItem {
     return this.getAppDataItem('defaultEditor') === true;
   }
 
-  public setLastSize(size: string) {
-    this.setAppDataItem('lastSize', size);
-  }
-
   public getLastSize() {
     return this.getAppDataItem('lastSize');
   }
 
   public acceptsThemes() {
-    if (this.content.package_info) {
-      return this.content.package_info.acceptsThemes === true;
-    }
-    return true;
+    return this.payload.safeContent.package_info?.acceptsThemes;
   }
 
   /**
@@ -248,15 +136,21 @@ export class SNComponent extends SNItem {
     return SNComponent.associativeAreas().includes(this.area);
   }
 
-  public associateWithItem(item: SNItem) {
-    this.associatedItemIds.push(item.uuid);
-  }
-
   public isExplicitlyEnabledForItem(item: SNItem) {
     return this.associatedItemIds.indexOf(item.uuid) !== -1;
   }
 
   public isExplicitlyDisabledForItem(item: SNItem) {
     return this.disassociatedItemIds.indexOf(item.uuid) !== -1;
+  }
+}
+
+export class ComponentTransformer extends ItemTransformer {
+  public associateWithItem(item: SNItem) {
+    this.content.associatedItemIds.push(item.uuid);
+  }
+
+  public setLastSize(size: string) {
+    this.setAppDataItem('lastSize', size);
   }
 }

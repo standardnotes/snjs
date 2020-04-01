@@ -512,10 +512,10 @@ export class Migration20200115 extends Migration {
           version: rootKeyParams!.version
         }
       });
-      const itemsKey = CreateItemFromPayload(payload);
+      const itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
       await itemsKey.initUUID();
-      await this.services.modelManager.mapItem(
-        itemsKey,
+      await this.services.modelManager.emitPayload(
+        itemsKey.payloadRepresentation(),
         PayloadSource.LocalChanged
       );
       await this.services.modelManager.setItemDirty(itemsKey);

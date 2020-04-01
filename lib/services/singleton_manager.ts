@@ -69,7 +69,7 @@ export class SNSingletonManager extends PureService {
    * all items keys have been downloaded.
    */
   private addObservers() {
-    this.removeCreationObserver = this.modelManager!.addCreationObserver(
+    this.removeCreationObserver = this.modelManager!.addInsertionObserver(
       async (items) => {
         this.resolveQueue = this.resolveQueue.concat(items);
       }
@@ -200,7 +200,7 @@ export class SNSingletonManager extends PureService {
         dirty: true
       }
     );
-    const item = await this.modelManager!.mapPayloadToLocalItem(
+    const item = await this.modelManager!.emitPayload(
       dirtyPayload,
       PayloadSource.LocalChanged
     );

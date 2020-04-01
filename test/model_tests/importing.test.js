@@ -23,9 +23,9 @@ describe('importing', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [notePayload, tagPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const note = modelManager.getItems(['Note'])[0];
     const tag = modelManager.getItems(['Tag'])[0];
@@ -62,9 +62,9 @@ describe('importing', () => {
      */
     const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
-    await modelManager.mapPayloadToLocalItem(
+    await modelManager.emitPayload(
       notePayload,
-      PayloadSources.LocalSaved
+      PayloadSource.LocalSaved
     );
     this.expectedItemCount++;
     const mutatedNote = CreateMaxPayloadFromAnyObject(
@@ -94,9 +94,9 @@ describe('importing', () => {
     const modelManager = this.application.modelManager;
     const pair = Factory.createRelatedNoteTagPairPayload();
     const tagPayload = pair[1];
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       pair,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
@@ -122,9 +122,9 @@ describe('importing', () => {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       pair,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
     const note = modelManager.notes[0];

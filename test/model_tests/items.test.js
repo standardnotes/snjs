@@ -19,9 +19,9 @@ describe('items', () => {
   it('setting an item as dirty should update its client updated at', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const item = modelManager.items[0];
     const prevDate = item.client_updated_at.getTime();
@@ -34,9 +34,9 @@ describe('items', () => {
   it('setting an item as dirty with option to skip client updated at', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const item = modelManager.items[0];
     const prevDate = item.client_updated_at.getTime();
@@ -49,9 +49,9 @@ describe('items', () => {
   it('properly pins, archives, and locks', async function () {
     const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     const item = modelManager.items[0];
@@ -71,9 +71,9 @@ describe('items', () => {
     const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params1, params2],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     const item1 = modelManager.notes[0];
@@ -116,9 +116,9 @@ describe('items', () => {
     const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.mapPayloadsToLocalItems(
+    await modelManager.emitPayloads(
       [params1, params2],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
 
     const item1 = modelManager.notes[0];

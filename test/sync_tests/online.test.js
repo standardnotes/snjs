@@ -290,18 +290,18 @@ describe('online syncing', () => {
         errorDecrypting: true
       }
     );
-    const items = await this.application.modelManager.mapPayloadsToLocalItems(
+    const items = await this.application.modelManager.emitPayloads(
       [errorred],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const mappedItem = items[0];
     expect(typeof mappedItem.content).to.equal('string');
 
     const decryptedPayload = await this.application.protocolService
       .payloadByDecryptingPayload(errorred);
-    const mappedItems2 = await this.application.modelManager.mapPayloadsToLocalItems(
+    const mappedItems2 = await this.application.modelManager.emitPayloads(
       [decryptedPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const mappedItem2 = mappedItems2[0];
     expect(typeof mappedItem2.content).to.equal('object');
@@ -568,9 +568,9 @@ describe('online syncing', () => {
         updated_at: Factory.yesterday()
       }
     );
-    await this.application.modelManager.mapPayloadsToLocalItems(
+    await this.application.modelManager.emitPayloads(
       [mutatedPayload],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     const resultNote = this.application.modelManager.findItem(note.uuid);
     expect(resultNote.uuid).to.equal(note.uuid);
@@ -631,14 +631,9 @@ describe('online syncing', () => {
     await this.application.syncService.sync(syncOptions);
     expect(note.dirty).to.equal(false);
     this.expectedItemCount++;
-
-    await this.application.modelManager.modifyItem(
-      note,
-      () => {
-        note.text = 'Stale text';
-        note.updated_at = Factory.yesterday();
-      }
-    );
+    note.text = 'Stale text';
+    note.updated_at = Factory.yesterday();
+    await this.application.modelManager.setItemDirty(note, true);
 
     await this.application.syncService.sync(syncOptions);
     expect(note.dirty).to.equal(false);
@@ -747,9 +742,9 @@ describe('online syncing', () => {
         .payloadByDecryptingPayload(payload);
       payloads.push(decrypted);
     }
-    await this.application.modelManager.mapPayloadsToLocalItems(
+    await this.application.modelManager.emitPayloads(
       payloads,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
     const foundNote = this.application.modelManager.findItem(note.uuid);
@@ -761,36 +756,26 @@ describe('online syncing', () => {
     const payload1 = Factory.createStorageItemPayload(ContentTypes.ServerExtension);
     const payload2 = Factory.createStorageItemPayload(ContentTypes.UserPrefs);
 
-    await this.application.modelManager.mapPayloadsToLocalItems(
+    await this.application.modelManager.emitPayloads(
       [payload1, payload2],
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
     const fooItem = this.application.modelManager.getItems(ContentTypes.ServerExtension)[0];
     const barItem = this.application.modelManager.getItems(ContentTypes.UserPrefs)[0];
     expect(fooItem).to.be.ok;
     expect(barItem).to.be.ok;
-
-    await this.application.modelManager.modifyItems(
-      [fooItem, barItem],
-      () => {
-        fooItem.addItemAsRelationship(barItem);
-      }
-    );
+    fooItem.addItemAsRelationship(barItem);
+    await this.application.modelManager.setItemsDirty([fooItem, barItem], true);
 
     expect(barItem.referencingItemsCount).to.equal(1);
     expect(barItem.allReferencingItems).to.include(fooItem);
 
     await this.application.syncService.sync(syncOptions);
     expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-
-    await this.application.modelManager.modifyItem(
-      fooItem,
-      () => {
-        fooItem.content.title = `${Math.random()}`;
-        fooItem.updated_at = Factory.yesterday();
-      }
-    );
+    fooItem.content.title = `${Math.random()}`;
+    fooItem.updated_at = Factory.yesterday();
+    await this.application.modelManager.setItemDirty(fooItem, true);
 
     await this.application.syncService.sync({...syncOptions, awaitAll: true});
 
@@ -965,9 +950,9 @@ describe('online syncing', () => {
     const itemCount = 6;
     for (let i = 0; i < itemCount; i++) {
       const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i / 2)]);
-      const item = await this.application.modelManager.mapPayloadToLocalItem(
+      const item = await this.application.modelManager.emitPayload(
         payload,
-        PayloadSources.LocalChanged
+        PayloadSource.LocalChanged
       );
       await this.application.modelManager.setItemDirty(item, true);
     }
@@ -1171,7 +1156,7 @@ describe('online syncing', () => {
     /** Create an item and sync it */
     const note = await Factory.createMappedNote(this.application);
     note.didCompleteMapping = (source) => {
-      if (source === PayloadSources.RemoteSaved) {
+      if (source === PayloadSource.RemoteSaved) {
         actualSaveCount++;
       }
     };

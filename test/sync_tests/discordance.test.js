@@ -60,9 +60,9 @@ describe('sync discordance', () => {
     await this.application.syncService.sync();
 
     const payload = Factory.createNotePayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem(
+    const item = await this.application.modelManager.emitPayload(
       payload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
 
@@ -109,9 +109,9 @@ describe('sync discordance', () => {
 
   it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
     const payload = Factory.createNotePayload();
-    const item = await this.application.modelManager.mapPayloadToLocalItem(
+    const item = await this.application.modelManager.emitPayload(
       payload,
-      PayloadSources.LocalChanged
+      PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
 
