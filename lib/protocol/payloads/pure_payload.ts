@@ -44,6 +44,7 @@ export class PurePayload {
   readonly errorDecryptingValueChanged?: boolean
   readonly lastSyncBegan?: Date
   readonly lastSyncEnd?: Date
+
   /** @deprecated */
   readonly auth_hash?: string
   /** @deprecated */
@@ -91,7 +92,7 @@ export class PurePayload {
     } else if(this.content){
       this.version = (this.content as PayloadContent).version;
     }
-    // deepFreeze(this);
+    deepFreeze(this);
   }
 
   get decoded() {
@@ -107,7 +108,6 @@ export class PurePayload {
 
   get contentObject() {
     if(this.format !== PayloadFormat.DecryptedBareObject) {
-      debugger;
       throw Error('Attempting to access non-object content as object');
     }
     return this.content as PayloadContent;
@@ -123,7 +123,7 @@ export class PurePayload {
   mergedWith(otherPayload: PurePayload) {
     return CopyPayload(
       this,
-      otherPayload as PayloadOverride
+      otherPayload
     );
   }
 

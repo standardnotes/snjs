@@ -14871,60 +14871,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /** The MaxItemPayload represents a payload with all possible fields */
 var MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dummy, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncEnd];
-function CreateMaxPayloadFromAnyObject(object, source, intent, override) {
-  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(source)) {
-    throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
-  }
-
-  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(intent)) {
-    throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
-  }
-
-  return CreatePayload(object, MaxPayloadFields, override);
-}
-function CreateIntentPayloadFromObject(object, intent, override) {
-  var payloadFields = payloadFieldsForIntent(intent);
-  return CreatePayload(object, payloadFields, override);
-}
-function CreateSourcedPayloadFromObject(object, source, override) {
-  var payloadFields = payloadFieldsForSource(source);
-  return CreatePayload(object, payloadFields, override);
-}
-
-function CreatePayload(object, fields, override) {
-  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(object, fields);
-
-  if (!fields) {
-    debugger;
-  }
-
-  if (override) {
-    if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isObject"])(override)) {
-      throw 'Attempting to override payload with non-object';
-    }
-
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
-  }
-
-  return new _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PurePayload"](rawPayload, fields);
-}
-
-function CopyPayload(payload, override) {
-  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(payload, payload.fields);
-
-  if (override) {
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
-  }
-
-  return new _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PurePayload"](rawPayload, payload.fields);
-}
 var EncryptionParametersFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey];
-function CreateEncryptionParameters(raw) {
-  return CreatePayload(raw, EncryptionParametersFields);
-}
-function CopyEncryptionParameters(raw, override) {
-  return CreatePayload(raw, EncryptionParametersFields, override);
-}
 var FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash];
 var StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].WaitingForKey];
 var ServerPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Legacy003AuthHash];
@@ -14941,18 +14888,67 @@ var ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE
  */
 
 var ServerSavedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_3__["PayloadField"].LastSyncEnd];
+function CreateMaxPayloadFromAnyObject(object, source, intent, override) {
+  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(source)) {
+    throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
+  }
+
+  if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(intent)) {
+    throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
+  }
+
+  return CreatePayload(object, MaxPayloadFields.slice(), override);
+}
+function CreateIntentPayloadFromObject(object, intent, override) {
+  var payloadFields = payloadFieldsForIntent(intent);
+  return CreatePayload(object, payloadFields, override);
+}
+function CreateSourcedPayloadFromObject(object, source, override) {
+  var payloadFields = payloadFieldsForSource(source);
+  return CreatePayload(object, payloadFields, override);
+}
+
+function CreatePayload(object, fields, override) {
+  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(object, fields);
+
+  if (override) {
+    if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isObject"])(override)) {
+      throw 'Attempting to override payload with non-object';
+    }
+
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
+  }
+
+  return new _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PurePayload"](rawPayload, fields.slice());
+}
+
+function CopyPayload(payload, override) {
+  var rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["pickByCopy"])(payload, payload.fields);
+
+  if (override) {
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepMerge"])(rawPayload, Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["Copy"])(override));
+  }
+
+  return new _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PurePayload"](rawPayload, payload.fields.slice());
+}
+function CreateEncryptionParameters(raw) {
+  return CreatePayload(raw, EncryptionParametersFields.slice());
+}
+function CopyEncryptionParameters(raw, override) {
+  return CreatePayload(raw, EncryptionParametersFields.slice(), override);
+}
 
 function payloadFieldsForIntent(intent) {
   if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].FilePreferEncrypted) {
-    return FilePayloadFields;
+    return FilePayloadFields.slice();
   }
 
   if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageEncrypted) {
-    return StoragePayloadFields;
+    return StoragePayloadFields.slice();
   }
 
   if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].SyncDecrypted) {
-    return ServerPayloadFields;
+    return ServerPayloadFields.slice();
   } else {
     throw "No payload fields found for intent ".concat(intent);
   }
@@ -14960,27 +14956,27 @@ function payloadFieldsForIntent(intent) {
 
 function payloadFieldsForSource(source) {
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].FileImport) {
-    return FilePayloadFields;
+    return FilePayloadFields.slice();
   }
 
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].SessionHistory) {
-    return SessionHistoryPayloadFields;
+    return SessionHistoryPayloadFields.slice();
   }
 
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ComponentRetrieved) {
-    return ComponentRetrievedPayloadFields;
+    return ComponentRetrievedPayloadFields.slice();
   }
 
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalRetrieved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalDirtied) {
-    return StoragePayloadFields;
+    return StoragePayloadFields.slice();
   }
 
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteRetrieved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictData || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].ConflictUuid) {
-    return ServerPayloadFields;
+    return ServerPayloadFields.slice();
   }
 
   if (source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].LocalSaved || source === _Payloads_index__WEBPACK_IMPORTED_MODULE_0__["PayloadSources"].RemoteSaved) {
-    return ServerSavedPayloadFields;
+    return ServerSavedPayloadFields.slice();
   } else {
     throw "No payload fields found for source ".concat(source);
   }
@@ -15199,8 +15195,9 @@ var PurePayload = /*#__PURE__*/function () {
       this.version = this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_1__["ProtocolVersion"].VersionLength);
     } else if (this.content) {
       this.version = this.content.version;
-    } // deepFreeze(this);
+    }
 
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["deepFreeze"])(this);
   }
 
   _createClass(PurePayload, [{
@@ -15239,7 +15236,6 @@ var PurePayload = /*#__PURE__*/function () {
     key: "contentObject",
     get: function get() {
       if (this.format !== _Payloads_formats__WEBPACK_IMPORTED_MODULE_4__["PayloadFormat"].DecryptedBareObject) {
-        debugger;
         throw Error('Attempting to access non-object content as object');
       }
 

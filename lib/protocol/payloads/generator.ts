@@ -9,6 +9,7 @@ import {
   deepMerge,
   isNullOrUndefined,
   isObject,
+  deepFreeze,
   pickByCopy,
 } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
@@ -48,7 +49,6 @@ export type RawPayload = {
   auth_params?: any
 }
 
-
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [
   PayloadField.Uuid,
@@ -71,80 +71,6 @@ const MaxPayloadFields = [
   PayloadField.LastSyncEnd,
 ]
 
-export function CreateMaxPayloadFromAnyObject(
-  object: object,
-  source?: PayloadSources,
-  intent?: EncryptionIntent,
-  override?: PayloadOverride
-) {
-  if (!isNullOrUndefined(source as any)) {
-    throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
-  }
-  if (!isNullOrUndefined(intent as any)) {
-    throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
-  }
-  return CreatePayload(
-    object,
-    MaxPayloadFields,
-    override
-  );
-}
-
-export function CreateIntentPayloadFromObject(
-  object: any,
-  intent: EncryptionIntent,
-  override?: PayloadOverride
-) {
-  const payloadFields = payloadFieldsForIntent(intent);
-  return CreatePayload(
-    object,
-    payloadFields,
-    override
-  );
-}
-
-export function CreateSourcedPayloadFromObject(
-  object: object,
-  source: PayloadSources,
-  override?: PayloadOverride
-) {
-  const payloadFields = payloadFieldsForSource(source);
-  return CreatePayload(
-    object,
-    payloadFields,
-    override
-  );
-}
-
-function CreatePayload(
-  object: object,
-  fields: PayloadField[],
-  override?: PayloadOverride
-): PurePayload {
-  const rawPayload = pickByCopy(object, fields);
-  if(!fields) {
-    debugger;
-  }
-  if (override) {
-    if (!isObject(override)) {
-      throw 'Attempting to override payload with non-object';
-    }
-    deepMerge(rawPayload, Copy(override));
-  }
-  return new PurePayload(rawPayload, fields);
-}
-
-export function CopyPayload(
-  payload: PurePayload,
-  override?: PayloadOverride
-): PurePayload {
-  const rawPayload = pickByCopy(payload, payload.fields);
-  if (override) {
-    deepMerge(rawPayload, Copy(override));
-  }
-  return new PurePayload(rawPayload, payload.fields);
-}
-
 const EncryptionParametersFields = [
   PayloadField.Uuid,
   PayloadField.ItemsKeyId,
@@ -155,24 +81,6 @@ const EncryptionParametersFields = [
   PayloadField.ErrorDecryptingChanged,
   PayloadField.WaitingForKey
 ];
-
-export function CreateEncryptionParameters(raw: RawPayload | PurePayload): PurePayload {
-  return CreatePayload(
-    raw,
-    EncryptionParametersFields,
-  );
-}
-
-export function CopyEncryptionParameters(
-  raw: RawPayload | PurePayload,
-  override?: PayloadOverride
-): PurePayload {
-  return CreatePayload(
-    raw,
-    EncryptionParametersFields,
-    override
-  );
-}
 
 const FilePayloadFields = [
   PayloadField.Uuid,
@@ -244,13 +152,102 @@ const ServerSavedPayloadFields = [
   PayloadField.LastSyncEnd
 ]
 
+export function CreateMaxPayloadFromAnyObject(
+  object: object,
+  source?: PayloadSources,
+  intent?: EncryptionIntent,
+  override?: PayloadOverride
+) {
+  if (!isNullOrUndefined(source as any)) {
+    throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
+  }
+  if (!isNullOrUndefined(intent as any)) {
+    throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
+  }
+  return CreatePayload(
+    object,
+    MaxPayloadFields.slice(),
+    override
+  );
+}
+
+export function CreateIntentPayloadFromObject(
+  object: any,
+  intent: EncryptionIntent,
+  override?: PayloadOverride
+) {
+  const payloadFields = payloadFieldsForIntent(intent);
+  return CreatePayload(
+    object,
+    payloadFields,
+    override
+  );
+}
+
+export function CreateSourcedPayloadFromObject(
+  object: object,
+  source: PayloadSources,
+  override?: PayloadOverride
+) {
+  const payloadFields = payloadFieldsForSource(source);
+  return CreatePayload(
+    object,
+    payloadFields,
+    override
+  );
+}
+
+function CreatePayload(
+  object: object,
+  fields: PayloadField[],
+  override?: PayloadOverride
+): PurePayload {
+  const rawPayload = pickByCopy(object, fields);
+  if (override) {
+    if (!isObject(override)) {
+      throw 'Attempting to override payload with non-object';
+    }
+    deepMerge(rawPayload, Copy(override));
+  }
+  return new PurePayload(rawPayload, fields.slice());
+}
+
+export function CopyPayload(
+  payload: PurePayload,
+  override?: PayloadOverride
+): PurePayload {
+  const rawPayload = pickByCopy(payload, payload.fields);
+  if (override) {
+    deepMerge(rawPayload, Copy(override));
+  }
+  return new PurePayload(rawPayload, payload.fields.slice());
+}
+
+export function CreateEncryptionParameters(raw: RawPayload | PurePayload): PurePayload {
+  return CreatePayload(
+    raw,
+    EncryptionParametersFields.slice(),
+  );
+}
+
+export function CopyEncryptionParameters(
+  raw: RawPayload | PurePayload,
+  override?: PayloadOverride
+): PurePayload {
+  return CreatePayload(
+    raw,
+    EncryptionParametersFields.slice(),
+    override
+  );
+}
+
 function payloadFieldsForIntent(intent: EncryptionIntent) {
   if ((
     intent === EncryptionIntent.FileEncrypted ||
     intent === EncryptionIntent.FileDecrypted ||
     intent === EncryptionIntent.FilePreferEncrypted
   )) {
-    return FilePayloadFields;
+    return FilePayloadFields.slice();
   }
 
   if ((
@@ -258,14 +255,14 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
     intent === EncryptionIntent.LocalStorageDecrypted ||
     intent === EncryptionIntent.LocalStorageEncrypted
   )) {
-    return StoragePayloadFields;
+    return StoragePayloadFields.slice();
   }
 
   if ((
     intent === EncryptionIntent.Sync ||
     intent === EncryptionIntent.SyncDecrypted
   )) {
-    return ServerPayloadFields;
+    return ServerPayloadFields.slice();
   } else {
     throw `No payload fields found for intent ${intent}`;
   }
@@ -273,22 +270,22 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
 
 export function payloadFieldsForSource(source: PayloadSources) {
   if (source === PayloadSources.FileImport) {
-    return FilePayloadFields;
+    return FilePayloadFields.slice();
   }
 
   if (source === PayloadSources.SessionHistory) {
-    return SessionHistoryPayloadFields;
+    return SessionHistoryPayloadFields.slice();
   }
 
   if (source === PayloadSources.ComponentRetrieved) {
-    return ComponentRetrievedPayloadFields;
+    return ComponentRetrievedPayloadFields.slice();
   }
 
   if ((
     source === PayloadSources.LocalRetrieved ||
     source === PayloadSources.LocalDirtied
   )) {
-    return StoragePayloadFields;
+    return StoragePayloadFields.slice();
   }
 
   if ((
@@ -296,13 +293,13 @@ export function payloadFieldsForSource(source: PayloadSources) {
     source === PayloadSources.ConflictData ||
     source === PayloadSources.ConflictUuid
   )) {
-    return ServerPayloadFields;
+    return ServerPayloadFields.slice();
   }
   if ((
     source === PayloadSources.LocalSaved ||
     source === PayloadSources.RemoteSaved
   )) {
-    return ServerSavedPayloadFields;
+    return ServerSavedPayloadFields.slice();
   } else {
     throw `No payload fields found for source ${source}`;
   }
