@@ -10881,6 +10881,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 26:
                 return _context7.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyEncryptionParameters"])(encryptedParameters, {
                   content: JSON.parse(content),
+                  enc_item_key: undefined,
                   errorDecrypting: false,
                   errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
                   waitingForKey: false
@@ -11487,6 +11488,8 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 40:
                 return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_6__["CopyEncryptionParameters"])(encryptedParameters, {
                   content: JSON.parse(content),
+                  items_key_id: undefined,
+                  enc_item_key: undefined,
                   auth_params: authParams,
                   errorDecrypting: false,
                   errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
@@ -12300,6 +12303,8 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 22:
                 return _context9.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_6__["CopyEncryptionParameters"])(encryptedParameters, {
                   content: JSON.parse(content),
+                  items_key_id: undefined,
+                  enc_item_key: undefined,
                   errorDecrypting: false,
                   errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
                   waitingForKey: false
