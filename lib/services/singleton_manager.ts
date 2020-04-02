@@ -1,7 +1,7 @@
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem } from '@Models/core/item';
-import { SNModelManager } from './model_manager';
+import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SingletonStrategies } from '@Models/index';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
@@ -26,7 +26,7 @@ import { SNSyncService } from './sync/sync_service';
  */
 export class SNSingletonManager extends PureService {
 
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private syncService?: SNSyncService
   private resolveQueue: SNItem[] = []
   private registeredPredicates: SNPredicate[] = []
@@ -34,7 +34,7 @@ export class SNSingletonManager extends PureService {
   private removeCreationObserver: any
   private removeSyncObserver: any
 
-  constructor(modelManager: SNModelManager, syncService: SNSyncService) {
+  constructor(modelManager: PayloadManager, syncService: SNSyncService) {
     super();
     this.modelManager = modelManager;
     this.syncService = syncService;

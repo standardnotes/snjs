@@ -1,4 +1,5 @@
-import { ItemTransformer } from './../../services/item_transformer';
+import { AppDataField } from './../core/item';
+import { ItemMutator } from './../../services/item_transformer';
 import { PurePayload } from '@Payloads/pure_payload';
 import { isString } from '@Lib/utils';
 import { SNItem } from '@Models/core/item';
@@ -34,7 +35,7 @@ export class SNComponent extends SNItem {
   public readonly autoupdateDisabled: boolean
   public readonly package_info: any
   public readonly area: ComponentAreas
-  public readonly permissions: any[]
+  public readonly permissions: any[] = []
   public readonly valid_until: Date
   public readonly active: boolean
   public readonly legacy_url: string
@@ -54,7 +55,6 @@ export class SNComponent extends SNItem {
     this.permissions = this.payload.safeContent.permissions || [];
     this.active = this.payload.safeContent.active;
     this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled;
-    this.componentData = this.payload.safeContent.componentData;
     this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || [];
     this.associatedItemIds = this.payload.safeContent.associatedItemIds || [];
     /**
@@ -88,11 +88,11 @@ export class SNComponent extends SNItem {
   }
 
   public isDefaultEditor() {
-    return this.getAppDataItem('defaultEditor') === true;
+    return this.getAppDomainValue(AppDataField.DefaultEditor) === true;
   }
 
   public getLastSize() {
-    return this.getAppDataItem('lastSize');
+    return this.getAppDomainValue(AppDataField.LastSize);
   }
 
   public acceptsThemes() {
@@ -137,15 +137,24 @@ export class SNComponent extends SNItem {
   }
 
   public isExplicitlyEnabledForItem(item: SNItem) {
-    return this.associatedItemIds.indexOf(item.uuid) !== -1;
+    return this.associatedItemIds.indexOf(item.uuid!) !== -1;
   }
 
   public isExplicitlyDisabledForItem(item: SNItem) {
-    return this.disassociatedItemIds.indexOf(item.uuid) !== -1;
+    return this.disassociatedItemIds.indexOf(item.uuid!) !== -1;
   }
 }
 
-export class ComponentTransformer extends ItemTransformer {
+export class ComponentTransformer extends ItemMutator {
+
+  set active(active: boolean) {
+    this.content.active = active;
+  }
+
+  set componentData(componentData: Record<string, any>) {
+    this.content.componentData = componentData;
+  }
+
   public associateWithItem(item: SNItem) {
     this.content.associatedItemIds.push(item.uuid);
   }

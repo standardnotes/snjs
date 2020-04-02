@@ -9,7 +9,7 @@ import { SNRootKeyParams, KeyParamsContent } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
-import { SNModelManager } from './model_manager';
+import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNWebCrypto, isWebCryptoAvailable, SNPureCrypto } from 'sncrypto';
 import { Uuid } from '@Lib/uuid';
@@ -98,7 +98,7 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersions.V003;
 */
 export class SNProtocolService extends PureService implements EncryptionDelegate {
 
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private storageService?: SNStorageService
   public crypto?: SNPureCrypto
   private operators: Record<string, SNProtocolOperator> = {}
@@ -108,7 +108,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private removeMappingObserver: any
 
   constructor(
-    modelManager: SNModelManager,
+    modelManager: PayloadManager,
     deviceInterface: DeviceInterface,
     storageService: SNStorageService,
     crypto: SNPureCrypto
@@ -1150,15 +1150,15 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.
     */
-    const allItemsKeys = this.allItemsKeys;
-    const neverSynced = allItemsKeys.filter((key) => {
+    const itemsKeys = this.itemsKeys;
+    const neverSynced = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
     /**
     * Find isDefault items key that have been previously synced.
     * If we find one, this means we can delete any non-synced keys.
     */
-    const defaultSyncedKey = allItemsKeys.find((key) => {
+    const defaultSyncedKey = itemsKeys.find((key) => {
       return !key.neverSynced && key.isDefault;
     });
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
@@ -1180,7 +1180,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         if (toDelete.length > 0) {
           await this.modelManager!.setItemsToBeDeleted(toDelete);
         }
-        if (allItemsKeys.length === 0) {
+        if (itemsKeys.length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
@@ -1214,7 +1214,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @access public
    * @returns All SN|ItemsKey objects synced to the account.
    */
-  get allItemsKeys() {
+  get itemsKeys() {
     return this.modelManager!.itemsKeys;
   }
 
@@ -1222,17 +1222,17 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns The items key used to encrypt the payload
    */
   public itemsKeyForPayload(payload: PurePayload) {
-    return this.allItemsKeys.find((key) => key.uuid === payload.items_key_id);
+    return this.itemsKeys.find((key) => key.uuid === payload.items_key_id);
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
   public getDefaultItemsKey() {
-    if (this.allItemsKeys.length === 1) {
-      return this.allItemsKeys[0];
+    if (this.itemsKeys.length === 1) {
+      return this.itemsKeys[0];
     }
-    return this.allItemsKeys.find((key) => {
+    return this.itemsKeys.find((key) => {
       return key.isDefault;
     });
   }
@@ -1242,7 +1242,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * keys with this new root key (by simply re-syncing).
    */
   public async reencryptItemsKeys() {
-    const itemsKeys = this.allItemsKeys;
+    const itemsKeys = this.itemsKeys;
     if (itemsKeys.length > 0) {
       /** 
        * Do not call sync after marking dirty.
@@ -1261,7 +1261,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * with previous protocol version.
    */
   public async defaultItemsKeyForItemVersion(version: ProtocolVersions) {
-    return this.allItemsKeys.find((key) => {
+    return this.itemsKeys.find((key) => {
       return key.version === version;
     });
   }

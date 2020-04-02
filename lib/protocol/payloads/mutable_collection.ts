@@ -1,62 +1,80 @@
+import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@Models/content_types';
 import { PayloadCollection } from '@Payloads/collection';
 import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 
-type PayloadMap = Partial<Record<UuidString, PurePayload>>
-type ContentTypeMap = Partial<Record<ContentType, PurePayload[]>>
+type Payloadable = PurePayload | SNItem
 
-export class MutablePayloadCollection {
+export class MutableCollection<T extends Payloadable> {
 
-  private readonly map: PayloadMap = {}
-  private readonly typedMap: ContentTypeMap = {}
+  private readonly map: Partial<Record<UuidString, T>> = {}
+  private readonly typedMap: Partial<Record<ContentType, T[]>> = {}
 
-  constructor(payloads: Array<PurePayload> = []) {
-    for (const payload of payloads) {
-      this.map[payload.uuid!] = payload;
-      this.setToTypedMap(payload);
+  constructor(elements: T[] = []) {
+    for (const element of elements) {
+      this.map[element.uuid!] = element;
+      this.setToTypedMap(element);
     }
   }
-  
-  private setToTypedMap(payload: PurePayload) {
-    const array = this.typedMap[payload.content_type!] || [] as PurePayload[];
-    remove(array, { uuid: payload.uuid! });
-    array.push(payload);
-    this.typedMap[payload.content_type!] = array;
+
+  public getAll(contentType?: ContentType) {
+    if (contentType) {
+      return this.typedMap[contentType] || [];
+    } else {
+      return Object.keys(this.map).map((uuid: UuidString) => {
+        return this.map[uuid]!;
+      }) as T[];
+    }
   }
 
-  private deleteFromTypedMap(payload: PurePayload) {
-    const array = this.typedMap[payload.content_type!] || [] as PurePayload[];
-    remove(array, { uuid: payload.uuid! });
-    this.typedMap[payload.content_type!] = array;
-  }
-
-  public getAllPayloads(): PurePayload[] {
-    return Object.keys(this.map).map((uuid: UuidString) => {
-      return this.map[uuid]!;
-    });
-  }
-
-  public getPayloadsForContentType(type: ContentType) {
-    return this.typedMap[type];
-  }
-
-  public findPayload(id: UuidString) {
+  public find(id: UuidString) {
     return this.map[id];
   }
 
-  public setPayload(payload: PurePayload) {
-    this.map[payload.uuid!] = payload;
-    this.setToTypedMap(payload);
+  public findAll(ids: UuidString[]) {
+    const results = [];
+    for (const id of ids) {
+      const element = this.map[id];
+      if (element) {
+        results.push(element);
+      }
+    }
+    return results;
   }
 
-  public deletePayload(payload: PurePayload) {
-    delete this.map[payload.uuid!];
-    this.deleteFromTypedMap(payload);
+  public set(elements: T | T[]) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    for (const element of elements) {
+      this.map[element.uuid!] = element;
+      this.setToTypedMap(element);
+    }
   }
 
-  public toImmutableCollection() {
-    return new PayloadCollection(this.getAllPayloads());
+  public delete(elements: T | T[]) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    for (const element of elements) {
+      delete this.map[element.uuid!];
+      this.deleteFromTypedMap(element);
+    }
   }
+
+  public toImmutablePayloadCollection() {
+    return new PayloadCollection(this.getAll() as PurePayload[]);
+  }
+
+  private setToTypedMap(element: T) {
+    const array = this.typedMap[element.content_type!] || [] as T[];
+    remove(array, { uuid: element.uuid! as any });
+    array.push(element);
+    this.typedMap[element.content_type!] = array;
+  }
+
+  private deleteFromTypedMap(element: T) {
+    const array = this.typedMap[element.content_type!] || [] as T[];
+    remove(array, { uuid: element.uuid! as any });
+    this.typedMap[element.content_type!] = array;
+  }
+
 }

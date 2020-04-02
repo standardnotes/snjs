@@ -1,3 +1,4 @@
+import { SNItem } from './core/item';
 import { DEFAULT_APP_DOMAIN } from '@Lib/index';
 import { PayloadContent } from '@Payloads/generator';
 import { deepMerge, Copy } from '@Lib/utils';
@@ -18,7 +19,7 @@ const ContentTypeClassMapping: Record<any, any> = {
   [ContentType.UserPrefs]: itemClasses.SNUserPrefs
 };
 
-export function CreateItemFromPayload(payload: PurePayload) {
+export function CreateItemFromPayload(payload: PurePayload): SNItem {
   const itemClass = ContentTypeClassMapping[payload.content_type!] || itemClasses.SNItem;
   // eslint-disable-next-line new-cap
   const item = new itemClass(true);
@@ -30,7 +31,7 @@ export function CreateItemFromPayload(payload: PurePayload) {
  * Builds item .content based on values and populates with other default required
  * fields if necessary.
  */
-export function BuildItemContent(values?: Record<string, any>) {
+export function BuildItemContent(values?: Record<string, any>, ) {
   const copy = values ? Copy(values) : {}
   return {
     references: [],

@@ -59,6 +59,6 @@ export function ItemContentsDiffer(
     item1.content,
     item2.content,
     item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-    item1.appDatacontentKeysToIgnoreWhenCheckingEquality()
+    item1.appDataContentKeysToIgnoreWhenCheckingEquality()
   );
 }

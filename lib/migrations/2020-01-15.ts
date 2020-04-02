@@ -19,7 +19,7 @@ import {
   Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
 } from '@Lib/utils';
 import { ProtocolVersions, EncryptionIntents, SNRootKey } from '@Protocol/index';
-import { SNItemsKey, ContentTypes } from '@Models/index';
+import { SNItemsKey, ContentType } from '@Models/index';
 import { SNStorageService } from '@Services/index';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
@@ -264,7 +264,7 @@ export class Migration20200115 extends Migration {
         CopyPayload(
           decryptedStoragePayload,
           {
-            content_type: ContentTypes.EncryptedStorage,
+            content_type: ContentType.EncryptedStorage,
             content: storageValueStore,
           }
         ),
@@ -380,7 +380,7 @@ export class Migration20200115 extends Migration {
           {
             uuid: await Uuid.GenerateUuid(),
             content: rawStructure.unwrapped,
-            content_type: ContentTypes.EncryptedStorage
+            content_type: ContentType.EncryptedStorage
           }
         );
         /** Encrypt new storage.unwrapped structure with passcode */
@@ -505,7 +505,7 @@ export class Migration20200115 extends Migration {
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
       const payload = CreateMaxPayloadFromAnyObject({
-        content_type: ContentTypes.ItemsKey,
+        content_type: ContentType.ItemsKey,
         content: {
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,

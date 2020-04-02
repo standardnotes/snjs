@@ -140,7 +140,7 @@ describe('online syncing', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await Uuid.GenerateUuid(),
-        content_type: ContentTypes.Mfa,
+        content_type: ContentType.Mfa,
         content: {
           secret: '123'
         }
@@ -753,16 +753,16 @@ describe('online syncing', () => {
   }).timeout(10000);
 
   it('duplicating an item should maintian its relationships', async function () {
-    const payload1 = Factory.createStorageItemPayload(ContentTypes.ServerExtension);
-    const payload2 = Factory.createStorageItemPayload(ContentTypes.UserPrefs);
+    const payload1 = Factory.createStorageItemPayload(ContentType.ServerExtension);
+    const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs);
 
     await this.application.modelManager.emitPayloads(
       [payload1, payload2],
       PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
-    const fooItem = this.application.modelManager.getItems(ContentTypes.ServerExtension)[0];
-    const barItem = this.application.modelManager.getItems(ContentTypes.UserPrefs)[0];
+    const fooItem = this.application.modelManager.getItems(ContentType.ServerExtension)[0];
+    const barItem = this.application.modelManager.getItems(ContentType.UserPrefs)[0];
     expect(fooItem).to.be.ok;
     expect(barItem).to.be.ok;
     fooItem.addItemAsRelationship(barItem);
@@ -785,7 +785,7 @@ describe('online syncing', () => {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    const fooItems = this.application.modelManager.getItems(ContentTypes.ServerExtension);
+    const fooItems = this.application.modelManager.getItems(ContentType.ServerExtension);
     const fooItem2 = fooItems[1];
 
     expect(fooItem2.content.conflict_of).to.equal(fooItem.uuid);

@@ -1,3 +1,4 @@
+import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { SNTag } from '@Models/app/tag';
 import { ContentType } from '@Models/content_types';
 import { SNPredicate } from '@Models/core/predicate';
@@ -13,9 +14,14 @@ const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
  * list of notes.
  */
 export class SNSmartTag extends SNTag {
-  
-  getDefaultContentType() {
-    return ContentType.SmartTag;
+
+  public readonly predicate: SNPredicate
+  public readonly isTrashTag: boolean
+
+  constructor(payload: PurePayload) {
+    super(payload);
+    this.predicate = this.payload.safeContent.predicate;
+    this.isTrashTag = this.payload.safeContent.isTrashTag;
   }
 
   static systemSmartTags() {
@@ -56,9 +62,9 @@ export class SNSmartTag extends SNTag {
       }
     );
     return [
-      CreateItemFromPayload(allNotes),
-      CreateItemFromPayload(archived),
-      CreateItemFromPayload(trash)
+      CreateItemFromPayload(allNotes) as SNSmartTag,
+      CreateItemFromPayload(archived) as SNSmartTag,
+      CreateItemFromPayload(trash) as SNSmartTag
     ];
   }
 }

@@ -2,7 +2,7 @@ import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { SNStorageService } from '@Services/index';
 import { ContentType } from '@Models/content_types';
-import { SNModelManager } from './../model_manager';
+import { PayloadManager } from './../model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { HistorySession } from '@Services/history/history_session';
 import { PayloadSource } from '@Payloads/sources';
@@ -20,7 +20,7 @@ const PERSIST_TIMEOUT = 2000;
  */
 export class SNHistoryManager extends PureService {
 
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private storageService?: SNStorageService
   private contentTypes: ContentType[] = []
   private timeout: any
@@ -31,7 +31,7 @@ export class SNHistoryManager extends PureService {
   private saveTimeout: any
 
   constructor(
-    modelManager: SNModelManager,
+    modelManager: PayloadManager,
     storageService: SNStorageService,
     contentTypes: ContentType[],
     timeout: any

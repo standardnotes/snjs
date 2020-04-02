@@ -1,3 +1,4 @@
+import { AppDataField } from './../core/item';
 import { SNItem } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
 import { ContentType } from '@Models/content_types';
@@ -25,24 +26,26 @@ export class SNTheme extends SNComponent {
   }
 
   setMobileRules(rules: any) {
-    this.setAppDataItem('mobileRules', rules);
+    // this.setAppDataItem(AppDataField.MobileRules, rules);
+    throw Error('setMobileRules is deprecated and no longer supported. Use mutators instead.');
   }
 
   getMobileRules() {
-    return this.getAppDataItem('mobileRules') || {constants: {}, rules: {}};
+    return this.getAppDomainValue(AppDataField.MobileRules) || {constants: {}, rules: {}};
   }
 
   /** Same as getMobileRules but without default value. */
   hasMobileRules() {
-    return this.getAppDataItem('mobileRules');
+    return this.getAppDomainValue(AppDataField.MobileRules);
   }
 
   setNotAvailOnMobile(na: boolean) {
-    this.setAppDataItem('notAvailableOnMobile', na);
+    // this.setAppDataItem(AppDataField.NotAvailableOnMobile, na);
+    throw Error('setNotAvailOnMobile is deprecated and no longer supported. Use mutators instead.');
   }
 
   getNotAvailOnMobile() {
-    return this.getAppDataItem('notAvailableOnMobile');
+    return this.getAppDomainValue(AppDataField.NotAvailableOnMobile);
   }
 
   /**
@@ -50,10 +53,12 @@ export class SNTheme extends SNComponent {
    * activate that theme on desktop/web
    */
   setMobileActive(active: boolean) {
-    this.setAppDataItem('mobileActive', active);
+    // this.setAppDataItem(AppDataField.MobileActive, active);
+    throw Error('setMobileActive is deprecated and no longer supported. Use mutators instead.');
   }
 
   isMobileActive() {
-    return this.getAppDataItem('mobileActive');
+    // return this.getAppDomainValue(AppDataField.MobileActive);
+    throw Error('isMobileActive is deprecated and no longer supported. Use mutators instead.');
   }
 }

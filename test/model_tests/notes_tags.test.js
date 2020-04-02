@@ -27,7 +27,7 @@ describe('notes and tags', () => {
   });
 
   it('properly constructs syncing params', async function () {
-    const note = await this.application.createTemplateItem(ContentTypes.Note);
+    const note = await this.application.createTemplateItem(ContentType.Note);
     const title = 'Foo';
     const text = 'Bar';
     note.title = title;
@@ -37,7 +37,7 @@ describe('notes and tags', () => {
     expect(content.title).to.equal(title);
     expect(content.text).to.equal(text);
 
-    const tag = await this.application.createTemplateItem(ContentTypes.Tag);
+    const tag = await this.application.createTemplateItem(ContentType.Tag);
     tag.title = title;
 
     expect(tag.collapseContent().title).to.equal(title);
@@ -483,7 +483,7 @@ describe('notes and tags', () => {
 
   it('setting a note dirty should collapse its properties into content', async function () {
     const modelManager = this.application.modelManager;
-    const note = await this.application.createTemplateItem(ContentTypes.Note);
+    const note = await this.application.createTemplateItem(ContentType.Note);
     note.title = 'Foo';
     expect(note.content.title).to.not.be.ok;
     await modelManager.setItemDirty(note);

@@ -3,8 +3,25 @@ import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { deepFreeze } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
-import { ConflictStrategies,} from '@Payloads/index';
+import { ConflictStrategies, } from '@Payloads/index';
 import { DEFAULT_APP_DOMAIN } from '@Lib/index';
+
+export enum AppDataField {
+  Pinned = 'pinned',
+  Archived = 'archived',
+  Locked = 'locked',
+  UserModifiedDate = 'client_updated_at',
+  DefaultEditor = 'defaultEditor',
+  MobileRules = 'mobileRules',
+  NotAvailableOnMobile = 'notAvailableOnMobile',
+  MobileActive = 'mobileActive',
+  LastSize = 'lastSize',
+  PrefersPlainEditor = 'prefersPlainEditor'
+}
+
+type AppData = {
+  [key in AppDataField]?: any
+}
 
 export enum SingletonStrategies {
   KeepEarliest = 1
@@ -34,6 +51,10 @@ export class SNItem {
     return this.payload.content;
   }
 
+  get references() {
+    return this.payload.safeContent.references || [];
+  }
+
   get deleted() {
     return this.payload.deleted;
   }
@@ -59,7 +80,7 @@ export class SNItem {
   }
 
   get user_modified_at() {
-    const value = this.getAppDataItem('client_updated_at');
+    const value = this.getAppDomainValue(AppDataField.UserModifiedDate);
     return new Date(value || this.updated_at);
   }
 
@@ -116,37 +137,44 @@ export class SNItem {
     return !!target;
   }
 
-  public getDomainDataItem(key: string, domain: string) {
-    const appData = this.payload.safeContent.appData;
-    if (!appData) {
+  /**
+   * Inside of content is a record called `appData` (which should have been called `domainData`).
+   * It was named `appData` as a way to indicate that it can house data for multiple apps.
+   * Each key of appData is a domain string, which was originally designed
+   * to allow for multiple 3rd party apps who share access to the same data to store data
+   * in an isolated location. This design premise is antiquited and no longer pursued,
+   * however we continue to use it as not to uncesesarily create a large data migration
+   * that would require users to sync all their data.
+   * 
+   * domainData[DomainKey] will give you another Record<string, any>.
+   * 
+   * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
+   * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
+   */
+  public getDomainData(domain: string) {
+    const domainData = this.payload.safeContent.appData;
+    if (!domainData) {
       return undefined;
     }
-    const data = appData[domain];
-    if (data) {
-      return data[key];
-    } else {
-      return undefined;
-    }
+    const data = domainData[domain];
+    return data;
   }
 
-  public getAppDataItem(key: string) {
-    return this.getDomainDataItem(key, DEFAULT_APP_DOMAIN);
+  public getAppDomainValue(key: AppDataField) {
+    const appData = this.getDomainData(DEFAULT_APP_DOMAIN);
+    return appData[key];
   }
 
   public get pinned() {
-    return this.getAppDataItem('pinned');
+    return this.getAppDomainValue(AppDataField.Pinned);
   }
 
   public get archived() {
-    return this.getAppDataItem('archived');
+    return this.getAppDomainValue(AppDataField.Archived);
   }
 
   public get locked() {
-    return this.getAppDataItem('locked');
-  }
-
-  private hasRawClientUpdatedAtValue() {
-    return this.getAppDataItem('client_updated_at') != null;
+    return this.getAppDomainValue(AppDataField.Locked);
   }
 
   /**
@@ -160,8 +188,8 @@ export class SNItem {
   }
 
   /** Same as `contentKeysToIgnoreWhenCheckingEquality`, but keys inside appData[Item.AppDomain] */
-  public appDatacontentKeysToIgnoreWhenCheckingEquality() {
-    return ['client_updated_at'];
+  public appDataContentKeysToIgnoreWhenCheckingEquality() {
+    return [AppDataField.UserModifiedDate];
   }
 
   public getContentCopy() {
@@ -233,7 +261,7 @@ export class SNItem {
       this.payload.contentObject,
       otherItem.payload.contentObject,
       this.contentKeysToIgnoreWhenCheckingEquality(),
-      this.appDatacontentKeysToIgnoreWhenCheckingEquality()
+      this.appDataContentKeysToIgnoreWhenCheckingEquality()
     );
   }
 

@@ -44,7 +44,8 @@ import {
   SNSyncService,
   ChallengeService,
   SyncModes,
-  SyncQueueStrategy
+  SyncQueueStrategy,
+  ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
 
@@ -67,9 +68,7 @@ type ApplicationObserver = {
 }
 type ItemStream = (
   items: SNItem[],
-  contentTypes: ContentType[],
   source?: PayloadSource,
-  sourceKey?: string
 ) => void
 type ObserverRemover = () => void
 
@@ -100,6 +99,7 @@ export class SNApplication {
   private privilegesService?: SNPrivilegesService
   private actionsManager?: SNActionsService
   private historyManager?: SNHistoryManager
+  private itemManager?: ItemManager
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -420,12 +420,12 @@ export class SNApplication {
   }
 
   public async saveItem(item: SNItem) {
-    await this.modelManager!.setItemDirty(item, true);
+    await this.itemManager!.setItemDirty(item, true);
     await this.syncService!.sync();
   }
 
   public async saveItems(items: SNItem[]) {
-    await this.modelManager!.setItemsDirty(items);
+    await this.itemManager!.setItemsDirty(items);
     await this.syncService!.sync();
   }
 
@@ -434,11 +434,11 @@ export class SNApplication {
    * sees of the item.
    */
   public async setItemNeedsSync(item: SNItem, updateUserModifiedDate = false) {
-    return this.modelManager!.setItemDirty(item, true, updateUserModifiedDate);
+    return this.itemManager!.setItemDirty(item, true, updateUserModifiedDate);
   }
 
   public async setItemsNeedsSync(items: SNItem[]) {
-    return this.modelManager!.setItemsDirty(items);
+    return this.itemManager!.setItemsDirty(items);
   }
 
   public async deleteItem(item: SNItem) {
@@ -495,15 +495,12 @@ export class SNApplication {
     contentType: ContentType | ContentType[],
     stream: ItemStream
   ) {
-    const observer = this.modelManager!.addChangeObserver(
+    const observer = this.itemManager!.addObserver(
       contentType,
-      async (allItems, _, __, source, sourceKey) => {
-        const includedContentTypes = allItems.map((item) => item.content_type);
+      (items, source) => {
         stream(
-          allItems,
-          includedContentTypes,
+          items,
           source,
-          sourceKey
         );
       }
     );
@@ -686,7 +683,7 @@ export class SNApplication {
    * https://github.com/standardnotes/desktop/issues/131
    */
   private async rewriteItemsKeys() {
-    const itemsKeys = this.protocolService!.allItemsKeys;
+    const itemsKeys = this.protocolService!.itemsKeys;
     const payloads = itemsKeys.map((key) => key.payloadRepresentation());
     await this.storageService!.deletePayloads(payloads);
     await this.syncService!.persistPayloads(payloads);
@@ -970,6 +967,7 @@ export class SNApplication {
 
   private constructServices() {
     this.createModelManager();
+    this.createItemManager();
     this.createStorageManager();
     this.createProtocolService();
 
@@ -1009,6 +1007,7 @@ export class SNApplication {
     this.privilegesService = undefined;
     this.actionsManager = undefined;
     this.historyManager = undefined;
+    this.itemManager = undefined;
 
     this.services = [];
   }
@@ -1044,6 +1043,11 @@ export class SNApplication {
       this.storageService,
     );
     this.services.push(this.apiService!);
+  }
+
+  private createItemManager() {
+    this.itemManager = new ItemManager(this.modelManager!);
+    this.services.push(this.itemManager!);
   }
 
   private createComponentManager() {

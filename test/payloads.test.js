@@ -13,7 +13,7 @@ describe('payload generation', () => {
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
-          predicate: SNPredicate.FromArray(['content_type', '=', ContentTypes.Note])
+          predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
         }
       }
     );

@@ -66,7 +66,7 @@ describe('2020-01-15 web migration', () => {
     const storagePayload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await operator003.crypto.generateUUID(),
-        content_type: ContentTypes.EncryptedStorage,
+        content_type: ContentType.EncryptedStorage,
         content: {
           storage: embeddedStorage
         },
@@ -218,7 +218,7 @@ describe('2020-01-15 web migration', () => {
         content: {
           storage: embeddedStorage
         },
-        content_type: ContentTypes.EncryptedStorage
+        content_type: ContentType.EncryptedStorage
       }
     );
     const encryptionParams = await operator003.generateEncryptedParameters(

@@ -66,10 +66,10 @@ describe('keys', () => {
   });
 
   it('validates content types requiring root encryption', async function () {
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentTypes.ItemsKey)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentTypes.EncryptedStorage)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentTypes.Item)).to.equal(false);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentTypes.Note)).to.equal(false);
+    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.ItemsKey)).to.equal(true);
+    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.EncryptedStorage)).to.equal(true);
+    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Item)).to.equal(false);
+    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Note)).to.equal(false);
   });
 
   it('generating export params with no account or passcode should produce encrypted payload',
@@ -87,7 +87,7 @@ describe('keys', () => {
   it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
-    expect(this.application.protocolService.allItemsKeys.length).to.equal(1);
+    expect(this.application.protocolService.itemsKeys.length).to.equal(1);
   }).timeout(5000);
 
   it('should use root key for encryption of storage', async function () {
@@ -99,7 +99,7 @@ describe('keys', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       {
         content: { foo: 'bar' },
-        content_type: ContentTypes.EncryptedStorage
+        content_type: ContentType.EncryptedStorage
       }
     );
     const keyToUse = await this.application.protocolService.
@@ -165,7 +165,7 @@ describe('keys', () => {
   });
 
   it('should create random items key if no account and no passcode', async function () {
-    const itemsKeys = this.application.protocolService.allItemsKeys;
+    const itemsKeys = this.application.protocolService.itemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
     await this.application.savePayload(notePayload);
@@ -182,7 +182,7 @@ describe('keys', () => {
         note,
         EncryptionIntents.Sync
       );
-    expect(keyToUse.content_type).to.equal(ContentTypes.ItemsKey);
+    expect(keyToUse.content_type).to.equal(ContentType.ItemsKey);
   });
 
   it('encrypting an item should associate an items key to it', async function () {
@@ -275,7 +275,7 @@ describe('keys', () => {
 
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.setPasscode('foo');
-    const itemsKey = this.application.protocolService.allItemsKeys[0];
+    const itemsKey = this.application.protocolService.itemsKeys[0];
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject(
@@ -310,7 +310,7 @@ describe('keys', () => {
         version: ProtocolVersions.V003
       });
 
-      const itemsKeys = this.application.protocolService.allItemsKeys;
+      const itemsKeys = this.application.protocolService.itemsKeys;
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
       expect(newestItemsKey.version).to.equal(ProtocolVersions.V003);
@@ -322,7 +322,7 @@ describe('keys', () => {
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');
     await Factory.createSyncedNote(this.application);
-    const itemsKeys = this.application.protocolService.allItemsKeys;
+    const itemsKeys = this.application.protocolService.itemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const originalItemsKey = itemsKeys[0];
 
@@ -377,7 +377,7 @@ describe('keys', () => {
     await Factory.registerUserToApplication({
       application: this.application, email: this.email, password: this.password
     });
-    const itemsKeys = this.application.protocolService.allItemsKeys;
+    const itemsKeys = this.application.protocolService.itemsKeys;
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
 
@@ -386,7 +386,7 @@ describe('keys', () => {
       'foobarfoo'
     );
 
-    expect(this.application.protocolService.allItemsKeys.length).to.equal(2);
+    expect(this.application.protocolService.itemsKeys.length).to.equal(2);
     const newDefaultItemsKey = this.application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
   }).timeout(5000);

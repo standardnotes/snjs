@@ -12,5 +12,5 @@ export { SNPrivileges } from '@Models/app/privileges';
 export { SNSmartTag } from '@Models/app/smartTag';
 export { SNTheme } from '@Models/app/theme';
 
-export { ContentType as ContentTypes, displayStringForContentType } from '@Models/content_types';
+export { ContentType, displayStringForContentType } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';

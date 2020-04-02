@@ -54,12 +54,12 @@ describe('singletons', () => {
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
     this.extPred = SNPredicate.CompoundPredicate([
-      new SNPredicate('content_type', '=', ContentTypes.Component),
+      new SNPredicate('content_type', '=', ContentType.Component),
       new SNPredicate('package_info.identifier', '=', this.extManagerId)
     ]);
     this.createExtMgr = async () => {
       return this.application.createManagedItem(
-        ContentTypes.Component,
+        ContentType.Component,
         {
           package_info: {
             name: 'Extensions',
@@ -116,7 +116,7 @@ describe('singletons', () => {
     /* Set to never synced as singleton manager will attempt to sync before resolving */
     this.application.syncService.ut_clearLastSyncDate();
     this.application.syncService.ut_setDatabaseLoaded(false);
-    const contentType = ContentTypes.UserPrefs;
+    const contentType = ContentType.UserPrefs;
     const predicate = new SNPredicate('content_type', '=', contentType);
     /* Start a sync right after we await singleton resolve below */
     setImmediate(() => {
@@ -187,7 +187,7 @@ describe('singletons', () => {
         didCompleteRelevantSync = true;
         const saved = data.savedPayloads;
         expect(saved.length).to.equal(1);
-        const matching = saved.find((p) => p.content_type === ContentTypes.Component && p.deleted);
+        const matching = saved.find((p) => p.content_type === ContentType.Component && p.deleted);
         expect(matching).to.not.be.ok;
       }
     });

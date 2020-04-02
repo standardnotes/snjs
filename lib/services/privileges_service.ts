@@ -3,12 +3,12 @@ import { SNStorageService } from '@Services/storage_service';
 import { SNProtocolService } from './protocol_service';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
-import { SNModelManager } from './model_manager';
+import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
 import { StorageKey } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { ContentTypes } from '@Root/lib/models';
+import { ContentType } from '@Root/lib/models';
 import { ProtectedActions, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
 
 export enum PrivilegeSessionLength {
@@ -62,7 +62,7 @@ const ActionsMetadata = {
  * the user has yet authenticated this action.
  */
 export class SNPrivilegesService extends PureService {
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private syncService?: SNSyncService
   private singletonManager?: SNSingletonManager
   private protocolService?: SNProtocolService
@@ -74,7 +74,7 @@ export class SNPrivilegesService extends PureService {
   private sessionLengths: PrivilegeSessionLength[] = []
 
   constructor(
-    modelManager: SNModelManager,
+    modelManager: PayloadManager,
     syncService: SNSyncService,
     singletonManager: SNSingletonManager,
     protocolService: SNProtocolService,
@@ -151,7 +151,7 @@ export class SNPrivilegesService extends PureService {
   }
 
   async getPrivileges() {
-    const contentType = ContentTypes.Privileges;
+    const contentType = ContentType.Privileges;
     const predicate = new SNPredicate('content_type', '=', contentType);
     return this.singletonManager!.findOrCreateSingleton(
       predicate,

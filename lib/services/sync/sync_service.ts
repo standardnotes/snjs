@@ -1,7 +1,7 @@
 import { SyncResponse } from '@Services/sync/response';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNModelManager } from './../model_manager';
+import { PayloadManager } from './../model_manager';
 import { SNStorageService } from './../storage_service';
 import { SNProtocolService } from './../protocol_service';
 import { removeFromIndex, sleep, subtractFromArray, isNullOrUndefined } from '@Lib/utils';
@@ -100,7 +100,7 @@ export class SNSyncService extends PureService {
   private sessionManager?: SNSessionManager
   private protocolService?: SNProtocolService
   private storageService?: SNStorageService
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private apiService?: SNApiService
   private interval: any
   private state?: SyncState
@@ -146,7 +146,7 @@ export class SNSyncService extends PureService {
     sessionManager: SNSessionManager,
     protocolService: SNProtocolService,
     storageService: SNStorageService,
-    modelManager: SNModelManager,
+    modelManager: PayloadManager,
     apiService: SNApiService,
     interval: any
   ) {

@@ -1,3 +1,4 @@
+import { CopyPayload } from '@Payloads/generator';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
@@ -10,7 +11,15 @@ export class DeltaFileImport extends PayloadsDelta {
   public async resultingCollection() {
     const results: Array<PurePayload> = [];
     for (const payload of this.applyCollection!.getAllPayloads()) {
-      const payloads = await this.payloadsByHandlingPayload(payload, results);
+      const payloads = (await this.payloadsByHandlingPayload(payload, results)).map((result) => {
+        return CopyPayload(
+          result,
+          {
+            dirty: true,
+            deleted: false
+          }
+        )
+      })
       extendArray(results, payloads);
     }
     return new PayloadCollection(results, PayloadSource.FileImport);

@@ -194,7 +194,7 @@ describe('model manager mapping', () => {
     const item = modelManager.allItems[0];
     return new Promise((resolve) => {
       modelManager.addChangeObserver(
-        ContentTypes.Any,
+        ContentType.Any,
         (items, _, __, ___, ____) => {
           expect(items[0].uuid === item.uuid);
           resolve();

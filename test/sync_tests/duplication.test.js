@@ -54,7 +54,7 @@ describe('duplication', () => {
   }
 
   it('components should not be duplicated under any circumstances', async function() {
-    const payload = createDirtyPayload(ContentTypes.Component);
+    const payload = createDirtyPayload(ContentType.Component);
     const item = await this.application.modelManager.emitPayload(
       payload,
       PayloadSource.LocalChanged
@@ -71,7 +71,7 @@ describe('duplication', () => {
   });
 
   it('items keys should not be duplicated under any circumstances', async function() {
-    const payload = createDirtyPayload(ContentTypes.ItemsKey);
+    const payload = createDirtyPayload(ContentType.ItemsKey);
     const item = await this.application.modelManager.emitPayload(
       payload,
       PayloadSource.LocalChanged

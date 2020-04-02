@@ -5,13 +5,13 @@ import { SNActionsExtension } from './../models/app/extension';
 import { SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
-import { SNModelManager } from './model_manager';
+import { PayloadManager } from './model_manager';
 import { SNHttpService, HttpResponse } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PayloadSource } from '@Payloads/sources';
 import { EncryptionIntent } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
-import { ContentTypes, Action } from '@Models/index';
+import { ContentType, Action } from '@Models/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 
@@ -35,7 +35,7 @@ export class SNActionsService extends PureService {
 
   private alertService?: SNAlertService
   private httpService?: SNHttpService
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private protocolService?: SNProtocolService
   private syncService?: SNSyncService
   private previousPasswords: string[] = []
@@ -44,7 +44,7 @@ export class SNActionsService extends PureService {
     alertService: SNAlertService,
     deviceInterface: DeviceInterface,
     httpService: SNHttpService,
-    modelManager: SNModelManager,
+    modelManager: PayloadManager,
     protocolService: SNProtocolService,
     syncService: SNSyncService,
   ) {
@@ -72,7 +72,7 @@ export class SNActionsService extends PureService {
 
   public getExtensions(): SNActionsExtension[] {
     return this.modelManager!
-      .validItemsForContentType(ContentTypes.ActionsExtension) as SNActionsExtension[];
+      .validItemsForContentType(ContentType.ActionsExtension) as SNActionsExtension[];
   }
 
   public extensionsInContextOfItem(item: SNItem) {

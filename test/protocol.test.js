@@ -72,7 +72,7 @@ describe('protocol', () => {
     const payload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await Uuid.GenerateUuid(),
-        content_type: ContentTypes.Mfa,
+        content_type: ContentType.Mfa,
         content: {
           secret: '123'
         }

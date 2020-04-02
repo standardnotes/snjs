@@ -1,32 +1,17 @@
-import { MutablePayloadCollection } from './../protocol/payloads/mutable_collection';
-import { PayloadOverride } from '@Payloads/generator';
+import { MutableCollection } from './../protocol/payloads/mutable_collection';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNComponent } from '@Models/app/component';
-import { SNTag } from '@Models/app/tag';
-import { SNNote } from './../models/app/note';
-import { SNItemsKey } from '@Models/app/items_key';
 import { SNItem } from '@Models/core/item';
-import { PayloadContent } from '@Payloads/generator';
 import remove from 'lodash/remove';
 import pull from 'lodash/pull';
-import { findInArray, isNullOrUndefined } from '@Lib/utils';
 import {
-  ContentTypes,
-  CreateItemFromPayload,
-  SNPredicate,
-  SNSmartTag
+  ContentType,
 } from '@Models/index';
 import { PureService } from '@Lib/services/pure_service';
 import {
   PayloadSource,
-  PayloadsByDuplicating,
-  CreateMaxPayloadFromAnyObject,
   PayloadCollection,
   DeltaFileImport,
-  PayloadField
 } from '@Payloads/index';
-import { Uuid } from '@Lib/uuid';
-import { BuildItemContent } from '../models/generator';
 
 type PayloadInsertionCallback = (
   payloads: PurePayload[],
@@ -47,7 +32,7 @@ type ChangeCallback = (
 ) => Promise<void>
 
 type ChangeObserver = {
-  types: ContentTypes | ContentTypes[]
+  types: ContentType | ContentType[]
   priority: number
   callback: ChangeCallback
 }
@@ -62,15 +47,15 @@ type ChangeObserver = {
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
  */
-export class SNModelManager extends PureService {
+export class PayloadManager extends PureService {
 
   private mappingObservers: ChangeObserver[] = []
   private creationObservers: InsertionObserver[] = []
-  public masterCollection: MutablePayloadCollection
+  public masterCollection: MutableCollection<PurePayload>
 
   constructor() {
     super();
-    this.masterCollection = new MutablePayloadCollection();
+    this.masterCollection = new MutableCollection();
   }
 
   /**
@@ -79,7 +64,7 @@ export class SNModelManager extends PureService {
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return this.masterCollection.toImmutableCollection();
+    return this.masterCollection.toImmutablePayloadCollection();
   }
 
   public deinit() {
@@ -89,8 +74,8 @@ export class SNModelManager extends PureService {
     this.resetState();
   }
 
-  private resetState() {
-    this.masterCollection = new MutablePayloadCollection();
+  public resetState() {
+    this.masterCollection = new MutableCollection();
   }
 
   /**
@@ -146,12 +131,12 @@ export class SNModelManager extends PureService {
         console.error('Payload is corrupt:', payload);
         continue;
       }
-      const masterPayload = this.masterCollection.findPayload(payload.uuid!);
+      const masterPayload = this.masterCollection.find(payload.uuid!);
       const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload;
       /** The item has been deleted and synced, 
        * and can thus be removed from our local record */
       if (newPayload.deleted && !newPayload.dirty) {
-        this.masterCollection.deletePayload(newPayload);
+        this.masterCollection.delete(newPayload);
       } else {
         processed.push(newPayload);
         if (!masterPayload) {
@@ -160,50 +145,6 @@ export class SNModelManager extends PureService {
       }
     }
     return { processed, newlyInserted };
-  }
-
-  private resolveRelationshipWhenItemAvailable(interestedItem: SNItem, missingItemId: string) {
-    const interestedItems = this.resolveQueue[missingItemId] || [];
-    interestedItems.push(interestedItem);
-    this.resolveQueue[missingItemId] = interestedItems;
-  }
-
-  private popItemsInterestedInMissingItem(item: SNItem) {
-    const interestedItems = this.resolveQueue[item.uuid];
-    delete this.resolveQueue[item.uuid];
-    return interestedItems || [];
-  }
-
-  public async resolveReferencesForItem(item: SNItem, markReferencesDirty = false) {
-    if (item.errorDecrypting) {
-      return;
-    }
-    const content = item.content;
-    /**
-     * If another client removes an item's references, this client won't pick
-     * up the removal unless we remove everything not present in the current
-     * list of references
-     */
-    item.updateLocalRelationships();
-    if (!content.references || item.deleted) {
-      return;
-    }
-    /** Make copy, references will be modified in array */
-    const references = content.references.slice();
-    const referencesIds = references.map((ref) => { return ref.uuid; });
-    const includeBlanks = true;
-    const items = this.findItems(referencesIds, includeBlanks);
-    for (const [index, referencedItem] of items.entries()) {
-      if (referencedItem) {
-        item.addItemAsRelationship(referencedItem);
-        if (markReferencesDirty) {
-          await this.setItemDirty(referencedItem, true);
-        }
-      } else {
-        const referenceId = referencesIds[index];
-        this.resolveRelationshipWhenItemAvailable(item, referenceId);
-      }
-    }
   }
 
   /** 
@@ -234,7 +175,7 @@ export class SNModelManager extends PureService {
    *  wrt to other observers
    */
   public addChangeObserver(
-    types: ContentTypes | ContentTypes[],
+    types: ContentType | ContentType[],
     callback: ChangeCallback,
     priority = 1
   ) {
@@ -266,7 +207,7 @@ export class SNModelManager extends PureService {
     });
     for (const observer of observers) {
       const allRelevantPayloads =
-        observer.types.includes(ContentTypes.Any)
+        observer.types.includes(ContentType.Any)
           ? payloads
           : payloads.filter((payload) => {
             return observer.types.includes(payload.content_type!);
@@ -292,273 +233,6 @@ export class SNModelManager extends PureService {
     }
   }
 
-
-  /**
-   * Duplicates an item and maps it, thus propagating the item to observers.
-   * @param isConflict - Whether to mark the duplicate as a conflict
-   *    of the original.
-   */
-  public async duplicateItem(item: SNItem, isConflict = false) {
-    const payload = CreateMaxPayloadFromAnyObject(item);
-    const payloads = await PayloadsByDuplicating(
-      payload,
-      this.getMasterCollection(),
-      isConflict,
-    );
-    const results = await this.emitPayloads(
-      payloads,
-      PayloadSource.LocalChanged
-    );
-    const copy = results.find((p) => p.uuid === payloads[0].uuid);
-    return copy!;
-  }
-
-  /**
-   * Creates an item and conditionally maps it and marks it as dirty.
-   * @param add - Whether to insert the item to model manager state.
-   * @param needsSync - Whether to mark the item as needing sync
-   */
-  public async createItem(
-    contentType: ContentTypes,
-    content?: PayloadContent,
-    add = false,
-    needsSync = false,
-    override?: PayloadOverride
-  ) {
-    if (!contentType) {
-      throw 'Attempting to create item with no contentType';
-    }
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: await Uuid.GenerateUuid(),
-        content_type: contentType,
-        content: BuildItemContent(content)
-      },
-      undefined,
-      undefined,
-      override
-    );
-    const item = CreateItemFromPayload(payload);
-    if (add) {
-      this.insertItem(item);
-      if (needsSync) {
-        await this.setItemDirty(item);
-      }
-      await this.notifyInsertionObservers([item], PayloadSource.LocalChanged);
-    }
-    return item;
-  }
-
-  /**
-   * Returns an array of items that need to be synced.
-   */
-  public getDirtyItems() {
-    return this.items.filter((item) => {
-      /* An item that has an error decrypting can be synced only if it is being deleted.
-        Otherwise, we don't want to send corrupt content up to the server. */
-      return item.dirty && !item.dummy && (!item.errorDecrypting || item.deleted);
-    });
-  }
-
-  /**
-   * Marks the item as deleted and needing sync.
-   * Removes the item from respective content arrays (this.notes, this.tags, etc.)
-   */
-  public async setItemToBeDeleted(item: SNItem) {
-    item.deleted = true;
-    if (!item.dummy) {
-      await this.setItemDirty(item, true);
-    }
-    await this.handleReferencesForItemDeletion(item);
-    this.removeItemFromRespectiveArray(item);
-  }
-
-  /**
-   * Like `setItemToBeDeleted`, but acts on an array of items.
-   */
-  public async setItemsToBeDeleted(items: SNItem[]) {
-    for (const item of items) {
-      await this.setItemToBeDeleted(item);
-    }
-  }
-
-  private async handleReferencesForItemDeletion(item: SNItem) {
-    /* Handle direct relationships */
-    if (!item.errorDecrypting) {
-      for (const reference of item.content.references!) {
-        const relationship = this.findItem(reference.uuid);
-        if (relationship) {
-          item.removeItemAsRelationship(relationship);
-          if (relationship.hasRelationshipWithItem(item)) {
-            relationship.removeItemAsRelationship(item);
-            await this.setItemDirty(relationship, true);
-          }
-        }
-      }
-    }
-    /* Handle indirect relationships */
-    const referencingItems = item.allReferencingItems;
-    for (const referencingItem of referencingItems) {
-      referencingItem.removeItemAsRelationship(item);
-      await this.setItemDirty(referencingItem, true);
-    }
-    item.resetLocalReferencePointers();
-  }
-
-  /**
-   * Removes an item directly from local state, without setting it as deleted or
-   * as needing sync. This is typically called after a deleted item has been fully synced.
-   */
-  public async removeItemLocally(item: SNItem) {
-    remove(this.items, { uuid: item.uuid });
-    delete this.itemsHash[item.uuid];
-    this.removeItemFromRespectiveArray(item);
-    item.isBeingRemovedLocally();
-  }
-
-  private removeItemFromRespectiveArray(item: SNItem) {
-    if (item.content_type === ContentTypes.Tag) {
-      remove(this.tags, { uuid: item.uuid });
-    } else if (item.content_type === ContentTypes.Note) {
-      remove(this.notes, { uuid: item.uuid });
-    } else if (item.content_type === ContentTypes.Component) {
-      remove(this.components, { uuid: item.uuid });
-    } else if (item.content_type === ContentTypes.ItemsKey) {
-      remove(this.itemsKeys, { uuid: item.uuid });
-    }
-  }
-
-  /** 
-   * Returns a detached array of all items
-   */
-  public get allItems() {
-    return this.items.slice();
-  }
-
-  /**
-   * Returns a detached array of all items which are not dummys
-   */
-  public get allNondummyItems() {
-    return this.items.filter((item) => {
-      return !item.dummy;
-    });
-  }
-
-  /**
-   * Returns a detached array of all items which are not deleted
-   */
-  public get nonDeletedItems() {
-    return this.items.filter((item) => {
-      return !item.dummy && !item.deleted;
-    });
-  }
-
-  /**
-   * Returns all items of a certain type
-   * @param contentType - A string or array of strings representing
-   *    content types.
-   */
-  public getItems(contentType: ContentTypes | ContentTypes[]): SNItem[] {
-    if (Array.isArray(contentType)) {
-      return this.allItems.filter((item) => {
-        return !item.dummy && contentType.includes(item.content_type);
-      });
-    }
-    const managed = this.managedItemsForContentType(contentType);
-    return managed || this.getItems([contentType]);
-  }
-
-  private managedItemsForContentType(contentType: ContentTypes): SNItem[] | null {
-    if (contentType === ContentTypes.Note) {
-      return this.notes.slice();
-    } else if (contentType === ContentTypes.Component) {
-      return this.components.slice();
-    } else if (contentType === ContentTypes.Tag) {
-      return this.tags.slice();
-    }
-    return null;
-  }
-
-  /** 
-   * Returns all items that have not been able to decrypt.
-   */
-  public invalidItems() {
-    return this.allItems.filter((item) => {
-      return item.errorDecrypting;
-    });
-  }
-
-  /**
-   * Returns all items which are properly decrypted
-   */
-  validItemsForContentType(contentType: ContentTypes) {
-    const managed = this.managedItemsForContentType(contentType);
-    const items = managed || this.allItems;
-    return items.filter((item) => {
-      return !item.errorDecrypting && (
-        Array.isArray(contentType)
-          ? contentType.includes(item.content_type)
-          : item.content_type === contentType
-      );
-    });
-  }
-
-  /**
-   * Returns an item for a given id
-   */
-  findItem(itemId: string) {
-    return this.itemsHash[itemId];
-  }
-
-  /**
-   * Returns all items matching given ids
-   * @param includeBlanks - Whether to include a null array element where a 
-   *  result could not be found. If true, ids.length and results.length will always be the same.
-   */
-  public findItems(ids: string[], includeBlanks = false) {
-    const results = [];
-    for (const id of ids) {
-      const item = this.itemsHash[id];
-      if (item || includeBlanks) {
-        results.push(item);
-      }
-    }
-    return results;
-  }
-
-  /**
-   * Returns all items matching a given predicate
-   */
-  public itemsMatchingPredicate(predicate: SNPredicate) {
-    return this.itemsMatchingPredicates([predicate]);
-  }
-
-  /**
-  * Returns all items matching an array of predicates
-  */
-  public itemsMatchingPredicates(predicates: SNPredicate[]) {
-    return this.filterItemsWithPredicates(this.allItems, predicates);
-  }
-
-  /**
-   * Performs actual predicate filtering for public methods above.
-   * Does not return deleted items.
-   */
-  private filterItemsWithPredicates(items: SNItem[], predicates: SNPredicate[]) {
-    const results = items.filter((item) => {
-      if (item.deleted) {
-        return false;
-      }
-      for (const predicate of predicates) {
-        if (!item.satisfiesPredicate(predicate)) {
-          return false;
-        }
-      }
-      return true;
-    });
-    return results;
-  }
-
   /**
    * Imports an array of payloads from an external source (such as a backup file)
    * and marks the items as dirty.
@@ -573,101 +247,6 @@ export class SNModelManager extends PureService {
       )
     );
     const collection = await delta.resultingCollection();
-    const items = await this.emitCollection(collection);
-    for (const item of items) {
-      await this.setItemDirty(item, true, false);
-      item.deleted = false;
-    }
-    return items;
-  }
-
-  /**
-   * The number of notes currently managed
-   */
-  public noteCount() {
-    return this.notes.filter((n) => !n.dummy).length;
-  }
-
-  /**
-   * Immediately removes all items from mapping state and notifies observers
-   * Used primarily when signing into an account and wanting to discard any current
-   * local data.
-   */
-  public removeAllItemsFromMemory() {
-    for (const item of this.items) {
-      item.deleted = true;
-    }
-    this.notifyChangeObservers(this.items, PayloadSource.LocalChanged);
-    this.resetState();
-  }
-
-  /**
-   * Finds the first tag matching a given title
-   */
-  public findTagByTitle(title: string) {
-    return findInArray(this.tags, 'title', title as any);
-  }
-
-  /**
-  * Finds or creates a tag with a given title
-  */
-  public async findOrCreateTagByTitle(title: string) {
-    let tag = this.findTagByTitle(title);
-    if (!tag) {
-      tag = await this.createItem(
-        ContentTypes.Tag,
-        BuildItemContent({ title }),
-        true,
-        true
-      );
-    }
-    return tag;
-  }
-
-  /**
-   * Returns all notes matching the smart tag
-   */
-  public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    const contentTypePredicate = new SNPredicate('content_type', '=', 'Note');
-    const predicates = [contentTypePredicate, smartTag.content.predicate];
-    if (!smartTag.content.isTrashTag) {
-      const notTrashedPredicate = new SNPredicate('content.trashed', '=', false);
-      predicates.push(notTrashedPredicate);
-    }
-    const results = this.itemsMatchingPredicates(predicates);
-    return results;
-  }
-
-  /**
-   * Returns the smart tag corresponding to the "Trash" tag.
-   */
-  public trashSmartTag() {
-    return this.systemSmartTags.find((tag) => tag.content.isTrashTag);
-  }
-
-  /**
-   * Returns all items currently in the trash
-   */
-  public trashedItems() {
-    return this.notesMatchingSmartTag(this.trashSmartTag()!);
-  }
-
-  /**
-   * Permanently deletes any items currently in the trash. Consumer must manually call sync.
-   */
-  public async emptyTrash() {
-    const notes = this.trashedItems();
-    return this.setItemsToBeDeleted(notes);
-  }
-
-  /**
-   * Returns all smart tags, sorted by title.
-   */
-  public getSmartTags() {
-    const userTags: SNSmartTag[] = this.validItemsForContentType(ContentTypes.SmartTag)
-      .sort((a, b) => {
-        return a.content.title < b.content.title ? -1 : 1;
-      }) as SNSmartTag[];
-    return this.systemSmartTags.concat(userTags);
+    return this.emitCollection(collection);
   }
 }

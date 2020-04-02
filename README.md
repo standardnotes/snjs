@@ -97,7 +97,7 @@ app.setPasscode(somePasscode).then(() => {
 
 ```javascript
 const item = await app.createManagedItem({
-  contentType: ContentTypes.Note, 
+  contentType: ContentType.Note, 
   content: {
     title: 'Ideas',
     text: 'Coming soon.'
@@ -111,7 +111,7 @@ await app.saveItem({ item: item });
 
 ```javascript
 app.streamItems({
-  contentType: ContentTypes.Note, 
+  contentType: ContentType.Note, 
   stream: ({ notes }) => {
     reloadUI(notes);
   }

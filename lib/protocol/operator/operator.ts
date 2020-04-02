@@ -11,7 +11,7 @@ import {
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { base64Encode, base64Decode, SNPureCrypto } from 'sncrypto';
-import { ContentTypes } from '@Root/lib/models';
+import { ContentType } from '@Root/lib/models';
 
 export type RootKeyResponse = {
   key: SNRootKey,
@@ -88,7 +88,7 @@ export abstract class SNProtocolOperator {
     const content = await this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject(
       {
-        content_type: ContentTypes.ItemsKey,
+        content_type: ContentType.ItemsKey,
         content: content
       }
     );
