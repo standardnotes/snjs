@@ -1,7 +1,5 @@
-import { ItemMutator } from './../../services/item_transformer';
-import { SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
-import { CreateMaxPayloadFromAnyObject, ConflictStrategies } from '@Payloads/index';
+import { SNItem, ItemMutator } from '@Models/core/item';
+import { ConflictStrategies } from '@Payloads/index';
 import { ProtocolVersion } from '@Protocol/versions';
 
 /**

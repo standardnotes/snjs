@@ -1,7 +1,7 @@
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
-import { SNItem, AppDataField } from '@Models/core/item';
+import { SNItem, AppDataField, MutationType } from '@Models/core/item';
 import { SNAlertService } from './alert_service';
 import { SNSyncService } from './sync/sync_service';
 import { PayloadManager } from './model_manager';
@@ -21,8 +21,6 @@ import { Uuid } from '@Lib/uuid';
 import { Copy, isString, extendArray, removeFromArray } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
-import { read } from 'fs';
-import { MutationType } from './item_transformer';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';

@@ -1,8 +1,6 @@
 import { AppDataField } from './../core/item';
-import { ItemMutator } from './../../services/item_transformer';
 import { PurePayload } from '@Payloads/pure_payload';
-import { isString } from '@Lib/utils';
-import { SNItem } from '@Models/core/item';
+import { SNItem, ItemMutator } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { ConflictStrategies } from '@Payloads/index';
 

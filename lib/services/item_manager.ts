@@ -10,14 +10,13 @@ import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
 import { MutableCollection } from './../protocol/payloads/mutable_collection';
 import { CreateItemFromPayload, BuildItemContent } from '@Models/generator';
-import { ItemMutator, MutationType } from './item_transformer';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentTransformer } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
 import { findInArray, removeFromArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { PayloadOverride, PayloadContent, ContentReference } from './../protocol/payloads/generator';
-import { SNItem } from './../models/core/item';
+import { PayloadOverride, PayloadContent } from './../protocol/payloads/generator';
+import { SNItem, ItemMutator, MutationType } from './../models/core/item';
 import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './model_manager';
@@ -247,14 +246,14 @@ export class ItemManager extends PureService {
    */
   async changeItem(
     item: SNItem,
-    transform: (transformer: ItemMutator) => void,
+    mutate: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
     return this.changeItems(
       [item],
-      transform,
+      mutate,
       mutationType,
       payloadSource,
       payloadSourceKey
@@ -263,16 +262,16 @@ export class ItemManager extends PureService {
 
   async changeItems(
     items: SNItem[],
-    transform: (transformer: ItemMutator) => void,
+    mutate: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
     const payloads = [];
     for (const item of items) {
-      const transformer = new ItemMutator(item, mutationType);
-      transform(transformer);
-      const payload = transformer.getResult();
+      const mutator = new ItemMutator(item, mutationType);
+      mutate(mutator);
+      const payload = mutator.getResult();
       payloads.push(payload);
     }
     return this.modelManager!.emitPayloads(
@@ -284,15 +283,15 @@ export class ItemManager extends PureService {
 
   async changeComponent(
     component: SNComponent,
-    transform: (transformer: ComponentTransformer) => void,
+    mutate: (mutator: ComponentTransformer) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const transformer = new ComponentTransformer(component, mutationType);
+    const mutator = new ComponentTransformer(component, mutationType);
     return this.applyTransform(
-      transformer,
-      transform,
+      mutator,
+      mutate,
       payloadSource,
       payloadSourceKey
     )
@@ -300,15 +299,15 @@ export class ItemManager extends PureService {
 
   async changeActionsExtension(
     extension: SNActionsExtension,
-    transform: (transformer: ActionsExtensionMutator) => void,
+    mutate: (mutator: ActionsExtensionMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const transformer = new ActionsExtensionMutator(extension, mutationType);
+    const mutator = new ActionsExtensionMutator(extension, mutationType);
     return this.applyTransform(
-      transformer,
-      transform,
+      mutator,
+      mutate,
       payloadSource,
       payloadSourceKey
     )
@@ -316,28 +315,28 @@ export class ItemManager extends PureService {
 
   async changeItemsKey(
     itemsKey: SNItemsKey,
-    transform: (transformer: ItemsKeyMutator) => void,
+    mutate: (mutator: ItemsKeyMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const transformer = new ItemsKeyMutator(itemsKey, mutationType);
+    const mutator = new ItemsKeyMutator(itemsKey, mutationType);
     return this.applyTransform(
-      transformer,
-      transform,
+      mutator,
+      mutate,
       payloadSource,
       payloadSourceKey
     )
   }
 
   private async applyTransform<T extends ItemMutator>(
-    transformer: T,
-    transform: (transformer: T) => void,
+    mutator: T,
+    mutate: (mutator: T) => void,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    transform(transformer);
-    const payload = transformer.getResult();
+    mutate(mutator);
+    const payload = mutator.getResult();
     return this.modelManager!.emitPayload(
       payload,
       payloadSource || PayloadSource.LocalChanged,

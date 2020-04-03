@@ -1,8 +1,6 @@
-import { ItemMutator, MutationType } from './../../services/item_transformer';
 import { AppDataField } from './../core/item';
-import { SNItem } from '@Models/core/item';
+import { SNItem, ItemMutator } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
-import { ContentType } from '@Models/content_types';
 import { SNComponent, ComponentAreas } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {

@@ -1,9 +1,25 @@
+import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride, CopyPayload } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { deepFreeze } from '@Lib/utils';
+import { deepFreeze, Copy } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
 import { ConflictStrategies, } from '@Payloads/index';
+
+export enum MutationType {
+  /**
+   * The item was changed as part of a user interaction. This means that the item's 
+   * user modified date will be updated
+   */
+  UserInteraction = 1,
+  /**
+   * The item was changed as part of an internal operation, such as a migration.
+   * This change will not updated the item's user modified date
+   */
+  Internal = 1,
+}
+
+const UserModifiedDateKey = 'client_updated_at';
 
 export enum AppDataField {
   Pinned = 'pinned',
@@ -310,5 +326,116 @@ export class SNItem {
       // the toLocaleDateString() result above.
       return date.toDateString() + ' ' + date.toLocaleTimeString();
     }
+  }
+}
+
+/**
+ * An item mutator takes in an item, and an operation, and returns the resulting payload.
+ * Subclasses of mutators can modify the content field directly, but cannot modify the payload directly.
+ * All changes to the payload must occur by copying the payload and reassigning its value.
+ */
+export class ItemMutator {
+  protected readonly item: SNItem
+  protected readonly source: MutationType
+  protected payload: PurePayload
+  protected content?: PayloadContent
+
+  constructor(item: SNItem, source: MutationType) {
+    this.item = item;
+    this.source = source;
+    this.payload = item.payload;
+    this.content = Copy(this.payload.content);
+  }
+
+  public getResult() {
+    if (this.source === MutationType.UserInteraction) {
+      // Set the user modified date to now if marking the item as dirty
+      this.setAppDataItem(UserModifiedDateKey, new Date());
+    } else {
+      const currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
+      if (!currentValue) {
+        // if we don't have an explcit raw value, we initialize client_updated_at.
+        this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at!));
+      }
+    }
+    return CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        dirty: true,
+        dirtiedDate: new Date(),
+      }
+    )
+  }
+
+  public setDeleted() {
+    this.content = undefined;
+    this.deleted = true;
+  }
+
+  public set lastSyncBegan(began: Date) {
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        lastSyncBegan: began
+      }
+    )
+  }
+
+  public set deleted(deleted: boolean) {
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        deleted: deleted
+      }
+    )
+  }
+
+  /**
+   * Overwrites the entirety of this domain's data with the data arg.
+   */
+  public setDomainData(data: any, domain: string) {
+    if (this.payload.errorDecrypting) {
+      return undefined;
+    }
+    const content = this.content!.appData || {};
+    content.appData[domain] || data;
+  }
+
+  /**
+   * First gets the domain data for the input domain.
+   * Then sets data[key] = value
+   */
+  public setDomainDataKey(key: string, value: any, domain: string) {
+    if (this.payload.errorDecrypting) {
+      return undefined;
+    }
+    const content = this.content!.appData || {};
+    const data = content.appData[domain] || {};
+    data[key] = value;
+    content.appData[domain] = data;
+  }
+
+  public setAppDataItem(key: string, value: any) {
+    this.setDomainDataKey(key, value, SNItem.DefaultAppDomain());
+  }
+
+  public addItemAsRelationship(item: SNItem) {
+    const references = this.content!.references || [];
+    if (!references.find((r) => r.uuid === item.uuid)) {
+      references.push({
+        uuid: item.uuid,
+        content_type: item.content_type!
+      });
+    }
+    this.content!.references = references;
+  }
+
+  public removeItemAsRelationship(item: SNItem) {
+    let references = this.content!.references || [];
+    references = references.filter((r) => r.uuid !== item.uuid);
+    this.content!.references = references;
   }
 }

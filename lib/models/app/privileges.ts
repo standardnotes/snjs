@@ -1,8 +1,6 @@
-import { ItemMutator, MutationType } from './../../services/item_transformer';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { removeFromArray } from '@Lib/utils';
-import { SNItem } from '@Models/core/item';
-import { PayloadContent } from '@Payloads/generator';
+import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
 export enum ProtectedActions {
