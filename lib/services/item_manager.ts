@@ -206,7 +206,7 @@ export class ItemManager extends PureService {
     type: ObservationType,
     source?: PayloadSource,
     sourceKey?: string,
-  ) {
+    ) {
     const items = payloads.map((payload) => {
       return CreateItemFromPayload(payload);
     });

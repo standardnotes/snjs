@@ -31,7 +31,7 @@ import {
   SNMigrationService,
   SNActionsService,
   SNApiService,
-  SNModelManager,
+  PayloadManager,
   SNProtocolService,
   SNPrivilegesService,
   SNHistoryManager,
@@ -87,7 +87,7 @@ export class SNApplication {
   private migrationService?: SNMigrationService
   private alertService?: SNAlertService
   private httpService?: SNHttpService
-  private modelManager?: SNModelManager
+  private modelManager?: PayloadManager
   private protocolService?: SNProtocolService
   private storageService?: SNStorageService
   private apiService?: SNApiService
@@ -1067,7 +1067,7 @@ export class SNApplication {
   }
 
   private createModelManager() {
-    this.modelManager = new (this.getClass(SNModelManager))();
+    this.modelManager = new PayloadManager();
     this.services.push(this.modelManager!);
   }
 

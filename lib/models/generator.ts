@@ -20,8 +20,7 @@ const ContentTypeClassMapping: Record<any, any> = {
 export function CreateItemFromPayload(payload: PurePayload): SNItem {
   const itemClass = ContentTypeClassMapping[payload.content_type!] || itemClasses.SNItem;
   // eslint-disable-next-line new-cap
-  const item = new itemClass(true);
-  item.updateFromPayload(payload);
+  const item = new itemClass(payload);
   return item;
 }
 

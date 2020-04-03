@@ -23,9 +23,14 @@ export { SNComponentManager, ComponentAction } from './services/component_manage
 export { HistorySession } from '@Services/history/history_session';
 export { ItemHistory } from '@Services/history/item_history';
 export { ItemHistoryEntry } from '@Services/history/item_history_entry';
-export { SNPrivileges, ProtectedActions, PrivilegeCredential as PrivilegeCredentials } from './models/app/privileges';
+export { 
+  SNPrivileges, 
+  ProtectedAction, 
+  PrivilegeCredential 
+} from './models/app/privileges';
 export { SNWebCrypto } from 'sncrypto';
-export { PayloadManager as SNModelManager } from './services/model_manager';
+export { PayloadManager } from './services/model_manager';
+export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
 export { ChallengeService } from './services/challenge_service';
 export { PureService } from '@Services/pure_service';
@@ -82,7 +87,7 @@ export {
   intentRequiresEncryption
 } from '@Protocol/intents';
 export { ContentType } from '@Models/content_types';
-export { CreateItemFromPayload } from '@Models/generator';
+export { CreateItemFromPayload, BuildItemContent } from '@Models/generator';
 
 export {
   ApplicationEvents

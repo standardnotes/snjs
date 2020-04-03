@@ -3,7 +3,7 @@ import { removeFromArray } from '@Lib/utils';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
-export enum ProtectedActions {
+export enum ProtectedAction {
   ManageExtensions = 'ActionManageExtensions',
   ManageBackups = 'ActionManageBackups',
   ViewProtectedNotes = 'ActionViewProtectedNotes',
@@ -17,7 +17,7 @@ export enum PrivilegeCredential {
   LocalPasscode = 'CredentialLocalPasscode'
 };
 
-type PrivilegeMap = Partial<Record<ProtectedActions, PrivilegeCredential[]>>
+type PrivilegeMap = Partial<Record<ProtectedAction, PrivilegeCredential[]>>
 
 /**
  * Privileges are a singleton object that store the preferences a user
@@ -43,12 +43,12 @@ export class SNPrivileges extends SNItem {
     );
   }
 
-  getCredentialsForAction(action: ProtectedActions) {
+  getCredentialsForAction(action: ProtectedAction) {
     return this.privilegeMap[action] || [];
   }
 
   isCredentialRequiredForAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credential: PrivilegeCredential
   ) {
     const credentialsRequired = this.getCredentialsForAction(action);
@@ -75,14 +75,14 @@ export class PrivilegeMutator extends ItemMutator {
   }
 
   setCredentialsForAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credentials: PrivilegeCredential[]
   ) {
     this.privilegeMap[action] = credentials;
   }
 
   toggleCredentialForAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credential: PrivilegeCredential
   ) {
     if (this.privileges.isCredentialRequiredForAction(action, credential)) {
@@ -93,14 +93,14 @@ export class PrivilegeMutator extends ItemMutator {
   }
 
   removeCredentialForAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credential: PrivilegeCredential
   ) {
     removeFromArray(this.privilegeMap[action]!, credential);
   }
 
   addCredentialForAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credential: PrivilegeCredential
   ) {
     const credentials = this.privileges.getCredentialsForAction(action);

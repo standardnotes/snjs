@@ -55,7 +55,11 @@ export class PurePayload {
   readonly format: PayloadFormat
   readonly version?: ProtocolVersion
 
-  constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource) {
+  constructor(
+    rawPayload: RawPayload,
+    fields: PayloadField[],
+    source: PayloadSource
+  ) {
     this.fields = fields;
     this.source = source;
     this.uuid = rawPayload.uuid;
@@ -66,7 +70,7 @@ export class PurePayload {
     this.enc_item_key = rawPayload.enc_item_key;
     /** Fallback to initializing with now date */
     this.created_at = new Date(rawPayload.created_at || new Date());
-  /** Fallback to initializing with 0 epoch date */
+    /** Fallback to initializing with 0 epoch date */
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
     this.dirtiedDate = new Date(rawPayload.dirtiedDate!);
     this.dirty = rawPayload.dirty;
@@ -78,7 +82,7 @@ export class PurePayload {
     this.lastSyncEnd = new Date(rawPayload.lastSyncEnd!);
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
-    
+
     if (isString(this.content)) {
       if ((this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)) {
         this.format = PayloadFormat.DecryptedBase64String;
@@ -90,13 +94,13 @@ export class PurePayload {
     } else {
       this.format = PayloadFormat.Deleted;
     }
-    
+
     if (isString(this.content)) {
       this.version = (this.content as string).substring(
         0,
         ProtocolVersion.VersionLength
       ) as ProtocolVersion;
-    } else if(this.content){
+    } else if (this.content) {
       this.version = (this.content as PayloadContent).version;
     }
 
@@ -119,7 +123,7 @@ export class PurePayload {
   }
 
   get contentObject() {
-    if(this.format !== PayloadFormat.DecryptedBareObject) {
+    if (this.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access non-object content as object');
     }
     return this.content as PayloadContent;

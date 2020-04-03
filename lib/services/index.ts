@@ -3,7 +3,7 @@ export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
 export { SNComponentManager } from '@Services/component_manager';
 export { SNHttpService } from '@Services/api/http_service';
-export { PayloadManager as SNModelManager } from '@Services/model_manager';
+export { PayloadManager } from '@Services/model_manager';
 export { SNSingletonManager } from '@Services/singleton_manager';
 export { SNActionsService } from '@Services/actions_service';
 export { SNMigrationService } from '@Lib/services/migration_service';

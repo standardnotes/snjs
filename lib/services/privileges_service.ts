@@ -10,7 +10,7 @@ import { SNPredicate } from '@Models/core/predicate';
 import { StorageKey } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentType } from '@Root/lib/models';
-import { ProtectedActions, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
+import { ProtectedAction, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
 
 export enum PrivilegeSessionLength {
   None = 0,
@@ -33,22 +33,22 @@ const CredentialsMetadata = {
 };
 
 const ActionsMetadata = {
-  [ProtectedActions.ManageExtensions]: {
+  [ProtectedAction.ManageExtensions]: {
     label: 'Manage Extensions'
   },
-  [ProtectedActions.ManageBackups]: {
+  [ProtectedAction.ManageBackups]: {
     label: 'Download/Import Backups'
   },
-  [ProtectedActions.ViewProtectedNotes]: {
+  [ProtectedAction.ViewProtectedNotes]: {
     label: 'View Protected Notes'
   },
-  [ProtectedActions.ManagePrivileges]: {
+  [ProtectedAction.ManagePrivileges]: {
     label: 'Manage Privileges'
   },
-  [ProtectedActions.ManagePasscode]: {
+  [ProtectedAction.ManagePasscode]: {
     label: 'Manage Passcode'
   },
-  [ProtectedActions.DeleteNote]: {
+  [ProtectedAction.DeleteNote]: {
     label: 'Delete Notes'
   },
 };
@@ -70,7 +70,7 @@ export class SNPrivilegesService extends PureService {
   private storageService?: SNStorageService
   private sessionManager?: SNSessionManager
 
-  private availableActions: ProtectedActions[] = []
+  private availableActions: ProtectedAction[] = []
   private availableCredentials: PrivilegeCredential[] = []
   private sessionLengths: PrivilegeSessionLength[] = []
 
@@ -103,8 +103,8 @@ export class SNPrivilegesService extends PureService {
   }
 
   private loadDefaults() {
-    this.availableActions = Object.keys(ProtectedActions).map((key) => {
-      return (ProtectedActions as any)[key] as ProtectedActions;
+    this.availableActions = Object.keys(ProtectedAction).map((key) => {
+      return (ProtectedAction as any)[key] as ProtectedAction;
     });
 
     this.availableCredentials = [
@@ -131,7 +131,7 @@ export class SNPrivilegesService extends PureService {
   /**
    * The credentials currently required to perform this action.
    */
-  async netCredentialsForAction(action: ProtectedActions) {
+  async netCredentialsForAction(action: ProtectedAction) {
     const privileges = await this.getPrivileges();
     const credentials = privileges.getCredentialsForAction(action);
     const netCredentials = [];
@@ -214,14 +214,14 @@ export class SNPrivilegesService extends PureService {
     }
   }
 
-  async actionHasPrivilegesConfigured(action: ProtectedActions) {
+  async actionHasPrivilegesConfigured(action: ProtectedAction) {
     return (await this.netCredentialsForAction(action)).length > 0;
   }
 
   /**
    * Whether the action requires present authentication.
    */
-  async actionRequiresPrivilege(action: ProtectedActions) {
+  async actionRequiresPrivilege(action: ProtectedAction) {
     const expiresAt = await this.getSessionExpirey();
     if (expiresAt > new Date()) {
       return false;
@@ -231,7 +231,7 @@ export class SNPrivilegesService extends PureService {
   }
 
   async authenticateAction(
-    action: ProtectedActions,
+    action: ProtectedAction,
     credentialAuthMapping: CredentialAuthMapping
   ) {
     const requiredCredentials = await this.netCredentialsForAction(action);
@@ -272,7 +272,7 @@ export class SNPrivilegesService extends PureService {
     return CredentialsMetadata[credential];
   }
 
-  displayInfoForAction(action: ProtectedActions) {
+  displayInfoForAction(action: ProtectedAction) {
     return ActionsMetadata[action];
   }
 

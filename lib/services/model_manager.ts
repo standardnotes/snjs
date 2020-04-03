@@ -1,3 +1,4 @@
+import { subtractFromArray } from '@Lib/utils';
 import { MutableCollection } from './../protocol/payloads/mutable_collection';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItem } from '@Models/core/item';
@@ -118,7 +119,10 @@ export class PayloadManager extends PureService {
     if (newlyInserted.length > 0) {
       await this.notifyInsertionObservers(newlyInserted, source, sourceKey);
     }
-    await this.notifyChangeObservers(processed, source, sourceKey);
+    subtractFromArray(processed, newlyInserted);
+    if(processed.length > 0) {
+      await this.notifyChangeObservers(processed, source, sourceKey);
+    }
     return processed;
   }
 
