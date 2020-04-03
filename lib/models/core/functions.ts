@@ -1,7 +1,6 @@
 import { SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
 import { omitInPlace } from '@Lib/utils';
-import { DEFAULT_APP_DOMAIN } from '@Lib/index';
 
 export function ItemContentsEqual(
   leftContent: PayloadContent,
@@ -12,7 +11,7 @@ export function ItemContentsEqual(
   /* Create copies of objects before running omit as not to modify source values directly. */
   leftContent = JSON.parse(JSON.stringify(leftContent));
   if (leftContent.appData) {
-    const domainData = leftContent.appData[DEFAULT_APP_DOMAIN];
+    const domainData = leftContent.appData[SNItem.DefaultAppDomain()];
     omitInPlace(domainData, appDataKeysToIgnore);
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
@@ -32,7 +31,7 @@ export function ItemContentsEqual(
 
   rightContent = JSON.parse(JSON.stringify(rightContent));
   if (rightContent.appData) {
-    const domainData = rightContent.appData[DEFAULT_APP_DOMAIN];
+    const domainData = rightContent.appData[SNItem.DefaultAppDomain()];
     omitInPlace(domainData, appDataKeysToIgnore);
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
@@ -56,8 +55,8 @@ export function ItemContentsDiffer(
     excludeContentKeys = [];
   }
   return !ItemContentsEqual(
-    item1.content,
-    item2.content,
+    item1.content as PayloadContent,
+    item2.content as PayloadContent,
     item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
     item1.appDataContentKeysToIgnoreWhenCheckingEquality()
   );

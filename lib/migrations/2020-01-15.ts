@@ -1,3 +1,5 @@
+import { BuildItemContent } from '@Models/generator';
+import { PayloadContent } from './../protocol/payloads/generator';
 import { OrchestratorFill } from './../services/challenge_service';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject } from './../services/storage_service';
@@ -379,7 +381,7 @@ export class Migration20200115 extends Migration {
         const payload = CreateMaxPayloadFromAnyObject(
           {
             uuid: await Uuid.GenerateUuid(),
-            content: rawStructure.unwrapped,
+            content: BuildItemContent(rawStructure.unwrapped),
             content_type: ContentType.EncryptedStorage
           }
         );
@@ -505,20 +507,20 @@ export class Migration20200115 extends Migration {
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
       const payload = CreateMaxPayloadFromAnyObject({
+        uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: {
+        content: BuildItemContent({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: rootKeyParams!.version
-        }
+        }),
+        dirty: true
       });
       const itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
-      await itemsKey.initUUID();
       await this.services.modelManager.emitPayload(
         itemsKey.payloadRepresentation(),
         PayloadSource.LocalChanged
       );
-      await this.services.modelManager.setItemDirty(itemsKey);
     }
   }
 }

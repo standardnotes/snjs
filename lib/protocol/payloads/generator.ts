@@ -152,7 +152,7 @@ const ServerSavedPayloadFields = [
 ]
 
 export function CreateMaxPayloadFromAnyObject(
-  object: object,
+  object: RawPayload,
   source?: PayloadSource,
   intent?: EncryptionIntent,
   override?: PayloadOverride
@@ -172,7 +172,7 @@ export function CreateMaxPayloadFromAnyObject(
 }
 
 export function CreateIntentPayloadFromObject(
-  object: any,
+  object: RawPayload,
   intent: EncryptionIntent,
   override?: PayloadOverride
 ) {
@@ -186,7 +186,7 @@ export function CreateIntentPayloadFromObject(
 }
 
 export function CreateSourcedPayloadFromObject(
-  object: object,
+  object: RawPayload,
   source: PayloadSource,
   override?: PayloadOverride
 ) {

@@ -1,3 +1,4 @@
+import { ItemManager } from '@Services/item_manager';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { SNStorageService } from '@Services/index';
@@ -20,38 +21,38 @@ const PERSIST_TIMEOUT = 2000;
  */
 export class SNHistoryManager extends PureService {
 
-  private modelManager?: PayloadManager
+  private itemManager?: ItemManager
   private storageService?: SNStorageService
   private contentTypes: ContentType[] = []
   private timeout: any
   private historySession?: HistorySession
-  private removeMappingObserver: any
+  private removeChangeObserver: any
   private persistable = false
   private autoOptimize = false
   private saveTimeout: any
 
   constructor(
-    modelManager: PayloadManager,
+    itemManager: ItemManager,
     storageService: SNStorageService,
     contentTypes: ContentType[],
     timeout: any
   ) {
     super();
-    this.modelManager = modelManager;
+    this.itemManager = itemManager;
     this.storageService = storageService;
     this.contentTypes = contentTypes;
     this.timeout = timeout;
   }
 
   public deinit() {
-    this.modelManager = undefined;
+    this.itemManager = undefined;
     this.storageService = undefined;
     this.contentTypes.length = 0;
     this.historySession = undefined;
     this.timeout = null;
-    if (this.removeMappingObserver) {
-      this.removeMappingObserver();
-      this.removeMappingObserver = null;
+    if (this.removeChangeObserver) {
+      this.removeChangeObserver();
+      this.removeChangeObserver = null;
     }
     super.deinit();
   }
@@ -78,13 +79,13 @@ export class SNHistoryManager extends PureService {
   }
 
   addChangeObserver() {
-    this.removeMappingObserver = this.modelManager!.addChangeObserver(
+    this.removeChangeObserver = this.itemManager!.addObserver(
       this.contentTypes,
-      async (allItems, _, __, source, ___) => {
+      async (items, source) => {
         if (source === PayloadSource.LocalDirtied) {
           return;
         }
-        for (const item of allItems) {
+        for (const item of items) {
           try {
             if (!item.deleted && !item.errorDecrypting) {
               this.addHistoryEntryForItem(item);
@@ -94,7 +95,7 @@ export class SNHistoryManager extends PureService {
           }
         }
       }
-    );
+    )
   }
 
   isDiskEnabled() {

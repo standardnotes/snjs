@@ -1,3 +1,8 @@
+import { ItemsKeyMutator } from './../models/app/items_key';
+import { SNTag } from '@Models/app/tag';
+import { SNNote } from './../models/app/note';
+import { SNItemsKey } from '@Models/index';
+import { SNActionsExtension, ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
@@ -21,11 +26,19 @@ import { ContentType } from '../models/content_types';
 type ObserverCallback = (
   items: SNItem[],
   source?: PayloadSource,
-  sourceKey?: string
+  sourceKey?: string,
+  type?: ObservationType,
 ) => Promise<void>
+
 type Observer = {
   contentType: ContentType | ContentType[]
   callback: ObserverCallback
+}
+export enum ObservationType {
+  /** The items have been newly inserted */
+  Inserted = 1,
+  /** The items are pre-existing but have been changed */
+  Changed = 2
 }
 
 /**
@@ -100,19 +113,19 @@ export class ItemManager extends PureService {
   }
 
   get itemsKeys() {
-    return this.collection.getAll(ContentType.ItemsKey);
+    return this.collection.getAll(ContentType.ItemsKey) as SNItemsKey[];
   }
 
   get notes() {
-    return this.collection.getAll(ContentType.Note);
+    return this.collection.getAll(ContentType.Note) as SNNote[];
   }
 
   get tags() {
-    return this.collection.getAll(ContentType.Tag);
+    return this.collection.getAll(ContentType.Tag) as SNTag[];
   }
 
   get components() {
-    return this.collection.getAll(ContentType.Component);
+    return this.collection.getAll(ContentType.Component) as SNComponent[];
   }
 
   public addObserver(
@@ -133,7 +146,7 @@ export class ItemManager extends PureService {
    * Returns the items that reference the given item
    */
   private itemsThatReferenceItem(item: SNItem) {
-    const ids = this.inverseReferenceMap[item.uuid!];
+    const ids = this.inverseReferenceMap[item.uuid];
     return this.findItems(ids);
   }
 
@@ -141,22 +154,22 @@ export class ItemManager extends PureService {
     const references = item.references;
     for (const reference of references) {
       /** Direct index */
-      this.referenceMap[item.uuid!] = item.references.map((r) => r.uuid);
+      this.referenceMap[item.uuid] = item.references.map((r) => r.uuid);
 
       /** Inverse index */
       const index = this.inverseReferenceMap[reference.uuid] || [];
-      index.push(item.uuid!);
+      index.push(item.uuid);
       this.inverseReferenceMap[reference.uuid] = index;
     }
   }
 
   private deestablishReferenceIndexForDeletedItem(item: SNItem) {
-    const directReferences = this.referenceMap[item.uuid!]
-    for(const directReference of directReferences) {
+    const directReferences = this.referenceMap[item.uuid]
+    for (const directReference of directReferences) {
       const inverseIndex = this.inverseReferenceMap[directReference];
       removeFromArray(inverseIndex, item.uuid);
     }
-    delete this.referenceMap[item.uuid!];
+    delete this.referenceMap[item.uuid];
   }
 
   private async onPayloadChange(
@@ -166,7 +179,12 @@ export class ItemManager extends PureService {
     source?: PayloadSource,
     sourceKey?: string
   ) {
-    const items = await this.setPayloads(allChangedPayloads, source, sourceKey);
+    const items = await this.setPayloads(
+      allChangedPayloads,
+      ObservationType.Changed,
+      source,
+      sourceKey
+    );
     const deleted = items.filter((item) => item.deleted);
     this.collection.delete(deleted);
   }
@@ -176,31 +194,38 @@ export class ItemManager extends PureService {
     source?: PayloadSource,
     sourceKey?: string
   ) {
-    this.setPayloads(payloads, source, sourceKey);
+    this.setPayloads(
+      payloads,
+      ObservationType.Inserted,
+      source,
+      sourceKey
+    );
   }
-  
+
   private async setPayloads(
     payloads: PurePayload[],
+    type: ObservationType,
     source?: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ) {
     const items = payloads.map((payload) => {
       return CreateItemFromPayload(payload);
     });
-    for(const item of items) {
-      if(item.deleted) {
+    for (const item of items) {
+      if (item.deleted) {
         this.deestablishReferenceIndexForDeletedItem(item);
       } else {
         this.establishReferenceIndex(item);
       }
     }
     this.collection.set(items)
-    await this.notifyObservers(items, source, sourceKey);
+    await this.notifyObservers(items, type, source, sourceKey);
     return items;
   }
 
   private async notifyObservers(
     items: SNItem[],
+    type: ObservationType,
     source?: PayloadSource,
     sourceKey?: string
   ) {
@@ -211,7 +236,7 @@ export class ItemManager extends PureService {
           observer.contentType === item.content_type!
         )
       });
-      await observer.callback(relevantItems, source, sourceKey);
+      await observer.callback(relevantItems, source, sourceKey, type);
     }
   }
 
@@ -260,12 +285,64 @@ export class ItemManager extends PureService {
   async changeComponent(
     component: SNComponent,
     transform: (transformer: ComponentTransformer) => void,
-    source: MutationType = MutationType.UserInteraction,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource?: PayloadSource,
+    payloadSourceKey?: string
   ) {
-    const transformer = new ComponentTransformer(component, source);
+    const transformer = new ComponentTransformer(component, mutationType);
+    return this.applyTransform(
+      transformer,
+      transform,
+      payloadSource,
+      payloadSourceKey
+    )
+  }
+
+  async changeActionsExtension(
+    extension: SNActionsExtension,
+    transform: (transformer: ActionsExtensionMutator) => void,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource?: PayloadSource,
+    payloadSourceKey?: string
+  ) {
+    const transformer = new ActionsExtensionMutator(extension, mutationType);
+    return this.applyTransform(
+      transformer,
+      transform,
+      payloadSource,
+      payloadSourceKey
+    )
+  }
+
+  async changeItemsKey(
+    itemsKey: SNItemsKey,
+    transform: (transformer: ItemsKeyMutator) => void,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource?: PayloadSource,
+    payloadSourceKey?: string
+  ) {
+    const transformer = new ItemsKeyMutator(itemsKey, mutationType);
+    return this.applyTransform(
+      transformer,
+      transform,
+      payloadSource,
+      payloadSourceKey
+    )
+  }
+
+  private async applyTransform<T extends ItemMutator>(
+    transformer: T,
+    transform: (transformer: T) => void,
+    payloadSource?: PayloadSource,
+    payloadSourceKey?: string
+  ) {
     transform(transformer);
     const payload = transformer.getResult();
-    return this.modelManager!.emitPayload(payload, PayloadSource.LocalChanged);
+    return this.modelManager!.emitPayload(
+      payload,
+      payloadSource || PayloadSource.LocalChanged,
+      payloadSourceKey
+    );
   }
 
   /**
@@ -330,13 +407,11 @@ export class ItemManager extends PureService {
 
   /**
    * Creates an item and conditionally maps it and marks it as dirty.
-   * @param add - Whether to insert the item to model manager state.
    * @param needsSync - Whether to mark the item as needing sync
    */
   public async createItem(
     contentType: ContentType,
     content?: PayloadContent,
-    add = false,
     needsSync = false,
     override?: PayloadOverride
   ) {
@@ -356,6 +431,27 @@ export class ItemManager extends PureService {
     );
     await this.modelManager!.emitPayload(payload, PayloadSource.Constructor);
     return this.findItem(payload.uuid!)!;
+  }
+
+  public async createTemplateItem(
+    contentType: ContentType,
+    content?: PayloadContent,
+  ) {
+    const payload = CreateMaxPayloadFromAnyObject(
+      {
+        uuid: await Uuid.GenerateUuid(),
+        content_type: contentType,
+        content: BuildItemContent(content)
+      }
+    );
+    return CreateItemFromPayload(payload);
+  }
+
+  public async emitItemFromPayload(
+    payload: PurePayload,
+    source = PayloadSource.Constructor
+  ) {
+    return this.modelManager?.emitPayload(payload, source);
   }
 
   /**
@@ -522,7 +618,6 @@ export class ItemManager extends PureService {
       tag = await this.createItem(
         ContentType.Tag,
         BuildItemContent({ title }),
-        true,
         true
       );
     }
@@ -594,5 +689,10 @@ export class ItemManager extends PureService {
     });
     this.resetState();
     this.modelManager!.resetState();
+  }
+
+  public removeItemLocally(item: SNItem) {
+    this.collection.delete(item);
+    this.modelManager?.removePayloadLocally(item.payload);
   }
 }

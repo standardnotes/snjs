@@ -1,14 +1,13 @@
+import { ItemManager, ObservationType } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem } from '@Models/core/item';
-import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
-import { SingletonStrategies } from '@Models/index';
+import { SingletonStrategies, ContentType } from '@Models/index';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
 import { CopyPayload } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
-import { PayloadSource } from '@Payloads/sources';
 import { SNSyncService } from './sync/sync_service';
 
 /**
@@ -26,29 +25,29 @@ import { SNSyncService } from './sync/sync_service';
  */
 export class SNSingletonManager extends PureService {
 
-  private modelManager?: PayloadManager
+  private itemManager?: ItemManager
   private syncService?: SNSyncService
   private resolveQueue: SNItem[] = []
   private registeredPredicates: SNPredicate[] = []
 
-  private removeCreationObserver: any
+  private removeItemObserver: any
   private removeSyncObserver: any
 
-  constructor(modelManager: PayloadManager, syncService: SNSyncService) {
+  constructor(itemManager: ItemManager, syncService: SNSyncService) {
     super();
-    this.modelManager = modelManager;
+    this.itemManager = itemManager;
     this.syncService = syncService;
     this.addObservers();
   }
 
   public deinit() {
     this.syncService = undefined;
-    this.modelManager = undefined;
+    this.itemManager = undefined;
     this.resolveQueue.length = 0;
     this.registeredPredicates.length = 0;
-    this.removeCreationObserver();
+    this.removeItemObserver();
+    this.removeItemObserver = undefined;
     this.removeSyncObserver();
-    this.removeCreationObserver = undefined;
     this.removeSyncObserver = undefined;
     super.deinit();
   }
@@ -69,9 +68,12 @@ export class SNSingletonManager extends PureService {
    * all items keys have been downloaded.
    */
   private addObservers() {
-    this.removeCreationObserver = this.modelManager!.addInsertionObserver(
-      async (items) => {
-        this.resolveQueue = this.resolveQueue.concat(items);
+    this.removeItemObserver = this.itemManager!.addObserver(
+      ContentType.Any,
+      async (items, _, __, type) => {
+        if(type === ObservationType.Inserted) {
+          this.resolveQueue = this.resolveQueue.concat(items);
+        }
       }
     );
     this.removeSyncObserver = this.syncService!.addEventObserver(async (eventName) => {
@@ -97,7 +99,7 @@ export class SNSingletonManager extends PureService {
   }
 
   private validItemsMatchingPredicate(predicate: SNPredicate) {
-    return this.modelManager!.itemsMatchingPredicate(predicate)
+    return this.itemManager!.itemsMatchingPredicate(predicate)
       .filter((item) => {
         return !item.errorDecrypting;
       });
@@ -169,7 +171,7 @@ export class SNSingletonManager extends PureService {
       return a.created_at < b.created_at ? -1 : 1;
     });
     const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0);
-    await this.modelManager!.setItemsToBeDeleted(deleteItems);
+    await this.itemManager!.setItemsToBeDeleted(deleteItems);
   }
 
   public async findOrCreateSingleton(predicate: SNPredicate, createPayload: PurePayload) {
@@ -187,11 +189,11 @@ export class SNSingletonManager extends PureService {
       return refreshedItems[0];
     }
     /** Delete any items that are errored */
-    const errorDecrypting = this.modelManager!
+    const errorDecrypting = this.itemManager!
       .itemsMatchingPredicate(predicate).filter((item) => {
         return item.errorDecrypting;
       });
-    await this.modelManager!.setItemsToBeDeleted(errorDecrypting);
+    await this.itemManager!.setItemsToBeDeleted(errorDecrypting);
     /** Safe to create */
     const dirtyPayload = CopyPayload(
       createPayload,
@@ -200,10 +202,7 @@ export class SNSingletonManager extends PureService {
         dirty: true
       }
     );
-    const item = await this.modelManager!.emitPayload(
-      dirtyPayload,
-      PayloadSource.LocalChanged
-    );
+    const item = await this.itemManager!.emitItemFromPayload(dirtyPayload);
     await this.syncService!.sync();
     return item;
   }

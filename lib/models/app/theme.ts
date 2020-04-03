@@ -1,3 +1,4 @@
+import { ItemMutator, MutationType } from './../../services/item_transformer';
 import { AppDataField } from './../core/item';
 import { SNItem } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
@@ -12,26 +13,17 @@ export class SNTheme extends SNComponent {
     return this.package_info && this.package_info.layerable;
   }
 
-  getDefaultContentType()  {
-    return ContentType.Theme;
-  }
-
   /** Do not duplicate under most circumstances. Always keep original */
   strategyWhenConflictingWithItem(item: SNItem) {
-    if(this.errorDecrypting) {
+    if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item);
     }
 
     return ConflictStrategies.KeepLeft;
   }
 
-  setMobileRules(rules: any) {
-    // this.setAppDataItem(AppDataField.MobileRules, rules);
-    throw Error('setMobileRules is deprecated and no longer supported. Use mutators instead.');
-  }
-
   getMobileRules() {
-    return this.getAppDomainValue(AppDataField.MobileRules) || {constants: {}, rules: {}};
+    return this.getAppDomainValue(AppDataField.MobileRules) || { constants: {}, rules: {} };
   }
 
   /** Same as getMobileRules but without default value. */
@@ -39,13 +31,22 @@ export class SNTheme extends SNComponent {
     return this.getAppDomainValue(AppDataField.MobileRules);
   }
 
-  setNotAvailOnMobile(na: boolean) {
-    // this.setAppDataItem(AppDataField.NotAvailableOnMobile, na);
-    throw Error('setNotAvailOnMobile is deprecated and no longer supported. Use mutators instead.');
-  }
-
   getNotAvailOnMobile() {
     return this.getAppDomainValue(AppDataField.NotAvailableOnMobile);
+  }
+
+  isMobileActive() {
+    return this.getAppDomainValue(AppDataField.MobileActive);
+  }
+}
+
+export class ThemeMutator extends ItemMutator {
+
+  setMobileRules(rules: any) {
+    this.setAppDataItem(AppDataField.MobileRules, rules);
+  }
+  setNotAvailOnMobile(notAvailable: boolean) {
+    this.setAppDataItem(AppDataField.NotAvailableOnMobile, notAvailable);
   }
 
   /**
@@ -53,12 +54,6 @@ export class SNTheme extends SNComponent {
    * activate that theme on desktop/web
    */
   setMobileActive(active: boolean) {
-    // this.setAppDataItem(AppDataField.MobileActive, active);
-    throw Error('setMobileActive is deprecated and no longer supported. Use mutators instead.');
-  }
-
-  isMobileActive() {
-    // return this.getAppDomainValue(AppDataField.MobileActive);
-    throw Error('isMobileActive is deprecated and no longer supported. Use mutators instead.');
+    this.setAppDataItem(AppDataField.MobileActive, active);
   }
 }

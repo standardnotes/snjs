@@ -1,3 +1,4 @@
+import { BuildItemContent } from '@Models/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { SNTag } from '@Models/app/tag';
 import { ContentType } from '@Models/content_types';
@@ -29,36 +30,36 @@ export class SNSmartTag extends SNTag {
       {
         uuid: SYSTEM_TAG_ALL_NOTES,
         dummy: true,
-        content: {
+        content: BuildItemContent({
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
           predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
-        }
+        })
       }
     );
     const archived = CreateMaxPayloadFromAnyObject(
       {
         uuid: SYSTEM_TAG_ARCHIVED_NOTES,
         dummy: true,
-        content: {
+        content: BuildItemContent({
           title: 'Archived',
           isSystemTag: true,
           isArchiveTag: true,
           predicate: SNPredicate.FromArray(['archived', '=', JSON.stringify(true)])
-        }
+        })
       }
     );
     const trash = CreateMaxPayloadFromAnyObject(
       {
         uuid: SYSTEM_TAG_TRASHED_NOTES,
         dummy: true,
-        content: {
+        content: BuildItemContent({
           title: 'Trash',
           isSystemTag: true,
           isTrashTag: true,
           predicate: SNPredicate.FromArray(['content.trashed', '=', JSON.stringify(true)])
-        }
+        })
       }
     );
     return [

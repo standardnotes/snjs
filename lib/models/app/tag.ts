@@ -8,7 +8,7 @@ import { ContentType } from '@Models/content_types';
  */
 export class SNTag extends SNItem {
 
-  public title!: string
+  public readonly title!: string
   
   constructor(payload: PurePayload) {
     super(payload);

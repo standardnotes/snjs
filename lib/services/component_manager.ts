@@ -478,7 +478,7 @@ export class SNComponentManager extends PureService {
     /** The data for this particular component */
     const clientData = componentData[component.getClientDataKey()!];
     const params: ItemMessagePayload = {
-      uuid: item.uuid!,
+      uuid: item.uuid,
       content_type: item.content_type!,
       created_at: item.created_at!,
       updated_at: item.updated_at!,
@@ -711,7 +711,7 @@ export class SNComponentManager extends PureService {
       if (!find(this.streamObservers, { identifier: component.uuid })) {
         /* For pushing laster as changes come in */
         this.streamObservers.push({
-          identifier: component.uuid!,
+          identifier: component.uuid,
           component: component,
           originalMessage: message,
           contentTypes: message.data.content_types
@@ -738,7 +738,7 @@ export class SNComponentManager extends PureService {
     this.runWithPermissions(component, requiredPermissions, () => {
       if (!find(this.contextStreamObservers, { identifier: component.uuid })) {
         this.contextStreamObservers.push({
-          identifier: component.uuid!,
+          identifier: component.uuid,
           component: component,
           originalMessage: message
         });
@@ -1190,10 +1190,10 @@ export class SNComponentManager extends PureService {
   }
 
   findOrCreateDataForComponent(component: SNComponent) {
-    let data = this.componentState[component.uuid!];
+    let data = this.componentState[component.uuid];
     if (!data) {
       data = {} as ComponentState;
-      this.componentState[component.uuid!] = data;
+      this.componentState[component.uuid] = data;
     }
     return data;
   }

@@ -4,7 +4,6 @@ import { deepFreeze } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
 import { ConflictStrategies, } from '@Payloads/index';
-import { DEFAULT_APP_DOMAIN } from '@Lib/index';
 
 export enum AppDataField {
   Pinned = 'pinned',
@@ -43,8 +42,12 @@ export class SNItem {
     })
   }
 
+  public static DefaultAppDomain() {
+    return 'org.standardnotes.sn';
+  }
+
   get uuid() {
-    return this.payload.uuid;
+    return this.payload.uuid!;
   }
 
   get content() {
@@ -60,7 +63,7 @@ export class SNItem {
   }
 
   get content_type() {
-    return this.payload.content_type;
+    return this.payload.content_type!;
   }
 
   get items_key_id() {
@@ -72,11 +75,11 @@ export class SNItem {
   }
 
   get created_at() {
-    return this.payload.created_at;
+    return this.payload.created_at!;
   }
 
   get updated_at() {
-    return this.payload.updated_at;
+    return this.payload.updated_at!;
   }
 
   get user_modified_at() {
@@ -161,7 +164,7 @@ export class SNItem {
   }
 
   public getAppDomainValue(key: AppDataField) {
-    const appData = this.getDomainData(DEFAULT_APP_DOMAIN);
+    const appData = this.getDomainData(SNItem.DefaultAppDomain());
     return appData[key];
   }
 

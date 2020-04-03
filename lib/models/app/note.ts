@@ -9,12 +9,12 @@ export interface NoteContent {
 /** A note item */
 export class SNNote extends SNItem implements NoteContent {
 
-  public title!: string
+  public readonly title!: string
   /* Some external editors can't handle a null value for text.
   * Notes created on mobile with no text have a null value for it,
   * so we'll just set a default here. */
-  public text: string = ''
-  public mobilePrefersPlainEditor: boolean
+  public readonly text: string = ''
+  public readonly mobilePrefersPlainEditor: boolean
 
   constructor(
     payload: PurePayload

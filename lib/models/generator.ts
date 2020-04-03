@@ -1,7 +1,5 @@
 import { SNItem } from './core/item';
-import { DEFAULT_APP_DOMAIN } from '@Lib/index';
-import { PayloadContent } from '@Payloads/generator';
-import { deepMerge, Copy } from '@Lib/utils';
+import { Copy } from '@Lib/utils';
 import { PurePayload } from '@Payloads/pure_payload';
 import * as itemClasses from '@Models/index';
 import { ContentType } from '@Models/content_types';
@@ -36,7 +34,7 @@ export function BuildItemContent(values?: Record<string, any>, ) {
   return {
     references: [],
     appData: {
-      [DEFAULT_APP_DOMAIN]: {}
+      [SNItem.DefaultAppDomain()]: {}
     },
     ...copy,
   }

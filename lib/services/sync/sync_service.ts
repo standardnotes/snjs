@@ -1,3 +1,4 @@
+import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -101,6 +102,7 @@ export class SNSyncService extends PureService {
   private protocolService?: SNProtocolService
   private storageService?: SNStorageService
   private modelManager?: PayloadManager
+  private itemManager?: ItemManager
   private apiService?: SNApiService
   private interval: any
   private state?: SyncState
@@ -143,6 +145,7 @@ export class SNSyncService extends PureService {
   ];
 
   constructor(
+    itemManager: ItemManager,
     sessionManager: SNSessionManager,
     protocolService: SNProtocolService,
     storageService: SNStorageService,
@@ -151,6 +154,7 @@ export class SNSyncService extends PureService {
     interval: any
   ) {
     super();
+    this.itemManager = itemManager;
     this.sessionManager = sessionManager;
     this.protocolService = protocolService;
     this.modelManager = modelManager;
@@ -174,6 +178,7 @@ export class SNSyncService extends PureService {
 
   public deinit() {
     this.sessionManager = undefined;
+    this.itemManager = undefined;
     this.protocolService = undefined;
     this.modelManager = undefined;
     this.storageService = undefined;
@@ -345,7 +350,7 @@ export class SNSyncService extends PureService {
   }
 
   private async itemsNeedingSync() {
-    const items = this.modelManager!.getDirtyItems();
+    const items = this.itemManager!.getDirtyItems();
     return items;
   }
 
@@ -374,14 +379,14 @@ export class SNSyncService extends PureService {
     this.log('Marking all items as needing sync');
     if (alternateUuids) {
       /** Make a copy of the array, as alternating uuid will affect array */
-      const items = this.modelManager!.allNondummyItems.filter((item) => {
+      const items = this.itemManager!.allNondummyItems.filter((item) => {
         return !item.errorDecrypting;
       }).slice();
       for (const item of items) {
         await this.alternateUuidForItem(item);
       }
     }
-    const items = this.modelManager!.allNondummyItems;
+    const items = this.itemManager!.allNondummyItems;
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(
         item,
@@ -566,10 +571,10 @@ export class SNSyncService extends PureService {
      * Setting this value means the item was 100% sent to the server.
      */
     const beginDate = new Date();
-    await this.modelManager!.changeItems(
+    await this.itemManager!.changeItems(
       items,
-      {
-        lastSyncBegan: beginDate
+      (mutator) => {
+        mutator.lastSyncBegan = beginDate;
       }
     );
 
@@ -871,8 +876,8 @@ export class SNSyncService extends PureService {
    */
   private async computeDataIntegrityHash() {
     try {
-      const items = this.modelManager!.nonDeletedItems.sort((a, b) => {
-        return b.updated_at?.getTime() - a.updated_at?.getTime();
+      const items = this.itemManager!.nonDeletedItems.sort((a, b) => {
+        return b.updated_at!.getTime() - a.updated_at!.getTime();
       });
       const dates = items.map((item) => item.updatedAtTimestamp());
       const string = dates.join(',');

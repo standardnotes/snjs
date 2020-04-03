@@ -1,3 +1,4 @@
+import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNItemsKey } from '@Models/app/items_key';
@@ -12,7 +13,7 @@ import { PayloadSource } from '@Payloads/sources';
 import { EncryptionIntent } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
 import { ContentType, Action } from '@Models/index';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 
 type PasswordRequestHandler = () => Promise<string>
@@ -36,11 +37,13 @@ export class SNActionsService extends PureService {
   private alertService?: SNAlertService
   private httpService?: SNHttpService
   private modelManager?: PayloadManager
+  private itemManager?: ItemManager
   private protocolService?: SNProtocolService
   private syncService?: SNSyncService
   private previousPasswords: string[] = []
 
   constructor(
+    itemManager: ItemManager,
     alertService: SNAlertService,
     deviceInterface: DeviceInterface,
     httpService: SNHttpService,
@@ -49,6 +52,7 @@ export class SNActionsService extends PureService {
     syncService: SNSyncService,
   ) {
     super();
+    this.itemManager = itemManager;
     this.alertService = alertService;
     this.deviceInterface = deviceInterface;
     this.httpService = httpService;
@@ -60,6 +64,7 @@ export class SNActionsService extends PureService {
 
   /** @override */
   public deinit() {
+    this.itemManager = undefined;
     this.alertService = undefined;
     this.deviceInterface = undefined;
     this.httpService = undefined;
@@ -71,7 +76,7 @@ export class SNActionsService extends PureService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    return this.modelManager!
+    return this.itemManager!
       .validItemsForContentType(ContentType.ActionsExtension) as SNActionsExtension[];
   }
 
@@ -97,19 +102,23 @@ export class SNActionsService extends PureService {
       extension.url,
       params
     ).then((response) => {
-      if (response.description) {
-        extension.description = response.description;
-      }
-      if (response.supported_types) {
-        extension.supported_types = response.supported_types;
-      }
-      if (response.actions) {
-        extension.actions = response.actions.map((action: any) => {
-          return new Action(action);
-        });
-      } else {
-        extension.actions = [];
-      }
+      const description = response.description || extension.description;
+      const supported_types = response.supported_types || extension.supported_types;
+      const actions = (
+        response.actions
+          ? response.actions.map((action: any) => {
+            return new Action(action);
+          })
+          : []
+      )
+      this.itemManager!.changeActionsExtension(
+        extension,
+        (mutator) => {
+          mutator.description = description;
+          mutator.supported_types = supported_types;
+          mutator.actions = actions;
+        }
+      )
       return extension;
     }).catch((response) => {
       console.error('Error loading extension', response);
@@ -177,11 +186,13 @@ export class SNActionsService extends PureService {
       response,
       passwordRequestHandler
     );
-    const item = await this.modelManager!.emitPayload(
-      payload!,
-      PayloadSource.RemoteActionRetrieved
+    await this.modelManager!.emitPayload(
+      CopyPayload(
+        payload!,
+        { dirty: true }
+      ),
+      PayloadSource.RemoteActionRetrieved,
     );
-    this.modelManager!.setItemDirty(item, true);
     this.syncService!.sync();
     return {
       response: response,
@@ -197,7 +208,7 @@ export class SNActionsService extends PureService {
         passwordRequestHandler
       );
       if (payload) {
-        const item = this.modelManager!.createItem(
+        const item = this.itemManager!.createItem(
           payload.content_type!,
           payload.contentObject
         );
@@ -220,7 +231,7 @@ export class SNActionsService extends PureService {
     response: HttpResponse,
     passwordRequestHandler: PasswordRequestHandler,
     key?: SNRootKey,
-  ) : Promise<PurePayload | undefined> {
+  ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
     const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
       payload,

@@ -51,11 +51,11 @@ export class PayloadManager extends PureService {
 
   private mappingObservers: ChangeObserver[] = []
   private creationObservers: InsertionObserver[] = []
-  public masterCollection: MutableCollection<PurePayload>
+  public collection: MutableCollection<PurePayload>
 
   constructor() {
     super();
-    this.masterCollection = new MutableCollection();
+    this.collection = new MutableCollection();
   }
 
   /**
@@ -64,7 +64,7 @@ export class PayloadManager extends PureService {
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return this.masterCollection.toImmutablePayloadCollection();
+    return this.collection.toImmutablePayloadCollection();
   }
 
   public deinit() {
@@ -75,7 +75,7 @@ export class PayloadManager extends PureService {
   }
 
   public resetState() {
-    this.masterCollection = new MutableCollection();
+    this.collection = new MutableCollection();
   }
 
   /**
@@ -95,10 +95,11 @@ export class PayloadManager extends PureService {
    * This function maps a payload to an item
    * @returns The mapped item
    */
-  public async emitPayload(payload: PurePayload, source: PayloadSource) {
+  public async emitPayload(payload: PurePayload, source: PayloadSource, sourceKey?: string) {
     const items = await this.emitPayloads(
       [payload],
-      source
+      source,
+      sourceKey
     );
     return items[0];
   }
@@ -131,12 +132,12 @@ export class PayloadManager extends PureService {
         console.error('Payload is corrupt:', payload);
         continue;
       }
-      const masterPayload = this.masterCollection.find(payload.uuid!);
+      const masterPayload = this.collection.find(payload.uuid!);
       const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload;
       /** The item has been deleted and synced, 
        * and can thus be removed from our local record */
       if (newPayload.deleted && !newPayload.dirty) {
-        this.masterCollection.delete(newPayload);
+        this.collection.delete(newPayload);
       } else {
         processed.push(newPayload);
         if (!masterPayload) {
@@ -248,5 +249,9 @@ export class PayloadManager extends PureService {
     );
     const collection = await delta.resultingCollection();
     return this.emitCollection(collection);
+  }
+
+  public removePayloadLocally(payload: PurePayload) {
+    this.collection.delete(payload);
   }
 }

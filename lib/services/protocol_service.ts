@@ -1,7 +1,7 @@
-import { RootKeyContent } from './../protocol/root_key';
+import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvents } from '@Lib/events';
-import { CreateItemFromPayload } from '@Models/generator';
+import { BuildItemContent, CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
@@ -98,6 +98,7 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersions.V003;
 */
 export class SNProtocolService extends PureService implements EncryptionDelegate {
 
+  private itemManager?: ItemManager
   private modelManager?: PayloadManager
   private storageService?: SNStorageService
   public crypto?: SNPureCrypto
@@ -108,12 +109,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private removeMappingObserver: any
 
   constructor(
+    itemManager: ItemManager,
     modelManager: PayloadManager,
     deviceInterface: DeviceInterface,
     storageService: SNStorageService,
     crypto: SNPureCrypto
   ) {
     super();
+    this.itemManager = itemManager;
     this.modelManager = modelManager;
     this.deviceInterface = deviceInterface;
     this.storageService = storageService;
@@ -145,6 +148,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
 
   /** @override */
   public deinit() {
+    this.itemManager = undefined;
     this.modelManager = undefined;
     this.deviceInterface = undefined;
     this.storageService = undefined;
@@ -505,7 +509,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         );
       }
     }
-    const version = payload.version;
+    const version = payload.version!;
     const operator = this.operatorForVersion(version);
     const encryptionParameters = CreateEncryptionParameters(payload);
     const decryptedParameters = await operator.generateDecryptedParameters(
@@ -573,7 +577,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Here we find such items, and attempt to decrypt them again.
    */
   public async decryptErroredItems() {
-    const items = this.modelManager!.allItems.filter((item) => {
+    const items = this.itemManager!.items.filter((item) => {
       return item.waitingForKey || item.errorDecrypting;
     });
     if (items.length === 0) {
@@ -646,7 +650,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     intent = EncryptionIntents.FilePreferEncrypted,
     returnIfEmpty = false
   ) {
-    const items = subItems || this.modelManager!.allItems;
+    const items = subItems || this.itemManager!.items;
     if (returnIfEmpty && items.length === 0) {
       return null;
     }
@@ -1121,7 +1125,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const itemsKey = this.itemsKeyForPayload(payload);
       return itemsKey;
     }
-    const payloadVersion = payload.version;
+    const payloadVersion = payload.version!;
     if (payloadVersion === this.getLatestVersion()) {
       throw 'No associated key found for item encrypted with latest protocol version.';
     }
@@ -1164,7 +1168,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.modelManager!.setItemsToBeDeleted(neverSynced);
+      await this.itemManager!.setItemsToBeDeleted(neverSynced);
     } else {
       /**
        * No previous synced items key.
@@ -1178,7 +1182,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
           return itemsKey.version !== rootKey.version;
         });
         if (toDelete.length > 0) {
-          await this.modelManager!.setItemsToBeDeleted(toDelete);
+          await this.itemManager!.setItemsToBeDeleted(toDelete);
         }
         if (itemsKeys.length === 0) {
           await this.createNewDefaultItemsKey();
@@ -1205,7 +1209,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @access public
    */
   async repersistAllItems() {
-    const items = this.modelManager!.allItems;
+    const items = this.itemManager!.items;
     const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
     return this.storageService!.savePayloads(payloads)
   }
@@ -1215,7 +1219,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns All SN|ItemsKey objects synced to the account.
    */
   get itemsKeys() {
-    return this.modelManager!.itemsKeys;
+    return this.itemManager!.itemsKeys;
   }
 
   /**
@@ -1249,7 +1253,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
         */
-      await this.modelManager!.setItemsDirty(itemsKeys);
+      await this.itemManager!.setItemsDirty(itemsKeys);
     }
   }
 
@@ -1276,37 +1280,37 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const operatorVersion = rootKey
       ? rootKey.version
       : this.getLatestVersion();
-    let itemsKey;
+    let itemsKey: SNItemsKey;
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
       /** Create root key based items key */
       const payload = CreateMaxPayloadFromAnyObject({
+        uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: {
+        content: BuildItemContent({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: operatorVersion
-        }
+        })
       });
-      itemsKey = CreateItemFromPayload(payload);
-      await itemsKey.initUUID();
+      itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
     } else {
       /** Create independent items key */
       itemsKey = await this.operatorForVersion(operatorVersion).createItemsKey();
     }
     const currentDefault = this.getDefaultItemsKey();
     if (currentDefault) {
-      currentDefault.content.isDefault = false;
-      await this.modelManager!.setItemDirty(currentDefault);
+      this.itemManager!.changeItemsKey(
+        currentDefault,
+        (mutator) => {
+          mutator.isDefault = false;
+        }
+      )
     }
-    itemsKey.content.isDefault = true;
-    const payload = itemsKey.payloadRepresentation(
-      {
-        dirty: true
+    await this.itemManager!.changeItemsKey(
+      itemsKey,
+      (mutator) => {
+        mutator.isDefault = true;
       }
-    );
-    await this.modelManager!.emitPayload(
-      payload,
-      PayloadSource.LocalChanged
-    );
+    )
   }
 }

@@ -1,7 +1,6 @@
-import omit from 'lodash/omit';
+import { ItemMutator } from './../../services/item_transformer';
+import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { SNItem } from '@Models/core/item';
-import { PayloadContent } from '@Payloads/generator';
-import { ContentType } from '@Models/content_types';
 import { Action } from './action';
 
 /**
@@ -9,12 +8,26 @@ import { Action } from './action';
  */
 export class SNActionsExtension extends SNItem {
 
-  public actions: Action[] = []
-  public description!: string
-  public name!: string
-  public url!: string
-  public package_info!: Record<string, any>
-  public supported_types!: string[]
+  public readonly actions: Action[] = []
+  public readonly description!: string
+  public readonly name!: string
+  public readonly url!: string
+  public readonly package_info!: Record<string, any>
+  public readonly supported_types!: string[]
+
+  constructor(payload: PurePayload) {
+    super(payload);
+    this.description = payload.safeContent.description;
+    this.url = payload.safeContent.url;
+    this.name = payload.safeContent.name;
+    this.package_info = payload.safeContent.package_info;
+    this.supported_types = payload.safeContent.supported_types;
+    if (payload.safeContent.actions) {
+      this.actions = payload.safeContent.actions.map((action: any) => {
+        return new Action(action);
+      });
+    }
+  }
 
   actionsWithContextForItem(item: SNItem) {
     return this.actions.filter((action) => {
@@ -24,39 +37,19 @@ export class SNActionsExtension extends SNItem {
       )
     });
   }
+}
 
-  mapContentToLocalProperties(content: PayloadContent) {
-    super.mapContentToLocalProperties(content);
-    this.description = content.description;
-    this.url = content.url;
-    this.name = content.name;
-    this.package_info = content.package_info;
-    this.supported_types = content.supported_types;
-    if (content.actions) {
-      this.actions = content.actions.map((action: any) => {
-        return new Action(action);
-      });
-    }
+export class ActionsExtensionMutator extends ItemMutator {
+
+  set description(description: string) {
+    this.content!.description = description;
   }
 
-  getDefaultContentType() {
-    return ContentType.ActionsExtension;
+  set supported_types(supported_types: string[]) {
+    this.content!.supported_types = supported_types;
   }
 
-  structureParams() {
-    const params = {
-      name: this.name,
-      url: this.url,
-      package_info: this.package_info,
-      description: this.description,
-      actions: this.actions.map((a) => {
-        return omit(a, ['subrows', 'subactions']);
-      }),
-      supported_types: this.supported_types
-    };
-
-    const superParams = super.structureParams();
-    Object.assign(superParams, params);
-    return superParams;
+  set actions(actions: Action[]) {
+    this.content!.actions = actions;
   }
 }

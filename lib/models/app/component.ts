@@ -148,15 +148,15 @@ export class SNComponent extends SNItem {
 export class ComponentTransformer extends ItemMutator {
 
   set active(active: boolean) {
-    this.content.active = active;
+    this.content!.active = active;
   }
 
   set componentData(componentData: Record<string, any>) {
-    this.content.componentData = componentData;
+    this.content!.componentData = componentData;
   }
 
   public associateWithItem(item: SNItem) {
-    this.content.associatedItemIds.push(item.uuid);
+    this.content!.associatedItemIds.push(item.uuid);
   }
 
   public setLastSize(size: string) {

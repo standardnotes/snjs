@@ -1,4 +1,3 @@
-export const DEFAULT_APP_DOMAIN = 'org.standardnotes.sn';
 export { ApplicationEvents, SyncEvents, applicationEventForSyncEvent } from '@Lib/events';
 export { ApplicationStage as ApplicationStages } from '@Lib/stages';
 export {

@@ -1,5 +1,4 @@
 import { AppDataField } from './../models/core/item';
-import { DEFAULT_APP_DOMAIN } from './../index';
 import { CopyPayload } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -22,7 +21,9 @@ export enum MutationType {
 const UserModifiedDateKey = 'client_updated_at';
 
 /**
- * An item transformers takes in an item, and an operation, and returns the resulting payload
+ * An item transformers takes in an item, and an operation, and returns the resulting payload.
+ * Subclasses of mutators can modify the content field directly, but cannot modify the payload directly.
+ * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export class ItemMutator {
   protected readonly item: SNItem
@@ -37,7 +38,7 @@ export class ItemMutator {
     this.content = Copy(this.payload.content);
   }
 
-  getResult() {
+  public getResult() {
     if (this.source === MutationType.UserInteraction) {
       // Set the user modified date to now if marking the item as dirty
       this.setAppDataItem(UserModifiedDateKey, new Date());
@@ -63,7 +64,17 @@ export class ItemMutator {
     this.deleted = true;
   }
 
-  set deleted(deleted: boolean) {
+  public set lastSyncBegan(began: Date) {
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        lastSyncBegan: began
+      }
+    )
+  }
+
+  public set deleted(deleted: boolean) {
     this.payload = CopyPayload(
       this.payload,
       {
@@ -99,14 +110,14 @@ export class ItemMutator {
   }
 
   public setAppDataItem(key: string, value: any) {
-    this.setDomainData(key, value, DEFAULT_APP_DOMAIN);
+    this.setDomainDataKey(key, value, SNItem.DefaultAppDomain());
   }
 
   public addItemAsRelationship(item: SNItem) {
     const references = this.content!.references || [];
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
-        uuid: item.uuid!,
+        uuid: item.uuid,
         content_type: item.content_type!
       });
     }

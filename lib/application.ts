@@ -341,21 +341,21 @@ export class SNApplication {
    * Finds an item by UUID.
    */
   public findItem(uuid: string) {
-    return this.modelManager!.findItem(uuid);
+    return this.itemManager!.findItem(uuid);
   }
 
   /** 
    * Finds an item by predicate.
   */
   public findItems(predicate: SNPredicate) {
-    return this.modelManager!.itemsMatchingPredicate(predicate);
+    return this.itemManager!.itemsMatchingPredicate(predicate);
   }
 
   /**
    * Takes the values of the input item and emits it onto global state.
    */
   public async mergeItem(item: SNItem, source: PayloadSource) {
-    return this.modelManager!.emitPayload(item.payloadRepresentation(), source);
+    return this.itemManager!.emitItemFromPayload(item.payloadRepresentation(), source);
   }
 
   /** 
@@ -368,10 +368,9 @@ export class SNApplication {
     needsSync = false,
     override?: PurePayload
   ) {
-    const item = await this.modelManager!.createItem(
+    const item = await this.itemManager!.createItem(
       contentType,
       content,
-      true,
       needsSync,
       override
     );
@@ -386,7 +385,7 @@ export class SNApplication {
     contentType: ContentType,
     content?: PayloadContent
   ) {
-    const item = await this.modelManager!.createItem(
+    const item = await this.itemManager!.createTemplateItem(
       contentType,
       content,
     );
@@ -442,49 +441,49 @@ export class SNApplication {
   }
 
   public async deleteItem(item: SNItem) {
-    await this.modelManager!.setItemToBeDeleted(item);
+    await this.itemManager!.setItemToBeDeleted(item);
     return this.sync();
   }
 
   public async deleteItemLocally(item: SNItem) {
-    this.modelManager!.removeItemLocally(item);
+    this.itemManager!.removeItemLocally(item);
   }
 
   public async emptyTrash() {
-    await this.modelManager!.emptyTrash();
+    await this.itemManager!.emptyTrash();
     return this.sync();
   }
 
   public getTrashedItems() {
-    return this.modelManager!.trashedItems();
+    return this.itemManager!.trashedItems();
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
-    return this.modelManager!.getItems(contentType);
+    return this.itemManager!.getItems(contentType);
   }
 
   public getDisplayableItems(contentType: ContentType) {
-    return this.modelManager!.validItemsForContentType(contentType);
+    return this.itemManager!.validItemsForContentType(contentType);
   }
 
   public getNotesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.modelManager!.notesMatchingSmartTag(smartTag);
+    return this.itemManager!.notesMatchingSmartTag(smartTag);
   }
 
   public findTag(title: string) {
-    return this.modelManager!.findTagByTitle(title);
+    return this.itemManager!.findTagByTitle(title);
   }
 
   public async findOrCreateTag(title: string) {
-    return this.modelManager!.findOrCreateTagByTitle(title);
+    return this.itemManager!.findOrCreateTagByTitle(title);
   }
 
   public getSmartTags() {
-    return this.modelManager!.getSmartTags();
+    return this.itemManager!.getSmartTags();
   }
 
   public getNoteCount() {
-    return this.modelManager!.noteCount();
+    return this.itemManager!.noteCount();
   }
 
 
@@ -497,11 +496,8 @@ export class SNApplication {
   ) {
     const observer = this.itemManager!.addObserver(
       contentType,
-      (items, source) => {
-        stream(
-          items,
-          source,
-        );
+      async (items, source) => {
+        stream(items, source);
       }
     );
     this.streamRemovers.push(observer);
@@ -773,7 +769,7 @@ export class SNApplication {
       if (mergeLocal) {
         await this.syncService!.markAllItemsAsNeedingSync(true);
       } else {
-        this.modelManager!.removeAllItemsFromMemory();
+        this.itemManager!.removeAllItemsFromMemory();
         await this.clearDatabase();
       }
       await this.notifyEvent(ApplicationEvents.SignedIn);
@@ -827,7 +823,7 @@ export class SNApplication {
       if (mergeLocal) {
         await this.syncService!.markAllItemsAsNeedingSync(true);
       } else {
-        this.modelManager!.removeAllItemsFromMemory();
+        this.itemManager!.removeAllItemsFromMemory();
         await this.clearDatabase();
       }
       await this.notifyEvent(ApplicationEvents.SignedIn);

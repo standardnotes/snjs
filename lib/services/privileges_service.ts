@@ -1,9 +1,10 @@
+import { BuildItemContent } from '@Models/generator';
+import { ItemManager } from '@Services/item_manager';
 import { SNSessionManager } from './api/session_manager';
 import { SNStorageService } from '@Services/storage_service';
 import { SNProtocolService } from './protocol_service';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
-import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
 import { StorageKey } from '@Lib/storage_keys';
@@ -62,7 +63,7 @@ const ActionsMetadata = {
  * the user has yet authenticated this action.
  */
 export class SNPrivilegesService extends PureService {
-  private modelManager?: PayloadManager
+  private itemManager?: ItemManager
   private syncService?: SNSyncService
   private singletonManager?: SNSingletonManager
   private protocolService?: SNProtocolService
@@ -74,7 +75,7 @@ export class SNPrivilegesService extends PureService {
   private sessionLengths: PrivilegeSessionLength[] = []
 
   constructor(
-    modelManager: PayloadManager,
+    itemManager: ItemManager,
     syncService: SNSyncService,
     singletonManager: SNSingletonManager,
     protocolService: SNProtocolService,
@@ -82,7 +83,7 @@ export class SNPrivilegesService extends PureService {
     sessionManager: SNSessionManager
   ) {
     super();
-    this.modelManager = modelManager;
+    this.itemManager = itemManager;
     this.syncService = syncService;
     this.singletonManager = singletonManager;
     this.protocolService = protocolService;
@@ -92,7 +93,7 @@ export class SNPrivilegesService extends PureService {
   }
 
   public deinit() {
-    this.modelManager = undefined;
+    this.itemManager = undefined;
     this.syncService = undefined;
     this.singletonManager = undefined;
     this.protocolService = undefined;
@@ -158,7 +159,7 @@ export class SNPrivilegesService extends PureService {
       CreateMaxPayloadFromAnyObject(
         {
           content_type: contentType,
-          content: {}
+          content: BuildItemContent({})
         }
       )
     ) as Promise<SNPrivileges>;
@@ -166,7 +167,7 @@ export class SNPrivilegesService extends PureService {
 
   async savePrivileges() {
     const privileges = await this.getPrivileges();
-    await this.modelManager!.setItemDirty(privileges);
+    await this.itemManager!.setItemDirty(privileges);
     return this.syncService!.sync();
   }
 
