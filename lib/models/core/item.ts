@@ -348,14 +348,16 @@ export class ItemMutator {
   }
 
   public getResult() {
-    if (this.source === MutationType.UserInteraction) {
-      // Set the user modified date to now if marking the item as dirty
-      this.setAppDataItem(UserModifiedDateKey, new Date());
-    } else {
-      const currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
-      if (!currentValue) {
-        // if we don't have an explcit raw value, we initialize client_updated_at.
-        this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at!));
+    if (!this.payload.deleted) {
+      if (this.source === MutationType.UserInteraction) {
+        // Set the user modified date to now if marking the item as dirty
+        this.setAppDataItem(UserModifiedDateKey, new Date());
+      } else {
+        const currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
+        if (!currentValue) {
+          // if we don't have an explcit raw value, we initialize client_updated_at.
+          this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at!));
+        }
       }
     }
     return CopyPayload(
@@ -370,7 +372,13 @@ export class ItemMutator {
 
   public setDeleted() {
     this.content = undefined;
-    this.deleted = true;
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        deleted: true
+      }
+    )
   }
 
   public set lastSyncBegan(began: Date) {
@@ -379,16 +387,6 @@ export class ItemMutator {
       {
         content: this.content,
         lastSyncBegan: began
-      }
-    )
-  }
-
-  public set deleted(deleted: boolean) {
-    this.payload = CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        deleted: deleted
       }
     )
   }
@@ -412,10 +410,15 @@ export class ItemMutator {
     if (this.payload.errorDecrypting) {
       return undefined;
     }
-    const content = this.content!.appData || {};
-    const data = content.appData[domain] || {};
-    data[key] = value;
-    content.appData[domain] = data;
+    if (!this.content!.appData) {
+      this.content!.appData = {};
+    }
+    const globalData = this.content!.appData;
+    if (!globalData[domain]) {
+      globalData[domain] = {};
+    }
+    const domainData = globalData[domain];
+    domainData[key] = value;
   }
 
   public setAppDataItem(key: string, value: any) {

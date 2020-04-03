@@ -63,12 +63,12 @@ export class ItemManager extends PureService {
    * item references. This is essentially equivalent to item.content.references, 
    * but keeps state even when the item is deleted. So if tag A references Note B, 
    * referenceMap[A.uuid] == [B.uuid]. */
-  private referenceMap: Record<UuidString, UuidString[]> = {}
+  private referenceMap: Partial<Record<UuidString, UuidString[]>> = {}
   /** Maintains an index for each item id where the value is an array of item ids where 
    * the items reference the key item. So if tag A references Note B, 
    * inverseReferenceMap[B.uuid] == [A.uuid]. This allows callers to determine for a given item,
    * who references it? It would be prohibitive to look this up on demand */
-  private inverseReferenceMap: Record<UuidString, UuidString[]> = {}
+  private inverseReferenceMap: Partial<Record<UuidString, UuidString[]>> = {}
 
   constructor(modelManager: PayloadManager) {
     super();
@@ -142,10 +142,10 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Returns the items that reference the given item
+   * Returns the items that reference the given item, or an empty array if no results.
    */
   private itemsThatReferenceItem(item: SNItem) {
-    const ids = this.inverseReferenceMap[item.uuid];
+    const ids = this.inverseReferenceMap[item.uuid] || [];
     return this.findItems(ids);
   }
 
@@ -163,12 +163,25 @@ export class ItemManager extends PureService {
   }
 
   private deestablishReferenceIndexForDeletedItem(item: SNItem) {
-    const directReferences = this.referenceMap[item.uuid]
+    /** Items that we reference */
+    const directReferences = this.referenceMap[item.uuid] || []
     for (const directReference of directReferences) {
-      const inverseIndex = this.inverseReferenceMap[directReference];
-      removeFromArray(inverseIndex, item.uuid);
+      removeFromArray(
+        this.inverseReferenceMap[directReference] || [],
+        item.uuid
+      );
     }
     delete this.referenceMap[item.uuid];
+
+    /** Items that are referencing us */
+    const inverseReferences = this.inverseReferenceMap[item.uuid] || []
+    for (const inverseReference of inverseReferences) {
+      removeFromArray(
+        this.referenceMap[inverseReference] || [],
+        item.uuid
+      );
+    }
+    delete this.inverseReferenceMap[item.uuid];
   }
 
   private async onPayloadChange(
@@ -206,7 +219,7 @@ export class ItemManager extends PureService {
     type: ObservationType,
     source?: PayloadSource,
     sourceKey?: string,
-    ) {
+  ) {
     const items = payloads.map((payload) => {
       return CreateItemFromPayload(payload);
     });

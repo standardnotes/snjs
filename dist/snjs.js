@@ -6815,15 +6815,17 @@ var ItemMutator = /*#__PURE__*/function () {
   _createClass(ItemMutator, [{
     key: "getResult",
     value: function getResult() {
-      if (this.source === MutationType.UserInteraction) {
-        // Set the user modified date to now if marking the item as dirty
-        this.setAppDataItem(UserModifiedDateKey, new Date());
-      } else {
-        var currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
+      if (!this.payload.deleted) {
+        if (this.source === MutationType.UserInteraction) {
+          // Set the user modified date to now if marking the item as dirty
+          this.setAppDataItem(UserModifiedDateKey, new Date());
+        } else {
+          var currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
 
-        if (!currentValue) {
-          // if we don't have an explcit raw value, we initialize client_updated_at.
-          this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at));
+          if (!currentValue) {
+            // if we don't have an explcit raw value, we initialize client_updated_at.
+            this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at));
+          }
         }
       }
 
@@ -6837,7 +6839,10 @@ var ItemMutator = /*#__PURE__*/function () {
     key: "setDeleted",
     value: function setDeleted() {
       this.content = undefined;
-      this.deleted = true;
+      this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
+        content: this.content,
+        deleted: true
+      });
     }
   }, {
     key: "setDomainData",
@@ -6865,10 +6870,18 @@ var ItemMutator = /*#__PURE__*/function () {
         return undefined;
       }
 
-      var content = this.content.appData || {};
-      var data = content.appData[domain] || {};
-      data[key] = value;
-      content.appData[domain] = data;
+      if (!this.content.appData) {
+        this.content.appData = {};
+      }
+
+      var globalData = this.content.appData;
+
+      if (!globalData[domain]) {
+        globalData[domain] = {};
+      }
+
+      var domainData = globalData[domain];
+      domainData[key] = value;
     }
   }, {
     key: "setAppDataItem",
@@ -6906,14 +6919,6 @@ var ItemMutator = /*#__PURE__*/function () {
       this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
         content: this.content,
         lastSyncBegan: began
-      });
-    }
-  }, {
-    key: "deleted",
-    set: function set(deleted) {
-      this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
-        content: this.content,
-        deleted: deleted
       });
     }
   }]);
@@ -20372,13 +20377,13 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       };
     }
     /**
-     * Returns the items that reference the given item
+     * Returns the items that reference the given item, or an empty array if no results.
      */
 
   }, {
     key: "itemsThatReferenceItem",
     value: function itemsThatReferenceItem(item) {
-      var ids = this.inverseReferenceMap[item.uuid];
+      var ids = this.inverseReferenceMap[item.uuid] || [];
       return this.findItems(ids);
     }
   }, {
@@ -20421,7 +20426,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "deestablishReferenceIndexForDeletedItem",
     value: function deestablishReferenceIndexForDeletedItem(item) {
-      var directReferences = this.referenceMap[item.uuid];
+      /** Items that we reference */
+      var directReferences = this.referenceMap[item.uuid] || [];
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
@@ -20429,8 +20435,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       try {
         for (var _iterator2 = directReferences[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var directReference = _step2.value;
-          var inverseIndex = this.inverseReferenceMap[directReference];
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_11__["removeFromArray"])(inverseIndex, item.uuid);
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_11__["removeFromArray"])(this.inverseReferenceMap[directReference] || [], item.uuid);
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -20448,6 +20453,34 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       }
 
       delete this.referenceMap[item.uuid];
+      /** Items that are referencing us */
+
+      var inverseReferences = this.inverseReferenceMap[item.uuid] || [];
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = inverseReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var inverseReference = _step3.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_11__["removeFromArray"])(this.referenceMap[inverseReference] || [], item.uuid);
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+
+      delete this.inverseReferenceMap[item.uuid];
     }
   }, {
     key: "onPayloadChange",
@@ -20510,7 +20543,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setPayloads",
     value: function () {
       var _setPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(payloads, type, source, sourceKey) {
-        var items, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, item;
+        var items, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, item;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
@@ -20519,13 +20552,13 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 items = payloads.map(function (payload) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_8__["CreateItemFromPayload"])(payload);
                 });
-                _iteratorNormalCompletion3 = true;
-                _didIteratorError3 = false;
-                _iteratorError3 = undefined;
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
                 _context3.prev = 4;
 
-                for (_iterator3 = items[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                  item = _step3.value;
+                for (_iterator4 = items[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                  item = _step4.value;
 
                   if (item.deleted) {
                     this.deestablishReferenceIndexForDeletedItem(item);
@@ -20540,26 +20573,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 8:
                 _context3.prev = 8;
                 _context3.t0 = _context3["catch"](4);
-                _didIteratorError3 = true;
-                _iteratorError3 = _context3.t0;
+                _didIteratorError4 = true;
+                _iteratorError4 = _context3.t0;
 
               case 12:
                 _context3.prev = 12;
                 _context3.prev = 13;
 
-                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                  _iterator3.return();
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
                 }
 
               case 15:
                 _context3.prev = 15;
 
-                if (!_didIteratorError3) {
+                if (!_didIteratorError4) {
                   _context3.next = 18;
                   break;
                 }
 
-                throw _iteratorError3;
+                throw _iteratorError4;
 
               case 18:
                 return _context3.finish(15);
@@ -20593,15 +20626,15 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "notifyObservers",
     value: function () {
       var _notifyObservers = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(items, type, source, sourceKey) {
-        var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _loop, _iterator4, _step4;
+        var _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _loop, _iterator5, _step5;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _iteratorNormalCompletion4 = true;
-                _didIteratorError4 = false;
-                _iteratorError4 = undefined;
+                _iteratorNormalCompletion5 = true;
+                _didIteratorError5 = false;
+                _iteratorError5 = undefined;
                 _context5.prev = 3;
                 _loop = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _loop() {
                   var observer, relevantItems;
@@ -20609,7 +20642,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                     while (1) {
                       switch (_context4.prev = _context4.next) {
                         case 0:
-                          observer = _step4.value;
+                          observer = _step5.value;
                           relevantItems = items.filter(function (item) {
                             return observer.contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_15__["ContentType"].Any || observer.contentType === item.content_type;
                           });
@@ -20623,10 +20656,10 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                     }
                   }, _loop);
                 });
-                _iterator4 = this.observers[Symbol.iterator]();
+                _iterator5 = this.observers[Symbol.iterator]();
 
               case 6:
-                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
+                if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
                   _context5.next = 11;
                   break;
                 }
@@ -20634,7 +20667,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 return _context5.delegateYield(_loop(), "t0", 8);
 
               case 8:
-                _iteratorNormalCompletion4 = true;
+                _iteratorNormalCompletion5 = true;
                 _context5.next = 6;
                 break;
 
@@ -20645,26 +20678,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 13:
                 _context5.prev = 13;
                 _context5.t1 = _context5["catch"](3);
-                _didIteratorError4 = true;
-                _iteratorError4 = _context5.t1;
+                _didIteratorError5 = true;
+                _iteratorError5 = _context5.t1;
 
               case 17:
                 _context5.prev = 17;
                 _context5.prev = 18;
 
-                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                  _iterator4.return();
+                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                  _iterator5.return();
                 }
 
               case 20:
                 _context5.prev = 20;
 
-                if (!_didIteratorError4) {
+                if (!_didIteratorError5) {
                   _context5.next = 23;
                   break;
                 }
 
-                throw _iteratorError4;
+                throw _iteratorError5;
 
               case 23:
                 return _context5.finish(20);
@@ -20731,11 +20764,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             payloadSource,
             payloadSourceKey,
             payloads,
-            _iteratorNormalCompletion5,
-            _didIteratorError5,
-            _iteratorError5,
-            _iterator5,
-            _step5,
+            _iteratorNormalCompletion6,
+            _didIteratorError6,
+            _iteratorError6,
+            _iterator6,
+            _step6,
             item,
             _mutator,
             payload,
@@ -20749,13 +20782,13 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 payloadSource = _args7.length > 3 ? _args7[3] : undefined;
                 payloadSourceKey = _args7.length > 4 ? _args7[4] : undefined;
                 payloads = [];
-                _iteratorNormalCompletion5 = true;
-                _didIteratorError5 = false;
-                _iteratorError5 = undefined;
+                _iteratorNormalCompletion6 = true;
+                _didIteratorError6 = false;
+                _iteratorError6 = undefined;
                 _context7.prev = 7;
 
-                for (_iterator5 = items[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                  item = _step5.value;
+                for (_iterator6 = items[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                  item = _step6.value;
                   _mutator = new _models_core_item__WEBPACK_IMPORTED_MODULE_13__["ItemMutator"](item, mutationType);
                   mutate(_mutator);
                   payload = _mutator.getResult();
@@ -20768,26 +20801,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 11:
                 _context7.prev = 11;
                 _context7.t0 = _context7["catch"](7);
-                _didIteratorError5 = true;
-                _iteratorError5 = _context7.t0;
+                _didIteratorError6 = true;
+                _iteratorError6 = _context7.t0;
 
               case 15:
                 _context7.prev = 15;
                 _context7.prev = 16;
 
-                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                  _iterator5.return();
+                if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                  _iterator6.return();
                 }
 
               case 18:
                 _context7.prev = 18;
 
-                if (!_didIteratorError5) {
+                if (!_didIteratorError6) {
                   _context7.next = 21;
                   break;
                 }
 
-                throw _iteratorError5;
+                throw _iteratorError6;
 
               case 21:
                 return _context7.finish(18);
@@ -21220,7 +21253,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setItemToBeDeleted",
     value: function () {
       var _setItemToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(item) {
-        var referencingItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, referencingItem;
+        var referencingItems, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, referencingItem;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context18) {
           while (1) {
@@ -21236,26 +21269,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
                 /* Handle indirect relationships */
                 referencingItems = this.itemsThatReferenceItem(item);
-                _iteratorNormalCompletion6 = true;
-                _didIteratorError6 = false;
-                _iteratorError6 = undefined;
+                _iteratorNormalCompletion7 = true;
+                _didIteratorError7 = false;
+                _iteratorError7 = undefined;
                 _context18.prev = 6;
-                _iterator6 = referencingItems[Symbol.iterator]();
+                _iterator7 = referencingItems[Symbol.iterator]();
 
               case 8:
-                if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
                   _context18.next = 15;
                   break;
                 }
 
-                referencingItem = _step6.value;
+                referencingItem = _step7.value;
                 _context18.next = 12;
                 return this.changeItem(referencingItem, function (mutator) {
                   mutator.removeItemAsRelationship(item);
                 });
 
               case 12:
-                _iteratorNormalCompletion6 = true;
+                _iteratorNormalCompletion7 = true;
                 _context18.next = 8;
                 break;
 
@@ -21266,26 +21299,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 17:
                 _context18.prev = 17;
                 _context18.t0 = _context18["catch"](6);
-                _didIteratorError6 = true;
-                _iteratorError6 = _context18.t0;
+                _didIteratorError7 = true;
+                _iteratorError7 = _context18.t0;
 
               case 21:
                 _context18.prev = 21;
                 _context18.prev = 22;
 
-                if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                  _iterator6.return();
+                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                  _iterator7.return();
                 }
 
               case 24:
                 _context18.prev = 24;
 
-                if (!_didIteratorError6) {
+                if (!_didIteratorError7) {
                   _context18.next = 27;
                   break;
                 }
 
-                throw _iteratorError6;
+                throw _iteratorError7;
 
               case 27:
                 return _context18.finish(24);
@@ -21318,30 +21351,30 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setItemsToBeDeleted",
     value: function () {
       var _setItemsToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(items) {
-        var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, item;
+        var _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, item;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context19) {
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
-                _iteratorNormalCompletion7 = true;
-                _didIteratorError7 = false;
-                _iteratorError7 = undefined;
+                _iteratorNormalCompletion8 = true;
+                _didIteratorError8 = false;
+                _iteratorError8 = undefined;
                 _context19.prev = 3;
-                _iterator7 = items[Symbol.iterator]();
+                _iterator8 = items[Symbol.iterator]();
 
               case 5:
-                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
                   _context19.next = 12;
                   break;
                 }
 
-                item = _step7.value;
+                item = _step8.value;
                 _context19.next = 9;
                 return this.setItemToBeDeleted(item);
 
               case 9:
-                _iteratorNormalCompletion7 = true;
+                _iteratorNormalCompletion8 = true;
                 _context19.next = 5;
                 break;
 
@@ -21352,26 +21385,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 14:
                 _context19.prev = 14;
                 _context19.t0 = _context19["catch"](3);
-                _didIteratorError7 = true;
-                _iteratorError7 = _context19.t0;
+                _didIteratorError8 = true;
+                _iteratorError8 = _context19.t0;
 
               case 18:
                 _context19.prev = 18;
                 _context19.prev = 19;
 
-                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                  _iterator7.return();
+                if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+                  _iterator8.return();
                 }
 
               case 21:
                 _context19.prev = 21;
 
-                if (!_didIteratorError7) {
+                if (!_didIteratorError8) {
                   _context19.next = 24;
                   break;
                 }
 
-                throw _iteratorError7;
+                throw _iteratorError8;
 
               case 24:
                 return _context19.finish(21);
@@ -21483,29 +21516,29 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           return false;
         }
 
-        var _iteratorNormalCompletion8 = true;
-        var _didIteratorError8 = false;
-        var _iteratorError8 = undefined;
+        var _iteratorNormalCompletion9 = true;
+        var _didIteratorError9 = false;
+        var _iteratorError9 = undefined;
 
         try {
-          for (var _iterator8 = predicates[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-            var predicate = _step8.value;
+          for (var _iterator9 = predicates[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+            var predicate = _step9.value;
 
             if (!item.satisfiesPredicate(predicate)) {
               return false;
             }
           }
         } catch (err) {
-          _didIteratorError8 = true;
-          _iteratorError8 = err;
+          _didIteratorError9 = true;
+          _iteratorError9 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-              _iterator8.return();
+            if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
+              _iterator9.return();
             }
           } finally {
-            if (_didIteratorError8) {
-              throw _iteratorError8;
+            if (_didIteratorError9) {
+              throw _iteratorError9;
             }
           }
         }
