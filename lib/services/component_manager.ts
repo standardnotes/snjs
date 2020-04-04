@@ -975,7 +975,7 @@ export class SNComponentManager extends PureService {
           if ([ContentType.Component, ContentType.Theme].includes(item.content_type!)) {
             await this.deactivateComponent(item as SNComponent, true);
           }
-          await this.itemManager!.setItemToBeDeleted(item);
+          await this.itemManager!.setItemToBeDeleted(item.uuid);
         }
         this.syncService!.sync();
         reply = { deleted: true };
@@ -1112,7 +1112,7 @@ export class SNComponentManager extends PureService {
               matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types));
             }
           }
-          await this.itemManager!.setItemDirty(component);
+          await this.itemManager!.setItemDirty(component.uuid);
           this.syncService!.sync();
         }
         this.permissionDialogs = this.permissionDialogs.filter((pendingDialog) => {
@@ -1328,7 +1328,7 @@ export class SNComponentManager extends PureService {
   }
 
   async deleteComponent(component: SNComponent) {
-    await this.itemManager!.setItemToBeDeleted(component);
+    await this.itemManager!.setItemToBeDeleted(component.uuid);
     this.syncService!.sync();
   }
 

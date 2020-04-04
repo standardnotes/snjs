@@ -13,7 +13,7 @@ import { CreateItemFromPayload, BuildItemContent } from '@Models/generator';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentTransformer } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { findInArray, removeFromArray } from '@Lib/utils';
+import { findInArray, isString, removeFromArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadOverride, PayloadContent } from './../protocol/payloads/generator';
 import { SNItem, ItemMutator, MutationType } from './../models/core/item';
@@ -143,9 +143,13 @@ export class ItemManager extends PureService {
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  private itemsThatReferenceItem(item: SNItem) {
-    const ids = this.inverseReferenceMap[item.uuid] || [];
+  private itemsThatReferenceItem(uuid: UuidString) {
+    const ids = this.inverseReferenceMap[uuid] || [];
     return this.findItems(ids);
+  }
+
+  private uuidsThatReferenceItem(uuid: UuidString) {
+    return this.inverseReferenceMap[uuid] || [];
   }
 
   private establishReferenceIndex(item: SNItem) {
@@ -161,26 +165,26 @@ export class ItemManager extends PureService {
     }
   }
 
-  private deestablishReferenceIndexForDeletedItem(item: SNItem) {
+  private deestablishReferenceIndexForDeletedItem(uuid: UuidString) {
     /** Items that we reference */
-    const directReferences = this.referenceMap[item.uuid] || []
+    const directReferences = this.referenceMap[uuid] || []
     for (const directReference of directReferences) {
       removeFromArray(
         this.inverseReferenceMap[directReference] || [],
-        item.uuid
+        uuid
       );
     }
-    delete this.referenceMap[item.uuid];
+    delete this.referenceMap[uuid];
 
     /** Items that are referencing us */
-    const inverseReferences = this.inverseReferenceMap[item.uuid] || []
+    const inverseReferences = this.inverseReferenceMap[uuid] || []
     for (const inverseReference of inverseReferences) {
       removeFromArray(
         this.referenceMap[inverseReference] || [],
-        item.uuid
+        uuid
       );
     }
-    delete this.inverseReferenceMap[item.uuid];
+    delete this.inverseReferenceMap[uuid];
   }
 
   private async onPayloadChange(
@@ -224,7 +228,7 @@ export class ItemManager extends PureService {
     });
     for (const item of items) {
       if (item.deleted) {
-        this.deestablishReferenceIndexForDeletedItem(item);
+        this.deestablishReferenceIndexForDeletedItem(item.uuid);
       } else {
         this.establishReferenceIndex(item);
       }
@@ -257,14 +261,14 @@ export class ItemManager extends PureService {
    * is properly reconciled.
    */
   async changeItem(
-    item: SNItem,
+    itemOrUuid: UuidString | SNItem,
     mutate: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
     const results = await this.changeItems(
-      [item],
+      [itemOrUuid] as UuidString[] | SNItem[],
       mutate,
       mutationType,
       payloadSource,
@@ -274,12 +278,15 @@ export class ItemManager extends PureService {
   }
 
   async changeItems(
-    items: SNItem[],
+    itemsOrUuids: UuidString[] | SNItem[],
     mutate: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
+    const items = isString(itemsOrUuids[0])
+      ? this.findItems(itemsOrUuids as UuidString[])
+      : itemsOrUuids as SNItem[];
     const payloads = [];
     for (const item of items) {
       const mutator = new ItemMutator(item, mutationType);
@@ -297,13 +304,16 @@ export class ItemManager extends PureService {
   }
 
   async changeNote(
-    component: SNNote,
+    itemOrUuid: UuidString | SNNote,
     mutate: (mutator: NoteMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const mutator = new NoteMutator(component, mutationType);
+    const note = isString(itemOrUuid)
+      ? this.findItem(itemOrUuid as UuidString)
+      : itemOrUuid as SNNote;
+    const mutator = new NoteMutator(note, mutationType);
     return this.applyTransform(
       mutator,
       mutate,
@@ -313,12 +323,15 @@ export class ItemManager extends PureService {
   }
 
   async changeComponent(
-    component: SNComponent,
+    itemOrUuid: UuidString | SNComponent,
     mutate: (mutator: ComponentTransformer) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
+    const component = isString(itemOrUuid)
+      ? this.findItem(itemOrUuid as UuidString)
+      : itemOrUuid as SNComponent;
     const mutator = new ComponentTransformer(component, mutationType);
     return this.applyTransform(
       mutator,
@@ -329,12 +342,15 @@ export class ItemManager extends PureService {
   }
 
   async changeActionsExtension(
-    extension: SNActionsExtension,
+    itemOrUuid: UuidString | SNActionsExtension,
     mutate: (mutator: ActionsExtensionMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
+    const extension = isString(itemOrUuid)
+      ? this.findItem(itemOrUuid as UuidString)
+      : itemOrUuid as SNActionsExtension;
     const mutator = new ActionsExtensionMutator(extension, mutationType);
     return this.applyTransform(
       mutator,
@@ -345,12 +361,15 @@ export class ItemManager extends PureService {
   }
 
   async changeItemsKey(
-    itemsKey: SNItemsKey,
+    itemOrUuid: UuidString | SNItemsKey,
     mutate: (mutator: ItemsKeyMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
+    const itemsKey = isString(itemOrUuid)
+      ? this.findItem(itemOrUuid as UuidString)
+      : itemOrUuid as SNItemsKey;
     const mutator = new ItemsKeyMutator(itemsKey, mutationType);
     return this.applyTransform(
       mutator,
@@ -381,14 +400,14 @@ export class ItemManager extends PureService {
     * @param updateClientDate - Whether to update the item's "user modified date"
     */
   public async setItemDirty(
-    item: SNItem,
+    uuid: UuidString,
     dirty = true,
     isUserModified = false,
     source?: PayloadSource,
     sourceKey?: string
   ) {
     return this.setItemsDirty(
-      [item],
+      [uuid],
       dirty,
       isUserModified,
       source,
@@ -400,14 +419,14 @@ export class ItemManager extends PureService {
    * Similar to `setItemDirty`, but acts on an array of items as the first param.
    */
   public async setItemsDirty(
-    items: SNItem[],
+    uuids: UuidString[],
     dirty = true,
     isUserModified = false,
     source?: PayloadSource,
     sourceKey?: string
   ) {
     return this.changeItems(
-      items,
+      uuids,
       () => { },
       isUserModified ? MutationType.UserInteraction : MutationType.Internal,
       source,
@@ -501,28 +520,29 @@ export class ItemManager extends PureService {
    * Marks the item as deleted and needing sync.
    * Removes the item from respective content arrays (this.notes, this.tags, etc.)
    */
-  public async setItemToBeDeleted(item: SNItem) {
-    await this.changeItem(item, (mutator) => {
+  public async setItemToBeDeleted(uuid: UuidString) {
+    await this.changeItem(uuid, (mutator) => {
       mutator.setDeleted();
     });
 
     /* Direct relationships are cleared by clearing content above */
     /* Handle indirect relationships */
-    const referencingItems = this.itemsThatReferenceItem(item);
-    for (const referencingItem of referencingItems) {
-      await this.changeItem(referencingItem, (mutator) => {
-        mutator.removeItemAsRelationship(item);
+    const referencingIds = this.uuidsThatReferenceItem(uuid);
+    for (const referencingId of referencingIds) {
+      const referencingItem = this.findItem(referencingId);
+      await this.changeItem(referencingId, (mutator) => {
+        mutator.removeItemAsRelationship(referencingItem);
       });
     }
-    this.deestablishReferenceIndexForDeletedItem(item);
+    this.deestablishReferenceIndexForDeletedItem(uuid);
   }
 
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
    */
-  public async setItemsToBeDeleted(items: SNItem[]) {
-    for (const item of items) {
-      await this.setItemToBeDeleted(item);
+  public async setItemsToBeDeleted(uuids: UuidString[]) {
+    for (const uuid of uuids) {
+      await this.setItemToBeDeleted(uuid);
     }
   }
 
@@ -689,7 +709,11 @@ export class ItemManager extends PureService {
    */
   public async emptyTrash() {
     const notes = this.trashedItems;
-    return this.setItemsToBeDeleted(notes);
+    return this.setItemsToBeDeleted(this.uuidsForItems(notes));
+  }
+
+  public uuidsForItems(items: SNItem[]) {
+    return items.map((i) => i.uuid!);
   }
 
   /**
@@ -706,7 +730,7 @@ export class ItemManager extends PureService {
   /**
  * The number of notes currently managed
  */
-  public noteCount() {
+  public get noteCount() {
     return this.notes.filter((n) => !n.dummy).length;
   }
 
@@ -716,7 +740,8 @@ export class ItemManager extends PureService {
  * local data.
  */
   public async removeAllItemsFromMemory() {
-    await this.changeItems(this.items, (mutator) => {
+    const uuids = this.uuidsForItems(this.items);
+    await this.changeItems(uuids, (mutator) => {
       mutator.setDeleted();
     });
     this.resetState();
@@ -725,6 +750,6 @@ export class ItemManager extends PureService {
 
   public removeItemLocally(item: SNItem) {
     this.collection.delete(item);
-    this.modelManager?.removePayloadLocally(item.payload);
+    this.modelManager!.removePayloadLocally(item.payload);
   }
 }

@@ -28,7 +28,7 @@ describe('item manager', () => {
       );
     };
 
-    this.createTag = async (notes) => {
+    this.createTag = async (notes = []) => {
       const references = notes.map((note) => {
         return {
           uuid: note.uuid,
@@ -97,7 +97,7 @@ describe('item manager', () => {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    const itemsThatReference = this.itemManager.itemsThatReferenceItem(note);
+    const itemsThatReference = this.itemManager.itemsThatReferenceItem(note.uuid);
     expect(itemsThatReference.length).to.equal(1);
     expect(itemsThatReference[0]).to.equal(tag);
   });
@@ -189,6 +189,23 @@ describe('item manager', () => {
     expect(this.itemManager.systemSmartTags.length).to.equal(3);
   });
 
+  it('find tag by title', async function () {
+    const tag = await this.createTag();
+
+    expect(this.itemManager.findTagByTitle(tag.title)).to.be.ok;
+  });
+
+  it('find or create tag by title', async function () {
+    const title = 'foo';
+
+    expect(await this.itemManager.findOrCreateTagByTitle(title)).to.be.ok;
+  });
+
+  it('note count', async function () {
+    await this.createNote();
+    expect(this.itemManager.noteCount).to.equal(1);
+  });
+
   it('trash', async function () {
     const note = await this.createNote();
     const versionTwo = await this.itemManager.changeItem(
@@ -210,5 +227,36 @@ describe('item manager', () => {
     const versionThree = this.itemManager.findItem(note.uuid);
     expect(versionThree.deleted).to.equal(true);
     expect(this.itemManager.trashedItems.length).to.equal(0);
+  });
+
+  it('remove all items from memory', async function () {
+    const observed = [];
+    this.itemManager.addObserver(
+      ContentType.Any,
+      async (items, source, sourceKey, type) => {
+        observed.push({ items, source, sourceKey, type });
+      },
+    );
+    await this.createNote();
+    await this.itemManager.removeAllItemsFromMemory();
+
+    const deletionEvent = observed[1];
+    expect(deletionEvent.items[0].deleted).to.equal(true);
+    expect(this.itemManager.items.length).to.equal(0);
+  });
+
+  it('remove item locally', async function () {
+    const observed = [];
+    this.itemManager.addObserver(
+      ContentType.Any,
+      async (items, source, sourceKey, type) => {
+        observed.push({ items, source, sourceKey, type });
+      },
+    );
+    const note = await this.createNote();
+    await this.itemManager.removeItemLocally(note);
+
+    expect(observed.length).to.equal(1);
+    expect(this.itemManager.findItem(note.uuid)).to.not.be.ok;
   });
 });
