@@ -1,6 +1,6 @@
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
-import { SNNote } from './../models/app/note';
+import { SNNote, NoteMutator } from './../models/app/note';
 import { SNItemsKey } from '@Models/index';
 import { SNActionsExtension, ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
@@ -78,7 +78,6 @@ export class ItemManager extends PureService {
       .addChangeObserver(ContentType.Any, this.onPayloadChange.bind(this));
     this.unsubInsertionObserver = this.modelManager
       .addInsertionObserver(this.onPayloadInsertion.bind(this));
-
     this.systemSmartTags = SNSmartTag.systemSmartTags();
   }
 
@@ -264,13 +263,14 @@ export class ItemManager extends PureService {
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    return this.changeItems(
+    const results = await this.changeItems(
       [item],
       mutate,
       mutationType,
       payloadSource,
       payloadSourceKey
     );
+    return results[0];
   }
 
   async changeItems(
@@ -287,11 +287,29 @@ export class ItemManager extends PureService {
       const payload = mutator.getResult();
       payloads.push(payload);
     }
-    return this.modelManager!.emitPayloads(
+    await this.modelManager!.emitPayloads(
       payloads,
       payloadSource || PayloadSource.LocalChanged,
       payloadSourceKey
     );
+    const results = this.findItems(payloads.map((p) => p.uuid!));
+    return results;
+  }
+
+  async changeNote(
+    component: SNNote,
+    mutate: (mutator: NoteMutator) => void,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource?: PayloadSource,
+    payloadSourceKey?: string
+  ) {
+    const mutator = new NoteMutator(component, mutationType);
+    return this.applyTransform(
+      mutator,
+      mutate,
+      payloadSource,
+      payloadSourceKey
+    )
   }
 
   async changeComponent(
@@ -398,6 +416,18 @@ export class ItemManager extends PureService {
   }
 
   /**
+   * Returns an array of items that need to be synced.
+   */
+  public getDirtyItems() {
+    return this.items.filter((item) => {
+      /* An item that has an error decrypting can be synced only if it is being deleted.
+        Otherwise, we don't want to send corrupt content up to the server. */
+      return item.dirty && !item.dummy && (!item.errorDecrypting || item.deleted);
+    });
+  }
+
+
+  /**
    * Duplicates an item and maps it, thus propagating the item to observers.
    * @param isConflict - Whether to mark the duplicate as a conflict
    *    of the original.
@@ -409,7 +439,7 @@ export class ItemManager extends PureService {
       this.modelManager!.getMasterCollection(),
       isConflict,
     );
-    const results = await this.modelManager!.emitPayloads(
+    await this.modelManager!.emitPayloads(
       resultingPayloads,
       PayloadSource.LocalChanged
     );
@@ -463,18 +493,8 @@ export class ItemManager extends PureService {
     payload: PurePayload,
     source = PayloadSource.Constructor
   ) {
-    return this.modelManager?.emitPayload(payload, source);
-  }
-
-  /**
-   * Returns an array of items that need to be synced.
-   */
-  public getDirtyItems() {
-    return this.items.filter((item) => {
-      /* An item that has an error decrypting can be synced only if it is being deleted.
-        Otherwise, we don't want to send corrupt content up to the server. */
-      return item.dirty && !item.dummy && (!item.errorDecrypting || item.deleted);
-    });
+    await this.modelManager!.emitPayload(payload, source);
+    return this.findItem(payload.uuid!);
   }
 
   /**
@@ -640,7 +660,7 @@ export class ItemManager extends PureService {
    * Returns all notes matching the smart tag
    */
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    const contentTypePredicate = new SNPredicate('content_type', '=', 'Note');
+    const contentTypePredicate = new SNPredicate('content_type', '=', ContentType.Note);
     const predicates = [contentTypePredicate, smartTag.predicate];
     if (!smartTag.isTrashTag) {
       const notTrashedPredicate = new SNPredicate('content.trashed', '=', false);
@@ -653,22 +673,22 @@ export class ItemManager extends PureService {
   /**
    * Returns the smart tag corresponding to the "Trash" tag.
    */
-  public trashSmartTag() {
-    return this.systemSmartTags.find((tag) => tag.isTrashTag);
+  public get trashSmartTag() {
+    return this.systemSmartTags.find((tag) => tag.isTrashTag)!;
   }
 
   /**
    * Returns all items currently in the trash
    */
-  public trashedItems() {
-    return this.notesMatchingSmartTag(this.trashSmartTag()!);
+  public get trashedItems() {
+    return this.notesMatchingSmartTag(this.trashSmartTag);
   }
 
   /**
    * Permanently deletes any items currently in the trash. Consumer must manually call sync.
    */
   public async emptyTrash() {
-    const notes = this.trashedItems();
+    const notes = this.trashedItems;
     return this.setItemsToBeDeleted(notes);
   }
 

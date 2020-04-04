@@ -51,6 +51,9 @@ export class SNItem {
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
+    if(!payload.uuid || !payload.content_type) {
+      throw Error('Cannot create item without both uuid and content_type');
+    }
     this.payload = payload;
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -182,6 +185,14 @@ export class SNItem {
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
     return appData[key];
+  }
+
+  public get protected() {
+    return this.payload.safeContent.protected;
+  }
+
+  public get trashed() {
+    return this.payload.safeContent.trashed;
   }
 
   public get pinned() {
@@ -389,6 +400,26 @@ export class ItemMutator {
         lastSyncBegan: began
       }
     )
+  }
+
+  public set protected(isProtected: boolean) {
+    this.content!.protected = isProtected;
+  }
+
+  public set trashed(trashed: boolean) {
+    this.content!.trashed = trashed;
+  }
+
+  public set pinned(pinned: boolean) {
+    this.setAppDataItem(AppDataField.Pinned, pinned);
+  }
+
+  public set archived(archived: boolean) {
+    this.setAppDataItem(AppDataField.Archived, archived);
+  }
+
+  public set locked(locked: boolean) {
+    this.setAppDataItem(AppDataField.Locked, locked);
   }
 
   /**

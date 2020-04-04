@@ -1,4 +1,4 @@
-import { SNItem } from '@Models/core/item';
+import { SNItem, ItemMutator } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
 export interface NoteContent {
@@ -38,4 +38,16 @@ export class SNNote extends SNItem implements NoteContent {
       return !note.dummy;
     });
   }
+}
+
+export class NoteMutator extends ItemMutator {
+
+  set title(title: string) {
+    this.content!.title = title;
+  }
+
+  set text(text: string) {
+    this.content!.text = text;
+  }
+
 }

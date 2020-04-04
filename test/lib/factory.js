@@ -274,6 +274,10 @@ export function randomString(length = 10) {
   return result;
 }
 
+export function generateUuidish() {
+  return this.randomString(32);
+}
+
 export function randomArrayValue(array) {
   return array[Math.floor(Math.random() * array.length)];
 }

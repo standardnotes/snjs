@@ -1,7 +1,7 @@
 import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
 type PredicateType = string[] | SNPredicate
-type PredicateArray = Array<string[]> | SNPredicate[] 
+type PredicateArray = Array<string[]> | SNPredicate[]
 type PredicateValue = string | Date | boolean | PredicateArray;
 
 /**
@@ -14,7 +14,11 @@ export class SNPredicate {
   private operator: string
   private value: PredicateValue
 
-  constructor(keypath: string, operator: string, value: PredicateValue) {
+  constructor(
+    keypath: string,
+    operator: string,
+    value: PredicateValue
+  ) {
     this.keypath = keypath;
     this.operator = operator;
     this.value = value;
@@ -28,7 +32,22 @@ export class SNPredicate {
           return element;
         }
       });
+    } else if(this.value === 'true' || this.value === 'false') {
+      /* If value is boolean string, convert to boolean */
+      this.value = JSON.parse(this.value);
     }
+  }
+
+  static FromJson(values: any) {
+    return new SNPredicate(
+      values.keypath,
+      values.operator,
+      values.value
+    );
+  }
+
+  static FromArray(array: string[]) {
+    return new SNPredicate(array[0], array[1], array[2]);
   }
 
   isRecursive() {
@@ -53,10 +72,6 @@ export class SNPredicate {
       'and',
       predicates
     );
-  }
-
-  static FromArray(array: string[]) {
-    return new SNPredicate(array[0], array[1], array[2]);
   }
 
   static ObjectSatisfiesPredicate(object: any, predicate: PredicateType) {
@@ -112,7 +127,7 @@ export class SNPredicate {
       } else {
         return valueAtKeyPath === targetValue;
       }
-    } 
+    }
     else if (predicate.operator === '!=') {
       // Use array comparison
       if (Array.isArray(valueAtKeyPath)) {
@@ -120,28 +135,28 @@ export class SNPredicate {
       } else {
         return valueAtKeyPath !== targetValue;
       }
-    } 
+    }
     else if (predicate.operator === '<') {
       return valueAtKeyPath < targetValue;
-    } 
+    }
     else if (predicate.operator === '>') {
       return valueAtKeyPath > targetValue;
-    } 
+    }
     else if (predicate.operator === '<=') {
       return valueAtKeyPath <= targetValue;
-    } 
+    }
     else if (predicate.operator === '>=') {
       return valueAtKeyPath >= targetValue;
-    } 
+    }
     else if (predicate.operator === 'startsWith') {
       return valueAtKeyPath.startsWith(targetValue);
-    } 
+    }
     else if (predicate.operator === 'in') {
       return (targetValue as any[]).indexOf(valueAtKeyPath) !== -1;
-    } 
+    }
     else if (predicate.operator === 'includes') {
       return this.resolveIncludesPredicate(valueAtKeyPath, targetValue);
-    } 
+    }
     else if (predicate.operator === 'matches') {
       const regex = new RegExp(targetValue as string);
       return regex.test(valueAtKeyPath);

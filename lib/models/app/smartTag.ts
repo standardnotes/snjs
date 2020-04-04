@@ -16,19 +16,22 @@ const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
  */
 export class SNSmartTag extends SNTag {
 
-  public readonly predicate: SNPredicate
+  public readonly predicate!: SNPredicate
   public readonly isTrashTag: boolean
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.predicate = this.payload.safeContent.predicate;
-    this.isTrashTag = this.payload.safeContent.isTrashTag;
+    if(payload.safeContent.predicate) {
+      this.predicate = SNPredicate.FromJson(payload.safeContent.predicate);
+    }
+    this.isTrashTag = payload.safeContent.isTrashTag;
   }
 
   static systemSmartTags() {
     const allNotes = CreateMaxPayloadFromAnyObject(
       {
         uuid: SYSTEM_TAG_ALL_NOTES,
+        content_type: ContentType.SmartTag,
         dummy: true,
         content: BuildItemContent({
           title: 'All notes',
@@ -41,6 +44,7 @@ export class SNSmartTag extends SNTag {
     const archived = CreateMaxPayloadFromAnyObject(
       {
         uuid: SYSTEM_TAG_ARCHIVED_NOTES,
+        content_type: ContentType.SmartTag,
         dummy: true,
         content: BuildItemContent({
           title: 'Archived',
@@ -53,6 +57,7 @@ export class SNSmartTag extends SNTag {
     const trash = CreateMaxPayloadFromAnyObject(
       {
         uuid: SYSTEM_TAG_TRASHED_NOTES,
+        content_type: ContentType.SmartTag,
         dummy: true,
         content: BuildItemContent({
           title: 'Trash',
