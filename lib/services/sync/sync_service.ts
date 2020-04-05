@@ -22,7 +22,7 @@ import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject, payloadFieldsForSource } from '@Payloads/generator';
 import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@Models/content_types';
-import { CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload, Uuids } from '@Models/generator';
 import { SyncSignal } from '@Services/sync/signals';
 import { StorageKeys, SyncEvents } from '@Lib/index';
 import { SNSessionManager } from '../api/session_manager';
@@ -747,18 +747,14 @@ export class SNSyncService extends PureService {
 
   private async handleOfflineResponse(response: SyncResponse) {
     this.log('Offline Sync Response', response.rawResponse);
-    const payloadsToMap = response.savedPayloads;
+    const payloadsToEmit = response.savedPayloads;
     /** Before persisting, merge with current base value that has content field */
-    const masterCollection = this.modelManager!.getMasterCollection();
-    const payloadsToPersist = payloadsToMap.map((payload) => {
-      const base = masterCollection.find(payload.uuid!);
-      return base.mergedWith(payload);
-    });
-    await this.persistPayloads(payloadsToPersist);
     await this.modelManager!.emitPayloads(
-      payloadsToMap,
+      payloadsToEmit,
       PayloadSource.LocalSaved
     );
+    const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
+    await this.persistPayloads(payloadsToPersist);
 
     this.opStatus!.clearError();
     this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
@@ -813,17 +809,7 @@ export class SNSyncService extends PureService {
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
       await this.modelManager!.emitCollection(collection);
-      let payloadsToPersist;
-      const fields = payloadFieldsForSource(collection.source!);
-      if (!fields.includes(PayloadField.Content)) {
-        /** Before persisting, merge with current base value that has content field */
-        payloadsToPersist = collection.all().map((payload) => {
-          const base = masterCollection.find(payload.uuid!);
-          return base.mergedWith(payload);
-        });
-      } else {
-        payloadsToPersist = collection.all();
-      }
+      const payloadsToPersist = this.modelManager!.find(collection.uuids()) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
     }
     await this.notifyEvent(

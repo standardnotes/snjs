@@ -14,7 +14,8 @@ export type RootKeyContent = {
 
 /**
  * A root key is a local only construct that houses the key used for the encryption
- * and decryption of items keys.
+ * and decryption of items keys. A root key extends SNItem for local convenience, but is
+ * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 export class SNRootKey extends SNItem {
 
@@ -36,16 +37,13 @@ export class SNRootKey extends SNItem {
     const payload = CreateMaxPayloadFromAnyObject(
       {
         uuid: uuid,
+        content_type: ContentType.RootKey,
         content: BuildItemContent(content)
       }
     )
     return new SNRootKey(payload);
   }
 
-  public static contentType() {
-    return ContentType.RootKey;
-  }
-  
   public get version() {
     if (!this.payload.safeContent.version) {
       throw 'Attempting to create key without version.';
@@ -73,7 +71,7 @@ export class SNRootKey extends SNItem {
   }
 
   /** 003 and below only. */
-  public  get dataAuthenticationKey() {
+  public get dataAuthenticationKey() {
     return this.payload.safeContent.dataAuthenticationKey;
   }
 

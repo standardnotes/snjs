@@ -10100,6 +10100,13 @@ var PayloadCollection = /*#__PURE__*/function () {
   }
 
   _createClass(PayloadCollection, [{
+    key: "uuids",
+    value: function uuids() {
+      return this.all().map(function (p) {
+        return p.uuid;
+      });
+    }
+  }, {
     key: "all",
     value: function all() {
       return this.payloads;
@@ -12748,7 +12755,32 @@ var PurePayload = /*#__PURE__*/function () {
   _createClass(PurePayload, [{
     key: "mergedWith",
     value: function mergedWith(otherPayload) {
-      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(this, otherPayload);
+      var override = {};
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = otherPayload.fields[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var field = _step.value;
+          override[field] = otherPayload[field];
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(this, override);
     }
     /**
      * Whether a payload can be discarded and removed from storage.
@@ -12904,7 +12936,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 /**
  * A root key is a local only construct that houses the key used for the encryption
- * and decryption of items keys.
+ * and decryption of items keys. A root key extends SNItem for local convenience, but is
+ * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 var SNRootKey = /*#__PURE__*/function (_SNItem) {
   _inherits(SNRootKey, _SNItem);
@@ -13025,6 +13058,7 @@ var SNRootKey = /*#__PURE__*/function (_SNItem) {
 
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
                   uuid: uuid,
+                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["ContentType"].RootKey,
                   content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])(content)
                 });
                 return _context.abrupt("return", new SNRootKey(payload));
@@ -13043,11 +13077,6 @@ var SNRootKey = /*#__PURE__*/function (_SNItem) {
 
       return Create;
     }()
-  }, {
-    key: "contentType",
-    value: function contentType() {
-      return _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["ContentType"].RootKey;
-    }
   }]);
 
   return SNRootKey;
@@ -22588,6 +22617,11 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
     value: function resetState() {
       this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_1__["MutableCollection"]();
     }
+  }, {
+    key: "find",
+    value: function find(uuids) {
+      return this.collection.findAll(uuids);
+    }
     /**
      * One of many mapping helpers available.
      * This function maps a collection of payloads.
@@ -31162,34 +31196,30 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "handleOfflineResponse",
     value: function () {
       var _handleOfflineResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(response) {
-        var payloadsToMap, masterCollection, payloadsToPersist;
+        var payloadsToEmit, payloadsToPersist;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
                 this.log('Offline Sync Response', response.rawResponse);
-                payloadsToMap = response.savedPayloads;
+                payloadsToEmit = response.savedPayloads;
                 /** Before persisting, merge with current base value that has content field */
 
-                masterCollection = this.modelManager.getMasterCollection();
-                payloadsToPersist = payloadsToMap.map(function (payload) {
-                  var base = masterCollection.find(payload.uuid);
-                  return base.mergedWith(payload);
-                });
-                _context19.next = 6;
+                _context19.next = 4;
+                return this.modelManager.emitPayloads(payloadsToEmit, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalSaved);
+
+              case 4:
+                payloadsToPersist = this.modelManager.find(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_18__["Uuids"])(payloadsToEmit));
+                _context19.next = 7;
                 return this.persistPayloads(payloadsToPersist);
 
-              case 6:
-                _context19.next = 8;
-                return this.modelManager.emitPayloads(payloadsToMap, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalSaved);
-
-              case 8:
+              case 7:
                 this.opStatus.clearError();
                 this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
-                _context19.next = 12;
+                _context19.next = 11;
                 return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
 
-              case 12:
+              case 11:
               case "end":
                 return _context19.stop();
             }
@@ -31238,7 +31268,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     key: "handleSuccessServerResponse",
     value: function () {
       var _handleSuccessServerResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(operation, response) {
-        var decryptedPayloads, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, collection, payloadsToPersist, fields, clientHash;
+        var decryptedPayloads, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, payload, decrypted, masterCollection, resolver, collections, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, collection, payloadsToPersist, clientHash;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
@@ -31343,7 +31373,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 49:
                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                  _context21.next = 61;
+                  _context21.next = 59;
                   break;
                 }
 
@@ -31352,85 +31382,73 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 return this.modelManager.emitCollection(collection);
 
               case 53:
-                payloadsToPersist = void 0;
-                fields = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["payloadFieldsForSource"])(collection.source);
-
-                if (!fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadField"].Content)) {
-                  /** Before persisting, merge with current base value that has content field */
-                  payloadsToPersist = collection.all().map(function (payload) {
-                    var base = masterCollection.find(payload.uuid);
-                    return base.mergedWith(payload);
-                  });
-                } else {
-                  payloadsToPersist = collection.all();
-                }
-
-                _context21.next = 58;
+                payloadsToPersist = this.modelManager.find(collection.uuids());
+                _context21.next = 56;
                 return this.persistPayloads(payloadsToPersist);
 
-              case 58:
+              case 56:
                 _iteratorNormalCompletion4 = true;
                 _context21.next = 49;
                 break;
 
-              case 61:
-                _context21.next = 67;
+              case 59:
+                _context21.next = 65;
                 break;
 
-              case 63:
-                _context21.prev = 63;
+              case 61:
+                _context21.prev = 61;
                 _context21.t1 = _context21["catch"](47);
                 _didIteratorError4 = true;
                 _iteratorError4 = _context21.t1;
 
-              case 67:
-                _context21.prev = 67;
-                _context21.prev = 68;
+              case 65:
+                _context21.prev = 65;
+                _context21.prev = 66;
 
                 if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
                   _iterator4.return();
                 }
 
-              case 70:
-                _context21.prev = 70;
+              case 68:
+                _context21.prev = 68;
 
                 if (!_didIteratorError4) {
-                  _context21.next = 73;
+                  _context21.next = 71;
                   break;
                 }
 
                 throw _iteratorError4;
 
+              case 71:
+                return _context21.finish(68);
+
+              case 72:
+                return _context21.finish(65);
+
               case 73:
-                return _context21.finish(70);
-
-              case 74:
-                return _context21.finish(67);
-
-              case 75:
-                _context21.next = 77;
+                _context21.next = 75;
                 return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
 
-              case 77:
+              case 75:
                 if (!response.checkIntegrity) {
-                  _context21.next = 83;
+                  _context21.next = 81;
                   break;
                 }
 
-                _context21.next = 80;
+                _context21.next = 78;
                 return this.computeDataIntegrityHash();
 
-              case 80:
+              case 78:
                 clientHash = _context21.sent;
-                _context21.next = 83;
+                _context21.next = 81;
                 return this.state.setIntegrityHashes(clientHash, response.integrityHash);
 
-              case 83:
+              case 81:
               case "end":
                 return _context21.stop();
             }
           }
-        }, _callee21, this, [[12, 27, 31, 39], [32,, 34, 38], [47, 63, 67, 75], [68,, 70, 74]]);
+        }, _callee21, this, [[12, 27, 31, 39], [32,, 34, 38], [47, 61, 65, 73], [66,, 68, 72]]);
       }));
 
       function handleSuccessServerResponse(_x21, _x22) {

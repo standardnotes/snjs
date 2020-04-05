@@ -137,9 +137,13 @@ export class PurePayload {
   }
 
   mergedWith(otherPayload: PurePayload) {
+    const override: PayloadOverride = {};
+    for (const field of otherPayload.fields) {
+      override[field] = otherPayload[field];
+    }
     return CopyPayload(
       this,
-      otherPayload
+      override
     );
   }
 

@@ -25,6 +25,10 @@ export class PayloadCollection {
     Object.freeze(this);
   }
 
+  public uuids() {
+    return this.all().map((p) => p.uuid!);
+  }
+
   public all() {
     return this.payloads;
   }

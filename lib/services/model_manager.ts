@@ -1,3 +1,4 @@
+import { UuidString } from './../types';
 import { subtractFromArray } from '@Lib/utils';
 import { MutableCollection } from './../protocol/payloads/mutable_collection';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -77,6 +78,10 @@ export class PayloadManager extends PureService {
 
   public resetState() {
     this.collection = new MutableCollection();
+  }
+
+  public find(uuids: UuidString[]) {
+    return this.collection.findAll(uuids);
   }
 
   /**
