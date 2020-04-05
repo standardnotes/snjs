@@ -1299,8 +1299,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const currentDefault = this.getDefaultItemsKey();
     if (currentDefault) {
-      this.itemManager!.changeItemsKey(
-        currentDefault,
+      await this.itemManager!.changeItemsKey(
+        currentDefault.uuid,
         (mutator) => {
           mutator.isDefault = false;
         }

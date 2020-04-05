@@ -1,4 +1,5 @@
 import remove from 'lodash/remove';
+import find from 'lodash/find';
 import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
 import uniqWith from 'lodash/uniqWith';
@@ -22,8 +23,16 @@ export function isWebEnvironment() {
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function findInArray(array: any[], key: string, value: any) {
-  return array.find((item) => item[key] === value);
+export function findInArray<T>(array: T[], key: string, value: any): T | undefined {
+  return array.find((item: any) => item[key] === value) as T;
+}
+
+/**
+ * Searches array of objects for first object where object[key] === value
+ * @returns Matching object or null if not found
+ */
+export function searchArray<T>(array: T[], predicate: Record<string, any>): T | undefined {
+  return find(array, predicate) as T;
 }
 
 /**

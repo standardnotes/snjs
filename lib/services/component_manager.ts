@@ -1,3 +1,4 @@
+import { RawPayload } from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -18,7 +19,7 @@ import {
 } from '@Models/index';
 import { ComponentAreas, SNComponent } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
-import { Copy, isString, extendArray, removeFromArray } from '@Lib/utils';
+import { Copy, isString, extendArray, removeFromArray, searchArray } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
 
@@ -26,6 +27,10 @@ const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';
 const CUSTOM_LOCAL_HOST = 'sn.local';
 const ANDROID_LOCAL_HOST = '10.0.2.2';
+
+type ComponentRawPayload = RawPayload & {
+  clientData: any
+}
 
 export enum ComponentAction {
   SetSize = 'set-size',
@@ -778,12 +783,12 @@ export class SNComponentManager extends PureService {
   }
 
   async handleSaveItemsMessage(component: SNComponent, message: ComponentMessage) {
-    const responseItems = message.data.items;
+    const responsePayloads = message.data.items as ComponentRawPayload[];
     const requiredPermissions = [];
     const itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
     /* Pending as in needed to be accounted for in permissions. */
-    const pendingResponseItems = responseItems.slice();
-    for (const responseItem of responseItems.slice()) {
+    const pendingResponseItems = responsePayloads.slice();
+    for (const responseItem of responsePayloads.slice()) {
       if (itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
         requiredPermissions.push({
           name: ComponentAction.StreamContextItem
@@ -805,21 +810,32 @@ export class SNComponentManager extends PureService {
     }
     this.runWithPermissions(component, requiredPermissions, async () => {
       this.removePrivatePropertiesFromResponseItems(
-        responseItems,
+        responsePayloads,
         component,
         true
       );
 
       /* Filter locked items */
-      const ids = responseItems.map((item: any) => { return item.uuid; });
-      const items = this.itemManager!.findItems(ids);
+      const uuids = responsePayloads.map((item: ComponentRawPayload) => item.uuid!);
+      const items = this.itemManager!.findItems(uuids, true);
       let lockedCount = 0;
-      for (const item of items) {
+      items.forEach((item, index) => {
+        if (!item) {
+          const responseItem = responsePayloads[index];
+          // An item this extension is trying to save was possibly removed locally, notify user
+          this.alertService!.alert(
+            `The extension ${component.name} is trying to save an item with type ` +
+            `${responseItem.content_type}, but that item does not exist .` +
+            `Please restart this extension and try again.`
+          );
+          return;
+        }
         if (item.locked) {
-          remove(responseItems, { uuid: item.uuid });
+          remove(responsePayloads, { uuid: item.uuid });
           lockedCount++;
         }
-      }
+      });
+
       if (lockedCount > 0) {
         const itemNoun = lockedCount === 1 ? 'item' : 'items';
         const auxVerb = lockedCount === 1 ? 'is' : 'are';
@@ -827,45 +843,32 @@ export class SNComponentManager extends PureService {
           `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} locked and cannot be edited.`,
           'Items Locked',
         );
+        return;
       }
-      const payloads = responseItems.map((responseItem: any) => {
+
+      const payloads = responsePayloads.map((responseItem: any) => {
         return CreateSourcedPayloadFromObject(
           responseItem,
           PayloadSource.ComponentRetrieved
         );
       });
-      await this.modelManager!.emitPayloads(
-        payloads,
+      await this.itemManager!.changeItems(
+        uuids,
+        (mutator) => {
+          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() });
+          const payload = searchArray(payloads, { uuid: mutator.getUuid() });
+          mutator.mergePayload(payload);
+          if (responseItem.clientData) {
+            const allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
+            allComponentData[component.getClientDataKey()!] = responseItem.clientData;
+            mutator.setDomainData(allComponentData, ComponentDataDomain);
+          }
+        },
+        MutationType.UserInteraction,
         PayloadSource.ComponentRetrieved,
         component.uuid
       );
-      for (const responseItem of responseItems) {
-        const item = this.itemManager!.findItem(responseItem.uuid);
-        if (!item) {
-          // An item this extension is trying to save was possibly removed locally, notify user
-          this.alertService!.alert(
-            `The extension ${component.name} is trying to save an item with type ` +
-            `${responseItem.content_type}, but that item does not exist .` +
-            `Please restart this extension and try again.`
-          );
-          continue;
-        }
-        if (!item.locked) {
-          await this.itemManager!.changeItem(
-            item,
-            (mutator) => {
-              if (responseItem.clientData) {
-                const allComponentData = item.getDomainData(ComponentDataDomain);
-                allComponentData[component.getClientDataKey()!] = responseItem.clientData;
-                mutator.setDomainData(allComponentData, ComponentDataDomain);
-              }
-            },
-            MutationType.UserInteraction,
-            PayloadSource.ComponentRetrieved,
-            component.uuid
-          );
-        }
-      }
+
       this.syncService!.sync().then(() => {
         /* Allow handlers to be notified when a save begins and ends, to update the UI */
         const saveMessage = Object.assign({}, message);

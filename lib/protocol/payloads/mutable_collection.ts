@@ -33,11 +33,15 @@ export class MutableCollection<T extends Payloadable> {
     return this.map[id];
   }
 
-  public findAll(ids: UuidString[]) {
+  /**
+   * @param includeBlanks If true and an item is not found, an `undefined` element
+   * will be inserted into the array.
+   */
+  public findAll(uuids: UuidString[], includeBlanks = false) {
     const results = [];
-    for (const id of ids) {
+    for (const id of uuids) {
       const element = this.map[id];
-      if (element) {
+      if (element || includeBlanks) {
         results.push(element);
       }
     }

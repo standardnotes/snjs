@@ -358,6 +358,14 @@ export class ItemMutator {
     this.content = Copy(this.payload.content);
   }
 
+  public getUuid() {
+    return this.payload.uuid!;
+  }
+
+  public getItem() {
+    return this.item;
+  }
+
   public getResult() {
     if (!this.payload.deleted) {
       if (this.source === MutationType.UserInteraction) {
@@ -379,6 +387,11 @@ export class ItemMutator {
         dirtiedDate: new Date(),
       }
     )
+  }
+
+  /** Merges the input payload with the base payload */
+  public mergePayload(payload: PurePayload) {
+    this.payload = this.payload.mergedWith(payload);
   }
 
   public setDeleted() {

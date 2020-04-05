@@ -13,7 +13,7 @@ import { CreateItemFromPayload, BuildItemContent } from '@Models/generator';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentTransformer } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { findInArray, isString, removeFromArray } from '@Lib/utils';
+import { isString, removeFromArray, searchArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadOverride, PayloadContent } from './../protocol/payloads/generator';
 import { SNItem, ItemMutator, MutationType } from './../models/core/item';
@@ -100,14 +100,16 @@ export class ItemManager extends PureService {
    * Returns an item for a given id
    */
   findItem(uuid: UuidString) {
-    return this.collection.find(uuid) as SNItem;
+    return this.collection.find(uuid) as SNItem | undefined;
   }
 
   /**
    * Returns all items matching given ids
-  */
-  findItems(uuids: UuidString[]) {
-    return this.collection.findAll(uuids);
+   * @param includeBlanks If true and an item is not found, an `undefined` element
+   * will be inserted into the array.
+   */
+  findItems(uuids: UuidString[], includeBlanks = false) {
+    return this.collection.findAll(uuids, includeBlanks);
   }
 
   get itemsKeys() {
@@ -259,6 +261,10 @@ export class ItemManager extends PureService {
    * Consumers wanting to modify an item should run it through this block,
    * so that data is properly mapped through our function, and latest state
    * is properly reconciled.
+   * @param itemOrUuid If an item is passed, the values of that item will be directly used,
+   * and the mutation will be applied on that item and propagated. This means that if you pass
+   * an old item reference and mutate that, the new value will be outdated. In this case, always
+   * pass the uuid of the item if you want to mutate the latest version of the item.
    */
   async changeItem(
     itemOrUuid: UuidString | SNItem,
@@ -277,6 +283,12 @@ export class ItemManager extends PureService {
     return results[0];
   }
 
+  /**
+   * @param itemsOrUuids If an item is passed, the values of that item will be directly used,
+   * and the mutation will be applied on that item and propagated. This means that if you pass
+   * an old item reference and mutate that, the new value will be outdated. In this case, always
+   * pass the uuid of the item if you want to mutate the latest version of the item.
+   */
   async changeItems(
     itemsOrUuids: UuidString[] | SNItem[],
     mutate: (mutator: ItemMutator) => void,
@@ -285,10 +297,13 @@ export class ItemManager extends PureService {
     payloadSourceKey?: string
   ) {
     const items = isString(itemsOrUuids[0])
-      ? this.findItems(itemsOrUuids as UuidString[])
+      ? this.findItems(itemsOrUuids as UuidString[], true)
       : itemsOrUuids as SNItem[];
     const payloads = [];
     for (const item of items) {
+      if (!item) {
+        throw Error('Attempting to change non-existant item');
+      }
       const mutator = new ItemMutator(item, mutationType);
       mutate(mutator);
       const payload = mutator.getResult();
@@ -313,6 +328,9 @@ export class ItemManager extends PureService {
     const note = isString(itemOrUuid)
       ? this.findItem(itemOrUuid as UuidString)
       : itemOrUuid as SNNote;
+    if (!note) {
+      throw Error('Attempting to change non-existant note');
+    }
     const mutator = new NoteMutator(note, mutationType);
     return this.applyTransform(
       mutator,
@@ -332,6 +350,9 @@ export class ItemManager extends PureService {
     const component = isString(itemOrUuid)
       ? this.findItem(itemOrUuid as UuidString)
       : itemOrUuid as SNComponent;
+    if (!component) {
+      throw Error('Attempting to change non-existant component');
+    }
     const mutator = new ComponentTransformer(component, mutationType);
     return this.applyTransform(
       mutator,
@@ -351,6 +372,9 @@ export class ItemManager extends PureService {
     const extension = isString(itemOrUuid)
       ? this.findItem(itemOrUuid as UuidString)
       : itemOrUuid as SNActionsExtension;
+    if (!extension) {
+      throw Error('Attempting to change non-existant extension');
+    }
     const mutator = new ActionsExtensionMutator(extension, mutationType);
     return this.applyTransform(
       mutator,
@@ -370,6 +394,9 @@ export class ItemManager extends PureService {
     const itemsKey = isString(itemOrUuid)
       ? this.findItem(itemOrUuid as UuidString)
       : itemOrUuid as SNItemsKey;
+    if (!itemsKey) {
+      throw Error('Attempting to change non-existant itemsKey');
+    }
     const mutator = new ItemsKeyMutator(itemsKey, mutationType);
     return this.applyTransform(
       mutator,
@@ -530,9 +557,11 @@ export class ItemManager extends PureService {
     const referencingIds = this.uuidsThatReferenceItem(uuid);
     for (const referencingId of referencingIds) {
       const referencingItem = this.findItem(referencingId);
-      await this.changeItem(referencingId, (mutator) => {
-        mutator.removeItemAsRelationship(referencingItem);
-      });
+      if (referencingItem) {
+        await this.changeItem(referencingId, (mutator) => {
+          mutator.removeItemAsRelationship(referencingItem);
+        });
+      }
     }
     this.deestablishReferenceIndexForDeletedItem(uuid);
   }
@@ -658,22 +687,19 @@ export class ItemManager extends PureService {
  * Finds the first tag matching a given title
  */
   public findTagByTitle(title: string) {
-    return findInArray(this.tags, 'title', title as any);
+    return searchArray(this.tags, { title: title });
   }
 
   /**
   * Finds or creates a tag with a given title
   */
   public async findOrCreateTagByTitle(title: string) {
-    let tag = this.findTagByTitle(title);
-    if (!tag) {
-      tag = await this.createItem(
-        ContentType.Tag,
-        BuildItemContent({ title }),
-        true
-      );
-    }
-    return tag;
+    const tag = this.findTagByTitle(title);
+    return tag || await this.createItem(
+      ContentType.Tag,
+      BuildItemContent({ title }),
+      true
+    ) as SNTag;
   }
 
   /**
@@ -728,17 +754,17 @@ export class ItemManager extends PureService {
   }
 
   /**
- * The number of notes currently managed
- */
+   * The number of notes currently managed
+   */
   public get noteCount() {
     return this.notes.filter((n) => !n.dummy).length;
   }
 
   /**
- * Immediately removes all items from mapping state and notifies observers
- * Used primarily when signing into an account and wanting to discard any current
- * local data.
- */
+   * Immediately removes all items from mapping state and notifies observers
+   * Used primarily when signing into an account and wanting to discard any current
+   * local data.
+   */
   public async removeAllItemsFromMemory() {
     const uuids = this.uuidsForItems(this.items);
     await this.changeItems(uuids, (mutator) => {

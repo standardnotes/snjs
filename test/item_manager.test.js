@@ -1,7 +1,22 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+
+const expectThrowsAsync = async (method, errorMessage) => {
+  let error = null;
+  try {
+    await method();
+  }
+  catch (err) {
+    error = err;
+  }
+  expect(error).to.be.an('Error');
+  if (errorMessage) {
+    expect(error.message).to.equal(errorMessage);
+  }
+};
 
 describe('item manager', () => {
 
@@ -54,6 +69,33 @@ describe('item manager', () => {
 
     expect(item).to.be.ok;
     expect(item.title).to.equal('hello');
+  });
+
+  it('find items with valid uuid', async function () {
+    const item = await this.createNote();
+
+    const results = await this.itemManager.findItems([item.uuid]);
+    expect(results.length).to.equal(1);
+    expect(results[0]).to.equal(item);
+  });
+
+  it('find items with invalid uuid no blanks', async function () {
+    const includeBlanks = false;
+    const results = await this.itemManager.findItems(
+      [Factory.generateUuidish()],
+      includeBlanks
+    );
+    expect(results.length).to.equal(0);
+  });
+
+  it('find items with invalid uuid include blanks', async function () {
+    const includeBlanks = true;
+    const results = await this.itemManager.findItems(
+      [Factory.generateUuidish()],
+      includeBlanks
+    );
+    expect(results.length).to.equal(1);
+    expect(results[0]).to.not.be.ok;
   });
 
   it('item state', async function () {
@@ -123,8 +165,28 @@ describe('item manager', () => {
     expect(secondObserved.type).to.equal(ObservationType.Inserted);
   });
 
-  it('change item', async function () {
+  it('change existing item', async function () {
     const note = await this.createNote();
+    const newTitle = String(Math.random());
+    await this.itemManager.changeNote(
+      note.uuid,
+      (mutator) => {
+        mutator.title = newTitle;
+      }
+    );
+
+    const latestVersion = this.itemManager.findItem(note.uuid);
+    expect(latestVersion.title).to.equal(newTitle);
+  });
+
+  it('change non-existing item through item ref should succeed', async function () {
+    const note = await this.itemManager.createTemplateItem(
+      ContentType.Note,
+      BuildItemContent({
+        title: 'hello',
+        text: 'world'
+      })
+    );
     const newTitle = String(Math.random());
     await this.itemManager.changeNote(
       note,
@@ -135,6 +197,27 @@ describe('item manager', () => {
 
     const latestVersion = this.itemManager.findItem(note.uuid);
     expect(latestVersion.title).to.equal(newTitle);
+  });
+
+  it('change non-existant item through uuid should fail', async function () {
+    const note = await this.itemManager.createTemplateItem(
+      ContentType.Note,
+      BuildItemContent({
+        title: 'hello',
+        text: 'world'
+      })
+    );
+
+    const changeFn = async () => {
+      const newTitle = String(Math.random());
+      return this.itemManager.changeNote(
+        note.uuid,
+        (mutator) => {
+          mutator.title = newTitle;
+        }
+      );
+    };
+    await expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant note');
   });
 
   it('set items dirty', async function () {
