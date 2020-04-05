@@ -15,7 +15,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     * If we have retrieved an item that was saved as part of this ongoing sync operation,
     * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
     */
-    for (const received of this.applyCollection.getAllPayloads()) {
+    for (const received of this.applyCollection.all()) {
       const savedOrSaving = this.findRelatedPayload(
         received.uuid!,
         PayloadSource.SavedOrSaving

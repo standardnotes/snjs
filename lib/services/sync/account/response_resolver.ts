@@ -46,7 +46,7 @@ export class SyncResponseResolver {
       this.response.rawRetrievedItems,
       PayloadSource.RemoteRetrieved
     );
-    if (collectionRetrieved.getAllPayloads().length > 0) {
+    if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved);
     }
 
@@ -54,7 +54,7 @@ export class SyncResponseResolver {
       this.response.rawSavedItems,
       PayloadSource.RemoteSaved
     );
-    if (collectionSaved.getAllPayloads().length > 0) {
+    if (collectionSaved.all().length > 0) {
       collections.push(collectionSaved);
     }
 
@@ -63,7 +63,7 @@ export class SyncResponseResolver {
       PayloadSource.ConflictUuid
     );
 
-    if (collectionUuidConflicts.getAllPayloads().length > 0) {
+    if (collectionUuidConflicts.all().length > 0) {
       collections.push(collectionUuidConflicts);
     }
 
@@ -71,7 +71,7 @@ export class SyncResponseResolver {
       this.response.rawDataConflictItems,
       PayloadSource.ConflictData
     );
-    if (collectionDataConflicts.getAllPayloads().length > 0) {
+    if (collectionDataConflicts.all().length > 0) {
       collections.push(collectionDataConflicts);
     }
 
@@ -97,7 +97,7 @@ export class SyncResponseResolver {
       this.relatedCollectionSet
     );
     const resultCollection = await delta.resultingCollection();
-    const updatedDirtyPayloads = resultCollection.getAllPayloads().map((payload) => {
+    const updatedDirtyPayloads = resultCollection.all().map((payload) => {
       return CopyPayload(
         payload,
         {
@@ -112,7 +112,7 @@ export class SyncResponseResolver {
   }
 
   private finalDirtyStateForPayload(payload: PurePayload) {
-    const current = this.baseCollection.findPayload(payload.uuid!);
+    const current = this.baseCollection.find(payload.uuid!);
     /**
      * `current` can be null in the case of new
      * items that haven't yet been mapped

@@ -25,6 +25,15 @@ export function CreateItemFromPayload(payload: PurePayload): SNItem {
 }
 
 /**
+ * Returns an array of uuids for the given items or payloads
+ */
+export function Uuids(items: SNItem[] | PurePayload[]) {
+  return (items as any).map((item: any) => {
+    return item.uuid;
+  })
+}
+
+/**
  * Builds item .content based on values and populates with other default required
  * fields if necessary.
  */

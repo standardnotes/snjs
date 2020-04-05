@@ -365,7 +365,7 @@ export class SNSyncService extends PureService {
       PayloadSource.LocalChanged
     );
     await this.persistPayloads(results);
-    return mapped[0];
+    return this.itemManager!.findItem(results[0].uuid!);
   }
 
   /**
@@ -751,7 +751,7 @@ export class SNSyncService extends PureService {
     /** Before persisting, merge with current base value that has content field */
     const masterCollection = this.modelManager!.getMasterCollection();
     const payloadsToPersist = payloadsToMap.map((payload) => {
-      const base = masterCollection.findPayload(payload.uuid!);
+      const base = masterCollection.find(payload.uuid!);
       return base.mergedWith(payload);
     });
     await this.persistPayloads(payloadsToPersist);
@@ -817,12 +817,12 @@ export class SNSyncService extends PureService {
       const fields = payloadFieldsForSource(collection.source!);
       if (!fields.includes(PayloadField.Content)) {
         /** Before persisting, merge with current base value that has content field */
-        payloadsToPersist = collection.getAllPayloads().map((payload) => {
-          const base = masterCollection.findPayload(payload.uuid!);
+        payloadsToPersist = collection.all().map((payload) => {
+          const base = masterCollection.find(payload.uuid!);
           return base.mergedWith(payload);
         });
       } else {
-        payloadsToPersist = collection.getAllPayloads();
+        payloadsToPersist = collection.all();
       }
       await this.persistPayloads(payloadsToPersist);
     }

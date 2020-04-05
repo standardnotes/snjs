@@ -10,7 +10,7 @@ export class DeltaFileImport extends PayloadsDelta {
 
   public async resultingCollection() {
     const results: Array<PurePayload> = [];
-    for (const payload of this.applyCollection!.getAllPayloads()) {
+    for (const payload of this.applyCollection!.all()) {
       const payloads = (await this.payloadsByHandlingPayload(payload, results)).map((result) => {
         return CopyPayload(
           result,
@@ -68,6 +68,6 @@ export class DeltaFileImport extends PayloadsDelta {
       PayloadSource.FileImport
     );
     const deltaCollection = await delta.resultingCollection();
-    return deltaCollection.getAllPayloads();
+    return deltaCollection.all();
   }
 }

@@ -855,8 +855,8 @@ export class SNComponentManager extends PureService {
       await this.itemManager!.changeItems(
         uuids,
         (mutator) => {
-          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() });
-          const payload = searchArray(payloads, { uuid: mutator.getUuid() });
+          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() })!;
+          const payload = searchArray(payloads, { uuid: mutator.getUuid() })!;
           mutator.mergePayload(payload);
           if (responseItem.clientData) {
             const allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
@@ -886,7 +886,7 @@ export class SNComponentManager extends PureService {
 
   handleDuplicateItemMessage(component: SNComponent, message: ComponentMessage) {
     const itemParams = message.data.item;
-    const item = this.itemManager!.findItem(itemParams.uuid);
+    const item = this.itemManager!.findItem(itemParams.uuid)!;
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,

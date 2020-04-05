@@ -215,7 +215,8 @@ function CreatePayload(
   const rawPayload = pickByCopy(object, fields);
   const overrideFields = Object.keys(override || []) as PayloadField[];
   for (const field of overrideFields) {
-    rawPayload[field] = override![field];
+    const value = override![field];
+    rawPayload[field] = value ? Copy(value) : value;
   }
   const newFields = uniqueArray(fields.concat(overrideFields));
   return new PurePayload(

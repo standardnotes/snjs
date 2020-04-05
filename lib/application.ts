@@ -17,7 +17,7 @@ import { removeFromArray, isNullOrUndefined } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
-import { CreateItemFromPayload } from '@Models/generator';
+import { Uuids, CreateItemFromPayload } from '@Models/generator';
 import {
   ApplicationEvents,
   ApplicationStages,
@@ -419,12 +419,12 @@ export class SNApplication {
   }
 
   public async saveItem(item: SNItem) {
-    await this.itemManager!.setItemDirty(item, true);
+    await this.itemManager!.setItemDirty(item.uuid, true);
     await this.syncService!.sync();
   }
 
   public async saveItems(items: SNItem[]) {
-    await this.itemManager!.setItemsDirty(items);
+    await this.itemManager!.setItemsDirty(Uuids(items));
     await this.syncService!.sync();
   }
 
@@ -433,15 +433,15 @@ export class SNApplication {
    * sees of the item.
    */
   public async setItemNeedsSync(item: SNItem, updateUserModifiedDate = false) {
-    return this.itemManager!.setItemDirty(item, true, updateUserModifiedDate);
+    return this.itemManager!.setItemDirty(item.uuid, true, updateUserModifiedDate);
   }
 
   public async setItemsNeedsSync(items: SNItem[]) {
-    return this.itemManager!.setItemsDirty(items);
+    return this.itemManager!.setItemsDirty(Uuids(items));
   }
 
   public async deleteItem(item: SNItem) {
-    await this.itemManager!.setItemToBeDeleted(item);
+    await this.itemManager!.setItemToBeDeleted(item.uuid);
     return this.sync();
   }
 
@@ -455,7 +455,7 @@ export class SNApplication {
   }
 
   public getTrashedItems() {
-    return this.itemManager!.trashedItems();
+    return this.itemManager!.trashedItems;
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
@@ -483,7 +483,7 @@ export class SNApplication {
   }
 
   public getNoteCount() {
-    return this.itemManager!.noteCount();
+    return this.itemManager!.noteCount;
   }
 
 
@@ -1009,13 +1009,13 @@ export class SNApplication {
   }
 
   private createMigrationService() {
-    this.migrationService = new (this.getClass(SNMigrationService))(
+    this.migrationService = new SNMigrationService(
       {
-        protocolService: this.protocolService,
-        deviceInterface: this.deviceInterface,
-        storageService: this.storageService,
-        modelManager: this.modelManager,
-        environment: this.environment,
+        protocolService: this.protocolService!,
+        deviceInterface: this.deviceInterface!,
+        storageService: this.storageService!,
+        modelManager: this.modelManager!,
+        environment: this.environment!,
         namespace: this.namespace
       },
       this.getMigrationChallengeResponder()
@@ -1034,9 +1034,9 @@ export class SNApplication {
   }
 
   private createApiService() {
-    this.apiService = new (this.getClass(SNApiService))(
-      this.httpService,
-      this.storageService,
+    this.apiService = new SNApiService(
+      this.httpService!,
+      this.storageService!,
     );
     this.services.push(this.apiService!);
   }
@@ -1050,19 +1050,20 @@ export class SNApplication {
     if (this.shouldSkipClass(SNComponentManager)) {
       return;
     }
-    this.componentManager = new (this.getClass(SNComponentManager))(
-      this.modelManager,
-      this.syncService,
-      this.alertService,
-      this.environment,
-      this.platform,
+    this.componentManager = new SNComponentManager(
+      this.itemManager!,
+      this.modelManager!,
+      this.syncService!,
+      this.alertService!,
+      this.environment!,
+      this.platform!,
       this.deviceInterface!.timeout,
     );
     this.services.push(this.componentManager!);
   }
 
   private createHttpManager() {
-    this.httpService = new (this.getClass(SNHttpService))();
+    this.httpService = new SNHttpService();
     this.services.push(this.httpService!);
   }
 
@@ -1072,27 +1073,28 @@ export class SNApplication {
   }
 
   private createSingletonManager() {
-    this.singletonManager = new (this.getClass(SNSingletonManager))(
-      this.modelManager,
-      this.syncService
+    this.singletonManager = new SNSingletonManager(
+      this.itemManager!,
+      this.syncService!
     );
     this.services.push(this.singletonManager!);
   }
 
   private createStorageManager() {
-    this.storageService = new (this.getClass(SNStorageService))(
-      this.deviceInterface,
+    this.storageService = new SNStorageService(
+      this.deviceInterface!,
       this.namespace,
     );
     this.services.push(this.storageService!);
   }
 
   private createProtocolService() {
-    this.protocolService = new (this.getClass(SNProtocolService))(
-      this.modelManager,
-      this.deviceInterface,
-      this.storageService,
-      this.crypto
+    this.protocolService = new SNProtocolService(
+      this.itemManager!,
+      this.modelManager!,
+      this.deviceInterface!,
+      this.storageService!,
+      this.crypto!
     );
     this.protocolService!.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvents.KeyStatusChanged);
@@ -1101,22 +1103,23 @@ export class SNApplication {
   }
 
   private createSessionManager() {
-    this.sessionManager = new (this.getClass(SNSessionManager))(
-      this.storageService,
-      this.apiService,
-      this.alertService,
-      this.protocolService
+    this.sessionManager = new SNSessionManager(
+      this.storageService!,
+      this.apiService!,
+      this.alertService!,
+      this.protocolService!
     );
     this.services.push(this.sessionManager!);
   }
 
   private createSyncManager() {
-    this.syncService = new (this.getClass(SNSyncService))(
-      this.sessionManager,
-      this.protocolService,
-      this.storageService,
-      this.modelManager,
-      this.apiService,
+    this.syncService = new SNSyncService(
+      this.itemManager!,
+      this.sessionManager!,
+      this.protocolService!,
+      this.storageService!,
+      this.modelManager!,
+      this.apiService!,
       this.deviceInterface!.interval
     );
     const syncEventCallback = async (eventName: string) => {
@@ -1132,29 +1135,29 @@ export class SNApplication {
   }
 
   private createChallengeService() {
-    this.challengeService = new (this.getClass(ChallengeService))(
-      this.storageService,
-      this.protocolService
+    this.challengeService = new ChallengeService(
+      this.storageService!,
+      this.protocolService!
     );
     this.services.push(this.challengeService!);
   }
 
   private createPrivilegesService() {
-    this.privilegesService = new (this.getClass(SNPrivilegesService))(
-      this.modelManager,
-      this.syncService,
-      this.singletonManager,
-      this.protocolService,
-      this.storageService,
-      this.sessionManager,
+    this.privilegesService = new SNPrivilegesService(
+      this.itemManager!,
+      this.syncService!,
+      this.singletonManager!,
+      this.protocolService!,
+      this.storageService!,
+      this.sessionManager!,
     );
     this.services.push(this.privilegesService!);
   }
 
   private createHistoryManager() {
-    this.historyManager = new (this.getClass(SNHistoryManager))(
-      this.modelManager,
-      this.storageService,
+    this.historyManager = new SNHistoryManager(
+      this.itemManager!,
+      this.storageService!,
       [ContentType.Note],
       this.deviceInterface!.timeout
     );
@@ -1162,13 +1165,14 @@ export class SNApplication {
   }
 
   private createActionsManager() {
-    this.actionsManager = new (this.getClass(SNActionsService))(
-      this.alertService,
-      this.deviceInterface,
-      this.httpService,
-      this.modelManager,
-      this.protocolService,
-      this.syncService,
+    this.actionsManager = new SNActionsService(
+      this.itemManager!,
+      this.alertService!,
+      this.deviceInterface!,
+      this.httpService!,
+      this.modelManager!,
+      this.protocolService!,
+      this.syncService!,
     );
     this.services.push(this.actionsManager!);
   }

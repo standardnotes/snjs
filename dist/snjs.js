@@ -1021,7 +1021,7 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context13.prev = _context13.next) {
               case 0:
                 _context13.next = 2;
-                return this.itemManager.setItemDirty(item, true);
+                return this.itemManager.setItemDirty(item.uuid, true);
 
               case 2:
                 _context13.next = 4;
@@ -1050,7 +1050,7 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context14.prev = _context14.next) {
               case 0:
                 _context14.next = 2;
-                return this.itemManager.setItemsDirty(items);
+                return this.itemManager.setItemsDirty(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_6__["Uuids"])(items));
 
               case 2:
                 _context14.next = 4;
@@ -1086,7 +1086,7 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context15.prev = _context15.next) {
               case 0:
                 updateUserModifiedDate = _args15.length > 1 && _args15[1] !== undefined ? _args15[1] : false;
-                return _context15.abrupt("return", this.itemManager.setItemDirty(item, true, updateUserModifiedDate));
+                return _context15.abrupt("return", this.itemManager.setItemDirty(item.uuid, true, updateUserModifiedDate));
 
               case 2:
               case "end":
@@ -1110,7 +1110,7 @@ var SNApplication = /*#__PURE__*/function () {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                return _context16.abrupt("return", this.itemManager.setItemsDirty(items));
+                return _context16.abrupt("return", this.itemManager.setItemsDirty(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_6__["Uuids"])(items)));
 
               case 1:
               case "end":
@@ -1135,7 +1135,7 @@ var SNApplication = /*#__PURE__*/function () {
             switch (_context17.prev = _context17.next) {
               case 0:
                 _context17.next = 2;
-                return this.itemManager.setItemToBeDeleted(item);
+                return this.itemManager.setItemToBeDeleted(item.uuid);
 
               case 2:
                 return _context17.abrupt("return", this.sync());
@@ -1209,7 +1209,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getTrashedItems",
     value: function getTrashedItems() {
-      return this.itemManager.trashedItems();
+      return this.itemManager.trashedItems;
     }
   }, {
     key: "getItems",
@@ -1263,7 +1263,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "getNoteCount",
     value: function getNoteCount() {
-      return this.itemManager.noteCount();
+      return this.itemManager.noteCount;
     }
     /** 
      * Begin streaming items to display in the UI.
@@ -2765,7 +2765,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createMigrationService",
     value: function createMigrationService() {
-      this.migrationService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNMigrationService"]))({
+      this.migrationService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNMigrationService"]({
         protocolService: this.protocolService,
         deviceInterface: this.deviceInterface,
         storageService: this.storageService,
@@ -2788,7 +2788,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createApiService",
     value: function createApiService() {
-      this.apiService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNApiService"]))(this.httpService, this.storageService);
+      this.apiService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNApiService"](this.httpService, this.storageService);
       this.services.push(this.apiService);
     }
   }, {
@@ -2804,13 +2804,13 @@ var SNApplication = /*#__PURE__*/function () {
         return;
       }
 
-      this.componentManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNComponentManager"]))(this.modelManager, this.syncService, this.alertService, this.environment, this.platform, this.deviceInterface.timeout);
+      this.componentManager = new _services__WEBPACK_IMPORTED_MODULE_9__["SNComponentManager"](this.itemManager, this.modelManager, this.syncService, this.alertService, this.environment, this.platform, this.deviceInterface.timeout);
       this.services.push(this.componentManager);
     }
   }, {
     key: "createHttpManager",
     value: function createHttpManager() {
-      this.httpService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNHttpService"]))();
+      this.httpService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNHttpService"]();
       this.services.push(this.httpService);
     }
   }, {
@@ -2822,13 +2822,13 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createSingletonManager",
     value: function createSingletonManager() {
-      this.singletonManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNSingletonManager"]))(this.modelManager, this.syncService);
+      this.singletonManager = new _services__WEBPACK_IMPORTED_MODULE_9__["SNSingletonManager"](this.itemManager, this.syncService);
       this.services.push(this.singletonManager);
     }
   }, {
     key: "createStorageManager",
     value: function createStorageManager() {
-      this.storageService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNStorageService"]))(this.deviceInterface, this.namespace);
+      this.storageService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNStorageService"](this.deviceInterface, this.namespace);
       this.services.push(this.storageService);
     }
   }, {
@@ -2836,7 +2836,7 @@ var SNApplication = /*#__PURE__*/function () {
     value: function createProtocolService() {
       var _this7 = this;
 
-      this.protocolService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNProtocolService"]))(this.modelManager, this.deviceInterface, this.storageService, this.crypto);
+      this.protocolService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNProtocolService"](this.itemManager, this.modelManager, this.deviceInterface, this.storageService, this.crypto);
       this.protocolService.onKeyStatusChange( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee51() {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee51$(_context51) {
           while (1) {
@@ -2857,7 +2857,7 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createSessionManager",
     value: function createSessionManager() {
-      this.sessionManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNSessionManager"]))(this.storageService, this.apiService, this.alertService, this.protocolService);
+      this.sessionManager = new _services__WEBPACK_IMPORTED_MODULE_9__["SNSessionManager"](this.storageService, this.apiService, this.alertService, this.protocolService);
       this.services.push(this.sessionManager);
     }
   }, {
@@ -2865,7 +2865,7 @@ var SNApplication = /*#__PURE__*/function () {
     value: function createSyncManager() {
       var _this8 = this;
 
-      this.syncService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNSyncService"]))(this.sessionManager, this.protocolService, this.storageService, this.modelManager, this.apiService, this.deviceInterface.interval);
+      this.syncService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNSyncService"](this.itemManager, this.sessionManager, this.protocolService, this.storageService, this.modelManager, this.apiService, this.deviceInterface.interval);
 
       var syncEventCallback = /*#__PURE__*/function () {
         var _ref11 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee52(eventName) {
@@ -2908,25 +2908,25 @@ var SNApplication = /*#__PURE__*/function () {
   }, {
     key: "createChallengeService",
     value: function createChallengeService() {
-      this.challengeService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["ChallengeService"]))(this.storageService, this.protocolService);
+      this.challengeService = new _services__WEBPACK_IMPORTED_MODULE_9__["ChallengeService"](this.storageService, this.protocolService);
       this.services.push(this.challengeService);
     }
   }, {
     key: "createPrivilegesService",
     value: function createPrivilegesService() {
-      this.privilegesService = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNPrivilegesService"]))(this.modelManager, this.syncService, this.singletonManager, this.protocolService, this.storageService, this.sessionManager);
+      this.privilegesService = new _services__WEBPACK_IMPORTED_MODULE_9__["SNPrivilegesService"](this.itemManager, this.syncService, this.singletonManager, this.protocolService, this.storageService, this.sessionManager);
       this.services.push(this.privilegesService);
     }
   }, {
     key: "createHistoryManager",
     value: function createHistoryManager() {
-      this.historyManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNHistoryManager"]))(this.modelManager, this.storageService, [_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note], this.deviceInterface.timeout);
+      this.historyManager = new _services__WEBPACK_IMPORTED_MODULE_9__["SNHistoryManager"](this.itemManager, this.storageService, [_Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note], this.deviceInterface.timeout);
       this.services.push(this.historyManager);
     }
   }, {
     key: "createActionsManager",
     value: function createActionsManager() {
-      this.actionsManager = new (this.getClass(_services__WEBPACK_IMPORTED_MODULE_9__["SNActionsService"]))(this.alertService, this.deviceInterface, this.httpService, this.modelManager, this.protocolService, this.syncService);
+      this.actionsManager = new _services__WEBPACK_IMPORTED_MODULE_9__["SNActionsService"](this.itemManager, this.alertService, this.deviceInterface, this.httpService, this.modelManager, this.protocolService, this.syncService);
       this.services.push(this.actionsManager);
     }
   }, {
@@ -3276,7 +3276,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*********************!*\
   !*** ./lib/main.ts ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, ObservationType, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, BuildItemContent, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, PayloadSource, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, SNItemsKey, SNPredicate, SNNote, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, ObservationType, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntents, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, BuildItemContent, ApplicationEvents, Environments, Platforms, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersions, PayloadFormats, StorageKeys, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3499,6 +3499,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_39__["CreateMaxPayloadFromAnyObject"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_39__["CreateSourcedPayloadFromObject"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_39__["CopyPayload"]; });
 
 /* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_40__["PayloadSource"]; });
@@ -6918,8 +6920,11 @@ var ItemMutator = /*#__PURE__*/function () {
         return undefined;
       }
 
-      var content = this.content.appData || {};
-      content.appData[domain] || data;
+      if (!this.content.appData) {
+        this.content.appData = {};
+      }
+
+      this.content.appData[domain] = data;
     }
     /**
      * First gets the domain data for the input domain.
@@ -7355,12 +7360,13 @@ var SNPredicate = /*#__PURE__*/function () {
 /*!*********************************!*\
   !*** ./lib/models/generator.ts ***!
   \*********************************/
-/*! exports provided: CreateItemFromPayload, BuildItemContent */
+/*! exports provided: CreateItemFromPayload, Uuids, BuildItemContent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return CreateItemFromPayload; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Uuids", function() { return Uuids; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BuildItemContent", function() { return BuildItemContent; });
 /* harmony import */ var _core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./core/item */ "./lib/models/core/item.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
@@ -7384,6 +7390,15 @@ function CreateItemFromPayload(payload) {
 
   var item = new itemClass(payload);
   return item;
+}
+/**
+ * Returns an array of uuids for the given items or payloads
+ */
+
+function Uuids(items) {
+  return items.map(function (item) {
+    return item.uuid;
+  });
 }
 /**
  * Builds item .content based on values and populates with other default required
@@ -10085,19 +10100,19 @@ var PayloadCollection = /*#__PURE__*/function () {
   }
 
   _createClass(PayloadCollection, [{
-    key: "getAllPayloads",
-    value: function getAllPayloads() {
+    key: "all",
+    value: function all() {
       return this.payloads;
     }
   }, {
-    key: "findPayload",
-    value: function findPayload(id) {
+    key: "find",
+    value: function find(id) {
       return this.payloadMap[id];
     }
   }, {
     key: "concat",
     value: function concat(inCollection) {
-      var result = inCollection.getAllPayloads().slice();
+      var result = inCollection.all().slice();
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
@@ -10107,7 +10122,7 @@ var PayloadCollection = /*#__PURE__*/function () {
           var ours = _step2.value;
 
           /** If the payload exists in incoming collection, don't add our version */
-          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(inCollection.getAllPayloads(), 'uuid', ours.uuid)) {
+          if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["findInArray"])(inCollection.all(), 'uuid', ours.uuid)) {
             continue;
           }
 
@@ -10137,7 +10152,7 @@ var PayloadCollection = /*#__PURE__*/function () {
 
       for (var _i = 0, _Object$keys = Object.keys(this.payloadMap); _i < _Object$keys.length; _i++) {
         var uuid = _Object$keys[_i];
-        var candidate = this.findPayload(uuid);
+        var candidate = this.find(uuid);
 
         if (candidate.errorDecrypting) {
           continue;
@@ -10488,7 +10503,7 @@ var PayloadsDelta = /*#__PURE__*/function () {
   }, {
     key: "findBasePayload",
     value: function findBasePayload(id) {
-      return this.baseCollection.findPayload(id);
+      return this.baseCollection.find(id);
     }
   }, {
     key: "findRelatedPayload",
@@ -10496,7 +10511,7 @@ var PayloadsDelta = /*#__PURE__*/function () {
       var _this$relatedCollecti;
 
       var collection = (_this$relatedCollecti = this.relatedCollectionSet) === null || _this$relatedCollecti === void 0 ? void 0 : _this$relatedCollecti.collectionForSource(source);
-      return collection === null || collection === void 0 ? void 0 : collection.findPayload(id);
+      return collection === null || collection === void 0 ? void 0 : collection.find(id);
     }
   }]);
 
@@ -10577,7 +10592,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 4;
-                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
+                _iterator = this.applyCollection.all()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -10711,7 +10726,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 8:
                 deltaCollection = _context2.sent;
-                return _context2.abrupt("return", deltaCollection.getAllPayloads());
+                return _context2.abrupt("return", deltaCollection.all());
 
               case 10:
               case "end":
@@ -10874,7 +10889,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 4;
-                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
+                _iterator = this.applyCollection.all()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -11092,7 +11107,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context2.prev = 4;
-                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
+                _iterator = this.applyCollection.all()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -11138,7 +11153,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 21:
                 deltaCollection = _context2.sent;
-                payloads = deltaCollection.getAllPayloads();
+                payloads = deltaCollection.all();
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, payloads);
 
               case 24:
@@ -11218,7 +11233,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
                 _context3.prev = 4;
-                _iterator2 = this.applyCollection.getAllPayloads()[Symbol.iterator]();
+                _iterator2 = this.applyCollection.all()[Symbol.iterator]();
 
               case 6:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -11374,7 +11389,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 _didIteratorError = false;
                 _iteratorError = undefined;
                 _context.prev = 5;
-                _iterator = this.applyCollection.getAllPayloads()[Symbol.iterator]();
+                _iterator = this.applyCollection.all()[Symbol.iterator]();
 
               case 7:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
@@ -11612,7 +11627,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                 _iteratorError = undefined;
                 _context.prev = 4;
 
-                for (_iterator = this.applyCollection.getAllPayloads()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                for (_iterator = this.applyCollection.all()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                   payload = _step.value;
                   current = this.findBasePayload(payload.uuid);
                   /** If we save an item, but while in transit it is deleted locally, we want to keep 
@@ -12240,7 +12255,8 @@ function CreatePayload(object, fields, source, override) {
 
   for (var _i = 0, _overrideFields = overrideFields; _i < _overrideFields.length; _i++) {
     var field = _overrideFields[_i];
-    rawPayload[field] = override[field];
+    var value = override[field];
+    rawPayload[field] = value ? Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["Copy"])(value) : value;
   }
 
   var newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["uniqueArray"])(fields.concat(overrideFields));
@@ -12436,8 +12452,8 @@ var MutableCollection = /*#__PURE__*/function () {
   }
 
   _createClass(MutableCollection, [{
-    key: "getAll",
-    value: function getAll(contentType) {
+    key: "all",
+    value: function all(contentType) {
       var _this = this;
 
       if (contentType) {
@@ -12554,7 +12570,7 @@ var MutableCollection = /*#__PURE__*/function () {
   }, {
     key: "toImmutablePayloadCollection",
     value: function toImmutablePayloadCollection() {
-      return new _Payloads_collection__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"](this.getAll());
+      return new _Payloads_collection__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"](this.all());
     }
   }, {
     key: "setToTypedMap",
@@ -20371,12 +20387,12 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsThatReferenceItem",
     value: function itemsThatReferenceItem(uuid) {
-      var ids = this.inverseReferenceMap[uuid] || [];
-      return this.findItems(ids);
+      var uuids = this.uuidsThatReferenceUuid(uuid);
+      return this.findItems(uuids);
     }
   }, {
-    key: "uuidsThatReferenceItem",
-    value: function uuidsThatReferenceItem(uuid) {
+    key: "uuidsThatReferenceUuid",
+    value: function uuidsThatReferenceUuid(uuid) {
       return this.inverseReferenceMap[uuid] || [];
     }
   }, {
@@ -20490,7 +20506,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 2:
                 items = _context.sent;
                 deleted = items.filter(function (item) {
-                  return item.deleted;
+                  return item.payload.discardable;
                 });
                 this.collection.delete(deleted);
 
@@ -21179,8 +21195,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     }
     /**
      * Duplicates an item and maps it, thus propagating the item to observers.
-     * @param isConflict - Whether to mark the duplicate as a conflict
-     *    of the original.
+     * @param isConflict - Whether to mark the duplicate as a conflict of the original.
      */
 
   }, {
@@ -21387,7 +21402,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 /* Direct relationships are cleared by clearing content above */
 
                 /* Handle indirect relationships */
-                referencingIds = this.uuidsThatReferenceItem(uuid);
+                referencingIds = this.uuidsThatReferenceUuid(uuid);
                 _iteratorNormalCompletion7 = true;
                 _didIteratorError7 = false;
                 _iteratorError7 = undefined;
@@ -21689,8 +21704,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       return results;
     }
     /**
-    * Finds the first tag matching a given title
-    */
+     * Finds the first tag matching a given title
+     */
 
   }, {
     key: "findTagByTitle",
@@ -21869,27 +21884,27 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsKeys",
     get: function get() {
-      return this.collection.getAll(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].ItemsKey);
+      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].ItemsKey);
     }
   }, {
     key: "notes",
     get: function get() {
-      return this.collection.getAll(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Note);
+      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Note);
     }
   }, {
     key: "tags",
     get: function get() {
-      return this.collection.getAll(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag);
+      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag);
     }
   }, {
     key: "components",
     get: function get() {
-      return this.collection.getAll(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Component);
+      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Component);
     }
   }, {
     key: "items",
     get: function get() {
-      return this.collection.getAll();
+      return this.collection.all();
     }
     /**
      * Returns a detached array of all items which are not dummys
@@ -22473,15 +22488,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadManager", function() { return PayloadManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../protocol/payloads/mutable_collection */ "./lib/protocol/payloads/mutable_collection.ts");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
-/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
+/* harmony import */ var _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../protocol/payloads/mutable_collection */ "./lib/protocol/payloads/mutable_collection.ts");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/pull */ "./node_modules/lodash/pull.js");
+/* harmony import */ var lodash_pull__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_pull__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -22519,7 +22533,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
@@ -22540,13 +22553,13 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(PayloadManager).call(this));
 
-    _defineProperty(_assertThisInitialized(_this), "mappingObservers", []);
+    _defineProperty(_assertThisInitialized(_this), "changeObservers", []);
 
     _defineProperty(_assertThisInitialized(_this), "creationObservers", []);
 
     _defineProperty(_assertThisInitialized(_this), "collection", void 0);
 
-    _this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_2__["MutableCollection"]();
+    _this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_1__["MutableCollection"]();
     return _this;
   }
   /**
@@ -22567,13 +22580,13 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
       _get(_getPrototypeOf(PayloadManager.prototype), "deinit", this).call(this);
 
       this.creationObservers.length = 0;
-      this.mappingObservers.length = 0;
+      this.changeObservers.length = 0;
       this.resetState();
     }
   }, {
     key: "resetState",
     value: function resetState() {
-      this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_2__["MutableCollection"]();
+      this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_1__["MutableCollection"]();
     }
     /**
      * One of many mapping helpers available.
@@ -22588,7 +22601,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                return _context.abrupt("return", this.emitPayloads(collection.getAllPayloads(), collection.source, sourceKey));
+                return _context.abrupt("return", this.emitPayloads(collection.all(), collection.source, sourceKey));
 
               case 1:
               case "end":
@@ -22614,7 +22627,6 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
     key: "emitPayload",
     value: function () {
       var _emitPayload = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(payload, source, sourceKey) {
-        var items;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -22623,10 +22635,6 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
                 return this.emitPayloads([payload], source, sourceKey);
 
               case 2:
-                items = _context2.sent;
-                return _context2.abrupt("return", items[0]);
-
-              case 4:
               case "end":
                 return _context2.stop();
             }
@@ -22649,7 +22657,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
     key: "emitPayloads",
     value: function () {
       var _emitPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(payloads, source, sourceKey) {
-        var _ref, processed, newlyInserted;
+        var _ref, changed, inserted;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
@@ -22660,32 +22668,27 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 _ref = _context3.sent;
-                processed = _ref.processed;
-                newlyInserted = _ref.newlyInserted;
+                changed = _ref.changed;
+                inserted = _ref.inserted;
 
-                if (!(newlyInserted.length > 0)) {
+                if (!(inserted.length > 0)) {
                   _context3.next = 8;
                   break;
                 }
 
                 _context3.next = 8;
-                return this.notifyInsertionObservers(newlyInserted, source, sourceKey);
+                return this.notifyInsertionObservers(inserted, source, sourceKey);
 
               case 8:
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(processed, newlyInserted);
-
-                if (!(processed.length > 0)) {
-                  _context3.next = 12;
+                if (!(changed.length > 0)) {
+                  _context3.next = 11;
                   break;
                 }
 
-                _context3.next = 12;
-                return this.notifyChangeObservers(processed, source, sourceKey);
+                _context3.next = 11;
+                return this.notifyChangeObservers(changed, source, sourceKey);
 
-              case 12:
-                return _context3.abrupt("return", processed);
-
-              case 13:
+              case 11:
               case "end":
                 return _context3.stop();
             }
@@ -22703,14 +22706,14 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
     key: "mergePayloadsOntoMaster",
     value: function () {
       var _mergePayloadsOntoMaster = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(payloads) {
-        var processed, newlyInserted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, masterPayload, newPayload;
+        var changed, inserted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, masterPayload, newPayload;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                processed = [];
-                newlyInserted = [];
+                changed = [];
+                inserted = [];
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
@@ -22739,13 +22742,15 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
                 /** The item has been deleted and synced, 
                  * and can thus be removed from our local record */
 
-                if (newPayload.deleted && !newPayload.dirty) {
+                if (newPayload.discardable) {
                   this.collection.delete(newPayload);
                 } else {
-                  processed.push(newPayload);
+                  this.collection.set(newPayload);
 
                   if (!masterPayload) {
-                    newlyInserted.push(newPayload);
+                    inserted.push(newPayload);
+                  } else {
+                    changed.push(newPayload);
                   }
                 }
 
@@ -22790,8 +22795,8 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
 
               case 32:
                 return _context4.abrupt("return", {
-                  processed: processed,
-                  newlyInserted: newlyInserted
+                  changed: changed,
+                  inserted: inserted
                 });
 
               case 33:
@@ -22822,7 +22827,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
       };
       this.creationObservers.push(observer);
       return function () {
-        lodash_remove__WEBPACK_IMPORTED_MODULE_3___default()(_this2.creationObservers, observer);
+        lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(_this2.creationObservers, observer);
       };
     }
   }, {
@@ -22927,9 +22932,9 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
         priority: priority,
         callback: callback
       };
-      this.mappingObservers.push(observer);
+      this.changeObservers.push(observer);
       return function () {
-        lodash_pull__WEBPACK_IMPORTED_MODULE_4___default()(_this3.mappingObservers, observer);
+        lodash_pull__WEBPACK_IMPORTED_MODULE_3___default()(_this3.changeObservers, observer);
       };
     }
     /** 
@@ -22947,7 +22952,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                observers = this.mappingObservers.sort(function (a, b) {
+                observers = this.changeObservers.sort(function (a, b) {
                   return a.priority < b.priority ? -1 : 1;
                 });
                 _iteratorNormalCompletion3 = true;
@@ -22962,7 +22967,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
                       switch (_context6.prev = _context6.next) {
                         case 0:
                           observer = _step3.value;
-                          allRelevantPayloads = observer.types.includes(_Models_index__WEBPACK_IMPORTED_MODULE_5__["ContentType"].Any) ? payloads : payloads.filter(function (payload) {
+                          allRelevantPayloads = observer.types.includes(_Models_index__WEBPACK_IMPORTED_MODULE_4__["ContentType"].Any) ? payloads : payloads.filter(function (payload) {
                             return observer.types.includes(payload.content_type);
                           });
                           validItems = [];
@@ -23109,7 +23114,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                delta = new _Payloads_index__WEBPACK_IMPORTED_MODULE_7__["DeltaFileImport"](this.getMasterCollection(), new _Payloads_index__WEBPACK_IMPORTED_MODULE_7__["PayloadCollection"](payloads, _Payloads_index__WEBPACK_IMPORTED_MODULE_7__["PayloadSource"].FileImport));
+                delta = new _Payloads_index__WEBPACK_IMPORTED_MODULE_6__["DeltaFileImport"](this.getMasterCollection(), new _Payloads_index__WEBPACK_IMPORTED_MODULE_6__["PayloadCollection"](payloads, _Payloads_index__WEBPACK_IMPORTED_MODULE_6__["PayloadSource"].FileImport));
                 _context8.next = 3;
                 return delta.resultingCollection();
 
@@ -23139,7 +23144,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
   }]);
 
   return PayloadManager;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_6__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_5__["PureService"]);
 
 /***/ }),
 
@@ -23482,7 +23487,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
               case 2:
                 privileges = _context3.sent;
                 _context3.next = 5;
-                return this.itemManager.setItemDirty(privileges);
+                return this.itemManager.setItemDirty(privileges.uuid);
 
               case 5:
                 return _context3.abrupt("return", this.syncService.sync());
@@ -26528,7 +26533,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context39.next = 7;
-                return this.itemManager.setItemsToBeDeleted(neverSynced);
+                return this.itemManager.setItemsToBeDeleted(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["Uuids"])(neverSynced));
 
               case 7:
                 _context39.next = 20;
@@ -26557,7 +26562,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context39.next = 17;
-                return this.itemManager.setItemsToBeDeleted(toDelete);
+                return this.itemManager.setItemsToBeDeleted(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["Uuids"])(toDelete));
 
               case 17:
                 if (!(itemsKeys.length === 0)) {
@@ -26713,7 +26718,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context42.next = 4;
-                return this.itemManager.setItemsDirty(itemsKeys);
+                return this.itemManager.setItemsDirty(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["Uuids"])(itemsKeys));
 
               case 4:
               case "end":
@@ -27077,6 +27082,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/sync/events */ "./lib/services/sync/events.ts");
+/* harmony import */ var _models_generator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../models/generator */ "./lib/models/generator.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -27128,6 +27134,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we 
  *    intitially create the item.
  */
+
 var SNSingletonManager = /*#__PURE__*/function (_PureService) {
   _inherits(SNSingletonManager, _PureService);
 
@@ -27519,7 +27526,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                   return item.errorDecrypting;
                 });
                 _context5.next = 12;
-                return this.itemManager.setItemsToBeDeleted(errorDecrypting);
+                return this.itemManager.setItemsToBeDeleted(Object(_models_generator__WEBPACK_IMPORTED_MODULE_8__["Uuids"])(errorDecrypting));
 
               case 12:
                 _context5.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"];
@@ -28995,7 +29002,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 3:
                 collectionRetrieved = _context.sent;
 
-                if (collectionRetrieved.getAllPayloads().length > 0) {
+                if (collectionRetrieved.all().length > 0) {
                   collections.push(collectionRetrieved);
                 }
 
@@ -29005,7 +29012,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 7:
                 collectionSaved = _context.sent;
 
-                if (collectionSaved.getAllPayloads().length > 0) {
+                if (collectionSaved.all().length > 0) {
                   collections.push(collectionSaved);
                 }
 
@@ -29015,7 +29022,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 11:
                 collectionUuidConflicts = _context.sent;
 
-                if (collectionUuidConflicts.getAllPayloads().length > 0) {
+                if (collectionUuidConflicts.all().length > 0) {
                   collections.push(collectionUuidConflicts);
                 }
 
@@ -29025,7 +29032,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
               case 15:
                 collectionDataConflicts = _context.sent;
 
-                if (collectionDataConflicts.getAllPayloads().length > 0) {
+                if (collectionDataConflicts.all().length > 0) {
                   collections.push(collectionDataConflicts);
                 }
 
@@ -29068,7 +29075,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 
               case 6:
                 resultCollection = _context2.sent;
-                updatedDirtyPayloads = resultCollection.getAllPayloads().map(function (payload) {
+                updatedDirtyPayloads = resultCollection.all().map(function (payload) {
                   return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(payload, {
                     dirty: _this.finalDirtyStateForPayload(payload)
                   });
@@ -29092,7 +29099,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
   }, {
     key: "finalDirtyStateForPayload",
     value: function finalDirtyStateForPayload(payload) {
-      var current = this.baseCollection.findPayload(payload.uuid);
+      var current = this.baseCollection.find(payload.uuid);
       /**
        * `current` can be null in the case of new
        * items that haven't yet been mapped
@@ -30294,7 +30301,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 return this.persistPayloads(results);
 
               case 9:
-                return _context10.abrupt("return", mapped[0]);
+                return _context10.abrupt("return", this.itemManager.findItem(results[0].uuid));
 
               case 10:
               case "end":
@@ -31166,7 +31173,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 masterCollection = this.modelManager.getMasterCollection();
                 payloadsToPersist = payloadsToMap.map(function (payload) {
-                  var base = masterCollection.findPayload(payload.uuid);
+                  var base = masterCollection.find(payload.uuid);
                   return base.mergedWith(payload);
                 });
                 _context19.next = 6;
@@ -31350,12 +31357,12 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 if (!fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadField"].Content)) {
                   /** Before persisting, merge with current base value that has content field */
-                  payloadsToPersist = collection.getAllPayloads().map(function (payload) {
-                    var base = masterCollection.findPayload(payload.uuid);
+                  payloadsToPersist = collection.all().map(function (payload) {
+                    var base = masterCollection.find(payload.uuid);
                     return base.mergedWith(payload);
                   });
                 } else {
-                  payloadsToPersist = collection.getAllPayloads();
+                  payloadsToPersist = collection.all();
                 }
 
                 _context21.next = 58;

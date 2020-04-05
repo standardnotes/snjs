@@ -47,11 +47,11 @@ export class PayloadsDelta {
    * @param {string} id  - The uuid of the payload to find 
    */
   protected findBasePayload(id: string) {
-    return this.baseCollection.findPayload(id);
+    return this.baseCollection.find(id);
   }
 
   protected findRelatedPayload(id: string, source: PayloadSource) {
     const collection = this.relatedCollectionSet?.collectionForSource(source);
-    return collection?.findPayload(id);
+    return collection?.find(id);
   }
 }

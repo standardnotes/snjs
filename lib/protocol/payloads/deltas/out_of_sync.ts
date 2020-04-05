@@ -9,7 +9,7 @@ export class DeltaOutOfSync extends PayloadsDelta {
 
   public async resultingCollection() {
     const results = [];
-    for (const payload of this.applyCollection.getAllPayloads()) {
+    for (const payload of this.applyCollection.all()) {
       /**
        * Map the server payload as authoritive content. If client copy differs,
        * we will create a duplicate of it below.

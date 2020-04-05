@@ -167,7 +167,7 @@ export class SNPrivilegesService extends PureService {
 
   async savePrivileges() {
     const privileges = await this.getPrivileges();
-    await this.itemManager!.setItemDirty(privileges);
+    await this.itemManager!.setItemDirty(privileges.uuid);
     return this.syncService!.sync();
   }
 

@@ -113,19 +113,19 @@ export class ItemManager extends PureService {
   }
 
   get itemsKeys() {
-    return this.collection.getAll(ContentType.ItemsKey) as SNItemsKey[];
+    return this.collection.all(ContentType.ItemsKey) as SNItemsKey[];
   }
 
   get notes() {
-    return this.collection.getAll(ContentType.Note) as SNNote[];
+    return this.collection.all(ContentType.Note) as SNNote[];
   }
 
   get tags() {
-    return this.collection.getAll(ContentType.Tag) as SNTag[];
+    return this.collection.all(ContentType.Tag) as SNTag[];
   }
 
   get components() {
-    return this.collection.getAll(ContentType.Component) as SNComponent[];
+    return this.collection.all(ContentType.Component) as SNComponent[];
   }
 
   public addObserver(
@@ -146,11 +146,11 @@ export class ItemManager extends PureService {
    * Returns the items that reference the given item, or an empty array if no results.
    */
   private itemsThatReferenceItem(uuid: UuidString) {
-    const ids = this.inverseReferenceMap[uuid] || [];
-    return this.findItems(ids);
+    const uuids = this.uuidsThatReferenceUuid(uuid);
+    return this.findItems(uuids);
   }
 
-  private uuidsThatReferenceItem(uuid: UuidString) {
+  private uuidsThatReferenceUuid(uuid: UuidString) {
     return this.inverseReferenceMap[uuid] || [];
   }
 
@@ -202,7 +202,7 @@ export class ItemManager extends PureService {
       source,
       sourceKey
     );
-    const deleted = items.filter((item) => item.deleted);
+    const deleted = items.filter((item) => item.payload.discardable);
     this.collection.delete(deleted);
   }
 
@@ -475,8 +475,7 @@ export class ItemManager extends PureService {
 
   /**
    * Duplicates an item and maps it, thus propagating the item to observers.
-   * @param isConflict - Whether to mark the duplicate as a conflict
-   *    of the original.
+   * @param isConflict - Whether to mark the duplicate as a conflict of the original.
    */
   public async duplicateItem(item: SNItem, isConflict = false) {
     const payload = CreateMaxPayloadFromAnyObject(item);
@@ -554,7 +553,7 @@ export class ItemManager extends PureService {
 
     /* Direct relationships are cleared by clearing content above */
     /* Handle indirect relationships */
-    const referencingIds = this.uuidsThatReferenceItem(uuid);
+    const referencingIds = this.uuidsThatReferenceUuid(uuid);
     for (const referencingId of referencingIds) {
       const referencingItem = this.findItem(referencingId);
       if (referencingItem) {
@@ -579,7 +578,7 @@ export class ItemManager extends PureService {
    * Returns a detached array of all items
    */
   public get items() {
-    return this.collection.getAll();
+    return this.collection.all();
   }
 
   /**
@@ -684,8 +683,8 @@ export class ItemManager extends PureService {
   }
 
   /**
- * Finds the first tag matching a given title
- */
+   * Finds the first tag matching a given title
+   */
   public findTagByTitle(title: string) {
     return searchArray(this.tags, { title: title });
   }

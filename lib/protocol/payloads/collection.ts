@@ -25,19 +25,19 @@ export class PayloadCollection {
     Object.freeze(this);
   }
 
-  public getAllPayloads() {
+  public all() {
     return this.payloads;
   }
 
-  public findPayload(id: string) {
+  public find(id: string) {
     return this.payloadMap[id];
   }
 
   public concat(inCollection: PayloadCollection) {
-    const result = inCollection.getAllPayloads().slice();
+    const result = inCollection.all().slice();
     for (const ours of this.payloads) {
       /** If the payload exists in incoming collection, don't add our version */
-      if (findInArray(inCollection.getAllPayloads(), 'uuid', ours.uuid)) {
+      if (findInArray(inCollection.all(), 'uuid', ours.uuid)) {
         continue;
       }
       result.push(ours);
@@ -48,7 +48,7 @@ export class PayloadCollection {
   public payloadsThatReferencePayload(payload: PurePayload) {
     const results = [];
     for (const uuid of Object.keys(this.payloadMap)) {
-      const candidate = this.findPayload(uuid);
+      const candidate = this.find(uuid);
       if(candidate.errorDecrypting) {
         continue;
       }

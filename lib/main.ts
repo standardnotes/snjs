@@ -107,7 +107,8 @@ export {
 export { PayloadCollection } from '@Payloads/collection';
 export {
   CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject
+  CreateSourcedPayloadFromObject,
+  CopyPayload
 } from '@Payloads/generator';
 export {
   PayloadSource,

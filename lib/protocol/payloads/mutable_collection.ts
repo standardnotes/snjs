@@ -19,7 +19,7 @@ export class MutableCollection<T extends Payloadable> {
     }
   }
 
-  public getAll(contentType?: ContentType) {
+  public all(contentType?: ContentType) {
     if (contentType) {
       return this.typedMap[contentType] || [];
     } else {
@@ -65,7 +65,7 @@ export class MutableCollection<T extends Payloadable> {
   }
 
   public toImmutablePayloadCollection() {
-    return new PayloadCollection(this.getAll() as PurePayload[]);
+    return new PayloadCollection(this.all() as PurePayload[]);
   }
 
   private setToTypedMap(element: T) {

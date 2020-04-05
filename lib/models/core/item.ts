@@ -442,8 +442,10 @@ export class ItemMutator {
     if (this.payload.errorDecrypting) {
       return undefined;
     }
-    const content = this.content!.appData || {};
-    content.appData[domain] || data;
+    if(!this.content!.appData) {
+      this.content!.appData = {};
+    }
+    this.content!.appData[domain] = data;
   }
 
   /**

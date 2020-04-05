@@ -21,7 +21,7 @@ describe('payload generation', () => {
   });
 });
 
-describe('payloads', () => {
+describe.only('payloads', () => {
   const sharedApplication = Factory.createApplication();
 
   before(async () => {

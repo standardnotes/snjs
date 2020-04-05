@@ -21,7 +21,6 @@ const expectThrowsAsync = async (method, errorMessage) => {
 describe('item manager', () => {
 
   before(async function () {
-    localStorage.clear();
     const crypto = new SNWebCrypto();
     Uuid.SetGenerators(
       crypto.generateUUIDSync,
@@ -32,7 +31,6 @@ describe('item manager', () => {
   beforeEach(function () {
     this.modelManager = new PayloadManager();
     this.itemManager = new ItemManager(this.modelManager);
-
     this.createNote = async () => {
       return this.itemManager.createItem(
         ContentType.Note,
@@ -58,10 +56,6 @@ describe('item manager', () => {
         })
       );
     };
-  });
-
-  after(async function () {
-    localStorage.clear();
   });
 
   it('create item', async function () {
@@ -129,7 +123,7 @@ describe('item manager', () => {
   it('deleting from reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
-    await this.itemManager.setItemToBeDeleted(note);
+    await this.itemManager.setItemToBeDeleted(note.uuid);
 
     expect(this.itemManager.referenceMap[tag.uuid]).to.eql([]);
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.not.be.ok;
@@ -222,7 +216,7 @@ describe('item manager', () => {
 
   it('set items dirty', async function () {
     const note = await this.createNote();
-    await this.itemManager.setItemDirty(note);
+    await this.itemManager.setItemDirty(note.uuid);
 
     const dirtyItems = this.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
@@ -255,10 +249,11 @@ describe('item manager', () => {
 
   it('set item deleted', async function () {
     const note = await this.createNote();
-    await this.itemManager.setItemToBeDeleted(note);
+    await this.itemManager.setItemToBeDeleted(note.uuid);
 
     /** Items should never be mutated directly */
     expect(note.deleted).to.not.be.ok;
+
     const latestVersion = this.itemManager.findItem(note.uuid);
     expect(latestVersion.deleted).to.equal(true);
     expect(latestVersion.dirty).to.equal(true);

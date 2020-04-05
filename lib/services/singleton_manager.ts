@@ -9,6 +9,7 @@ import { CopyPayload } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
+import { Uuids } from '../models/generator';
 
 /**
  * The singleton manager allow consumers to ensure that only 1 item exists of a certain
@@ -193,7 +194,7 @@ export class SNSingletonManager extends PureService {
       .itemsMatchingPredicate(predicate).filter((item) => {
         return item.errorDecrypting;
       });
-    await this.itemManager!.setItemsToBeDeleted(errorDecrypting);
+    await this.itemManager!.setItemsToBeDeleted(Uuids(errorDecrypting));
     /** Safe to create */
     const dirtyPayload = CopyPayload(
       createPayload,

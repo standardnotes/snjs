@@ -7,7 +7,7 @@ export class DeltaRemoteSaved extends PayloadsDelta {
 
   public async resultingCollection() {
     const processed = [];
-    for (const payload of this.applyCollection.getAllPayloads()) {
+    for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid!);
       /** If we save an item, but while in transit it is deleted locally, we want to keep 
        * local deletion status, and not old deleted value that was sent to server.

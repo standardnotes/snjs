@@ -50,7 +50,7 @@ type ChangeObserver = {
  */
 export class PayloadManager extends PureService {
 
-  private mappingObservers: ChangeObserver[] = []
+  private changeObservers: ChangeObserver[] = []
   private creationObservers: InsertionObserver[] = []
   public collection: MutableCollection<PurePayload>
 
@@ -71,7 +71,7 @@ export class PayloadManager extends PureService {
   public deinit() {
     super.deinit();
     this.creationObservers.length = 0;
-    this.mappingObservers.length = 0;
+    this.changeObservers.length = 0;
     this.resetState();
   }
 
@@ -85,7 +85,7 @@ export class PayloadManager extends PureService {
    */
   public async emitCollection(collection: PayloadCollection, sourceKey?: string) {
     return this.emitPayloads(
-      collection.getAllPayloads(),
+      collection.all(),
       collection.source!,
       sourceKey
     );
@@ -96,13 +96,16 @@ export class PayloadManager extends PureService {
    * This function maps a payload to an item
    * @returns The mapped item
    */
-  public async emitPayload(payload: PurePayload, source: PayloadSource, sourceKey?: string) {
-    const items = await this.emitPayloads(
+  public async emitPayload(
+    payload: PurePayload,
+    source: PayloadSource,
+    sourceKey?: string
+  ) {
+    await this.emitPayloads(
       [payload],
       source,
       sourceKey
     );
-    return items[0];
   }
 
   /**
@@ -115,22 +118,20 @@ export class PayloadManager extends PureService {
     sourceKey?: string
   ) {
     /** First loop should process payloads and add items only; no relationship handling. */
-    const { processed, newlyInserted } = await this.mergePayloadsOntoMaster(payloads);
-    if (newlyInserted.length > 0) {
-      await this.notifyInsertionObservers(newlyInserted, source, sourceKey);
+    const { changed, inserted } = await this.mergePayloadsOntoMaster(payloads);
+    if (inserted.length > 0) {
+      await this.notifyInsertionObservers(inserted, source, sourceKey);
     }
-    subtractFromArray(processed, newlyInserted);
-    if(processed.length > 0) {
-      await this.notifyChangeObservers(processed, source, sourceKey);
+    if (changed.length > 0) {
+      await this.notifyChangeObservers(changed, source, sourceKey);
     }
-    return processed;
   }
 
   private async mergePayloadsOntoMaster(
     payloads: PurePayload[]
   ) {
-    const processed: PurePayload[] = [];
-    const newlyInserted: PurePayload[] = [];
+    const changed: PurePayload[] = [];
+    const inserted: PurePayload[] = [];
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
         console.error('Payload is corrupt:', payload);
@@ -140,16 +141,18 @@ export class PayloadManager extends PureService {
       const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload;
       /** The item has been deleted and synced, 
        * and can thus be removed from our local record */
-      if (newPayload.deleted && !newPayload.dirty) {
+      if (newPayload.discardable) {
         this.collection.delete(newPayload);
       } else {
-        processed.push(newPayload);
+        this.collection.set(newPayload);
         if (!masterPayload) {
-          newlyInserted.push(newPayload);
+          inserted.push(newPayload);
+        } else {
+          changed.push(newPayload);
         }
       }
     }
-    return { processed, newlyInserted };
+    return { changed, inserted };
   }
 
   /** 
@@ -192,9 +195,9 @@ export class PayloadManager extends PureService {
       priority,
       callback
     };
-    this.mappingObservers.push(observer);
+    this.changeObservers.push(observer);
     return () => {
-      pull(this.mappingObservers, observer);
+      pull(this.changeObservers, observer);
     };
   }
 
@@ -207,7 +210,7 @@ export class PayloadManager extends PureService {
     source: PayloadSource,
     sourceKey?: string
   ) {
-    const observers = this.mappingObservers.sort((a, b) => {
+    const observers = this.changeObservers.sort((a, b) => {
       return a.priority < b.priority ? -1 : 1;
     });
     for (const observer of observers) {
