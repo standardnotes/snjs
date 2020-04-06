@@ -15,6 +15,10 @@ export class SNTag extends SNItem {
     this.title = this.payload.safeContent.title;
   }
 
+  get noteCount() {
+    return this.payload.safeContent.references.length;
+  }
+
   public isSmartTag() {
     return this.content_type === ContentType.SmartTag;
   }

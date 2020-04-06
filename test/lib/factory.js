@@ -119,7 +119,7 @@ export function itemToStoragePayload(item) {
 
 export function createMappedNote(application) {
   const payload = createNotePayload();
-  return application.modelManager.emitPayload(
+  return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
   );
@@ -127,7 +127,7 @@ export function createMappedNote(application) {
 
 export function createMappedTag(application) {
   const payload = createStorageItemTagPayload();
-  return application.modelManager.emitPayload(
+  return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
   );
@@ -135,11 +135,11 @@ export function createMappedTag(application) {
 
 export async function createSyncedNote(application) {
   const payload = createNotePayload();
-  const note = await application.modelManager.emitPayload(
+  const note = await application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
   );
-  await application.modelManager.setItemDirty(note, true);
+  await application.itemManager.setItemDirty(note, true);
   await application.syncService.sync();
   return note;
 }
@@ -156,7 +156,7 @@ export async function getStoragePayloadsOfType(application, type) {
 export async function createManyMappedNotes(application, count) {
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application);
-    await application.modelManager.setItemDirty(note, true);
+    await application.itemManager.setItemDirty(note, true);
   }
 }
 
@@ -202,13 +202,13 @@ export function generateUuid() {
 export function createNoteParams({ title, text, dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
-    content_type: 'Note',
+    content_type: ContentType.Note,
     dirty: dirty,
-    content: {
+    content: BuildItemContent({
       title: title || 'hello',
       text: text || 'world',
       references: []
-    }
+    })
   };
   return params;
 }
@@ -216,11 +216,11 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
 export function createTagParams({ dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
-    content_type: 'Tag',
-    content: {
+    content_type: ContentType.Tag,
+    content: BuildItemContent({
       title: 'thoughts',
       references: []
-    }
+    })
   };
   return params;
 }

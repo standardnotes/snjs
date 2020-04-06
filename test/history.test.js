@@ -145,11 +145,11 @@ describe('session history', () => {
           text: Factory.randomString(100)
         })
       );
-      const item = await this.modelManager.emitPayload(
+      const item = await this.itemManager.emitItemFromPayload(
         payload,
         PayloadSource.LocalChanged
       );
-      await this.application.modelManager.setItemDirty(item);
+      await this.application.itemManager.setItemDirty(item);
       await this.application.syncService.sync();
       const itemHistory = this.historyManager.historyForItem(item);
       /** It should keep the first and last by default */

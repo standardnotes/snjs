@@ -25,7 +25,7 @@ describe('upgrading', () => {
   });
 
   it('upgrade should be available when account only', async function () {
-    const oldVersion = ProtocolVersions.V003;
+    const oldVersion = ProtocolVersion.V003;
     /** Register with 003 version */
     await Factory.registerOldUser({
       application: this.application,
@@ -38,7 +38,7 @@ describe('upgrading', () => {
   });
 
   it('upgrade should be available when passcode only', async function () {
-    const oldVersion = ProtocolVersions.V003;
+    const oldVersion = ProtocolVersion.V003;
     const passcode = '1234';
     await Factory.setOldVersionPasscode({
       application: this.application,
@@ -50,8 +50,8 @@ describe('upgrading', () => {
   });
 
   it('application protocol upgrade', async function () {
-    const oldVersion = ProtocolVersions.V003;
-    const newVersion = ProtocolVersions.V004;
+    const oldVersion = ProtocolVersion.V003;
+    const newVersion = ProtocolVersion.V004;
     /** Register with 003 version */
     await Factory.registerOldUser({
       application: this.application,
@@ -123,7 +123,7 @@ describe('upgrading', () => {
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
     const itemsKey = this.application.protocolService.getDefaultItemsKey();
-    await this.application.modelManager.setItemToBeDeleted(itemsKey);
+    await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid);
     expect(this.application.protocolService.itemsKeys.length).to.equal(0);
 
     /** Register with 003 version */
@@ -131,27 +131,27 @@ describe('upgrading', () => {
       application: this.application,
       email: this.email,
       password: this.password,
-      version: ProtocolVersions.V003
+      version: ProtocolVersion.V003
     });
 
     expect(this.application.protocolService.itemsKeys.length).to.equal(1);
 
     expect(
       (await this.application.protocolService.getRootKeyParams()).version
-    ).to.equal(ProtocolVersions.V003);
+    ).to.equal(ProtocolVersion.V003);
     expect(
       (await this.application.protocolService.getRootKey()).version
-    ).to.equal(ProtocolVersions.V003);
+    ).to.equal(ProtocolVersion.V003);
 
     /** Create note and ensure its encrypted with 003 */
     await Factory.createSyncedNote(this.application);
 
     const notePayloads = await Factory.getStoragePayloadsOfType(
       this.application,
-      'Note'
+      ContentType.Note
     );
     const notePayload003 = notePayloads[0];
-    expect(notePayload003.version).to.equal(ProtocolVersions.V003);
+    expect(notePayload003.version).to.equal(ProtocolVersion.V003);
 
     await this.application.changePassword(
       this.password,
@@ -171,12 +171,12 @@ describe('upgrading', () => {
 
     /** After change, note should now be encrypted with latest protocol version */
 
-    const note = this.application.modelManager.notes[0];
+    const note = this.application.itemManager.notes[0];
     await this.application.saveItem(note);
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,
-      'Note'
+      ContentType.Note
     );
     const refreshedNotePayload = refreshedNotePayloads[0];
     expect(refreshedNotePayload.version).to.equal(latestVersion);

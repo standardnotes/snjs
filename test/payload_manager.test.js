@@ -66,25 +66,22 @@ describe('payload manager', () => {
 
   it('insertion observer', async function () {
     const observations = [];
-    const changeObservations = [];
-    this.modelManager.addInsertionObserver((payloads) => {
-      observations.push({ payloads });
-    });
-    this.modelManager.addChangeObserver((payloads) => {
-      changeObservations.push({ payloads });
+    this.modelManager.addChangeObserver(ContentType.Any, (_, inserted) => {
+      observations.push({ inserted });
     });
     const payload = await this.createNotePayload();
     await this.modelManager.emitPayload(payload);
 
     expect(observations.length).equal(1);
-    expect(observations[0].payloads[0]).equal(payload);
-    expect(changeObservations.length).to.equal(0);
+    expect(observations[0].inserted[0]).equal(payload);
   });
 
   it('change observer', async function () {
     const observations = [];
-    this.modelManager.addChangeObserver(ContentType.Any, (payloads) => {
-      observations.push({ payloads });
+    this.modelManager.addChangeObserver(ContentType.Any, (changed) => {
+      if(changed.length > 0) {
+        observations.push({ changed });
+      }
     });
     const payload = await this.createNotePayload();
     await this.modelManager.emitPayload(payload);
@@ -98,18 +95,16 @@ describe('payload manager', () => {
     ));
 
     expect(observations.length).equal(1);
-    expect(observations[0].payloads[0].uuid).equal(payload.uuid);
+    expect(observations[0].changed[0].uuid).equal(payload.uuid);
   });
 
   it('reset state', async function () {
-    this.modelManager.addInsertionObserver((payloads) => {});
-    this.modelManager.addChangeObserver((payloads) => {});
+    this.modelManager.addChangeObserver(ContentType.Any, (payloads) => {});
     const payload = await this.createNotePayload();
     await this.modelManager.emitPayload(payload);
     await this.modelManager.resetState();
 
     expect(this.modelManager.collection.all().length).to.equal(0);
-    expect(this.modelManager.creationObservers.length).equal(1);
     expect(this.modelManager.changeObservers.length).equal(1);
   });
 

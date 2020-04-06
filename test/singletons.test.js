@@ -73,7 +73,7 @@ describe('singletons', () => {
 
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
@@ -86,13 +86,13 @@ describe('singletons', () => {
     const privs3 = createPrivsPayload();
 
     this.expectedItemCount++;
-    const items = await this.application.modelManager.emitPayloads(
+    const items = await this.application.itemManager.emitItemsFromPayloads(
       [privs1, privs2, privs3],
       PayloadSource.LocalChanged
     );
-    await this.application.modelManager.setItemsDirty(items);
+    await this.application.itemManager.setItemsDirty(items);
     await this.application.syncService.sync(syncOptions);
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 
   it('resolves registered predicate', async function () {
@@ -109,7 +109,7 @@ describe('singletons', () => {
     const refreshedExtMgr = this.application.findItem(extManager.uuid);
     expect(refreshedExtMgr).to.be.ok;
     await this.application.sync(syncOptions);
-    expect(this.application.modelManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
+    expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
   });
 
   it('resolves via find or create', async function () {
@@ -141,7 +141,7 @@ describe('singletons', () => {
     const refreshedUserPrefs = this.application.findItem(userPreferences.uuid);
     expect(refreshedUserPrefs).to.be.ok;
     await this.application.sync(syncOptions);
-    expect(this.application.modelManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(this.application.itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   }).timeout(Factory.TestTimeout);
 
   it('resolves registered predicate with signing in/out', async function () {
@@ -212,7 +212,7 @@ describe('singletons', () => {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrivs = await this.application.privilegesService.getPrivileges();
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
+    const allPrivs = this.application.itemManager.validItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
   }).timeout(Factory.TestTimeout);
 
@@ -234,13 +234,13 @@ describe('singletons', () => {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrivs = await this.application.privilegesService.getPrivileges();
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.modelManager.validItemsForContentType(ogPrivs.content_type);
+    const allPrivs = this.application.itemManager.validItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
   }).timeout(Factory.TestTimeout);
 
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.emitPayload(
+    const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
@@ -254,14 +254,14 @@ describe('singletons', () => {
       predicate,
       payload
     );
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
 
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
-    const item = await this.application.modelManager.emitPayload(
+    const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
@@ -281,6 +281,6 @@ describe('singletons', () => {
     expect(resolvedItem.uuid).to.equal(item.uuid);
     expect(resolvedItem2.uuid).to.not.equal(resolvedItem.uuid);
     expect(resolvedItem.deleted).to.equal(true);
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 });

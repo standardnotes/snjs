@@ -36,7 +36,7 @@ import {
   SNProtocolOperator003,
   SNProtocolOperator004,
   CreateKeyParams,
-  ProtocolVersions,
+  ProtocolVersion,
   compareVersions,
   EncryptionIntent
 } from '@Protocol/index';
@@ -66,7 +66,7 @@ export enum KeyMode {
 }
 
 /** The last protocol version to not use root-key based items keys */
-const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersions.V003;
+const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
 
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
@@ -139,8 +139,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     });
     this.removeMappingObserver = this.modelManager.addChangeObserver(
       [ContentType.ItemsKey],
-      async () => {
-        await this.decryptErroredItems();
+      async (_, inserted) => {
+        if(inserted.length > 0) {
+          await this.decryptErroredItems();
+        }
       }
     );
   }
@@ -190,7 +192,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Returns the latest protocol version
    */
   public getLatestVersion() {
-    return ProtocolVersions.V004;
+    return ProtocolVersion.V004;
   }
 
   /** 
@@ -243,7 +245,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
      * 
      * Versions 004 and above are always supported.
      */
-    if (compareVersions(keyParams.version, ProtocolVersions.V004) >= 0) {
+    if (compareVersions(keyParams.version, ProtocolVersion.V004) >= 0) {
       /* keyParams.version >= 004 */
       return true;
     } else {
@@ -256,17 +258,17 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public supportedVersions() {
     return [
-      ProtocolVersions.V001,
-      ProtocolVersions.V002,
-      ProtocolVersions.V003,
-      ProtocolVersions.V004,
+      ProtocolVersion.V001,
+      ProtocolVersion.V002,
+      ProtocolVersion.V003,
+      ProtocolVersion.V004,
     ];
   }
 
   /**
    * Determines whether the input version is greater than the latest supported library version.
    */
-  public isVersionNewerThanLibraryVersion(version: ProtocolVersions) {
+  public isVersionNewerThanLibraryVersion(version: ProtocolVersion) {
     const libraryVersion = this.getLatestVersion();
     return compareVersions(version, libraryVersion) === 1;
   }
@@ -274,10 +276,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Determines whether the input version is expired
    */
-  public isProtocolVersionOutdated(version: ProtocolVersions) {
-    const expirationDates: Partial<Record<ProtocolVersions, number>> = {
-      [ProtocolVersions.V001]: Date.parse('2018-01-01'),
-      [ProtocolVersions.V002]: Date.parse('2020-01-01')
+  public isProtocolVersionOutdated(version: ProtocolVersion) {
+    const expirationDates: Partial<Record<ProtocolVersion, number>> = {
+      [ProtocolVersion.V001]: Date.parse('2018-01-01'),
+      [ProtocolVersion.V002]: Date.parse('2020-01-01')
     };
     const date = expirationDates[version];
     if (!date) {
@@ -293,13 +295,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * This function returns the client-enforced minimum cost, to prevent the server from
    * overwhelmingly under-reporting the cost.
    */
-  public costMinimumForVersion(version: ProtocolVersions) {
-    if (compareVersions(version, ProtocolVersions.V003) >= 0) {
+  public costMinimumForVersion(version: ProtocolVersion) {
+    if (compareVersions(version, ProtocolVersion.V003) >= 0) {
       throw 'Cost minimums only apply to versions <= 002';
     }
-    if (version === ProtocolVersions.V001) {
+    if (version === ProtocolVersion.V001) {
       return V001Algorithm.PbkdfMinCost;
-    } else if (version === ProtocolVersions.V002) {
+    } else if (version === ProtocolVersion.V002) {
       return V002Algorithm.PbkdfMinCost;
     } else {
       throw `Invalid version for cost minimum: ${version}`;
@@ -310,23 +312,23 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return this.createOperatorForVersion(this.getLatestVersion());
   }
 
-  private createOperatorForVersion(version: ProtocolVersions): SNProtocolOperator {
-    if (version === ProtocolVersions.V001) {
+  private createOperatorForVersion(version: ProtocolVersion): SNProtocolOperator {
+    if (version === ProtocolVersion.V001) {
       return new SNProtocolOperator001(this.crypto!);
-    } else if (version === ProtocolVersions.V002) {
+    } else if (version === ProtocolVersion.V002) {
       return new SNProtocolOperator002(this.crypto!);
-    } else if (version === ProtocolVersions.V003) {
+    } else if (version === ProtocolVersion.V003) {
       return new SNProtocolOperator003(this.crypto!);
-    } else if (version === ProtocolVersions.V004) {
+    } else if (version === ProtocolVersion.V004) {
       return new SNProtocolOperator004(this.crypto!);
-    } else if (version === ProtocolVersions.V000Base64Decrypted) {
+    } else if (version === ProtocolVersion.V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {
       throw `Unable to find operator for version ${version}`;
     }
   }
 
-  private operatorForVersion(version: ProtocolVersions) {
+  private operatorForVersion(version: ProtocolVersion) {
     const operatorKey = version;
     let operator = this.operators[operatorKey];
     if (!operator) {
@@ -631,7 +633,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public createKeyParams(keyParams: KeyParamsContent) {
     /* 002 doesn't have version automatically, newer versions do. */
     if (!keyParams.version) {
-      keyParams.version = ProtocolVersions.V002;
+      keyParams.version = ProtocolVersion.V002;
     }
     return CreateKeyParams(keyParams);
   }
@@ -1263,7 +1265,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns The SNItemsKey object to decrypt items encrypted
    * with previous protocol version.
    */
-  public async defaultItemsKeyForItemVersion(version: ProtocolVersions) {
+  public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
     return this.itemsKeys.find((key) => {
       return key.version === version;
     });

@@ -27,7 +27,7 @@ describe('offline syncing', () => {
 
   it('should sync item with no passcode', async function() {
     const note = await Factory.createMappedNote(this.application);
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
@@ -36,7 +36,7 @@ describe('offline syncing', () => {
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
     this.expectedItemCount++;
 
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
     const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
@@ -56,14 +56,14 @@ describe('offline syncing', () => {
   it('should sync item encrypted with passcode', async function() {
     await this.application.setPasscode('foobar');
     await Factory.createMappedNote(this.application);
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(1);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncService.sync();
     this.expectedItemCount++;
 
-    expect(this.application.modelManager.getDirtyItems().length).to.equal(0);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
     const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 

@@ -20,7 +20,7 @@ import { PayloadSource } from '@Payloads/sources';
 import {
   Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
 } from '@Lib/utils';
-import { ProtocolVersions, EncryptionIntent, SNRootKey } from '@Protocol/index';
+import { ProtocolVersion, EncryptionIntent, SNRootKey } from '@Protocol/index';
 import { SNItemsKey, ContentType } from '@Models/index';
 import { SNStorageService } from '@Services/index';
 import { Uuid } from '@Lib/uuid';
@@ -132,8 +132,8 @@ export class Migration20200115 extends Migration {
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const version = !isNullOrUndefined(ak)
-        ? ProtocolVersions.V003
-        : ProtocolVersions.V002;
+        ? ProtocolVersion.V003
+        : ProtocolVersion.V002;
       const accountKey = await SNRootKey.Create(
         {
           masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
@@ -218,8 +218,8 @@ export class Migration20200115 extends Migration {
     storageValueStore: Record<string, any>
     ) {
     const version = storageValueStore.ak
-      ? ProtocolVersions.V003
-      : ProtocolVersions.V002;
+      ? ProtocolVersion.V003
+      : ProtocolVersion.V002;
     const accountKey = await SNRootKey.Create(
       {
         masterKey: storageValueStore.mk,
@@ -354,8 +354,8 @@ export class Migration20200115 extends Migration {
         );
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
         const defaultVersion = !isNullOrUndefined(accountKeyContent.ak)
-          ? ProtocolVersions.V003
-          : ProtocolVersions.V002;
+          ? ProtocolVersion.V003
+          : ProtocolVersion.V002;
         const newAccountKey = CopyPayload(
           unwrappedAccountKey,
           {
@@ -399,8 +399,8 @@ export class Migration20200115 extends Migration {
       const hasAccount = keychainValue && keychainValue.mk;
       if (hasAccount) {
         const defaultVersion = !isNullOrUndefined(keychainValue.ak)
-          ? ProtocolVersions.V003
-          : ProtocolVersions.V002;
+          ? ProtocolVersion.V003
+          : ProtocolVersion.V002;
         const accountKey = await SNRootKey.Create(
           {
             masterKey: keychainValue.mk,
@@ -517,7 +517,7 @@ export class Migration20200115 extends Migration {
         dirty: true
       });
       const itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
-      await this.services.modelManager.emitPayload(
+      await this.services.itemManager.emitItemFromPayload(
         itemsKey.payloadRepresentation(),
         PayloadSource.LocalChanged
       );

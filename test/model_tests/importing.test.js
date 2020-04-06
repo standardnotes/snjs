@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('importing', () => {
+describe.only('importing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -16,26 +16,24 @@ describe('importing', () => {
     await this.application.deinit();
   });
 
-  it('importing existing data should keep relationships valid', async function () {
-    const modelManager = this.application.modelManager;
-
+  it.only('importing existing data should keep relationships valid', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
       PayloadSource.LocalChanged
     );
-    const note = modelManager.getItems(['Note'])[0];
-    const tag = modelManager.getItems(['Tag'])[0];
     this.expectedItemCount += 2;
+    const note = this.application.itemManager.getItems([ContentType.Note])[0];
+    const tag = this.application.itemManager.getItems([ContentType.Tag])[0];
 
     expect(tag.content.references.length).to.equal(1);
-    expect(tag.notes.length).to.equal(1);
+    expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(note.tags.length).to.equal(1);
+    expect(this.application.itemManager.itemsThatReferenceItem(note.uuid).length).to.equal(1);
 
     await this.application.importData(
       {
@@ -45,14 +43,14 @@ describe('importing', () => {
       true,
     );
 
-    expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
     expect(tag.content.references.length).to.equal(1);
-    expect(tag.notes.length).to.equal(1);
+    expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(note.referencingItemsCount).to.equal(1);
-    expect(note.tags.length).to.equal(1);
+    
+    expect(this.application.itemManager.itemsThatReferenceItem(note.uuid).length).to.equal(1);
   });
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -60,9 +58,8 @@ describe('importing', () => {
      * Used strategy here will be KEEP_LEFT_DUPLICATE_RIGHT
      * which means that new right items will be created with different
      */
-    const modelManager = this.application.modelManager;
     const notePayload = Factory.createNotePayload();
-    await modelManager.emitPayload(
+    await this.application.itemManager.emitItemFromPayload(
       notePayload,
       PayloadSource.LocalSaved
     );
@@ -85,16 +82,15 @@ describe('importing', () => {
       true,
     );
     this.expectedItemCount++;
-    expect(modelManager.notes.length).to.equal(2);
-    const imported = modelManager.notes.find((n) => n.uuid !== notePayload.uuid);
+    expect(this.application.itemManager.notes.length).to.equal(2);
+    const imported = this.application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid);
     expect(imported.content.title).to.equal(mutatedNote.content.title);
   });
 
   it('importing a tag with lesser references should not create duplicate', async function () {
-    const modelManager = this.application.modelManager;
     const pair = Factory.createRelatedNoteTagPairPayload();
     const tagPayload = pair[1];
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       pair,
       PayloadSource.LocalChanged
     );
@@ -113,22 +109,21 @@ describe('importing', () => {
       undefined,
       true,
     );
-    expect(modelManager.tags.length).to.equal(1);
-    expect(modelManager.findItem(tagPayload.uuid).content.references.length).to.equal(1);
+    expect(this.application.itemManager.tags.length).to.equal(1);
+    expect(this.application.itemManager.findItem(tagPayload.uuid).content.references.length).to.equal(1);
   });
 
   it('importing data with differing content should create duplicates', async function () {
-    const modelManager = this.application.modelManager;
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       pair,
       PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
-    const note = modelManager.notes[0];
-    const tag = modelManager.tags[0];
+    const note = this.application.itemManager.notes[0];
+    const tag = this.application.itemManager.tags[0];
     const mutatedNote = CreateMaxPayloadFromAnyObject(
       notePayload,
       null,
@@ -152,23 +147,23 @@ describe('importing', () => {
       true,
     );
     this.expectedItemCount += 2;
-    expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
-    const newNote = modelManager.notes.find((n) => n.uuid !== notePayload.uuid);
-    const newTag = modelManager.tags.find((t) => t.uuid !== tagPayload.uuid);
+    const newNote = this.application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid);
+    const newTag = this.application.itemManager.tags.find((t) => t.uuid !== tagPayload.uuid);
 
     expect(newNote.uuid).to.not.equal(note.uuid);
     expect(newTag.uuid).to.not.equal(tag.uuid);
 
     expect(tag.content.references.length).to.equal(2);
-    expect(tag.notes.length).to.equal(2);
+    expect(tag.noteCount).to.equal(2);
 
     expect(note.content.references.length).to.equal(0);
     expect(note.referencingItemsCount).to.equal(2);
     expect(note.tags.length).to.equal(2);
 
     expect(newTag.content.references.length).to.equal(1);
-    expect(newTag.notes.length).to.equal(1);
+    expect(newTag.noteCount).to.equal(1);
 
     expect(newNote.content.references.length).to.equal(0);
     expect(newNote.referencingItemsCount).to.equal(1);
@@ -187,7 +182,6 @@ describe('importing', () => {
        * value now doesn't match what's coming in. The solution is to get all values
        * ahead of time before any changes are made.
        */
-      const modelManager = this.application.modelManager;
       const note = await Factory.createMappedNote(this.application);
       const tag = await Factory.createMappedTag(this.application);
       this.expectedItemCount += 2;
@@ -225,7 +219,7 @@ describe('importing', () => {
       this.expectedItemCount += 1;
 
       /** We expect now that the total item count is 3, not 4. */
-      expect(modelManager.allItems.length).to.equal(this.expectedItemCount);
+      expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
       /** References from both items have merged. */
       expect(tag.content.references.length).to.equal(2);
     });

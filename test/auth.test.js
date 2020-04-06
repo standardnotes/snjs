@@ -117,7 +117,7 @@ describe('basic auth', () => {
     this.expectedItemCount += noteCount;
     await this.application.syncService.sync();
 
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
     const newPassword = 'newpassword';
     const response = await this.application.changePassword(
@@ -127,19 +127,19 @@ describe('basic auth', () => {
     /** New items key */
     this.expectedItemCount++;
 
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     
     expect(response.error).to.not.be.ok;
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-    expect(this.application.modelManager.invalidItems().length).to.equal(0);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.invalidItems().length).to.equal(0);
     
     await this.application.syncService.markAllItemsAsNeedingSync();
     await this.application.syncService.sync();
     
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     
     /** Create conflict for a note */
-    const note = this.application.modelManager.notes[0];
+    const note = this.application.itemManager.notes[0];
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
     await this.application.saveItem(note);
@@ -158,8 +158,8 @@ describe('basic auth', () => {
     expect(signinResponse).to.be.ok;
     expect(signinResponse.error).to.not.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-    expect(this.application.modelManager.invalidItems().length).to.equal(0);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.invalidItems().length).to.equal(0);
   }).timeout(20000);
 
   it('changes password many times', async function () {
@@ -187,14 +187,14 @@ describe('basic auth', () => {
       currentPassword = newPassword;
       newPassword = Factory.randomString();
 
-      expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
-      expect(this.application.modelManager.invalidItems().length).to.equal(0);
+      expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+      expect(this.application.itemManager.invalidItems().length).to.equal(0);
 
       await this.application.syncService.markAllItemsAsNeedingSync();
       await this.application.syncService.sync();
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-      expect(this.application.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
-      expect(this.application.modelManager.invalidItems().length).to.equal(0);
+      expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
+      expect(this.application.itemManager.invalidItems().length).to.equal(0);
 
       /** Should login with new password */
       const signinResponse = await this.application.signIn(

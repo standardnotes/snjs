@@ -55,7 +55,7 @@ describe('duplication', () => {
 
   it('components should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentType.Component);
-    const item = await this.application.modelManager.emitPayload(
+    const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
@@ -65,14 +65,14 @@ describe('duplication', () => {
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
-    await this.application.modelManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item);
     await this.application.syncService.sync();
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 
   it('items keys should not be duplicated under any circumstances', async function() {
     const payload = createDirtyPayload(ContentType.ItemsKey);
-    const item = await this.application.modelManager.emitPayload(
+    const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
@@ -82,8 +82,8 @@ describe('duplication', () => {
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
-    await this.application.modelManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item);
     await this.application.syncService.sync();
-    expect(this.application.modelManager.allItems.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 });

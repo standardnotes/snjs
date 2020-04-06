@@ -22,8 +22,8 @@ describe('application instances', () => {
     expect(app1.modelManager).to.not.equal(app2.modelManager);
 
     await Factory.createMappedNote(app1);
-    expect(app1.modelManager.allItems.length).length.to.equal(BASE_ITEM_COUNT + 1);
-    expect(app2.modelManager.allItems.length).to.equal(BASE_ITEM_COUNT);
+    expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);
+    expect(app2.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
     await app1.deinit();
     await app2.deinit();
   });

@@ -54,7 +54,7 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      version: ProtocolVersions.V003,
+      version: ProtocolVersion.V003,
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
@@ -155,15 +155,15 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
@@ -272,15 +272,15 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     const keychainValue = await application.deviceInterface.getKeychainValue();
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
@@ -318,12 +318,12 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(accountResult.keyParams.getPortableValue())
     );
     const accountKey = accountResult.key;
-    expect(accountKey.version).to.equal(ProtocolVersions.V003);
+    expect(accountKey.version).to.equal(ProtocolVersion.V003);
     await application.deviceInterface.setKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      version: ProtocolVersions.V003
+      version: ProtocolVersion.V003
     });
     const biometricPrefs = {
       enabled: true,
@@ -392,7 +392,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
@@ -402,8 +402,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(typeof keyParams).to.equal('object');
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
@@ -496,8 +496,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(

@@ -97,7 +97,7 @@ describe('payload encryption', () => {
     expect(changedPayload.content.text).to.equal(changedText);
   });
 
-  it('copying payload with override should override selected fields only', async () => {
+  it('copying payload with override content should override completely', async () => {
     const item = await Factory.createMappedNote(sharedApplication);
     const payload = CreateMaxPayloadFromAnyObject(item);
     const mutated = CreateMaxPayloadFromAnyObject(
@@ -110,7 +110,7 @@ describe('payload encryption', () => {
         }
       }
     );
-    expect(mutated.content.text).to.equal(payload.content.text);
+    expect(mutated.content.text).to.not.be.ok;
   });
 
   it('copying payload with override should copy empty arrays', async () => {

@@ -30,7 +30,7 @@ export {
 } from './models/app/privileges';
 export { SNWebCrypto } from 'sncrypto';
 export { PayloadManager } from './services/model_manager';
-export { ItemManager, ObservationType } from './services/item_manager';
+export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
 export { ChallengeService } from './services/challenge_service';
 export { PureService } from '@Services/pure_service';

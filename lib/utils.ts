@@ -187,7 +187,7 @@ export function removeFromIndex(array: any[], index: number) {
  * Returns a new array by removeing the value from the array at the given index 
  * @returns {Array}
  */
-export function arrayByRemovingFromIndex(array: any[], index: number) {
+export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
   const copy = array.slice();
   removeFromIndex(copy, index);
   return copy;

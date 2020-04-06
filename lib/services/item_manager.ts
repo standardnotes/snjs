@@ -9,7 +9,7 @@ import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
 import { MutableCollection } from './../protocol/payloads/mutable_collection';
-import { CreateItemFromPayload, BuildItemContent } from '@Models/generator';
+import { CreateItemFromPayload, BuildItemContent, Uuids } from '@Models/generator';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
@@ -23,24 +23,23 @@ import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
 
 type ObserverCallback = (
+  /** The items are pre-existing but have been changed */
   changed: SNItem[],
+  /** The items have been newly inserted */
   inserted: SNItem[],
+  /** The items have been deleted from local state (and remote state if applicable) */
   discarded: SNItem[],
   source?: PayloadSource,
   sourceKey?: string
 ) => Promise<void>
 
+const nondeleted = (items: SNItem[]) => {
+  return items.filter((item) => !item.deleted);
+}
+
 type Observer = {
   contentType: ContentType[]
   callback: ObserverCallback
-}
-export enum ObservationType {
-  /** The items have been newly inserted */
-  Inserted = 1,
-  /** The items are pre-existing but have been changed */
-  Changed = 2,
-  /** The items have been deleted from local state (and remote state if applicable) */
-  Discarded = 3
 }
 
 /**
@@ -110,20 +109,32 @@ export class ItemManager extends PureService {
     return this.collection.findAll(uuids, includeBlanks);
   }
 
+  /**
+   * Returns all non-deleted items keys
+   */
   get itemsKeys() {
-    return this.collection.all(ContentType.ItemsKey) as SNItemsKey[];
+    return nondeleted(this.collection.all(ContentType.ItemsKey)) as SNItemsKey[];
   }
 
+  /**
+  * Returns all non-deleted notes
+  */
   get notes() {
-    return this.collection.all(ContentType.Note) as SNNote[];
+    return nondeleted(this.collection.all(ContentType.Note)) as SNNote[];
   }
 
+  /**
+  * Returns all non-deleted tags
+  */
   get tags() {
-    return this.collection.all(ContentType.Tag) as SNTag[];
+    return nondeleted(this.collection.all(ContentType.Tag)) as SNTag[];
   }
 
+  /**
+  * Returns all non-deleted components
+  */
   get components() {
-    return this.collection.all(ContentType.Component) as SNComponent[];
+    return nondeleted(this.collection.all(ContentType.Component)) as SNComponent[];
   }
 
   public addObserver(
@@ -148,6 +159,15 @@ export class ItemManager extends PureService {
    */
   private itemsThatReferenceItem(uuid: UuidString) {
     const uuids = this.uuidsThatReferenceUuid(uuid);
+    return this.findItems(uuids);
+  }
+
+  /**
+   * Returns all items that an item directly references
+   */
+  private referencesForItem(uuid: UuidString) {
+    const item = this.findItem(uuid)!;
+    const uuids = item.references.map((ref) => ref.uuid);
     return this.findItems(uuids);
   }
 
@@ -306,6 +326,7 @@ export class ItemManager extends PureService {
     const payloads = [];
     for (const item of items) {
       if (!item) {
+        debugger;
         throw Error('Attempting to change non-existant item');
       }
       const mutator = new ItemMutator(item, mutationType);
@@ -546,9 +567,17 @@ export class ItemManager extends PureService {
     return this.findItem(payload.uuid!);
   }
 
+  public async emitItemsFromPayloads(
+    payloads: PurePayload[],
+    source = PayloadSource.Constructor
+  ) {
+    await this.modelManager!.emitPayloads(payloads, source);
+    const uuids = Uuids(payloads);
+    return this.findItems(uuids);
+  }
+
   /**
    * Marks the item as deleted and needing sync.
-   * Removes the item from respective content arrays (this.notes, this.tags, etc.)
    */
   public async setItemToBeDeleted(uuid: UuidString) {
     await this.changeItem(uuid, (mutator) => {
@@ -613,20 +642,9 @@ export class ItemManager extends PureService {
       return this.items.filter((item) => {
         return !item.dummy && contentType.includes(item.content_type!);
       });
+    } else {
+      return this.collection.all(contentType);
     }
-    const managed = this.managedItemsForContentType(contentType);
-    return managed || this.getItems([contentType]);
-  }
-
-  private managedItemsForContentType(contentType: ContentType): SNItem[] | null {
-    if (contentType === ContentType.Note) {
-      return this.notes.slice();
-    } else if (contentType === ContentType.Component) {
-      return this.components.slice();
-    } else if (contentType === ContentType.Tag) {
-      return this.tags.slice();
-    }
-    return null;
   }
 
   /** 
@@ -642,15 +660,8 @@ export class ItemManager extends PureService {
    * Returns all items which are properly decrypted
    */
   validItemsForContentType(contentType: ContentType) {
-    const managed = this.managedItemsForContentType(contentType);
-    const items = managed || this.items;
-    return items.filter((item) => {
-      return !item.errorDecrypting && (
-        Array.isArray(contentType)
-          ? contentType.includes(item.content_type)
-          : item.content_type === contentType
-      );
-    });
+    const items = this.collection.all(contentType);
+    return items.filter((item) => !item.errorDecrypting);
   }
 
   /**
@@ -738,11 +749,7 @@ export class ItemManager extends PureService {
    */
   public async emptyTrash() {
     const notes = this.trashedItems;
-    return this.setItemsToBeDeleted(this.uuidsForItems(notes));
-  }
-
-  public uuidsForItems(items: SNItem[]) {
-    return items.map((i) => i.uuid!);
+    return this.setItemsToBeDeleted(Uuids(notes));
   }
 
   /**
@@ -769,7 +776,7 @@ export class ItemManager extends PureService {
    * local data.
    */
   public async removeAllItemsFromMemory() {
-    const uuids = this.uuidsForItems(this.items);
+    const uuids = Uuids(this.items);
     await this.changeItems(uuids, (mutator) => {
       mutator.setDeleted();
     });

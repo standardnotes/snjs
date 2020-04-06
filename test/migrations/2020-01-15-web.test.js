@@ -157,12 +157,12 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
@@ -299,12 +299,12 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
@@ -427,12 +427,12 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersions.V003);
+    expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
@@ -509,8 +509,8 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok;
 
     /** Expect note is decrypted */
-    expect(application.modelManager.notes.length).to.equal(1);
-    const retrievedNote = application.modelManager.notes[0];
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 

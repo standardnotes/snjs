@@ -17,44 +17,41 @@ describe('items', () => {
   });
 
   it('setting an item as dirty should update its client updated at', async function () {
-    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
-    const item = modelManager.items[0];
+    const item = this.application.itemManager.items[0];
     const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
-    await modelManager.setItemDirty(item, true, true);
+    await this.application.itemManager.setItemDirty(item, true, true);
     const newDate = item.client_updated_at.getTime();
     expect(prevDate).to.not.equal(newDate);
   });
 
   it('setting an item as dirty with option to skip client updated at', async function () {
-    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
-    const item = modelManager.items[0];
+    const item = this.application.itemManager.items[0];
     const prevDate = item.client_updated_at.getTime();
     await Factory.sleep(0.1);
-    await modelManager.setItemDirty(item, true);
+    await this.application.itemManager.setItemDirty(item, true);
     const newDate = item.client_updated_at.getTime();
     expect(prevDate).to.equal(newDate);
   });
 
   it('properly pins, archives, and locks', async function () {
-    const modelManager = this.application.modelManager;
     const params = Factory.createNotePayload();
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
 
-    const item = modelManager.items[0];
+    const item = this.application.itemManager.items[0];
     expect(item.pinned).to.not.be.ok;
 
     item.setAppDataItem('pinned', true);
@@ -68,16 +65,15 @@ describe('items', () => {
   });
 
   it('properly compares item equality', async function () {
-    const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [params1, params2],
       PayloadSource.LocalChanged
     );
 
-    const item1 = modelManager.notes[0];
-    const item2 = modelManager.notes[1];
+    const item1 = itemManager.notes[0];
+    const item2 = itemManager.notes[1];
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
@@ -113,16 +109,15 @@ describe('items', () => {
   });
 
   it('content equality should not have side effects', async function () {
-    const modelManager = this.application.modelManager;
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [params1, params2],
       PayloadSource.LocalChanged
     );
 
-    const item1 = modelManager.notes[0];
-    const item2 = modelManager.notes[1];
+    const item1 = this.application.itemManager.notes[0];
+    const item2 = this.application.itemManager.notes[1];
 
     item1.content.foo = 'bar';
     expect(item1.content.foo).to.equal('bar');
@@ -139,7 +134,7 @@ describe('items', () => {
     // There was an issue where calling that function would modify values directly to omit keys
     // in contentKeysToIgnoreWhenCheckingEquality.
 
-    await modelManager.setItemsDirty([item1, item2], true);
+    await this.application.itemManager.setItemsDirty([item1, item2], true);
 
     expect(item1.getAppDataItem('client_updated_at')).to.be.ok;
     expect(item2.getAppDataItem('client_updated_at')).to.be.ok;

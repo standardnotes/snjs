@@ -12,7 +12,6 @@ describe('mapping performance', () => {
     which caused searching to be really expensive and caused a huge slowdown.
     */
     const application = await Factory.createInitAppWithRandNamespace();
-    const modelManager = application.modelManager;
 
     // create a bunch of notes and tags, and make sure mapping doesn't take a long time
     const noteCount = 1500;
@@ -22,7 +21,7 @@ describe('mapping performance', () => {
     for (let i = 0; i < tagCount; i++) {
       var tag = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: 'Tag',
+        content_type: ContentType.Tag,
         content: {
           title: `${Math.random()}`,
           references: []
@@ -33,7 +32,7 @@ describe('mapping performance', () => {
     for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: 'Note',
+        content_type: ContentType.Note,
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
@@ -43,7 +42,7 @@ describe('mapping performance', () => {
       const randomTag = Factory.randomArrayValue(tags);
       randomTag.content.references.push(
         {
-          content_type: 'Note',
+          content_type: ContentType.Note,
           uuid: note.uuid
         }
       );
@@ -60,7 +59,7 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.emitPayloads(
+      await this.application.itemManager.emitItemsFromPayloads(
         subArray,
         PayloadSource.LocalChanged
       );
@@ -72,7 +71,7 @@ describe('mapping performance', () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for (const note of modelManager.validItemsForContentType('Note')) {
+    for (const note of this.application.itemManager.validItemsForContentType(ContentType.Note)) {
       expect(note.referencingItemsCount).to.be.above(0);
     }
     await application.deinit();
@@ -85,14 +84,13 @@ describe('mapping performance', () => {
       so that things require less loops in modelManager, regarding missedReferences.
     */
     const application = await Factory.createInitAppWithRandNamespace();
-    const modelManager = application.modelManager;
 
     const noteCount = 10000;
     const notes = [];
 
     const tag = {
       uuid: Uuid.GenerateUuidSynchronously(),
-      content_type: 'Tag',
+      content_type: ContentType.Tag,
       content: {
         title: `${Math.random()}`,
         references: []
@@ -102,7 +100,7 @@ describe('mapping performance', () => {
     for (let i = 0; i < noteCount; i++) {
       const note = {
         uuid: Uuid.GenerateUuidSynchronously(),
-        content_type: 'Note',
+        content_type: ContentType.Note,
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
@@ -111,7 +109,7 @@ describe('mapping performance', () => {
       };
 
       tag.content.references.push({
-        content_type: 'Note',
+        content_type: ContentType.Note,
         uuid: note.uuid
       });
       notes.push(note);
@@ -127,7 +125,7 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await modelManager.emitPayloads(
+      await this.application.itemManager.emitItemsFromPayloads(
         subArray,
         PayloadSource.LocalChanged
       );
@@ -143,8 +141,8 @@ describe('mapping performance', () => {
     const EXPECTED_RUN_TIME = 8.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
-    const mappedTag = modelManager.validItemsForContentType('Tag')[0];
-    for (const note of modelManager.validItemsForContentType('Note')) {
+    const mappedTag = this.application.itemManager.validItemsForContentType(ContentType.Tag)[0];
+    for (const note of this.application.itemManager.validItemsForContentType(ContentType.Note)) {
       expect(note.referencingItemsCount).to.equal(1);
       expect(note.allReferencingItems[0]).to.equal(mappedTag);
     }

@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('keys', () => {
+describe('keys', () => {
 
   before(async function () {
     localStorage.clear();
@@ -84,7 +84,7 @@ describe.only('keys', () => {
       expect(processedPayload.format).to.equal(PayloadFormat.EncryptedString);
     });
 
-  it.only('has root key and one items key after registering user', async function () {
+  it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.protocolService.itemsKeys.length).to.equal(1);
@@ -226,16 +226,16 @@ describe.only('keys', () => {
       );
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
-    await this.application.modelManager.removeItemLocally(itemsKey);
+    await this.application.itemManager.removeItemLocally(itemsKey);
 
     const decryptedPayload = await this.application.protocolService
       .payloadByDecryptingPayload(encryptedPayload);
-    await this.application.modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [decryptedPayload],
       PayloadSource.LocalChanged
     );
 
-    const note = this.application.modelManager.notes[0];
+    const note = this.application.itemManager.notes[0];
     expect(note.uuid).to.equal(notePayload.uuid);
     expect(note.errorDecrypting).to.equal(true);
     expect(note.waitingForKey).to.equal(true);
@@ -243,7 +243,7 @@ describe.only('keys', () => {
     const keyPayload = CreateMaxPayloadFromAnyObject(
       itemsKey
     );
-    await this.application.modelManager.emitPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [keyPayload],
       PayloadSource.LocalChanged
     );
@@ -254,9 +254,11 @@ describe.only('keys', () => {
      */
     await Factory.sleep(0.2);
 
-    expect(note.errorDecrypting).to.equal(false);
-    expect(note.waitingForKey).to.equal(false);
-    expect(note.content.title).to.equal(title);
+    const updatedNote = this.application.itemManager.findItem(note.uuid);
+
+    expect(updatedNote.errorDecrypting).to.equal(false);
+    expect(updatedNote.waitingForKey).to.equal(false);
+    expect(updatedNote.content.title).to.equal(title);
   });
 
   it('generating export params with logged in account should produce encrypted payload', async function () {
@@ -307,13 +309,13 @@ describe.only('keys', () => {
         application: this.application,
         email: this.email,
         password: this.password,
-        version: ProtocolVersions.V003
+        version: ProtocolVersion.V003
       });
 
       const itemsKeys = this.application.protocolService.itemsKeys;
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
-      expect(newestItemsKey.version).to.equal(ProtocolVersions.V003);
+      expect(newestItemsKey.version).to.equal(ProtocolVersion.V003);
       const rootKey = await this.application.protocolService.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);

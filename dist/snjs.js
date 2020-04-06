@@ -3278,7 +3278,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*********************!*\
   !*** ./lib/main.ts ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, ObservationType, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, BuildItemContent, ApplicationEvents, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, BuildItemContent, ApplicationEvents, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3363,8 +3363,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _services_item_manager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/item_manager */ "./lib/services/item_manager.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemManager", function() { return _services_item_manager__WEBPACK_IMPORTED_MODULE_15__["ItemManager"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ObservationType", function() { return _services_item_manager__WEBPACK_IMPORTED_MODULE_15__["ObservationType"]; });
 
 /* harmony import */ var _services_api_http_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/api/http_service */ "./lib/services/api/http_service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return _services_api_http_service__WEBPACK_IMPORTED_MODULE_16__["SNHttpService"]; });
@@ -4056,7 +4054,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 38:
                 ak = _context4.sent;
-                version = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V002;
+                version = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V002;
                 _context4.t0 = _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"];
                 _context4.next = 43;
                 return this.services.deviceInterface.getRawStorageValue('mk');
@@ -4225,7 +4223,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                version = storageValueStore.ak ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V002;
+                version = storageValueStore.ak ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V002;
                 _context7.next = 3;
                 return _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create({
                   masterKey: storageValueStore.mk,
@@ -4443,7 +4441,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
               case 24:
                 unwrappedAccountKey = _context10.sent;
                 accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-                defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(accountKeyContent.ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V002;
+                defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(accountKeyContent.ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V002;
                 newAccountKey = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"])(unwrappedAccountKey, {
                   content: {
                     masterKey: accountKeyContent.mk,
@@ -4513,7 +4511,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                   break;
                 }
 
-                _defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(keychainValue.ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersions"].V002;
+                _defaultVersion = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(keychainValue.ak) ? _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V003 : _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["ProtocolVersion"].V002;
                 _context10.next = 61;
                 return _Protocol_index__WEBPACK_IMPORTED_MODULE_7__["SNRootKey"].Create({
                   masterKey: keychainValue.mk,
@@ -4861,7 +4859,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 payload = (0, _context14.t0)(_context14.t4);
                 itemsKey = Object(_Models_index__WEBPACK_IMPORTED_MODULE_8__["CreateItemFromPayload"])(payload);
                 _context14.next = 18;
-                return this.services.modelManager.emitPayload(itemsKey.payloadRepresentation(), _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSource"].LocalChanged);
+                return this.services.itemManager.emitItemFromPayload(itemsKey.payloadRepresentation(), _Payloads_sources__WEBPACK_IMPORTED_MODULE_5__["PayloadSource"].LocalChanged);
 
               case 18:
               case "end":
@@ -6095,6 +6093,11 @@ var SNTag = /*#__PURE__*/function (_SNItem) {
     key: "isSmartTag",
     value: function isSmartTag() {
       return this.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].SmartTag;
+    }
+  }, {
+    key: "noteCount",
+    get: function get() {
+      return this.payload.safeContent.references.length;
     }
   }], [{
     key: "arrayToDisplayString",
@@ -7595,13 +7598,13 @@ function isEnvironmentMobile(environment) {
 /*!*******************************!*\
   !*** ./lib/protocol/index.ts ***!
   \*******************************/
-/*! exports provided: ProtocolVersions, compareVersions, EncryptionIntent, isDecryptedIntent, intentRequiresEncryption, SNRootKey, CreateKeyParams, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004 */
+/*! exports provided: ProtocolVersion, compareVersions, EncryptionIntent, isDecryptedIntent, intentRequiresEncryption, SNRootKey, CreateKeyParams, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersion"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["ProtocolVersion"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "compareVersions", function() { return _Protocol_versions__WEBPACK_IMPORTED_MODULE_0__["compareVersions"]; });
 
@@ -12779,8 +12782,8 @@ var PurePayload = /*#__PURE__*/function () {
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
-    this.lastSyncBegan = new Date(rawPayload.lastSyncBegan);
-    this.lastSyncEnd = new Date(rawPayload.lastSyncEnd);
+    this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined;
+    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined;
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
 
@@ -20288,12 +20291,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!**************************************!*\
   !*** ./lib/services/item_manager.ts ***!
   \**************************************/
-/*! exports provided: ObservationType, ItemManager */
+/*! exports provided: ItemManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ObservationType", function() { return ObservationType; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemManager", function() { return ItemManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -20355,7 +20357,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var ObservationType;
+
+var nondeleted = function nondeleted(items) {
+  return items.filter(function (item) {
+    return !item.deleted;
+  });
+};
+
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a 
  * more user-friendly or item-specific interface to creating and updating data. 
@@ -20366,13 +20374,6 @@ var ObservationType;
  * will then notify  its observers (which is us), we'll convert the payloads to items, 
  * and then  we'll propagate them to our listeners.
  */
-
-(function (ObservationType) {
-  ObservationType[ObservationType["Inserted"] = 1] = "Inserted";
-  ObservationType[ObservationType["Changed"] = 2] = "Changed";
-  ObservationType[ObservationType["Discarded"] = 3] = "Discarded";
-})(ObservationType || (ObservationType = {}));
-
 var ItemManager = /*#__PURE__*/function (_PureService) {
   _inherits(ItemManager, _PureService);
 
@@ -20449,6 +20450,10 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       return this.collection.findAll(uuids, includeBlanks);
     }
+    /**
+     * Returns all non-deleted items keys
+     */
+
   }, {
     key: "addObserver",
     value: function addObserver(contentType, callback) {
@@ -20475,6 +20480,19 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "itemsThatReferenceItem",
     value: function itemsThatReferenceItem(uuid) {
       var uuids = this.uuidsThatReferenceUuid(uuid);
+      return this.findItems(uuids);
+    }
+    /**
+     * Returns all items that an item directly references
+     */
+
+  }, {
+    key: "referencesForItem",
+    value: function referencesForItem(uuid) {
+      var item = this.findItem(uuid);
+      var uuids = item.references.map(function (ref) {
+        return ref.uuid;
+      });
       return this.findItems(uuids);
     }
   }, {
@@ -20911,80 +20929,81 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
               case 10:
                 if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                  _context5.next = 21;
+                  _context5.next = 22;
                   break;
                 }
 
                 item = _step7.value;
 
                 if (item) {
-                  _context5.next = 14;
+                  _context5.next = 15;
                   break;
                 }
 
+                debugger;
                 throw Error('Attempting to change non-existant item');
 
-              case 14:
+              case 15:
                 _mutator = new _models_core_item__WEBPACK_IMPORTED_MODULE_14__["ItemMutator"](item, mutationType);
                 mutate(_mutator);
                 payload = _mutator.getResult();
                 payloads.push(payload);
 
-              case 18:
+              case 19:
                 _iteratorNormalCompletion7 = true;
                 _context5.next = 10;
                 break;
 
-              case 21:
-                _context5.next = 27;
+              case 22:
+                _context5.next = 28;
                 break;
 
-              case 23:
-                _context5.prev = 23;
+              case 24:
+                _context5.prev = 24;
                 _context5.t0 = _context5["catch"](8);
                 _didIteratorError7 = true;
                 _iteratorError7 = _context5.t0;
 
-              case 27:
-                _context5.prev = 27;
+              case 28:
                 _context5.prev = 28;
+                _context5.prev = 29;
 
                 if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
                   _iterator7.return();
                 }
 
-              case 30:
-                _context5.prev = 30;
+              case 31:
+                _context5.prev = 31;
 
                 if (!_didIteratorError7) {
-                  _context5.next = 33;
+                  _context5.next = 34;
                   break;
                 }
 
                 throw _iteratorError7;
 
-              case 33:
-                return _context5.finish(30);
-
               case 34:
-                return _context5.finish(27);
+                return _context5.finish(31);
 
               case 35:
-                _context5.next = 37;
+                return _context5.finish(28);
+
+              case 36:
+                _context5.next = 38;
                 return this.modelManager.emitPayloads(payloads, payloadSource || _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalChanged, payloadSourceKey);
 
-              case 37:
+              case 38:
                 results = this.findItems(payloads.map(function (p) {
                   return p.uuid;
                 }));
                 return _context5.abrupt("return", results);
 
-              case 39:
+              case 40:
               case "end":
                 return _context5.stop();
             }
           }
-        }, _callee5, this, [[8, 23, 27, 35], [28,, 30, 34]]);
+        }, _callee5, this, [[8, 24, 28, 36], [29,, 31, 35]]);
       }));
 
       function changeItems(_x18, _x19) {
@@ -21468,24 +21487,56 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
       return emitItemFromPayload;
     }()
+  }, {
+    key: "emitItemsFromPayloads",
+    value: function () {
+      var _emitItemsFromPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(payloads) {
+        var source,
+            uuids,
+            _args17 = arguments;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context17) {
+          while (1) {
+            switch (_context17.prev = _context17.next) {
+              case 0:
+                source = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].Constructor;
+                _context17.next = 3;
+                return this.modelManager.emitPayloads(payloads, source);
+
+              case 3:
+                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["Uuids"])(payloads);
+                return _context17.abrupt("return", this.findItems(uuids));
+
+              case 5:
+              case "end":
+                return _context17.stop();
+            }
+          }
+        }, _callee17, this);
+      }));
+
+      function emitItemsFromPayloads(_x40) {
+        return _emitItemsFromPayloads.apply(this, arguments);
+      }
+
+      return emitItemsFromPayloads;
+    }()
     /**
      * Marks the item as deleted and needing sync.
-     * Removes the item from respective content arrays (this.notes, this.tags, etc.)
      */
 
   }, {
     key: "setItemToBeDeleted",
     value: function () {
-      var _setItemToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(uuid) {
+      var _setItemToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(uuid) {
         var _this3 = this;
 
         var referencingIds, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _loop, _iterator8, _step8;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context18) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context19) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
-                _context18.next = 2;
+                _context19.next = 2;
                 return this.changeItem(uuid, function (mutator) {
                   mutator.setDeleted();
                 });
@@ -21498,29 +21549,29 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion8 = true;
                 _didIteratorError8 = false;
                 _iteratorError8 = undefined;
-                _context18.prev = 6;
+                _context19.prev = 6;
                 _loop = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _loop() {
                   var referencingId, referencingItem;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _loop$(_context17) {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _loop$(_context18) {
                     while (1) {
-                      switch (_context17.prev = _context17.next) {
+                      switch (_context18.prev = _context18.next) {
                         case 0:
                           referencingId = _step8.value;
                           referencingItem = _this3.findItem(referencingId);
 
                           if (!referencingItem) {
-                            _context17.next = 5;
+                            _context18.next = 5;
                             break;
                           }
 
-                          _context17.next = 5;
+                          _context18.next = 5;
                           return _this3.changeItem(referencingId, function (mutator) {
                             mutator.removeItemAsRelationship(referencingItem);
                           });
 
                         case 5:
                         case "end":
-                          return _context17.stop();
+                          return _context18.stop();
                       }
                     }
                   }, _loop);
@@ -21529,63 +21580,63 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
               case 9:
                 if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
-                  _context18.next = 14;
+                  _context19.next = 14;
                   break;
                 }
 
-                return _context18.delegateYield(_loop(), "t0", 11);
+                return _context19.delegateYield(_loop(), "t0", 11);
 
               case 11:
                 _iteratorNormalCompletion8 = true;
-                _context18.next = 9;
+                _context19.next = 9;
                 break;
 
               case 14:
-                _context18.next = 20;
+                _context19.next = 20;
                 break;
 
               case 16:
-                _context18.prev = 16;
-                _context18.t1 = _context18["catch"](6);
+                _context19.prev = 16;
+                _context19.t1 = _context19["catch"](6);
                 _didIteratorError8 = true;
-                _iteratorError8 = _context18.t1;
+                _iteratorError8 = _context19.t1;
 
               case 20:
-                _context18.prev = 20;
-                _context18.prev = 21;
+                _context19.prev = 20;
+                _context19.prev = 21;
 
                 if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
                   _iterator8.return();
                 }
 
               case 23:
-                _context18.prev = 23;
+                _context19.prev = 23;
 
                 if (!_didIteratorError8) {
-                  _context18.next = 26;
+                  _context19.next = 26;
                   break;
                 }
 
                 throw _iteratorError8;
 
               case 26:
-                return _context18.finish(23);
+                return _context19.finish(23);
 
               case 27:
-                return _context18.finish(20);
+                return _context19.finish(20);
 
               case 28:
                 this.deestablishReferenceIndexForDeletedItem(uuid);
 
               case 29:
               case "end":
-                return _context18.stop();
+                return _context19.stop();
             }
           }
-        }, _callee17, this, [[6, 16, 20, 28], [21,, 23, 27]]);
+        }, _callee18, this, [[6, 16, 20, 28], [21,, 23, 27]]);
       }));
 
-      function setItemToBeDeleted(_x40) {
+      function setItemToBeDeleted(_x41) {
         return _setItemToBeDeleted.apply(this, arguments);
       }
 
@@ -21598,77 +21649,77 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "setItemsToBeDeleted",
     value: function () {
-      var _setItemsToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(uuids) {
+      var _setItemsToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(uuids) {
         var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, uuid;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context19) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context20) {
           while (1) {
-            switch (_context19.prev = _context19.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
                 _iteratorNormalCompletion9 = true;
                 _didIteratorError9 = false;
                 _iteratorError9 = undefined;
-                _context19.prev = 3;
+                _context20.prev = 3;
                 _iterator9 = uuids[Symbol.iterator]();
 
               case 5:
                 if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                  _context19.next = 12;
+                  _context20.next = 12;
                   break;
                 }
 
                 uuid = _step9.value;
-                _context19.next = 9;
+                _context20.next = 9;
                 return this.setItemToBeDeleted(uuid);
 
               case 9:
                 _iteratorNormalCompletion9 = true;
-                _context19.next = 5;
+                _context20.next = 5;
                 break;
 
               case 12:
-                _context19.next = 18;
+                _context20.next = 18;
                 break;
 
               case 14:
-                _context19.prev = 14;
-                _context19.t0 = _context19["catch"](3);
+                _context20.prev = 14;
+                _context20.t0 = _context20["catch"](3);
                 _didIteratorError9 = true;
-                _iteratorError9 = _context19.t0;
+                _iteratorError9 = _context20.t0;
 
               case 18:
-                _context19.prev = 18;
-                _context19.prev = 19;
+                _context20.prev = 18;
+                _context20.prev = 19;
 
                 if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
                   _iterator9.return();
                 }
 
               case 21:
-                _context19.prev = 21;
+                _context20.prev = 21;
 
                 if (!_didIteratorError9) {
-                  _context19.next = 24;
+                  _context20.next = 24;
                   break;
                 }
 
                 throw _iteratorError9;
 
               case 24:
-                return _context19.finish(21);
+                return _context20.finish(21);
 
               case 25:
-                return _context19.finish(18);
+                return _context20.finish(18);
 
               case 26:
               case "end":
-                return _context19.stop();
+                return _context20.stop();
             }
           }
-        }, _callee18, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee19, this, [[3, 14, 18, 26], [19,, 21, 25]]);
       }));
 
-      function setItemsToBeDeleted(_x41) {
+      function setItemsToBeDeleted(_x42) {
         return _setItemsToBeDeleted.apply(this, arguments);
       }
 
@@ -21691,23 +21742,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         return this.items.filter(function (item) {
           return !item.dummy && contentType.includes(item.content_type);
         });
+      } else {
+        return this.collection.all(contentType);
       }
-
-      var managed = this.managedItemsForContentType(contentType);
-      return managed || this.getItems([contentType]);
-    }
-  }, {
-    key: "managedItemsForContentType",
-    value: function managedItemsForContentType(contentType) {
-      if (contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Note) {
-        return this.notes.slice();
-      } else if (contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Component) {
-        return this.components.slice();
-      } else if (contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag) {
-        return this.tags.slice();
-      }
-
-      return null;
     }
     /** 
      * Returns all items that have not been able to decrypt.
@@ -21727,10 +21764,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "validItemsForContentType",
     value: function validItemsForContentType(contentType) {
-      var managed = this.managedItemsForContentType(contentType);
-      var items = managed || this.items;
+      var items = this.collection.all(contentType);
       return items.filter(function (item) {
-        return !item.errorDecrypting && (Array.isArray(contentType) ? contentType.includes(item.content_type) : item.content_type === contentType);
+        return !item.errorDecrypting;
       });
     }
     /**
@@ -21813,40 +21849,40 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "findOrCreateTagByTitle",
     value: function () {
-      var _findOrCreateTagByTitle = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(title) {
+      var _findOrCreateTagByTitle = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(title) {
         var tag;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context20) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context21) {
           while (1) {
-            switch (_context20.prev = _context20.next) {
+            switch (_context21.prev = _context21.next) {
               case 0:
                 tag = this.findTagByTitle(title);
-                _context20.t0 = tag;
+                _context21.t0 = tag;
 
-                if (_context20.t0) {
-                  _context20.next = 6;
+                if (_context21.t0) {
+                  _context21.next = 6;
                   break;
                 }
 
-                _context20.next = 5;
+                _context21.next = 5;
                 return this.createItem(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["BuildItemContent"])({
                   title: title
                 }), true);
 
               case 5:
-                _context20.t0 = _context20.sent;
+                _context21.t0 = _context21.sent;
 
               case 6:
-                return _context20.abrupt("return", _context20.t0);
+                return _context21.abrupt("return", _context21.t0);
 
               case 7:
               case "end":
-                return _context20.stop();
+                return _context21.stop();
             }
           }
-        }, _callee19, this);
+        }, _callee20, this);
       }));
 
-      function findOrCreateTagByTitle(_x42) {
+      function findOrCreateTagByTitle(_x43) {
         return _findOrCreateTagByTitle.apply(this, arguments);
       }
 
@@ -21881,21 +21917,21 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
      * Permanently deletes any items currently in the trash. Consumer must manually call sync.
      */
     value: function () {
-      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20() {
+      var _emptyTrash = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21() {
         var notes;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context21) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context22) {
           while (1) {
-            switch (_context21.prev = _context21.next) {
+            switch (_context22.prev = _context22.next) {
               case 0:
                 notes = this.trashedItems;
-                return _context21.abrupt("return", this.setItemsToBeDeleted(this.uuidsForItems(notes)));
+                return _context22.abrupt("return", this.setItemsToBeDeleted(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["Uuids"])(notes)));
 
               case 2:
               case "end":
-                return _context21.stop();
+                return _context22.stop();
             }
           }
-        }, _callee20, this);
+        }, _callee21, this);
       }));
 
       function emptyTrash() {
@@ -21904,13 +21940,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
       return emptyTrash;
     }()
-  }, {
-    key: "uuidsForItems",
-    value: function uuidsForItems(items) {
-      return items.map(function (i) {
-        return i.uuid;
-      });
-    }
     /**
      * Returns all smart tags, sorted by title.
      */
@@ -21937,14 +21966,14 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
      * local data.
      */
     value: function () {
-      var _removeAllItemsFromMemory = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21() {
+      var _removeAllItemsFromMemory = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee22() {
         var uuids;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context22) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee22$(_context23) {
           while (1) {
-            switch (_context22.prev = _context22.next) {
+            switch (_context23.prev = _context23.next) {
               case 0:
-                uuids = this.uuidsForItems(this.items);
-                _context22.next = 3;
+                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["Uuids"])(this.items);
+                _context23.next = 3;
                 return this.changeItems(uuids, function (mutator) {
                   mutator.setDeleted();
                 });
@@ -21955,10 +21984,10 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
               case 5:
               case "end":
-                return _context22.stop();
+                return _context23.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee22, this);
       }));
 
       function removeAllItemsFromMemory() {
@@ -21976,22 +22005,34 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsKeys",
     get: function get() {
-      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].ItemsKey);
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].ItemsKey));
     }
+    /**
+    * Returns all non-deleted notes
+    */
+
   }, {
     key: "notes",
     get: function get() {
-      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Note);
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Note));
     }
+    /**
+    * Returns all non-deleted tags
+    */
+
   }, {
     key: "tags",
     get: function get() {
-      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag);
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Tag));
     }
+    /**
+    * Returns all non-deleted components
+    */
+
   }, {
     key: "components",
     get: function get() {
-      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Component);
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_16__["ContentType"].Component));
     }
   }, {
     key: "items",
@@ -23905,7 +23946,7 @@ var KeyMode;
   KeyMode[KeyMode["WrapperOnly"] = 3] = "WrapperOnly";
 })(KeyMode || (KeyMode = {}));
 
-var LAST_NONROOT_ITEMS_KEY_VERSION = _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V003;
+var LAST_NONROOT_ITEMS_KEY_VERSION = _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V003;
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
  * handles delegation of a task to the respective protocol operator. Each version of the protocol
@@ -23980,21 +24021,32 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
       enumerable: false,
       writable: true
     });
-    _this.removeMappingObserver = _this.modelManager.addChangeObserver([_Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey], /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return _this.decryptErroredItems();
+    _this.removeMappingObserver = _this.modelManager.addChangeObserver([_Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey], /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_, inserted) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(inserted.length > 0)) {
+                  _context.next = 3;
+                  break;
+                }
 
-            case 2:
-            case "end":
-              return _context.stop();
+                _context.next = 3;
+                return _this.decryptErroredItems();
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
           }
-        }
-      }, _callee);
-    })));
+        }, _callee);
+      }));
+
+      return function (_x, _x2) {
+        return _ref.apply(this, arguments);
+      };
+    }());
     return _this;
   }
   /** @override */
@@ -24120,7 +24172,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getLatestVersion",
     value: function getLatestVersion() {
-      return _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V004;
+      return _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V004;
     }
     /** 
      * Returns the protocol version associated with the user's account
@@ -24295,7 +24347,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
        * 
        * Versions 004 and above are always supported.
        */
-      if (Object(_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["compareVersions"])(keyParams.version, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V004) >= 0) {
+      if (Object(_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["compareVersions"])(keyParams.version, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V004) >= 0) {
         /* keyParams.version >= 004 */
         return true;
       } else {
@@ -24309,7 +24361,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "supportedVersions",
     value: function supportedVersions() {
-      return [_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V001, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V002, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V003, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V004];
+      return [_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V001, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V002, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V003, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V004];
     }
     /**
      * Determines whether the input version is greater than the latest supported library version.
@@ -24330,7 +24382,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
     value: function isProtocolVersionOutdated(version) {
       var _expirationDates;
 
-      var expirationDates = (_expirationDates = {}, _defineProperty(_expirationDates, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V001, Date.parse('2018-01-01')), _defineProperty(_expirationDates, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V002, Date.parse('2020-01-01')), _expirationDates);
+      var expirationDates = (_expirationDates = {}, _defineProperty(_expirationDates, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V001, Date.parse('2018-01-01')), _defineProperty(_expirationDates, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V002, Date.parse('2020-01-01')), _expirationDates);
       var date = expirationDates[version];
 
       if (!date) {
@@ -24350,13 +24402,13 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "costMinimumForVersion",
     value: function costMinimumForVersion(version) {
-      if (Object(_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["compareVersions"])(version, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V003) >= 0) {
+      if (Object(_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["compareVersions"])(version, _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V003) >= 0) {
         throw 'Cost minimums only apply to versions <= 002';
       }
 
-      if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V001) {
+      if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V001) {
         return _protocol_operator_algorithms__WEBPACK_IMPORTED_MODULE_10__["V001Algorithm"].PbkdfMinCost;
-      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V002) {
+      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V002) {
         return _protocol_operator_algorithms__WEBPACK_IMPORTED_MODULE_10__["V002Algorithm"].PbkdfMinCost;
       } else {
         throw "Invalid version for cost minimum: ".concat(version);
@@ -24370,15 +24422,15 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "createOperatorForVersion",
     value: function createOperatorForVersion(version) {
-      if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V001) {
+      if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V001) {
         return new _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["SNProtocolOperator001"](this.crypto);
-      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V002) {
+      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V002) {
         return new _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["SNProtocolOperator002"](this.crypto);
-      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V003) {
+      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V003) {
         return new _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["SNProtocolOperator003"](this.crypto);
-      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V004) {
+      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V004) {
         return new _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["SNProtocolOperator004"](this.crypto);
-      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V000Base64Decrypted) {
+      } else if (version === _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V000Base64Decrypted) {
         return this.createOperatorForLatestVersion();
       } else {
         throw "Unable to find operator for version ".concat(version);
@@ -24432,7 +24484,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee7, this);
       }));
 
-      function computeRootKey(_x, _x2) {
+      function computeRootKey(_x3, _x4) {
         return _computeRootKey.apply(this, arguments);
       }
 
@@ -24462,7 +24514,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee8, this);
       }));
 
-      function createRootKey(_x3, _x4) {
+      function createRootKey(_x5, _x6) {
         return _createRootKey.apply(this, arguments);
       }
 
@@ -24602,7 +24654,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee9, this);
       }));
 
-      function payloadByEncryptingPayload(_x5, _x6, _x7) {
+      function payloadByEncryptingPayload(_x7, _x8, _x9) {
         return _payloadByEncryptingPayload.apply(this, arguments);
       }
 
@@ -24695,7 +24747,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee10, this, [[4, 18, 22, 30], [23,, 25, 29]]);
       }));
 
-      function payloadsByEncryptingPayloads(_x8, _x9) {
+      function payloadsByEncryptingPayloads(_x10, _x11) {
         return _payloadsByEncryptingPayloads.apply(this, arguments);
       }
 
@@ -24776,7 +24828,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee11, this);
       }));
 
-      function payloadByDecryptingPayload(_x10, _x11) {
+      function payloadByDecryptingPayload(_x12, _x13) {
         return _payloadByDecryptingPayload.apply(this, arguments);
       }
 
@@ -24910,7 +24962,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee12, this, [[4, 34, 38, 46], [18, 25], [39,, 41, 45]]);
       }));
 
-      function payloadsByDecryptingPayloads(_x12, _x13) {
+      function payloadsByDecryptingPayloads(_x14, _x15) {
         return _payloadsByDecryptingPayloads.apply(this, arguments);
       }
 
@@ -25021,7 +25073,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee14, this);
       }));
 
-      function payloadsByDecryptingBackupFile(_x14, _x15) {
+      function payloadsByDecryptingBackupFile(_x16, _x17) {
         return _payloadsByDecryptingBackupFile.apply(this, arguments);
       }
 
@@ -25037,7 +25089,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
     value: function createKeyParams(keyParams) {
       /* 002 doesn't have version automatically, newer versions do. */
       if (!keyParams.version) {
-        keyParams.version = _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersions"].V002;
+        keyParams.version = _Protocol_index__WEBPACK_IMPORTED_MODULE_9__["ProtocolVersion"].V002;
       }
 
       return Object(_Protocol_index__WEBPACK_IMPORTED_MODULE_9__["CreateKeyParams"])(keyParams);
@@ -25112,7 +25164,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee15, this);
       }));
 
-      function createBackupFile(_x16) {
+      function createBackupFile(_x18) {
         return _createBackupFile.apply(this, arguments);
       }
 
@@ -25602,7 +25654,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee25, this);
       }));
 
-      function validateWrappingKey(_x17) {
+      function validateWrappingKey(_x19) {
         return _validateWrappingKey.apply(this, arguments);
       }
 
@@ -25642,7 +25694,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee26, this);
       }));
 
-      function computeWrappingKey(_x18) {
+      function computeWrappingKey(_x20) {
         return _computeWrappingKey.apply(this, arguments);
       }
 
@@ -25717,7 +25769,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee27, this);
       }));
 
-      function unwrapRootKey(_x19) {
+      function unwrapRootKey(_x21) {
         return _unwrapRootKey.apply(this, arguments);
       }
 
@@ -25810,7 +25862,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee28, this);
       }));
 
-      function setNewRootKeyWrapper(_x20, _x21) {
+      function setNewRootKeyWrapper(_x22, _x23) {
         return _setNewRootKeyWrapper.apply(this, arguments);
       }
 
@@ -25849,7 +25901,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee29, this);
       }));
 
-      function wrapAndPersistRootKey(_x22) {
+      function wrapAndPersistRootKey(_x24) {
         return _wrapAndPersistRootKey.apply(this, arguments);
       }
 
@@ -26030,7 +26082,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee31, this);
       }));
 
-      function setNewRootKey(_x23, _x24, _x25) {
+      function setNewRootKey(_x25, _x26, _x27) {
         return _setNewRootKey.apply(this, arguments);
       }
 
@@ -26161,7 +26213,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee34, this);
       }));
 
-      function validateAccountPassword(_x26) {
+      function validateAccountPassword(_x28) {
         return _validateAccountPassword.apply(this, arguments);
       }
 
@@ -26221,7 +26273,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee35, this);
       }));
 
-      function validatePasscode(_x27) {
+      function validatePasscode(_x29) {
         return _validatePasscode.apply(this, arguments);
       }
 
@@ -26300,7 +26352,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee36, this);
       }));
 
-      function keyToUseForEncryptionOfPayload(_x28, _x29) {
+      function keyToUseForEncryptionOfPayload(_x30, _x31) {
         return _keyToUseForEncryptionOfPayload.apply(this, arguments);
       }
 
@@ -26362,7 +26414,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee37, this);
       }));
 
-      function keyToUseForDecryptionOfPayload(_x30) {
+      function keyToUseForDecryptionOfPayload(_x32) {
         return _keyToUseForDecryptionOfPayload.apply(this, arguments);
       }
 
@@ -26401,7 +26453,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee38, this);
       }));
 
-      function onSyncEvent(_x31) {
+      function onSyncEvent(_x33) {
         return _onSyncEvent.apply(this, arguments);
       }
 
@@ -26678,7 +26730,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         }, _callee43, this);
       }));
 
-      function defaultItemsKeyForItemVersion(_x32) {
+      function defaultItemsKeyForItemVersion(_x34) {
         return _defaultItemsKeyForItemVersion.apply(this, arguments);
       }
 
@@ -27380,7 +27432,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                 });
                 deleteItems = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["arrayByRemovingFromIndex"])(earliestFirst, 0);
                 _context4.next = 6;
-                return this.itemManager.setItemsToBeDeleted(deleteItems);
+                return this.itemManager.setItemsToBeDeleted(Object(_models_generator__WEBPACK_IMPORTED_MODULE_7__["Uuids"])(deleteItems));
 
               case 6:
               case "end":

@@ -129,13 +129,13 @@ describe('item manager', () => {
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.not.be.ok;
   });
 
-  it.only('emitting discardable payload should remove it from our collection', async function () {
+  it('emitting discardable payload should remove it from our collection', async function () {
     const note = await this.createNote();
     const payload = note.payloadRepresentation({
       deleted: true,
       dirty: false
     });
-    await this.modelManager.emitPayload(payload);
+    await this.itemManager.emitItemFromPayload(payload);
     
     expect(payload.discardable).to.equal(true);
     expect(this.itemManager.findItem(note.uuid)).to.not.be.ok;
@@ -154,8 +154,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      async (items, source, sourceKey, type) => {
-        observed.push({ items, source, sourceKey, type });
+      async (changed, inserted, discarded, source, sourceKey) => {
+        observed.push({ changed, inserted, discarded, source, sourceKey });
       },
     );
     const note = await this.createNote();
@@ -163,12 +163,10 @@ describe('item manager', () => {
     expect(observed.length).to.equal(2);
 
     const firstObserved = observed[0];
-    expect(firstObserved.items).to.eql([note]);
-    expect(firstObserved.type).to.equal(ObservationType.Inserted);
+    expect(firstObserved.inserted).to.eql([note]);
 
     const secondObserved = observed[1];
-    expect(secondObserved.items).to.eql([tag]);
-    expect(secondObserved.type).to.equal(ObservationType.Inserted);
+    expect(secondObserved.inserted).to.eql([tag]);
   });
 
   it('change existing item', async function () {

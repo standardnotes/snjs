@@ -86,8 +86,8 @@ export class PurePayload {
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
-    this.lastSyncBegan = new Date(rawPayload.lastSyncBegan!);
-    this.lastSyncEnd = new Date(rawPayload.lastSyncEnd!);
+    this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined;
+    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined;
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
 

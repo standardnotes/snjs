@@ -1,4 +1,4 @@
-import { ItemManager, ObservationType } from '@Services/item_manager';
+import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem } from '@Models/core/item';
@@ -172,7 +172,7 @@ export class SNSingletonManager extends PureService {
       return a.created_at < b.created_at ? -1 : 1;
     });
     const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0);
-    await this.itemManager!.setItemsToBeDeleted(deleteItems);
+    await this.itemManager!.setItemsToBeDeleted(Uuids(deleteItems));
   }
 
   public async findOrCreateSingleton(predicate: SNPredicate, createPayload: PurePayload) {

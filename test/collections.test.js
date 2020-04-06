@@ -22,7 +22,7 @@ describe('payload collections', () => {
     const collection = new PayloadCollection(
       [payload]
     );
-    expect(collection.findPayload(payload.uuid)).to.be.ok;
+    expect(collection.find(payload.uuid)).to.be.ok;
   });
 
   it('references', async () => {
@@ -39,7 +39,7 @@ describe('payload collections', () => {
   it('master collection', async () => {
     const note = await Factory.createMappedNote(sharedApplication);
     const masterCollection = sharedApplication.modelManager.getMasterCollection();
-    const result = masterCollection.findPayload(note.uuid);
+    const result = masterCollection.find(note.uuid);
     expect(result.uuid).to.equal(note.uuid);
   });
 });
