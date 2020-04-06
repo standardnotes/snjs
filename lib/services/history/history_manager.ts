@@ -8,7 +8,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { HistorySession } from '@Services/history/history_session';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined, concatArrays } from '@Lib/utils';
 
 const PERSIST_TIMEOUT = 2000;
 
@@ -81,7 +81,8 @@ export class SNHistoryManager extends PureService {
   addChangeObserver() {
     this.removeChangeObserver = this.itemManager!.addObserver(
       this.contentTypes,
-      async (items, source) => {
+      async (changed, inserted, discarded, source) => {
+        const items = concatArrays(changed, inserted, discarded) as SNItem[];
         if (source === PayloadSource.LocalDirtied) {
           return;
         }

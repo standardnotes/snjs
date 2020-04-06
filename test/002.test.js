@@ -68,7 +68,7 @@ describe('002 protocol operations', () => {
     const key = await protocol002.createItemsKey();
     const params = await protocol002.generateEncryptedParameters(
       payload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       key,
     );
     expect(params.content).to.be.ok;
@@ -81,7 +81,7 @@ describe('002 protocol operations', () => {
     const key = await protocol002.createItemsKey();
     const params = await protocol002.generateEncryptedParameters(
       payload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       key,
     );
 

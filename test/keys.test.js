@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('keys', () => {
+describe.only('keys', () => {
 
   before(async function () {
     localStorage.clear();
@@ -26,39 +26,39 @@ describe('keys', () => {
   });
 
   it('validate isLocalStorageIntent', async function () {
-    expect(isLocalStorageIntent(EncryptionIntents.Sync)).to.equal(false);
-    expect(isLocalStorageIntent(EncryptionIntents.LocalStorageEncrypted)).to.equal(true);
-    expect(isLocalStorageIntent(EncryptionIntents.LocalStorageDecrypted)).to.equal(true);
-    expect(isLocalStorageIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(true);
-    expect(isLocalStorageIntent(EncryptionIntents.FileEncrypted)).to.equal(false);
-    expect(isLocalStorageIntent(EncryptionIntents.FileDecrypted)).to.equal(false);
+    expect(isLocalStorageIntent(EncryptionIntent.Sync)).to.equal(false);
+    expect(isLocalStorageIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(true);
+    expect(isLocalStorageIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true);
+    expect(isLocalStorageIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(true);
+    expect(isLocalStorageIntent(EncryptionIntent.FileEncrypted)).to.equal(false);
+    expect(isLocalStorageIntent(EncryptionIntent.FileDecrypted)).to.equal(false);
   });
 
   it('validate isFileIntent', async function () {
-    expect(isFileIntent(EncryptionIntents.Sync)).to.equal(false);
-    expect(isFileIntent(EncryptionIntents.LocalStorageEncrypted)).to.equal(false);
-    expect(isFileIntent(EncryptionIntents.LocalStorageDecrypted)).to.equal(false);
-    expect(isFileIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
-    expect(isFileIntent(EncryptionIntents.FileEncrypted)).to.equal(true);
-    expect(isFileIntent(EncryptionIntents.FileDecrypted)).to.equal(true);
+    expect(isFileIntent(EncryptionIntent.Sync)).to.equal(false);
+    expect(isFileIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false);
+    expect(isFileIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(false);
+    expect(isFileIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false);
+    expect(isFileIntent(EncryptionIntent.FileEncrypted)).to.equal(true);
+    expect(isFileIntent(EncryptionIntent.FileDecrypted)).to.equal(true);
   });
 
   it('validate isDecryptedIntent', async function () {
-    expect(isDecryptedIntent(EncryptionIntents.Sync)).to.equal(false);
-    expect(isDecryptedIntent(EncryptionIntents.LocalStorageEncrypted)).to.equal(false);
-    expect(isDecryptedIntent(EncryptionIntents.LocalStorageDecrypted)).to.equal(true);
-    expect(isDecryptedIntent(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
-    expect(isDecryptedIntent(EncryptionIntents.FileEncrypted)).to.equal(false);
-    expect(isDecryptedIntent(EncryptionIntents.FileDecrypted)).to.equal(true);
+    expect(isDecryptedIntent(EncryptionIntent.Sync)).to.equal(false);
+    expect(isDecryptedIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false);
+    expect(isDecryptedIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true);
+    expect(isDecryptedIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false);
+    expect(isDecryptedIntent(EncryptionIntent.FileEncrypted)).to.equal(false);
+    expect(isDecryptedIntent(EncryptionIntent.FileDecrypted)).to.equal(true);
   });
 
   it('validate intentRequiresEncryption', async function () {
-    expect(intentRequiresEncryption(EncryptionIntents.Sync)).to.equal(true);
-    expect(intentRequiresEncryption(EncryptionIntents.LocalStorageEncrypted)).to.equal(true);
-    expect(intentRequiresEncryption(EncryptionIntents.LocalStorageDecrypted)).to.equal(false);
-    expect(intentRequiresEncryption(EncryptionIntents.LocalStoragePreferEncrypted)).to.equal(false);
-    expect(intentRequiresEncryption(EncryptionIntents.FileEncrypted)).to.equal(true);
-    expect(intentRequiresEncryption(EncryptionIntents.FileDecrypted)).to.equal(false);
+    expect(intentRequiresEncryption(EncryptionIntent.Sync)).to.equal(true);
+    expect(intentRequiresEncryption(EncryptionIntent.LocalStorageEncrypted)).to.equal(true);
+    expect(intentRequiresEncryption(EncryptionIntent.LocalStorageDecrypted)).to.equal(false);
+    expect(intentRequiresEncryption(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false);
+    expect(intentRequiresEncryption(EncryptionIntent.FileEncrypted)).to.equal(true);
+    expect(intentRequiresEncryption(EncryptionIntent.FileDecrypted)).to.equal(false);
   });
 
   it('should not have root key by default', async function () {
@@ -79,12 +79,12 @@ describe('keys', () => {
       const processedPayload = await this.application.protocolService
         .payloadByEncryptingPayload(
           payload,
-          EncryptionIntents.LocalStoragePreferEncrypted
+          EncryptionIntent.LocalStoragePreferEncrypted
         );
-      expect(processedPayload.format).to.equal(PayloadFormats.EncryptedString);
+      expect(processedPayload.format).to.equal(PayloadFormat.EncryptedString);
     });
 
-  it('has root key and one items key after registering user', async function () {
+  it.only('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.protocolService.itemsKeys.length).to.equal(1);
@@ -105,7 +105,7 @@ describe('keys', () => {
     const keyToUse = await this.application.protocolService.
       keyToUseForEncryptionOfPayload(
         payload,
-        EncryptionIntents.LocalStoragePreferEncrypted
+        EncryptionIntent.LocalStoragePreferEncrypted
       );
     expect(keyToUse).to.equal(await this.application.protocolService.getRootKey());
   });
@@ -148,7 +148,7 @@ describe('keys', () => {
     /** Encrypt items key */
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
       itemsKey.payloadRepresentation(),
-      EncryptionIntents.Sync
+      EncryptionIntent.Sync
     );
     /** Should not have an items_key_id */
     expect(encryptedPayload.items_key_id).to.not.be.ok;
@@ -171,7 +171,7 @@ describe('keys', () => {
     await this.application.savePayload(notePayload);
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    const rawNotePayload = rawPayloads.find((r) => r.content_type === 'Note');
+    const rawNotePayload = rawPayloads.find((r) => r.content_type === ContentType.Note);
     expect(typeof rawNotePayload.content).to.equal('string');
   });
 
@@ -180,7 +180,7 @@ describe('keys', () => {
     const keyToUse = await this.application.protocolService.
       keyToUseForEncryptionOfPayload(
         note,
-        EncryptionIntents.Sync
+        EncryptionIntent.Sync
       );
     expect(keyToUse.content_type).to.equal(ContentType.ItemsKey);
   });
@@ -190,7 +190,7 @@ describe('keys', () => {
     const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         note,
-        EncryptionIntents.Sync
+        EncryptionIntent.Sync
       );
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
     expect(itemsKey).to.be.ok;
@@ -202,7 +202,7 @@ describe('keys', () => {
     const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         note,
-        EncryptionIntents.Sync
+        EncryptionIntent.Sync
       );
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
@@ -222,7 +222,7 @@ describe('keys', () => {
     const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         notePayload,
-        EncryptionIntents.Sync
+        EncryptionIntent.Sync
       );
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
@@ -265,7 +265,7 @@ describe('keys', () => {
     const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         payload,
-        EncryptionIntents.Sync
+        EncryptionIntent.Sync
       );
     expect(typeof encryptedPayload.content).to.equal('string');
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
@@ -281,7 +281,7 @@ describe('keys', () => {
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject(
       itemsKeyRawPayload
     );
-    expect(itemsKeyPayload.format).to.equal(PayloadFormats.EncryptedString);
+    expect(itemsKeyPayload.format).to.equal(PayloadFormat.EncryptedString);
   });
 
   it('correctly validates local passcode', async function () {

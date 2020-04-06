@@ -105,9 +105,7 @@ export async function PayloadsByAlternatingUuid(
       /** Do not set as dirty; this item is non-syncable
         and should be immediately discarded */
       dirty: false,
-      content: {
-        references: []
-      }
+      content: undefined
     }
   );
 

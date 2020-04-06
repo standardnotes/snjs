@@ -203,7 +203,12 @@ export function CopyPayload(
   payload: PurePayload,
   override?: PayloadOverride
 ): PurePayload {
-  return CreatePayload(payload, payload.fields, payload.source, override);
+  return CreatePayload(
+    payload,
+    payload.fields,
+    payload.source,
+    override
+  );
 }
 
 function CreatePayload(
@@ -213,7 +218,9 @@ function CreatePayload(
   override?: PayloadOverride
 ): PurePayload {
   const rawPayload = pickByCopy(object, fields);
-  const overrideFields = Object.keys(override || []) as PayloadField[];
+  const overrideFields = override instanceof PurePayload
+    ? override.fields.slice()
+    : Object.keys(override || []) as PayloadField[];
   for (const field of overrideFields) {
     const value = override![field];
     rawPayload[field] = value ? Copy(value) : value;

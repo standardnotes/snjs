@@ -19,7 +19,7 @@ import {
 } from '@Models/index';
 import { ComponentAreas, SNComponent } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
-import { Copy, isString, extendArray, removeFromArray, searchArray } from '@Lib/utils';
+import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
 
@@ -234,7 +234,8 @@ export class SNComponentManager extends PureService {
   configureForGeneralUsage() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      async (items, source, sourceKey) => {
+      async (changed, inserted, discarded, source, sourceKey) => {
+        const items = concatArrays(changed, inserted, discarded) as SNItem[];
         const syncedComponents = items.filter((item) => {
           return (
             item.content_type === ContentType.Component ||

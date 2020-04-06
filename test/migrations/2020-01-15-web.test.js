@@ -74,7 +74,7 @@ describe('2020-01-15 web migration', () => {
     );
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       passcodeResult.key,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
@@ -92,7 +92,7 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       accountKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -142,14 +142,14 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok;
 
     const keyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(typeof keyParams).to.equal('object');
 
     /** Embedded value should match */
     const migratedKeyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(JSON.parse(embeddedStorage.auth_params));
@@ -223,7 +223,7 @@ describe('2020-01-15 web migration', () => {
     );
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       passcodeResult.key,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
@@ -241,7 +241,7 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       passcodeKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -291,7 +291,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Embedded value should match */
     const migratedKeyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(embeddedStorage.auth_params);
@@ -359,7 +359,7 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       accountKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -407,7 +407,7 @@ describe('2020-01-15 web migration', () => {
     expect(valueStore.content_type).to.not.be.ok;
     /** Embedded value should match */
     const migratedKeyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).to.eql(accountResult.keyParams.getPortableValue());
@@ -419,7 +419,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok;
 
     const keyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(typeof keyParams).to.equal('object');
@@ -474,7 +474,7 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.DecryptedBareObject
+      PayloadFormat.DecryptedBareObject
     );
     const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,

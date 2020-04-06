@@ -496,8 +496,9 @@ export class SNApplication {
   ) {
     const observer = this.itemManager!.addObserver(
       contentType,
-      async (items, source) => {
-        stream(items, source);
+      async (changed, inserted, discarded, source) => {
+        const all = changed.concat(inserted).concat(discarded);
+        stream(all, source);
       }
     );
     this.streamRemovers.push(observer);

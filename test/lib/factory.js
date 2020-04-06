@@ -11,8 +11,8 @@ export function createApplication(namespace, environment, platform) {
     setInterval.bind(window)
   );
   return new SNApplication(
-    environment || Environments.Web,
-    platform || Platforms.MacWeb,
+    environment || Environment.Web,
+    platform || Platform.MacWeb,
     deviceInterface,
     namespace,
     undefined,

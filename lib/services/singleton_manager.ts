@@ -71,9 +71,9 @@ export class SNSingletonManager extends PureService {
   private addObservers() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      async (items, _, __, type) => {
-        if(type === ObservationType.Inserted) {
-          this.resolveQueue = this.resolveQueue.concat(items);
+      async (_, inserted) => {
+        if(inserted.length > 0) {
+          this.resolveQueue = this.resolveQueue.concat(inserted);
         }
       }
     );

@@ -130,7 +130,7 @@ describe('004 protocol operations', () => {
     const key = await protocol004.createItemsKey();
     const params = await protocol004.generateEncryptedParameters(
       payload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       key,
     );
     const decrypted = await protocol004.generateDecryptedParameters(

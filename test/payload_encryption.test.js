@@ -4,24 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('payload generation', () => {
-  it('generates payload', async () => {
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: 'foo',
-        content: {
-          title: 'All notes',
-          isSystemTag: true,
-          isAllTag: true,
-          predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
-        }
-      }
-    );
-    expect(payload).to.be.ok;
-  });
-});
-
-describe.only('payloads', () => {
+describe('payload encryption', () => {
   const sharedApplication = Factory.createApplication();
 
   before(async () => {
@@ -66,7 +49,7 @@ describe.only('payloads', () => {
 
     const encryptedPayload = await sharedApplication.protocolService.payloadByEncryptingPayload(
       notePayload,
-      EncryptionIntents.Sync
+      EncryptionIntent.Sync
     );
 
     expect(encryptedPayload.dirty).to.not.be.ok;
@@ -167,7 +150,7 @@ describe.only('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.Sync
+      EncryptionIntent.Sync
     );
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
@@ -184,7 +167,7 @@ describe.only('payloads', () => {
     const encodedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.FileDecrypted
+      EncryptionIntent.FileDecrypted
     );
 
     expect(encodedPayload.enc_item_key).to.not.be.ok;
@@ -202,7 +185,7 @@ describe.only('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.LocalStorageEncrypted
+      EncryptionIntent.LocalStorageEncrypted
     );
 
     expect(encryptedPayload.enc_item_key).to.not.be.null;
@@ -223,7 +206,7 @@ describe.only('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.FileEncrypted
+      EncryptionIntent.FileEncrypted
     );
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
@@ -248,7 +231,7 @@ describe.only('payloads', () => {
     const encryptedPayload = await sharedApplication.protocolService
     .payloadByEncryptingPayload(
       mutatedPayload,
-      EncryptionIntents.Sync
+      EncryptionIntent.Sync
     );
     expect(encryptedPayload.content).to.eql(payload.content);
     expect(encryptedPayload.enc_item_key).to.not.be.null;

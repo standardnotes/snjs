@@ -3,7 +3,7 @@ import { PayloadField } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ProtocolVersion } from '@Protocol/versions';
-import { isNullOrUndefined, isString, isObject, Copy, deepFreeze } from '@Lib/utils';
+import { isString, isObject, deepFreeze } from '@Lib/utils';
 import { CopyPayload, PayloadOverride, RawPayload, PayloadContent } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
@@ -60,8 +60,16 @@ export class PurePayload {
     fields: PayloadField[],
     source: PayloadSource
   ) {
-    this.fields = fields;
-    this.source = source;
+    if(fields) {
+      this.fields = fields;
+    } else {
+      this.fields = Object.keys(rawPayload) as PayloadField[];
+    }
+    if(source) {
+      this.source = source;
+    } else {
+      this.source = PayloadSource.Constructor;
+    }
     this.uuid = rawPayload.uuid;
     this.content_type = rawPayload.content_type;
     this.content = rawPayload.content;
@@ -107,6 +115,7 @@ export class PurePayload {
     deepFreeze(this);
   }
 
+  /** 
   get decoded() {
     return this.format === PayloadFormat.DecryptedBareObject;
   }
@@ -117,6 +126,7 @@ export class PurePayload {
       this.format === PayloadFormat.DecryptedBase64String
     );
   }
+  */
 
   get safeContent() {
     return (this.content || {}) as PayloadContent;

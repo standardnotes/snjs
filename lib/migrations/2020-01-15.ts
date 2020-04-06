@@ -10,8 +10,8 @@ import {
   Challenge,
   ChallengeType,
   ChallengeReason,
-  StorageKeys,
-  RawStorageKeys,
+  StorageKey,
+  RawStorageKey,
   namespacedKey,
   ApplicationStages
 } from '@Lib/index';
@@ -20,7 +20,7 @@ import { PayloadSource } from '@Payloads/sources';
 import {
   Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
 } from '@Lib/utils';
-import { ProtocolVersions, EncryptionIntents, SNRootKey } from '@Protocol/index';
+import { ProtocolVersions, EncryptionIntent, SNRootKey } from '@Protocol/index';
 import { SNItemsKey, ContentType } from '@Models/index';
 import { SNStorageService } from '@Services/index';
 import { Uuid } from '@Lib/uuid';
@@ -84,7 +84,7 @@ export class Migration20200115 extends Migration {
     );
     /** Could be null if no account, or if account and storage is encrypted */
     if (rawAccountKeyParams) {
-      newStorageRawStructure.nonwrapped[StorageKeys.RootKeyParams] = rawAccountKeyParams;
+      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = rawAccountKeyParams;
     }
     const encryptedStorage = await deviceInterface.getJsonParsedStorageValue(
       LegacyKeys.WebEncryptedStorageKey
@@ -100,13 +100,13 @@ export class Migration20200115 extends Migration {
       const decryptedStoragePayload = passcodeResult.decryptedStoragePayload;
       const passcodeParams = passcodeResult.keyParams;
       newStorageRawStructure.nonwrapped[
-        StorageKeys.RootKeyWrapperKeyParams
+        StorageKey.RootKeyWrapperKeyParams
       ] = passcodeParams.getPortableValue();
       const rawStorageValueStore = Copy(decryptedStoragePayload.contentObject.storage);
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure[ValueModesKeys.Nonwrapped][StorageKeys.RootKeyParams] 
+      newStorageRawStructure[ValueModesKeys.Nonwrapped][StorageKey.RootKeyParams] 
         = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
 
       let keyToEncryptStorageWith = passcodeKey;
@@ -118,7 +118,7 @@ export class Migration20200115 extends Migration {
           storageValueStore
         );
         keyToEncryptStorageWith = accountKey;
-        newStorageRawStructure.nonwrapped[StorageKeys.WrappedRootKey] = wrappedKey;
+        newStorageRawStructure.nonwrapped[StorageKey.WrappedRootKey] = wrappedKey;
       }
       /** Encrypt storage with proper key */
       newStorageRawStructure.wrapped = await this.webDesktopHelperEncryptStorage(
@@ -163,7 +163,7 @@ export class Migration20200115 extends Migration {
     );
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(
-      namespacedKey(this.services.namespace, RawStorageKeys.StorageObject),
+      namespacedKey(this.services.namespace, RawStorageKey.StorageObject),
       JSON.stringify(newStructure)
     );
   }
@@ -241,7 +241,7 @@ export class Migration20200115 extends Migration {
       encryptedAccountKey = await this.services.protocolService
         .payloadByEncryptingPayload(
           accountKeyPayload,
-          EncryptionIntents.LocalStorageEncrypted,
+          EncryptionIntent.LocalStorageEncrypted,
           passcodeKey,
         );
     }
@@ -270,7 +270,7 @@ export class Migration20200115 extends Migration {
             content: storageValueStore,
           }
         ),
-        EncryptionIntents.LocalStoragePreferEncrypted,
+        EncryptionIntent.LocalStoragePreferEncrypted,
         key,
       );
     return wrapped;
@@ -307,9 +307,9 @@ export class Migration20200115 extends Migration {
     );
     const rawStructure: StorageValuesObject = {
       [ValueModesKeys.Nonwrapped]: {
-        [StorageKeys.WrappedRootKey]: wrappedAccountKey,
-        [StorageKeys.RootKeyWrapperKeyParams]: rawPasscodeParams,
-        [StorageKeys.RootKeyParams]: rawAccountKeyParams
+        [StorageKey.WrappedRootKey]: wrappedAccountKey,
+        [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
+        [StorageKey.RootKeyParams]: rawAccountKeyParams
       },
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
@@ -340,7 +340,7 @@ export class Migration20200115 extends Migration {
         return passcodeKey!;
       };
       const timing = keychainValue.offline.timing;
-      rawStructure[ValueModesKeys.Unwrapped]![StorageKeys.MobilePasscodeTiming] = timing;
+      rawStructure[ValueModesKeys.Unwrapped]![StorageKey.MobilePasscodeTiming] = timing;
       if (wrappedAccountKey) {
         /** 
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
@@ -370,10 +370,10 @@ export class Migration20200115 extends Migration {
         );
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(
           newAccountKey,
-          EncryptionIntents.LocalStoragePreferEncrypted,
+          EncryptionIntent.LocalStoragePreferEncrypted,
           passcodeKey,
         );
-        rawStructure.nonwrapped[StorageKeys.WrappedRootKey] = newWrappedAccountKey;
+        rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey;
         await this.services.deviceInterface.clearKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
@@ -388,7 +388,7 @@ export class Migration20200115 extends Migration {
         /** Encrypt new storage.unwrapped structure with passcode */
         const wrapped = await this.services.protocolService.payloadByEncryptingPayload(
           payload,
-          EncryptionIntents.LocalStoragePreferEncrypted,
+          EncryptionIntent.LocalStoragePreferEncrypted,
           passcodeKey,
         );
         rawStructure.wrapped = wrapped;
@@ -454,7 +454,7 @@ export class Migration20200115 extends Migration {
 
   /**
    * All platforms
-   * Deletes all StorageKeys and LegacyKeys from root raw storage.
+   * Deletes all StorageKey and LegacyKeys from root raw storage.
    * @access private
    */
   async deleteLegacyStorageValues() {
@@ -466,7 +466,7 @@ export class Migration20200115 extends Migration {
       'cachedThemes',
     ];
     const managedKeys = [
-      ...objectToValueArray(StorageKeys),
+      ...objectToValueArray(StorageKey),
       ...objectToValueArray(LegacyKeys),
       ...miscKeys
     ];
@@ -489,7 +489,7 @@ export class Migration20200115 extends Migration {
       return;
     }
     const session = new Session(currentToken);
-    await this.services.storageService.setValue(StorageKeys.Session, session);
+    await this.services.storageService.setValue(StorageKey.Session, session);
   }
 
   /**

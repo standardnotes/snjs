@@ -15,26 +15,16 @@ import {
   DeltaFileImport,
 } from '@Payloads/index';
 
-type PayloadInsertionCallback = (
-  payloads: PurePayload[],
-  source: PayloadSource,
-  sourceKey?: string
-) => Promise<void>
-
-type InsertionObserver = {
-  callback: PayloadInsertionCallback
-}
-
 type ChangeCallback = (
-  allChangedPayloads: PurePayload[],
-  nondeletedPayloads?: PurePayload[],
-  deletedPayloads?: PurePayload[],
+  changed: PurePayload[],
+  inserted: PurePayload[],
+  discarded: PurePayload[],
   source?: PayloadSource,
   sourceKey?: string
 ) => Promise<void>
 
 type ChangeObserver = {
-  types: ContentType | ContentType[]
+  types: ContentType[]
   priority: number
   callback: ChangeCallback
 }
@@ -52,7 +42,6 @@ type ChangeObserver = {
 export class PayloadManager extends PureService {
 
   private changeObservers: ChangeObserver[] = []
-  private creationObservers: InsertionObserver[] = []
   public collection: MutableCollection<PurePayload>
 
   constructor() {
@@ -71,7 +60,6 @@ export class PayloadManager extends PureService {
 
   public deinit() {
     super.deinit();
-    this.creationObservers.length = 0;
     this.changeObservers.length = 0;
     this.resetState();
   }
@@ -123,13 +111,8 @@ export class PayloadManager extends PureService {
     sourceKey?: string
   ) {
     /** First loop should process payloads and add items only; no relationship handling. */
-    const { changed, inserted } = await this.mergePayloadsOntoMaster(payloads);
-    if (inserted.length > 0) {
-      await this.notifyInsertionObservers(inserted, source, sourceKey);
-    }
-    if (changed.length > 0) {
-      await this.notifyChangeObservers(changed, source, sourceKey);
-    }
+    const { changed, inserted, discarded } = await this.mergePayloadsOntoMaster(payloads);
+    await this.notifyChangeObservers(changed, inserted, discarded, source, sourceKey);
   }
 
   private async mergePayloadsOntoMaster(
@@ -137,6 +120,7 @@ export class PayloadManager extends PureService {
   ) {
     const changed: PurePayload[] = [];
     const inserted: PurePayload[] = [];
+    const discarded: PurePayload[] = [];
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
         console.error('Payload is corrupt:', payload);
@@ -148,6 +132,7 @@ export class PayloadManager extends PureService {
        * and can thus be removed from our local record */
       if (newPayload.discardable) {
         this.collection.delete(newPayload);
+        discarded.push(newPayload);
       } else {
         this.collection.set(newPayload);
         if (!masterPayload) {
@@ -157,28 +142,7 @@ export class PayloadManager extends PureService {
         }
       }
     }
-    return { changed, inserted };
-  }
-
-  /** 
-   * Notifies observers when an item has been created 
-   */
-  public addInsertionObserver(callback: PayloadInsertionCallback) {
-    const observer: InsertionObserver = { callback };
-    this.creationObservers.push(observer);
-    return () => {
-      remove(this.creationObservers, observer);
-    };
-  }
-
-  private async notifyInsertionObservers(
-    payloads: PurePayload[],
-    source: PayloadSource,
-    sourceKey?: string
-  ) {
-    for (const observer of this.creationObservers) {
-      await observer.callback(payloads, source, sourceKey);
-    }
+    return { changed, inserted, discarded };
   }
 
   /** 
@@ -211,38 +175,30 @@ export class PayloadManager extends PureService {
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
   public async notifyChangeObservers(
-    payloads: PurePayload[],
+    changed: PurePayload[],
+    inserted: PurePayload[],
+    discarded: PurePayload[],
     source: PayloadSource,
     sourceKey?: string
   ) {
     const observers = this.changeObservers.sort((a, b) => {
       return a.priority < b.priority ? -1 : 1;
     });
+    const filter = (payloads: PurePayload[], types: ContentType[]) => {
+      return types.includes(ContentType.Any)
+        ? payloads
+        : payloads.filter((payload) => {
+          return types.includes(payload.content_type!);
+        });
+    }
     for (const observer of observers) {
-      const allRelevantPayloads =
-        observer.types.includes(ContentType.Any)
-          ? payloads
-          : payloads.filter((payload) => {
-            return observer.types.includes(payload.content_type!);
-          });
-      const validItems = [];
-      const deletedItems = [];
-      for (const item of allRelevantPayloads) {
-        if (item.deleted) {
-          deletedItems.push(item);
-        } else {
-          validItems.push(item);
-        }
-      }
-      if (allRelevantPayloads.length > 0) {
-        await observer.callback(
-          allRelevantPayloads,
-          validItems,
-          deletedItems,
-          source,
-          sourceKey
-        );
-      }
+      await observer.callback(
+        filter(changed, observer.types),
+        filter(inserted, observer.types),
+        filter(discarded, observer.types),
+        source,
+        sourceKey
+      );
     }
   }
 

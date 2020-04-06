@@ -24,7 +24,7 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload, Uuids } from '@Models/generator';
 import { SyncSignal } from '@Services/sync/signals';
-import { StorageKeys, SyncEvents } from '@Lib/index';
+import { StorageKey, SyncEvents } from '@Lib/index';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 
@@ -316,28 +316,28 @@ export class SNSyncService extends PureService {
 
   private async setLastSyncToken(token: string) {
     this.syncToken = token;
-    return this.storageService!.setValue(StorageKeys.LastSyncToken, token);
+    return this.storageService!.setValue(StorageKey.LastSyncToken, token);
   }
 
   private async setPaginationToken(token: string) {
     this.cursorToken = token;
     if (token) {
-      return this.storageService!.setValue(StorageKeys.PaginationToken, token);
+      return this.storageService!.setValue(StorageKey.PaginationToken, token);
     } else {
-      return this.storageService!.removeValue(StorageKeys.PaginationToken);
+      return this.storageService!.removeValue(StorageKey.PaginationToken);
     }
   }
 
   private async getLastSyncToken() {
     if (!this.syncToken) {
-      this.syncToken = await this.storageService!.getValue(StorageKeys.LastSyncToken);
+      this.syncToken = await this.storageService!.getValue(StorageKey.LastSyncToken);
     }
     return this.syncToken!;
   }
 
   private async getPaginationToken() {
     if (!this.cursorToken) {
-      this.cursorToken = await this.storageService!.getValue(StorageKeys.PaginationToken);
+      this.cursorToken = await this.storageService!.getValue(StorageKey.PaginationToken);
     }
     return this.cursorToken!;
   }
@@ -345,8 +345,8 @@ export class SNSyncService extends PureService {
   private async clearSyncPositionTokens() {
     this.syncToken = undefined;
     this.cursorToken = undefined;
-    await this.storageService!.removeValue(StorageKeys.LastSyncToken);
-    await this.storageService!.removeValue(StorageKeys.PaginationToken);
+    await this.storageService!.removeValue(StorageKey.LastSyncToken);
+    await this.storageService!.removeValue(StorageKey.PaginationToken);
   }
 
   private async itemsNeedingSync() {
@@ -360,7 +360,7 @@ export class SNSyncService extends PureService {
       payload,
       this.modelManager!.getMasterCollection()
     );
-    const mapped = await this.modelManager!.emitPayloads(
+    await this.modelManager!.emitPayloads(
       results,
       PayloadSource.LocalChanged
     );

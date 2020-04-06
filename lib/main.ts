@@ -6,10 +6,10 @@ export { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004';
 export { DeviceInterface } from '@Lib/device_interface';
 export {
-  SNItem,
+  SNItem, ItemMutator,
   SNItemsKey,
   SNPredicate,
-  SNNote,
+  SNNote, NoteMutator,
   SNTag,
   SNSmartTag,
   SNActionsExtension,
@@ -80,7 +80,7 @@ export {
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
-  EncryptionIntent as EncryptionIntents,
+  EncryptionIntent,
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
@@ -93,8 +93,8 @@ export {
   ApplicationEvents
 } from '@Lib/events';
 export {
-  Environment as Environments,
-  Platform as Platforms,
+  Environment,
+  Platform,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile,
   platformFromString
@@ -108,20 +108,19 @@ export { PayloadCollection } from '@Payloads/collection';
 export {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,
+  CreateIntentPayloadFromObject,
   CopyPayload
 } from '@Payloads/generator';
 export {
   PayloadSource,
   isPayloadSourceRetrieved
 } from '@Lib/protocol/payloads/sources';
-export { ProtocolVersion as ProtocolVersions } from '@Lib/protocol/versions';
-export {
-  PayloadFormat as PayloadFormats,
-} from '@Payloads/formats';
+export { ProtocolVersion } from '@Lib/protocol/versions';
+export { PayloadFormat } from '@Payloads/formats';
+export { PurePayload } from '@Payloads/pure_payload';
+export { PayloadField } from '@Payloads/fields';
 
-export {
-  StorageKey as StorageKeys,
-} from '@Lib/storage_keys';
+export { StorageKey } from '@Lib/storage_keys';
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/2020-01-01-base';

@@ -80,7 +80,7 @@ describe('protocol', () => {
     );
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.SyncDecrypted
+      EncryptionIntent.SyncDecrypted
     );
     expect(encrypted.content.startsWith('000')).to.equal(true);
     const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted);

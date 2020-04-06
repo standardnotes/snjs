@@ -143,7 +143,7 @@ export class SNComponent extends SNItem {
   }
 }
 
-export class ComponentTransformer extends ItemMutator {
+export class ComponentMutator extends ItemMutator {
 
   set active(active: boolean) {
     this.content!.active = active;

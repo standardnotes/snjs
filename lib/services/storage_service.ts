@@ -4,7 +4,7 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
-import { ApplicationStages, RawStorageKeys, namespacedKey } from '@Lib/index';
+import { ApplicationStages, RawStorageKey, namespacedKey } from '@Lib/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
@@ -256,7 +256,7 @@ export class SNStorageService extends PureService {
    * Default persistence key. Platforms can override as needed.
    */
   private getPersistenceKey() {
-    return namespacedKey(this.namespace, RawStorageKeys.StorageObject);
+    return namespacedKey(this.namespace, RawStorageKey.StorageObject);
   }
 
   private defaultValuesObject(

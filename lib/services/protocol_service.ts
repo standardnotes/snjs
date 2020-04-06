@@ -19,8 +19,7 @@ import {
   CreateSourcedPayloadFromObject,
   CreateMaxPayloadFromAnyObject,
   PayloadSource,
-  PayloadFormats,
-  PayloadField
+  PayloadFormat
 } from '@Payloads/index';
 import {
   isWebEnvironment,
@@ -39,7 +38,7 @@ import {
   CreateKeyParams,
   ProtocolVersions,
   compareVersions,
-  EncryptionIntents
+  EncryptionIntent
 } from '@Protocol/index';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '@Models/content_types';
@@ -367,35 +366,35 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * or throws an exception if unsupported configuration of parameters.
    */
   private payloadContentFormatForIntent(
-    intent: EncryptionIntents,
+    intent: EncryptionIntent,
     key?: SNRootKey | SNItemsKey,
   ) {
     if (!key) {
       /** Decrypted */
       if ((
-        intent === EncryptionIntents.LocalStorageDecrypted ||
-        intent === EncryptionIntents.LocalStoragePreferEncrypted ||
-        intent === EncryptionIntents.FileDecrypted ||
-        intent === EncryptionIntents.FilePreferEncrypted
+        intent === EncryptionIntent.LocalStorageDecrypted ||
+        intent === EncryptionIntent.LocalStoragePreferEncrypted ||
+        intent === EncryptionIntent.FileDecrypted ||
+        intent === EncryptionIntent.FilePreferEncrypted
       )) {
-        return PayloadFormats.DecryptedBareObject;
+        return PayloadFormat.DecryptedBareObject;
       } else if ((
-        intent === EncryptionIntents.SyncDecrypted
+        intent === EncryptionIntent.SyncDecrypted
       )) {
-        return PayloadFormats.DecryptedBase64String;
+        return PayloadFormat.DecryptedBase64String;
       } else {
         throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.';
       }
     } else {
       /** Encrypted */
       if ((
-        intent === EncryptionIntents.Sync ||
-        intent === EncryptionIntents.FileEncrypted ||
-        intent === EncryptionIntents.FilePreferEncrypted ||
-        intent === EncryptionIntents.LocalStorageEncrypted ||
-        intent === EncryptionIntents.LocalStoragePreferEncrypted
+        intent === EncryptionIntent.Sync ||
+        intent === EncryptionIntent.FileEncrypted ||
+        intent === EncryptionIntent.FilePreferEncrypted ||
+        intent === EncryptionIntent.LocalStorageEncrypted ||
+        intent === EncryptionIntent.LocalStoragePreferEncrypted
       )) {
-        return PayloadFormats.EncryptedString;
+        return PayloadFormat.EncryptedString;
       } else {
         throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.';
       }
@@ -415,7 +414,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async payloadByEncryptingPayload(
     payload: PurePayload,
-    intent: EncryptionIntents,
+    intent: EncryptionIntent,
     key?: SNRootKey | SNItemsKey,
   ) : Promise<PurePayload> {
     if (payload.errorDecrypting) {
@@ -430,7 +429,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (!key && intentRequiresEncryption(intent)) {
       throw 'Attempting to generate encrypted payload with no key.';
     }
-    if (payload.format !== PayloadFormats.DecryptedBareObject) {
+    if (payload.format !== PayloadFormat.DecryptedBareObject) {
       throw 'Attempting to encrypt already encrypted payload.';
     }
     if (!payload.content) {
@@ -463,7 +462,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async payloadsByEncryptingPayloads(
     payloads: PurePayload[],
-    intent: EncryptionIntents | ((payload: PurePayload) => EncryptionIntents)
+    intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent)
   ) {
     const results = [];
     for (const payload of payloads) {
@@ -492,10 +491,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw 'Attempting to decrypt payload that has no content.';
     }
     const format = payload.format;
-    if (format === PayloadFormats.DecryptedBareObject) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return payload;
     }
-    if (!key && format === PayloadFormats.EncryptedString) {
+    if (!key && format === PayloadFormat.EncryptedString) {
       key = await this.keyToUseForDecryptionOfPayload(payload);
       if (!key) {
         return CreateMaxPayloadFromAnyObject(
@@ -647,7 +646,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async createBackupFile(
     subItems?: SNItem[],
-    intent = EncryptionIntents.FilePreferEncrypted,
+    intent = EncryptionIntent.FilePreferEncrypted,
     returnIfEmpty = false
   ) {
     const items = subItems || this.itemManager!.items;
@@ -665,7 +664,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       items: encryptedPayloads
     };
     const keyParams = await this.getRootKeyParams();
-    if (keyParams && intent !== EncryptionIntents.FileDecrypted) {
+    if (keyParams && intent !== EncryptionIntent.FileDecrypted) {
       data.keyParams = keyParams.getPortableValue();
     }
     const prettyPrint = 2;
@@ -921,7 +920,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     );
     const wrappedKey = await this.payloadByEncryptingPayload(
       payload,
-      EncryptionIntents.LocalStorageEncrypted,
+      EncryptionIntent.LocalStorageEncrypted,
       wrappingKey,
     );
     await this.storageService!.setValue(
@@ -1088,7 +1087,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   */
   private async keyToUseForEncryptionOfPayload(
     payload: PurePayload,
-    intent: EncryptionIntents
+    intent: EncryptionIntent
   ) {
     if (isNullOrUndefined(intent)) {
       throw 'Intent must be supplied when looking up key for encryption of item.';

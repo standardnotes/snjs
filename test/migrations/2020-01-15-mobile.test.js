@@ -16,8 +16,8 @@ describe('2020-01-15 mobile migration', () => {
 
   it('2020-01-15 migration with passcode and account', async function () {
     const application = await Factory.createAppWithRandNamespace(
-      Environments.Mobile,
-      Platforms.Ios
+      Environment.Mobile,
+      Platform.Ios
     );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
@@ -77,7 +77,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     const encryptedKeyParams = await operator003.generateEncryptedParameters(
       keyPayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       passcodeKey,
     );
     const wrappedKey = CreateMaxPayloadFromAnyObject(
@@ -104,7 +104,7 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       accountKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -146,7 +146,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(valueStore.content_type).to.not.be.ok;
 
     const keyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(typeof keyParams).to.equal('object');
@@ -179,8 +179,8 @@ describe('2020-01-15 mobile migration', () => {
 
   it('2020-01-15 migration with passcode only', async function () {
     const application = await Factory.createAppWithRandNamespace(
-      Environments.Mobile,
-      Platforms.Ios
+      Environment.Mobile,
+      Platform.Ios
     );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
@@ -222,7 +222,7 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       passcodeKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -290,15 +290,15 @@ describe('2020-01-15 mobile migration', () => {
       await application.storageService.getValue('biometrics_prefs')
     ).to.eql(biometricPrefs);
     expect(
-      await application.storageService.getValue(StorageKeys.MobilePasscodeTiming)
+      await application.storageService.getValue(StorageKey.MobilePasscodeTiming)
     ).to.eql(passcodeTiming);
     await application.deinit();
   });
 
   it('2020-01-15 migration with account only', async function () {
     const application = await Factory.createAppWithRandNamespace(
-      Environments.Mobile,
-      Platforms.Ios
+      Environment.Mobile,
+      Platform.Ios
     );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
@@ -342,7 +342,7 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.EncryptedString,
+      PayloadFormat.EncryptedString,
       accountKey,
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
@@ -396,7 +396,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
-      StorageKeys.RootKeyParams,
+      StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
     expect(typeof keyParams).to.equal('object');
@@ -419,8 +419,8 @@ describe('2020-01-15 mobile migration', () => {
 
   it('2020-01-15 migration with no account and no passcode', async function () {
     const application = await Factory.createAppWithRandNamespace(
-      Environments.Mobile,
-      Platforms.Ios
+      Environment.Mobile,
+      Platform.Ios
     );
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
@@ -445,7 +445,7 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload();
     const noteParams = await operator003.generateEncryptedParameters(
       notePayload,
-      PayloadFormats.DecryptedBareObject
+      PayloadFormat.DecryptedBareObject
     );
     const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,

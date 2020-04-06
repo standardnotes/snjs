@@ -148,7 +148,7 @@ describe('online syncing', () => {
     );
     const results = await this.application.syncService.payloadsByPreparingForServer([payload]);
     const processed = results[0];
-    expect(processed.format).to.equal(PayloadFormats.DecryptedBase64String);
+    expect(processed.format).to.equal(PayloadFormat.DecryptedBase64String);
   }).timeout(10000);
 
   it('resolve on next timing strategy', async function () {
@@ -280,7 +280,7 @@ describe('online syncing', () => {
 
     const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
       note.payloadRepresentation(),
-      EncryptionIntents.Sync
+      EncryptionIntent.Sync
     );
     const errorred = CreateMaxPayloadFromAnyObject(
       encrypted,

@@ -9,7 +9,7 @@ export enum RawStorageKey {
 
 /**
  * Keys used for retrieving and saving simple key/value pairs.
- * These keys are managed and are embedded inside RawStorageKeys.StorageObject
+ * These keys are managed and are embedded inside RawStorageKey.StorageObject
  */
 export enum StorageKey {
   RootKeyParams = 'ROOT_KEY_PARAMS',

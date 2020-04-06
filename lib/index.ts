@@ -1,8 +1,8 @@
 export { ApplicationEvents, SyncEvents, applicationEventForSyncEvent } from '@Lib/events';
 export { ApplicationStage as ApplicationStages } from '@Lib/stages';
 export {
-  Environment as Environments,
-  Platform as Platforms,
+  Environment,
+  Platform,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile
 } from '@Lib/platforms';
@@ -15,7 +15,7 @@ export {
   ChallengeValue
 } from '@Lib/challenges';
 export {
-  StorageKey as StorageKeys,
-  RawStorageKey as RawStorageKeys,
+  StorageKey,
+  RawStorageKey,
   namespacedKey,
 } from '@Lib/storage_keys';

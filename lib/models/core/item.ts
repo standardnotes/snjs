@@ -51,7 +51,7 @@ export class SNItem {
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
-    if(!payload.uuid || !payload.content_type) {
+    if (!payload.uuid || !payload.content_type) {
       throw Error('Cannot create item without both uuid and content_type');
     }
     this.payload = payload;
@@ -223,8 +223,7 @@ export class SNItem {
   }
 
   public getContentCopy() {
-    const contentCopy = JSON.parse(JSON.stringify(this.content));
-    return contentCopy;
+    return JSON.parse(JSON.stringify(this.content));
   }
 
   /** Whether the item has never been synced to a server */
@@ -442,7 +441,7 @@ export class ItemMutator {
     if (this.payload.errorDecrypting) {
       return undefined;
     }
-    if(!this.content!.appData) {
+    if (!this.content!.appData) {
       this.content!.appData = {};
     }
     this.content!.appData[domain] = data;

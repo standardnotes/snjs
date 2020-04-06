@@ -44,8 +44,8 @@ const serverUrl = getServerURL();
 const deviceInterface = new DeviceInterfaceSubclass();
 const app = new SNApplication({
    deviceInterface: deviceInterface,
-   environment: Environments.Web,
-   platform: Platforms.MacWeb,
+   environment: Environment.Web,
+   platform: Platform.MacWeb,
    host: serverUrl
 });
 ```
