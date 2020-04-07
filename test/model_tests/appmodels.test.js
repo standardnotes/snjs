@@ -139,10 +139,10 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
 
-    await this.application.itemManager.changeItem(item1, (mutator) => {
+    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
-    await this.application.itemManager.changeItem(item2, (mutator) => {
+    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
       mutator.addItemAsRelationship(item1);
     });
 
@@ -154,10 +154,10 @@ describe('app models', () => {
     var item1 = await Factory.createMappedNote(this.application);
     var item2 = await Factory.createMappedNote(this.application);
 
-    await this.application.itemManager.changeItem(item1, (mutator) => {
+    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
-    await this.application.itemManager.changeItem(item2, (mutator) => {
+    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
       mutator.addItemAsRelationship(item1);
     });
     
@@ -192,10 +192,10 @@ describe('app models', () => {
   it('creating and removing relationships between two items should have valid references', async function () {
     var item1 = await Factory.createMappedNote(this.application);
     var item2 = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.changeItem(item1, (mutator) => {
+    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
-    await this.application.itemManager.changeItem(item2, (mutator) => {
+    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
       mutator.addItemAsRelationship(item1);
     });
 
@@ -238,7 +238,7 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
 
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
     
@@ -260,7 +260,7 @@ describe('app models', () => {
   it('removing references should update cross-refs', async function () {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
 
@@ -286,7 +286,7 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);
 
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
 
@@ -313,7 +313,7 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application);
     this.expectedItemCount += 2;
 
-    await this.application.itemManager.changeItem(item1, (mutator) => {
+    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
 
@@ -342,7 +342,7 @@ describe('app models', () => {
   it('maintains referencing relationships when duplicating', async function () {
     const tag = await Factory.createMappedTag(this.application);
     const note = await Factory.createMappedNote(this.application);
-    const refreshedTag = await this.application.itemManager.changeItem(tag, (mutator) => {
+    const refreshedTag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note);
     });
 

@@ -1281,7 +1281,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const operatorVersion = rootKey
       ? rootKey.version
       : this.getLatestVersion();
-    let itemsKey: SNItemsKey;
+    let itemTemplate: SNItemsKey;
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
       /** Create root key based items key */
       const payload = CreateMaxPayloadFromAnyObject({
@@ -1293,10 +1293,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
           version: operatorVersion
         })
       });
-      itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
+      itemTemplate = CreateItemFromPayload(payload) as SNItemsKey;
     } else {
       /** Create independent items key */
-      itemsKey = await this.operatorForVersion(operatorVersion).createItemsKey();
+      itemTemplate = await this.operatorForVersion(operatorVersion).createItemsKey();
     }
     const currentDefault = this.getDefaultItemsKey();
     if (currentDefault) {
@@ -1307,8 +1307,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         }
       )
     }
+    const itemsKey = await this.itemManager!.insertItem(itemTemplate);
     await this.itemManager!.changeItemsKey(
-      itemsKey,
+      itemsKey.uuid,
       (mutator) => {
         mutator.isDefault = true;
       }

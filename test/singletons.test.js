@@ -90,7 +90,7 @@ describe('singletons', () => {
       [privs1, privs2, privs3],
       PayloadSource.LocalChanged
     );
-    await this.application.itemManager.setItemsDirty(items);
+    await this.application.itemManager.setItemsDirty(Uuids(items));
     await this.application.syncService.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });

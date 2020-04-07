@@ -25,7 +25,7 @@ describe('items', () => {
     const item = this.application.itemManager.items[0];
     const prevDate = item.userModifiedDate.getTime();
     await Factory.sleep(0.1);
-    await this.application.itemManager.setItemDirty(item, true);
+    await this.application.itemManager.setItemDirty(item.uuid, true);
     const refreshedItem = this.application.itemManager.findItem(item.uuid);
     const newDate = refreshedItem.userModifiedDate.getTime();
     expect(prevDate).to.not.equal(newDate);
@@ -40,7 +40,7 @@ describe('items', () => {
     const item = this.application.itemManager.items[0];
     const prevDate = item.userModifiedDate.getTime();
     await Factory.sleep(0.1);
-    await this.application.itemManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item.uuid);
     const newDate = item.userModifiedDate.getTime();
     expect(prevDate).to.equal(newDate);
   });
@@ -55,7 +55,7 @@ describe('items', () => {
     const item = this.application.itemManager.items[0];
     expect(item.pinned).to.not.be.ok;
 
-    const refreshedItem = await this.application.changeItem(item, (mutator) => {
+    const refreshedItem = await this.application.changeItem(item.uuid, (mutator) => {
       mutator.pinned = true;
       mutator.archived = true;
       mutator.locked = true;
@@ -79,32 +79,32 @@ describe('items', () => {
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
     // items should ignore this field when checking for equality
-    item1 = await this.application.changeItem(item1, (mutator) => {
+    item1 = await this.application.changeItem(item1.uuid, (mutator) => {
       mutator.userModifiedDate = new Date();
     });
-    item2 = await this.application.changeItem(item2, (mutator) => {
+    item2 = await this.application.changeItem(item2.uuid, (mutator) => {
       mutator.userModifiedDate = undefined;
     });
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
-    item1 = await this.application.changeItem(item1, (mutator) => {
+    item1 = await this.application.changeItem(item1.uuid, (mutator) => {
       mutator.content.foo = 'bar';
     });
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(false);
 
-    item2 = await this.application.changeItem(item2, (mutator) => {
+    item2 = await this.application.changeItem(item2.uuid, (mutator) => {
       mutator.content.foo = 'bar';
     });
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
     expect(item2.isItemContentEqualWith(item1)).to.equal(true);
 
-    item1 = await this.application.changeItem(item1, (mutator) => {
+    item1 = await this.application.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
-    item2 = await this.application.changeItem(item2, (mutator) => {
+    item2 = await this.application.changeItem(item2.uuid, (mutator) => {
       mutator.addItemAsRelationship(item1);
     });
 
@@ -113,10 +113,10 @@ describe('items', () => {
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(false);
 
-    item1 = await this.application.changeItem(item1, (mutator) => {
+    item1 = await this.application.changeItem(item1.uuid, (mutator) => {
       mutator.removeItemAsRelationship(item2);
     });
-    item2 = await this.application.changeItem(item2, (mutator) => {
+    item2 = await this.application.changeItem(item2.uuid, (mutator) => {
       mutator.removeItemAsRelationship(item1);
     });
 
@@ -136,7 +136,7 @@ describe('items', () => {
     let item1 = this.application.itemManager.notes[0];
     const item2 = this.application.itemManager.notes[1];
 
-    item1 = await this.application.changeItem(item1, (mutator) => {
+    item1 = await this.application.changeItem(item1.uuid, (mutator) => {
       mutator.content.foo = 'bar';
     });
 
@@ -154,7 +154,7 @@ describe('items', () => {
     // There was an issue where calling that function would modify values directly to omit keys
     // in contentKeysToIgnoreWhenCheckingEquality.
 
-    await this.application.itemManager.setItemsDirty([item1, item2]);
+    await this.application.itemManager.setItemsDirty([item1.uuid, item2.uuid]);
 
     expect(item1.userModifiedDate).to.be.ok;
     expect(item2.userModifiedDate).to.be.ok;

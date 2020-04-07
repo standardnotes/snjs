@@ -205,7 +205,7 @@ describe('importing', () => {
       const tag = await Factory.createMappedTag(this.application);
       this.expectedItemCount += 2;
 
-      await this.application.itemManager.changeItem(tag, (mutator) => {
+      await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
         mutator.addItemAsRelationship(note);
       });
 

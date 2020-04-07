@@ -104,7 +104,7 @@ const item = await app.createManagedItem({
   }
 });
 /** Save the item both locally and sync with server */
-await app.saveItem({ item: item });
+await app.saveItem(item.uuid);
 ```
 
 ### Stream notes

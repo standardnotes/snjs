@@ -112,7 +112,7 @@ export class SNActionsService extends PureService {
           : []
       )
       this.itemManager!.changeActionsExtension(
-        extension,
+        extension.uuid,
         (mutator) => {
           mutator.description = description;
           mutator.supported_types = supported_types;

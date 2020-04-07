@@ -98,7 +98,7 @@ describe.only('model manager mapping', () => {
     this.expectedItemCount++;
 
     let item = this.application.itemManager.items[0];
-    item = await this.application.changeItem(item, (mutator) => {
+    item = await this.application.changeItem(item.uuid, (mutator) => {
       mutator.setDeleted();
     });
     const payload2 = CreateMaxPayloadFromAnyObject(item);
@@ -147,21 +147,6 @@ describe.only('model manager mapping', () => {
     await this.application.itemManager.setItemDirty(note.uuid);
     const dirtyItems = this.application.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
-  });
-
-  it('clearing dirty items should return no items', async function () {
-    const payload = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
-      [payload],
-      PayloadSource.LocalChanged
-    );
-    const note = this.application.itemManager.notes[0];
-    await this.application.itemManager.setItemDirty(note.uuid);
-    const dirtyItems = this.application.itemManager.getDirtyItems();
-    expect(dirtyItems.length).to.equal(1);
-
-    await this.application.itemManager.clearItemsAsDirty(Uuids(dirtyItems));
-    expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
   });
 
   it('set all items dirty', async function () {

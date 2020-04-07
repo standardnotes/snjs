@@ -28,7 +28,7 @@ describe('notes + tags syncing', async function() {
 
   it('syncing an item then downloading it should include items_key_id', async function() {
     const note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note);
+    await this.application.itemManager.setItemDirty(note.uuid);
     await this.application.syncService.sync();
     await this.application.modelManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
@@ -55,7 +55,7 @@ describe('notes + tags syncing', async function() {
     expect(this.application.itemManager.tags.length).to.equal(1);
 
     for(let i = 0; i < 9; i++) {
-      await this.application.itemManager.setItemsDirty([note, tag]);
+      await this.application.itemManager.setItemsDirty([note.uuid, tag.uuid]);
       await this.application.syncService.sync();
       this.application.syncService.clearSyncPositionTokens();
       expect(tag.content.references.length).to.equal(1);
@@ -78,7 +78,7 @@ describe('notes + tags syncing', async function() {
     );
     const originalNote = this.application.itemManager.notes[0];
     const originalTag = this.application.itemManager.tags[0];
-    await this.application.itemManager.setItemsDirty([originalNote, originalTag]);
+    await this.application.itemManager.setItemsDirty([originalNote.uuid, originalTag.uuid]);
 
     await this.application.syncService.sync();
 
@@ -122,7 +122,7 @@ describe('notes + tags syncing', async function() {
     const tag = this.application.itemManager.tags[0];
     expect(note.referencingItemsCount).to.equal(1);
 
-    await this.application.itemManager.setItemsDirty([note, tag]);
+    await this.application.itemManager.setItemsDirty([note.uuid, tag.uuid]);
     await this.application.syncService.sync();
     await this.application.syncService.clearSyncPositionTokens();
 
@@ -134,7 +134,7 @@ describe('notes + tags syncing', async function() {
 
     tag.title = `${Math.random()}`;
     tag.updated_at = Factory.yesterday();
-    await this.application.saveItem(tag);
+    await this.application.saveItem(tag.uuid);
 
     // tag should now be conflicted and a copy created
     expect(this.application.itemManager.notes.length).to.equal(1);

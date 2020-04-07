@@ -450,16 +450,41 @@ export class SNApplication {
     return this.itemManager!.trashedItems;
   }
 
-  public async saveItem(item: SNItem) {
-   return this.changeItem(item, () => {});
+  /**
+   * Inserts the input item by its payload properties, and marks the item as dirty.
+   * A sync is not performed after an item is inserted. This must be handled by the caller.
+   */
+  public async insertItem(item: SNItem) {
+    /* First insert the item */
+    const insertedItem = await this.itemManager!.insertItem(item);
+    /* Now change the item so that it's marked as dirty */
+    await this.itemManager!.changeItems([insertedItem.uuid]);
   }
 
+  /**
+   * Saves the item by uuid by finding it, setting it as dirty if its not already,
+   * and performing a sync request.
+   */
+  public async saveItem(uuid: UuidString) {
+    const item = this.itemManager!.findItem(uuid);
+    if(!item) {
+      throw Error('Attempting to save non-inserted item');
+    }
+    if(!item.dirty) {
+      await this.itemManager!.changeItem(uuid);
+    }
+    await this.syncService!.sync();
+  }
+
+  /**
+   * Mutates a pre-existing item, marks it as dirty, and syncs it
+   */
   public async changeItem(
-    itemOrUuid: UuidString | SNItem,
-    mutate: (mutator: ItemMutator) => void
+    uuid: UuidString,
+    mutate?: (mutator: ItemMutator) => void
   ) {
     const results = await this.itemManager!.changeItems(
-      [itemOrUuid] as UuidString[] | SNItem[],
+      [uuid],
       mutate
     );
     await this.syncService!.sync();

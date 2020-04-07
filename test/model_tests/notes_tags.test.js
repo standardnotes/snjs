@@ -208,7 +208,7 @@ describe.only('notes and tags', () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    tag = await this.application.changeItem(tag, (mutator) => {
+    tag = await this.application.changeItem(tag.uuid, (mutator) => {
       mutator.removeItemAsRelationship(note);
     });
 
@@ -294,7 +294,7 @@ describe.only('notes and tags', () => {
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
-    note = await this.application.changeItem(note, (mutator) => {
+    note = await this.application.changeItem(note.uuid, (mutator) => {
       mutator.content.title = Math.random();
     });
     expect(note.content.title).to.not.equal(notePayload.content.title);
@@ -327,7 +327,7 @@ describe.only('notes and tags', () => {
 
   it('setting a note dirty should collapse its properties into content', async function () {
     let note = await this.application.createTemplateItem(ContentType.Note, { title: 'Foo' });    
-    await this.application.saveItem(note);
+    await this.application.saveItem(note.uuid);
     note = this.application.itemManager.findItem(note.uuid);
     expect(note.content.title).to.equal('Foo');
   });
@@ -371,7 +371,7 @@ describe.only('notes and tags', () => {
 //   expect(tag.noteCount).to.equal(1);
 //   expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
 
-//   tag = await this.application.changeItem(tag, (mutator) => {
+//   tag = await this.application.changeItem(tag.uuid, (mutator) => {
 //     mutator.removeItemAsRelationship(note);
 //   });
 

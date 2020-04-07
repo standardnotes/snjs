@@ -924,9 +924,10 @@ export class SNComponentManager extends PureService {
           responseItem,
           PayloadSource.RemoteRetrieved
         );
-        const item = CreateItemFromPayload(payload);
+        const template = CreateItemFromPayload(payload);
+        const item = await this.itemManager!.insertItem(template);
         await this.itemManager!.changeItem(
-          item,
+          item.uuid,
           (mutator) => {
             if (responseItem.clientData) {
               const allComponentData = item.getDomainData(ComponentDataDomain);
@@ -1000,7 +1001,7 @@ export class SNComponentManager extends PureService {
   handleSetComponentDataMessage(component: SNComponent, message: ComponentMessage) {
     /* A component setting its own data does not require special permissions */
     this.runWithPermissions(component, [], async () => {
-      await this.itemManager!.changeComponent(component, (mutator) => {
+      await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.componentData = message.data.componentData;
       })
       this.syncService!.sync();
@@ -1273,7 +1274,7 @@ export class SNComponentManager extends PureService {
     if (component.active) {
       return;
     }
-    await this.itemManager!.changeComponent(component, (mutator) => {
+    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
       mutator.active = true;
     });
     this.syncService!.sync();
@@ -1304,7 +1305,7 @@ export class SNComponentManager extends PureService {
     if (!component.active) {
       return;
     }
-    await this.itemManager!.changeComponent(component, (mutator) => {
+    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
       mutator.active = false;
     });
     this.findOrCreateDataForComponent(component).sessionKey = undefined;
@@ -1314,7 +1315,7 @@ export class SNComponentManager extends PureService {
 
   async reloadComponent(component: SNComponent) {
     /* Do soft deactivate */
-    await this.itemManager!.changeComponent(component, (mutator) => {
+    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
       mutator.active = false;
     });
     this.deregisterComponent(component);
@@ -1322,7 +1323,7 @@ export class SNComponentManager extends PureService {
     /* Do soft activate */
     return new Promise((resolve) => {
       this.timeout(async () => {
-        await this.itemManager!.changeComponent(component, (mutator) => {
+        await this.itemManager!.changeComponent(component.uuid, (mutator) => {
           mutator.active = true;
         });
         this.registerComponent(component);

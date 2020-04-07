@@ -65,7 +65,7 @@ describe('duplication', () => {
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
-    await this.application.itemManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item.uuid);
     await this.application.syncService.sync();
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
@@ -82,7 +82,7 @@ describe('duplication', () => {
     /** Conflict the item */
     item.content.foo = 'zar';
     item.updated_at = Factory.yesterday();
-    await this.application.itemManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item.uuid);
     await this.application.syncService.sync();
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });

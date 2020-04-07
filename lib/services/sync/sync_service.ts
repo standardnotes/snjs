@@ -574,7 +574,7 @@ export class SNSyncService extends PureService {
      */
     const beginDate = new Date();
     await this.itemManager!.changeItems(
-      items,
+      Uuids(items),
       (mutator) => {
         mutator.lastSyncBegan = beginDate;
       }

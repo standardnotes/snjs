@@ -142,7 +142,7 @@ describe('basic auth', () => {
     const note = this.application.itemManager.notes[0];
     note.title = `${Math.random()}`;
     note.updated_at = Factory.yesterday();
-    await this.application.saveItem(note);
+    await this.application.saveItem(note.uuid);
     this.expectedItemCount++;
   
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);

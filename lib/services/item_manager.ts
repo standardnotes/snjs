@@ -158,7 +158,7 @@ export class ItemManager extends PureService {
    * Returns the items that reference the given item, or an empty array if no results.
    */
   private itemsReferencingItem(uuid: UuidString) {
-    if(!isString(uuid)) {
+    if (!isString(uuid)) {
       throw Error('Must use uuid string');
     }
     const uuids = this.uuidsThatReferenceUuid(uuid);
@@ -312,14 +312,14 @@ export class ItemManager extends PureService {
    * pass the uuid of the item if you want to mutate the latest version of the item.
    */
   async changeItem(
-    itemOrUuid: UuidString | SNItem,
-    mutate: (mutator: ItemMutator) => void,
+    uuid: UuidString,
+    mutate?: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
     const results = await this.changeItems(
-      [itemOrUuid] as UuidString[] | SNItem[],
+      [uuid],
       mutate,
       mutationType,
       payloadSource,
@@ -329,28 +329,25 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * @param itemsOrUuids If an item is passed, the values of that item will be directly used,
-   * and the mutation will be applied on that item and propagated. This means that if you pass
-   * an old item reference and mutate that, the new value will be outdated. In this case, always
-   * pass the uuid of the item if you want to mutate the latest version of the item.
+   * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
-  async changeItems(
-    itemsOrUuids: UuidString[] | SNItem[],
-    mutate: (mutator: ItemMutator) => void,
+  public async changeItems(
+    uuids: UuidString[],
+    mutate?: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const items = isString(itemsOrUuids[0])
-      ? this.findItems(itemsOrUuids as UuidString[], true)
-      : itemsOrUuids as SNItem[];
+    const items = this.findItems(uuids as UuidString[], true);
     const payloads = [];
     for (const item of items) {
       if (!item) {
         throw Error('Attempting to change non-existant item');
       }
       const mutator = new ItemMutator(item, mutationType);
-      mutate(mutator);
+      if (mutate) {
+        mutate(mutator);
+      }
       const payload = mutator.getResult();
       payloads.push(payload);
     }
@@ -364,15 +361,13 @@ export class ItemManager extends PureService {
   }
 
   async changeNote(
-    itemOrUuid: UuidString | SNNote,
+    uuid: UuidString,
     mutate: (mutator: NoteMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const note = isString(itemOrUuid)
-      ? this.findItem(itemOrUuid as UuidString)
-      : itemOrUuid as SNNote;
+    const note = this.findItem(uuid);
     if (!note) {
       throw Error('Attempting to change non-existant note');
     }
@@ -386,15 +381,13 @@ export class ItemManager extends PureService {
   }
 
   async changeComponent(
-    itemOrUuid: UuidString | SNComponent,
+    uuid: UuidString,
     mutate: (mutator: ComponentMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const component = isString(itemOrUuid)
-      ? this.findItem(itemOrUuid as UuidString)
-      : itemOrUuid as SNComponent;
+    const component = this.findItem(uuid);
     if (!component) {
       throw Error('Attempting to change non-existant component');
     }
@@ -408,15 +401,13 @@ export class ItemManager extends PureService {
   }
 
   async changeActionsExtension(
-    itemOrUuid: UuidString | SNActionsExtension,
+    uuid: UuidString,
     mutate: (mutator: ActionsExtensionMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const extension = isString(itemOrUuid)
-      ? this.findItem(itemOrUuid as UuidString)
-      : itemOrUuid as SNActionsExtension;
+    const extension = this.findItem(uuid);
     if (!extension) {
       throw Error('Attempting to change non-existant extension');
     }
@@ -430,15 +421,13 @@ export class ItemManager extends PureService {
   }
 
   async changeItemsKey(
-    itemOrUuid: UuidString | SNItemsKey,
+    uuid: UuidString,
     mutate: (mutator: ItemsKeyMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
-    const itemsKey = isString(itemOrUuid)
-      ? this.findItem(itemOrUuid as UuidString)
-      : itemOrUuid as SNItemsKey;
+    const itemsKey = this.findItem(uuid);
     if (!itemsKey) {
       throw Error('Attempting to change non-existant itemsKey');
     }
@@ -466,21 +455,6 @@ export class ItemManager extends PureService {
     );
   }
 
-  public async clearItemsAsDirty(
-    uuids: UuidString[]
-  ) {
-    const items = this.findItems(uuids);
-    const payloads = items.map((item) => {
-      return item!.payloadRepresentation({
-        dirty: false
-      })
-    })
-    return this.modelManager!.emitPayloads(
-      payloads,
-      PayloadSource.LocalDirtied
-    );
-  }
-
   /**
     * Sets the item as needing sync. The item is then run through the mapping function,
     * and propagated to mapping observers.
@@ -492,7 +466,7 @@ export class ItemManager extends PureService {
     source?: PayloadSource,
     sourceKey?: string
   ) {
-    if(!isString(uuid)) {
+    if (!isString(uuid)) {
       throw Error('Must use uuid when setting item dirty');
     }
     return this.setItemsDirty(
@@ -517,7 +491,7 @@ export class ItemManager extends PureService {
     }
     return this.changeItems(
       uuids,
-      () => { },
+      undefined,
       isUserModified ? MutationType.UserInteraction : MutationType.Internal,
       source,
       sourceKey
@@ -536,11 +510,14 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Marks the item as dirty and updates its user modified date. If the item has not
-   * yet been inserted (i.e is a template item), it will be inserted.
+   * Inserts the item as-is by reading its payload value. This function will not 
+   * modify item in any way (such as marking it as dirty). It is up to the caller
+   * to pass in a dirtied item if that is their intention.
    */
-  public async saveItems(items: SNItem[]) {
-    return this.changeItems(items, () => {});
+  public async insertItem(item: SNItem) {
+    const payload = item.payload;
+    const insertedItem = await this.emitItemFromPayload(payload);
+    return insertedItem;
   }
 
   /**
@@ -610,7 +587,7 @@ export class ItemManager extends PureService {
     source = PayloadSource.Constructor
   ) {
     await this.modelManager!.emitPayload(payload, source);
-    return this.findItem(payload.uuid!);
+    return this.findItem(payload.uuid!)!;
   }
 
   public async emitItemsFromPayloads(
@@ -629,7 +606,7 @@ export class ItemManager extends PureService {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.uuidsThatReferenceUuid(uuid);
-    
+
     const item = this.findItem(uuid);
     const changedItem = await this.changeItem(uuid, (mutator) => {
       mutator.setDeleted();

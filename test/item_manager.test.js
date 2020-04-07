@@ -123,7 +123,7 @@ describe('item manager', () => {
   it('inverse reference map should not have duplicates', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
-    await this.itemManager.changeItem(tag, () => {});
+    await this.itemManager.changeItem(tag.uuid);
 
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
   });
@@ -149,7 +149,7 @@ describe('item manager', () => {
   it('removing relationship should update reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
-    await this.itemManager.changeItem(tag, (mutator) => {
+    await this.itemManager.changeItem(tag.uuid, (mutator) => {
       mutator.removeItemAsRelationship(note);
     });
 
@@ -221,7 +221,7 @@ describe('item manager', () => {
     );
     const newTitle = String(Math.random());
     await this.itemManager.changeNote(
-      note,
+      note.uuid,
       (mutator) => {
         mutator.title = newTitle;
       }
@@ -336,7 +336,7 @@ describe('item manager', () => {
   it('trash', async function () {
     const note = await this.createNote();
     const versionTwo = await this.itemManager.changeItem(
-      note,
+      note.uuid,
       (mutator) => {
         mutator.trashed = true;
       }

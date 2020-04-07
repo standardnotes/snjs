@@ -31,13 +31,6 @@ const createItemParams = function () {
   return params;
 };
 
-const createItem = function () {
-  const payload = CreateMaxPayloadFromAnyObject(
-    createItemParams()
-  );
-  return CreateItemFromPayload(payload);
-};
-
 describe('predicates', async function () {
   before(async function () {
     localStorage.clear();
@@ -51,6 +44,14 @@ describe('predicates', async function () {
   beforeEach(function () {
     this.itemManager = new PayloadManager();
     this.itemManager = new ItemManager(this.itemManager);
+    this.createItem = async () => {
+      const payload = CreateMaxPayloadFromAnyObject(
+        createItemParams()
+      );
+      const template = CreateItemFromPayload(payload);
+      await this.itemManager.insertItem(template);
+    };
+
 
     this.createNote = async function () {
       return this.itemManager.createItem(
@@ -84,7 +85,7 @@ describe('predicates', async function () {
   });
 
   it('test and operator', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Item']
@@ -100,7 +101,7 @@ describe('predicates', async function () {
   });
 
   it('test or operator', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'or', [
       ['content.title', '=', 'Hello'],
       ['content_type', '=', 'Item']
@@ -120,7 +121,7 @@ describe('predicates', async function () {
   });
 
   it('test deep nested recursive operator', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [
       ['content.title', '=', 'Hello'],
       ['this_field_ignored', 'or', [
@@ -141,9 +142,9 @@ describe('predicates', async function () {
   });
 
   it('test custom and', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     const changedItem = await this.itemManager.changeItem(
-      item,
+      item.uuid,
       (mutator) => {
         mutator.pinned = true;
         mutator.protected = true;
@@ -161,9 +162,9 @@ describe('predicates', async function () {
   });
 
   it('test compound', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     const changedItem = await this.itemManager.changeItem(
-      item,
+      item.uuid,
       (mutator) => {
         mutator.pinned = true;
         mutator.protected = true;
@@ -179,7 +180,7 @@ describe('predicates', async function () {
   });
 
   it('test equality', async function () {
-    const item = createItem();
+    const item = await this.createItem();
 
     expect(item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Foo'))).to.equal(false);
     expect(item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Item'))).to.equal(true);
@@ -192,7 +193,7 @@ describe('predicates', async function () {
   });
 
   it('test inequality', async function () {
-    const item = createItem();
+    const item = await this.createItem();
 
     expect(item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Foo'))).to.equal(true);
     expect(item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Item'))).to.equal(false);
@@ -205,7 +206,7 @@ describe('predicates', async function () {
   });
 
   it('test nonexistent property', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('foobar', '!=', 'Foo'))).to.equal(true);
     expect(item.satisfiesPredicate(new SNPredicate('foobar', '=', 'Foo'))).to.equal(false);
 
@@ -216,7 +217,7 @@ describe('predicates', async function () {
   });
 
   it('test includes', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(
       new SNPredicate('content.tags', 'includes', ['title', '=', 'bar']))).to.equal(true);
     expect(item.satisfiesPredicate(
@@ -231,9 +232,9 @@ describe('predicates', async function () {
   });
 
   it('test dynamic appData values', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     const changedItem = await this.itemManager.changeItem(
-      item,
+      item.uuid,
       (mutator) => {
         mutator.archived = true;
       }
@@ -360,7 +361,7 @@ describe('predicates', async function () {
     const contentPred = new SNPredicate('content_type', '=', 'Item');
 
     await this.itemManager.changeItem(
-      item2,
+      item2.uuid,
       (mutator) => {
         mutator.archived = true;
       }
@@ -372,12 +373,12 @@ describe('predicates', async function () {
   });
 
   it('nonexistent property should not satisfy predicate', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('content.foobar.length', '=', 0))).to.equal(false);
   });
 
   it('false should compare true with undefined', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     const itemManager = this.itemManager;
     await itemManager.emitItemFromPayload(
       item.payloadRepresentation(),
@@ -388,9 +389,9 @@ describe('predicates', async function () {
   });
 
   it('regex', async function () {
-    const item = createItem();
+    const item = await this.createItem();
     const changedItem = await this.itemManager.changeItem(
-      item,
+      item.uuid,
       (mutator) => {
         mutator.content.title = '123';
       }
@@ -402,7 +403,7 @@ describe('predicates', async function () {
     expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
 
     await this.itemManager.changeItem(
-      changedItem,
+      changedItem.uuid,
       (mutator) => {
         mutator.content.title = 'abc';
       }

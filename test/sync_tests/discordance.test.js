@@ -100,7 +100,7 @@ describe('sync discordance', () => {
     expect(this.application.syncService.isOutOfSync()).to.equal(true);
 
     // We will now reinstate the item and sync, which should repair everything
-    await this.application.itemManager.setItemDirty(item);
+    await this.application.itemManager.setItemDirty(item.uuid);
     await this.application.syncService.sync({checkIntegrity: true});
 
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
@@ -145,7 +145,7 @@ describe('sync discordance', () => {
     // now lets change the local content without syncing it.
     const aNote = this.application.itemManager.notes[0];
     aNote.text = 'discordance';
-    await this.application.itemManager.setItemDirty(aNote);
+    await this.application.itemManager.setItemDirty(aNote.uuid);
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)
     // we expect that the remote content coming in doesn't wipe our pending change. A conflict should be created
@@ -159,7 +159,7 @@ describe('sync discordance', () => {
     }
 
     // now lets sync the item, just to make sure it doesn't cause any problems
-    await this.application.itemManager.setItemDirty(aNote);
+    await this.application.itemManager.setItemDirty(aNote.uuid);
     await this.application.syncService.sync({checkIntegrity: true});
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
