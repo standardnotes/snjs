@@ -1,4 +1,4 @@
-import { SNItem } from '@Models/core/item';
+import { SNItem, ItemMutator } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { ContentType } from '@Models/content_types';
 
@@ -29,5 +29,11 @@ export class SNTag extends SNItem {
     }).map((tag) => {
       return '#' + tag.title;
     }).join(' ');
+  }
+}
+
+export class TagMutator extends ItemMutator {
+  set title(title: string) {
+    this.content!.title = title;
   }
 }

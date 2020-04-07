@@ -200,7 +200,7 @@ describe('item manager', () => {
   it('change existing item', async function () {
     const note = await this.createNote();
     const newTitle = String(Math.random());
-    await this.itemManager.changeNote(
+    await this.itemManager.changeItem(
       note.uuid,
       (mutator) => {
         mutator.title = newTitle;
@@ -222,7 +222,7 @@ describe('item manager', () => {
 
     const changeFn = async () => {
       const newTitle = String(Math.random());
-      return this.itemManager.changeNote(
+      return this.itemManager.changeItem(
         note.uuid,
         (mutator) => {
           mutator.title = newTitle;

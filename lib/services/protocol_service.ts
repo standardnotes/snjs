@@ -451,11 +451,12 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (!encryptionParameters) {
       throw 'Unable to generate encryption parameters';
     }
-    return CreateIntentPayloadFromObject(
+    const result = CreateIntentPayloadFromObject(
       payload,
       intent,
       encryptionParameters,
     );
+    return result
   }
 
   /**

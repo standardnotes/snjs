@@ -165,7 +165,6 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     );
     return CreateEncryptionParameters(
       {
-        uuid: payload.uuid,
         items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
         content: encryptedContentString,
         enc_item_key: encryptedItemKey

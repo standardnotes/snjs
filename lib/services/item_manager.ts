@@ -1,3 +1,4 @@
+import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
 import { SNNote, NoteMutator } from './../models/app/note';
@@ -328,6 +329,22 @@ export class ItemManager extends PureService {
     return results[0];
   }
 
+  private createMutatorForItem(item: SNItem, type: MutationType) {
+    if(item.content_type === ContentType.Note) {
+      return new NoteMutator(item, type);
+    } else if (item.content_type === ContentType.Tag) {
+      return new TagMutator(item, type);
+    } else if(item.content_type === ContentType.Component) {
+      return new ComponentMutator(item, type);
+    } else if (item.content_type === ContentType.ActionsExtension) {
+      return new ActionsExtensionMutator(item, type);
+    } else if (item.content_type === ContentType.ItemsKey) {
+      return new ItemsKeyMutator(item, type);
+    } else {
+      return new ItemMutator(item, type);
+    }
+  }
+
   /**
    * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
@@ -344,7 +361,7 @@ export class ItemManager extends PureService {
       if (!item) {
         throw Error('Attempting to change non-existant item');
       }
-      const mutator = new ItemMutator(item, mutationType);
+      const mutator = this.createMutatorForItem(item, mutationType);
       if (mutate) {
         mutate(mutator);
       }

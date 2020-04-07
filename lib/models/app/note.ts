@@ -41,7 +41,6 @@ export class SNNote extends SNItem implements NoteContent {
 }
 
 export class NoteMutator extends ItemMutator {
-
   set title(title: string) {
     this.content!.title = title;
   }
@@ -49,5 +48,4 @@ export class NoteMutator extends ItemMutator {
   set text(text: string) {
     this.content!.text = text;
   }
-
 }

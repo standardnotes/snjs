@@ -44,7 +44,7 @@ export abstract class SNProtocolOperator {
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */
-  public abstract async computeRootKey(password: string, keyParams: SNRootKeyParams) : Promise<SNRootKey>;
+  public abstract async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
 
   /**
    * Creates a new root key given an identifier and a user password

@@ -71,6 +71,9 @@ export class PurePayload {
       this.source = PayloadSource.Constructor;
     }
     this.uuid = rawPayload.uuid;
+    if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
+      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be');
+    }
     this.content_type = rawPayload.content_type;
     this.content = rawPayload.content;
     this.deleted = rawPayload.deleted;
@@ -136,7 +139,7 @@ export class PurePayload {
   get safeReferences() {
     return this.safeContent.references || [];
   }
-  
+
   get contentObject() {
     if (this.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access non-object content as object');

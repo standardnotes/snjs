@@ -320,6 +320,9 @@ export class SNStorageService extends PureService {
         /** If the payload is deleted and not dirty, remove it from db. */
         deleted.push(payload);
       } else {
+        if(!payload.uuid) {
+          throw Error('Attempting to persist payload with no uuid');
+        }
         const encrypted = await this.encryptionDelegate!.payloadByEncryptingPayload(
           payload,
           this.encryptionPolicy === StorageEncryptionPolicies.Default

@@ -26,12 +26,13 @@ describe('offline syncing', () => {
   });
 
   it('should sync item with no passcode', async function() {
-    const note = await Factory.createMappedNote(this.application);
+    let note = await Factory.createMappedNote(this.application);
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
     await this.application.syncService.sync();
+    note = this.application.findItem(note.uuid);
     /** In rare cases a sync can complete so fast that the dates are equal; this is ok. */
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
     this.expectedItemCount++;

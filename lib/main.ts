@@ -109,6 +109,7 @@ export {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,
   CreateIntentPayloadFromObject,
+  CreateEncryptionParameters,
   CopyPayload
 } from '@Payloads/generator';
 export {

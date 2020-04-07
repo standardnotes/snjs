@@ -194,4 +194,21 @@ describe('payload', () => {
 
     expect(intentPayload.content_type).to.be.ok;
   });
+
+  it('Encryption params with override of select fields should only merge provided fields', function () {
+    const payload = this.createBarePayload();
+    const override = CreateEncryptionParameters({
+      waitingForKey: true,
+      errorDecrypting: true
+    });
+    const intentPayload = CreateIntentPayloadFromObject(
+      payload,
+      EncryptionIntent.LocalStoragePreferEncrypted,
+      override
+    );
+
+    expect(intentPayload.uuid).to.be.ok;
+    expect(intentPayload.content).to.be.ok;
+    expect(intentPayload.content_type).to.be.ok;
+  });
 });

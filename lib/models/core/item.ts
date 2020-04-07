@@ -83,14 +83,6 @@ export class SNItem {
     return this.payload.content_type!;
   }
 
-  get items_key_id() {
-    return this.payload.items_key_id;
-  }
-
-  get enc_item_key() {
-    return this.payload.enc_item_key;
-  }
-
   get created_at() {
     return this.payload.created_at!;
   }
@@ -408,6 +400,15 @@ export class ItemMutator {
       {
         content: this.content,
         lastSyncBegan: began
+      }
+    )
+  }
+
+  public set updated_at(updated_at: Date) {
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        updated_at: updated_at
       }
     )
   }

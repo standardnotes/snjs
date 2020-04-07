@@ -231,11 +231,12 @@ function CreatePayload(
 }
 
 export function CreateEncryptionParameters(
-  raw: RawPayload | PurePayload
+  raw: RawPayload
 ): PurePayload {
+  const fields = Object.keys(raw) as PayloadField[];
   return CreatePayload(
     raw,
-    EncryptionParametersFields.slice(),
+    fields
   );
 }
 
