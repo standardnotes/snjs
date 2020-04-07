@@ -68,7 +68,10 @@ export class ConflictDelta extends SinglePayloadDelta {
         {
           updated_at: updatedAt,
           dirty: true,
-          content: { references: refs }
+          content: { 
+            ...this.basePayload.safeContent,
+            references: refs
+          }
         }
       );
       return [payload];

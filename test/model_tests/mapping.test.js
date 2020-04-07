@@ -120,7 +120,12 @@ describe('model manager mapping', () => {
       payload,
       null,
       null,
-      { content: { title: newTitle } }
+      {
+        content: {
+          ...payload.safeContent,
+          title: newTitle
+        }
+      }
     );
     await this.application.itemManager.emitItemsFromPayloads(
       [mutated],

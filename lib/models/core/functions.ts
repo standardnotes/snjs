@@ -1,6 +1,6 @@
 import { SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
-import { omitInPlace } from '@Lib/utils';
+import { omitInPlace, sortedCopy } from '@Lib/utils';
 
 export function ItemContentsEqual(
   leftContent: PayloadContent,
@@ -9,7 +9,7 @@ export function ItemContentsEqual(
   appDataKeysToIgnore: string[]
 ) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = JSON.parse(JSON.stringify(leftContent));
+  leftContent = sortedCopy(leftContent);
   if (leftContent.appData) {
     const domainData = leftContent.appData[SNItem.DefaultAppDomain()];
     omitInPlace(domainData, appDataKeysToIgnore);
@@ -29,7 +29,7 @@ export function ItemContentsEqual(
   }
   omitInPlace(leftContent, keysToIgnore);
 
-  rightContent = JSON.parse(JSON.stringify(rightContent));
+  rightContent = sortedCopy(rightContent);
   if (rightContent.appData) {
     const domainData = rightContent.appData[SNItem.DefaultAppDomain()];
     omitInPlace(domainData, appDataKeysToIgnore);

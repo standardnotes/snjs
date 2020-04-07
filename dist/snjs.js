@@ -6383,7 +6383,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysToIgnore) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = JSON.parse(JSON.stringify(leftContent));
+  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["sortedCopy"])(leftContent);
 
   if (leftContent.appData) {
     var domainData = leftContent.appData[_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"].DefaultAppDomain()];
@@ -6404,7 +6404,7 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
   }
 
   Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["omitInPlace"])(leftContent, keysToIgnore);
-  rightContent = JSON.parse(JSON.stringify(rightContent));
+  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["sortedCopy"])(rightContent);
 
   if (rightContent.appData) {
     var _domainData = rightContent.appData[_Models_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"].DefaultAppDomain()];
@@ -10277,6 +10277,12 @@ __webpack_require__.r(__webpack_exports__);
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -10414,9 +10420,9 @@ var ConflictDelta = /*#__PURE__*/function (_SinglePayloadDelta) {
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(this.basePayload, {
                   updated_at: _updatedAt,
                   dirty: true,
-                  content: {
+                  content: _objectSpread({}, this.basePayload.safeContent, {
                     references: refs
-                  }
+                  })
                 });
                 return _context2.abrupt("return", [payload]);
 
@@ -10616,7 +10622,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
     key: "resultingCollection",
     value: function () {
       var _resultingCollection = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, payloads;
+        var results, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, payload, handled, payloads;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -10631,7 +10637,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 6:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context.next = 15;
+                  _context.next = 16;
                   break;
                 }
 
@@ -10640,7 +10646,8 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 return this.payloadsByHandlingPayload(payload, results);
 
               case 10:
-                payloads = _context.sent.map(function (result) {
+                handled = _context.sent;
+                payloads = handled.map(function (result) {
                   return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CopyPayload"])(result, {
                     dirty: true,
                     deleted: false
@@ -10648,54 +10655,54 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 });
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, payloads);
 
-              case 12:
+              case 13:
                 _iteratorNormalCompletion = true;
                 _context.next = 6;
                 break;
 
-              case 15:
-                _context.next = 21;
+              case 16:
+                _context.next = 22;
                 break;
 
-              case 17:
-                _context.prev = 17;
+              case 18:
+                _context.prev = 18;
                 _context.t0 = _context["catch"](4);
                 _didIteratorError = true;
                 _iteratorError = _context.t0;
 
-              case 21:
-                _context.prev = 21;
+              case 22:
                 _context.prev = 22;
+                _context.prev = 23;
 
                 if (!_iteratorNormalCompletion && _iterator.return != null) {
                   _iterator.return();
                 }
 
-              case 24:
-                _context.prev = 24;
+              case 25:
+                _context.prev = 25;
 
                 if (!_didIteratorError) {
-                  _context.next = 27;
+                  _context.next = 28;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 27:
-                return _context.finish(24);
-
               case 28:
-                return _context.finish(21);
+                return _context.finish(25);
 
               case 29:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
+                return _context.finish(22);
 
               case 30:
+                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_5__["PayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
+
+              case 31:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[4, 17, 21, 29], [22,, 24, 28]]);
+        }, _callee, this, [[4, 18, 22, 30], [23,, 25, 29]]);
       }));
 
       function resultingCollection() {
@@ -10715,7 +10722,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
               case 0:
                 /**
                  * Check to see if we've already processed a payload for this id.
-                 * If so, that would be the latest value, and not what's in the BC.
+                 * If so, that would be the latest value, and not what's in the base collection.
                  */
 
                 /*
@@ -11873,6 +11880,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -11924,9 +11937,9 @@ function _PayloadsByDuplicating() {
             };
 
             if (isConflict) {
-              override.content = {
+              override.content = _objectSpread({}, payload.safeContent, {
                 conflict_of: payload.uuid
-              };
+              });
             }
 
             copy = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, override);
@@ -12153,9 +12166,9 @@ function _PayloadsByUpdatingReferences() {
           case 49:
             result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
               dirty: true,
-              content: {
+              content: _objectSpread({}, payload.safeContent, {
                 references: references
-              }
+              })
             });
             results.push(result);
 
@@ -17860,7 +17873,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this11.itemManager.duplicateItem(item);
+                return _this11.itemManager.duplicateItem(item.uuid);
 
               case 2:
                 duplicate = _context4.sent;
@@ -20501,27 +20514,33 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       return this.inverseReferenceMap[uuid] || [];
     }
   }, {
-    key: "establishReferenceIndex",
-    value: function establishReferenceIndex(item) {
-      var references = item.references;
+    key: "updateReferenceIndex",
+    value: function updateReferenceIndex(item) {
+      var previousDirect = this.referenceMap[item.uuid] || [];
+      /** Direct index */
+
+      this.referenceMap[item.uuid] = item.references.map(function (r) {
+        return r.uuid;
+      });
+      /** Inverse index */
+
+      /** First remove any old values in case references have changed */
+
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = references[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var reference = _step.value;
+        for (var _iterator = previousDirect[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var previousDirectReference = _step.value;
+          var inverseIndex = this.inverseReferenceMap[previousDirectReference];
 
-          /** Direct index */
-          this.referenceMap[item.uuid] = item.references.map(function (r) {
-            return r.uuid;
-          });
-          /** Inverse index */
-
-          var index = this.inverseReferenceMap[reference.uuid] || [];
-          index.push(item.uuid);
-          this.inverseReferenceMap[reference.uuid] = index;
+          if (inverseIndex) {
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(inverseIndex, item.uuid);
+          }
         }
+        /** Now map current references */
+
       } catch (err) {
         _didIteratorError = true;
         _iteratorError = err;
@@ -20536,20 +20555,20 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           }
         }
       }
-    }
-  }, {
-    key: "deestablishReferenceIndexForDeletedItem",
-    value: function deestablishReferenceIndexForDeletedItem(uuid) {
-      /** Items that we reference */
-      var directReferences = this.referenceMap[uuid] || [];
+
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = directReferences[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var directReference = _step2.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(this.inverseReferenceMap[directReference] || [], uuid);
+        for (var _iterator2 = item.references[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var reference = _step2.value;
+
+          var _inverseIndex = this.inverseReferenceMap[reference.uuid] || [];
+
+          _inverseIndex.push(item.uuid);
+
+          this.inverseReferenceMap[reference.uuid] = _inverseIndex;
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -20565,19 +20584,20 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           }
         }
       }
-
-      delete this.referenceMap[uuid];
-      /** Items that are referencing us */
-
-      var inverseReferences = this.inverseReferenceMap[uuid] || [];
+    }
+  }, {
+    key: "deestablishReferenceIndexForDeletedItem",
+    value: function deestablishReferenceIndexForDeletedItem(uuid) {
+      /** Items that we reference */
+      var directReferences = this.referenceMap[uuid] || [];
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator3 = inverseReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var inverseReference = _step3.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(this.referenceMap[inverseReference] || [], uuid);
+        for (var _iterator3 = directReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var directReference = _step3.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(this.inverseReferenceMap[directReference] || [], uuid);
         }
       } catch (err) {
         _didIteratorError3 = true;
@@ -20590,6 +20610,34 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         } finally {
           if (_didIteratorError3) {
             throw _iteratorError3;
+          }
+        }
+      }
+
+      delete this.referenceMap[uuid];
+      /** Items that are referencing us */
+
+      var inverseReferences = this.inverseReferenceMap[uuid] || [];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = inverseReferences[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var inverseReference = _step4.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(this.referenceMap[inverseReference] || [], uuid);
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -20624,7 +20672,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setPayloads",
     value: function () {
       var _setPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(changed, inserted, discarded, source, sourceKey) {
-        var changedItems, insertedItems, changedOrInserted, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, item, discardedItems, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, _item;
+        var changedItems, insertedItems, changedOrInserted, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, item, discardedItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _item;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
@@ -20637,18 +20685,18 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["CreateItemFromPayload"])(p);
                 });
                 changedOrInserted = changedItems.concat(insertedItems);
-                _iteratorNormalCompletion4 = true;
-                _didIteratorError4 = false;
-                _iteratorError4 = undefined;
+                _iteratorNormalCompletion5 = true;
+                _didIteratorError5 = false;
+                _iteratorError5 = undefined;
                 _context2.prev = 6;
 
-                for (_iterator4 = changedOrInserted[Symbol.iterator](); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                  item = _step4.value;
+                for (_iterator5 = changedOrInserted[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                  item = _step5.value;
 
                   if (item.deleted) {
                     this.deestablishReferenceIndexForDeletedItem(item.uuid);
                   } else {
-                    this.establishReferenceIndex(item);
+                    this.updateReferenceIndex(item);
                   }
                 }
 
@@ -20658,26 +20706,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 10:
                 _context2.prev = 10;
                 _context2.t0 = _context2["catch"](6);
-                _didIteratorError4 = true;
-                _iteratorError4 = _context2.t0;
+                _didIteratorError5 = true;
+                _iteratorError5 = _context2.t0;
 
               case 14:
                 _context2.prev = 14;
                 _context2.prev = 15;
 
-                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                  _iterator4.return();
+                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                  _iterator5.return();
                 }
 
               case 17:
                 _context2.prev = 17;
 
-                if (!_didIteratorError4) {
+                if (!_didIteratorError5) {
                   _context2.next = 20;
                   break;
                 }
 
-                throw _iteratorError4;
+                throw _iteratorError5;
 
               case 20:
                 return _context2.finish(17);
@@ -20690,13 +20738,13 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 discardedItems = discarded.map(function (p) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_9__["CreateItemFromPayload"])(p);
                 });
-                _iteratorNormalCompletion5 = true;
-                _didIteratorError5 = false;
-                _iteratorError5 = undefined;
+                _iteratorNormalCompletion6 = true;
+                _didIteratorError6 = false;
+                _iteratorError6 = undefined;
                 _context2.prev = 27;
 
-                for (_iterator5 = discardedItems[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                  _item = _step5.value;
+                for (_iterator6 = discardedItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                  _item = _step6.value;
                   this.deestablishReferenceIndexForDeletedItem(_item.uuid);
                   this.collection.delete(_item);
                 }
@@ -20707,26 +20755,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 31:
                 _context2.prev = 31;
                 _context2.t1 = _context2["catch"](27);
-                _didIteratorError5 = true;
-                _iteratorError5 = _context2.t1;
+                _didIteratorError6 = true;
+                _iteratorError6 = _context2.t1;
 
               case 35:
                 _context2.prev = 35;
                 _context2.prev = 36;
 
-                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                  _iterator5.return();
+                if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+                  _iterator6.return();
                 }
 
               case 38:
                 _context2.prev = 38;
 
-                if (!_didIteratorError5) {
+                if (!_didIteratorError6) {
                   _context2.next = 41;
                   break;
                 }
 
-                throw _iteratorError5;
+                throw _iteratorError6;
 
               case 41:
                 return _context2.finish(38);
@@ -20756,25 +20804,25 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "notifyObservers",
     value: function () {
       var _notifyObservers = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(changed, inserted, discarded, source, sourceKey) {
-        var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, observer, filter;
+        var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, observer, filter;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _iteratorNormalCompletion6 = true;
-                _didIteratorError6 = false;
-                _iteratorError6 = undefined;
+                _iteratorNormalCompletion7 = true;
+                _didIteratorError7 = false;
+                _iteratorError7 = undefined;
                 _context3.prev = 3;
-                _iterator6 = this.observers[Symbol.iterator]();
+                _iterator7 = this.observers[Symbol.iterator]();
 
               case 5:
-                if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
+                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
                   _context3.next = 13;
                   break;
                 }
 
-                observer = _step6.value;
+                observer = _step7.value;
 
                 filter = function filter(items, types) {
                   return items.filter(function (item) {
@@ -20786,7 +20834,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 return observer.callback(filter(changed, observer.contentType), filter(inserted, observer.contentType), filter(discarded, observer.contentType), source, sourceKey);
 
               case 10:
-                _iteratorNormalCompletion6 = true;
+                _iteratorNormalCompletion7 = true;
                 _context3.next = 5;
                 break;
 
@@ -20797,26 +20845,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 15:
                 _context3.prev = 15;
                 _context3.t0 = _context3["catch"](3);
-                _didIteratorError6 = true;
-                _iteratorError6 = _context3.t0;
+                _didIteratorError7 = true;
+                _iteratorError7 = _context3.t0;
 
               case 19:
                 _context3.prev = 19;
                 _context3.prev = 20;
 
-                if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                  _iterator6.return();
+                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                  _iterator7.return();
                 }
 
               case 22:
                 _context3.prev = 22;
 
-                if (!_didIteratorError6) {
+                if (!_didIteratorError7) {
                   _context3.next = 25;
                   break;
                 }
 
-                throw _iteratorError6;
+                throw _iteratorError7;
 
               case 25:
                 return _context3.finish(22);
@@ -20901,11 +20949,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             payloadSourceKey,
             items,
             payloads,
-            _iteratorNormalCompletion7,
-            _didIteratorError7,
-            _iteratorError7,
-            _iterator7,
-            _step7,
+            _iteratorNormalCompletion8,
+            _didIteratorError8,
+            _iteratorError8,
+            _iterator8,
+            _step8,
             item,
             _mutator,
             payload,
@@ -20921,19 +20969,19 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 payloadSourceKey = _args5.length > 4 ? _args5[4] : undefined;
                 items = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["isString"])(itemsOrUuids[0]) ? this.findItems(itemsOrUuids, true) : itemsOrUuids;
                 payloads = [];
-                _iteratorNormalCompletion7 = true;
-                _didIteratorError7 = false;
-                _iteratorError7 = undefined;
+                _iteratorNormalCompletion8 = true;
+                _didIteratorError8 = false;
+                _iteratorError8 = undefined;
                 _context5.prev = 8;
-                _iterator7 = items[Symbol.iterator]();
+                _iterator8 = items[Symbol.iterator]();
 
               case 10:
-                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
                   _context5.next = 22;
                   break;
                 }
 
-                item = _step7.value;
+                item = _step8.value;
 
                 if (item) {
                   _context5.next = 15;
@@ -20950,7 +20998,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 payloads.push(payload);
 
               case 19:
-                _iteratorNormalCompletion7 = true;
+                _iteratorNormalCompletion8 = true;
                 _context5.next = 10;
                 break;
 
@@ -20961,26 +21009,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 24:
                 _context5.prev = 24;
                 _context5.t0 = _context5["catch"](8);
-                _didIteratorError7 = true;
-                _iteratorError7 = _context5.t0;
+                _didIteratorError8 = true;
+                _iteratorError8 = _context5.t0;
 
               case 28:
                 _context5.prev = 28;
                 _context5.prev = 29;
 
-                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                  _iterator7.return();
+                if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+                  _iterator8.return();
                 }
 
               case 31:
                 _context5.prev = 31;
 
-                if (!_didIteratorError7) {
+                if (!_didIteratorError8) {
                   _context5.next = 34;
                   break;
                 }
 
-                throw _iteratorError7;
+                throw _iteratorError8;
 
               case 34:
                 return _context5.finish(31);
@@ -21312,8 +21360,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "duplicateItem",
     value: function () {
-      var _duplicateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(item) {
+      var _duplicateItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(uuid) {
         var isConflict,
+            item,
             payload,
             resultingPayloads,
             duplicate,
@@ -21323,20 +21372,21 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context13.prev = _context13.next) {
               case 0:
                 isConflict = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : false;
+                item = this.findItem(uuid);
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_13__["CreateMaxPayloadFromAnyObject"])(item);
-                _context13.next = 4;
+                _context13.next = 5;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_7__["PayloadsByDuplicating"])(payload, this.modelManager.getMasterCollection(), isConflict);
 
-              case 4:
+              case 5:
                 resultingPayloads = _context13.sent;
-                _context13.next = 7;
+                _context13.next = 8;
                 return this.modelManager.emitPayloads(resultingPayloads, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalChanged);
 
-              case 7:
+              case 8:
                 duplicate = this.findItem(resultingPayloads[0].uuid);
                 return _context13.abrupt("return", duplicate);
 
-              case 9:
+              case 10:
               case "end":
                 return _context13.stop();
             }
@@ -21530,7 +21580,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       var _setItemToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee18(uuid) {
         var _this3 = this;
 
-        var referencingIds, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _loop, _iterator8, _step8;
+        var referencingIds, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _loop, _iterator9, _step9;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee18$(_context19) {
           while (1) {
@@ -21546,9 +21596,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
                 /* Handle indirect relationships */
                 referencingIds = this.uuidsThatReferenceUuid(uuid);
-                _iteratorNormalCompletion8 = true;
-                _didIteratorError8 = false;
-                _iteratorError8 = undefined;
+                _iteratorNormalCompletion9 = true;
+                _didIteratorError9 = false;
+                _iteratorError9 = undefined;
                 _context19.prev = 6;
                 _loop = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _loop() {
                   var referencingId, referencingItem;
@@ -21556,7 +21606,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                     while (1) {
                       switch (_context18.prev = _context18.next) {
                         case 0:
-                          referencingId = _step8.value;
+                          referencingId = _step9.value;
                           referencingItem = _this3.findItem(referencingId);
 
                           if (!referencingItem) {
@@ -21576,10 +21626,10 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                     }
                   }, _loop);
                 });
-                _iterator8 = referencingIds[Symbol.iterator]();
+                _iterator9 = referencingIds[Symbol.iterator]();
 
               case 9:
-                if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
+                if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
                   _context19.next = 14;
                   break;
                 }
@@ -21587,7 +21637,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 return _context19.delegateYield(_loop(), "t0", 11);
 
               case 11:
-                _iteratorNormalCompletion8 = true;
+                _iteratorNormalCompletion9 = true;
                 _context19.next = 9;
                 break;
 
@@ -21598,26 +21648,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 16:
                 _context19.prev = 16;
                 _context19.t1 = _context19["catch"](6);
-                _didIteratorError8 = true;
-                _iteratorError8 = _context19.t1;
+                _didIteratorError9 = true;
+                _iteratorError9 = _context19.t1;
 
               case 20:
                 _context19.prev = 20;
                 _context19.prev = 21;
 
-                if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-                  _iterator8.return();
+                if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
+                  _iterator9.return();
                 }
 
               case 23:
                 _context19.prev = 23;
 
-                if (!_didIteratorError8) {
+                if (!_didIteratorError9) {
                   _context19.next = 26;
                   break;
                 }
 
-                throw _iteratorError8;
+                throw _iteratorError9;
 
               case 26:
                 return _context19.finish(23);
@@ -21650,30 +21700,30 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setItemsToBeDeleted",
     value: function () {
       var _setItemsToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(uuids) {
-        var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, uuid;
+        var _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, uuid;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context20) {
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
-                _iteratorNormalCompletion9 = true;
-                _didIteratorError9 = false;
-                _iteratorError9 = undefined;
+                _iteratorNormalCompletion10 = true;
+                _didIteratorError10 = false;
+                _iteratorError10 = undefined;
                 _context20.prev = 3;
-                _iterator9 = uuids[Symbol.iterator]();
+                _iterator10 = uuids[Symbol.iterator]();
 
               case 5:
-                if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+                if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
                   _context20.next = 12;
                   break;
                 }
 
-                uuid = _step9.value;
+                uuid = _step10.value;
                 _context20.next = 9;
                 return this.setItemToBeDeleted(uuid);
 
               case 9:
-                _iteratorNormalCompletion9 = true;
+                _iteratorNormalCompletion10 = true;
                 _context20.next = 5;
                 break;
 
@@ -21684,26 +21734,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 14:
                 _context20.prev = 14;
                 _context20.t0 = _context20["catch"](3);
-                _didIteratorError9 = true;
-                _iteratorError9 = _context20.t0;
+                _didIteratorError10 = true;
+                _iteratorError10 = _context20.t0;
 
               case 18:
                 _context20.prev = 18;
                 _context20.prev = 19;
 
-                if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
-                  _iterator9.return();
+                if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
+                  _iterator10.return();
                 }
 
               case 21:
                 _context20.prev = 21;
 
-                if (!_didIteratorError9) {
+                if (!_didIteratorError10) {
                   _context20.next = 24;
                   break;
                 }
 
-                throw _iteratorError9;
+                throw _iteratorError10;
 
               case 24:
                 return _context20.finish(21);
@@ -21800,29 +21850,29 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           return false;
         }
 
-        var _iteratorNormalCompletion10 = true;
-        var _didIteratorError10 = false;
-        var _iteratorError10 = undefined;
+        var _iteratorNormalCompletion11 = true;
+        var _didIteratorError11 = false;
+        var _iteratorError11 = undefined;
 
         try {
-          for (var _iterator10 = predicates[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-            var predicate = _step10.value;
+          for (var _iterator11 = predicates[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+            var predicate = _step11.value;
 
             if (!item.satisfiesPredicate(predicate)) {
               return false;
             }
           }
         } catch (err) {
-          _didIteratorError10 = true;
-          _iteratorError10 = err;
+          _didIteratorError11 = true;
+          _iteratorError11 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
-              _iterator10.return();
+            if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
+              _iterator11.return();
             }
           } finally {
-            if (_didIteratorError10) {
-              throw _iteratorError10;
+            if (_didIteratorError11) {
+              throw _iteratorError11;
             }
           }
         }
@@ -30246,29 +30296,30 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "alternateUuidForItem",
     value: function () {
-      var _alternateUuidForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(item) {
-        var payload, results;
+      var _alternateUuidForItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(uuid) {
+        var item, payload, results;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
+                item = this.itemManager.findItem(uuid);
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item);
-                _context10.next = 3;
+                _context10.next = 4;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_14__["PayloadsByAlternatingUuid"])(payload, this.modelManager.getMasterCollection());
 
-              case 3:
+              case 4:
                 results = _context10.sent;
-                _context10.next = 6;
+                _context10.next = 7;
                 return this.modelManager.emitPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
 
-              case 6:
-                _context10.next = 8;
+              case 7:
+                _context10.next = 9;
                 return this.persistPayloads(results);
 
-              case 8:
+              case 9:
                 return _context10.abrupt("return", this.itemManager.findItem(results[0].uuid));
 
-              case 9:
+              case 10:
               case "end":
                 return _context10.stop();
             }
@@ -30325,7 +30376,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 item = _step.value;
                 _context11.next = 12;
-                return this.alternateUuidForItem(item);
+                return this.alternateUuidForItem(item.uuid);
 
               case 12:
                 _iteratorNormalCompletion = true;
@@ -31911,7 +31962,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.ts ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -31938,6 +31989,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "objectToValueArray", function() { return objectToValueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortedCopy", function() { return sortedCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return jsonParseEmbeddedKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitInPlace", function() { return omitInPlace; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
@@ -32253,6 +32305,40 @@ function objectToValueArray(object) {
   return values;
 }
 /**
+ * Returns a key-sorted copy of the object.
+ * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
+ */
+
+function sortedCopy(object) {
+  var keys = Object.keys(object).sort();
+  var result = {};
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
+
+  try {
+    for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var key = _step4.value;
+      result[key] = object[key];
+    }
+  } catch (err) {
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+        _iterator4.return();
+      }
+    } finally {
+      if (_didIteratorError4) {
+        throw _iteratorError4;
+      }
+    }
+  }
+
+  return Copy(result);
+}
+/**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
 
@@ -32284,26 +32370,26 @@ function omitInPlace(object, keys) {
     return;
   }
 
-  var _iteratorNormalCompletion4 = true;
-  var _didIteratorError4 = false;
-  var _iteratorError4 = undefined;
+  var _iteratorNormalCompletion5 = true;
+  var _didIteratorError5 = false;
+  var _iteratorError5 = undefined;
 
   try {
-    for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-      var key = _step4.value;
+    for (var _iterator5 = keys[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+      var key = _step5.value;
       delete object[key];
     }
   } catch (err) {
-    _didIteratorError4 = true;
-    _iteratorError4 = err;
+    _didIteratorError5 = true;
+    _iteratorError5 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-        _iterator4.return();
+      if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+        _iterator5.return();
       }
     } finally {
-      if (_didIteratorError4) {
-        throw _iteratorError4;
+      if (_didIteratorError5) {
+        throw _iteratorError5;
       }
     }
   }
@@ -32319,26 +32405,26 @@ function omitByCopy(object, keys) {
    * when payload is an ES6 item class. So we instead manually omit each key.
    */
 
-  var _iteratorNormalCompletion5 = true;
-  var _didIteratorError5 = false;
-  var _iteratorError5 = undefined;
+  var _iteratorNormalCompletion6 = true;
+  var _didIteratorError6 = false;
+  var _iteratorError6 = undefined;
 
   try {
-    for (var _iterator5 = keys[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-      var key = _step5.value;
+    for (var _iterator6 = keys[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+      var key = _step6.value;
       delete newObject[key];
     }
   } catch (err) {
-    _didIteratorError5 = true;
-    _iteratorError5 = err;
+    _didIteratorError6 = true;
+    _iteratorError6 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-        _iterator5.return();
+      if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+        _iterator6.return();
       }
     } finally {
-      if (_didIteratorError5) {
-        throw _iteratorError5;
+      if (_didIteratorError6) {
+        throw _iteratorError6;
       }
     }
   }
@@ -32402,52 +32488,14 @@ function deepMerge(a, b) {
 
 function pickByCopy(object, keys) {
   var result = {};
-  var _iteratorNormalCompletion6 = true;
-  var _didIteratorError6 = false;
-  var _iteratorError6 = undefined;
-
-  try {
-    for (var _iterator6 = keys[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-      var key = _step6.value;
-      result[key] = object[key];
-    }
-  } catch (err) {
-    _didIteratorError6 = true;
-    _iteratorError6 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-        _iterator6.return();
-      }
-    } finally {
-      if (_didIteratorError6) {
-        throw _iteratorError6;
-      }
-    }
-  }
-
-  return Copy(result);
-}
-/**
- * Recursively makes an object immutable via Object.freeze
- */
-
-function deepFreeze(object) {
-  var propNames = Object.getOwnPropertyNames(object);
   var _iteratorNormalCompletion7 = true;
   var _didIteratorError7 = false;
   var _iteratorError7 = undefined;
 
   try {
-    for (var _iterator7 = propNames[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-      var name = _step7.value;
-      var value = object[name];
-
-      if (value && _typeof(value) === 'object' && !Object.isFrozen(value)) {
-        object[name] = deepFreeze(value);
-      } else {
-        object[name] = value;
-      }
+    for (var _iterator7 = keys[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+      var key = _step7.value;
+      result[key] = object[key];
     }
   } catch (err) {
     _didIteratorError7 = true;
@@ -32460,6 +32508,44 @@ function deepFreeze(object) {
     } finally {
       if (_didIteratorError7) {
         throw _iteratorError7;
+      }
+    }
+  }
+
+  return Copy(result);
+}
+/**
+ * Recursively makes an object immutable via Object.freeze
+ */
+
+function deepFreeze(object) {
+  var propNames = Object.getOwnPropertyNames(object);
+  var _iteratorNormalCompletion8 = true;
+  var _didIteratorError8 = false;
+  var _iteratorError8 = undefined;
+
+  try {
+    for (var _iterator8 = propNames[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+      var name = _step8.value;
+      var value = object[name];
+
+      if (value && _typeof(value) === 'object' && !Object.isFrozen(value)) {
+        object[name] = deepFreeze(value);
+      } else {
+        object[name] = value;
+      }
+    }
+  } catch (err) {
+    _didIteratorError8 = true;
+    _iteratorError8 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+        _iterator8.return();
+      }
+    } finally {
+      if (_didIteratorError8) {
+        throw _iteratorError8;
       }
     }
   }

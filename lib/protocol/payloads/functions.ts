@@ -32,7 +32,8 @@ export async function PayloadsByDuplicating(
   };
   if (isConflict) {
     override.content = {
-      conflict_of: payload.uuid
+      ...payload.safeContent,
+      conflict_of: payload.uuid,
     };
   }
   const copy = CopyPayload(
@@ -136,6 +137,7 @@ async function PayloadsByUpdatingReferences(
       {
         dirty: true,
         content: {
+          ...payload.safeContent,
           references: references
         }
       }

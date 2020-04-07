@@ -11,7 +11,8 @@ export class DeltaFileImport extends PayloadsDelta {
   public async resultingCollection() {
     const results: Array<PurePayload> = [];
     for (const payload of this.applyCollection!.all()) {
-      const payloads = (await this.payloadsByHandlingPayload(payload, results)).map((result) => {
+      const handled = await this.payloadsByHandlingPayload(payload, results);
+      const payloads = handled.map((result) => {
         return CopyPayload(
           result,
           {
@@ -31,7 +32,7 @@ export class DeltaFileImport extends PayloadsDelta {
   ) {
     /**
      * Check to see if we've already processed a payload for this id.
-     * If so, that would be the latest value, and not what's in the BC.
+     * If so, that would be the latest value, and not what's in the base collection.
      */
     /*
      * Find the most recently created conflict if available, as that

@@ -272,7 +272,7 @@ describe('singletons', () => {
       predicate,
       payload
     );
-    await this.application.syncService.alternateUuidForItem(resolvedItem);
+    await this.application.syncService.alternateUuidForItem(resolvedItem.uuid);
     await this.application.syncService.sync(syncOptions);
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton(
       predicate,

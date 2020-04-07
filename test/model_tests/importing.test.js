@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('importing', () => {
+describe('importing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -16,7 +16,7 @@ describe.only('importing', () => {
     await this.application.deinit();
   });
 
-  it.only('importing existing data should keep relationships valid', async function () {
+  it('importing existing data should keep relationships valid', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -49,7 +49,6 @@ describe.only('importing', () => {
     expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    
     expect(this.application.itemManager.itemsThatReferenceItem(note.uuid).length).to.equal(1);
   });
 
@@ -68,14 +67,19 @@ describe.only('importing', () => {
       notePayload,
       null,
       null,
-      { content: { title: `${Math.random()}` } }
+      {
+        content: {
+          ...notePayload.content,
+          title: `${Math.random()}`
+        }
+      }
     );
     await this.application.importData(
       {
         items: [
           mutatedNote,
           mutatedNote,
-          mutatedNote
+          mutatedNote,
         ]
       },
       undefined,
@@ -98,7 +102,12 @@ describe.only('importing', () => {
       tagPayload,
       null,
       null,
-      { content: { references: [] } }
+      {
+        content: {
+          ...tagPayload.safeContent,
+          references: []
+        }
+      }
     );
     await this.application.importData(
       {
@@ -128,13 +137,23 @@ describe.only('importing', () => {
       notePayload,
       null,
       null,
-      { content: { title: `${Math.random()}` } }
+      {
+        content: {
+          ...notePayload.safeContent,
+          title: `${Math.random()}`
+        }
+      }
     );
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
       null,
       null,
-      { content: { title: `${Math.random()}` } }
+      {
+        content: {
+          ...tagPayload.safeContent,
+          title: `${Math.random()}`
+        }
+      }
     );
     await this.application.importData(
       {
@@ -154,20 +173,20 @@ describe.only('importing', () => {
 
     expect(newNote.uuid).to.not.equal(note.uuid);
     expect(newTag.uuid).to.not.equal(tag.uuid);
+    
+    const refreshedTag = this.application.itemManager.findItem(tag.uuid);
+    expect(refreshedTag.content.references.length).to.equal(2);
+    expect(refreshedTag.noteCount).to.equal(2);
 
-    expect(tag.content.references.length).to.equal(2);
-    expect(tag.noteCount).to.equal(2);
-
-    expect(note.content.references.length).to.equal(0);
-    expect(note.referencingItemsCount).to.equal(2);
-    expect(note.tags.length).to.equal(2);
+    const refreshedNote = this.application.itemManager.findItem(note.uuid);
+    expect(refreshedNote.content.references.length).to.equal(0);
+    expect(this.application.itemManager.itemsThatReferenceItem(refreshedNote.uuid).length).to.equal(2);
 
     expect(newTag.content.references.length).to.equal(1);
     expect(newTag.noteCount).to.equal(1);
 
     expect(newNote.content.references.length).to.equal(0);
-    expect(newNote.referencingItemsCount).to.equal(1);
-    expect(newNote.tags.length).to.equal(1);
+    expect(this.application.itemManager.itemsThatReferenceItem(newNote.uuid).length).to.equal(1);
   });
 
   it('when importing items, imported values should not be used to determine if changed',
@@ -186,8 +205,9 @@ describe.only('importing', () => {
       const tag = await Factory.createMappedTag(this.application);
       this.expectedItemCount += 2;
 
-      tag.addItemAsRelationship(note);
-      await this.application.saveItem(tag);
+      await this.application.itemManager.changeItem(tag, (mutator) => {
+        mutator.addItemAsRelationship(note);
+      });
 
       const externalNote = Object.assign({},
         {
@@ -220,7 +240,9 @@ describe.only('importing', () => {
 
       /** We expect now that the total item count is 3, not 4. */
       expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+      
+      const refreshedTag = this.application.itemManager.findItem(tag.uuid);
       /** References from both items have merged. */
-      expect(tag.content.references.length).to.equal(2);
+      expect(refreshedTag.content.references.length).to.equal(2);
     });
 });

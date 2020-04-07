@@ -54,7 +54,12 @@ describe('notes and tags', () => {
       tagPayload,
       null,
       null,
-      { content: { references: null } }
+      {
+        content: {
+          ...tagPayload.safeContent,
+          references: null
+        }
+      }
     );
     const mutatedNote = CreateMaxPayloadFromAnyObject(
       notePayload,
@@ -144,7 +149,12 @@ describe('notes and tags', () => {
       tagPayload,
       null,
       null,
-      { content: { references: [] } }
+      {
+        content: {
+          ...tagPayload.safeContent,
+          references: []
+        }
+      }
     );
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedTag],
@@ -218,7 +228,12 @@ describe('notes and tags', () => {
       tagPayload,
       null,
       null,
-      { content: { references: [] } }
+      {
+        content: {
+          ...tagPayload.safeContent,
+          references: []
+        }
+      }
     );
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedTag],
@@ -318,7 +333,7 @@ describe('notes and tags', () => {
     const note = this.application.itemManager.notes[0];
     const tag = this.application.itemManager.tags[0];
 
-    const duplicateTag = await this.application.itemManager.duplicateItem(tag, true);
+    const duplicateTag = await this.application.itemManager.duplicateItem(tag.uuid, true);
 
     await this.application.syncService.sync();
     expect(tag.uuid).to.not.equal(duplicateTag.uuid);
@@ -346,7 +361,7 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged
     );
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
-    const duplicateNote = await this.application.itemManager.duplicateItem(note, true);
+    const duplicateNote = await this.application.itemManager.duplicateItem(note.uuid, true);
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
     expect(duplicateNote.tags.length).to.equal(note.tags.length);
   });
@@ -408,6 +423,7 @@ describe('notes and tags', () => {
       null,
       {
         content: {
+          ...notePayload.safeContent,
           references: [{
             content_type: tagPayload.content_type,
             uuid: tagPayload.uuid

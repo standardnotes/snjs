@@ -120,6 +120,14 @@ describe('item manager', () => {
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
   });
 
+  it('inverse reference map should not have duplicates', async function () {
+    const note = await this.createNote();
+    const tag = await this.createTag([note]);
+    await this.itemManager.changeItem(tag, () => {});
+
+    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
+  });
+
   it('deleting from reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
@@ -127,6 +135,17 @@ describe('item manager', () => {
 
     expect(this.itemManager.referenceMap[tag.uuid]).to.eql([]);
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.not.be.ok;
+  });
+
+  it('removing relationship should update reference map', async function () {
+    const note = await this.createNote();
+    const tag = await this.createTag([note]);
+    await this.itemManager.changeItem(tag, (mutator) => {
+      mutator.removeItemAsRelationship(note);
+    });
+
+    expect(this.itemManager.referenceMap[tag.uuid]).to.eql([]);
+    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([]);
   });
 
   it('emitting discardable payload should remove it from our collection', async function () {
@@ -236,11 +255,21 @@ describe('item manager', () => {
 
   it('duplicate item', async function () {
     const note = await this.createNote();
-    await this.itemManager.duplicateItem(note);
+    await this.itemManager.duplicateItem(note.uuid);
 
     expect(this.itemManager.items.length).to.equal(2);
     expect(this.itemManager.notes.length).to.equal(2);
     expect(this.itemManager.notes[0].uuid).to.not.equal(this.itemManager.notes[1].uuid);
+  });
+
+  it('duplicate item with relationships', async function () {
+    const note = await this.createNote();
+    const tag = await this.createTag([note]);
+    const duplicate = await this.itemManager.duplicateItem(tag.uuid);
+
+    expect(duplicate.content.references.length).to.equal(1);
+    expect(this.itemManager.items.length).to.equal(3);
+    expect(this.itemManager.tags.length).to.equal(2);
   });
 
   it('create template item', async function () {
@@ -270,7 +299,8 @@ describe('item manager', () => {
     expect(latestVersion.content).to.not.be.ok;
     /** Deleted items stick around until they are synced */
     expect(this.itemManager.items.length).to.equal(1);
-    expect(this.itemManager.notes.length).to.equal(1);
+    /** Deleted items do not show up in particular arrays (.notes, .tags, .components, etc) */
+    expect(this.itemManager.notes.length).to.equal(0);
   });
 
   it('system smart tags', async function () {

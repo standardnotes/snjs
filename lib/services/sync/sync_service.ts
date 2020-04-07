@@ -1,3 +1,4 @@
+import { UuidString } from './../../types';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { SNItem } from '@Models/core/item';
@@ -354,7 +355,8 @@ export class SNSyncService extends PureService {
     return items;
   }
 
-  private async alternateUuidForItem(item: SNItem) {
+  private async alternateUuidForItem(uuid: UuidString) {
+    const item = this.itemManager!.findItem(uuid)!;
     const payload = CreateMaxPayloadFromAnyObject(item);
     const results = await PayloadsByAlternatingUuid(
       payload,
@@ -383,7 +385,7 @@ export class SNSyncService extends PureService {
         return !item.errorDecrypting;
       }).slice();
       for (const item of items) {
-        await this.alternateUuidForItem(item);
+        await this.alternateUuidForItem(item.uuid);
       }
     }
     const items = this.itemManager!.allNondummyItems;

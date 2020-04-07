@@ -175,16 +175,25 @@ export class ItemManager extends PureService {
     return this.inverseReferenceMap[uuid] || [];
   }
 
-  private establishReferenceIndex(item: SNItem) {
-    const references = item.references;
-    for (const reference of references) {
-      /** Direct index */
-      this.referenceMap[item.uuid] = item.references.map((r) => r.uuid);
+  private updateReferenceIndex(item: SNItem) {
+    const previousDirect = this.referenceMap[item.uuid] || [];
+    /** Direct index */
+    this.referenceMap[item.uuid] = item.references.map((r) => r.uuid);
 
-      /** Inverse index */
-      const index = this.inverseReferenceMap[reference.uuid] || [];
-      index.push(item.uuid);
-      this.inverseReferenceMap[reference.uuid] = index;
+    /** Inverse index */
+    /** First remove any old values in case references have changed */
+    for (const previousDirectReference of previousDirect) {
+      const inverseIndex = this.inverseReferenceMap[previousDirectReference];
+      if (inverseIndex) {
+        removeFromArray(inverseIndex, item.uuid);
+      }
+    }
+
+    /** Now map current references */
+    for (const reference of item.references) {
+      const inverseIndex = this.inverseReferenceMap[reference.uuid] || [];
+      inverseIndex.push(item.uuid);
+      this.inverseReferenceMap[reference.uuid] = inverseIndex;
     }
   }
 
@@ -241,7 +250,7 @@ export class ItemManager extends PureService {
       if (item.deleted) {
         this.deestablishReferenceIndexForDeletedItem(item.uuid);
       } else {
-        this.establishReferenceIndex(item);
+        this.updateReferenceIndex(item);
       }
     }
     this.collection.set(changedOrInserted)
@@ -502,7 +511,8 @@ export class ItemManager extends PureService {
    * Duplicates an item and maps it, thus propagating the item to observers.
    * @param isConflict - Whether to mark the duplicate as a conflict of the original.
    */
-  public async duplicateItem(item: SNItem, isConflict = false) {
+  public async duplicateItem(uuid: UuidString, isConflict = false) {
+    const item = this.findItem(uuid)!;
     const payload = CreateMaxPayloadFromAnyObject(item);
     const resultingPayloads = await PayloadsByDuplicating(
       payload,

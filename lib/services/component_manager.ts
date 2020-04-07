@@ -895,7 +895,7 @@ export class SNComponentManager extends PureService {
       }
     ];
     this.runWithPermissions(component, requiredPermissions, async () => {
-      const duplicate = await this.itemManager!.duplicateItem(item);
+      const duplicate = await this.itemManager!.duplicateItem(item.uuid);
       this.syncService!.sync();
       this.replyToMessage(
         component,

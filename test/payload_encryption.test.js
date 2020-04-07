@@ -87,6 +87,7 @@ describe('payload encryption', () => {
       null,
       {
         content: {
+          ...payload.safeContent,
           text: changedText
         }
       }
@@ -106,6 +107,7 @@ describe('payload encryption', () => {
       null,
       {
         content: {
+          ...payload.safeContent,
           foo: 'bar'
         }
       }
@@ -124,6 +126,7 @@ describe('payload encryption', () => {
       null,
       {
         content: {
+          ...tagPayload.safeContent,
           references: []
         }
       }

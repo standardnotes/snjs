@@ -54,6 +54,7 @@ describe('payload manager', () => {
       payload,
       {
         content: {
+          ...payload.safeContent,
           title: newTitle
         }
       }
@@ -89,6 +90,7 @@ describe('payload manager', () => {
       payload,
       {
         content: {
+          ...payload.safeContent,
           title: 'new title'
         }
       }

@@ -207,6 +207,19 @@ export function objectToValueArray(object: AnyRecord) {
 }
 
 /**
+ * Returns a key-sorted copy of the object.
+ * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
+ */
+export function sortedCopy(object: any) {
+  const keys = Object.keys(object).sort();
+  const result: any = {};
+  for(const key of keys) {
+    result[key] = object[key];
+  }
+  return Copy(result);
+}
+
+/**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
 export function jsonParseEmbeddedKeys(object: AnyRecord) {
