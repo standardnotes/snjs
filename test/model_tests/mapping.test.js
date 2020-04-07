@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('model manager mapping', () => {
+describe.only('model manager mapping', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -97,9 +97,10 @@ describe('model manager mapping', () => {
     );
     this.expectedItemCount++;
 
-    const item = itemManager.items[0];
-    item.deleted = true;
-    await this.application.itemManager.setItemDirty(item, true);
+    let item = this.application.itemManager.items[0];
+    item = await this.application.changeItem(item, (mutator) => {
+      mutator.setDeleted();
+    });
     const payload2 = CreateMaxPayloadFromAnyObject(item);
     await this.application.itemManager.emitItemsFromPayloads(
       [payload2],
@@ -138,13 +139,13 @@ describe('model manager mapping', () => {
 
   it('setting an item dirty should retrieve it in dirty items', async function () {
     const payload = Factory.createNotePayload();
-    await itemManager.emitItemsFromPayloads(
+    await this.application.itemManager.emitItemsFromPayloads(
       [payload],
       PayloadSource.LocalChanged
     );
-    const note = itemManager.notes[0];
-    await itemManager.setItemDirty(note, true);
-    const dirtyItems = itemManager.getDirtyItems();
+    const note = this.application.itemManager.notes[0];
+    await this.application.itemManager.setItemDirty(note.uuid);
+    const dirtyItems = this.application.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
   });
 
@@ -155,11 +156,11 @@ describe('model manager mapping', () => {
       PayloadSource.LocalChanged
     );
     const note = this.application.itemManager.notes[0];
-    await this.application.itemManager.setItemDirty(note);
-    const dirtyItems = itemManager.getDirtyItems();
+    await this.application.itemManager.setItemDirty(note.uuid);
+    const dirtyItems = this.application.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
 
-    this.application.itemManager.setItemsDirty(dirtyItems, false);
+    await this.application.itemManager.clearItemsAsDirty(Uuids(dirtyItems));
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
   });
 
@@ -188,10 +189,10 @@ describe('model manager mapping', () => {
     );
     const item = this.application.itemManager.items[0];
     return new Promise((resolve) => {
-      modelManager.addChangeObserver(
+      this.application.itemManager.addObserver(
         ContentType.Any,
-        (items, _, __, ___, ____) => {
-          expect(items[0].uuid === item.uuid);
+        (changed, inserted, discarded) => {
+          expect(changed[0].uuid === item.uuid);
           resolve();
         }
       );

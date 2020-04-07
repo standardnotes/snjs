@@ -64,7 +64,7 @@ describe('item', () => {
   it('user modified date should be ok', function () {
     const item = this.createNote();
 
-    expect(item.user_modified_at).to.be.ok;
+    expect(item.userModifiedDate).to.be.ok;
   });
 
   it('has relationship with item true', function () {

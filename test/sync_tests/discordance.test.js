@@ -100,7 +100,7 @@ describe('sync discordance', () => {
     expect(this.application.syncService.isOutOfSync()).to.equal(true);
 
     // We will now reinstate the item and sync, which should repair everything
-    await this.application.itemManager.setItemDirty(item, true);
+    await this.application.itemManager.setItemDirty(item);
     await this.application.syncService.sync({checkIntegrity: true});
 
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
@@ -159,7 +159,7 @@ describe('sync discordance', () => {
     }
 
     // now lets sync the item, just to make sure it doesn't cause any problems
-    await this.application.itemManager.setItemDirty(aNote, true);
+    await this.application.itemManager.setItemDirty(aNote);
     await this.application.syncService.sync({checkIntegrity: true});
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);

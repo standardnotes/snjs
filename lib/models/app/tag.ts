@@ -16,7 +16,7 @@ export class SNTag extends SNItem {
   }
 
   get noteCount() {
-    return this.payload.safeContent.references.length;
+    return this.payload.safeReferences.length;
   }
 
   public isSmartTag() {

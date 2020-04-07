@@ -59,7 +59,7 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       const subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await this.application.itemManager.emitItemsFromPayloads(
+      await application.itemManager.emitItemsFromPayloads(
         subArray,
         PayloadSource.LocalChanged
       );
@@ -71,13 +71,13 @@ describe('mapping performance', () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for (const note of this.application.itemManager.validItemsForContentType(ContentType.Note)) {
-      expect(note.referencingItemsCount).to.be.above(0);
+    for (const note of application.itemManager.validItemsForContentType(ContentType.Note)) {
+      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.be.above(0);
     }
     await application.deinit();
   }).timeout(20000);
 
-  it('mapping a tag with thousands of notes should be quick', async () => {
+  it.only('mapping a tag with thousands of notes should be quick', async () => {
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
@@ -125,7 +125,7 @@ describe('mapping performance', () => {
     const batchSize = 100;
     for (let i = 0; i < payloads.length; i += batchSize) {
       var subArray = payloads.slice(currentIndex, currentIndex + batchSize);
-      await this.application.itemManager.emitItemsFromPayloads(
+      await application.itemManager.emitItemsFromPayloads(
         subArray,
         PayloadSource.LocalChanged
       );
@@ -141,10 +141,9 @@ describe('mapping performance', () => {
     const EXPECTED_RUN_TIME = 8.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
-    const mappedTag = this.application.itemManager.validItemsForContentType(ContentType.Tag)[0];
-    for (const note of this.application.itemManager.validItemsForContentType(ContentType.Note)) {
-      expect(note.referencingItemsCount).to.equal(1);
-      expect(note.allReferencingItems[0]).to.equal(mappedTag);
+    application.itemManager.validItemsForContentType(ContentType.Tag)[0];
+    for (const note of application.itemManager.validItemsForContentType(ContentType.Note)) {
+      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
     }
     await application.deinit();
   }).timeout(20000);

@@ -157,7 +157,10 @@ export class ItemManager extends PureService {
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  private itemsThatReferenceItem(uuid: UuidString) {
+  private itemsReferencingItem(uuid: UuidString) {
+    if(!isString(uuid)) {
+      throw Error('Must use uuid string');
+    }
     const uuids = this.uuidsThatReferenceUuid(uuid);
     return this.findItems(uuids);
   }
@@ -166,16 +169,25 @@ export class ItemManager extends PureService {
    * Returns all items that an item directly references
    */
   private referencesForItem(uuid: UuidString) {
+    if (!isString(uuid)) {
+      throw Error('Must use uuid string');
+    }
     const item = this.findItem(uuid)!;
     const uuids = item.references.map((ref) => ref.uuid);
     return this.findItems(uuids);
   }
 
   private uuidsThatReferenceUuid(uuid: UuidString) {
+    if (!isString(uuid)) {
+      throw Error('Must use uuid string');
+    }
     return this.inverseReferenceMap[uuid] || [];
   }
 
   private updateReferenceIndex(item: SNItem) {
+    if (isString(item)) {
+      throw Error('Must use item reference');
+    }
     const previousDirect = this.referenceMap[item.uuid] || [];
     /** Direct index */
     this.referenceMap[item.uuid] = item.references.map((r) => r.uuid);
@@ -335,7 +347,6 @@ export class ItemManager extends PureService {
     const payloads = [];
     for (const item of items) {
       if (!item) {
-        debugger;
         throw Error('Attempting to change non-existant item');
       }
       const mutator = new ItemMutator(item, mutationType);
@@ -455,6 +466,21 @@ export class ItemManager extends PureService {
     );
   }
 
+  public async clearItemsAsDirty(
+    uuids: UuidString[]
+  ) {
+    const items = this.findItems(uuids);
+    const payloads = items.map((item) => {
+      return item!.payloadRepresentation({
+        dirty: false
+      })
+    })
+    return this.modelManager!.emitPayloads(
+      payloads,
+      PayloadSource.LocalDirtied
+    );
+  }
+
   /**
     * Sets the item as needing sync. The item is then run through the mapping function,
     * and propagated to mapping observers.
@@ -462,14 +488,15 @@ export class ItemManager extends PureService {
     */
   public async setItemDirty(
     uuid: UuidString,
-    dirty = true,
     isUserModified = false,
     source?: PayloadSource,
     sourceKey?: string
   ) {
+    if(!isString(uuid)) {
+      throw Error('Must use uuid when setting item dirty');
+    }
     return this.setItemsDirty(
       [uuid],
-      dirty,
       isUserModified,
       source,
       sourceKey
@@ -481,11 +508,13 @@ export class ItemManager extends PureService {
    */
   public async setItemsDirty(
     uuids: UuidString[],
-    dirty = true,
     isUserModified = false,
     source?: PayloadSource,
     sourceKey?: string
   ) {
+    if (!isString(uuids[0])) {
+      throw Error('Must use uuid when setting item dirty');
+    }
     return this.changeItems(
       uuids,
       () => { },
@@ -506,6 +535,13 @@ export class ItemManager extends PureService {
     });
   }
 
+  /**
+   * Marks the item as dirty and updates its user modified date. If the item has not
+   * yet been inserted (i.e is a template item), it will be inserted.
+   */
+  public async saveItems(items: SNItem[]) {
+    return this.changeItems(items, () => {});
+  }
 
   /**
    * Duplicates an item and maps it, thus propagating the item to observers.
@@ -590,31 +626,39 @@ export class ItemManager extends PureService {
    * Marks the item as deleted and needing sync.
    */
   public async setItemToBeDeleted(uuid: UuidString) {
-    await this.changeItem(uuid, (mutator) => {
+    /** Capture referencing ids before we delete the item below, otherwise
+     * the index may be updated before we get a chance to act on it */
+    const referencingIds = this.uuidsThatReferenceUuid(uuid);
+    
+    const item = this.findItem(uuid);
+    const changedItem = await this.changeItem(uuid, (mutator) => {
       mutator.setDeleted();
     });
 
-    /* Direct relationships are cleared by clearing content above */
-    /* Handle indirect relationships */
-    const referencingIds = this.uuidsThatReferenceUuid(uuid);
+    /** Handle indirect relationships. 
+     * (Direct relationships are cleared by clearing content above) */
     for (const referencingId of referencingIds) {
       const referencingItem = this.findItem(referencingId);
       if (referencingItem) {
-        await this.changeItem(referencingId, (mutator) => {
-          mutator.removeItemAsRelationship(referencingItem);
+        await this.changeItem(referencingItem.uuid, (mutator) => {
+          mutator.removeItemAsRelationship(item!);
         });
       }
     }
     this.deestablishReferenceIndexForDeletedItem(uuid);
+    return changedItem;
   }
 
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
    */
   public async setItemsToBeDeleted(uuids: UuidString[]) {
+    const changedItems = [];
     for (const uuid of uuids) {
-      await this.setItemToBeDeleted(uuid);
+      const changedItem = await this.setItemToBeDeleted(uuid);
+      changedItems.push(changedItem);
     }
+    return changedItems;
   }
 
   /** 

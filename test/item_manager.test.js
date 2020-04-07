@@ -137,6 +137,15 @@ describe('item manager', () => {
     expect(this.itemManager.inverseReferenceMap[note.uuid]).to.not.be.ok;
   });
 
+  it('deleting referenced item should update referencing item references', async function () {
+    const note = await this.createNote();
+    let tag = await this.createTag([note]);
+    await this.itemManager.setItemToBeDeleted(note.uuid);
+
+    tag = this.itemManager.findItem(tag.uuid);
+    expect(tag.content.references.length).to.equal(0);
+  });
+
   it('removing relationship should update reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
@@ -164,7 +173,7 @@ describe('item manager', () => {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    const itemsThatReference = this.itemManager.itemsThatReferenceItem(note.uuid);
+    const itemsThatReference = this.itemManager.itemsReferencingItem(note.uuid);
     expect(itemsThatReference.length).to.equal(1);
     expect(itemsThatReference[0]).to.equal(tag);
   });

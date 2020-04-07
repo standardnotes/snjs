@@ -19,8 +19,6 @@ export enum MutationType {
   Internal = 1,
 }
 
-const UserModifiedDateKey = 'client_updated_at';
-
 export enum AppDataField {
   Pinned = 'pinned',
   Archived = 'archived',
@@ -101,7 +99,7 @@ export class SNItem {
     return this.payload.updated_at!;
   }
 
-  get user_modified_at() {
+  get userModifiedDate() {
     const value = this.getAppDomainValue(AppDataField.UserModifiedDate);
     return new Date(value || this.updated_at);
   }
@@ -305,7 +303,7 @@ export class SNItem {
   }
 
   public updatedAtString() {
-    return this.dateToLocalizedString(this.user_modified_at);
+    return this.dateToLocalizedString(this.userModifiedDate);
   }
 
   public updatedAtTimestamp() {
@@ -369,12 +367,12 @@ export class ItemMutator {
     if (!this.payload.deleted) {
       if (this.source === MutationType.UserInteraction) {
         // Set the user modified date to now if marking the item as dirty
-        this.setAppDataItem(UserModifiedDateKey, new Date());
+        this.userModifiedDate = new Date();
       } else {
-        const currentValue = this.item.getAppDomainValue(AppDataField.UserModifiedDate);
+        const currentValue = this.item.userModifiedDate;
         if (!currentValue) {
           // if we don't have an explcit raw value, we initialize client_updated_at.
-          this.setAppDataItem(UserModifiedDateKey, new Date(this.item.updated_at!));
+          this.userModifiedDate = new Date(this.item.updated_at!);
         }
       }
     }
@@ -412,6 +410,10 @@ export class ItemMutator {
         lastSyncBegan: began
       }
     )
+  }
+
+  public set userModifiedDate(date: Date) {
+    this.setAppDataItem(AppDataField.UserModifiedDate, date);
   }
 
   public set protected(isProtected: boolean) {

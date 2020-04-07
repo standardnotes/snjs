@@ -1,3 +1,5 @@
+import { MigrationServices } from './migrations/types';
+import { UuidString } from './types';
 import { SyncEvents } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
@@ -5,7 +7,7 @@ import { BackupFile } from './services/protocol_service';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
-import { SNItem } from '@Models/core/item';
+import { SNItem, ItemMutator } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ChallengeResponse } from './challenges';
@@ -418,22 +420,12 @@ export class SNApplication {
     return this.syncService!.getStatus();
   }
 
-  public async saveItem(item: SNItem) {
-    await this.itemManager!.setItemDirty(item.uuid, true);
-    await this.syncService!.sync();
-  }
-
-  public async saveItems(items: SNItem[]) {
-    await this.itemManager!.setItemsDirty(Uuids(items));
-    await this.syncService!.sync();
-  }
-
   /** 
    * @param updateUserModifiedDate  Whether to change the modified date the user 
    * sees of the item.
    */
   public async setItemNeedsSync(item: SNItem, updateUserModifiedDate = false) {
-    return this.itemManager!.setItemDirty(item.uuid, true, updateUserModifiedDate);
+    return this.itemManager!.setItemDirty(item.uuid, updateUserModifiedDate);
   }
 
   public async setItemsNeedsSync(items: SNItem[]) {
@@ -456,6 +448,22 @@ export class SNApplication {
 
   public getTrashedItems() {
     return this.itemManager!.trashedItems;
+  }
+
+  public async saveItem(item: SNItem) {
+   return this.changeItem(item, () => {});
+  }
+
+  public async changeItem(
+    itemOrUuid: UuidString | SNItem,
+    mutate: (mutator: ItemMutator) => void
+  ) {
+    const results = await this.itemManager!.changeItems(
+      [itemOrUuid] as UuidString[] | SNItem[],
+      mutate
+    );
+    await this.syncService!.sync();
+    return results[0];
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
@@ -640,7 +648,7 @@ export class SNApplication {
     this.syncService!.lockSyncing();
   }
 
-  private  unlockSyncing() {
+  private unlockSyncing() {
     this.syncService!.unlockSyncing();
   }
 
@@ -1015,10 +1023,10 @@ export class SNApplication {
         protocolService: this.protocolService!,
         deviceInterface: this.deviceInterface!,
         storageService: this.storageService!,
-        modelManager: this.modelManager!,
+        itemManager: this.itemManager!,
         environment: this.environment!,
         namespace: this.namespace
-      },
+      } as MigrationServices,
       this.getMigrationChallengeResponder()
     );
     this.services.push(this.migrationService!);

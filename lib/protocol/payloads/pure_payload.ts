@@ -60,12 +60,12 @@ export class PurePayload {
     fields: PayloadField[],
     source: PayloadSource
   ) {
-    if(fields) {
+    if (fields) {
       this.fields = fields;
     } else {
       this.fields = Object.keys(rawPayload) as PayloadField[];
     }
-    if(source) {
+    if (source) {
       this.source = source;
     } else {
       this.source = PayloadSource.Constructor;
@@ -128,10 +128,15 @@ export class PurePayload {
   }
   */
 
+
   get safeContent() {
     return (this.content || {}) as PayloadContent;
   }
 
+  get safeReferences() {
+    return this.safeContent.references || [];
+  }
+  
   get contentObject() {
     if (this.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access non-object content as object');

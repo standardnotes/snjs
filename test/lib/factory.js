@@ -139,7 +139,7 @@ export async function createSyncedNote(application) {
     payload,
     PayloadSource.LocalChanged
   );
-  await application.itemManager.setItemDirty(note, true);
+  await application.itemManager.setItemDirty(note);
   await application.syncService.sync();
   return note;
 }
@@ -156,7 +156,7 @@ export async function getStoragePayloadsOfType(application, type) {
 export async function createManyMappedNotes(application, count) {
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application);
-    await application.itemManager.setItemDirty(note, true);
+    await application.itemManager.setItemDirty(note);
   }
 }
 

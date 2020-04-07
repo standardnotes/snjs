@@ -33,7 +33,7 @@ describe('importing', () => {
     expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(this.application.itemManager.itemsThatReferenceItem(note.uuid).length).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
 
     await this.application.importData(
       {
@@ -49,7 +49,7 @@ describe('importing', () => {
     expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(this.application.itemManager.itemsThatReferenceItem(note.uuid).length).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
   });
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -180,13 +180,13 @@ describe('importing', () => {
 
     const refreshedNote = this.application.itemManager.findItem(note.uuid);
     expect(refreshedNote.content.references.length).to.equal(0);
-    expect(this.application.itemManager.itemsThatReferenceItem(refreshedNote.uuid).length).to.equal(2);
+    expect(this.application.itemManager.itemsReferencingItem(refreshedNote.uuid).length).to.equal(2);
 
     expect(newTag.content.references.length).to.equal(1);
     expect(newTag.noteCount).to.equal(1);
 
     expect(newNote.content.references.length).to.equal(0);
-    expect(this.application.itemManager.itemsThatReferenceItem(newNote.uuid).length).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(newNote.uuid).length).to.equal(1);
   });
 
   it('when importing items, imported values should not be used to determine if changed',
