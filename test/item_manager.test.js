@@ -211,26 +211,6 @@ describe('item manager', () => {
     expect(latestVersion.title).to.equal(newTitle);
   });
 
-  it('change non-existing item through item ref should succeed', async function () {
-    const note = await this.itemManager.createTemplateItem(
-      ContentType.Note,
-      BuildItemContent({
-        title: 'hello',
-        text: 'world'
-      })
-    );
-    const newTitle = String(Math.random());
-    await this.itemManager.changeNote(
-      note.uuid,
-      (mutator) => {
-        mutator.title = newTitle;
-      }
-    );
-
-    const latestVersion = this.itemManager.findItem(note.uuid);
-    expect(latestVersion.title).to.equal(newTitle);
-  });
-
   it('change non-existant item through uuid should fail', async function () {
     const note = await this.itemManager.createTemplateItem(
       ContentType.Note,

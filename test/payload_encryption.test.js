@@ -107,7 +107,6 @@ describe('payload encryption', () => {
       null,
       {
         content: {
-          ...payload.safeContent,
           foo: 'bar'
         }
       }

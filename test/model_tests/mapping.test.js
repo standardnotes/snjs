@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('model manager mapping', () => {
+describe('model manager mapping', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -98,7 +98,7 @@ describe.only('model manager mapping', () => {
     this.expectedItemCount++;
 
     let item = this.application.itemManager.items[0];
-    item = await this.application.changeItem(item.uuid, (mutator) => {
+    item = await this.application.itemManager.changeItem(item.uuid, (mutator) => {
       mutator.setDeleted();
     });
     const payload2 = CreateMaxPayloadFromAnyObject(item);

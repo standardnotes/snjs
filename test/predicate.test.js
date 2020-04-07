@@ -49,7 +49,7 @@ describe('predicates', async function () {
         createItemParams()
       );
       const template = CreateItemFromPayload(payload);
-      await this.itemManager.insertItem(template);
+      return this.itemManager.insertItem(template);
     };
 
 

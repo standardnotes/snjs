@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('notes and tags', () => {
+describe('notes and tags', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -327,7 +327,7 @@ describe.only('notes and tags', () => {
 
   it('setting a note dirty should collapse its properties into content', async function () {
     let note = await this.application.createTemplateItem(ContentType.Note, { title: 'Foo' });    
-    await this.application.saveItem(note.uuid);
+    await this.application.insertItem(note);
     note = this.application.itemManager.findItem(note.uuid);
     expect(note.content.title).to.equal('Foo');
   });

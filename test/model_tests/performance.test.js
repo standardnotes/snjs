@@ -77,7 +77,7 @@ describe('mapping performance', () => {
     await application.deinit();
   }).timeout(20000);
 
-  it.only('mapping a tag with thousands of notes should be quick', async () => {
+  it('mapping a tag with thousands of notes should be quick', async () => {
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
