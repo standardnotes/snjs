@@ -1183,7 +1183,7 @@ describe('online syncing', () => {
     expect(foundItem.text).to.equal(text);
   }).timeout(10000);
 
-  it('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
+  it.only('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
     /** We can't track how many times an item is synced, only how many times its mapped */
     const expectedSaveCount = 2;
     let actualSaveCount = 0;

@@ -8202,6 +8202,7 @@ var SNProtocolOperator001 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 24:
                 authHash = _context6.sent;
                 return _context6.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateEncryptionParameters"])({
+                  uuid: payload.uuid,
                   items_key_id: key instanceof _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"] ? key.uuid : undefined,
                   content: ciphertext,
                   enc_item_key: encItemKey,
@@ -8781,6 +8782,7 @@ var SNProtocolOperator002 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 20:
                 ciphertext = _context8.sent;
                 return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_6__["CreateEncryptionParameters"])({
+                  uuid: payload.uuid,
                   items_key_id: key instanceof _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"] ? key.uuid : undefined,
                   content: ciphertext,
                   enc_item_key: encItemKey
@@ -9616,6 +9618,7 @@ var SNProtocolOperator004 = /*#__PURE__*/function (_SNProtocolOperator) {
               case 17:
                 encryptedItemKey = _context8.sent;
                 return _context8.abrupt("return", Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_6__["CreateEncryptionParameters"])({
+                  uuid: payload.uuid,
                   items_key_id: key instanceof _Models_app_items_key__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"] ? key.uuid : undefined,
                   content: encryptedContentString,
                   enc_item_key: encryptedItemKey
@@ -12605,9 +12608,10 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return MutableCollection; });
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -12618,7 +12622,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 var MutableCollection = /*#__PURE__*/function () {
+  /** Maintains an index for each item id where the value is an array of item ids that the 
+  * item references. This is essentially equivalent to item.content.references, 
+  * but keeps state even when the item is deleted. So if tag A references Note B, 
+  * referenceMap[A.uuid] == [B.uuid]. */
+
+  /** Maintains an index for each item id where the value is an array of item ids where 
+   * the items reference the key item. So if tag A references Note B, 
+   * inverseReferenceMap[B.uuid] == [A.uuid]. This allows callers to determine for a given item,
+   * who references it? It would be prohibitive to look this up on demand */
   function MutableCollection() {
     var elements = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
@@ -12627,6 +12641,10 @@ var MutableCollection = /*#__PURE__*/function () {
     _defineProperty(this, "map", {});
 
     _defineProperty(this, "typedMap", {});
+
+    _defineProperty(this, "referenceMap", {});
+
+    _defineProperty(this, "inverseReferenceMap", {});
 
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -12669,8 +12687,8 @@ var MutableCollection = /*#__PURE__*/function () {
     }
   }, {
     key: "find",
-    value: function find(id) {
-      return this.map[id];
+    value: function find(uuid) {
+      return this.map[uuid];
     }
     /**
      * @param includeBlanks If true and an item is not found, an `undefined` element
@@ -12725,6 +12743,12 @@ var MutableCollection = /*#__PURE__*/function () {
           var element = _step3.value;
           this.map[element.uuid] = element;
           this.setToTypedMap(element);
+
+          if (element.deleted) {
+            this.deestablishReferenceIndexForDeletedItem(element.uuid);
+          } else {
+            this.updateReferenceIndex(element.uuid);
+          }
         }
       } catch (err) {
         _didIteratorError3 = true;
@@ -12742,8 +12766,8 @@ var MutableCollection = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "delete",
-    value: function _delete(elements) {
+    key: "discard",
+    value: function discard(elements) {
       elements = Array.isArray(elements) ? elements : [elements];
       var _iteratorNormalCompletion4 = true;
       var _didIteratorError4 = false;
@@ -12752,8 +12776,9 @@ var MutableCollection = /*#__PURE__*/function () {
       try {
         for (var _iterator4 = elements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
           var element = _step4.value;
-          delete this.map[element.uuid];
+          this.deestablishReferenceIndexForDeletedItem(element.uuid);
           this.deleteFromTypedMap(element);
+          delete this.map[element.uuid];
         }
       } catch (err) {
         _didIteratorError4 = true;
@@ -12773,13 +12798,13 @@ var MutableCollection = /*#__PURE__*/function () {
   }, {
     key: "toImmutablePayloadCollection",
     value: function toImmutablePayloadCollection() {
-      return new _Payloads_collection__WEBPACK_IMPORTED_MODULE_1__["PayloadCollection"](this.all());
+      return new _Payloads_collection__WEBPACK_IMPORTED_MODULE_2__["PayloadCollection"](this.all());
     }
   }, {
     key: "setToTypedMap",
     value: function setToTypedMap(element) {
       var array = this.typedMap[element.content_type] || [];
-      lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(array, {
+      lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(array, {
         uuid: element.uuid
       });
       array.push(element);
@@ -12789,10 +12814,155 @@ var MutableCollection = /*#__PURE__*/function () {
     key: "deleteFromTypedMap",
     value: function deleteFromTypedMap(element) {
       var array = this.typedMap[element.content_type] || [];
-      lodash_remove__WEBPACK_IMPORTED_MODULE_0___default()(array, {
+      lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(array, {
         uuid: element.uuid
       });
       this.typedMap[element.content_type] = array;
+    }
+  }, {
+    key: "uuidsThatReferenceUuid",
+    value: function uuidsThatReferenceUuid(uuid) {
+      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isString"])(uuid)) {
+        throw Error('Must use uuid string');
+      }
+
+      return this.inverseReferenceMap[uuid] || [];
+    }
+  }, {
+    key: "updateReferenceIndex",
+    value: function updateReferenceIndex(uuid) {
+      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isString"])(uuid)) {
+        throw Error('Must use uuid');
+      }
+
+      var object = this.find(uuid);
+      var previousDirect = this.referenceMap[uuid] || [];
+      /** Direct index */
+
+      this.referenceMap[uuid] = object.references.map(function (r) {
+        return r.uuid;
+      });
+      /** Inverse index */
+
+      /** First remove any old values in case references have changed */
+
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = previousDirect[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var previousDirectReference = _step5.value;
+          var inverseIndex = this.inverseReferenceMap[previousDirectReference];
+
+          if (inverseIndex) {
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(inverseIndex, uuid);
+          }
+        }
+        /** Now map current references */
+
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion6 = true;
+      var _didIteratorError6 = false;
+      var _iteratorError6 = undefined;
+
+      try {
+        for (var _iterator6 = object.references[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          var reference = _step6.value;
+
+          var _inverseIndex = this.inverseReferenceMap[reference.uuid] || [];
+
+          _inverseIndex.push(uuid);
+
+          this.inverseReferenceMap[reference.uuid] = _inverseIndex;
+        }
+      } catch (err) {
+        _didIteratorError6 = true;
+        _iteratorError6 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+            _iterator6.return();
+          }
+        } finally {
+          if (_didIteratorError6) {
+            throw _iteratorError6;
+          }
+        }
+      }
+    }
+  }, {
+    key: "deestablishReferenceIndexForDeletedItem",
+    value: function deestablishReferenceIndexForDeletedItem(uuid) {
+      /** Items that we reference */
+      var directReferences = this.referenceMap[uuid] || [];
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
+
+      try {
+        for (var _iterator7 = directReferences[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var directReference = _step7.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.inverseReferenceMap[directReference] || [], uuid);
+        }
+      } catch (err) {
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+            _iterator7.return();
+          }
+        } finally {
+          if (_didIteratorError7) {
+            throw _iteratorError7;
+          }
+        }
+      }
+
+      delete this.referenceMap[uuid];
+      /** Items that are referencing us */
+
+      var inverseReferences = this.inverseReferenceMap[uuid] || [];
+      var _iteratorNormalCompletion8 = true;
+      var _didIteratorError8 = false;
+      var _iteratorError8 = undefined;
+
+      try {
+        for (var _iterator8 = inverseReferences[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+          var inverseReference = _step8.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.referenceMap[inverseReference] || [], uuid);
+        }
+      } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
+            _iterator8.return();
+          }
+        } finally {
+          if (_didIteratorError8) {
+            throw _iteratorError8;
+          }
+        }
+      }
+
+      delete this.inverseReferenceMap[uuid];
     }
   }]);
 
@@ -13030,6 +13200,13 @@ var PurePayload = /*#__PURE__*/function () {
     key: "safeContent",
     get: function get() {
       return this.content || {};
+    }
+    /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */
+
+  }, {
+    key: "references",
+    get: function get() {
+      return this.safeReferences;
     }
   }, {
     key: "safeReferences",
@@ -20549,15 +20726,6 @@ var nondeleted = function nondeleted(items) {
 var ItemManager = /*#__PURE__*/function (_PureService) {
   _inherits(ItemManager, _PureService);
 
-  /** Maintains an index for each item id where the value is an array of item ids that the 
-   * item references. This is essentially equivalent to item.content.references, 
-   * but keeps state even when the item is deleted. So if tag A references Note B, 
-   * referenceMap[A.uuid] == [B.uuid]. */
-
-  /** Maintains an index for each item id where the value is an array of item ids where 
-   * the items reference the key item. So if tag A references Note B, 
-   * inverseReferenceMap[B.uuid] == [A.uuid]. This allows callers to determine for a given item,
-   * who references it? It would be prohibitive to look this up on demand */
   function ItemManager(modelManager) {
     var _this;
 
@@ -20574,10 +20742,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     _defineProperty(_assertThisInitialized(_this), "collection", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "systemSmartTags", void 0);
-
-    _defineProperty(_assertThisInitialized(_this), "referenceMap", {});
-
-    _defineProperty(_assertThisInitialized(_this), "inverseReferenceMap", {});
 
     _this.modelManager = modelManager;
     _this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_9__["MutableCollection"]();
@@ -20598,8 +20762,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "resetState",
     value: function resetState() {
       this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_9__["MutableCollection"]();
-      this.referenceMap = {};
-      this.inverseReferenceMap = {};
     }
     /**
      * Returns an item for a given id
@@ -20655,7 +20817,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         throw Error('Must use uuid string');
       }
 
-      var uuids = this.uuidsThatReferenceUuid(uuid);
+      var uuids = this.collection.uuidsThatReferenceUuid(uuid);
       return this.findItems(uuids);
     }
     /**
@@ -20674,150 +20836,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         return ref.uuid;
       });
       return this.findItems(uuids);
-    }
-  }, {
-    key: "uuidsThatReferenceUuid",
-    value: function uuidsThatReferenceUuid(uuid) {
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
-        throw Error('Must use uuid string');
-      }
-
-      return this.inverseReferenceMap[uuid] || [];
-    }
-  }, {
-    key: "updateReferenceIndex",
-    value: function updateReferenceIndex(item) {
-      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(item)) {
-        throw Error('Must use item reference');
-      }
-
-      var previousDirect = this.referenceMap[item.uuid] || [];
-      /** Direct index */
-
-      this.referenceMap[item.uuid] = item.references.map(function (r) {
-        return r.uuid;
-      });
-      /** Inverse index */
-
-      /** First remove any old values in case references have changed */
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = previousDirect[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var previousDirectReference = _step.value;
-          var inverseIndex = this.inverseReferenceMap[previousDirectReference];
-
-          if (inverseIndex) {
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(inverseIndex, item.uuid);
-          }
-        }
-        /** Now map current references */
-
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = item.references[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var reference = _step2.value;
-
-          var _inverseIndex = this.inverseReferenceMap[reference.uuid] || [];
-
-          _inverseIndex.push(item.uuid);
-
-          this.inverseReferenceMap[reference.uuid] = _inverseIndex;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-    }
-  }, {
-    key: "deestablishReferenceIndexForDeletedItem",
-    value: function deestablishReferenceIndexForDeletedItem(uuid) {
-      /** Items that we reference */
-      var directReferences = this.referenceMap[uuid] || [];
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = directReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var directReference = _step3.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(this.inverseReferenceMap[directReference] || [], uuid);
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
-      delete this.referenceMap[uuid];
-      /** Items that are referencing us */
-
-      var inverseReferences = this.inverseReferenceMap[uuid] || [];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = inverseReferences[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var inverseReference = _step4.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(this.referenceMap[inverseReference] || [], uuid);
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      delete this.inverseReferenceMap[uuid];
     }
   }, {
     key: "onPayloadChange",
@@ -20847,7 +20865,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setPayloads",
     value: function () {
       var _setPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(changed, inserted, discarded, source, sourceKey) {
-        var changedItems, insertedItems, changedOrInserted, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, item, discardedItems, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _item;
+        var changedItems, insertedItems, changedOrInserted, discardedItems, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
@@ -20860,113 +20878,63 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(p);
                 });
                 changedOrInserted = changedItems.concat(insertedItems);
-                _iteratorNormalCompletion5 = true;
-                _didIteratorError5 = false;
-                _iteratorError5 = undefined;
-                _context2.prev = 6;
-
-                for (_iterator5 = changedOrInserted[Symbol.iterator](); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                  item = _step5.value;
-
-                  if (item.deleted) {
-                    this.deestablishReferenceIndexForDeletedItem(item.uuid);
-                  } else {
-                    this.updateReferenceIndex(item);
-                  }
-                }
-
-                _context2.next = 14;
-                break;
-
-              case 10:
-                _context2.prev = 10;
-                _context2.t0 = _context2["catch"](6);
-                _didIteratorError5 = true;
-                _iteratorError5 = _context2.t0;
-
-              case 14:
-                _context2.prev = 14;
-                _context2.prev = 15;
-
-                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-                  _iterator5.return();
-                }
-
-              case 17:
-                _context2.prev = 17;
-
-                if (!_didIteratorError5) {
-                  _context2.next = 20;
-                  break;
-                }
-
-                throw _iteratorError5;
-
-              case 20:
-                return _context2.finish(17);
-
-              case 21:
-                return _context2.finish(14);
-
-              case 22:
                 this.collection.set(changedOrInserted);
                 discardedItems = discarded.map(function (p) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(p);
                 });
-                _iteratorNormalCompletion6 = true;
-                _didIteratorError6 = false;
-                _iteratorError6 = undefined;
-                _context2.prev = 27;
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context2.prev = 8;
 
-                for (_iterator6 = discardedItems[Symbol.iterator](); !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                  _item = _step6.value;
-                  this.deestablishReferenceIndexForDeletedItem(_item.uuid);
-                  this.collection.delete(_item);
+                for (_iterator = discardedItems[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  item = _step.value;
+                  this.collection.discard(item);
                 }
 
-                _context2.next = 35;
+                _context2.next = 16;
                 break;
 
-              case 31:
-                _context2.prev = 31;
-                _context2.t1 = _context2["catch"](27);
-                _didIteratorError6 = true;
-                _iteratorError6 = _context2.t1;
+              case 12:
+                _context2.prev = 12;
+                _context2.t0 = _context2["catch"](8);
+                _didIteratorError = true;
+                _iteratorError = _context2.t0;
 
-              case 35:
-                _context2.prev = 35;
-                _context2.prev = 36;
+              case 16:
+                _context2.prev = 16;
+                _context2.prev = 17;
 
-                if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-                  _iterator6.return();
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
                 }
 
-              case 38:
-                _context2.prev = 38;
+              case 19:
+                _context2.prev = 19;
 
-                if (!_didIteratorError6) {
-                  _context2.next = 41;
+                if (!_didIteratorError) {
+                  _context2.next = 22;
                   break;
                 }
 
-                throw _iteratorError6;
+                throw _iteratorError;
 
-              case 41:
-                return _context2.finish(38);
+              case 22:
+                return _context2.finish(19);
 
-              case 42:
-                return _context2.finish(35);
+              case 23:
+                return _context2.finish(16);
 
-              case 43:
-                _context2.next = 45;
+              case 24:
+                _context2.next = 26;
                 return this.notifyObservers(changedItems, insertedItems, discardedItems, source, sourceKey);
 
-              case 45:
+              case 26:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[6, 10, 14, 22], [15,, 17, 21], [27, 31, 35, 43], [36,, 38, 42]]);
+        }, _callee2, this, [[8, 12, 16, 24], [17,, 19, 23]]);
       }));
 
       function setPayloads(_x6, _x7, _x8, _x9, _x10) {
@@ -20979,25 +20947,25 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "notifyObservers",
     value: function () {
       var _notifyObservers = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(changed, inserted, discarded, source, sourceKey) {
-        var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, observer, filter;
+        var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, observer, filter;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _iteratorNormalCompletion7 = true;
-                _didIteratorError7 = false;
-                _iteratorError7 = undefined;
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
                 _context3.prev = 3;
-                _iterator7 = this.observers[Symbol.iterator]();
+                _iterator2 = this.observers[Symbol.iterator]();
 
               case 5:
-                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
                   _context3.next = 13;
                   break;
                 }
 
-                observer = _step7.value;
+                observer = _step2.value;
 
                 filter = function filter(items, types) {
                   return items.filter(function (item) {
@@ -21009,7 +20977,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 return observer.callback(filter(changed, observer.contentType), filter(inserted, observer.contentType), filter(discarded, observer.contentType), source, sourceKey);
 
               case 10:
-                _iteratorNormalCompletion7 = true;
+                _iteratorNormalCompletion2 = true;
                 _context3.next = 5;
                 break;
 
@@ -21020,26 +20988,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 15:
                 _context3.prev = 15;
                 _context3.t0 = _context3["catch"](3);
-                _didIteratorError7 = true;
-                _iteratorError7 = _context3.t0;
+                _didIteratorError2 = true;
+                _iteratorError2 = _context3.t0;
 
               case 19:
                 _context3.prev = 19;
                 _context3.prev = 20;
 
-                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                  _iterator7.return();
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
                 }
 
               case 22:
                 _context3.prev = 22;
 
-                if (!_didIteratorError7) {
+                if (!_didIteratorError2) {
                   _context3.next = 25;
                   break;
                 }
 
-                throw _iteratorError7;
+                throw _iteratorError2;
 
               case 25:
                 return _context3.finish(22);
@@ -21147,11 +21115,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             payloadSourceKey,
             items,
             payloads,
-            _iteratorNormalCompletion8,
-            _didIteratorError8,
-            _iteratorError8,
-            _iterator8,
-            _step8,
+            _iteratorNormalCompletion3,
+            _didIteratorError3,
+            _iteratorError3,
+            _iterator3,
+            _step3,
             item,
             _mutator,
             payload,
@@ -21167,19 +21135,19 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 payloadSourceKey = _args5.length > 4 ? _args5[4] : undefined;
                 items = this.findItems(uuids, true);
                 payloads = [];
-                _iteratorNormalCompletion8 = true;
-                _didIteratorError8 = false;
-                _iteratorError8 = undefined;
+                _iteratorNormalCompletion3 = true;
+                _didIteratorError3 = false;
+                _iteratorError3 = undefined;
                 _context5.prev = 8;
-                _iterator8 = items[Symbol.iterator]();
+                _iterator3 = items[Symbol.iterator]();
 
               case 10:
-                if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
+                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
                   _context5.next = 21;
                   break;
                 }
 
-                item = _step8.value;
+                item = _step3.value;
 
                 if (item) {
                   _context5.next = 14;
@@ -21199,7 +21167,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 payloads.push(payload);
 
               case 18:
-                _iteratorNormalCompletion8 = true;
+                _iteratorNormalCompletion3 = true;
                 _context5.next = 10;
                 break;
 
@@ -21210,26 +21178,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 23:
                 _context5.prev = 23;
                 _context5.t0 = _context5["catch"](8);
-                _didIteratorError8 = true;
-                _iteratorError8 = _context5.t0;
+                _didIteratorError3 = true;
+                _iteratorError3 = _context5.t0;
 
               case 27:
                 _context5.prev = 27;
                 _context5.prev = 28;
 
-                if (!_iteratorNormalCompletion8 && _iterator8.return != null) {
-                  _iterator8.return();
+                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                  _iterator3.return();
                 }
 
               case 30:
                 _context5.prev = 30;
 
-                if (!_didIteratorError8) {
+                if (!_didIteratorError3) {
                   _context5.next = 33;
                   break;
                 }
 
-                throw _iteratorError8;
+                throw _iteratorError3;
 
               case 33:
                 return _context5.finish(30);
@@ -21836,7 +21804,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setItemToBeDeleted",
     value: function () {
       var _setItemToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee19(uuid) {
-        var referencingIds, item, changedItem, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, referencingId, referencingItem;
+        var referencingIds, item, changedItem, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, referencingId, referencingItem;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee19$(_context19) {
           while (1) {
@@ -21844,7 +21812,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 /** Capture referencing ids before we delete the item below, otherwise
                  * the index may be updated before we get a chance to act on it */
-                referencingIds = this.uuidsThatReferenceUuid(uuid);
+                referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
                 item = this.findItem(uuid);
                 _context19.next = 4;
                 return this.changeItem(uuid, function (mutator) {
@@ -21856,19 +21824,19 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
                 /** Handle indirect relationships. 
                  * (Direct relationships are cleared by clearing content above) */
-                _iteratorNormalCompletion9 = true;
-                _didIteratorError9 = false;
-                _iteratorError9 = undefined;
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
                 _context19.prev = 8;
-                _iterator9 = referencingIds[Symbol.iterator]();
+                _iterator4 = referencingIds[Symbol.iterator]();
 
               case 10:
-                if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
                   _context19.next = 19;
                   break;
                 }
 
-                referencingId = _step9.value;
+                referencingId = _step4.value;
                 referencingItem = this.findItem(referencingId);
 
                 if (!referencingItem) {
@@ -21882,7 +21850,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 });
 
               case 16:
-                _iteratorNormalCompletion9 = true;
+                _iteratorNormalCompletion4 = true;
                 _context19.next = 10;
                 break;
 
@@ -21893,26 +21861,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 21:
                 _context19.prev = 21;
                 _context19.t0 = _context19["catch"](8);
-                _didIteratorError9 = true;
-                _iteratorError9 = _context19.t0;
+                _didIteratorError4 = true;
+                _iteratorError4 = _context19.t0;
 
               case 25:
                 _context19.prev = 25;
                 _context19.prev = 26;
 
-                if (!_iteratorNormalCompletion9 && _iterator9.return != null) {
-                  _iterator9.return();
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
                 }
 
               case 28:
                 _context19.prev = 28;
 
-                if (!_didIteratorError9) {
+                if (!_didIteratorError4) {
                   _context19.next = 31;
                   break;
                 }
 
-                throw _iteratorError9;
+                throw _iteratorError4;
 
               case 31:
                 return _context19.finish(28);
@@ -21921,10 +21889,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 return _context19.finish(25);
 
               case 33:
-                this.deestablishReferenceIndexForDeletedItem(uuid);
                 return _context19.abrupt("return", changedItem);
 
-              case 35:
+              case 34:
               case "end":
                 return _context19.stop();
             }
@@ -21946,26 +21913,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "setItemsToBeDeleted",
     value: function () {
       var _setItemsToBeDeleted = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(uuids) {
-        var changedItems, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, uuid, changedItem;
+        var changedItems, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, uuid, changedItem;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
                 changedItems = [];
-                _iteratorNormalCompletion10 = true;
-                _didIteratorError10 = false;
-                _iteratorError10 = undefined;
+                _iteratorNormalCompletion5 = true;
+                _didIteratorError5 = false;
+                _iteratorError5 = undefined;
                 _context20.prev = 4;
-                _iterator10 = uuids[Symbol.iterator]();
+                _iterator5 = uuids[Symbol.iterator]();
 
               case 6:
-                if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
+                if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
                   _context20.next = 15;
                   break;
                 }
 
-                uuid = _step10.value;
+                uuid = _step5.value;
                 _context20.next = 10;
                 return this.setItemToBeDeleted(uuid);
 
@@ -21974,7 +21941,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 changedItems.push(changedItem);
 
               case 12:
-                _iteratorNormalCompletion10 = true;
+                _iteratorNormalCompletion5 = true;
                 _context20.next = 6;
                 break;
 
@@ -21985,26 +21952,26 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 17:
                 _context20.prev = 17;
                 _context20.t0 = _context20["catch"](4);
-                _didIteratorError10 = true;
-                _iteratorError10 = _context20.t0;
+                _didIteratorError5 = true;
+                _iteratorError5 = _context20.t0;
 
               case 21:
                 _context20.prev = 21;
                 _context20.prev = 22;
 
-                if (!_iteratorNormalCompletion10 && _iterator10.return != null) {
-                  _iterator10.return();
+                if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+                  _iterator5.return();
                 }
 
               case 24:
                 _context20.prev = 24;
 
-                if (!_didIteratorError10) {
+                if (!_didIteratorError5) {
                   _context20.next = 27;
                   break;
                 }
 
-                throw _iteratorError10;
+                throw _iteratorError5;
 
               case 27:
                 return _context20.finish(24);
@@ -22104,29 +22071,29 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           return false;
         }
 
-        var _iteratorNormalCompletion11 = true;
-        var _didIteratorError11 = false;
-        var _iteratorError11 = undefined;
+        var _iteratorNormalCompletion6 = true;
+        var _didIteratorError6 = false;
+        var _iteratorError6 = undefined;
 
         try {
-          for (var _iterator11 = predicates[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-            var predicate = _step11.value;
+          for (var _iterator6 = predicates[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+            var predicate = _step6.value;
 
             if (!item.satisfiesPredicate(predicate)) {
               return false;
             }
           }
         } catch (err) {
-          _didIteratorError11 = true;
-          _iteratorError11 = err;
+          _didIteratorError6 = true;
+          _iteratorError6 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion11 && _iterator11.return != null) {
-              _iterator11.return();
+            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+              _iterator6.return();
             }
           } finally {
-            if (_didIteratorError11) {
-              throw _iteratorError11;
+            if (_didIteratorError6) {
+              throw _iteratorError6;
             }
           }
         }
@@ -22303,7 +22270,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "removeItemLocally",
     value: function removeItemLocally(item) {
-      this.collection.delete(item);
+      this.collection.discard(item);
       this.modelManager.removePayloadLocally(item.payload);
     }
   }, {
@@ -23166,7 +23133,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
                  * and can thus be removed from our local record */
 
                 if (newPayload.discardable) {
-                  this.collection.delete(newPayload);
+                  this.collection.discard(newPayload);
                   discarded.push(newPayload);
                 } else {
                   this.collection.set(newPayload);
@@ -23400,7 +23367,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "removePayloadLocally",
     value: function removePayloadLocally(payload) {
-      this.collection.delete(payload);
+      this.collection.discard(payload);
     }
   }]);
 

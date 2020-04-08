@@ -105,6 +105,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     const authHash = await this.crypto.hmac256(ciphertext, ak);
     return CreateEncryptionParameters(
       {
+        uuid: payload.uuid,
         items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
         content: ciphertext,
         enc_item_key: encItemKey!,

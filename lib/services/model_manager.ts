@@ -131,7 +131,7 @@ export class PayloadManager extends PureService {
       /** The item has been deleted and synced, 
        * and can thus be removed from our local record */
       if (newPayload.discardable) {
-        this.collection.delete(newPayload);
+        this.collection.discard(newPayload);
         discarded.push(newPayload);
       } else {
         this.collection.set(newPayload);
@@ -220,6 +220,6 @@ export class PayloadManager extends PureService {
   }
 
   public removePayloadLocally(payload: PurePayload) {
-    this.collection.delete(payload);
+    this.collection.discard(payload);
   }
 }

@@ -110,14 +110,14 @@ describe('item manager', () => {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(this.itemManager.referenceMap[tag.uuid]).to.eql([note.uuid]);
+    expect(this.itemManager.collection.referenceMap[tag.uuid]).to.eql([note.uuid]);
   });
 
   it('inverse reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
+    expect(this.itemManager.collection.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
   });
 
   it('inverse reference map should not have duplicates', async function () {
@@ -125,7 +125,7 @@ describe('item manager', () => {
     const tag = await this.createTag([note]);
     await this.itemManager.changeItem(tag.uuid);
 
-    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
+    expect(this.itemManager.collection.inverseReferenceMap[note.uuid]).to.eql([tag.uuid]);
   });
 
   it('deleting from reference map', async function () {
@@ -133,8 +133,8 @@ describe('item manager', () => {
     const tag = await this.createTag([note]);
     await this.itemManager.setItemToBeDeleted(note.uuid);
 
-    expect(this.itemManager.referenceMap[tag.uuid]).to.eql([]);
-    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.not.be.ok;
+    expect(this.itemManager.collection.referenceMap[tag.uuid]).to.eql([]);
+    expect(this.itemManager.collection.inverseReferenceMap[note.uuid]).to.not.be.ok;
   });
 
   it('deleting referenced item should update referencing item references', async function () {
@@ -153,8 +153,8 @@ describe('item manager', () => {
       mutator.removeItemAsRelationship(note);
     });
 
-    expect(this.itemManager.referenceMap[tag.uuid]).to.eql([]);
-    expect(this.itemManager.inverseReferenceMap[note.uuid]).to.eql([]);
+    expect(this.itemManager.collection.referenceMap[tag.uuid]).to.eql([]);
+    expect(this.itemManager.collection.inverseReferenceMap[note.uuid]).to.eql([]);
   });
 
   it('emitting discardable payload should remove it from our collection', async function () {
@@ -229,7 +229,7 @@ describe('item manager', () => {
         }
       );
     };
-    await expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant note');
+    await expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant item');
   });
 
   it('set items dirty', async function () {

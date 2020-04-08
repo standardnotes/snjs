@@ -89,12 +89,12 @@ describe('app models', () => {
     expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(1);
   });
 
-  it('mapping item without uuid should not map it', async function () {
+  it.only('mapping item without uuid should not map it', async function () {
     const params = CreateMaxPayloadFromAnyObject(
       Factory.createNoteParams(),
       null,
       null,
-      { uuid: null }
+      { uuid: undefined }
     );
 
     await this.application.itemManager.emitItemsFromPayloads(

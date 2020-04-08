@@ -10,7 +10,7 @@ describe('payload encryption', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(sharedApplication);
-    await Factory.registerUserToApplication({application: sharedApplication});
+    await Factory.registerUserToApplication({ application: sharedApplication });
   });
 
   after(async () => {
@@ -32,7 +32,7 @@ describe('payload encryption', () => {
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
   });
 
-  it('server payloads should not contain client values', async function() {
+  it('server payloads should not contain client values', async function () {
     const rawPayload = Factory.createNotePayload();
     const notePayload = CreateMaxPayloadFromAnyObject(
       rawPayload,
@@ -134,27 +134,13 @@ describe('payload encryption', () => {
     expect(mutated.content.references.length).to.equal(0);
   });
 
-  it('creating payload with omit fields', async () => {
-    const payload = Factory.createNotePayload();
-    const uuid = payload.uuid;
-    const changedPayload = CreateMaxPayloadFromAnyObject(
-      payload,
-      null,
-      null,
-      {uuid: null}
-    );
-
-    expect(payload.uuid).to.equal(uuid);
-    expect(changedPayload.uuid).to.not.be.ok;
-  });
-
   it('returns valid encrypted params for syncing', async () => {
     const payload = Factory.createNotePayload();
     const encryptedPayload = await sharedApplication.protocolService
-    .payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.Sync
-    );
+      .payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.Sync
+      );
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
     expect(encryptedPayload.auth_hash).to.not.be.ok;
@@ -168,10 +154,10 @@ describe('payload encryption', () => {
   it('returns unencrypted params with no keys', async () => {
     const payload = Factory.createNotePayload();
     const encodedPayload = await sharedApplication.protocolService
-    .payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.FileDecrypted
-    );
+      .payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.FileDecrypted
+      );
 
     expect(encodedPayload.enc_item_key).to.not.be.ok;
     expect(encodedPayload.auth_hash).to.not.be.ok;
@@ -186,10 +172,10 @@ describe('payload encryption', () => {
     const payload = Factory.createNotePayload();
 
     const encryptedPayload = await sharedApplication.protocolService
-    .payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.LocalStorageEncrypted
-    );
+      .payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.LocalStorageEncrypted
+      );
 
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.auth_hash).to.not.be.ok;
@@ -207,10 +193,10 @@ describe('payload encryption', () => {
   it('omits deleted for export file', async () => {
     const payload = Factory.createNotePayload();
     const encryptedPayload = await sharedApplication.protocolService
-    .payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.FileEncrypted
-    );
+      .payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.FileEncrypted
+      );
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;
     expect(encryptedPayload.content_type).to.not.be.null;
@@ -232,10 +218,10 @@ describe('payload encryption', () => {
       }
     );
     const encryptedPayload = await sharedApplication.protocolService
-    .payloadByEncryptingPayload(
-      mutatedPayload,
-      EncryptionIntent.Sync
-    );
+      .payloadByEncryptingPayload(
+        mutatedPayload,
+        EncryptionIntent.Sync
+      );
     expect(encryptedPayload.content).to.eql(payload.content);
     expect(encryptedPayload.enc_item_key).to.not.be.null;
     expect(encryptedPayload.uuid).to.not.be.null;

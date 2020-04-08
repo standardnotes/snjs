@@ -3,7 +3,7 @@ import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
 import { SNNote, NoteMutator } from './../models/app/note';
 import { SNItemsKey } from '@Models/index';
-import { SNActionsExtension, ActionsExtensionMutator } from './../models/app/extension';
+import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
@@ -61,17 +61,6 @@ export class ItemManager extends PureService {
   private collection: MutableCollection<SNItem>
   private systemSmartTags: SNSmartTag[]
 
-  /** Maintains an index for each item id where the value is an array of item ids that the 
-   * item references. This is essentially equivalent to item.content.references, 
-   * but keeps state even when the item is deleted. So if tag A references Note B, 
-   * referenceMap[A.uuid] == [B.uuid]. */
-  private referenceMap: Partial<Record<UuidString, UuidString[]>> = {}
-  /** Maintains an index for each item id where the value is an array of item ids where 
-   * the items reference the key item. So if tag A references Note B, 
-   * inverseReferenceMap[B.uuid] == [A.uuid]. This allows callers to determine for a given item,
-   * who references it? It would be prohibitive to look this up on demand */
-  private inverseReferenceMap: Partial<Record<UuidString, UuidString[]>> = {}
-
   constructor(modelManager: PayloadManager) {
     super();
     this.modelManager = modelManager;
@@ -90,8 +79,6 @@ export class ItemManager extends PureService {
 
   private resetState() {
     this.collection = new MutableCollection();
-    this.referenceMap = {};
-    this.inverseReferenceMap = {};
   }
 
   /**
@@ -158,78 +145,24 @@ export class ItemManager extends PureService {
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  private itemsReferencingItem(uuid: UuidString) {
+  public itemsReferencingItem(uuid: UuidString) {
     if (!isString(uuid)) {
       throw Error('Must use uuid string');
     }
-    const uuids = this.uuidsThatReferenceUuid(uuid);
+    const uuids = this.collection.uuidsThatReferenceUuid(uuid);
     return this.findItems(uuids);
   }
 
   /**
    * Returns all items that an item directly references
    */
-  private referencesForItem(uuid: UuidString) {
+  public referencesForItem(uuid: UuidString) {
     if (!isString(uuid)) {
       throw Error('Must use uuid string');
     }
     const item = this.findItem(uuid)!;
     const uuids = item.references.map((ref) => ref.uuid);
     return this.findItems(uuids);
-  }
-
-  private uuidsThatReferenceUuid(uuid: UuidString) {
-    if (!isString(uuid)) {
-      throw Error('Must use uuid string');
-    }
-    return this.inverseReferenceMap[uuid] || [];
-  }
-
-  private updateReferenceIndex(item: SNItem) {
-    if (isString(item)) {
-      throw Error('Must use item reference');
-    }
-    const previousDirect = this.referenceMap[item.uuid] || [];
-    /** Direct index */
-    this.referenceMap[item.uuid] = item.references.map((r) => r.uuid);
-
-    /** Inverse index */
-    /** First remove any old values in case references have changed */
-    for (const previousDirectReference of previousDirect) {
-      const inverseIndex = this.inverseReferenceMap[previousDirectReference];
-      if (inverseIndex) {
-        removeFromArray(inverseIndex, item.uuid);
-      }
-    }
-
-    /** Now map current references */
-    for (const reference of item.references) {
-      const inverseIndex = this.inverseReferenceMap[reference.uuid] || [];
-      inverseIndex.push(item.uuid);
-      this.inverseReferenceMap[reference.uuid] = inverseIndex;
-    }
-  }
-
-  private deestablishReferenceIndexForDeletedItem(uuid: UuidString) {
-    /** Items that we reference */
-    const directReferences = this.referenceMap[uuid] || []
-    for (const directReference of directReferences) {
-      removeFromArray(
-        this.inverseReferenceMap[directReference] || [],
-        uuid
-      );
-    }
-    delete this.referenceMap[uuid];
-
-    /** Items that are referencing us */
-    const inverseReferences = this.inverseReferenceMap[uuid] || []
-    for (const inverseReference of inverseReferences) {
-      removeFromArray(
-        this.referenceMap[inverseReference] || [],
-        uuid
-      );
-    }
-    delete this.inverseReferenceMap[uuid];
   }
 
   private async onPayloadChange(
@@ -259,19 +192,11 @@ export class ItemManager extends PureService {
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
     const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
-    for (const item of changedOrInserted) {
-      if (item.deleted) {
-        this.deestablishReferenceIndexForDeletedItem(item.uuid);
-      } else {
-        this.updateReferenceIndex(item);
-      }
-    }
     this.collection.set(changedOrInserted)
 
     const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
     for (const item of discardedItems) {
-      this.deestablishReferenceIndexForDeletedItem(item.uuid);
-      this.collection.delete(item);
+      this.collection.discard(item);
     }
 
     await this.notifyObservers(changedItems, insertedItems, discardedItems, source, sourceKey);
@@ -626,7 +551,7 @@ export class ItemManager extends PureService {
   public async setItemToBeDeleted(uuid: UuidString) {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
-    const referencingIds = this.uuidsThatReferenceUuid(uuid);
+    const referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
 
     const item = this.findItem(uuid);
     const changedItem = await this.changeItem(uuid, (mutator) => {
@@ -643,7 +568,6 @@ export class ItemManager extends PureService {
         });
       }
     }
-    this.deestablishReferenceIndexForDeletedItem(uuid);
     return changedItem;
   }
 
@@ -837,7 +761,7 @@ export class ItemManager extends PureService {
   }
 
   public removeItemLocally(item: SNItem) {
-    this.collection.delete(item);
+    this.collection.discard(item);
     this.modelManager!.removePayloadLocally(item.payload);
   }
 }

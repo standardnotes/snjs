@@ -136,6 +136,11 @@ export class PurePayload {
     return (this.content || {}) as PayloadContent;
   }
 
+  /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */
+  get references() {
+    return this.safeReferences;
+  }
+
   get safeReferences() {
     return this.safeContent.references || [];
   }
