@@ -37,10 +37,12 @@ describe('privileges', () => {
 
   it('adds credentials for actions', async function () {
     const privileges = await this.privilegesService.getPrivileges();
-    privileges.addCredentialForAction(
-      ProtectedAction.ViewProtectedNotes,
-      PrivilegeCredential.LocalPasscode
-    );
+    await this.application.itemManager.changeItem(privileges.uuid, (mutator) => {
+      mutator.addCredentialForAction(
+        ProtectedAction.ViewProtectedNotes,
+        PrivilegeCredential.LocalPasscode
+      );
+    });
     await this.application.setPasscode('foobar');
     const credentials = await this.privilegesService.netCredentialsForAction(
       ProtectedAction.ViewProtectedNotes

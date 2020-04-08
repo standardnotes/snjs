@@ -1,4 +1,4 @@
-import { BuildItemContent } from '@Models/generator';
+import { FillItemContent } from '@Models/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { SNTag } from '@Models/app/tag';
 import { ContentType } from '@Models/content_types';
@@ -33,7 +33,7 @@ export class SNSmartTag extends SNTag {
         uuid: SYSTEM_TAG_ALL_NOTES,
         content_type: ContentType.SmartTag,
         dummy: true,
-        content: BuildItemContent({
+        content: FillItemContent({
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
@@ -46,7 +46,7 @@ export class SNSmartTag extends SNTag {
         uuid: SYSTEM_TAG_ARCHIVED_NOTES,
         content_type: ContentType.SmartTag,
         dummy: true,
-        content: BuildItemContent({
+        content: FillItemContent({
           title: 'Archived',
           isSystemTag: true,
           isArchiveTag: true,
@@ -59,7 +59,7 @@ export class SNSmartTag extends SNTag {
         uuid: SYSTEM_TAG_TRASHED_NOTES,
         content_type: ContentType.SmartTag,
         dummy: true,
-        content: BuildItemContent({
+        content: FillItemContent({
           title: 'Trash',
           isSystemTag: true,
           isTrashTag: true,

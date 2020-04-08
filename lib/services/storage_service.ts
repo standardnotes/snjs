@@ -1,4 +1,4 @@
-import { BuildItemContent } from '@Models/generator';
+import { PayloadContent } from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
@@ -200,7 +200,7 @@ export class SNStorageService extends PureService {
     const payload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await Uuid.GenerateUuid(),
-        content: BuildItemContent(valuesToWrap),
+        content: valuesToWrap as PayloadContent,
         content_type: ContentType.EncryptedStorage
       }
     );

@@ -140,9 +140,10 @@ describe('basic auth', () => {
     
     /** Create conflict for a note */
     const note = this.application.itemManager.notes[0];
-    note.title = `${Math.random()}`;
-    note.updated_at = Factory.yesterday();
-    await this.application.saveItem(note.uuid);
+    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+      mutator.updated_at = Factory.yesterday();
+    });
     this.expectedItemCount++;
   
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);

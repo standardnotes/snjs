@@ -1,7 +1,7 @@
 import { PayloadSource } from '@Payloads/sources';
 import { PayloadField } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
-import { CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload, FillItemContent } from '@Models/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { isString, isObject, deepFreeze } from '@Lib/utils';
 import { CopyPayload, PayloadOverride, RawPayload, PayloadContent } from '@Payloads/generator';
@@ -75,7 +75,13 @@ export class PurePayload {
       throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
     }
     this.content_type = rawPayload.content_type!;
-    this.content = rawPayload.content;
+    if(rawPayload.content) {
+      if(isObject(rawPayload.content)) {
+        this.content = FillItemContent(rawPayload.content as PayloadContent);
+      } else {
+        this.content = rawPayload.content;
+      }
+    }
     this.deleted = rawPayload.deleted;
     this.items_key_id = rawPayload.items_key_id;
     this.enc_item_key = rawPayload.enc_item_key;

@@ -1,5 +1,5 @@
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { removeFromArray } from '@Lib/utils';
+import { Copy, removeFromArray } from '@Lib/utils';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
@@ -64,7 +64,7 @@ export class PrivilegeMutator extends ItemMutator {
   constructor(item: SNItem, source: MutationType) {
     super(item, source);
     this.privileges = item as SNPrivileges;
-    this.privilegeMap = this.payload.safeContent.desktopPrivileges || {};
+    this.privilegeMap = Copy(this.payload.safeContent.desktopPrivileges || {});
   }
 
   getResult() {
@@ -103,7 +103,7 @@ export class PrivilegeMutator extends ItemMutator {
     action: ProtectedAction,
     credential: PrivilegeCredential
   ) {
-    const credentials = this.privileges.getCredentialsForAction(action);
+    const credentials = this.privileges.getCredentialsForAction(action).slice();
     credentials.push(credential);
     this.setCredentialsForAction(action, credentials);
   }

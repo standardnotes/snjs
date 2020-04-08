@@ -12,9 +12,9 @@ describe('item', () => {
         {
           uuid: '123',
           content_type: ContentType.Note,
-          content: BuildItemContent({
+          content: {
             title: 'hello'
-          })
+          }
         }
       );
     };
@@ -34,10 +34,10 @@ describe('item', () => {
         new PurePayload({
           uuid: Factory.generateUuidish(),
           content_type: ContentType.Tag,
-          content: BuildItemContent({
+          content: {
             title: 'thoughts',
             references: references
-          })
+          }
         })
       );
     };

@@ -129,7 +129,7 @@ describe('singletons', () => {
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
       contentType,
-      BuildItemContent({})
+      {}
     );
     this.expectedItemCount += 1;
 
@@ -242,8 +242,10 @@ describe('singletons', () => {
     );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    /** Set after sync so that it syncs properly */
-    item.errorDecrypting = true;
+    await this.application.itemManager.changeItem(item.uuid, (mutator) => {
+      /** Set after sync so that it syncs properly */
+      mutator.errorDecrypting = true;
+    });
 
     const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
@@ -265,11 +267,12 @@ describe('singletons', () => {
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
     const predicate = new SNPredicate('content_type', '=', item.content_type);
-    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
+    let resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
       payload.content_type,
       payload.content
     );
+    const originalUuid = resolvedItem.uuid;
     await this.application.syncService.alternateUuidForItem(resolvedItem.uuid);
     await this.application.syncService.sync(syncOptions);
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton(
@@ -277,9 +280,9 @@ describe('singletons', () => {
       payload.content_type,
       payload.content
     );
-    expect(resolvedItem.uuid).to.equal(item.uuid);
-    expect(resolvedItem2.uuid).to.not.equal(resolvedItem.uuid);
-    expect(resolvedItem.deleted).to.equal(true);
+    resolvedItem = this.application.findItem(resolvedItem.uuid);
+    expect(resolvedItem).to.not.be.ok;
+    expect(resolvedItem2.uuid).to.not.equal(originalUuid);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 });

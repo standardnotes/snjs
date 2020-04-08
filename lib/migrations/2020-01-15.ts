@@ -1,5 +1,4 @@
-import { BuildItemContent } from '@Models/generator';
-import { PayloadContent } from './../protocol/payloads/generator';
+import { FillItemContent } from '@Models/generator';
 import { OrchestratorFill } from './../services/challenge_service';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject } from './../services/storage_service';
@@ -106,7 +105,7 @@ export class Migration20200115 extends Migration {
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure[ValueModesKeys.Nonwrapped][StorageKey.RootKeyParams]
+      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams]
         = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
 
       let keyToEncryptStorageWith = passcodeKey;
@@ -157,9 +156,9 @@ export class Migration20200115 extends Migration {
    */
   private async allPlatformHelperSetStorageStructure(rawStructure: StorageValuesObject) {
     const newStructure = SNStorageService.defaultValuesObject(
-      rawStructure[ValueModesKeys.Wrapped],
-      rawStructure[ValueModesKeys.Unwrapped],
-      rawStructure[ValueModesKeys.Nonwrapped],
+      rawStructure.wrapped,
+      rawStructure.unwrapped,
+      rawStructure.nonwrapped,
     );
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(
@@ -342,7 +341,7 @@ export class Migration20200115 extends Migration {
         return passcodeKey!;
       };
       const timing = keychainValue.offline.timing;
-      rawStructure[ValueModesKeys.Unwrapped]![StorageKey.MobilePasscodeTiming] = timing;
+      rawStructure.unwrapped![StorageKey.MobilePasscodeTiming] = timing;
       if (wrappedAccountKey) {
         /** 
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
@@ -383,7 +382,7 @@ export class Migration20200115 extends Migration {
         const payload = CreateMaxPayloadFromAnyObject(
           {
             uuid: await Uuid.GenerateUuid(),
-            content: BuildItemContent(rawStructure.unwrapped),
+            content: FillItemContent(rawStructure.unwrapped!),
             content_type: ContentType.EncryptedStorage
           }
         );
@@ -511,7 +510,7 @@ export class Migration20200115 extends Migration {
       const payload = CreateMaxPayloadFromAnyObject({
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: BuildItemContent({
+        content: FillItemContent({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: rootKeyParams!.version

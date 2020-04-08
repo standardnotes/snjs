@@ -63,11 +63,11 @@ describe('duplication', () => {
     this.expectedItemCount++;
     await this.application.syncService.sync();
 
-    /** Conflict the item */
-    item.content.foo = 'zar';
-    item.updated_at = Factory.yesterday();
-    await this.application.itemManager.setItemDirty(item.uuid);
-    await this.application.syncService.sync();
+    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
+      /** Conflict the item */
+      mutator.content.foo = 'zar';
+      mutator.updated_at = Factory.yesterday();
+    });
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 
@@ -80,11 +80,11 @@ describe('duplication', () => {
     this.expectedItemCount++;
     await this.application.syncService.sync();
 
-    /** Conflict the item */
-    item.content.foo = 'zar';
-    item.updated_at = Factory.yesterday();
-    await this.application.itemManager.setItemDirty(item.uuid);
-    await this.application.syncService.sync();
+    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
+      /** Conflict the item */
+      mutator.content.foo = 'zar';
+      mutator.updated_at = Factory.yesterday();
+    });
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 });

@@ -87,7 +87,7 @@ export {
   intentRequiresEncryption
 } from '@Protocol/intents';
 export { ContentType } from '@Models/content_types';
-export { CreateItemFromPayload, BuildItemContent, Uuids } from '@Models/generator';
+export { CreateItemFromPayload, Uuids } from '@Models/generator';
 
 export {
   ApplicationEvents

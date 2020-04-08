@@ -1,4 +1,4 @@
-import { BuildItemContent } from '@Models/generator';
+import { FillItemContent } from '@Models/generator';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
@@ -38,7 +38,7 @@ export class SNRootKey extends SNItem {
       {
         uuid: uuid,
         content_type: ContentType.RootKey,
-        content: BuildItemContent(content)
+        content: FillItemContent(content)
       }
     )
     return new SNRootKey(payload);

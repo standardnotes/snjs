@@ -3351,7 +3351,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*********************!*\
   !*** ./lib/main.ts ***!
   \*********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, BuildItemContent, Uuids, ApplicationEvents, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, SNEditor, SNComponentManager, ComponentAction, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, ApplicationEvents, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvents, PayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3549,8 +3549,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_34__["CreateItemFromPayload"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BuildItemContent", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_34__["BuildItemContent"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuids", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_34__["Uuids"]; });
 
@@ -4095,7 +4093,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 storageValueStore = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["jsonParseEmbeddedKeys"])(rawStorageValueStore);
                 /** Store previously encrypted auth_params into new nonwrapped value key */
 
-                newStorageRawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Nonwrapped][_Lib_index__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].RootKeyParams] = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+                newStorageRawStructure.nonwrapped[_Lib_index__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].RootKeyParams] = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
                 keyToEncryptStorageWith = passcodeKey;
                 /** Extract account key (mk, pw, ak) if it exists */
 
@@ -4191,7 +4189,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                newStructure = _Services_index__WEBPACK_IMPORTED_MODULE_9__["SNStorageService"].defaultValuesObject(rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Wrapped], rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Unwrapped], rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Nonwrapped]);
+                newStructure = _Services_index__WEBPACK_IMPORTED_MODULE_9__["SNStorageService"].defaultValuesObject(rawStructure.wrapped, rawStructure.unwrapped, rawStructure.nonwrapped);
                 newStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Unwrapped] = undefined;
                 _context5.next = 4;
                 return this.services.deviceInterface.setRawStorageValue(Object(_Lib_index__WEBPACK_IMPORTED_MODULE_3__["namespacedKey"])(this.services.namespace, _Lib_index__WEBPACK_IMPORTED_MODULE_3__["RawStorageKey"].StorageObject), JSON.stringify(newStructure));
@@ -4499,7 +4497,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 }();
 
                 timing = keychainValue.offline.timing;
-                rawStructure[_Services_storage_service__WEBPACK_IMPORTED_MODULE_11__["ValueModesKeys"].Unwrapped][_Lib_index__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].MobilePasscodeTiming] = timing;
+                rawStructure.unwrapped[_Lib_index__WEBPACK_IMPORTED_MODULE_3__["StorageKey"].MobilePasscodeTiming] = timing;
 
                 if (!wrappedAccountKey) {
                   _context10.next = 36;
@@ -4557,7 +4555,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 43:
                 _context10.t1 = _context10.sent;
-                _context10.t2 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])(rawStructure.unwrapped);
+                _context10.t2 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["FillItemContent"])(rawStructure.unwrapped);
                 _context10.t3 = _Models_index__WEBPACK_IMPORTED_MODULE_8__["ContentType"].EncryptedStorage;
                 _context10.t4 = {
                   uuid: _context10.t1,
@@ -4921,7 +4919,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
               case 10:
                 _context14.t1 = _context14.sent;
                 _context14.t2 = _Models_index__WEBPACK_IMPORTED_MODULE_8__["ContentType"].ItemsKey;
-                _context14.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])({
+                _context14.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["FillItemContent"])({
                   itemsKey: rootKey.masterKey,
                   dataAuthenticationKey: rootKey.dataAuthenticationKey,
                   version: rootKeyParams.version
@@ -5956,7 +5954,7 @@ var PrivilegeMutator = /*#__PURE__*/function (_ItemMutator) {
     _defineProperty(_assertThisInitialized(_this2), "privilegeMap", {});
 
     _this2.privileges = item;
-    _this2.privilegeMap = _this2.payload.safeContent.desktopPrivileges || {};
+    _this2.privilegeMap = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["Copy"])(_this2.payload.safeContent.desktopPrivileges || {});
     return _this2;
   }
 
@@ -5991,7 +5989,7 @@ var PrivilegeMutator = /*#__PURE__*/function (_ItemMutator) {
   }, {
     key: "addCredentialForAction",
     value: function addCredentialForAction(action, credential) {
-      var credentials = this.privileges.getCredentialsForAction(action);
+      var credentials = this.privileges.getCredentialsForAction(action).slice();
       credentials.push(credential);
       this.setCredentialsForAction(action, credentials);
     }
@@ -6080,7 +6078,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
         uuid: SYSTEM_TAG_ALL_NOTES,
         content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].SmartTag,
         dummy: true,
-        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["BuildItemContent"])({
+        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["FillItemContent"])({
           title: 'All notes',
           isSystemTag: true,
           isAllTag: true,
@@ -6091,7 +6089,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
         uuid: SYSTEM_TAG_ARCHIVED_NOTES,
         content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].SmartTag,
         dummy: true,
-        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["BuildItemContent"])({
+        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["FillItemContent"])({
           title: 'Archived',
           isSystemTag: true,
           isArchiveTag: true,
@@ -6102,7 +6100,7 @@ var SNSmartTag = /*#__PURE__*/function (_SNTag) {
         uuid: SYSTEM_TAG_TRASHED_NOTES,
         content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].SmartTag,
         dummy: true,
-        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["BuildItemContent"])({
+        content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_0__["FillItemContent"])({
           title: 'Trash',
           isSystemTag: true,
           isTrashTag: true,
@@ -7110,6 +7108,14 @@ var ItemMutator = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "errorDecrypting",
+    set: function set(errorDecrypting) {
+      this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
+        content: this.content,
+        errorDecrypting: errorDecrypting
+      });
+    }
+  }, {
     key: "updated_at",
     set: function set(updated_at) {
       this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
@@ -7492,33 +7498,27 @@ var SNPredicate = /*#__PURE__*/function () {
 /*!*********************************!*\
   !*** ./lib/models/generator.ts ***!
   \*********************************/
-/*! exports provided: CreateItemFromPayload, Uuids, BuildItemContent */
+/*! exports provided: CreateItemFromPayload, Uuids, FillItemContent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return CreateItemFromPayload; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Uuids", function() { return Uuids; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BuildItemContent", function() { return BuildItemContent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FillItemContent", function() { return FillItemContent; });
 /* harmony import */ var _core_item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/index */ "./lib/models/index.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 var _ContentTypeClassMapp;
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
-
-var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Note, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Tag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].ItemsKey, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].SmartTag, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].ActionsExtension, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Editor, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Privileges, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].UserPrefs, _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNUserPrefs"]), _ContentTypeClassMapp);
+var ContentTypeClassMapping = (_ContentTypeClassMapp = {}, _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Note, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNNote"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Tag, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].ItemsKey, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNItemsKey"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].SmartTag, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNSmartTag"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].ActionsExtension, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNActionsExtension"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Editor, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNEditor"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNTheme"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Component, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNComponent"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Privileges, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNPrivileges"]), _defineProperty(_ContentTypeClassMapp, _Models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].UserPrefs, _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNUserPrefs"]), _ContentTypeClassMapp);
 function CreateItemFromPayload(payload) {
-  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models_index__WEBPACK_IMPORTED_MODULE_2__["SNItem"]; // eslint-disable-next-line new-cap
+  var itemClass = ContentTypeClassMapping[payload.content_type] || _Models_index__WEBPACK_IMPORTED_MODULE_1__["SNItem"]; // eslint-disable-next-line new-cap
 
   var item = new itemClass(payload);
   return item;
@@ -7533,16 +7533,24 @@ function Uuids(items) {
   });
 }
 /**
- * Builds item .content based on values and populates with other default required
- * fields if necessary.
+ * Modifies the input object to fill in any missing required values from the 
+ * content body.
  */
 
-function BuildItemContent(values) {
-  var copy = values ? Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["Copy"])(values) : {};
-  return _objectSpread({
-    references: [],
-    appData: _defineProperty({}, _core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"].DefaultAppDomain(), {})
-  }, copy);
+function FillItemContent(content) {
+  if (!content.references) {
+    content.references = [];
+  }
+
+  if (!content.appData) {
+    content.appData = {};
+  }
+
+  if (!content.appData[_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"].DefaultAppDomain()]) {
+    content.appData[_core_item__WEBPACK_IMPORTED_MODULE_0__["SNItem"].DefaultAppDomain()] = {};
+  }
+
+  return content;
 }
 
 /***/ }),
@@ -10013,7 +10021,7 @@ var SNProtocolOperator = /*#__PURE__*/function () {
               case 6:
                 _context3.t1 = _context3.sent;
                 _context3.t2 = _Root_lib_models__WEBPACK_IMPORTED_MODULE_7__["ContentType"].ItemsKey;
-                _context3.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["BuildItemContent"])(content);
+                _context3.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["FillItemContent"])(content);
                 _context3.t4 = {
                   uuid: _context3.t1,
                   content_type: _context3.t2,
@@ -13101,7 +13109,15 @@ var PurePayload = /*#__PURE__*/function () {
     }
 
     this.content_type = rawPayload.content_type;
-    this.content = rawPayload.content;
+
+    if (rawPayload.content) {
+      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["isObject"])(rawPayload.content)) {
+        this.content = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["FillItemContent"])(rawPayload.content);
+      } else {
+        this.content = rawPayload.content;
+      }
+    }
+
     this.deleted = rawPayload.deleted;
     this.items_key_id = rawPayload.items_key_id;
     this.enc_item_key = rawPayload.enc_item_key;
@@ -13463,7 +13479,7 @@ var SNRootKey = /*#__PURE__*/function (_SNItem) {
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CreateMaxPayloadFromAnyObject"])({
                   uuid: uuid,
                   content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_4__["ContentType"].RootKey,
-                  content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])(content)
+                  content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["FillItemContent"])(content)
                 });
                 return _context.abrupt("return", new SNRootKey(payload));
 
@@ -20651,23 +20667,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemManager", function() { return ItemManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../models/app/tag */ "./lib/models/app/tag.ts");
-/* harmony import */ var _models_app_items_key__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../models/app/items_key */ "./lib/models/app/items_key.ts");
-/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../models/app/note */ "./lib/models/app/note.ts");
-/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../models/app/extension */ "./lib/models/app/extension.ts");
-/* harmony import */ var _models_app_smartTag__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../models/app/smartTag */ "./lib/models/app/smartTag.ts");
-/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./../models/core/predicate */ "./lib/models/core/predicate.ts");
-/* harmony import */ var _uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../uuid */ "./lib/uuid.ts");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
-/* harmony import */ var _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./../protocol/payloads/mutable_collection */ "./lib/protocol/payloads/mutable_collection.ts");
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./../models/app/component */ "./lib/models/app/component.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./../models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./../protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../models/app/privileges */ "./lib/models/app/privileges.ts");
+/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../models/app/tag */ "./lib/models/app/tag.ts");
+/* harmony import */ var _models_app_items_key__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../models/app/items_key */ "./lib/models/app/items_key.ts");
+/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../models/app/note */ "./lib/models/app/note.ts");
+/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../models/app/extension */ "./lib/models/app/extension.ts");
+/* harmony import */ var _models_app_smartTag__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./../models/app/smartTag */ "./lib/models/app/smartTag.ts");
+/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../models/core/predicate */ "./lib/models/core/predicate.ts");
+/* harmony import */ var _uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./../uuid */ "./lib/uuid.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
+/* harmony import */ var _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./../protocol/payloads/mutable_collection */ "./lib/protocol/payloads/mutable_collection.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./../models/app/component */ "./lib/models/app/component.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./../models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./../protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../models/content_types */ "./lib/models/content_types.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -20693,6 +20710,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -20749,9 +20767,9 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     _defineProperty(_assertThisInitialized(_this), "systemSmartTags", void 0);
 
     _this.modelManager = modelManager;
-    _this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_9__["MutableCollection"]();
-    _this.unsubChangeObserver = _this.modelManager.addChangeObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Any, _this.onPayloadChange.bind(_assertThisInitialized(_this)));
-    _this.systemSmartTags = _models_app_smartTag__WEBPACK_IMPORTED_MODULE_5__["SNSmartTag"].systemSmartTags();
+    _this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
+    _this.unsubChangeObserver = _this.modelManager.addChangeObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Any, _this.onPayloadChange.bind(_assertThisInitialized(_this)));
+    _this.systemSmartTags = _models_app_smartTag__WEBPACK_IMPORTED_MODULE_6__["SNSmartTag"].systemSmartTags();
     return _this;
   }
 
@@ -20766,7 +20784,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "resetState",
     value: function resetState() {
-      this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_9__["MutableCollection"]();
+      this.collection = new _protocol_payloads_mutable_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
     }
     /**
      * Returns an item for a given id
@@ -20808,7 +20826,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       };
       this.observers.push(observer);
       return function () {
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(_this2.observers, observer);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["removeFromArray"])(_this2.observers, observer);
       };
     }
     /**
@@ -20818,7 +20836,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsReferencingItem",
     value: function itemsReferencingItem(uuid) {
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
+      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["isString"])(uuid)) {
         throw Error('Must use uuid string');
       }
 
@@ -20832,7 +20850,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "referencesForItem",
     value: function referencesForItem(uuid) {
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
+      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["isString"])(uuid)) {
         throw Error('Must use uuid string');
       }
 
@@ -20877,15 +20895,15 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 changedItems = changed.map(function (p) {
-                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(p);
+                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(p);
                 });
                 insertedItems = inserted.map(function (p) {
-                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(p);
+                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(p);
                 });
                 changedOrInserted = changedItems.concat(insertedItems);
                 this.collection.set(changedOrInserted);
                 discardedItems = discarded.map(function (p) {
-                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(p);
+                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(p);
                 });
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
@@ -20974,7 +20992,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
                 filter = function filter(items, types) {
                   return items.filter(function (item) {
-                    return types.includes(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Any) || types.includes(item.content_type);
+                    return types.includes(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Any) || types.includes(item.content_type);
                   });
                 };
 
@@ -21057,11 +21075,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                mutationType = _args4.length > 2 && _args4[2] !== undefined ? _args4[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args4.length > 3 && _args4[3] !== undefined ? _args4[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args4.length > 2 && _args4[2] !== undefined ? _args4[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args4.length > 3 && _args4[3] !== undefined ? _args4[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args4.length > 4 ? _args4[4] : undefined;
 
-                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
+                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["isString"])(uuid)) {
                   _context4.next = 5;
                   break;
                 }
@@ -21093,18 +21111,20 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "createMutatorForItem",
     value: function createMutatorForItem(item, type) {
-      if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Note) {
-        return new _models_app_note__WEBPACK_IMPORTED_MODULE_3__["NoteMutator"](item, type);
-      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Tag) {
-        return new _models_app_tag__WEBPACK_IMPORTED_MODULE_1__["TagMutator"](item, type);
-      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Component) {
-        return new _models_app_component__WEBPACK_IMPORTED_MODULE_12__["ComponentMutator"](item, type);
-      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ActionsExtension) {
-        return new _models_app_extension__WEBPACK_IMPORTED_MODULE_4__["ActionsExtensionMutator"](item, type);
-      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey) {
-        return new _models_app_items_key__WEBPACK_IMPORTED_MODULE_2__["ItemsKeyMutator"](item, type);
+      if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Note) {
+        return new _models_app_note__WEBPACK_IMPORTED_MODULE_4__["NoteMutator"](item, type);
+      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Tag) {
+        return new _models_app_tag__WEBPACK_IMPORTED_MODULE_2__["TagMutator"](item, type);
+      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Component) {
+        return new _models_app_component__WEBPACK_IMPORTED_MODULE_13__["ComponentMutator"](item, type);
+      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ActionsExtension) {
+        return new _models_app_extension__WEBPACK_IMPORTED_MODULE_5__["ActionsExtensionMutator"](item, type);
+      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ItemsKey) {
+        return new _models_app_items_key__WEBPACK_IMPORTED_MODULE_3__["ItemsKeyMutator"](item, type);
+      } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Privileges) {
+        return new _models_app_privileges__WEBPACK_IMPORTED_MODULE_1__["PrivilegeMutator"](item, type);
       } else {
-        return new _models_core_item__WEBPACK_IMPORTED_MODULE_15__["ItemMutator"](item, type);
+        return new _models_core_item__WEBPACK_IMPORTED_MODULE_16__["ItemMutator"](item, type);
       }
     }
     /**
@@ -21135,8 +21155,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                mutationType = _args5.length > 2 && _args5[2] !== undefined ? _args5[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args5.length > 2 && _args5[2] !== undefined ? _args5[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args5.length > 4 ? _args5[4] : undefined;
                 items = this.findItems(uuids, true);
                 payloads = [];
@@ -21248,8 +21268,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                mutationType = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args6.length > 3 && _args6[3] !== undefined ? _args6[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args6.length > 3 && _args6[3] !== undefined ? _args6[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args6.length > 4 ? _args6[4] : undefined;
                 note = this.findItem(uuid);
 
@@ -21261,7 +21281,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant note');
 
               case 6:
-                mutator = new _models_app_note__WEBPACK_IMPORTED_MODULE_3__["NoteMutator"](note, mutationType);
+                mutator = new _models_app_note__WEBPACK_IMPORTED_MODULE_4__["NoteMutator"](note, mutationType);
                 return _context6.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -21292,8 +21312,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                mutationType = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args7.length > 3 && _args7[3] !== undefined ? _args7[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args7.length > 3 && _args7[3] !== undefined ? _args7[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args7.length > 4 ? _args7[4] : undefined;
                 component = this.findItem(uuid);
 
@@ -21305,7 +21325,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant component');
 
               case 6:
-                mutator = new _models_app_component__WEBPACK_IMPORTED_MODULE_12__["ComponentMutator"](component, mutationType);
+                mutator = new _models_app_component__WEBPACK_IMPORTED_MODULE_13__["ComponentMutator"](component, mutationType);
                 return _context7.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -21336,8 +21356,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                mutationType = _args8.length > 2 && _args8[2] !== undefined ? _args8[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args8.length > 3 && _args8[3] !== undefined ? _args8[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args8.length > 2 && _args8[2] !== undefined ? _args8[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args8.length > 3 && _args8[3] !== undefined ? _args8[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args8.length > 4 ? _args8[4] : undefined;
                 extension = this.findItem(uuid);
 
@@ -21349,7 +21369,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant extension');
 
               case 6:
-                mutator = new _models_app_extension__WEBPACK_IMPORTED_MODULE_4__["ActionsExtensionMutator"](extension, mutationType);
+                mutator = new _models_app_extension__WEBPACK_IMPORTED_MODULE_5__["ActionsExtensionMutator"](extension, mutationType);
                 return _context8.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -21380,8 +21400,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                mutationType = _args9.length > 2 && _args9[2] !== undefined ? _args9[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args9.length > 3 && _args9[3] !== undefined ? _args9[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                mutationType = _args9.length > 2 && _args9[2] !== undefined ? _args9[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction;
+                payloadSource = _args9.length > 3 && _args9[3] !== undefined ? _args9[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args9.length > 4 ? _args9[4] : undefined;
                 itemsKey = this.findItem(uuid);
 
@@ -21393,7 +21413,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant itemsKey');
 
               case 6:
-                mutator = new _models_app_items_key__WEBPACK_IMPORTED_MODULE_2__["ItemsKeyMutator"](itemsKey, mutationType);
+                mutator = new _models_app_items_key__WEBPACK_IMPORTED_MODULE_3__["ItemsKeyMutator"](itemsKey, mutationType);
                 return _context9.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -21422,7 +21442,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                payloadSource = _args10.length > 2 && _args10[2] !== undefined ? _args10[2] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                payloadSource = _args10.length > 2 && _args10[2] !== undefined ? _args10[2] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args10.length > 3 ? _args10[3] : undefined;
                 mutate(mutator);
                 payload = mutator.getResult();
@@ -21461,7 +21481,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 isUserModified = _args11.length > 1 && _args11[1] !== undefined ? _args11[1] : false;
 
-                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
+                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["isString"])(uuid)) {
                   _context11.next = 3;
                   break;
                 }
@@ -21506,7 +21526,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 isUserModified = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : false;
 
-                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuids[0])) {
+                if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["isString"])(uuids[0])) {
                   _context12.next = 3;
                   break;
                 }
@@ -21514,7 +21534,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Must use uuid when setting item dirty');
 
               case 3:
-                return _context12.abrupt("return", this.changeItems(uuids, undefined, isUserModified ? _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].Internal));
+                return _context12.abrupt("return", this.changeItems(uuids, undefined, isUserModified ? _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].UserInteraction : _models_core_item__WEBPACK_IMPORTED_MODULE_16__["MutationType"].Internal));
 
               case 4:
               case "end":
@@ -21601,14 +21621,14 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 isConflict = _args14.length > 1 && _args14[1] !== undefined ? _args14[1] : false;
                 item = this.findItem(uuid);
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_14__["CreateMaxPayloadFromAnyObject"])(item);
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item);
                 _context14.next = 5;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_8__["PayloadsByDuplicating"])(payload, this.modelManager.getMasterCollection(), isConflict);
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_9__["PayloadsByDuplicating"])(payload, this.modelManager.getMasterCollection(), isConflict);
 
               case 5:
                 resultingPayloads = _context14.sent;
                 _context14.next = 8;
-                return this.modelManager.emitPayloads(resultingPayloads, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged);
+                return this.modelManager.emitPayloads(resultingPayloads, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].LocalChanged);
 
               case 8:
                 duplicate = this.findItem(resultingPayloads[0].uuid);
@@ -21656,14 +21676,14 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to create item with no contentType';
 
               case 4:
-                _context15.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_14__["CreateMaxPayloadFromAnyObject"];
+                _context15.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"];
                 _context15.next = 7;
-                return _uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
+                return _uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
 
               case 7:
                 _context15.t1 = _context15.sent;
                 _context15.t2 = contentType;
-                _context15.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["BuildItemContent"])(content);
+                _context15.t3 = content ? Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])(content) : undefined;
                 _context15.t4 = needsSync;
                 _context15.t5 = {
                   uuid: _context15.t1,
@@ -21676,7 +21696,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 _context15.t8 = override;
                 payload = (0, _context15.t0)(_context15.t5, _context15.t6, _context15.t7, _context15.t8);
                 _context15.next = 18;
-                return this.modelManager.emitPayload(payload, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].Constructor);
+                return this.modelManager.emitPayload(payload, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].Constructor);
 
               case 18:
                 return _context15.abrupt("return", this.findItem(payload.uuid));
@@ -21704,21 +21724,21 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                _context16.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_14__["CreateMaxPayloadFromAnyObject"];
+                _context16.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"];
                 _context16.next = 3;
-                return _uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
+                return _uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
 
               case 3:
                 _context16.t1 = _context16.sent;
                 _context16.t2 = contentType;
-                _context16.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["BuildItemContent"])(content);
+                _context16.t3 = content ? Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])(content) : undefined;
                 _context16.t4 = {
                   uuid: _context16.t1,
                   content_type: _context16.t2,
                   content: _context16.t3
                 };
                 payload = (0, _context16.t0)(_context16.t4);
-                return _context16.abrupt("return", Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["CreateItemFromPayload"])(payload));
+                return _context16.abrupt("return", Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(payload));
 
               case 9:
               case "end":
@@ -21744,7 +21764,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                source = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].Constructor;
+                source = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].Constructor;
                 _context17.next = 3;
                 return this.modelManager.emitPayload(payload, source);
 
@@ -21776,12 +21796,12 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context18.prev = _context18.next) {
               case 0:
-                source = _args18.length > 1 && _args18[1] !== undefined ? _args18[1] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].Constructor;
+                source = _args18.length > 1 && _args18[1] !== undefined ? _args18[1] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_17__["PayloadSource"].Constructor;
                 _context18.next = 3;
                 return this.modelManager.emitPayloads(payloads, source);
 
               case 3:
-                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["Uuids"])(payloads);
+                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["Uuids"])(payloads);
                 return _context18.abrupt("return", this.findItems(uuids));
 
               case 5:
@@ -22111,7 +22131,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "findTagByTitle",
     value: function findTagByTitle(title) {
-      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["searchArray"])(this.tags, {
+      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_14__["searchArray"])(this.tags, {
         title: title
       });
     }
@@ -22137,7 +22157,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context21.next = 5;
-                return this.createItem(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Tag, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["BuildItemContent"])({
+                return this.createItem(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Tag, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])({
                   title: title
                 }), true);
 
@@ -22168,11 +22188,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "notesMatchingSmartTag",
     value: function notesMatchingSmartTag(smartTag) {
-      var contentTypePredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_6__["SNPredicate"]('content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Note);
+      var contentTypePredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"]('content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Note);
       var predicates = [contentTypePredicate, smartTag.predicate];
 
       if (!smartTag.isTrashTag) {
-        var notTrashedPredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_6__["SNPredicate"]('content.trashed', '=', false);
+        var notTrashedPredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"]('content.trashed', '=', false);
         predicates.push(notTrashedPredicate);
       }
 
@@ -22197,7 +22217,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context22.prev = _context22.next) {
               case 0:
                 notes = this.trashedItems;
-                return _context22.abrupt("return", this.setItemsToBeDeleted(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["Uuids"])(notes)));
+                return _context22.abrupt("return", this.setItemsToBeDeleted(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["Uuids"])(notes)));
 
               case 2:
               case "end":
@@ -22220,7 +22240,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getSmartTags",
     value: function getSmartTags() {
-      var userTags = this.validItemsForContentType(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].SmartTag);
+      var userTags = this.validItemsForContentType(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].SmartTag);
       var sortedUserTags = userTags.sort(function (a, b) {
         return a.title < b.title ? -1 : 1;
       });
@@ -22245,7 +22265,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_10__["Uuids"])(this.items);
+                uuids = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["Uuids"])(this.items);
                 _context23.next = 3;
                 return this.changeItems(uuids, function (mutator) {
                   mutator.setDeleted();
@@ -22278,7 +22298,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsKeys",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey));
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ItemsKey));
     }
     /**
     * Returns all non-deleted notes
@@ -22287,7 +22307,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "notes",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Note));
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Note));
     }
     /**
     * Returns all non-deleted tags
@@ -22296,7 +22316,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "tags",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Tag));
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Tag));
     }
     /**
     * Returns all non-deleted components
@@ -22305,7 +22325,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "components",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Component));
+      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Component));
     }
   }, {
     key: "items",
@@ -22360,7 +22380,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }]);
 
   return ItemManager;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_11__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_12__["PureService"]);
 
 /***/ }),
 
@@ -23681,7 +23701,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
               case 0:
                 contentType = _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__["ContentType"].Privileges;
                 predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SNPredicate"]('content_type', '=', contentType);
-                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton(predicate, contentType, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])({})));
+                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton(predicate, contentType, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["FillItemContent"])({})));
 
               case 3:
               case "end":
@@ -27048,7 +27068,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
               case 8:
                 _context44.t1 = _context44.sent;
                 _context44.t2 = _Models_content_types__WEBPACK_IMPORTED_MODULE_11__["ContentType"].ItemsKey;
-                _context44.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["BuildItemContent"])({
+                _context44.t3 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["FillItemContent"])({
                   itemsKey: rootKey.masterKey,
                   dataAuthenticationKey: rootKey.dataAuthenticationKey,
                   version: operatorVersion
@@ -27858,14 +27878,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNStorageService", function() { return SNStorageService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/index */ "./lib/index.ts");
-/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Lib/index */ "./lib/index.ts");
+/* harmony import */ var _Payloads_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/index */ "./lib/protocol/payloads/index.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -27895,7 +27914,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 
 
 
@@ -28001,7 +28019,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 return _get(_getPrototypeOf(SNStorageService.prototype), "handleApplicationStage", this).call(this, stage);
 
               case 2:
-                if (stage === _Lib_index__WEBPACK_IMPORTED_MODULE_4__["ApplicationStages"].Launched_10) {
+                if (stage === _Lib_index__WEBPACK_IMPORTED_MODULE_3__["ApplicationStages"].Launched_10) {
                   this.storagePersistable = true;
                 }
 
@@ -28162,7 +28180,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
     key: "isStorageWrapped",
     value: function isStorageWrapped() {
       var wrappedValue = this.values[ValueModesKeys.Wrapped];
-      return !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["isNullOrUndefined"])(wrappedValue) && Object.keys(wrappedValue).length > 0;
+      return !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["isNullOrUndefined"])(wrappedValue) && Object.keys(wrappedValue).length > 0;
     }
   }, {
     key: "canDecryptWithKey",
@@ -28212,8 +28230,8 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to decrypt nonexistent wrapped value';
 
               case 2:
-                payload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])(wrappedValue, undefined, undefined, {
-                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_6__["ContentType"].EncryptedStorage
+                payload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])(wrappedValue, undefined, undefined, {
+                  content_type: _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentType"].EncryptedStorage
                 });
                 _context7.next = 5;
                 return this.encryptionDelegate.payloadByDecryptingPayload(payload, key);
@@ -28260,7 +28278,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 throw 'Unable to decrypt storage.';
 
               case 6:
-                this.values[ValueModesKeys.Unwrapped] = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["Copy"])(decryptedPayload.contentObject);
+                this.values[ValueModesKeys.Unwrapped] = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["Copy"])(decryptedPayload.contentObject);
                 delete this.values[ValueModesKeys.Wrapped];
 
               case 8:
@@ -28293,14 +28311,14 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
               case 0:
                 rawContent = Object.assign({}, this.values);
                 valuesToWrap = rawContent[ValueModesKeys.Unwrapped];
-                _context9.t0 = _Payloads_index__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"];
+                _context9.t0 = _Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"];
                 _context9.next = 5;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
+                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
 
               case 5:
                 _context9.t1 = _context9.sent;
-                _context9.t2 = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])(valuesToWrap);
-                _context9.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_6__["ContentType"].EncryptedStorage;
+                _context9.t2 = valuesToWrap;
+                _context9.t3 = _Models_content_types__WEBPACK_IMPORTED_MODULE_5__["ContentType"].EncryptedStorage;
                 _context9.t4 = {
                   uuid: _context9.t1,
                   content: _context9.t2,
@@ -28308,7 +28326,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
                 };
                 payload = (0, _context9.t0)(_context9.t4);
                 _context9.next = 12;
-                return this.encryptionDelegate.payloadByEncryptingPayload(payload, _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].LocalStoragePreferEncrypted);
+                return this.encryptionDelegate.payloadByEncryptingPayload(payload, _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted);
 
               case 12:
                 encryptedPayload = _context9.sent;
@@ -28504,7 +28522,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getPersistenceKey",
     value: function getPersistenceKey() {
-      return Object(_Lib_index__WEBPACK_IMPORTED_MODULE_4__["namespacedKey"])(this.namespace, _Lib_index__WEBPACK_IMPORTED_MODULE_4__["RawStorageKey"].StorageObject);
+      return Object(_Lib_index__WEBPACK_IMPORTED_MODULE_3__["namespacedKey"])(this.namespace, _Lib_index__WEBPACK_IMPORTED_MODULE_3__["RawStorageKey"].StorageObject);
     }
   }, {
     key: "defaultValuesObject",
@@ -28654,7 +28672,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
 
               case 17:
                 _context17.next = 19;
-                return this.encryptionDelegate.payloadByEncryptingPayload(_payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].LocalStoragePreferEncrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].LocalStorageDecrypted);
+                return this.encryptionDelegate.payloadByEncryptingPayload(_payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStoragePreferEncrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_1__["EncryptionIntent"].LocalStorageDecrypted);
 
               case 19:
                 encrypted = _context17.sent;
@@ -28890,7 +28908,7 @@ var SNStorageService = /*#__PURE__*/function (_PureService) {
   }]);
 
   return SNStorageService;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__["PureService"]);
 
 /***/ }),
 

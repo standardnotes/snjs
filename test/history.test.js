@@ -30,8 +30,9 @@ describe('session history', () => {
   });
 
   async function setTextAndSync(application, item, text) {
-    item.text = text;
-    await application.saveItem(item.uuid);
+    return application.changeAndSaveItem(item.uuid, (mutator) => {
+      mutator.text = text;
+    });
   }
 
   function deleteCharsFromString(string, amount) {
@@ -49,8 +50,9 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(1);
 
     /** Sync with different contents, should create new entry */
-    item.title = Math.random();
-    await this.application.saveItem(item.uuid);
+    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
+      mutator.title = Math.random();
+    });
     expect(itemHistory.entries.length).to.equal(2);
 
     this.historyManager.clearHistoryForItem(item);
@@ -65,7 +67,7 @@ describe('session history', () => {
   });
 
   it('should optimize basic entries', async function () {
-    const item = await Factory.createSyncedNote(this.application);
+    let item = await Factory.createSyncedNote(this.application);
     const itemHistory = this.historyManager.historyForItem(item);
     /** It should keep the first revision, regardless of character delta. */
     expect(itemHistory.entries.length).to.equal(1);
@@ -84,7 +86,7 @@ describe('session history', () => {
      * Now changing it by one character should discard this entry,
      * keeping the total at 2.
      */
-    await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       item.content.text + Factory.randomString(1)
@@ -95,7 +97,7 @@ describe('session history', () => {
      * revision, but now remove the previous revision, since it's no longer
      * the last, and is a small change.
      */
-    await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       item.content.text + Factory.randomString(largeCharacterChange + 1)
@@ -105,7 +107,7 @@ describe('session history', () => {
      * Change it again over the delta threshhold. It should keep this revision,
      * and the last one, totaling 3.
      */
-    await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       item.content.text + Factory.randomString(largeCharacterChange + 1)
@@ -113,7 +115,7 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(3);
 
     /** Delete over threshold text. It should keep this revision. */
-    await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       deleteCharsFromString(item.content.text, largeCharacterChange + 1)
@@ -124,13 +126,13 @@ describe('session history', () => {
      * last, upping the total to 5. However, the next small revision after that
      * should delete it, keeping it at 5.
      */
-    await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       deleteCharsFromString(item.content.text, 1)
     );
     expect(itemHistory.entries.length).to.equal(5);
-    await setTextAndSync(
+    item =  await setTextAndSync(
       this.application,
       item,
       deleteCharsFromString(item.content.text, 1)
@@ -145,7 +147,7 @@ describe('session history', () => {
           text: Factory.randomString(100)
         })
       );
-      const item = await this.itemManager.emitItemFromPayload(
+      let item = await this.application.itemManager.emitItemFromPayload(
         payload,
         PayloadSource.LocalChanged
       );
@@ -153,12 +155,12 @@ describe('session history', () => {
       await this.application.syncService.sync();
       const itemHistory = this.historyManager.historyForItem(item);
       /** It should keep the first and last by default */
-      await setTextAndSync(
+      item = await setTextAndSync(
         this.application,
         item,
         item.content.text
       );
-      await setTextAndSync(
+      item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(1)
@@ -177,7 +179,7 @@ describe('session history', () => {
        * It would have been 2 typically. But because we're hanging on to a small
        * revision right before a large deletion, the total will be 3.
        */
-      await setTextAndSync(
+      item = await setTextAndSync(
         this.application,
         item,
         deleteCharsFromString(item.content.text, largeCharacterChange + 1)
@@ -190,7 +192,7 @@ describe('session history', () => {
        * large revision will have more information.
        */
       /** Make a small positive change. This should be kept, because it's the last. */
-      await setTextAndSync(
+      item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(1)
@@ -200,7 +202,7 @@ describe('session history', () => {
        * Make a large positive change. The previous small positive change should
        * now be discarded, keeping a total of 4.
        */
-      await setTextAndSync(
+      item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(largeCharacterChange + 1

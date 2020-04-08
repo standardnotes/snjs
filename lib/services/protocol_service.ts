@@ -1,7 +1,7 @@
 import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvents } from '@Lib/events';
-import { BuildItemContent, CreateItemFromPayload, Uuids } from '@Models/generator';
+import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
@@ -1291,7 +1291,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const payload = CreateMaxPayloadFromAnyObject({
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: BuildItemContent({
+        content: FillItemContent({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: operatorVersion

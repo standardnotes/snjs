@@ -8,7 +8,7 @@ const createItemParams = function () {
   const params = {
     uuid: Factory.generateUuidish(),
     content_type: 'Item',
-    content: BuildItemContent({
+    content: {
       title: 'Hello',
       desc: 'World',
       numbers: ['1', '2', '3'],
@@ -26,7 +26,7 @@ const createItemParams = function () {
           id: Math.random()
         }
       ]
-    })
+    }
   };
   return params;
 };
@@ -56,10 +56,10 @@ describe('predicates', async function () {
     this.createNote = async function () {
       return this.itemManager.createItem(
         ContentType.Note,
-        BuildItemContent({
+        {
           title: 'hello',
           text: 'world'
-        })
+        }
       );
     };
 
@@ -72,10 +72,10 @@ describe('predicates', async function () {
       });
       return this.itemManager.createItem(
         ContentType.Tag,
-        BuildItemContent({
+        {
           title: 'thoughts',
           references: references
-        })
+        }
       );
     };
   });
@@ -329,7 +329,7 @@ describe('predicates', async function () {
       {
         uuid: Factory.generateUuidish(),
         content_type: 'Item',
-        content: BuildItemContent({
+        content: {
           tags: [
             {
               title: 'sobar',
@@ -340,7 +340,7 @@ describe('predicates', async function () {
               id: Math.random()
             }
           ]
-        })
+        }
       }
     );
 

@@ -186,10 +186,10 @@ export function createItemParams(contentType) {
   const params = {
     uuid: generateUuid(),
     content_type: contentType,
-    content: BuildItemContent({
+    content: {
       title: 'hello',
       text: 'world'
-    })
+    }
   };
   return params;
 }
@@ -204,11 +204,11 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
     uuid: generateUuid(),
     content_type: ContentType.Note,
     dirty: dirty,
-    content: BuildItemContent({
+    content: {
       title: title || 'hello',
       text: text || 'world',
       references: []
-    })
+    }
   };
   return params;
 }
@@ -217,10 +217,10 @@ export function createTagParams({ dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Tag,
-    content: BuildItemContent({
+    content: {
       title: 'thoughts',
       references: []
-    })
+    }
   };
   return params;
 }

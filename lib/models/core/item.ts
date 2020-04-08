@@ -422,6 +422,17 @@ export class ItemMutator {
     )
   }
 
+  public set errorDecrypting(errorDecrypting: boolean) {
+    this.payload = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        errorDecrypting: errorDecrypting
+      }
+    )
+  }
+
+
   public set updated_at(updated_at: Date) {
     this.payload = CopyPayload(
       this.payload,

@@ -34,10 +34,10 @@ describe('item manager', () => {
     this.createNote = async () => {
       return this.itemManager.createItem(
         ContentType.Note,
-        BuildItemContent({
+        {
           title: 'hello',
           text: 'world'
-        })
+        }
       );
     };
 
@@ -50,10 +50,10 @@ describe('item manager', () => {
       });
       return this.itemManager.createItem(
         ContentType.Tag,
-        BuildItemContent({
+        {
           title: 'thoughts',
           references: references
-        })
+        }
       );
     };
   });
@@ -214,10 +214,10 @@ describe('item manager', () => {
   it('change non-existant item through uuid should fail', async function () {
     const note = await this.itemManager.createTemplateItem(
       ContentType.Note,
-      BuildItemContent({
+      {
         title: 'hello',
         text: 'world'
-      })
+      }
     );
 
     const changeFn = async () => {

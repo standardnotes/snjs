@@ -1,5 +1,5 @@
 import { Uuid } from './../../uuid';
-import { BuildItemContent, CreateItemFromPayload } from '@Models/generator';
+import { FillItemContent, CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
 import { SNRootKeyParams } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
@@ -91,7 +91,7 @@ export abstract class SNProtocolOperator {
       {
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: BuildItemContent(content)
+        content: FillItemContent(content)
       }
     );
     return CreateItemFromPayload(payload) as SNItemsKey;

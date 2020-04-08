@@ -21,10 +21,10 @@ describe('payload manager', () => {
         {
           uuid: Factory.generateUuidish(),
           content_type: ContentType.Note,
-          content: BuildItemContent({
+          content: {
             title: 'hello',
             text: 'world'
-          })
+          }
         }
       );
     };

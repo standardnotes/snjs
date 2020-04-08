@@ -11,9 +11,9 @@ describe('payload', () => {
         {
           uuid: '123',
           content_type: ContentType.Note,
-          content: BuildItemContent({
+          content: {
             title: 'hello'
-          })
+          }
         }
       );
     };
@@ -42,9 +42,9 @@ describe('payload', () => {
       {
         uuid: '123',
         content_type: ContentType.Note,
-        content: BuildItemContent({
+        content: {
           title: 'hello'
-        })
+        }
       }
     );
 
@@ -62,9 +62,9 @@ describe('payload', () => {
       {
         uuid: '123',
         content_type: ContentType.Note,
-        content: BuildItemContent({
+        content: {
           title: 'hello'
-        })
+        }
       }
     );
 

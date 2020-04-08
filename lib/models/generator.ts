@@ -1,3 +1,4 @@
+import { PayloadContent } from '@Payloads/generator';
 import { SNItem } from './core/item';
 import { Copy } from '@Lib/utils';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -34,16 +35,18 @@ export function Uuids(items: SNItem[] | PurePayload[]) {
 }
 
 /**
- * Builds item .content based on values and populates with other default required
- * fields if necessary.
+ * Modifies the input object to fill in any missing required values from the 
+ * content body.
  */
-export function BuildItemContent(values?: Record<string, any>, ) {
-  const copy = values ? Copy(values) : {}
-  return {
-    references: [],
-    appData: {
-      [SNItem.DefaultAppDomain()]: {}
-    },
-    ...copy,
+export function FillItemContent(content: Record<string, any>) {
+  if(!content.references) {
+    content.references = [];
   }
+  if(!content.appData) {
+    content.appData = {};
+  }
+  if (!content.appData[SNItem.DefaultAppDomain()]) {
+    content.appData[SNItem.DefaultAppDomain()] = {};
+  }
+  return content as PayloadContent;
 }

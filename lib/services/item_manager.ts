@@ -1,3 +1,4 @@
+import { PrivilegeMutator } from './../models/app/privileges';
 import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
@@ -10,7 +11,7 @@ import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
 import { MutableCollection } from './../protocol/payloads/mutable_collection';
-import { CreateItemFromPayload, BuildItemContent, Uuids } from '@Models/generator';
+import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
@@ -268,7 +269,10 @@ export class ItemManager extends PureService {
       return new ActionsExtensionMutator(item, type);
     } else if (item.content_type === ContentType.ItemsKey) {
       return new ItemsKeyMutator(item, type);
-    } else {
+    } else if(item.content_type === ContentType.Privileges) {
+      return new PrivilegeMutator(item, type);
+    } 
+    else {
       return new ItemMutator(item, type);
     }
   }
@@ -495,7 +499,7 @@ export class ItemManager extends PureService {
       {
         uuid: await Uuid.GenerateUuid(),
         content_type: contentType,
-        content: BuildItemContent(content),
+        content: content ? FillItemContent(content) : undefined,
         dirty: needsSync
       },
       undefined,
@@ -514,7 +518,7 @@ export class ItemManager extends PureService {
       {
         uuid: await Uuid.GenerateUuid(),
         content_type: contentType,
-        content: BuildItemContent(content)
+        content: content ? FillItemContent(content) : undefined
       }
     );
     return CreateItemFromPayload(payload);
@@ -679,7 +683,7 @@ export class ItemManager extends PureService {
     const tag = this.findTagByTitle(title);
     return tag || await this.createItem(
       ContentType.Tag,
-      BuildItemContent({ title }),
+      FillItemContent({ title }),
       true
     ) as SNTag;
   }

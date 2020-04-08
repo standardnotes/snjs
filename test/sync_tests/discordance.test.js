@@ -7,15 +7,15 @@ const expect = chai.expect;
 describe('sync discordance', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  before(async function() {
+  before(async function () {
     localStorage.clear();
   });
 
-  after(async function() {
+  after(async function () {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -27,7 +27,7 @@ describe('sync discordance', () => {
     });
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
@@ -35,21 +35,21 @@ describe('sync discordance', () => {
   });
 
   it('should begin discordance upon instructions', async function () {
-    await this.application.syncService.sync({checkIntegrity: false});
+    await this.application.syncService.sync({ checkIntegrity: false });
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.ok;
 
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.null;
 
     // integrity should be valid
     expect(this.application.syncService.state.discordance).to.equal(0);
 
     // sync should no longer request integrity hash from server
-    await this.application.syncService.sync({checkIntegrity: false});
+    await this.application.syncService.sync({ checkIntegrity: false });
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.ok;
 
     // we expect another integrity check here
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.null;
 
     // integrity should be valid
@@ -66,7 +66,7 @@ describe('sync discordance', () => {
     );
     this.expectedItemCount++;
 
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
 
     // Expect no discordance
     expect(this.application.syncService.state.discordance).to.equal(0);
@@ -75,16 +75,15 @@ describe('sync discordance', () => {
     await this.application.itemManager.removeItemLocally(item);
 
     // wait for integrity check interval
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
 
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
 
     // We expect now to be in discordance. What the client has is different from what the server has
     // The above sync will not resolve until it syncs enough time to meet discordance threshold
-    expect(this.application.syncService.state.discordance).to.equal(
-      this.application.syncService.maxDiscordance
-    );
+    expect(this.application.syncService.state.discordance).
+      to.equal(this.application.syncService.maxDiscordance);
 
     // We now expect out of sync to be true, since we have reached maxDiscordance
     expect(this.application.syncService.isOutOfSync()).to.equal(true);
@@ -100,8 +99,8 @@ describe('sync discordance', () => {
     expect(this.application.syncService.isOutOfSync()).to.equal(true);
 
     // We will now reinstate the item and sync, which should repair everything
-    await this.application.itemManager.setItemDirty(item.uuid);
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.itemManager.insertItem(item);
+    await this.application.syncService.sync({ checkIntegrity: true });
 
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.syncService.state.discordance).to.equal(0);
@@ -118,18 +117,12 @@ describe('sync discordance', () => {
     await this.application.syncService.sync();
 
     // Delete item locally only without notifying server. We should then be in discordance.
-    // Don't use this.application.itemManager.removeItemLocally(item), as it saves some state about itemsPendingDeletion. Use internal API
-
-    this.application.itemManager.items = this.application.itemManager.items.filter((candidate) => {
-      return candidate.uuid !== item.uuid;
-    });
-
     await this.application.itemManager.removeItemLocally(item);
     this.expectedItemCount--;
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
     await Factory.sleep(0.2);
     expect(this.application.syncService.isOutOfSync()).to.equal(true);
@@ -142,10 +135,11 @@ describe('sync discordance', () => {
     // expect a clean merge
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
-    // now lets change the local content without syncing it.
     const aNote = this.application.itemManager.notes[0];
-    aNote.text = 'discordance';
-    await this.application.itemManager.setItemDirty(aNote.uuid);
+    // now lets change the local content without syncing it.
+    await this.application.itemManager.changeItem(aNote.uuid, (mutator) => {
+      mutator.text = 'discordance';
+    });
 
     // When we resolve out of sync now (even though we're not currently officially out of sync)
     // we expect that the remote content coming in doesn't wipe our pending change. A conflict should be created
@@ -154,13 +148,13 @@ describe('sync discordance', () => {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
-    for(const item of this.application.itemManager.items) {
+    for (const item of this.application.itemManager.items) {
       expect(item.uuid).not.be.null;
     }
 
     // now lets sync the item, just to make sure it doesn't cause any problems
     await this.application.itemManager.setItemDirty(aNote.uuid);
-    await this.application.syncService.sync({checkIntegrity: true});
+    await this.application.syncService.sync({ checkIntegrity: true });
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
