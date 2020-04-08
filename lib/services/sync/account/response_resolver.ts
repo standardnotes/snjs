@@ -6,6 +6,7 @@ import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadCollectionSet } from '@Payloads/collection_set';
 import { CreateSourcedPayloadFromObject, CopyPayload } from '@Payloads/generator';
+import { ContentType } from '@Root/lib/models';
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -58,21 +59,26 @@ export class SyncResponseResolver {
       collections.push(collectionSaved);
     }
 
-    const collectionUuidConflicts = await this.collectionByProcessingRawItems(
-      this.response.rawUuidConflictItems,
-      PayloadSource.ConflictUuid
-    );
-
-    if (collectionUuidConflicts.all().length > 0) {
-      collections.push(collectionUuidConflicts);
+    const rawUuidConflictItems = this.response.rawUuidConflictItems;
+    if (rawUuidConflictItems.length > 0) {
+      const collectionUuidConflicts = await this.collectionByProcessingRawItems(
+        rawUuidConflictItems,
+        PayloadSource.ConflictUuid
+      );
+      if (collectionUuidConflicts.all().length > 0) {
+        collections.push(collectionUuidConflicts);
+      }
     }
 
-    const collectionDataConflicts = await this.collectionByProcessingRawItems(
-      this.response.rawDataConflictItems,
-      PayloadSource.ConflictData
-    );
-    if (collectionDataConflicts.all().length > 0) {
-      collections.push(collectionDataConflicts);
+    const rawConflictedItems = this.response.rawDataConflictItems;
+    if (rawConflictedItems.length > 0) {
+      const collectionDataConflicts = await this.collectionByProcessingRawItems(
+        rawConflictedItems,
+        PayloadSource.ConflictData
+      );
+      if (collectionDataConflicts.all().length > 0) {
+        collections.push(collectionDataConflicts);
+      }
     }
 
     return collections;
@@ -98,10 +104,12 @@ export class SyncResponseResolver {
     );
     const resultCollection = await delta.resultingCollection();
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
+      const stillDirty = this.finalDirtyStateForPayload(payload);
       return CopyPayload(
         payload,
         {
-          dirty: this.finalDirtyStateForPayload(payload)
+          dirty: stillDirty,
+          dirtiedDate: stillDirty ? new Date() : undefined
         }
       );
     });
@@ -119,8 +127,14 @@ export class SyncResponseResolver {
      */
     let stillDirty;
     if (current) {
-      /** Marking items dirty after lastSyncBegan will cause them to sync again. */
-      stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
+      if(payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate!) {
+        /** The payload was dirtied as part of handling deltas, and not because it was 
+         * dirtied by a client. We keep the payload dirty state here. */
+        stillDirty = payload.dirty;
+      } else {
+        /** Marking items dirty after lastSyncBegan will cause them to sync again. */
+        stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
+      }
     } else {
       /** Forward whatever value any delta resolver may have set */
       stillDirty = payload.dirty;

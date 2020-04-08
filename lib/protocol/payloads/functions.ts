@@ -26,7 +26,7 @@ export async function PayloadsByDuplicating(
   const override: PayloadOverride = {
     uuid: await Uuid.GenerateUuid(),
     dirty: true,
-    dirtiedDate: null,
+    dirtiedDate: new Date(),
     lastSyncBegan: null,
     lastSyncEnd: null,
   };
@@ -77,7 +77,10 @@ export async function PayloadsByAlternatingUuid(
     payload,
     {
       uuid: await Uuid.GenerateUuid(),
-      dirty: true
+      dirty: true,
+      dirtiedDate: new Date(),
+      lastSyncBegan: null,
+      lastSyncEnd: null,
     }
   );
 
@@ -136,6 +139,7 @@ async function PayloadsByUpdatingReferences(
       payload,
       {
         dirty: true,
+        dirtiedDate: new Date(),
         content: {
           ...payload.safeContent,
           references: references

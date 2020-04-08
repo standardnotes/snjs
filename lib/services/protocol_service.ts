@@ -407,7 +407,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Generates parameters for a payload that are typically encrypted, and used for syncing
    * or saving locally. Parameters are non-typed objects that can later by converted to objects.
    * If the input payload is not properly decrypted in the first place, it will be returned
-   * as-is.
+   * as-is. If the payload is deleted, it will be returned as-is (assuming that the content field is null)
    * @param payload - The payload to encrypt
    * @param key The key to use to encrypt the payload. 
    *   Will be looked up if not supplied.
@@ -420,6 +420,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     key?: SNRootKey | SNItemsKey,
   ) : Promise<PurePayload> {
     if (payload.errorDecrypting) {
+      return payload;
+    }
+    if(payload.deleted) {
       return payload;
     }
     if (isNullOrUndefined(intent)) {

@@ -344,7 +344,9 @@ export class ItemMutator {
     this.item = item;
     this.source = source;
     this.payload = item.payload;
-    this.content = Copy(this.payload.content);
+    if(this.payload.content) {
+      this.content = Copy(this.payload.content);
+    }
   }
 
   public getUuid() {

@@ -32,7 +32,8 @@ export class ConflictDelta extends SinglePayloadDelta {
         this.basePayload,
         {
           updated_at: updatedAt,
-          dirty: true
+          dirty: true,
+          dirtiedDate: new Date()
         }
       );
       const rightPayloads = await PayloadsByDuplicating(
@@ -68,6 +69,7 @@ export class ConflictDelta extends SinglePayloadDelta {
         {
           updated_at: updatedAt,
           dirty: true,
+          dirtiedDate: new Date(),
           content: { 
             ...this.basePayload.safeContent,
             references: refs

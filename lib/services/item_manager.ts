@@ -319,6 +319,9 @@ export class ItemManager extends PureService {
     payloadSource?: PayloadSource,
     payloadSourceKey?: string
   ) {
+    if(!isString(uuid)) {
+      throw Error('Invalid uuid for changeItem');
+    }
     const results = await this.changeItems(
       [uuid],
       mutate,
@@ -486,12 +489,13 @@ export class ItemManager extends PureService {
     if (!isString(uuid)) {
       throw Error('Must use uuid when setting item dirty');
     }
-    return this.setItemsDirty(
+    const result = await this.setItemsDirty(
       [uuid],
       isUserModified,
       source,
       sourceKey
     );
+    return result[0];
   }
 
   /**

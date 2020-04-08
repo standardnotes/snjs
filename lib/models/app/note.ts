@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from '@Lib/utils';
 import { SNItem, ItemMutator } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
@@ -14,7 +15,7 @@ export class SNNote extends SNItem implements NoteContent {
   * Notes created on mobile with no text have a null value for it,
   * so we'll just set a default here. */
   public readonly text: string = ''
-  public readonly mobilePrefersPlainEditor: boolean
+  public readonly mobilePrefersPlainEditor?: boolean
 
   constructor(
     payload: PurePayload
@@ -22,7 +23,9 @@ export class SNNote extends SNItem implements NoteContent {
     super(payload);
     this.title = this.payload.safeContent.title;
     this.text = this.payload.safeContent.text;
-    this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
+    if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {
+      this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
+    }
   }
 
   safeText() {

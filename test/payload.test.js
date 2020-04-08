@@ -132,7 +132,8 @@ describe('payload', () => {
         uuid: '123',
         content_type: ContentType.Note,
         updated_at: new Date(),
-        dirty: true
+        dirty: true,
+        dirtiedDate: new Date()
       }
     );
     const merged = payload.mergedWith(otherPayload);

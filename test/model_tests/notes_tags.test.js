@@ -208,7 +208,7 @@ describe('notes and tags', () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    tag = await this.application.changeItem(tag.uuid, (mutator) => {
+    tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
       mutator.removeItemAsRelationship(note);
     });
 
@@ -294,7 +294,7 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
-    note = await this.application.changeItem(note.uuid, (mutator) => {
+    note = await this.application.changeAndSaveItem(note.uuid, (mutator) => {
       mutator.content.title = Math.random();
     });
     expect(note.content.title).to.not.equal(notePayload.content.title);
@@ -371,7 +371,7 @@ describe('notes and tags', () => {
 //   expect(tag.noteCount).to.equal(1);
 //   expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
 
-//   tag = await this.application.changeItem(tag.uuid, (mutator) => {
+//   tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
 //     mutator.removeItemAsRelationship(note);
 //   });
 

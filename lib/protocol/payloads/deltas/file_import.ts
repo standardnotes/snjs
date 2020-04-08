@@ -17,6 +17,7 @@ export class DeltaFileImport extends PayloadsDelta {
           result,
           {
             dirty: true,
+            dirtiedDate: new Date(),
             deleted: false
           }
         )

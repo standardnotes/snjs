@@ -189,7 +189,10 @@ export class SNActionsService extends PureService {
     await this.modelManager!.emitPayload(
       CopyPayload(
         payload!,
-        { dirty: true }
+        {
+          dirty: true,
+          dirtiedDate: new Date()
+        }
       ),
       PayloadSource.RemoteActionRetrieved,
     );

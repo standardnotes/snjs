@@ -31,6 +31,7 @@ describe('notes + tags syncing', async function() {
     await this.application.itemManager.setItemDirty(note.uuid);
     await this.application.syncService.sync();
     await this.application.modelManager.resetState();
+    await this.application.itemManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync();
     const downloadedNote = this.application.itemManager.notes[0];
@@ -135,7 +136,7 @@ describe('notes + tags syncing', async function() {
     expect(this.application.itemManager.notes.length).to.equal(1);
     expect(this.application.itemManager.tags.length).to.equal(1);
     
-    tag = await this.application.changeItem(tag.uuid, (mutator) => {
+    tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
       mutator.title = `${Math.random()}`;
       mutator.updated_at = Factory.yesterday();
     });

@@ -77,6 +77,16 @@ export class SyncResponse {
     });
   }
 
+  /**
+   * Items may be deleted from a combination of sources, such as from RemoteSaved,
+   * or if a conflict handler decides to delete a payload.
+   */
+  get deletedPayloads() {
+    return this.allProcessedPayloads.filter((payload) => {
+      return payload.discardable;
+    })
+  }
+
   get retrievedPayloads() {
     return this.rawRetrievedItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(

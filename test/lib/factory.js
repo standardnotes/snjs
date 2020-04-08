@@ -186,10 +186,10 @@ export function createItemParams(contentType) {
   const params = {
     uuid: generateUuid(),
     content_type: contentType,
-    content: {
+    content: BuildItemContent({
       title: 'hello',
       text: 'world'
-    }
+    })
   };
   return params;
 }

@@ -64,6 +64,19 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       }
       const differs = !current.compareContentFields(decrypted);
       if (differs) {
+        /**
+         * Ensure no conflict has already been created with the incoming content.
+         * This can occur in a multi-page sync request where in the middle of the request,
+         * we make changes to many items, including duplicating, but since we are still not
+         * uploading the changes until after the multi-page request completes, we may have
+         * already conflicted this item.
+         */
+        const existingConflict = this.findConflictOf(conflict.uuid!);
+        if (existingConflict && existingConflict.compareContentFields(decrypted)) {
+          /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
+          continue;
+        }
+
         const copyResults = await PayloadsByDuplicating(
           decrypted,
           this.baseCollection,
@@ -77,5 +90,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       filtered.concat(conflictResults),
       PayloadSource.RemoteRetrieved
     );
+  }
+
+  private findConflictOf(uuid: string) {
+    return this.baseCollection.all().find((p) => {
+      return p.safeContent.conflict_of === uuid;
+    })
   }
 }

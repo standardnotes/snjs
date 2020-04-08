@@ -47,7 +47,8 @@ describe('duplication', () => {
       null,
       null,
       {
-        dirty: true
+        dirty: true,
+        dirtiedDate: new Date()
       }
     );
     return payload;

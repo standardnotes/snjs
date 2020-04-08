@@ -40,6 +40,7 @@ describe('payload encryption', () => {
       null,
       {
         dirty: true,
+        dirtiedDate: new Date(),
         lastSyncBegan: new Date(),
         waitingForKey: false,
         dummy: true,

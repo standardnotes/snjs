@@ -395,7 +395,8 @@ export class SNSyncService extends PureService {
         undefined,
         undefined,
         {
-          dirty: true
+          dirty: true,
+          dirtiedDate: new Date()
         }
       );
     });
@@ -750,13 +751,17 @@ export class SNSyncService extends PureService {
   private async handleOfflineResponse(response: SyncResponse) {
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
-    /** Before persisting, merge with current base value that has content field */
     await this.modelManager!.emitPayloads(
       payloadsToEmit,
       PayloadSource.LocalSaved
     );
     const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
     await this.persistPayloads(payloadsToPersist);
+   
+    const deletedPayloads = response.deletedPayloads;
+    if (deletedPayloads.length > 0) {
+      await this.deletePayloads(deletedPayloads);
+    }
 
     this.opStatus!.clearError();
     this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
@@ -814,6 +819,10 @@ export class SNSyncService extends PureService {
       const payloadsToPersist = this.modelManager!.find(collection.uuids()) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
     }
+    const deletedPayloads = response.deletedPayloads;
+    if (deletedPayloads.length > 0) {
+      await this.deletePayloads(deletedPayloads);
+    }
     await this.notifyEvent(
       SyncEvents.SingleSyncCompleted,
       response
@@ -847,14 +856,23 @@ export class SNSyncService extends PureService {
     await this.persistPayloads(payloads);
   }
 
-  public async persistPayloads(decryptedPayloads: PurePayload[]) {
-    if (decryptedPayloads.length === 0) {
+  /**
+   * @param payloads The decrypted payloads to persist
+   */
+  public async persistPayloads(payloads: PurePayload[]) {
+    if (payloads.length === 0) {
       return;
     }
-    return this.storageService!.savePayloads(decryptedPayloads).catch((error) => {
+    return this.storageService!.savePayloads(payloads).catch((error) => {
       this.notifyEvent(SyncEvents.DatabaseWriteError, error);
       throw error;
     });
+  }
+
+  private async deletePayloads(
+    payloads: PurePayload[]
+  ) {
+    return this.persistPayloads(payloads);
   }
 
   /**

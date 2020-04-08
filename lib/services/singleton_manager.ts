@@ -200,7 +200,8 @@ export class SNSingletonManager extends PureService {
       createPayload,
       {
         uuid: await Uuid.GenerateUuid(),
-        dirty: true
+        dirty: true,
+        dirtiedDate: new Date()
       }
     );
     const item = await this.itemManager!.emitItemFromPayload(dirtyPayload);

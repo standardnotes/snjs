@@ -46,6 +46,13 @@ export abstract class PureService {
       const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');
       const string = `${timeString}.${date.getMilliseconds()}`;
       if (args) {
+        args = args.map((arg) => {
+          if(Array.isArray(arg)) {
+            return arg.slice();
+          } else {
+            return arg;
+          }
+        })
         console.log(string, message, ...args);
       } else {
         console.log(string, message);

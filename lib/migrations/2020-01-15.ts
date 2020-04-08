@@ -514,7 +514,8 @@ export class Migration20200115 extends Migration {
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: rootKeyParams!.version
         }),
-        dirty: true
+        dirty: true,
+        dirtiedDate: new Date()
       });
       const itemsKey = CreateItemFromPayload(payload) as SNItemsKey;
       await this.services.itemManager.emitItemFromPayload(

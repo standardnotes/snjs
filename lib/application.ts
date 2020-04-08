@@ -329,7 +329,8 @@ export class SNApplication {
     const dirtied = CopyPayload(
       payload,
       {
-        dirty: true
+        dirty: true,
+        dirtiedDate: new Date()
       }
     );
     await this.modelManager!.emitPayload(
@@ -479,19 +480,19 @@ export class SNApplication {
   /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
-  public async changeItem(
+  public async changeAndSaveItem(
     uuid: UuidString,
     mutate?: (mutator: ItemMutator) => void
   ) {
     if(!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
-    const results = await this.itemManager!.changeItems(
+    await this.itemManager!.changeItems(
       [uuid],
       mutate
     );
     await this.syncService!.sync();
-    return results[0];
+    return this.findItem(uuid);
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
