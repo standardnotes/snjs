@@ -30,8 +30,8 @@ export class PurePayload {
    * to omit that field altogether (as in the case of server saved payloads) */
   readonly fields: PayloadField[]
   readonly source: PayloadSource
-  readonly uuid?: string
-  readonly content_type?: ContentType
+  readonly uuid: string
+  readonly content_type: ContentType
   readonly content?: PayloadContent | string
   readonly deleted?: boolean
   readonly items_key_id?: string
@@ -70,11 +70,11 @@ export class PurePayload {
     } else {
       this.source = PayloadSource.Constructor;
     }
-    this.uuid = rawPayload.uuid;
+    this.uuid = rawPayload.uuid!;
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
-      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be');
+      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
     }
-    this.content_type = rawPayload.content_type;
+    this.content_type = rawPayload.content_type!;
     this.content = rawPayload.content;
     this.deleted = rawPayload.deleted;
     this.items_key_id = rawPayload.items_key_id;

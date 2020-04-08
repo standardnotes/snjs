@@ -643,7 +643,6 @@ describe('online syncing', () => {
     note = this.application.findItem(note.uuid);
     expect(note.dirty).to.equal(false);
     this.expectedItemCount++;
-    this.application.syncService.loggingEnabled = true;
     note = await this.application.changeAndSaveItem(note.uuid, (mutator) => {
       mutator.text = 'Stale text';
       mutator.updated_at = Factory.yesterday();
@@ -1183,12 +1182,12 @@ describe('online syncing', () => {
     expect(foundItem.text).to.equal(text);
   }).timeout(10000);
 
-  it.only('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
+  it('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
     /** We can't track how many times an item is synced, only how many times its mapped */
     const expectedSaveCount = 2;
     let actualSaveCount = 0;
     /** Create an item and sync it */
-    const note = await Factory.createMappedNote(this.application);
+    let note = await Factory.createMappedNote(this.application);
     this.application.itemManager.addObserver(
       ContentType.Note,
       (changed, inserted, discarded, source) => {
@@ -1198,12 +1197,15 @@ describe('online syncing', () => {
       }
     );
     this.expectedItemCount++;
-    this.application.syncService.ut_beginLatencySimulator(1000);
+    this.application.syncService.ut_beginLatencySimulator(150);
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions);
-    /** Dirty the item 100ms into 1s request */
+    /** Dirty the item 100ms into 150ms request */
+    const newText = `${Math.random()}`;
     setTimeout(async function () {
-      await this.application.itemManager.setItemDirty(note.uuid);
+      await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+        mutator.text = newText;
+      });
     }.bind(this), 100);
     /**
      * Await sync request. A sync request will perform another request if there
@@ -1211,6 +1213,8 @@ describe('online syncing', () => {
      */
     await syncRequest;
     expect(actualSaveCount).to.equal(expectedSaveCount);
+    note = this.application.findItem(note.uuid);
+    expect(note.text).to.equal(newText);
   }).timeout(Factory.TestTimeout);
 
   it('retreiving a remote deleted item should succeed', async function () {

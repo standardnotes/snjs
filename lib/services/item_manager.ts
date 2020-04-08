@@ -241,7 +241,7 @@ export class ItemManager extends PureService {
     uuid: UuidString,
     mutate?: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     if(!isString(uuid)) {
@@ -280,7 +280,7 @@ export class ItemManager extends PureService {
     uuids: UuidString[],
     mutate?: (mutator: ItemMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     const items = this.findItems(uuids as UuidString[], true);
@@ -298,7 +298,7 @@ export class ItemManager extends PureService {
     }
     await this.modelManager!.emitPayloads(
       payloads,
-      payloadSource || PayloadSource.LocalChanged,
+      payloadSource,
       payloadSourceKey
     );
     const results = this.findItems(payloads.map((p) => p.uuid!));
@@ -309,7 +309,7 @@ export class ItemManager extends PureService {
     uuid: UuidString,
     mutate: (mutator: NoteMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     const note = this.findItem(uuid);
@@ -329,7 +329,7 @@ export class ItemManager extends PureService {
     uuid: UuidString,
     mutate: (mutator: ComponentMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     const component = this.findItem(uuid);
@@ -349,7 +349,7 @@ export class ItemManager extends PureService {
     uuid: UuidString,
     mutate: (mutator: ActionsExtensionMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     const extension = this.findItem(uuid);
@@ -369,7 +369,7 @@ export class ItemManager extends PureService {
     uuid: UuidString,
     mutate: (mutator: ItemsKeyMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     const itemsKey = this.findItem(uuid);
@@ -388,14 +388,14 @@ export class ItemManager extends PureService {
   private async applyTransform<T extends ItemMutator>(
     mutator: T,
     mutate: (mutator: T) => void,
-    payloadSource?: PayloadSource,
+    payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
     mutate(mutator);
     const payload = mutator.getResult();
     return this.modelManager!.emitPayload(
       payload,
-      payloadSource || PayloadSource.LocalChanged,
+      payloadSource,
       payloadSourceKey
     );
   }
@@ -407,9 +407,7 @@ export class ItemManager extends PureService {
     */
   public async setItemDirty(
     uuid: UuidString,
-    isUserModified = false,
-    source?: PayloadSource,
-    sourceKey?: string
+    isUserModified = false
   ) {
     if (!isString(uuid)) {
       throw Error('Must use uuid when setting item dirty');
@@ -417,8 +415,6 @@ export class ItemManager extends PureService {
     const result = await this.setItemsDirty(
       [uuid],
       isUserModified,
-      source,
-      sourceKey
     );
     return result[0];
   }
@@ -428,9 +424,7 @@ export class ItemManager extends PureService {
    */
   public async setItemsDirty(
     uuids: UuidString[],
-    isUserModified = false,
-    source?: PayloadSource,
-    sourceKey?: string
+    isUserModified = false
   ) {
     if (!isString(uuids[0])) {
       throw Error('Must use uuid when setting item dirty');
@@ -439,8 +433,6 @@ export class ItemManager extends PureService {
       uuids,
       undefined,
       isUserModified ? MutationType.UserInteraction : MutationType.Internal,
-      source,
-      sourceKey
     );
   }
 

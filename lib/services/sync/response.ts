@@ -1,52 +1,120 @@
+import { PurePayload } from '@Payloads/pure_payload';
 import { isNullOrUndefined, deepFreeze } from '@Lib/utils';
 import { ApiEndpointParam } from '@Services/api/keys';
 import { PayloadSource } from '@Payloads/sources';
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import { CreateSourcedPayloadFromObject, RawPayload } from '@Payloads/generator';
 
-const SYNC_CONFLICT_TYPE_CONFLICTING_DATA = 'sync_conflict';
-const SYNC_CONFLICT_TYPE_UUID_CONFLICT = 'uuid_conflict';
+enum ConflictType {
+  ConflictingData = 'sync_conflict',
+  UuidConflict = 'uuid_conflict'
+}
+
+type ConflictParams = {
+  type: ConflictType
+  server_item?: RawPayload
+  unsaved_item?: RawPayload
+  /** @legacay */
+  item?: RawPayload
+}
 
 type RawSyncResponse = {
   error?: any
   [ApiEndpointParam.LastSyncToken]?: string
   [ApiEndpointParam.PaginationToken]?: string
   [ApiEndpointParam.IntegrityResult]?: string
-  retrieved_items?: any[]
-  saved_items?: any[]
-  conflicts?: any[]
-  unsaved?: any[]
+  retrieved_items?: RawPayload[]
+  saved_items?: RawPayload[]
+  conflicts?: ConflictParams[]
+  unsaved?: ConflictParams[]
   status?: number
 }
 
 export class SyncResponse {
 
-  public rawResponse: RawSyncResponse
+  public readonly rawResponse: RawSyncResponse
+  public readonly savedPayloads: PurePayload[]
+  public readonly retrievedPayloads: PurePayload[]
+  public readonly uuidConflictPayloads: PurePayload[]
+  public readonly dataConflictPayloads: PurePayload[]
+  public readonly deletedPayloads: PurePayload[]
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse;
+    this.savedPayloads = this.
+      filterRawItemArray(rawResponse.saved_items).
+      map((rawItem) => {
+        return CreateSourcedPayloadFromObject(
+          rawItem,
+          PayloadSource.RemoteSaved
+        );
+      });
+    this.retrievedPayloads = this.
+      filterRawItemArray(rawResponse.retrieved_items).
+      map((rawItem) => {
+        return CreateSourcedPayloadFromObject(
+          rawItem,
+          PayloadSource.RemoteRetrieved
+        );
+      });
+    this.dataConflictPayloads = this.
+      filterRawItemArray(this.rawDataConflictItems).
+      map((rawItem) => {
+        return CreateSourcedPayloadFromObject(
+          rawItem,
+          PayloadSource.ConflictData
+        );
+      });
+    this.uuidConflictPayloads = this.
+      filterRawItemArray(this.rawUuidConflictItems).
+      map((rawItem) => {
+        return CreateSourcedPayloadFromObject(
+          rawItem,
+          PayloadSource.ConflictUuid
+        );
+      });
+    /**
+     * Items may be deleted from a combination of sources, such as from RemoteSaved,
+     * or if a conflict handler decides to delete a payload.
+     */
+    this.deletedPayloads = this.allProcessedPayloads.filter((payload) => {
+      return payload.discardable;
+    })
     deepFreeze(this);
   }
 
-  get error() {
+  /**
+   * Filter out and exclude any items that do not have a uuid. These are useless to us.
+   */
+  private filterRawItemArray(rawItems: RawPayload[] = []) {
+    return rawItems.filter((rawItem) => {
+      if (!rawItem.uuid) {
+        return false;
+      } else {
+        return true;
+      }
+    })
+  }
+
+  public get error() {
     return this.rawResponse.error;
   }
 
   /**
    * Returns the HTTP status code for invalid requests
    */
-  get status() : number {
+  public get status(): number {
     return this.rawResponse.status!;
   }
 
-  get lastSyncToken() {
+  public get lastSyncToken() {
     return this.rawResponse[ApiEndpointParam.LastSyncToken];
   }
 
-  get paginationToken() {
+  public get paginationToken() {
     return this.rawResponse[ApiEndpointParam.PaginationToken];
   }
 
-  get integrityHash() {
+  public get integrityHash() {
     return this.rawResponse[ApiEndpointParam.IntegrityResult];
   }
 
@@ -54,102 +122,41 @@ export class SyncResponse {
     return this.integrityHash && !this.paginationToken;
   }
 
-  get numberOfItemsInvolved() {
-    const allRawItems = this.rawSavedItems
-      .concat(this.rawRetrievedItems)
-      .concat(this.rawItemsFromConflicts);
-    return allRawItems.length;
+  public get numberOfItemsInvolved() {
+    return this.allProcessedPayloads.length;
   }
 
-  get allProcessedPayloads() {
-    const allPayloads = this.retrievedPayloads
-      .concat(this.savedPayloads)
-      .concat(this.conflictPayloads);
+  public get allProcessedPayloads() {
+    const allPayloads = this.savedPayloads
+      .concat(this.retrievedPayloads)
+      .concat(this.dataConflictPayloads)
+      .concat(this.uuidConflictPayloads);
     return allPayloads;
   }
 
-  get savedPayloads() {
-    return this.rawSavedItems.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.RemoteSaved
-      );
-    });
-  }
-
-  /**
-   * Items may be deleted from a combination of sources, such as from RemoteSaved,
-   * or if a conflict handler decides to delete a payload.
-   */
-  get deletedPayloads() {
-    return this.allProcessedPayloads.filter((payload) => {
-      return payload.discardable;
-    })
-  }
-
-  get retrievedPayloads() {
-    return this.rawRetrievedItems.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.RemoteRetrieved
-      );
-    });
-  }
-
-  get conflictPayloads() {
-    return this.rawItemsFromConflicts.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.RemoteRetrieved
-      );
-    });
-  }
-
-  get rawSavedItems() {
-    return this.rawResponse.saved_items || [];
-  }
-
-  get rawRetrievedItems() {
-    return this.rawResponse.retrieved_items || [];
-  }
-
-  get rawUuidConflictItems() {
+  private get rawUuidConflictItems() {
     return this.rawConflictObjects.filter((conflict) => {
-      return conflict.type === SYNC_CONFLICT_TYPE_UUID_CONFLICT;
+      return conflict.type === ConflictType.UuidConflict;
     }).map((conflict) => {
-      return conflict.unsaved_item || conflict.item;
+      return conflict.unsaved_item! || conflict.item!;
     });
   }
 
-  get rawDataConflictItems() {
+  private get rawDataConflictItems() {
     return this.rawConflictObjects.filter((conflict) => {
-      return conflict.type === SYNC_CONFLICT_TYPE_CONFLICTING_DATA;
+      return conflict.type === ConflictType.ConflictingData;
     }).map((conflict) => {
-      return conflict.server_item || conflict.item;
+      return conflict.server_item! || conflict.item!;
     });
   }
 
-  get rawItemsFromConflicts() {
-    const conflicts = this.rawResponse.conflicts || [];
-    const legacyConflicts = this.rawResponse.unsaved || [];
-    const rawConflictItems = conflicts.map((conflict) => {
-      /** unsaved_item for uuid conflicts,
-      and server_item for data conflicts */
-      return conflict.unsaved_item || conflict.server_item;
-    });
-    const rawLegacyConflictItems = legacyConflicts.map((conflict) => {
-      return conflict.item;
-    });
-    return rawConflictItems.concat(rawLegacyConflictItems);
-  }
-
-  get rawConflictObjects() {
+  private get rawConflictObjects() {
     const conflicts = this.rawResponse.conflicts || [];
     const legacyConflicts = this.rawResponse.unsaved || [];
     return conflicts.concat(legacyConflicts);
   }
 
-  get hasError() {
+  public get hasError() {
     return !isNullOrUndefined(this.rawResponse.error);
   }
 }

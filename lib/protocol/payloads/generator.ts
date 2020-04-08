@@ -25,8 +25,8 @@ export type PayloadOverride = {
 } | PurePayload
 
 export type RawPayload = {
-  uuid?: string
-  content_type?: ContentType
+  uuid: string
+  content_type: ContentType
   content?: PayloadContent | string
   deleted?: boolean
   items_key_id?: string
@@ -41,6 +41,18 @@ export type RawPayload = {
   errorDecryptingValueChanged?: boolean
   lastSyncBegan?: Date
   lastSyncEnd?: Date
+  auth_hash?: string
+  auth_params?: any
+}
+
+export type RawEncryptionParameters = {
+  uuid?: string
+  content?: PayloadContent | string
+  items_key_id?: string
+  enc_item_key?: string
+  errorDecrypting?: boolean
+  waitingForKey?: boolean
+  errorDecryptingValueChanged?: boolean
   auth_hash?: string
   auth_params?: any
 }
@@ -231,7 +243,7 @@ function CreatePayload(
 }
 
 export function CreateEncryptionParameters(
-  raw: RawPayload
+  raw: RawEncryptionParameters
 ): PurePayload {
   const fields = Object.keys(raw) as PayloadField[];
   return CreatePayload(
@@ -241,7 +253,7 @@ export function CreateEncryptionParameters(
 }
 
 export function CopyEncryptionParameters(
-  raw: PurePayload,
+  raw: RawEncryptionParameters,
   override?: PayloadOverride
 ): PurePayload {
   return CreatePayload(
@@ -294,7 +306,7 @@ export function payloadFieldsForSource(source: PayloadSource) {
 
   if ((
     source === PayloadSource.LocalRetrieved ||
-    source === PayloadSource.LocalDirtied
+    source === PayloadSource.LocalChanged
   )) {
     return StoragePayloadFields.slice();
   }

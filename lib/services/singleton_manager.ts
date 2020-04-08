@@ -5,7 +5,7 @@ import { SNItem } from '@Models/core/item';
 import { PureService } from '@Lib/services/pure_service';
 import { SingletonStrategies, ContentType } from '@Models/index';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
-import { CopyPayload } from '@Payloads/generator';
+import { CopyPayload, PayloadOverride, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
@@ -72,7 +72,7 @@ export class SNSingletonManager extends PureService {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
       async (_, inserted) => {
-        if(inserted.length > 0) {
+        if (inserted.length > 0) {
           this.resolveQueue = this.resolveQueue.concat(inserted);
         }
       }
@@ -175,7 +175,11 @@ export class SNSingletonManager extends PureService {
     await this.itemManager!.setItemsToBeDeleted(Uuids(deleteItems));
   }
 
-  public async findOrCreateSingleton(predicate: SNPredicate, createPayload: PurePayload) {
+  public async findOrCreateSingleton(
+    predicate: SNPredicate,
+    createContentType: ContentType,
+    createContent: PayloadContent
+  ) {
     const items = this.validItemsMatchingPredicate(predicate);
     if (items.length > 0) {
       return items[0];
@@ -196,10 +200,11 @@ export class SNSingletonManager extends PureService {
       });
     await this.itemManager!.setItemsToBeDeleted(Uuids(errorDecrypting));
     /** Safe to create */
-    const dirtyPayload = CopyPayload(
-      createPayload,
+    const dirtyPayload = CreateMaxPayloadFromAnyObject(
       {
         uuid: await Uuid.GenerateUuid(),
+        content_type: createContentType,
+        content: createContent,
         dirty: true,
         dirtiedDate: new Date()
       }

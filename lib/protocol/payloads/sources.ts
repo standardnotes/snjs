@@ -4,7 +4,9 @@ export enum PayloadSource {
   /* The payload returned by offline sync operation */
   LocalSaved = 3,
   LocalRetrieved = 4,
-  LocalDirtied = 5,
+  /* Payload when a client modifies item property then maps it to update UI. 
+  This also indicates that the item was dirtied*/
+  LocalChanged= 5,
   /** Payloads retrieved from an external
    extension/component */
   ComponentRetrieved = 6,
@@ -26,14 +28,12 @@ export enum PayloadSource {
   DecryptedTransient = 13,
   ConflictUuid = 14,
   ConflictData = 15,
-  /* Payload when a client modifies item property then maps it to update UI */
-  LocalChanged = 16,
-  SessionHistory = 17,
+  SessionHistory = 16,
   /**
    * Payloads with a source of Constructor means that the payload was created
    * in isolated space by the caller, and does not yet have any app-related affiliation.
    */
-  Constructor = 18
+  Constructor = 17
 };
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {

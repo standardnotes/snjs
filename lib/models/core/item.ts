@@ -16,7 +16,13 @@ export enum MutationType {
    * The item was changed as part of an internal operation, such as a migration.
    * This change will not updated the item's user modified date
    */
-  Internal = 1,
+  Internal = 2,
+  /**
+   * The item was changed as part of an internal function that wishes to modify
+   * internal item properties, such as lastSyncBegan, without modifying the item's dirty
+   * state. By default all other mutation types will result in a dirtied result.
+   */
+  NonDirtying = 3,
 }
 
 export enum AppDataField {
@@ -336,15 +342,15 @@ export class SNItem {
  */
 export class ItemMutator {
   protected readonly item: SNItem
-  protected readonly source: MutationType
+  protected readonly type: MutationType
   protected payload: PurePayload
   protected content?: PayloadContent
 
-  constructor(item: SNItem, source: MutationType) {
+  constructor(item: SNItem, type: MutationType) {
     this.item = item;
-    this.source = source;
+    this.type = type;
     this.payload = item.payload;
-    if(this.payload.content) {
+    if (this.payload.content) {
       this.content = Copy(this.payload.content);
     }
   }
@@ -358,26 +364,36 @@ export class ItemMutator {
   }
 
   public getResult() {
-    if (!this.payload.deleted) {
-      if (this.source === MutationType.UserInteraction) {
-        // Set the user modified date to now if marking the item as dirty
-        this.userModifiedDate = new Date();
-      } else {
-        const currentValue = this.item.userModifiedDate;
-        if (!currentValue) {
-          // if we don't have an explcit raw value, we initialize client_updated_at.
-          this.userModifiedDate = new Date(this.item.updated_at!);
+    if (this.type === MutationType.NonDirtying) {
+      return CopyPayload(
+        this.payload,
+        {
+          content: this.content,
+        }
+      )
+    }
+    else {
+      if (!this.payload.deleted) {
+        if (this.type === MutationType.UserInteraction) {
+          // Set the user modified date to now if marking the item as dirty
+          this.userModifiedDate = new Date();
+        } else {
+          const currentValue = this.item.userModifiedDate;
+          if (!currentValue) {
+            // if we don't have an explcit raw value, we initialize client_updated_at.
+            this.userModifiedDate = new Date(this.item.updated_at!);
+          }
         }
       }
+      return CopyPayload(
+        this.payload,
+        {
+          content: this.content,
+          dirty: true,
+          dirtiedDate: new Date(),
+        }
+      )
     }
-    return CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        dirty: true,
-        dirtiedDate: new Date(),
-      }
-    )
   }
 
   /** Merges the input payload with the base payload */

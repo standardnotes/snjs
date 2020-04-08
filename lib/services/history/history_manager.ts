@@ -83,7 +83,7 @@ export class SNHistoryManager extends PureService {
       this.contentTypes,
       async (changed, inserted, discarded, source) => {
         const items = concatArrays(changed, inserted, discarded) as SNItem[];
-        if (source === PayloadSource.LocalDirtied) {
+        if (source === PayloadSource.LocalChanged) {
           return;
         }
         for (const item of items) {

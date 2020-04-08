@@ -97,7 +97,7 @@ export class Migration20200115 extends Migration {
         encryptedStoragePayload
       );
       const passcodeKey = passcodeResult.key;
-      const decryptedStoragePayload = passcodeResult.decryptedStoragePayload;
+      const decryptedStoragePayload = passcodeResult.decryptedStoragePayload!;
       const passcodeParams = passcodeResult.keyParams;
       newStorageRawStructure.nonwrapped[
         StorageKey.RootKeyWrapperKeyParams
@@ -106,7 +106,7 @@ export class Migration20200115 extends Migration {
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure[ValueModesKeys.Nonwrapped][StorageKey.RootKeyParams] 
+      newStorageRawStructure[ValueModesKeys.Nonwrapped][StorageKey.RootKeyParams]
         = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
 
       let keyToEncryptStorageWith = passcodeKey;
@@ -180,10 +180,11 @@ export class Migration20200115 extends Migration {
     const passcodeParams = this.services.protocolService
       .createKeyParams(rawPasscodeParams);
     /** Decrypt it with the passcode */
-    let decryptedStoragePayload = CreateMaxPayloadFromAnyObject({ errorDecrypting: true });
+    let decryptedStoragePayload: PurePayload | undefined;
+    let errorDecrypting = true;
     let passcodeKey: SNRootKey;
     const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-    while (decryptedStoragePayload.errorDecrypting) {
+    while (errorDecrypting) {
       const orchestratorFill: OrchestratorFill = {};
       const response = await this.requestChallengeResponse(challenge, false, orchestratorFill);
       const value = response.getValueForType(ChallengeType.LocalPasscode);
@@ -197,6 +198,7 @@ export class Migration20200115 extends Migration {
           encryptedPayload,
           passcodeKey
         );
+      errorDecrypting = decryptedStoragePayload.errorDecrypting!;
       orchestratorFill.orchestrator!.setValidationStatus(
         value,
         !decryptedStoragePayload.errorDecrypting
@@ -214,9 +216,9 @@ export class Migration20200115 extends Migration {
    * Web/desktop only
    */
   private async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
-    passcodeKey: SNRootKey, 
+    passcodeKey: SNRootKey,
     storageValueStore: Record<string, any>
-    ) {
+  ) {
     const version = storageValueStore.ak
       ? ProtocolVersion.V003
       : ProtocolVersion.V002;

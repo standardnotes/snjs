@@ -90,7 +90,7 @@ describe('keys', () => {
     expect(this.application.protocolService.itemsKeys.length).to.equal(1);
   }).timeout(5000);
 
-  it.only('should use root key for encryption of storage', async function () {
+  it('should use root key for encryption of storage', async function () {
     const email = 'foo';
     const password = 'bar';
     const result = await this.application.protocolService.createRootKey(email, password);
@@ -98,6 +98,7 @@ describe('keys', () => {
 
     const payload = CreateMaxPayloadFromAnyObject(
       {
+        uuid: Factory.generateUuidish(),
         content: { foo: 'bar' },
         content_type: ContentType.EncryptedStorage
       }

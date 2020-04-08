@@ -1,7 +1,7 @@
 import { UuidString } from './../../types';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
-import { SNItem } from '@Models/core/item';
+import { SNItem, MutationType } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadManager } from './../model_manager';
 import { SNStorageService } from './../storage_service';
@@ -578,7 +578,8 @@ export class SNSyncService extends PureService {
       Uuids(items),
       (mutator) => {
         mutator.lastSyncBegan = beginDate;
-      }
+      },
+      MutationType.NonDirtying
     );
 
     const online = this.sessionManager!.online();

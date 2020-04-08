@@ -261,7 +261,7 @@ export class SNComponentManager extends PureService {
         }
         /* LocalChanged is not interesting to send to observers. For local changes,
         we wait until the item is set to dirty before notifying observers, where the mapping
-        source would be PayloadSource.LocalDirtied */
+        source would be PayloadSource.LocalChanged */
         if (source !== PayloadSource.LocalChanged) {
           this.notifyStreamObservers(items, source, sourceKey);
         }

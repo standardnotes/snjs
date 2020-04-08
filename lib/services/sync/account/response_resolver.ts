@@ -5,7 +5,7 @@ import { DeltaClassForSource } from '@Payloads/deltas/generator';
 import { PayloadSource } from '@Payloads/sources';
 import { PayloadCollection } from '@Payloads/collection';
 import { PayloadCollectionSet } from '@Payloads/collection_set';
-import { CreateSourcedPayloadFromObject, CopyPayload } from '@Payloads/generator';
+import { CreateSourcedPayloadFromObject, CopyPayload, RawPayload } from '@Payloads/generator';
 import { ContentType } from '@Root/lib/models';
 
 /**
@@ -43,26 +43,25 @@ export class SyncResponseResolver {
   public async collectionsByProcessingResponse() {
     const collections = [];
 
-    const collectionRetrieved = await this.collectionByProcessingRawItems(
-      this.response.rawRetrievedItems,
+    const collectionRetrieved = await this.collectionByProcessingPayloads(
+      this.response.retrievedPayloads,
       PayloadSource.RemoteRetrieved
     );
     if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved);
     }
 
-    const collectionSaved = await this.collectionByProcessingRawItems(
-      this.response.rawSavedItems,
+    const collectionSaved = await this.collectionByProcessingPayloads(
+      this.response.savedPayloads,
       PayloadSource.RemoteSaved
     );
     if (collectionSaved.all().length > 0) {
       collections.push(collectionSaved);
     }
 
-    const rawUuidConflictItems = this.response.rawUuidConflictItems;
-    if (rawUuidConflictItems.length > 0) {
-      const collectionUuidConflicts = await this.collectionByProcessingRawItems(
-        rawUuidConflictItems,
+    if (this.response.uuidConflictPayloads.length > 0) {
+      const collectionUuidConflicts = await this.collectionByProcessingPayloads(
+        this.response.uuidConflictPayloads,
         PayloadSource.ConflictUuid
       );
       if (collectionUuidConflicts.all().length > 0) {
@@ -70,10 +69,9 @@ export class SyncResponseResolver {
       }
     }
 
-    const rawConflictedItems = this.response.rawDataConflictItems;
-    if (rawConflictedItems.length > 0) {
-      const collectionDataConflicts = await this.collectionByProcessingRawItems(
-        rawConflictedItems,
+    if (this.response.dataConflictPayloads.length > 0) {
+      const collectionDataConflicts = await this.collectionByProcessingPayloads(
+        this.response.dataConflictPayloads,
         PayloadSource.ConflictData
       );
       if (collectionDataConflicts.all().length > 0) {
@@ -84,13 +82,10 @@ export class SyncResponseResolver {
     return collections;
   }
 
-  private async collectionByProcessingRawItems(rawItems: any[], source: PayloadSource) {
-    const payloads = rawItems.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        source,
-      );
-    });
+  private async collectionByProcessingPayloads(
+    payloads: PurePayload[],
+    source: PayloadSource
+  ) {
     const collection = new PayloadCollection(
       payloads,
       source
@@ -127,7 +122,7 @@ export class SyncResponseResolver {
      */
     let stillDirty;
     if (current) {
-      if(payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate!) {
+      if (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate!) {
         /** The payload was dirtied as part of handling deltas, and not because it was 
          * dirtied by a client. We keep the payload dirty state here. */
         stillDirty = payload.dirty;

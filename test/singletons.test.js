@@ -9,7 +9,7 @@ describe('singletons', () => {
     checkIntegrity: true
   };
   const BASE_ITEM_COUNT = 1; /** Default items key */
-  
+
   function createPrivsPayload() {
     const params = {
       uuid: Uuid.GenerateUuidSynchronously(),
@@ -128,12 +128,8 @@ describe('singletons', () => {
     });
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
-      CreateMaxPayloadFromAnyObject(
-        {
-          content_type: contentType,
-          content: {}
-        }
-      )
+      contentType,
+      BuildItemContent({})
     );
     this.expectedItemCount += 1;
 
@@ -223,7 +219,7 @@ describe('singletons', () => {
     this.expectedItemCount++;
     await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    
+
     /** Create another instance while signed out */
     await this.application.privilegesService.getPrivileges();
     await Factory.loginToApplication({
@@ -252,7 +248,8 @@ describe('singletons', () => {
     const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
-      payload
+      payload.content_type,
+      payload.content
     );
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
@@ -270,13 +267,15 @@ describe('singletons', () => {
     const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
-      payload
+      payload.content_type,
+      payload.content
     );
     await this.application.syncService.alternateUuidForItem(resolvedItem.uuid);
     await this.application.syncService.sync(syncOptions);
     const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
-      payload
+      payload.content_type,
+      payload.content
     );
     expect(resolvedItem.uuid).to.equal(item.uuid);
     expect(resolvedItem2.uuid).to.not.equal(resolvedItem.uuid);

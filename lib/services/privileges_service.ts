@@ -156,12 +156,8 @@ export class SNPrivilegesService extends PureService {
     const predicate = new SNPredicate('content_type', '=', contentType);
     return this.singletonManager!.findOrCreateSingleton(
       predicate,
-      CreateMaxPayloadFromAnyObject(
-        {
-          content_type: contentType,
-          content: BuildItemContent({})
-        }
-      )
+      contentType,
+      BuildItemContent({})
     ) as Promise<SNPrivileges>;
   }
 

@@ -684,7 +684,7 @@ var SNApplication = /*#__PURE__*/function () {
       };
       this.eventHandlers.push(observer);
       return function () {
-        removeFromArray(_this5.eventHandlers, observer);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(_this5.eventHandlers, observer);
       };
     }
   }, {
@@ -1372,7 +1372,7 @@ var SNApplication = /*#__PURE__*/function () {
       this.streamRemovers.push(observer);
       return function () {
         observer();
-        removeFromArray(_this6.streamRemovers, observer);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromArray"])(_this6.streamRemovers, observer);
       };
     }
     /** 
@@ -4219,7 +4219,7 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
     key: "webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage",
     value: function () {
       var _webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(encryptedPayload) {
-        var rawPasscodeParams, passcodeParams, decryptedStoragePayload, passcodeKey, challenge, orchestratorFill, response, value, passcode;
+        var rawPasscodeParams, passcodeParams, decryptedStoragePayload, errorDecrypting, passcodeKey, challenge, orchestratorFill, response, value, passcode;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -4232,14 +4232,12 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
                 passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
                 /** Decrypt it with the passcode */
 
-                decryptedStoragePayload = Object(_Payloads_index__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"])({
-                  errorDecrypting: true
-                });
+                errorDecrypting = true;
                 challenge = new _Lib_index__WEBPACK_IMPORTED_MODULE_3__["Challenge"]([_Lib_index__WEBPACK_IMPORTED_MODULE_3__["ChallengeType"].LocalPasscode], _Lib_index__WEBPACK_IMPORTED_MODULE_3__["ChallengeReason"].Migration);
 
               case 6:
-                if (!decryptedStoragePayload.errorDecrypting) {
-                  _context6.next = 22;
+                if (!errorDecrypting) {
+                  _context6.next = 23;
                   break;
                 }
 
@@ -4261,18 +4259,19 @@ var Migration20200115 = /*#__PURE__*/function (_Migration) {
 
               case 18:
                 decryptedStoragePayload = _context6.sent;
+                errorDecrypting = decryptedStoragePayload.errorDecrypting;
                 orchestratorFill.orchestrator.setValidationStatus(value, !decryptedStoragePayload.errorDecrypting);
                 _context6.next = 6;
                 break;
 
-              case 22:
+              case 23:
                 return _context6.abrupt("return", {
                   decryptedStoragePayload: decryptedStoragePayload,
                   key: passcodeKey,
                   keyParams: passcodeParams
                 });
 
-              case 23:
+              case 24:
               case "end":
                 return _context6.stop();
             }
@@ -6572,7 +6571,8 @@ var MutationType;
 
 (function (MutationType) {
   MutationType[MutationType["UserInteraction"] = 1] = "UserInteraction";
-  MutationType[MutationType["Internal"] = 1] = "Internal";
+  MutationType[MutationType["Internal"] = 2] = "Internal";
+  MutationType[MutationType["NonDirtying"] = 3] = "NonDirtying";
 })(MutationType || (MutationType = {}));
 
 var AppDataField;
@@ -6954,19 +6954,19 @@ var SNItem = /*#__PURE__*/function () {
 _defineProperty(SNItem, "sharedDateFormatter", void 0);
 
 var ItemMutator = /*#__PURE__*/function () {
-  function ItemMutator(item, source) {
+  function ItemMutator(item, type) {
     _classCallCheck(this, ItemMutator);
 
     _defineProperty(this, "item", void 0);
 
-    _defineProperty(this, "source", void 0);
+    _defineProperty(this, "type", void 0);
 
     _defineProperty(this, "payload", void 0);
 
     _defineProperty(this, "content", void 0);
 
     this.item = item;
-    this.source = source;
+    this.type = type;
     this.payload = item.payload;
 
     if (this.payload.content) {
@@ -6987,25 +6987,31 @@ var ItemMutator = /*#__PURE__*/function () {
   }, {
     key: "getResult",
     value: function getResult() {
-      if (!this.payload.deleted) {
-        if (this.source === MutationType.UserInteraction) {
-          // Set the user modified date to now if marking the item as dirty
-          this.userModifiedDate = new Date();
-        } else {
-          var currentValue = this.item.userModifiedDate;
+      if (this.type === MutationType.NonDirtying) {
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
+          content: this.content
+        });
+      } else {
+        if (!this.payload.deleted) {
+          if (this.type === MutationType.UserInteraction) {
+            // Set the user modified date to now if marking the item as dirty
+            this.userModifiedDate = new Date();
+          } else {
+            var currentValue = this.item.userModifiedDate;
 
-          if (!currentValue) {
-            // if we don't have an explcit raw value, we initialize client_updated_at.
-            this.userModifiedDate = new Date(this.item.updated_at);
+            if (!currentValue) {
+              // if we don't have an explcit raw value, we initialize client_updated_at.
+              this.userModifiedDate = new Date(this.item.updated_at);
+            }
           }
         }
-      }
 
-      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
-        content: this.content,
-        dirty: true,
-        dirtiedDate: new Date()
-      });
+        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_0__["CopyPayload"])(this.payload, {
+          content: this.content,
+          dirty: true,
+          dirtiedDate: new Date()
+        });
+      }
     }
     /** Merges the input payload with the base payload */
 
@@ -12505,7 +12511,7 @@ function payloadFieldsForSource(source) {
     return ComponentRetrievedPayloadFields.slice();
   }
 
-  if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].LocalRetrieved || source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].LocalDirtied) {
+  if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].LocalRetrieved || source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_0__["PayloadSource"].LocalChanged) {
     return StoragePayloadFields.slice();
   }
 
@@ -13091,7 +13097,7 @@ var PurePayload = /*#__PURE__*/function () {
     this.uuid = rawPayload.uuid;
 
     if (!this.uuid && this.fields.includes(_Payloads_index__WEBPACK_IMPORTED_MODULE_1__["PayloadField"].Uuid)) {
-      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be');
+      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
     }
 
     this.content_type = rawPayload.content_type;
@@ -13261,7 +13267,7 @@ var PayloadSource;
   PayloadSource[PayloadSource["RemoteSaved"] = 2] = "RemoteSaved";
   PayloadSource[PayloadSource["LocalSaved"] = 3] = "LocalSaved";
   PayloadSource[PayloadSource["LocalRetrieved"] = 4] = "LocalRetrieved";
-  PayloadSource[PayloadSource["LocalDirtied"] = 5] = "LocalDirtied";
+  PayloadSource[PayloadSource["LocalChanged"] = 5] = "LocalChanged";
   PayloadSource[PayloadSource["ComponentRetrieved"] = 6] = "ComponentRetrieved";
   PayloadSource[PayloadSource["DesktopInstalled"] = 7] = "DesktopInstalled";
   PayloadSource[PayloadSource["RemoteActionRetrieved"] = 8] = "RemoteActionRetrieved";
@@ -13272,9 +13278,8 @@ var PayloadSource;
   PayloadSource[PayloadSource["DecryptedTransient"] = 13] = "DecryptedTransient";
   PayloadSource[PayloadSource["ConflictUuid"] = 14] = "ConflictUuid";
   PayloadSource[PayloadSource["ConflictData"] = 15] = "ConflictData";
-  PayloadSource[PayloadSource["LocalChanged"] = 16] = "LocalChanged";
-  PayloadSource[PayloadSource["SessionHistory"] = 17] = "SessionHistory";
-  PayloadSource[PayloadSource["Constructor"] = 18] = "Constructor";
+  PayloadSource[PayloadSource["SessionHistory"] = 16] = "SessionHistory";
+  PayloadSource[PayloadSource["Constructor"] = 17] = "Constructor";
 })(PayloadSource || (PayloadSource = {}));
 
 ;
@@ -17142,7 +17147,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 case 36:
                   /* LocalChanged is not interesting to send to observers. For local changes,
                   we wait until the item is set to dirty before notifying observers, where the mapping
-                  source would be PayloadSource.LocalDirtied */
+                  source would be PayloadSource.LocalChanged */
                   if (source !== _Payloads_index__WEBPACK_IMPORTED_MODULE_6__["PayloadSource"].LocalChanged) {
                     _this2.notifyStreamObservers(items, source, sourceKey);
                   }
@@ -19776,7 +19781,7 @@ var SNHistoryManager = /*#__PURE__*/function (_PureService) {
                 case 0:
                   items = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["concatArrays"])(changed, inserted, discarded);
 
-                  if (!(source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalDirtied)) {
+                  if (!(source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalChanged)) {
                     _context2.next = 3;
                     break;
                   }
@@ -21053,7 +21058,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 mutationType = _args4.length > 2 && _args4[2] !== undefined ? _args4[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args4.length > 3 ? _args4[3] : undefined;
+                payloadSource = _args4.length > 3 && _args4[3] !== undefined ? _args4[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args4.length > 4 ? _args4[4] : undefined;
 
                 if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
@@ -21131,7 +21136,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 mutationType = _args5.length > 2 && _args5[2] !== undefined ? _args5[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args5.length > 3 ? _args5[3] : undefined;
+                payloadSource = _args5.length > 3 && _args5[3] !== undefined ? _args5[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args5.length > 4 ? _args5[4] : undefined;
                 items = this.findItems(uuids, true);
                 payloads = [];
@@ -21207,7 +21212,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
               case 35:
                 _context5.next = 37;
-                return this.modelManager.emitPayloads(payloads, payloadSource || _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged, payloadSourceKey);
+                return this.modelManager.emitPayloads(payloads, payloadSource, payloadSourceKey);
 
               case 37:
                 results = this.findItems(payloads.map(function (p) {
@@ -21244,7 +21249,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 mutationType = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args6.length > 3 ? _args6[3] : undefined;
+                payloadSource = _args6.length > 3 && _args6[3] !== undefined ? _args6[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args6.length > 4 ? _args6[4] : undefined;
                 note = this.findItem(uuid);
 
@@ -21288,7 +21293,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 mutationType = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args7.length > 3 ? _args7[3] : undefined;
+                payloadSource = _args7.length > 3 && _args7[3] !== undefined ? _args7[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args7.length > 4 ? _args7[4] : undefined;
                 component = this.findItem(uuid);
 
@@ -21332,7 +21337,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 mutationType = _args8.length > 2 && _args8[2] !== undefined ? _args8[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args8.length > 3 ? _args8[3] : undefined;
+                payloadSource = _args8.length > 3 && _args8[3] !== undefined ? _args8[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args8.length > 4 ? _args8[4] : undefined;
                 extension = this.findItem(uuid);
 
@@ -21376,7 +21381,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context9.prev = _context9.next) {
               case 0:
                 mutationType = _args9.length > 2 && _args9[2] !== undefined ? _args9[2] : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction;
-                payloadSource = _args9.length > 3 ? _args9[3] : undefined;
+                payloadSource = _args9.length > 3 && _args9[3] !== undefined ? _args9[3] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
                 payloadSourceKey = _args9.length > 4 ? _args9[4] : undefined;
                 itemsKey = this.findItem(uuid);
 
@@ -21408,17 +21413,22 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "applyTransform",
     value: function () {
-      var _applyTransform = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(mutator, mutate, payloadSource, payloadSourceKey) {
-        var payload;
+      var _applyTransform = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(mutator, mutate) {
+        var payloadSource,
+            payloadSourceKey,
+            payload,
+            _args10 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
+                payloadSource = _args10.length > 2 && _args10[2] !== undefined ? _args10[2] : _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged;
+                payloadSourceKey = _args10.length > 3 ? _args10[3] : undefined;
                 mutate(mutator);
                 payload = mutator.getResult();
-                return _context10.abrupt("return", this.modelManager.emitPayload(payload, payloadSource || _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_16__["PayloadSource"].LocalChanged, payloadSourceKey));
+                return _context10.abrupt("return", this.modelManager.emitPayload(payload, payloadSource, payloadSourceKey));
 
-              case 3:
+              case 5:
               case "end":
                 return _context10.stop();
             }
@@ -21426,7 +21436,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee10, this);
       }));
 
-      function applyTransform(_x28, _x29, _x30, _x31) {
+      function applyTransform(_x28, _x29) {
         return _applyTransform.apply(this, arguments);
       }
 
@@ -21443,8 +21453,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     value: function () {
       var _setItemDirty = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(uuid) {
         var isUserModified,
-            source,
-            sourceKey,
             result,
             _args11 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
@@ -21452,25 +21460,23 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
             switch (_context11.prev = _context11.next) {
               case 0:
                 isUserModified = _args11.length > 1 && _args11[1] !== undefined ? _args11[1] : false;
-                source = _args11.length > 2 ? _args11[2] : undefined;
-                sourceKey = _args11.length > 3 ? _args11[3] : undefined;
 
                 if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuid)) {
-                  _context11.next = 5;
+                  _context11.next = 3;
                   break;
                 }
 
                 throw Error('Must use uuid when setting item dirty');
 
-              case 5:
-                _context11.next = 7;
-                return this.setItemsDirty([uuid], isUserModified, source, sourceKey);
+              case 3:
+                _context11.next = 5;
+                return this.setItemsDirty([uuid], isUserModified);
 
-              case 7:
+              case 5:
                 result = _context11.sent;
                 return _context11.abrupt("return", result[0]);
 
-              case 9:
+              case 7:
               case "end":
                 return _context11.stop();
             }
@@ -21478,7 +21484,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee11, this);
       }));
 
-      function setItemDirty(_x32) {
+      function setItemDirty(_x30) {
         return _setItemDirty.apply(this, arguments);
       }
 
@@ -21493,28 +21499,24 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     value: function () {
       var _setItemsDirty = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(uuids) {
         var isUserModified,
-            source,
-            sourceKey,
             _args12 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
                 isUserModified = _args12.length > 1 && _args12[1] !== undefined ? _args12[1] : false;
-                source = _args12.length > 2 ? _args12[2] : undefined;
-                sourceKey = _args12.length > 3 ? _args12[3] : undefined;
 
                 if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(uuids[0])) {
-                  _context12.next = 5;
+                  _context12.next = 3;
                   break;
                 }
 
                 throw Error('Must use uuid when setting item dirty');
 
-              case 5:
-                return _context12.abrupt("return", this.changeItems(uuids, undefined, isUserModified ? _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].Internal, source, sourceKey));
+              case 3:
+                return _context12.abrupt("return", this.changeItems(uuids, undefined, isUserModified ? _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].UserInteraction : _models_core_item__WEBPACK_IMPORTED_MODULE_15__["MutationType"].Internal));
 
-              case 6:
+              case 4:
               case "end":
                 return _context12.stop();
             }
@@ -21522,7 +21524,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee12, this);
       }));
 
-      function setItemsDirty(_x33) {
+      function setItemsDirty(_x31) {
         return _setItemsDirty.apply(this, arguments);
       }
 
@@ -21572,7 +21574,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee13, this);
       }));
 
-      function insertItem(_x34) {
+      function insertItem(_x32) {
         return _insertItem.apply(this, arguments);
       }
 
@@ -21620,7 +21622,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee14, this);
       }));
 
-      function duplicateItem(_x35) {
+      function duplicateItem(_x33) {
         return _duplicateItem.apply(this, arguments);
       }
 
@@ -21687,7 +21689,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee15, this);
       }));
 
-      function createItem(_x36, _x37) {
+      function createItem(_x34, _x35) {
         return _createItem.apply(this, arguments);
       }
 
@@ -21726,7 +21728,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee16);
       }));
 
-      function createTemplateItem(_x38, _x39) {
+      function createTemplateItem(_x36, _x37) {
         return _createTemplateItem.apply(this, arguments);
       }
 
@@ -21757,7 +21759,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee17, this);
       }));
 
-      function emitItemFromPayload(_x40) {
+      function emitItemFromPayload(_x38) {
         return _emitItemFromPayload.apply(this, arguments);
       }
 
@@ -21790,7 +21792,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee18, this);
       }));
 
-      function emitItemsFromPayloads(_x41) {
+      function emitItemsFromPayloads(_x39) {
         return _emitItemsFromPayloads.apply(this, arguments);
       }
 
@@ -21899,7 +21901,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee19, this, [[8, 21, 25, 33], [26,, 28, 32]]);
       }));
 
-      function setItemToBeDeleted(_x42) {
+      function setItemToBeDeleted(_x40) {
         return _setItemToBeDeleted.apply(this, arguments);
       }
 
@@ -21990,7 +21992,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee20, this, [[4, 17, 21, 29], [22,, 24, 28]]);
       }));
 
-      function setItemsToBeDeleted(_x43) {
+      function setItemsToBeDeleted(_x41) {
         return _setItemsToBeDeleted.apply(this, arguments);
       }
 
@@ -22153,7 +22155,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         }, _callee21, this);
       }));
 
-      function findOrCreateTagByTitle(_x44) {
+      function findOrCreateTagByTitle(_x42) {
         return _findOrCreateTagByTitle.apply(this, arguments);
       }
 
@@ -23393,9 +23395,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
 /* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/core/predicate */ "./lib/models/core/predicate.ts");
 /* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
-/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
+/* harmony import */ var _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Root/lib/models */ "./lib/models/index.ts");
+/* harmony import */ var _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/app/privileges */ "./lib/models/app/privileges.ts");
 
 
 var _CredentialsMetadata, _ActionsMetadata;
@@ -23434,7 +23435,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-
 var PrivilegeSessionLength;
 
 (function (PrivilegeSessionLength) {
@@ -23444,24 +23444,24 @@ var PrivilegeSessionLength;
   PrivilegeSessionLength[PrivilegeSessionLength["OneWeek"] = 604800] = "OneWeek";
 })(PrivilegeSessionLength || (PrivilegeSessionLength = {}));
 
-var CredentialsMetadata = (_CredentialsMetadata = {}, _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].AccountPassword, {
+var CredentialsMetadata = (_CredentialsMetadata = {}, _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword, {
   label: 'Account Password',
   prompt: 'Please enter your account password.'
-}), _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].LocalPasscode, {
+}), _defineProperty(_CredentialsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode, {
   label: 'Local Passcode',
   prompt: 'Please enter your local passcode.'
 }), _CredentialsMetadata);
-var ActionsMetadata = (_ActionsMetadata = {}, _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].ManageExtensions, {
+var ActionsMetadata = (_ActionsMetadata = {}, _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].ManageExtensions, {
   label: 'Manage Extensions'
-}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].ManageBackups, {
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].ManageBackups, {
   label: 'Download/Import Backups'
-}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].ViewProtectedNotes, {
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].ViewProtectedNotes, {
   label: 'View Protected Notes'
-}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].ManagePrivileges, {
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].ManagePrivileges, {
   label: 'Manage Privileges'
-}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].ManagePasscode, {
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].ManagePasscode, {
   label: 'Manage Passcode'
-}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"].DeleteNote, {
+}), _defineProperty(_ActionsMetadata, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"].DeleteNote, {
   label: 'Delete Notes'
 }), _ActionsMetadata);
 /** 
@@ -23529,10 +23529,10 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "loadDefaults",
     value: function loadDefaults() {
-      this.availableActions = Object.keys(_Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"]).map(function (key) {
-        return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["ProtectedAction"][key];
+      this.availableActions = Object.keys(_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"]).map(function (key) {
+        return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"][key];
       });
-      this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].LocalPasscode];
+      this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode];
       this.sessionLengths = [PrivilegeSessionLength.None, PrivilegeSessionLength.FiveMinutes, PrivilegeSessionLength.OneHour, PrivilegeSessionLength.OneWeek];
     }
   }, {
@@ -23580,7 +23580,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
 
                 credential = _step.value;
 
-                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].AccountPassword)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword)) {
                   _context.next = 19;
                   break;
                 }
@@ -23599,7 +23599,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 19:
-                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].LocalPasscode)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode)) {
                   _context.next = 24;
                   break;
                 }
@@ -23679,12 +23679,9 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                contentType = _Root_lib_models__WEBPACK_IMPORTED_MODULE_6__["ContentType"].Privileges;
+                contentType = _Root_lib_models__WEBPACK_IMPORTED_MODULE_5__["ContentType"].Privileges;
                 predicate = new _Models_core_predicate__WEBPACK_IMPORTED_MODULE_3__["SNPredicate"]('content_type', '=', contentType);
-                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton(predicate, Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"])({
-                  content_type: contentType,
-                  content: Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])({})
-                })));
+                return _context2.abrupt("return", this.singletonManager.findOrCreateSingleton(predicate, contentType, Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["BuildItemContent"])({})));
 
               case 3:
               case "end":
@@ -24062,7 +24059,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].AccountPassword)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword)) {
                   _context11.next = 8;
                   break;
                 }
@@ -24076,7 +24073,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
                 return _context11.abrupt("return", valid);
 
               case 8:
-                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_7__["PrivilegeCredential"].LocalPasscode)) {
+                if (!(credential === _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode)) {
                   _context11.next = 14;
                   break;
                 }
@@ -27752,7 +27749,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "findOrCreateSingleton",
     value: function () {
-      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(predicate, createPayload) {
+      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(predicate, createContentType, createContent) {
         var items, refreshedItems, errorDecrypting, dirtyPayload, item;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
@@ -27796,32 +27793,35 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                 return this.itemManager.setItemsToBeDeleted(Object(_models_generator__WEBPACK_IMPORTED_MODULE_7__["Uuids"])(errorDecrypting));
 
               case 12:
-                _context5.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CopyPayload"];
-                _context5.t1 = createPayload;
-                _context5.next = 16;
+                _context5.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateMaxPayloadFromAnyObject"];
+                _context5.next = 15;
                 return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
 
-              case 16:
-                _context5.t2 = _context5.sent;
-                _context5.t3 = new Date();
-                _context5.t4 = {
-                  uuid: _context5.t2,
+              case 15:
+                _context5.t1 = _context5.sent;
+                _context5.t2 = createContentType;
+                _context5.t3 = createContent;
+                _context5.t4 = new Date();
+                _context5.t5 = {
+                  uuid: _context5.t1,
+                  content_type: _context5.t2,
+                  content: _context5.t3,
                   dirty: true,
-                  dirtiedDate: _context5.t3
+                  dirtiedDate: _context5.t4
                 };
-                dirtyPayload = (0, _context5.t0)(_context5.t1, _context5.t4);
-                _context5.next = 22;
+                dirtyPayload = (0, _context5.t0)(_context5.t5);
+                _context5.next = 23;
                 return this.itemManager.emitItemFromPayload(dirtyPayload);
 
-              case 22:
+              case 23:
                 item = _context5.sent;
-                _context5.next = 25;
+                _context5.next = 26;
                 return this.syncService.sync();
 
-              case 25:
+              case 26:
                 return _context5.abrupt("return", item);
 
-              case 26:
+              case 27:
               case "end":
                 return _context5.stop();
             }
@@ -27829,7 +27829,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
         }, _callee5, this);
       }));
 
-      function findOrCreateSingleton(_x8, _x9) {
+      function findOrCreateSingleton(_x8, _x9, _x10) {
         return _findOrCreateSingleton.apply(this, arguments);
       }
 
@@ -29267,14 +29267,14 @@ var SyncResponseResolver = /*#__PURE__*/function () {
     key: "collectionsByProcessingResponse",
     value: function () {
       var _collectionsByProcessingResponse = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var collections, collectionRetrieved, collectionSaved, rawUuidConflictItems, collectionUuidConflicts, rawConflictedItems, collectionDataConflicts;
+        var collections, collectionRetrieved, collectionSaved, collectionUuidConflicts, collectionDataConflicts;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 collections = [];
                 _context.next = 3;
-                return this.collectionByProcessingRawItems(this.response.rawRetrievedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
+                return this.collectionByProcessingPayloads(this.response.retrievedPayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
 
               case 3:
                 collectionRetrieved = _context.sent;
@@ -29284,7 +29284,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 }
 
                 _context.next = 7;
-                return this.collectionByProcessingRawItems(this.response.rawSavedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
+                return this.collectionByProcessingPayloads(this.response.savedPayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
 
               case 7:
                 collectionSaved = _context.sent;
@@ -29293,45 +29293,41 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                   collections.push(collectionSaved);
                 }
 
-                rawUuidConflictItems = this.response.rawUuidConflictItems;
-
-                if (!(rawUuidConflictItems.length > 0)) {
-                  _context.next = 15;
+                if (!(this.response.uuidConflictPayloads.length > 0)) {
+                  _context.next = 14;
                   break;
                 }
 
-                _context.next = 13;
-                return this.collectionByProcessingRawItems(rawUuidConflictItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictUuid);
+                _context.next = 12;
+                return this.collectionByProcessingPayloads(this.response.uuidConflictPayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictUuid);
 
-              case 13:
+              case 12:
                 collectionUuidConflicts = _context.sent;
 
                 if (collectionUuidConflicts.all().length > 0) {
                   collections.push(collectionUuidConflicts);
                 }
 
-              case 15:
-                rawConflictedItems = this.response.rawDataConflictItems;
-
-                if (!(rawConflictedItems.length > 0)) {
-                  _context.next = 21;
+              case 14:
+                if (!(this.response.dataConflictPayloads.length > 0)) {
+                  _context.next = 19;
                   break;
                 }
 
-                _context.next = 19;
-                return this.collectionByProcessingRawItems(rawConflictedItems, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictData);
+                _context.next = 17;
+                return this.collectionByProcessingPayloads(this.response.dataConflictPayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictData);
 
-              case 19:
+              case 17:
                 collectionDataConflicts = _context.sent;
 
                 if (collectionDataConflicts.all().length > 0) {
                   collections.push(collectionDataConflicts);
                 }
 
-              case 21:
+              case 19:
                 return _context.abrupt("return", collections);
 
-              case 22:
+              case 20:
               case "end":
                 return _context.stop();
             }
@@ -29346,27 +29342,24 @@ var SyncResponseResolver = /*#__PURE__*/function () {
       return collectionsByProcessingResponse;
     }()
   }, {
-    key: "collectionByProcessingRawItems",
+    key: "collectionByProcessingPayloads",
     value: function () {
-      var _collectionByProcessingRawItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(rawItems, source) {
+      var _collectionByProcessingPayloads = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(payloads, source) {
         var _this = this;
 
-        var payloads, collection, deltaClass, delta, resultCollection, updatedDirtyPayloads;
+        var collection, deltaClass, delta, resultCollection, updatedDirtyPayloads;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                payloads = rawItems.map(function (rawItem) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(rawItem, source);
-                });
                 collection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](payloads, source);
                 deltaClass = Object(_Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__["DeltaClassForSource"])(source); // eslint-disable-next-line new-cap
 
                 delta = new deltaClass(this.baseCollection, collection, this.relatedCollectionSet);
-                _context2.next = 6;
+                _context2.next = 5;
                 return delta.resultingCollection();
 
-              case 6:
+              case 5:
                 resultCollection = _context2.sent;
                 updatedDirtyPayloads = resultCollection.all().map(function (payload) {
                   var stillDirty = _this.finalDirtyStateForPayload(payload);
@@ -29378,7 +29371,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                 });
                 return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["PayloadCollection"](updatedDirtyPayloads, source));
 
-              case 9:
+              case 8:
               case "end":
                 return _context2.stop();
             }
@@ -29386,11 +29379,11 @@ var SyncResponseResolver = /*#__PURE__*/function () {
         }, _callee2, this);
       }));
 
-      function collectionByProcessingRawItems(_x, _x2) {
-        return _collectionByProcessingRawItems.apply(this, arguments);
+      function collectionByProcessingPayloads(_x, _x2) {
+        return _collectionByProcessingPayloads.apply(this, arguments);
       }
 
-      return collectionByProcessingRawItems;
+      return collectionByProcessingPayloads;
     }()
   }, {
     key: "finalDirtyStateForPayload",
@@ -29583,19 +29576,70 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var SYNC_CONFLICT_TYPE_CONFLICTING_DATA = 'sync_conflict';
-var SYNC_CONFLICT_TYPE_UUID_CONFLICT = 'uuid_conflict';
+var ConflictType;
+
+(function (ConflictType) {
+  ConflictType["ConflictingData"] = "sync_conflict";
+  ConflictType["UuidConflict"] = "uuid_conflict";
+})(ConflictType || (ConflictType = {}));
+
 var SyncResponse = /*#__PURE__*/function () {
   function SyncResponse(rawResponse) {
     _classCallCheck(this, SyncResponse);
 
     _defineProperty(this, "rawResponse", void 0);
 
+    _defineProperty(this, "savedPayloads", void 0);
+
+    _defineProperty(this, "retrievedPayloads", void 0);
+
+    _defineProperty(this, "uuidConflictPayloads", void 0);
+
+    _defineProperty(this, "dataConflictPayloads", void 0);
+
+    _defineProperty(this, "deletedPayloads", void 0);
+
     this.rawResponse = rawResponse;
+    this.savedPayloads = this.filterRawItemArray(rawResponse.saved_items).map(function (rawItem) {
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
+    });
+    this.retrievedPayloads = this.filterRawItemArray(rawResponse.retrieved_items).map(function (rawItem) {
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
+    });
+    this.dataConflictPayloads = this.filterRawItemArray(this.rawDataConflictItems).map(function (rawItem) {
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictData);
+    });
+    this.uuidConflictPayloads = this.filterRawItemArray(this.rawUuidConflictItems).map(function (rawItem) {
+      return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].ConflictUuid);
+    });
+    /**
+     * Items may be deleted from a combination of sources, such as from RemoteSaved,
+     * or if a conflict handler decides to delete a payload.
+     */
+
+    this.deletedPayloads = this.allProcessedPayloads.filter(function (payload) {
+      return payload.discardable;
+    });
     Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["deepFreeze"])(this);
   }
+  /**
+   * Filter out and exclude any items that do not have a uuid. These are useless to us.
+   */
+
 
   _createClass(SyncResponse, [{
+    key: "filterRawItemArray",
+    value: function filterRawItemArray() {
+      var rawItems = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      return rawItems.filter(function (rawItem) {
+        if (!rawItem.uuid) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
+  }, {
     key: "error",
     get: function get() {
       return this.rawResponse.error;
@@ -29632,63 +29676,19 @@ var SyncResponse = /*#__PURE__*/function () {
   }, {
     key: "numberOfItemsInvolved",
     get: function get() {
-      var allRawItems = this.rawSavedItems.concat(this.rawRetrievedItems).concat(this.rawItemsFromConflicts);
-      return allRawItems.length;
+      return this.allProcessedPayloads.length;
     }
   }, {
     key: "allProcessedPayloads",
     get: function get() {
-      var allPayloads = this.retrievedPayloads.concat(this.savedPayloads).concat(this.conflictPayloads);
+      var allPayloads = this.savedPayloads.concat(this.retrievedPayloads).concat(this.dataConflictPayloads).concat(this.uuidConflictPayloads);
       return allPayloads;
-    }
-  }, {
-    key: "savedPayloads",
-    get: function get() {
-      return this.rawSavedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved);
-      });
-    }
-    /**
-     * Items may be deleted from a combination of sources, such as from RemoteSaved,
-     * or if a conflict handler decides to delete a payload.
-     */
-
-  }, {
-    key: "deletedPayloads",
-    get: function get() {
-      return this.allProcessedPayloads.filter(function (payload) {
-        return payload.discardable;
-      });
-    }
-  }, {
-    key: "retrievedPayloads",
-    get: function get() {
-      return this.rawRetrievedItems.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
-      });
-    }
-  }, {
-    key: "conflictPayloads",
-    get: function get() {
-      return this.rawItemsFromConflicts.map(function (rawItem) {
-        return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CreateSourcedPayloadFromObject"])(rawItem, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved);
-      });
-    }
-  }, {
-    key: "rawSavedItems",
-    get: function get() {
-      return this.rawResponse.saved_items || [];
-    }
-  }, {
-    key: "rawRetrievedItems",
-    get: function get() {
-      return this.rawResponse.retrieved_items || [];
     }
   }, {
     key: "rawUuidConflictItems",
     get: function get() {
       return this.rawConflictObjects.filter(function (conflict) {
-        return conflict.type === SYNC_CONFLICT_TYPE_UUID_CONFLICT;
+        return conflict.type === ConflictType.UuidConflict;
       }).map(function (conflict) {
         return conflict.unsaved_item || conflict.item;
       });
@@ -29697,25 +29697,10 @@ var SyncResponse = /*#__PURE__*/function () {
     key: "rawDataConflictItems",
     get: function get() {
       return this.rawConflictObjects.filter(function (conflict) {
-        return conflict.type === SYNC_CONFLICT_TYPE_CONFLICTING_DATA;
+        return conflict.type === ConflictType.ConflictingData;
       }).map(function (conflict) {
         return conflict.server_item || conflict.item;
       });
-    }
-  }, {
-    key: "rawItemsFromConflicts",
-    get: function get() {
-      var conflicts = this.rawResponse.conflicts || [];
-      var legacyConflicts = this.rawResponse.unsaved || [];
-      var rawConflictItems = conflicts.map(function (conflict) {
-        /** unsaved_item for uuid conflicts,
-        and server_item for data conflicts */
-        return conflict.unsaved_item || conflict.server_item;
-      });
-      var rawLegacyConflictItems = legacyConflicts.map(function (conflict) {
-        return conflict.item;
-      });
-      return rawConflictItems.concat(rawLegacyConflictItems);
     }
   }, {
     key: "rawConflictObjects",
@@ -29964,26 +29949,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return SNSyncService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.ts");
-/* harmony import */ var _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/sync/sync_op_status */ "./lib/services/sync/sync_op_status.ts");
-/* harmony import */ var _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/sync/sync_state */ "./lib/services/sync/sync_state.ts");
-/* harmony import */ var _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/sync/account/downloader */ "./lib/services/sync/account/downloader.ts");
-/* harmony import */ var _Services_sync_account_response_resolver__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/sync/account/response_resolver */ "./lib/services/sync/account/response_resolver.ts");
-/* harmony import */ var _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/sync/account/operation */ "./lib/services/sync/account/operation.ts");
-/* harmony import */ var _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/sync/offline/operation */ "./lib/services/sync/offline/operation.ts");
-/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.ts");
-/* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Lib/index */ "./lib/index.ts");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Services_sync_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/sync/utils */ "./lib/services/sync/utils.ts");
+/* harmony import */ var _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/sync/sync_op_status */ "./lib/services/sync/sync_op_status.ts");
+/* harmony import */ var _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/sync/sync_state */ "./lib/services/sync/sync_state.ts");
+/* harmony import */ var _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Services/sync/account/downloader */ "./lib/services/sync/account/downloader.ts");
+/* harmony import */ var _Services_sync_account_response_resolver__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Services/sync/account/response_resolver */ "./lib/services/sync/account/response_resolver.ts");
+/* harmony import */ var _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Services/sync/account/operation */ "./lib/services/sync/account/operation.ts");
+/* harmony import */ var _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Services/sync/offline/operation */ "./lib/services/sync/offline/operation.ts");
+/* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony import */ var _Services_sync_signals__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! @Services/sync/signals */ "./lib/services/sync/signals.ts");
+/* harmony import */ var _Lib_index__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! @Lib/index */ "./lib/index.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -30017,6 +30003,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -30140,9 +30127,9 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
     _defineProperty(_assertThisInitialized(_this), "_simulate_latency", void 0);
 
-    _defineProperty(_assertThisInitialized(_this), "localLoadPriorty", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].UserPrefs, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Privileges, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Component, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Theme]);
+    _defineProperty(_assertThisInitialized(_this), "localLoadPriorty", [_Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ItemsKey, _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].UserPrefs, _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Privileges, _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Component, _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Theme]);
 
-    _defineProperty(_assertThisInitialized(_this), "nonEncryptedTypes", [_Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ServerExtension]);
+    _defineProperty(_assertThisInitialized(_this), "nonEncryptedTypes", [_Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Mfa, _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ServerExtension]);
 
     _this.itemManager = itemManager;
     _this.sessionManager = sessionManager;
@@ -30222,7 +30209,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     value: function initializeStatus() {
       var _this2 = this;
 
-      this.opStatus = new _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_4__["SyncOpStatus"](this.interval, function (event) {
+      this.opStatus = new _Services_sync_sync_op_status__WEBPACK_IMPORTED_MODULE_5__["SyncOpStatus"](this.interval, function (event) {
         _this2.notifyEvent(event);
       });
     }
@@ -30231,11 +30218,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     value: function initializeState() {
       var _this3 = this;
 
-      this.state = new _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_5__["SyncState"](function (event) {
-        if (event === _Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].EnterOutOfSync) {
-          _this3.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].EnterOutOfSync);
-        } else if (event === _Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].ExitOutOfSync) {
-          _this3.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].ExitOutOfSync);
+      this.state = new _Services_sync_sync_state__WEBPACK_IMPORTED_MODULE_6__["SyncState"](function (event) {
+        if (event === _Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].EnterOutOfSync) {
+          _this3.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].EnterOutOfSync);
+        } else if (event === _Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].ExitOutOfSync) {
+          _this3.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].ExitOutOfSync);
         }
       }, this.maxDiscordance);
     }
@@ -30293,7 +30280,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 return _context2.abrupt("return", this.storageService.getAllRawPayloads().catch(function (error) {
-                  _this4.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DatabaseReadError, error);
+                  _this4.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].DatabaseReadError, error);
 
                   throw error;
                 }));
@@ -30336,22 +30323,22 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 unsortedPayloads = rawPayloads.map(function (rawPayload) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(rawPayload);
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])(rawPayload);
                 });
-                payloads = Object(_Services_sync_utils__WEBPACK_IMPORTED_MODULE_3__["SortPayloadsByRecentAndContentPriority"])(unsortedPayloads, this.localLoadPriorty);
+                payloads = Object(_Services_sync_utils__WEBPACK_IMPORTED_MODULE_4__["SortPayloadsByRecentAndContentPriority"])(unsortedPayloads, this.localLoadPriorty);
                 /** Decrypt and map items keys first */
 
                 itemsKeysPayloads = payloads.filter(function (payload) {
-                  return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_17__["ContentType"].ItemsKey;
+                  return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ItemsKey;
                 });
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(payloads, itemsKeysPayloads);
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["subtractFromArray"])(payloads, itemsKeysPayloads);
                 _context3.next = 8;
                 return this.protocolService.payloadsByDecryptingPayloads(itemsKeysPayloads);
 
               case 8:
                 decryptedItemsKeys = _context3.sent;
                 _context3.next = 11;
-                return this.modelManager.emitPayloads(decryptedItemsKeys, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalRetrieved);
+                return this.modelManager.emitPayloads(decryptedItemsKeys, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalRetrieved);
 
               case 11:
                 /** Map in batches to give interface a chance to update */
@@ -30374,10 +30361,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 20:
                 decrypted = _context3.sent;
                 _context3.next = 23;
-                return this.modelManager.emitPayloads(decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalRetrieved);
+                return this.modelManager.emitPayloads(decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalRetrieved);
 
               case 23:
-                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].LocalDataIncrementalLoad);
+                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].LocalDataIncrementalLoad);
                 this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false);
 
               case 25:
@@ -30412,7 +30399,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 this.syncToken = token;
-                return _context4.abrupt("return", this.storageService.setValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].LastSyncToken, token));
+                return _context4.abrupt("return", this.storageService.setValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].LastSyncToken, token));
 
               case 2:
               case "end":
@@ -30443,10 +30430,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context5.abrupt("return", this.storageService.setValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].PaginationToken, token));
+                return _context5.abrupt("return", this.storageService.setValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].PaginationToken, token));
 
               case 5:
-                return _context5.abrupt("return", this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].PaginationToken));
+                return _context5.abrupt("return", this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].PaginationToken));
 
               case 6:
               case "end":
@@ -30476,7 +30463,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context6.next = 3;
-                return this.storageService.getValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].LastSyncToken);
+                return this.storageService.getValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].LastSyncToken);
 
               case 3:
                 this.syncToken = _context6.sent;
@@ -30512,7 +30499,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context7.next = 3;
-                return this.storageService.getValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].PaginationToken);
+                return this.storageService.getValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].PaginationToken);
 
               case 3:
                 this.cursorToken = _context7.sent;
@@ -30545,11 +30532,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.syncToken = undefined;
                 this.cursorToken = undefined;
                 _context8.next = 4;
-                return this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].LastSyncToken);
+                return this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].LastSyncToken);
 
               case 4:
                 _context8.next = 6;
-                return this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["StorageKey"].PaginationToken);
+                return this.storageService.removeValue(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["StorageKey"].PaginationToken);
 
               case 6:
               case "end":
@@ -30601,14 +30588,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 item = this.itemManager.findItem(uuid);
-                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item);
+                payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])(item);
                 _context10.next = 4;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_14__["PayloadsByAlternatingUuid"])(payload, this.modelManager.getMasterCollection());
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_15__["PayloadsByAlternatingUuid"])(payload, this.modelManager.getMasterCollection());
 
               case 4:
                 results = _context10.sent;
                 _context10.next = 7;
-                return this.modelManager.emitPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
+                return this.modelManager.emitPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalChanged);
 
               case 7:
                 _context10.next = 9;
@@ -30718,13 +30705,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 29:
                 items = this.itemManager.allNondummyItems;
                 payloads = items.map(function (item) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])(item, undefined, undefined, {
+                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])(item, undefined, undefined, {
                     dirty: true,
                     dirtiedDate: new Date()
                   });
                 });
                 _context11.next = 33;
-                return this.modelManager.emitPayloads(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
+                return this.modelManager.emitPayloads(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalChanged);
 
               case 33:
                 _context11.next = 35;
@@ -30828,7 +30815,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
       }
 
       var promise = this.spawnQueue[0];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromIndex"])(this.spawnQueue, 0);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["removeFromIndex"])(this.spawnQueue, 0);
       this.log('Syncing again from spawn queue');
       return this.sync(_objectSpread({
         queueStrategy: SyncQueueStrategy.ForceSpawnNew,
@@ -30850,7 +30837,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
       var _this7 = this;
 
       return this.protocolService.payloadsByEncryptingPayloads(payloads, function (payload) {
-        return _this7.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntent"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_16__["EncryptionIntent"].Sync;
+        return _this7.nonEncryptedTypes.includes(payload.content_type) ? _Protocol_intents__WEBPACK_IMPORTED_MODULE_17__["EncryptionIntent"].SyncDecrypted : _Protocol_intents__WEBPACK_IMPORTED_MODULE_17__["EncryptionIntent"].Sync;
       });
     }
   }, {
@@ -30947,7 +30934,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 neverSyncedDeleted = items.filter(function (item) {
                   return item.neverSynced && item.deleted;
                 });
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(items, neverSyncedDeleted);
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["subtractFromArray"])(items, neverSyncedDeleted);
                 decryptedPayloads = items.map(function (item) {
                   return item.payloadRepresentation();
                 });
@@ -30965,7 +30952,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                  * will have made it in time to piggyback on the current request. Anything that comes
                  * _after_ in-time will schedule a new sync request. */
                 inTimeResolveQueue = this.resolveQueue.slice();
-                useStrategy = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(options.queueStrategy) ? options.queueStrategy : SyncQueueStrategy.ResolveOnNext;
+                useStrategy = !Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(options.queueStrategy) ? options.queueStrategy : SyncQueueStrategy.ResolveOnNext;
 
                 if (!(syncInProgress || !databaseLoaded || !canExecuteSync)) {
                   _context13.next = 36;
@@ -30999,11 +30986,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 36:
                 /** Lock syncing immediately after checking in progress above */
                 this.opStatus.setDidBegin();
-                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SyncWillBegin);
+                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].SyncWillBegin);
                 /* Subtract from array as soon as we're sure they'll be called. 
                 resolves are triggered at the end of this function call */
 
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
                 /** 
                  * lastSyncBegan must be set *after* any point we may have returned above. 
                  * Setting this value means the item was 100% sent to the server.
@@ -31011,9 +30998,9 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 beginDate = new Date();
                 _context13.next = 42;
-                return this.itemManager.changeItems(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_18__["Uuids"])(items), function (mutator) {
+                return this.itemManager.changeItems(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_19__["Uuids"])(items), function (mutator) {
                   mutator.lastSyncBegan = beginDate;
-                });
+                }, _Models_core_item__WEBPACK_IMPORTED_MODULE_1__["MutationType"].NonDirtying);
 
               case 42:
                 online = this.sessionManager.online();
@@ -31021,7 +31008,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 useMode = function (tryMode) {
                   if (online && !_this8.completedOnlineDownloadFirstSync) {
                     return SyncModes.DownloadFirst;
-                  } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(tryMode)) {
+                  } else if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(tryMode)) {
                     return tryMode;
                   } else {
                     return SyncModes.Default;
@@ -31108,8 +31095,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.opStatus.reset();
                 this.state.lastSyncDate = new Date();
 
-                if (operation instanceof _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__["AccountSyncOperation"] && operation.numberOfItemsInvolved >= this.majorChangeThreshold) {
-                  this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].MajorDataChange);
+                if (operation instanceof _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_9__["AccountSyncOperation"] && operation.numberOfItemsInvolved >= this.majorChangeThreshold) {
+                  this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].MajorDataChange);
                 }
 
                 _context13.next = 78;
@@ -31122,7 +31109,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context13.next = 81;
-                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].FullSyncCompleted, {
+                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].FullSyncCompleted, {
                   source: options.source
                 });
 
@@ -31137,7 +31124,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context13.next = 85;
-                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DownloadFirstSyncCompleted);
+                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].DownloadFirstSyncCompleted);
 
               case 85:
                 _context13.next = 87;
@@ -31197,7 +31184,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 105:
-                if (!(operation instanceof _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__["AccountSyncOperation"] && operation.checkIntegrity)) {
+                if (!(operation instanceof _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_9__["AccountSyncOperation"] && operation.checkIntegrity)) {
                   _context13.next = 114;
                   break;
                 }
@@ -31306,7 +31293,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             switch (_context15.prev = _context15.next) {
               case 0:
                 this.log('Syncing online user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
-                _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_8__["AccountSyncOperation"];
+                _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_9__["AccountSyncOperation"];
                 _context15.t1 = payloads;
 
                 _context15.t2 = /*#__PURE__*/function () {
@@ -31315,7 +31302,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                       while (1) {
                         switch (_context14.prev = _context14.next) {
                           case 0:
-                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SyncSignal"].Response)) {
+                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_20__["SyncSignal"].Response)) {
                               _context14.next = 10;
                               break;
                             }
@@ -31341,7 +31328,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                             break;
 
                           case 10:
-                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SyncSignal"].StatusChanged)) {
+                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_20__["SyncSignal"].StatusChanged)) {
                               _context14.next = 13;
                               break;
                             }
@@ -31403,13 +31390,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
             switch (_context17.prev = _context17.next) {
               case 0:
                 this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
-                operation = new _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_9__["OfflineSyncOperation"](payloads, /*#__PURE__*/function () {
+                operation = new _Services_sync_offline_operation__WEBPACK_IMPORTED_MODULE_10__["OfflineSyncOperation"](payloads, /*#__PURE__*/function () {
                   var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(type, response) {
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
                       while (1) {
                         switch (_context16.prev = _context16.next) {
                           case 0:
-                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_19__["SyncSignal"].Response)) {
+                            if (!(type === _Services_sync_signals__WEBPACK_IMPORTED_MODULE_20__["SyncSignal"].Response)) {
                               _context16.next = 3;
                               break;
                             }
@@ -31485,10 +31472,10 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.log('Offline Sync Response', response.rawResponse);
                 payloadsToEmit = response.savedPayloads;
                 _context19.next = 4;
-                return this.modelManager.emitPayloads(payloadsToEmit, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalSaved);
+                return this.modelManager.emitPayloads(payloadsToEmit, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalSaved);
 
               case 4:
-                payloadsToPersist = this.modelManager.find(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_18__["Uuids"])(payloadsToEmit));
+                payloadsToPersist = this.modelManager.find(Object(_Models_generator__WEBPACK_IMPORTED_MODULE_19__["Uuids"])(payloadsToEmit));
                 _context19.next = 7;
                 return this.persistPayloads(payloadsToPersist);
 
@@ -31507,7 +31494,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.opStatus.clearError();
                 this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
                 _context19.next = 15;
-                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
+                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].SingleSyncCompleted, response);
 
               case 15:
               case "end":
@@ -31534,11 +31521,11 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 this.log('Sync Error', response);
 
                 if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
-                  this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].InvalidSession);
+                  this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].InvalidSession);
                 }
 
                 this.opStatus.setError(response.error);
-                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SyncError, response.error);
+                this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].SyncError, response.error);
 
               case 4:
               case "end":
@@ -31570,7 +31557,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context21.next = 3;
-                return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["sleep"])(this._simulate_latency.latency);
+                return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["sleep"])(this._simulate_latency.latency);
 
               case 3:
                 this.log('Online Sync Response', response.rawResponse);
@@ -31593,7 +31580,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 payload = _step3.value;
 
-                if (!(payload.deleted || !payload.fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_11__["PayloadField"].Content))) {
+                if (!(payload.deleted || !payload.fields.includes(_Payloads_fields__WEBPACK_IMPORTED_MODULE_12__["PayloadField"].Content))) {
                   _context21.next = 18;
                   break;
                 }
@@ -31649,7 +31636,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 39:
                 masterCollection = this.modelManager.getMasterCollection();
-                resolver = new _Services_sync_account_response_resolver__WEBPACK_IMPORTED_MODULE_7__["SyncResponseResolver"](response, decryptedPayloads, masterCollection, operation.payloadsSavedOrSaving);
+                resolver = new _Services_sync_account_response_resolver__WEBPACK_IMPORTED_MODULE_8__["SyncResponseResolver"](response, decryptedPayloads, masterCollection, operation.payloadsSavedOrSaving);
                 _context21.next = 43;
                 return resolver.collectionsByProcessingResponse();
 
@@ -31728,7 +31715,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 77:
                 _context21.next = 79;
-                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].SingleSyncCompleted, response);
+                return this.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].SingleSyncCompleted, response);
 
               case 79:
                 if (!response.checkIntegrity) {
@@ -31778,7 +31765,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   });
                 });
                 _context22.next = 3;
-                return this.modelManager.emitPayloads(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].LocalChanged);
+                return this.modelManager.emitPayloads(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].LocalChanged);
 
               case 3:
                 _context22.next = 5;
@@ -31821,7 +31808,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 return _context23.abrupt("return", this.storageService.savePayloads(payloads).catch(function (error) {
-                  _this11.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_20__["SyncEvents"].DatabaseWriteError, error);
+                  _this11.notifyEvent(_Lib_index__WEBPACK_IMPORTED_MODULE_21__["SyncEvents"].DatabaseWriteError, error);
 
                   throw error;
                 }));
@@ -31922,13 +31909,13 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context26.prev = _context26.next) {
               case 0:
-                downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__["AccountDownloader"](this.apiService, this.protocolService, undefined, 'resolve-out-of-sync');
+                downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_7__["AccountDownloader"](this.apiService, this.protocolService, undefined, 'resolve-out-of-sync');
                 _context26.next = 3;
                 return downloader.run();
 
               case 3:
                 payloads = _context26.sent;
-                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_10__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_13__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_12__["PayloadSource"].RemoteRetrieved));
+                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_11__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_14__["PayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_13__["PayloadSource"].RemoteRetrieved));
                 _context26.next = 7;
                 return delta.resultingCollection();
 
@@ -31970,14 +31957,14 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context27.prev = _context27.next) {
               case 0:
-                downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_6__["AccountDownloader"](this.apiService, this.protocolService, contentType, customEvent);
+                downloader = new _Services_sync_account_downloader__WEBPACK_IMPORTED_MODULE_7__["AccountDownloader"](this.apiService, this.protocolService, contentType, customEvent);
                 _context27.next = 3;
                 return downloader.run();
 
               case 3:
                 payloads = _context27.sent;
                 return _context27.abrupt("return", payloads.map(function (payload) {
-                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_18__["CreateItemFromPayload"])(payload);
+                  return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_19__["CreateItemFromPayload"])(payload);
                 }));
 
               case 5:
@@ -32032,7 +32019,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
   }]);
 
   return SNSyncService;
-}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_2__["PureService"]);
+}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_3__["PureService"]);
 
 /***/ }),
 
