@@ -92,7 +92,7 @@ export async function registerOldUser({ application, email, password, version })
     accountKey,
     accountKeyParams
   );
-  application.notifyEvent(ApplicationEvents.SignedIn);
+  application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
     mode: SyncModes.DownloadFirst
   });

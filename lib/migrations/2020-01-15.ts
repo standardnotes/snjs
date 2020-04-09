@@ -1,19 +1,11 @@
+import { ApplicationStage } from '@Lib/stages';
+import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
+import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
 import { FillItemContent } from '@Models/generator';
 import { OrchestratorFill } from './../services/challenge_service';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject } from './../services/storage_service';
 import { Migration } from '@Lib/migrations/migration';
-import {
-  isEnvironmentWebOrDesktop,
-  isEnvironmentMobile,
-  Challenge,
-  ChallengeType,
-  ChallengeReason,
-  StorageKey,
-  RawStorageKey,
-  namespacedKey,
-  ApplicationStages
-} from '@Lib/index';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/index';
 import { PayloadSource } from '@Payloads/sources';
 import {
@@ -26,6 +18,7 @@ import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { Session } from '@Services/api/session';
 import { CreateItemFromPayload } from '../models';
+import { isEnvironmentWebOrDesktop, isEnvironmentMobile } from '@Lib/platforms';
 
 const LegacyKeys = {
   WebPasscodeParamsKey: 'offlineParams',
@@ -43,19 +36,19 @@ export class Migration20200115 extends Migration {
   }
 
   protected registerStageHandlers() {
-    this.registerStageHandler(ApplicationStages.PreparingForLaunch_0, async () => {
+    this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
       if (isEnvironmentWebOrDesktop(this.services.environment)) {
         return this.migrateStorageStructureForWebDesktop();
       } else if (isEnvironmentMobile(this.services.environment)) {
         return this.migrateStorageStructureForMobile();
       }
     });
-    this.registerStageHandler(ApplicationStages.StorageDecrypted_09, async () => {
+    this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
       await this.migrateArbitraryRawStorageToManagedStorageAllPlatforms();
       await this.migrateSessionStorage();
       await this.deleteLegacyStorageValues();
     });
-    this.registerStageHandler(ApplicationStages.LoadingDatabase_11, async () => {
+    this.registerStageHandler(ApplicationStage.LoadingDatabase_11, async () => {
       await this.createDefaultItemsKeyForAllPlatforms();
       this.markDone();
     });

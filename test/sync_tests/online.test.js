@@ -159,7 +159,7 @@ describe('online syncing', () => {
 
     this.application.syncService.ut_beginLatencySimulator(250);
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvents.FullSyncCompleted) {
+      if (event === SyncEvent.FullSyncCompleted) {
         events++;
       }
     });
@@ -192,7 +192,7 @@ describe('online syncing', () => {
     this.application.syncService.ut_beginLatencySimulator(250);
 
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvents.FullSyncCompleted) {
+      if (event === SyncEvent.FullSyncCompleted) {
         events++;
       }
     });
@@ -218,7 +218,7 @@ describe('online syncing', () => {
     this.expectedItemCount++;
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvents.SingleSyncCompleted) {
+      if (event === SyncEvent.SingleSyncCompleted) {
         const note = this.application.findItem(originalNote.uuid);
         expect(note.dirty).to.not.be.ok;
       }
@@ -682,13 +682,13 @@ describe('online syncing', () => {
     let didCompleteRelevantSync = false;
     let beginCheckingResponse = false;
     this.application.syncService.addEventObserver((eventName, data) => {
-      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+      if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
         beginCheckingResponse = true;
       }
       if (!beginCheckingResponse) {
         return;
       }
-      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+      if (!didCompleteRelevantSync && eventName === SyncEvent.SingleSyncCompleted) {
         didCompleteRelevantSync = true;
         const response = data;
         const matching = response.savedPayloads.find((p) => p.uuid === note.uuid);
@@ -711,14 +711,14 @@ describe('online syncing', () => {
     let didCompleteRelevantSync = false;
     let beginCheckingResponse = false;
     this.application.syncService.addEventObserver(async (eventName, data) => {
-      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+      if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
         await this.application.itemManager.setItemToBeDeleted(note.uuid);
         beginCheckingResponse = true;
       }
       if (!beginCheckingResponse) {
         return;
       }
-      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+      if (!didCompleteRelevantSync && eventName === SyncEvent.SingleSyncCompleted) {
         didCompleteRelevantSync = true;
         const response = data;
         const matching = response.savedPayloads.find((p) => p.uuid === note.uuid);
@@ -1118,7 +1118,7 @@ describe('online syncing', () => {
     const expectedEvents = 1;
     let actualEvents = 0;
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvents.FullSyncCompleted && data.source === SyncSources.External) {
+      if (event === SyncEvent.FullSyncCompleted && data.source === SyncSources.External) {
         actualEvents++;
       }
     });

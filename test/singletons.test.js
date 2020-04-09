@@ -173,13 +173,13 @@ describe('singletons', () => {
     let didCompleteRelevantSync = false;
     let beginCheckingResponse = false;
     this.application.syncService.addEventObserver(async (eventName, data) => {
-      if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+      if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
         beginCheckingResponse = true;
       }
       if (!beginCheckingResponse) {
         return;
       }
-      if (!didCompleteRelevantSync && eventName === SyncEvents.SingleSyncCompleted) {
+      if (!didCompleteRelevantSync && eventName === SyncEvent.SingleSyncCompleted) {
         didCompleteRelevantSync = true;
         const saved = data.savedPayloads;
         expect(saved.length).to.equal(1);

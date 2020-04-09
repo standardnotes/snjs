@@ -1,4 +1,5 @@
 import { UuidString } from './types';
+import { ApplicationEvent } from './events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
 import { EncryptionIntent } from './protocol/intents';
@@ -7,19 +8,19 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
+import { Challenge } from './challenges';
 import { ChallengeOrchestrator } from './services/challenge_service';
 import { SNPureCrypto } from 'sncrypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
 import { PayloadSource } from './protocol/payloads/sources';
-import { ApplicationEvents, Challenge } from './index';
 import { StorageValueModes } from './services/storage_service';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
 };
-declare type ApplicationEventCallback = (event: ApplicationEvents, data?: any) => Promise<void>;
+declare type ApplicationEventCallback = (event: ApplicationEvent, data?: any) => Promise<void>;
 declare type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
 /** The main entrypoint of an application. */
 export declare class SNApplication {
@@ -99,8 +100,8 @@ export declare class SNApplication {
     /**
      * @param singleEvent Whether to only listen for a particular event.
      */
-    addEventObserver(callback: ApplicationEventCallback, singleEvent?: ApplicationEvents): () => void;
-    addSingleEventObserver(event: ApplicationEvents, callback: ApplicationEventCallback): () => void;
+    addEventObserver(callback: ApplicationEventCallback, singleEvent?: ApplicationEvent): () => void;
+    addSingleEventObserver(event: ApplicationEvent, callback: ApplicationEventCallback): () => void;
     private notifyEvent;
     /**
      * Whether the local database has completed loading local items.

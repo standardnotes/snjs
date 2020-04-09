@@ -10,7 +10,7 @@ export { SNMigrationService } from '@Lib/services/migration_service';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
 export { SNHistoryManager } from '@Services/history/history_manager';
 export { SNPrivilegesService } from '@Services/privileges_service';
-export { SyncEvent as SyncEvents } from '@Services/sync/events';
+export { SyncEvent as SyncEvent } from '@Services/sync/events';
 export { ItemManager } from '@Services/item_manager';
 export {
   SNSyncService,

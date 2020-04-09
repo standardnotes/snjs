@@ -1,8 +1,8 @@
+import { ApplicationStage } from '../stages';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SNRootKey } from '../protocol/root_key';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { PureService } from './pure_service';
-import { ApplicationStages } from '../index';
 import { DeviceInterface } from '../device_interface';
 export declare enum StoragePersistencePolicies {
     Default = 1,
@@ -49,7 +49,7 @@ export declare class SNStorageService extends PureService {
     private values;
     constructor(deviceInterface: DeviceInterface, namespace: string);
     deinit(): void;
-    handleApplicationStage(stage: ApplicationStages): Promise<void>;
+    handleApplicationStage(stage: ApplicationStage): Promise<void>;
     setPersistencePolicy(persistencePolicy: StoragePersistencePolicies): Promise<void>;
     setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
     isEphemeralSession(): boolean;

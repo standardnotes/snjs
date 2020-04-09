@@ -1,6 +1,7 @@
+import { ApplicationEvent } from './../events';
+import { ApplicationStage } from '../stages';
 import { MigrationServices } from './../migrations/types';
 import { MigrationChallengeHandler } from './../migrations/migration';
-import { ApplicationEvents, ApplicationStages } from '../index';
 import { PureService } from './pure_service';
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -22,11 +23,11 @@ export declare class SNMigrationService extends PureService {
      * Application instances will call this function directly when they arrive
      * at a certain migratory state.
      */
-    handleApplicationStage(stage: ApplicationStages): Promise<void>;
+    handleApplicationStage(stage: ApplicationStage): Promise<void>;
     /**
      * Called by application
      */
-    handleApplicationEvent(event: ApplicationEvents): Promise<void>;
+    handleApplicationEvent(event: ApplicationEvent): Promise<void>;
     private runBaseMigration;
     private getRequiredMigrations;
     /** @access private */

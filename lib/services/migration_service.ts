@@ -1,8 +1,10 @@
+import { SyncEvent } from '@Services/sync/events';
+import { ApplicationEvent } from './../events';
+import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
 import { MigrationChallengeHandler } from './../migrations/migration';
 import * as migrationImports from '@Lib/migrations';
-import { ApplicationEvents, ApplicationStages, SyncEvents } from '@Lib/index';
 import { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 import { PureService } from '@Services/pure_service';
 import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
@@ -59,7 +61,7 @@ export class SNMigrationService extends PureService {
    * Application instances will call this function directly when they arrive
    * at a certain migratory state.
    */
-  public async handleApplicationStage(stage: ApplicationStages) {
+  public async handleApplicationStage(stage: ApplicationStage) {
     await super.handleApplicationStage(stage);
     await this.handleStage(stage);
   }
@@ -67,14 +69,14 @@ export class SNMigrationService extends PureService {
   /**
    * Called by application
    */
-  public async handleApplicationEvent(event: ApplicationEvents) {
-    if (event === ApplicationEvents.SignedIn) {
-      await this.handleStage(ApplicationStages.SignedIn_30);
+  public async handleApplicationEvent(event: ApplicationEvent) {
+    if (event === ApplicationEvent.SignedIn) {
+      await this.handleStage(ApplicationStage.SignedIn_30);
     }
-    else if (event === ApplicationEvents.CompletedSync) {
+    else if (event === ApplicationEvent.CompletedSync) {
       if(!this.handledFullSyncStage) {
         this.handledFullSyncStage = true;
-        await this.handleStage(ApplicationStages.FullSyncCompleted_13);
+        await this.handleStage(ApplicationStage.FullSyncCompleted_13);
       }
     }
   }
@@ -82,7 +84,7 @@ export class SNMigrationService extends PureService {
   private async runBaseMigration() {
     const baseMigration = new BaseMigration(this.services!);
     await baseMigration.handleStage(
-      ApplicationStages.PreparingForLaunch_0
+      ApplicationStage.PreparingForLaunch_0
     );
   }
 
@@ -140,7 +142,7 @@ export class SNMigrationService extends PureService {
     );
   }
 
-  private async handleStage(stage: ApplicationStages) {
+  private async handleStage(stage: ApplicationStage) {
     for (const migration of this.activeMigrations!) {
       await migration.handleStage(stage);
     }

@@ -1,10 +1,11 @@
+import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
+import { ApplicationStage } from '@Lib/stages';
 import { PayloadContent } from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
-import { ApplicationStages, RawStorageKey, namespacedKey } from '@Lib/index';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
@@ -36,7 +37,6 @@ export enum ValueModesKeys {
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
 };
-
 type ValuesObjectRecord = Record<string, any>
 
 export type StorageValuesObject = {
@@ -85,9 +85,9 @@ export class SNStorageService extends PureService {
     super.deinit();
   }
 
-  async handleApplicationStage(stage: ApplicationStages) {
+  async handleApplicationStage(stage: ApplicationStage) {
     await super.handleApplicationStage(stage);
-    if (stage === ApplicationStages.Launched_10) {
+    if (stage === ApplicationStage.Launched_10) {
       this.storagePersistable = true;
     }
   }

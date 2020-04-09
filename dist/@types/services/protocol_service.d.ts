@@ -1,6 +1,6 @@
 import { ItemManager } from './item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
-import { SyncEvents } from '../events';
+import { SyncEvent } from '../events';
 import { SNItem } from '../models/core/item';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { SNItemsKey } from '../models/app/items_key';
@@ -323,7 +323,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @returns The key object to use for decrypting this payload.
     */
     private keyToUseForDecryptionOfPayload;
-    onSyncEvent(eventName: SyncEvents): Promise<void>;
+    onSyncEvent(eventName: SyncEvent): Promise<void>;
     /**
      * When a download-first sync completes, it means we've completed a (potentially multipage)
      * sync where we only downloaded what the server had before uploading anything. We will be

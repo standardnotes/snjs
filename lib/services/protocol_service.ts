@@ -1,6 +1,6 @@
 import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
-import { SyncEvents } from '@Lib/events';
+import { SyncEvent } from '@Lib/events';
 import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -1137,11 +1137,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return this.defaultItemsKeyForItemVersion(payloadVersion);
   }
 
-  public async onSyncEvent(eventName: SyncEvents) {
-    if (eventName === SyncEvents.FullSyncCompleted) {
+  public async onSyncEvent(eventName: SyncEvent) {
+    if (eventName === SyncEvent.FullSyncCompleted) {
       await this.handleFullSyncCompletion();
     }
-    if (eventName === SyncEvents.DownloadFirstSyncCompleted) {
+    if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
       await this.handleDownloadFirstSyncCompletion();
     }
   }

@@ -1,7 +1,7 @@
 import { SyncEvent } from '@Services/sync/events';
-export { SyncEvent as SyncEvents };
+export { SyncEvent };
 
-export enum ApplicationEvents {
+export enum ApplicationEvent {
   SignedIn = 2,
   SignedOut = 3,
   CompletedSync = 5,
@@ -45,18 +45,18 @@ export enum ApplicationEvents {
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
   return ({
-    [SyncEvent.FullSyncCompleted]: ApplicationEvents.CompletedSync,
-    [SyncEvent.SyncError]: ApplicationEvents.FailedSync,
-    [SyncEvent.SyncTakingTooLong]: ApplicationEvents.HighLatencySync,
-    [SyncEvent.EnterOutOfSync]: ApplicationEvents.EnteredOutOfSync,
-    [SyncEvent.ExitOutOfSync]: ApplicationEvents.ExitedOutOfSync,
-    [SyncEvent.LocalDataLoaded]: ApplicationEvents.LocalDataLoaded,
-    [SyncEvent.MajorDataChange]: ApplicationEvents.MajorDataChange,
-    [SyncEvent.LocalDataIncrementalLoad]: ApplicationEvents.LocalDataIncrementalLoad,
-    [SyncEvent.StatusChanged]: ApplicationEvents.SyncStatusChanged,
-    [SyncEvent.SyncWillBegin]: ApplicationEvents.WillSync,
-    [SyncEvent.InvalidSession]: ApplicationEvents.InvalidSyncSession,
-    [SyncEvent.DatabaseReadError]: ApplicationEvents.LocalDatabaseReadError,
-    [SyncEvent.DatabaseWriteError]: ApplicationEvents.LocalDatabaseWriteError
+    [SyncEvent.FullSyncCompleted]: ApplicationEvent.CompletedSync,
+    [SyncEvent.SyncError]: ApplicationEvent.FailedSync,
+    [SyncEvent.SyncTakingTooLong]: ApplicationEvent.HighLatencySync,
+    [SyncEvent.EnterOutOfSync]: ApplicationEvent.EnteredOutOfSync,
+    [SyncEvent.ExitOutOfSync]: ApplicationEvent.ExitedOutOfSync,
+    [SyncEvent.LocalDataLoaded]: ApplicationEvent.LocalDataLoaded,
+    [SyncEvent.MajorDataChange]: ApplicationEvent.MajorDataChange,
+    [SyncEvent.LocalDataIncrementalLoad]: ApplicationEvent.LocalDataIncrementalLoad,
+    [SyncEvent.StatusChanged]: ApplicationEvent.SyncStatusChanged,
+    [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
+    [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
+    [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
+    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError
   } as any)[syncEvent];
 }

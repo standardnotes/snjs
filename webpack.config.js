@@ -3,7 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 // const CircularDependencyPlugin = require('circular-dependency-plugin');
 module.exports = {
   entry: {
-    'snjs.js': './lib/main.ts'
+    'snjs.js': './lib/index.ts'
   },
   resolve: {
     extensions: ['.ts', '.js'],

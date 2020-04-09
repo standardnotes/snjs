@@ -1,5 +1,5 @@
 import { PureService } from '@Services/pure_service';
-import { ApplicationEvents } from '@Lib/events';
+import { ApplicationEvent } from '@Lib/events';
 import { SNApplication } from '../application';
 
 export class ApplicationService extends PureService {
@@ -31,21 +31,21 @@ export class ApplicationService extends PureService {
     if (this.application!.isLaunched()) {
       this.onAppLaunch();
     }
-    this.unsubApp = this.application!.addEventObserver(async (event: ApplicationEvents) => {
+    this.unsubApp = this.application!.addEventObserver(async (event: ApplicationEvent) => {
       this.onAppEvent(event);
-      if (event === ApplicationEvents.Started) {
+      if (event === ApplicationEvent.Started) {
         await this.onAppStart();
-      } else if (event === ApplicationEvents.Launched) {
+      } else if (event === ApplicationEvent.Launched) {
         await this.onAppLaunch();
-      } else if (event === ApplicationEvents.CompletedSync) {
+      } else if (event === ApplicationEvent.CompletedSync) {
         this.onAppSync();
-      } else if (event === ApplicationEvents.KeyStatusChanged) {
+      } else if (event === ApplicationEvent.KeyStatusChanged) {
         this.onAppKeyChange();
       }
     });
   }
 
-  onAppEvent(event: ApplicationEvents) {
+  onAppEvent(event: ApplicationEvent) {
     /** Optional override */
   }
 

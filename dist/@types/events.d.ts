@@ -1,6 +1,6 @@
 import { SyncEvent } from './services/sync/events';
-export { SyncEvent as SyncEvents };
-export declare enum ApplicationEvents {
+export { SyncEvent };
+export declare enum ApplicationEvent {
     SignedIn = 2,
     SignedOut = 3,
     CompletedSync = 5,

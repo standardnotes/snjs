@@ -1,3 +1,5 @@
+import { SyncEvent } from '@Services/sync/events';
+import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
@@ -25,7 +27,6 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload, Uuids } from '@Models/generator';
 import { SyncSignal } from '@Services/sync/signals';
-import { StorageKey, SyncEvents } from '@Lib/index';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 
@@ -206,10 +207,10 @@ export class SNSyncService extends PureService {
   private initializeState() {
     this.state = new SyncState(
       (event) => {
-        if (event === SyncEvents.EnterOutOfSync) {
-          this.notifyEvent(SyncEvents.EnterOutOfSync);
-        } else if (event === SyncEvents.ExitOutOfSync) {
-          this.notifyEvent(SyncEvents.ExitOutOfSync);
+        if (event === SyncEvent.EnterOutOfSync) {
+          this.notifyEvent(SyncEvent.EnterOutOfSync);
+        } else if (event === SyncEvent.ExitOutOfSync) {
+          this.notifyEvent(SyncEvent.ExitOutOfSync);
         }
       },
       this.maxDiscordance,
@@ -252,7 +253,7 @@ export class SNSyncService extends PureService {
    */
   public async getDatabasePayloads() {
     return this.storageService!.getAllRawPayloads().catch((error) => {
-      this.notifyEvent(SyncEvents.DatabaseReadError, error);
+      this.notifyEvent(SyncEvent.DatabaseReadError, error);
       throw error;
     });
   }
@@ -303,7 +304,7 @@ export class SNSyncService extends PureService {
         PayloadSource.LocalRetrieved
       );
       this.notifyEvent(
-        SyncEvents.LocalDataIncrementalLoad
+        SyncEvent.LocalDataIncrementalLoad
       );
       this.opStatus!.setDatabaseLoadStatus(
         currentPosition,
@@ -564,7 +565,7 @@ export class SNSyncService extends PureService {
 
     /** Lock syncing immediately after checking in progress above */
     this.opStatus!.setDidBegin();
-    this.notifyEvent(SyncEvents.SyncWillBegin);
+    this.notifyEvent(SyncEvent.SyncWillBegin);
     /* Subtract from array as soon as we're sure they'll be called. 
     resolves are triggered at the end of this function call */
     subtractFromArray(this.resolveQueue, inTimeResolveQueue);
@@ -636,18 +637,18 @@ export class SNSyncService extends PureService {
       operation instanceof AccountSyncOperation &&
       operation.numberOfItemsInvolved >= this.majorChangeThreshold
     ) {
-      this.notifyEvent(SyncEvents.MajorDataChange);
+      this.notifyEvent(SyncEvent.MajorDataChange);
     }
     await this.handleNeverSyncedDeleted(neverSyncedDeleted);
     if (useMode !== SyncModes.DownloadFirst) {
-      await this.notifyEvent(SyncEvents.FullSyncCompleted, { source: options.source });
+      await this.notifyEvent(SyncEvent.FullSyncCompleted, { source: options.source });
     }
 
     if (useMode === SyncModes.DownloadFirst) {
       if (online) {
         this.completedOnlineDownloadFirstSync = true;
       }
-      await this.notifyEvent(SyncEvents.DownloadFirstSyncCompleted);
+      await this.notifyEvent(SyncEvent.DownloadFirstSyncCompleted);
       /** Perform regular sync now that we've finished download first sync */
       await this.sync({
         source: SyncSources.AfterDownloadFirst,
@@ -768,7 +769,7 @@ export class SNSyncService extends PureService {
     this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
 
     await this.notifyEvent(
-      SyncEvents.SingleSyncCompleted,
+      SyncEvent.SingleSyncCompleted,
       response
     );
   }
@@ -776,11 +777,11 @@ export class SNSyncService extends PureService {
   private async handleErrorServerResponse(response: SyncResponse) {
     this.log('Sync Error', response);
     if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
-      this.notifyEvent(SyncEvents.InvalidSession);
+      this.notifyEvent(SyncEvent.InvalidSession);
     }
 
     this.opStatus!.setError(response.error);
-    this.notifyEvent(SyncEvents.SyncError, response.error);
+    this.notifyEvent(SyncEvent.SyncError, response.error);
   }
 
   private async handleSuccessServerResponse(
@@ -825,7 +826,7 @@ export class SNSyncService extends PureService {
       await this.deletePayloads(deletedPayloads);
     }
     await this.notifyEvent(
-      SyncEvents.SingleSyncCompleted,
+      SyncEvent.SingleSyncCompleted,
       response
     );
 
@@ -865,7 +866,7 @@ export class SNSyncService extends PureService {
       return;
     }
     return this.storageService!.savePayloads(payloads).catch((error) => {
-      this.notifyEvent(SyncEvents.DatabaseWriteError, error);
+      this.notifyEvent(SyncEvent.DatabaseWriteError, error);
       throw error;
     });
   }

@@ -1,6 +1,7 @@
+import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './migrations/types';
 import { UuidString } from './types';
-import { SyncEvents } from '@Lib/events';
+import { SyncEvent, ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
 import { BackupFile } from './services/protocol_service';
@@ -10,7 +11,7 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { ChallengeResponse } from './challenges';
+import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
 import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto';
@@ -20,14 +21,6 @@ import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
 import { Uuids, CreateItemFromPayload } from '@Models/generator';
-import {
-  ApplicationEvents,
-  ApplicationStages,
-  applicationEventForSyncEvent,
-  ChallengeType,
-  ChallengeReason,
-  Challenge
-} from '@Lib/index';
 import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service';
 import {
   SNMigrationService,
@@ -51,6 +44,7 @@ import {
 } from './services';
 import { DeviceInterface } from './device_interface';
 
+
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 
@@ -61,11 +55,11 @@ type LaunchCallback = {
   ) => void
 }
 type ApplicationEventCallback = (
-  event: ApplicationEvents,
+  event: ApplicationEvent,
   data?: any
 ) => Promise<void>;
 type ApplicationObserver = {
-  singleEvent?: ApplicationEvents
+  singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
 type ItemStream = (
@@ -168,17 +162,17 @@ export class SNApplication {
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface!.openDatabase()
       .catch((error) => {
-        this.notifyEvent(ApplicationEvents.LocalDatabaseReadError, error);
+        this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error);
         return undefined;
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
     await this.migrationService!.initialize();
-    await this.handleStage(ApplicationStages.PreparingForLaunch_0);
+    await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService!.initializeFromDisk();
     await this.protocolService!.initialize();
-    await this.handleStage(ApplicationStages.ReadyForLaunch_05);
+    await this.handleStage(ApplicationStage.ReadyForLaunch_05);
     this.started = true;
-    await this.notifyEvent(ApplicationEvents.Started);
+    await this.notifyEvent(ApplicationEvent.Started);
   }
 
   private setLaunchCallback(callback: LaunchCallback) {
@@ -203,17 +197,17 @@ export class SNApplication {
     if (this.storageService!.isStorageWrapped()) {
       await this.storageService!.decryptStorage();
     }
-    await this.handleStage(ApplicationStages.StorageDecrypted_09);
+    await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService!.loadHost();
     await this.sessionManager!.initializeFromDisk();
     this.historyManager!.initializeFromDisk();
 
     this.launched = true;
-    await this.notifyEvent(ApplicationEvents.Launched);
-    await this.handleStage(ApplicationStages.Launched_10);
+    await this.notifyEvent(ApplicationEvent.Launched);
+    await this.handleStage(ApplicationStage.Launched_10);
 
     const databasePayloads = await this.syncService!.getDatabasePayloads();
-    await this.handleStage(ApplicationStages.LoadingDatabase_11);
+    await this.handleStage(ApplicationStage.LoadingDatabase_11);
 
     if (this.createdNewDatabase) {
       await this.syncService!.onNewDatabaseCreated();
@@ -228,7 +222,7 @@ export class SNApplication {
         if (this.dealloced) {
           throw 'Application has been destroyed.';
         }
-        await this.handleStage(ApplicationStages.LoadedDatabase_12);
+        await this.handleStage(ApplicationStage.LoadedDatabase_12);
         this.beginAutoSyncTimer();
         return this.syncService!.sync({
           mode: SyncModes.DownloadFirst
@@ -275,7 +269,7 @@ export class SNApplication {
     };
   }
 
-  private async handleStage(stage: ApplicationStages) {
+  private async handleStage(stage: ApplicationStage) {
     for (const service of this.services) {
       await service.handleApplicationStage(stage);
     }
@@ -286,7 +280,7 @@ export class SNApplication {
    */
   public addEventObserver(
     callback: ApplicationEventCallback,
-    singleEvent?: ApplicationEvents
+    singleEvent?: ApplicationEvent
   ) {
     const observer = { callback, singleEvent };
     this.eventHandlers.push(observer);
@@ -296,10 +290,10 @@ export class SNApplication {
   }
 
   public addSingleEventObserver(
-    event: ApplicationEvents,
+    event: ApplicationEvent,
     callback: ApplicationEventCallback
   ) {
-    const filteredCallback = async (firedEvent: ApplicationEvents) => {
+    const filteredCallback = async (firedEvent: ApplicationEvent) => {
       if (firedEvent === event) {
         callback(event);
       }
@@ -307,7 +301,7 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(event: ApplicationEvents, data?: any) {
+  private async notifyEvent(event: ApplicationEvent, data?: any) {
     for (const observer of this.eventHandlers.slice()) {
       if (observer.singleEvent && observer.singleEvent === event) {
         await observer.callback(event, data || {});
@@ -810,7 +804,7 @@ export class SNApplication {
         this.itemManager!.removeAllItemsFromMemory();
         await this.clearDatabase();
       }
-      await this.notifyEvent(ApplicationEvents.SignedIn);
+      await this.notifyEvent(ApplicationEvent.SignedIn);
       this.unlockSyncing();
       await this.syncService!.sync({
         mode: SyncModes.DownloadFirst,
@@ -864,7 +858,7 @@ export class SNApplication {
         this.itemManager!.removeAllItemsFromMemory();
         await this.clearDatabase();
       }
-      await this.notifyEvent(ApplicationEvents.SignedIn);
+      await this.notifyEvent(ApplicationEvent.SignedIn);
       this.unlockSyncing();
       const syncPromise = this.syncService!.sync({
         mode: SyncModes.DownloadFirst,
@@ -923,7 +917,7 @@ export class SNApplication {
     await this.sessionManager!.signOut();
     await this.protocolService!.clearLocalKeyState();
     await this.storageService!.clearAllData();
-    await this.notifyEvent(ApplicationEvents.SignedOut);
+    await this.notifyEvent(ApplicationEvent.SignedOut);
     this.deinit();
   }
 
@@ -1135,7 +1129,7 @@ export class SNApplication {
       this.crypto!
     );
     this.protocolService!.onKeyStatusChange(async () => {
-      await this.notifyEvent(ApplicationEvents.KeyStatusChanged);
+      await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
     });
     this.services.push(this.protocolService!);
   }
@@ -1161,11 +1155,11 @@ export class SNApplication {
       this.deviceInterface!.interval
     );
     const syncEventCallback = async (eventName: string) => {
-      const appEvent = applicationEventForSyncEvent(eventName as SyncEvents);
+      const appEvent = applicationEventForSyncEvent(eventName as SyncEvent);
       if (appEvent) {
         await this.notifyEvent(appEvent);
       }
-      await this.protocolService!.onSyncEvent(eventName as SyncEvents);
+      await this.protocolService!.onSyncEvent(eventName as SyncEvent);
     };
     const uninstall = this.syncService!.addEventObserver(syncEventCallback);
     this.serviceObservers.push(uninstall);
