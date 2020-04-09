@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 
 export class DeltaRemoteSaved extends PayloadsDelta {
@@ -23,6 +23,6 @@ export class DeltaRemoteSaved extends PayloadsDelta {
       );
       processed.push(result);
     }
-    return new PayloadCollection(processed, PayloadSource.RemoteSaved);
+    return new ImmutablePayloadCollection(processed, PayloadSource.RemoteSaved);
   }
 }

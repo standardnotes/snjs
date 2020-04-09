@@ -1,6 +1,6 @@
 import { UuidString } from './../types';
 import { subtractFromArray } from '@Lib/utils';
-import { MutableCollection } from './../protocol/payloads/mutable_collection';
+import { MutableCollection } from './../protocol/payloads/collection';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItem } from '@Models/core/item';
 import remove from 'lodash/remove';
@@ -11,7 +11,7 @@ import {
 import { PureService } from '@Lib/services/pure_service';
 import {
   PayloadSource,
-  PayloadCollection,
+  ImmutablePayloadCollection,
   DeltaFileImport,
 } from '@Payloads/index';
 
@@ -55,7 +55,7 @@ export class PayloadManager extends PureService {
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return this.collection.toImmutablePayloadCollection();
+    return this.collection.immutablePayloadCopy();
   }
 
   public deinit() {
@@ -76,7 +76,7 @@ export class PayloadManager extends PureService {
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(collection: PayloadCollection, sourceKey?: string) {
+  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
     return this.emitPayloads(
       collection.all(),
       collection.source!,
@@ -210,7 +210,7 @@ export class PayloadManager extends PureService {
   public async importPayloads(payloads: PurePayload[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      new PayloadCollection(
+      new ImmutablePayloadCollection(
         payloads,
         PayloadSource.FileImport
       )

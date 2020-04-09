@@ -1,10 +1,10 @@
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride, CopyPayload } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { deepFreeze, Copy } from '@Lib/utils';
+import { deepFreeze, Copy, isObject } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
-import { ConflictStrategies, } from '@Payloads/index';
+import { ConflictStrategies, PayloadFormat, } from '@Payloads/index';
 
 export enum MutationType {
   /**
@@ -58,6 +58,12 @@ export class SNItem {
     if (!payload.uuid || !payload.content_type) {
       throw Error('Cannot create item without both uuid and content_type');
     }
+    if (
+      payload.format === PayloadFormat.DecryptedBareObject &&
+      (payload.enc_item_key || payload.items_key_id || payload.auth_hash)
+    ) {
+      throw Error('Creating an item from a decrypted payload should not contain enc params');
+    }
     this.payload = payload;
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -75,6 +81,10 @@ export class SNItem {
 
   get content() {
     return this.payload.content;
+  }
+
+  get safeContent() {
+    return this.payload.safeContent;
   }
 
   get references() {

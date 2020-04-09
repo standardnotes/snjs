@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
@@ -86,15 +86,14 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       }
     }
 
-    return new PayloadCollection(
+    return new ImmutablePayloadCollection(
       filtered.concat(conflictResults),
       PayloadSource.RemoteRetrieved
     );
   }
 
   private findConflictOf(uuid: string) {
-    return this.baseCollection.all().find((p) => {
-      return p.safeContent.conflict_of === uuid;
-    })
+    const conflictsOf = this.baseCollection.conflictsOf(uuid);
+    return conflictsOf[0];
   }
 }

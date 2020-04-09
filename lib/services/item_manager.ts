@@ -10,7 +10,7 @@ import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
-import { MutableCollection } from './../protocol/payloads/mutable_collection';
+import { MutableCollection } from './../protocol/payloads/collection';
 import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';

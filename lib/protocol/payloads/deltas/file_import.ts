@@ -2,7 +2,7 @@ import { CopyPayload } from '@Payloads/generator';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
@@ -24,7 +24,7 @@ export class DeltaFileImport extends PayloadsDelta {
       })
       extendArray(results, payloads);
     }
-    return new PayloadCollection(results, PayloadSource.FileImport);
+    return new ImmutablePayloadCollection(results, PayloadSource.FileImport);
   }
 
   private async payloadsByHandlingPayload(

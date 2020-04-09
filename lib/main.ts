@@ -104,7 +104,7 @@ export {
 } from '@Lib/services';
 
 /** Payloads */
-export { PayloadCollection } from '@Payloads/collection';
+export { MutableCollection, ImmutablePayloadCollection } from '@Payloads/collection';
 export {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,

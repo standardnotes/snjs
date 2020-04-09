@@ -1,5 +1,5 @@
-export { PayloadCollection } from './collection';
-export { PayloadCollectionSet } from './collection_set';
+export { ImmutablePayloadCollection } from './collection';
+export { ImmutablePayloadCollectionSet } from './collection_set';
 export {
   CreateMaxPayloadFromAnyObject,
   CreateEncryptionParameters,

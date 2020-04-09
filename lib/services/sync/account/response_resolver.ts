@@ -3,8 +3,8 @@ import { SyncResponse } from '@Services/sync/response';
 
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
-import { PayloadCollectionSet } from '@Payloads/collection_set';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollectionSet } from '@Payloads/collection_set';
 import { CreateSourcedPayloadFromObject, CopyPayload, RawPayload } from '@Payloads/generator';
 import { ContentType } from '@Root/lib/models';
 
@@ -17,23 +17,23 @@ import { ContentType } from '@Root/lib/models';
 export class SyncResponseResolver {
 
   private response: SyncResponse
-  private baseCollection: PayloadCollection;
-  private relatedCollectionSet: PayloadCollectionSet
+  private baseCollection: ImmutablePayloadCollection;
+  private relatedCollectionSet: ImmutablePayloadCollectionSet
 
   constructor(
     response: SyncResponse,
     decryptedResponsePayloads: PurePayload[],
-    baseCollection: PayloadCollection,
+    baseCollection: ImmutablePayloadCollection,
     payloadsSavedOrSaving: PurePayload[]
   ) {
     this.response = response;
     this.baseCollection = baseCollection;
-    this.relatedCollectionSet = new PayloadCollectionSet([
-      new PayloadCollection(
+    this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
+      new ImmutablePayloadCollection(
         decryptedResponsePayloads,
         PayloadSource.DecryptedTransient
       ),
-      new PayloadCollection(
+      new ImmutablePayloadCollection(
         payloadsSavedOrSaving,
         PayloadSource.SavedOrSaving
       )
@@ -86,7 +86,7 @@ export class SyncResponseResolver {
     payloads: PurePayload[],
     source: PayloadSource
   ) {
-    const collection = new PayloadCollection(
+    const collection = new ImmutablePayloadCollection(
       payloads,
       source
     );
@@ -108,7 +108,7 @@ export class SyncResponseResolver {
         }
       );
     });
-    return new PayloadCollection(
+    return new ImmutablePayloadCollection(
       updatedDirtyPayloads,
       source
     );

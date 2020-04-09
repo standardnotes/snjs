@@ -5,21 +5,17 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('payload collections', () => {
-  const sharedApplication = Factory.createApplication();
-
   before(async () => {
     localStorage.clear();
-    await Factory.initializeApplication(sharedApplication);
   });
 
   after(async () => {
     localStorage.clear();
-    sharedApplication.deinit();
   });
 
   it('find', async () => {
     const payload = Factory.createNotePayload();
-    const collection = new PayloadCollection(
+    const collection = new ImmutablePayloadCollection(
       [payload]
     );
     expect(collection.find(payload.uuid)).to.be.ok;
@@ -29,17 +25,33 @@ describe('payload collections', () => {
     const payloads = Factory.createRelatedNoteTagPairPayload();
     const notePayload = payloads[0];
     const tagPayload = payloads[1];
-    const collection = new PayloadCollection(
+    const collection = new ImmutablePayloadCollection(
       [notePayload, tagPayload]
     );
-    const referencing = collection.payloadsThatReferencePayload(notePayload);
+    const referencing = collection.elementsReferencingElement(notePayload);
     expect(referencing.length).to.equal(1);
   });
 
-  it('master collection', async () => {
-    const note = await Factory.createMappedNote(sharedApplication);
-    const masterCollection = sharedApplication.modelManager.getMasterCollection();
-    const result = masterCollection.find(note.uuid);
-    expect(result.uuid).to.equal(note.uuid);
+  it('conflict map', async () => {
+    const payload = Factory.createNotePayload();
+    const collection = new MutableCollection([payload]);
+    const conflict = CopyPayload(
+      payload,
+      {
+        content: {
+          conflict_of: payload.uuid,
+          ...payload.content
+        }
+      }
+    );
+    collection.set([conflict]);
+
+    expect(collection.conflictsOf(payload.uuid)).to.eql([conflict]);
+
+    const manualResults = collection.all().find((p) => {
+      return p.safeContent.conflict_of === payload.uuid;
+    });
+    expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults]);
   });
+
 });

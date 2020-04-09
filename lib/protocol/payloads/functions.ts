@@ -1,5 +1,5 @@
 import { ContentReference } from './generator';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { CreateItemFromPayload } from '@Models/generator';
 import remove from 'lodash/remove';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
@@ -19,7 +19,7 @@ export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayloa
  */
 export async function PayloadsByDuplicating(
   payload: PurePayload,
-  baseCollection: PayloadCollection,
+  baseCollection: ImmutablePayloadCollection,
   isConflict: boolean
 ) {
   const results = [];
@@ -46,7 +46,7 @@ export async function PayloadsByDuplicating(
   /**
    * Get the payloads that make reference to payload and add the copy.
    */
-  const referencing = baseCollection.payloadsThatReferencePayload(payload);
+  const referencing = baseCollection.elementsReferencingElement(payload);
   const updatedReferencing = await PayloadsByUpdatingReferences(
     referencing,
     [{
@@ -66,7 +66,7 @@ export async function PayloadsByDuplicating(
  */
 export async function PayloadsByAlternatingUuid(
   payload: PurePayload,
-  baseCollection: PayloadCollection
+  baseCollection: ImmutablePayloadCollection
 ) {
   const results = [];
   /**
@@ -90,7 +90,7 @@ export async function PayloadsByAlternatingUuid(
    * Get the payloads that make reference to payload and remove
    * payload as a relationship, instead adding the new copy.
    */
-  const referencing = baseCollection.payloadsThatReferencePayload(payload);
+  const referencing = baseCollection.elementsReferencingElement(payload);
   const updatedReferencing = await PayloadsByUpdatingReferences(
     referencing,
     [{

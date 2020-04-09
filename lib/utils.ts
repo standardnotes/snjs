@@ -151,12 +151,21 @@ export function existsInArray<T>(inArray: T[], value: T) {
   return inArray.indexOf(value) >= 0;
 }
 
-
 /** 
  * Removes an object from the array by value 
  */
 export function removeFromArray<T>(array: T[], value: T) {
   array.splice(array.indexOf(value), 1);
+}
+
+/** 
+ * Adds the element to the array if the array does not already include the value.
+ * The array is searched via array.indexOf
+ */
+export function addIfUnique<T>(array: T[], value: T) {
+  if(!existsInArray(array, value)) {
+    array.push(value);
+  }
 }
 
 /** 

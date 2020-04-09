@@ -1,13 +1,13 @@
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 
-export class PayloadCollectionSet {
-  readonly collections: Array<PayloadCollection>
+export class ImmutablePayloadCollectionSet {
+  readonly collections: Array<ImmutablePayloadCollection>
 
   /**
-   * @param collections An array of PayloadCollection objects.
+   * @param collections An array of ImmutablePayloadCollection objects.
    */
-  constructor(collections: Array<PayloadCollection>) {
+  constructor(collections: Array<ImmutablePayloadCollection>) {
     this.collections = collections;
     Object.freeze(this);
   }

@@ -18,7 +18,7 @@ import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
 import { PayloadField } from '@Payloads/fields';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject, payloadFieldsForSource } from '@Payloads/generator';
 import { EncryptionIntent } from '@Protocol/intents';
@@ -908,7 +908,7 @@ export class SNSyncService extends PureService {
     const payloads = await downloader.run();
     const delta = new DeltaOutOfSync(
       this.modelManager!.getMasterCollection(),
-      new PayloadCollection(
+      new ImmutablePayloadCollection(
         payloads,
         PayloadSource.RemoteRetrieved
       )

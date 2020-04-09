@@ -1,70 +1,190 @@
-import { findInArray } from '@Lib/utils';
 import { PayloadSource } from '@Payloads/sources';
+import { UuidMap } from './uuid_map';
+import { isString } from '@Lib/utils';
+import { SNItem } from './../../models/core/item';
+import remove from 'lodash/remove';
+import { ContentType } from '@Models/content_types';
+import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 
-interface PayloadMap {
-  [name: string]: PurePayload
+type Payloadable = PurePayload | SNItem
+
+export class MutableCollection<T extends Payloadable> {
+
+  protected readonly map: Partial<Record<UuidString, T>> = {}
+  protected readonly typedMap: Partial<Record<ContentType, T[]>> = {} = {}
+  /** Maintains an index where the direct map for each item id is an array 
+   * of item ids that the item references. This is essentially equivalent to 
+   * item.content.references, but keeps state even when the item is deleted. 
+   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid]. 
+   * The inverse map for each item is an array of item ids where the items reference the 
+   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid]. 
+   * This allows callers to determine for a given item, who references it? 
+   * It would be prohibitive to look this up on demand */
+  protected readonly referenceMap: UuidMap
+  /** Maintains an index for each item uuid where the value is an array of uuids that are
+   * conflicts of that item. So if Note B and C are conflicts of Note A, 
+   * conflictMap[A.uuid] == [B.uuid, C.uuid] */
+  protected readonly conflictMap: UuidMap
+
+  constructor(
+    elements: T[] = [],
+    copy = false,
+    mapCopy?: Partial<Record<UuidString, T>>,
+    typedMapCopy?: Partial<Record<ContentType, T[]>>,
+    referenceMapCopy?: UuidMap,
+    conflictMapCopy?: UuidMap
+  ) {
+    if (copy) {
+      this.map = mapCopy!;
+      this.typedMap = typedMapCopy!;
+      this.referenceMap = referenceMapCopy!;
+      this.conflictMap = conflictMapCopy!;
+    } else {
+      this.referenceMap = new UuidMap();
+      this.conflictMap = new UuidMap();
+      this.set(elements);
+    }
+  }
+
+  immutablePayloadCopy() {
+    const mapCopy = Object.freeze(Object.assign({}, this.map));
+    const typedMapCopy = Object.freeze(Object.assign({}, this.typedMap));
+    const referenceMapCopy = Object.freeze(this.referenceMap.makeCopy()) as UuidMap;
+    const conflictMapCopy = Object.freeze(this.conflictMap.makeCopy()) as UuidMap;
+    return new ImmutablePayloadCollection(
+      undefined,
+      undefined,
+      true,
+      mapCopy as Partial<Record<UuidString, PurePayload>>,
+      typedMapCopy as Partial<Record<ContentType, PurePayload[]>>,
+      referenceMapCopy,
+      conflictMapCopy
+    )
+  }
+
+  public uuids() {
+    return Object.keys(this.map);
+  }
+
+  public all(contentType?: ContentType) {
+    if (contentType) {
+      return this.typedMap[contentType] || [];
+    } else {
+      return Object.keys(this.map).map((uuid: UuidString) => {
+        return this.map[uuid]!;
+      }) as T[];
+    }
+  }
+
+  public find(uuid: UuidString) {
+    return this.map[uuid];
+  }
+
+  /**
+   * @param includeBlanks If true and an item is not found, an `undefined` element
+   * will be inserted into the array.
+   */
+  public findAll(uuids: UuidString[], includeBlanks = false) {
+    const results = [];
+    for (const id of uuids) {
+      const element = this.map[id];
+      if (element || includeBlanks) {
+        results.push(element);
+      }
+    }
+    return results;
+  }
+
+  public set(elements: T | T[]) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    for (const element of elements) {
+      this.map[element.uuid!] = element;
+      this.setToTypedMap(element);
+      if (element.deleted) {
+        this.referenceMap.removeFromMap(element.uuid!);
+      } else {
+        const conflictOf = element.safeContent.conflict_of;
+        if (conflictOf) {
+          this.conflictMap.establishRelationship(conflictOf, element.uuid);
+        }
+        this.referenceMap.setAllRelationships(
+          element.uuid!,
+          element.references.map((r) => r.uuid)
+        );
+      }
+    }
+  }
+
+  public discard(elements: T | T[]) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    for (const element of elements) {
+      this.conflictMap.removeFromMap(element.uuid);
+      this.referenceMap.removeFromMap(element.uuid);
+      this.deleteFromTypedMap(element);
+      delete this.map[element.uuid!];
+    }
+  }
+
+  private setToTypedMap(element: T) {
+    const array = this.typedMap[element.content_type!] || [] as T[];
+    remove(array, { uuid: element.uuid! as any });
+    array.push(element);
+    this.typedMap[element.content_type!] = array;
+  }
+
+  private deleteFromTypedMap(element: T) {
+    const array = this.typedMap[element.content_type!] || [] as T[];
+    remove(array, { uuid: element.uuid! as any });
+    this.typedMap[element.content_type!] = array;
+  }
+
+  public uuidsThatReferenceUuid(uuid: UuidString) {
+    if (!isString(uuid)) {
+      throw Error('Must use uuid string');
+    }
+    return this.referenceMap.getInverseRelationships(uuid);
+  }
+
+  public elementsReferencingElement(element: T) {
+    const uuids = this.uuidsThatReferenceUuid(element.uuid);
+    return this.findAll(uuids) as T[];
+  }
+
+  public conflictsOf(uuid: UuidString) {
+    const uuids = this.conflictMap.getDirectRelationships(uuid);
+    return this.findAll(uuids) as T[];
+  }
 }
 
 /**
  * A collection of payloads coming from a single source.
  */
-export class PayloadCollection {
+export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
+  public readonly source?: PayloadSource
 
-  readonly source?: PayloadSource
-  readonly payloads: Array<PurePayload>
-  readonly payloadMap: PayloadMap
-
-  constructor(payloads: Array<PurePayload> = [], source?: PayloadSource) {
+  constructor(
+    payloads: PurePayload[] = [],
+    source?: PayloadSource,
+    copy = false,
+    mapCopy?: Partial<Record<UuidString, PurePayload>>,
+    typedMapCopy?: Partial<Record<ContentType, PurePayload[]>>,
+    referenceMapCopy?: UuidMap,
+    conflictMapCopy?: UuidMap
+  ) {
+    super(
+      payloads,
+      copy,
+      mapCopy,
+      typedMapCopy,
+      referenceMapCopy,
+      conflictMapCopy
+    );
     this.source = source;
-    this.payloadMap = {};
-    this.payloads = payloads;
-    for (const payload of payloads) {
-      this.payloadMap[payload.uuid!] = payload;
-    }
     Object.freeze(this);
   }
 
-  public uuids() {
-    return this.all().map((p) => p.uuid!);
-  }
-
-  public all() {
-    return this.payloads;
-  }
-
-  public find(id: string) {
-    return this.payloadMap[id];
-  }
-
-  public concat(inCollection: PayloadCollection) {
-    const result = inCollection.all().slice();
-    for (const ours of this.payloads) {
-      /** If the payload exists in incoming collection, don't add our version */
-      if (findInArray(inCollection.all(), 'uuid', ours.uuid)) {
-        continue;
-      }
-      result.push(ours);
-    }
-    return new PayloadCollection(result, this.source);
-  }
-
-  public payloadsThatReferencePayload(payload: PurePayload) {
-    const results = [];
-    for (const uuid of Object.keys(this.payloadMap)) {
-      const candidate = this.find(uuid);
-      if(candidate.errorDecrypting) {
-        continue;
-      }
-      const references = findInArray(
-        candidate.contentObject.references,
-        'uuid',
-        payload.uuid
-      );
-      if (references) {
-        results.push(candidate);
-      }
-    }
-    return results;
+  public get payloads() {
+    return this.all();
   }
 }

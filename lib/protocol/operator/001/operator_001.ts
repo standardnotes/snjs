@@ -172,6 +172,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
         encryptedParameters,
         {
           content: JSON.parse(content),
+          items_key_id: undefined,
           enc_item_key: undefined,
           errorDecrypting: false,
           errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,

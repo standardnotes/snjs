@@ -124,22 +124,12 @@ export class PurePayload {
     deepFreeze(this);
   }
 
-  /** 
-  get decoded() {
-    return this.format === PayloadFormat.DecryptedBareObject;
-  }
-
-  get encoded() {
-    return (
-      this.format === PayloadFormat.EncryptedString ||
-      this.format === PayloadFormat.DecryptedBase64String
-    );
-  }
-  */
-
-
   get safeContent() {
-    return (this.content || {}) as PayloadContent;
+    if(this.format === PayloadFormat.DecryptedBareObject) {
+      return this.content as PayloadContent;
+    } else {
+      return {} as PayloadContent;
+    }
   }
 
   /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */

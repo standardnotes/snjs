@@ -1,6 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadCollectionSet } from '@Payloads/collection_set';
-import { PayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollectionSet } from '@Payloads/collection_set';
+import { ImmutablePayloadCollection } from '@Payloads/collection';
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state, 
@@ -19,9 +19,9 @@ import { PayloadCollection } from '@Payloads/collection';
  */
 export class PayloadsDelta {
 
-  protected readonly baseCollection: PayloadCollection
-  protected readonly applyCollection: PayloadCollection
-  protected readonly relatedCollectionSet?: PayloadCollectionSet
+  protected readonly baseCollection: ImmutablePayloadCollection
+  protected readonly applyCollection: ImmutablePayloadCollection
+  protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet
 
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
@@ -30,16 +30,16 @@ export class PayloadsDelta {
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    baseCollection: PayloadCollection,
-    applyCollection: PayloadCollection,
-    relatedCollectionSet?: PayloadCollectionSet
+    baseCollection: ImmutablePayloadCollection,
+    applyCollection: ImmutablePayloadCollection,
+    relatedCollectionSet?: ImmutablePayloadCollectionSet
   ) {
     this.baseCollection = baseCollection;
     this.applyCollection = applyCollection;
     this.relatedCollectionSet = relatedCollectionSet;
   }
 
-  public async resultingCollection(): Promise<PayloadCollection> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     throw 'Must override PayloadDelta.resultingCollection.';
   }
 
