@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "moduleResolution": "node",
+        "allowJs": true,
+        "strict": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "types": [
+            "node"
+        ],
+        "declaration": true,
+        "declarationDir": "../dist/@types",
+        "outDir": "../dist/@types",
+        "emitDeclarationOnly": true,
+        "baseUrl": ".",
+        "paths": {
+            "@Lib/*": [
+                "*"
+            ],
+            "@Services/*": [
+                "./services/*"
+            ],
+            "@Models/*": [
+                "./models/*"
+            ],
+            "@Protocol/*": [
+                "./protocol/*"
+            ],
+            "@Payloads/*": [
+                "./protocol/payloads/*"
+            ]
+        }
+    }
+}

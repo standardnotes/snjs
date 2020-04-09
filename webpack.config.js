@@ -1,6 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
-const CircularDependencyPlugin = require('circular-dependency-plugin');
+// const CircularDependencyPlugin = require('circular-dependency-plugin');
 module.exports = {
   entry: {
     'snjs.js': './lib/main.ts'
@@ -8,7 +8,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      '@Root': path.resolve(__dirname, '.'),
       '@Lib': path.resolve(__dirname, 'lib'),
       '@Services': path.resolve(__dirname, 'lib/services'),
       '@Models': path.resolve(__dirname, 'lib/models'),

@@ -2,7 +2,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { SNItem } from '@Models/core/item';
 import { deepMerge, isString } from '@Lib/utils';
 import { CopyPayload } from '@Payloads/generator';
-import { CreateItemFromPayload } from '@Root/lib/models';
+import { CreateItemFromPayload } from '@Lib/models';
 
 export class ItemHistoryEntry {
 

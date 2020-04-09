@@ -12,7 +12,7 @@ import {
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { base64Encode, base64Decode, SNPureCrypto } from 'sncrypto';
-import { ContentType } from '@Root/lib/models';
+import { ContentType } from '@Lib/models';
 
 export type RootKeyResponse = {
   key: SNRootKey,

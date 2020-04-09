@@ -5,8 +5,7 @@ import { DeltaClassForSource } from '@Payloads/deltas/generator';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Payloads/collection';
 import { ImmutablePayloadCollectionSet } from '@Payloads/collection_set';
-import { CreateSourcedPayloadFromObject, CopyPayload, RawPayload } from '@Payloads/generator';
-import { ContentType } from '@Root/lib/models';
+import { CopyPayload } from '@Payloads/generator';
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top

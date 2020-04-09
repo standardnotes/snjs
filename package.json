@@ -2,11 +2,12 @@
   "name": "snjs",
   "version": "1.0.5",
   "main": "dist/snjs.js",
+  "types": "dist/@types",
   "scripts": {
     "start": "webpack --mode development -w",
     "bundle": "webpack --mode production",
     "docs": "jsdoc -c jsdoc.json",
-    "check-types": "tsc"
+    "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -40,13 +41,14 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "sncrypto": "github:standardnotes/sncrypto#6625bbcc141161eb866475d9786238001f3c514d",
     "exports-loader": "^0.7.0",
+    "tscpaths": "0.0.9",
     "lodash": "^4.17.15",
     "mocha": "^7.1.0",
     "regenerator-runtime": "^0.13.5",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
-    "sncrypto": "github:standardnotes/sncrypto#7d20eeb50a38d0a33da5dce27476c3bf07967f50",
     "ts-loader": "^6.2.2",
     "typescript": "^3.8.3",
     "typescript-eslint": "0.0.1-alpha.0",

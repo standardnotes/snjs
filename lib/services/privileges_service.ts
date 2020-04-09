@@ -8,8 +8,7 @@ import { SNSyncService } from './sync/sync_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
 import { StorageKey } from '@Lib/storage_keys';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { ContentType } from '@Root/lib/models';
+import { ContentType } from '@Lib/models';
 import { ProtectedAction, PrivilegeCredential, SNPrivileges } from '@Models/app/privileges';
 
 export enum PrivilegeSessionLength {
