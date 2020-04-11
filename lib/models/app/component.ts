@@ -4,9 +4,10 @@ import { SNItem, ItemMutator } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { ConflictStrategies } from '@Payloads/index';
 
-export enum ComponentAreas {
+export enum ComponentArea {
   Editor = 'editor-editor',
   Themes = 'themes',
+  TagsList = 'tags-list',
   EditorStack = 'editor-stack',
   NoteTags = 'note-tags',
   Rooms = 'rooms',
@@ -32,7 +33,7 @@ export class SNComponent extends SNItem {
   public readonly name: string
   public readonly autoupdateDisabled: boolean
   public readonly package_info: any
-  public readonly area: ComponentAreas
+  public readonly area: ComponentArea
   public readonly permissions: any[] = []
   public readonly valid_until: Date
   public readonly active: boolean
@@ -75,13 +76,13 @@ export class SNComponent extends SNItem {
   }
 
   public isEditor() {
-    return this.area === ComponentAreas.Editor;
+    return this.area === ComponentArea.Editor;
   }
 
   public isTheme() {
     return (
       this.content_type === ContentType.Theme ||
-      this.area === ComponentAreas.Themes
+      this.area === ComponentArea.Themes
     );
   }
 
@@ -127,7 +128,7 @@ export class SNComponent extends SNItem {
    * default in areas unrelated to a certain item.
    */
   public static associativeAreas() {
-    return [ComponentAreas.Editor];
+    return [ComponentArea.Editor];
   }
 
   public isAssociative() {

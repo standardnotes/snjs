@@ -1,3 +1,4 @@
+import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride, CopyPayload } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -52,6 +53,7 @@ export enum SingletonStrategies {
 export class SNItem {
 
   public readonly payload: PurePayload
+  public readonly conflictOf?: UuidString
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
@@ -65,6 +67,7 @@ export class SNItem {
       throw Error('Creating an item from a decrypted payload should not contain enc params');
     }
     this.payload = payload;
+    this.conflictOf = payload.safeContent.conflict_of;
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
       deepFreeze(this);
@@ -454,6 +457,10 @@ export class ItemMutator {
 
   public set userModifiedDate(date: Date) {
     this.setAppDataItem(AppDataField.UserModifiedDate, date);
+  }
+
+  public set conflictOf(conflictOf: UuidString | undefined) {
+    this.content!.conflict_of = conflictOf;
   }
 
   public set protected(isProtected: boolean) {

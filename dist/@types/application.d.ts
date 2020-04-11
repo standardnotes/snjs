@@ -16,6 +16,7 @@ import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
 import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
+import { SNPrivilegesService, SNAlertService, SNComponentManager } from './services';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
@@ -32,7 +33,7 @@ export declare class SNApplication {
     private crypto?;
     deviceInterface?: DeviceInterface;
     private migrationService?;
-    private alertService?;
+    alertService?: SNAlertService;
     private httpService?;
     private modelManager?;
     private protocolService?;
@@ -42,8 +43,8 @@ export declare class SNApplication {
     private syncService?;
     private challengeService?;
     private singletonManager?;
-    private componentManager?;
-    private privilegesService?;
+    componentManager?: SNComponentManager;
+    privilegesService?: SNPrivilegesService;
     private actionsManager?;
     private historyManager?;
     private itemManager?;
@@ -143,7 +144,7 @@ export declare class SNApplication {
      * @returns The date of last sync
      */
     getLastSyncDate(): Date | undefined;
-    getSyncStatus(): import("./services/sync/sync_op_status").SyncOpStatus | undefined;
+    getSyncStatus(): import("./services/sync/sync_op_status").SyncOpStatus;
     /**
      * @param updateUserModifiedDate  Whether to change the modified date the user
      * sees of the item.
@@ -170,7 +171,8 @@ export declare class SNApplication {
     changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void): Promise<SNItem | undefined>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     getDisplayableItems(contentType: ContentType): SNItem[];
-    getNotesMatchingSmartTag(smartTag: SNSmartTag): SNItem[];
+    notesMatchingSmartTag(smartTag: SNSmartTag): SNItem[];
+    referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
     findTag(title: string): import("./models").SNTag | undefined;
     findOrCreateTag(title: string): Promise<import("./models").SNTag>;
     getSmartTags(): SNSmartTag[];
@@ -269,7 +271,7 @@ export declare class SNApplication {
      * already has referene to the passcode, they can pass it in here so that the user
      * is not prompted again.
      */
-    changePassword(currentPassword: string, newPassword: string, passcode: string): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    changePassword(currentPassword: string, newPassword: string, passcode?: string): Promise<import("./services/api/http_service").HttpResponse | undefined>;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;

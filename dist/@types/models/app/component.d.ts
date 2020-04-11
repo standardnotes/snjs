@@ -1,9 +1,10 @@
 import { PurePayload } from '../../protocol/payloads/pure_payload';
 import { SNItem, ItemMutator } from '../core/item';
 import { ConflictStrategies } from '../../protocol/payloads/index';
-export declare enum ComponentAreas {
+export declare enum ComponentArea {
     Editor = "editor-editor",
     Themes = "themes",
+    TagsList = "tags-list",
     EditorStack = "editor-stack",
     NoteTags = "note-tags",
     Rooms = "rooms",
@@ -27,7 +28,7 @@ export declare class SNComponent extends SNItem {
     readonly name: string;
     readonly autoupdateDisabled: boolean;
     readonly package_info: any;
-    readonly area: ComponentAreas;
+    readonly area: ComponentArea;
     readonly permissions: any[];
     readonly valid_until: Date;
     readonly active: boolean;
@@ -52,7 +53,7 @@ export declare class SNComponent extends SNItem {
      * given item, compared to a dissaciative component, which is enabled by
      * default in areas unrelated to a certain item.
      */
-    static associativeAreas(): ComponentAreas[];
+    static associativeAreas(): ComponentArea[];
     isAssociative(): boolean;
     isExplicitlyEnabledForItem(item: SNItem): boolean;
     isExplicitlyDisabledForItem(item: SNItem): boolean;

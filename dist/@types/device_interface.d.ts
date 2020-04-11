@@ -7,7 +7,7 @@
 export declare abstract class DeviceInterface {
     timeout: any;
     interval: any;
-    private namespace;
+    protected namespace: string;
     /**
       * @param {function} timeout
          A platform-specific function that is fed functions to run

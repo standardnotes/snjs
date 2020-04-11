@@ -8,7 +8,7 @@ import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
 import { PayloadSource } from '../protocol/payloads/index';
 import { ContentType } from '../models/index';
-import { ComponentAreas, SNComponent } from '../models/app/component';
+import { ComponentArea, SNComponent } from '../models/app/component';
 import { Platform, Environment } from '../platforms';
 export declare enum ComponentAction {
     SetSize = "set-size",
@@ -36,12 +36,12 @@ export declare enum ComponentAction {
 }
 declare type ComponentHandler = {
     identifier: string;
-    areas: ComponentAreas[];
-    actionHandler?: any;
-    contextRequestHandler?: any;
-    componentForSessionKeyHandler?: any;
-    activationHandler?: any;
-    focusHandler?: any;
+    areas: ComponentArea[];
+    activationHandler?: (component: SNComponent) => void;
+    actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
+    contextRequestHandler?: (component: SNComponent) => SNItem | undefined;
+    componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
+    focusHandler?: (component: SNComponent, focused: boolean) => void;
 };
 declare type PermissionDialog = {
     component: SNComponent;
@@ -119,7 +119,7 @@ export declare class SNComponentManager extends PureService {
     get isDesktop(): boolean;
     get isMobile(): boolean;
     get components(): SNComponent[];
-    componentsForArea(area: ComponentAreas): SNComponent[];
+    componentsForArea(area: ComponentArea): SNComponent[];
     /** @override */
     deinit(): void;
     setDesktopManager(desktopManager: any): void;
@@ -134,7 +134,7 @@ export declare class SNComponentManager extends PureService {
     getActiveThemes(): SNTheme[];
     urlsForActiveThemes(): string[];
     postActiveThemesToComponent(component: SNComponent): void;
-    contextItemDidChangeInArea(area: ComponentAreas): void;
+    contextItemDidChangeInArea(area: ComponentArea): void;
     setComponentHidden(component: SNComponent, hidden: boolean): void;
     jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSource): ItemMessagePayload;
     sendItemsInReply(component: SNComponent, items: SNItem[], message: ComponentMessage, source?: PayloadSource): void;
@@ -149,8 +149,8 @@ export declare class SNComponentManager extends PureService {
     handleStreamItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage): void;
     isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent): boolean;
-    itemIdsInContextJurisdictionForComponent(component: SNComponent): any[];
-    handlersForArea(area: ComponentAreas): ComponentHandler[];
+    itemIdsInContextJurisdictionForComponent(component: SNComponent): string[];
+    handlersForArea(area: ComponentArea): ComponentHandler[];
     handleSaveItemsMessage(component: SNComponent, message: ComponentMessage): Promise<void>;
     handleDuplicateItemMessage(component: SNComponent, message: ComponentMessage): void;
     handleCreateItemsMessage(component: SNComponent, message: ComponentMessage): void;

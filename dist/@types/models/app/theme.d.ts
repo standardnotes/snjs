@@ -1,8 +1,8 @@
 import { SNItem, ItemMutator } from '../core/item';
 import { ConflictStrategies } from '../../protocol/payloads/deltas';
-import { SNComponent, ComponentAreas } from './component';
+import { SNComponent, ComponentArea } from './component';
 export declare class SNTheme extends SNComponent {
-    area: ComponentAreas;
+    area: ComponentArea;
     isLayerable(): any;
     /** Do not duplicate under most circumstances. Always keep original */
     strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;

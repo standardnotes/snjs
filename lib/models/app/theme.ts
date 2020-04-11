@@ -1,11 +1,11 @@
 import { AppDataField } from './../core/item';
 import { SNItem, ItemMutator } from '@Models/core/item';
 import { ConflictStrategies } from '@Payloads/deltas';
-import { SNComponent, ComponentAreas } from '@Models/app/component';
+import { SNComponent, ComponentArea } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
 
-  public area: ComponentAreas = ComponentAreas.Themes
+  public area: ComponentArea = ComponentArea.Themes
 
   isLayerable() {
     return this.package_info && this.package_info.layerable;

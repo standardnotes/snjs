@@ -16,8 +16,10 @@ export {
   Action,
   SNTheme,
   SNComponent,
-  SNEditor
+  SNEditor,
+  SNUserPrefs
 } from './models';
+export { ComponentArea } from './models/app/component';
 
 export { SNComponentManager, ComponentAction } from './services/component_manager';
 export { HistorySession } from '@Services/history/history_session';
@@ -32,7 +34,7 @@ export { SNWebCrypto } from 'sncrypto';
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
-export { ChallengeService } from './services/challenge_service';
+export { ChallengeService, ChallengeOrchestrator } from './services/challenge_service';
 export { PureService } from '@Services/pure_service';
 export { ApplicationService } from '@Services/application_service';
 export {
@@ -48,8 +50,9 @@ export {
   ChallengeResponse,
   ChallengeType,
   challengeTypeToString,
-  ChallengeValue
+  ChallengeValue,
 } from '@Lib/challenges';
+
 export {
   SNSyncService,
   SyncSources,
@@ -130,3 +133,4 @@ export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 export {
   PrivilegeSessionLength
 } from '@Services/privileges_service';
+

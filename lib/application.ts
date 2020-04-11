@@ -81,7 +81,7 @@ export class SNApplication {
   public deviceInterface?: DeviceInterface
 
   private migrationService?: SNMigrationService
-  private alertService?: SNAlertService
+  public alertService?: SNAlertService
   private httpService?: SNHttpService
   private modelManager?: PayloadManager
   private protocolService?: SNProtocolService
@@ -91,8 +91,8 @@ export class SNApplication {
   private syncService?: SNSyncService
   private challengeService?: ChallengeService
   private singletonManager?: SNSingletonManager
-  private componentManager?: SNComponentManager
-  private privilegesService?: SNPrivilegesService
+  public componentManager?: SNComponentManager
+  public privilegesService?: SNPrivilegesService
   private actionsManager?: SNActionsService
   private historyManager?: SNHistoryManager
   private itemManager?: ItemManager
@@ -412,7 +412,7 @@ export class SNApplication {
   }
 
   public getSyncStatus() {
-    return this.syncService!.getStatus();
+    return this.syncService!.getStatus()!;
   }
 
   /** 
@@ -497,8 +497,18 @@ export class SNApplication {
     return this.itemManager!.validItemsForContentType(contentType);
   }
 
-  public getNotesMatchingSmartTag(smartTag: SNSmartTag) {
+  public notesMatchingSmartTag(smartTag: SNSmartTag) {
     return this.itemManager!.notesMatchingSmartTag(smartTag);
+  }
+
+  public referencesForItem(item: SNItem, contentType?: ContentType) {
+    let references = this.itemManager!.referencesForItem(item.uuid);
+    if(contentType) {
+      references = references.filter((ref) => {
+        return ref?.content_type === contentType;
+      })
+    }
+    return references;
   }
 
   public findTag(title: string) {
@@ -885,7 +895,7 @@ export class SNApplication {
   public async changePassword(
     currentPassword: string,
     newPassword: string,
-    passcode: string
+    passcode?: string
   ) {
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
     if (canceled) {

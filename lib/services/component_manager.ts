@@ -17,7 +17,7 @@ import {
 import {
   ContentType, displayStringForContentType, CreateItemFromPayload
 } from '@Models/index';
-import { ComponentAreas, SNComponent } from '@Models/app/component';
+import { ComponentArea, SNComponent } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
 import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
@@ -70,12 +70,12 @@ type StreamObserver = {
 
 type ComponentHandler = {
   identifier: string
-  areas: ComponentAreas[]
-  actionHandler?: any,
-  contextRequestHandler?: any,
-  componentForSessionKeyHandler?: any
-  activationHandler?: any
-  focusHandler?: any
+  areas: ComponentArea[]
+  activationHandler?: (component: SNComponent) => void
+  actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
+  contextRequestHandler?: (component: SNComponent) => SNItem | undefined
+  componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
+  focusHandler?: (component: SNComponent, focused: boolean) => void
 }
 
 type PermissionDialog = {
@@ -199,7 +199,7 @@ export class SNComponentManager extends PureService {
     ]) as SNComponent[];
   }
 
-  componentsForArea(area: ComponentAreas) {
+  componentsForArea(area: ComponentArea) {
     return this.components.filter((component) => {
       return component.area === area;
     });
@@ -300,7 +300,7 @@ export class SNComponentManager extends PureService {
       for (const handler of this.handlers) {
         if (
           !handler.areas.includes(observer.component.area) &&
-          !handler.areas.includes(ComponentAreas.Any)
+          !handler.areas.includes(ComponentArea.Any)
         ) {
           continue;
         }
@@ -396,7 +396,7 @@ export class SNComponentManager extends PureService {
   }
 
   getActiveThemes() {
-    return this.componentsForArea(ComponentAreas.Themes).filter((theme) => {
+    return this.componentsForArea(ComponentArea.Themes).filter((theme) => {
       return theme.active;
     }) as SNTheme[];
   }
@@ -428,11 +428,11 @@ export class SNComponentManager extends PureService {
     );
   }
 
-  contextItemDidChangeInArea(area: ComponentAreas) {
+  contextItemDidChangeInArea(area: ComponentArea) {
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(area) === false &&
-        !handler.areas.includes(ComponentAreas.Any)
+        !handler.areas.includes(ComponentArea.Any)
       ) {
         continue;
       }
@@ -670,10 +670,10 @@ export class SNComponentManager extends PureService {
     for (const handler of this.handlers) {
       if (handler.actionHandler && (
         handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentAreas.Any)
+        handler.areas.includes(ComponentArea.Any)
       )) {
         this.timeout(() => {
-          handler.actionHandler(component, message.action, message.data);
+          handler.actionHandler!(component, message.action, message.data);
         });
       }
     }
@@ -777,7 +777,7 @@ export class SNComponentManager extends PureService {
     return itemIds;
   }
 
-  handlersForArea(area: ComponentAreas) {
+  handlersForArea(area: ComponentArea) {
     return this.handlers.filter((candidate) => {
       return candidate.areas.includes(area);
     });
@@ -1013,7 +1013,7 @@ export class SNComponentManager extends PureService {
   }
 
   async toggleComponent(component: SNComponent) {
-    if (component.area === ComponentAreas.Modal) {
+    if (component.area === ComponentArea.Modal) {
       this.openModalComponent(component);
     } else {
       if (component.active) {
@@ -1260,12 +1260,12 @@ export class SNComponentManager extends PureService {
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentAreas.Any)
+        handler.areas.includes(ComponentArea.Any)
       ) {
         handler.activationHandler && handler.activationHandler(component);
       }
     }
-    if (component.area === ComponentAreas.Themes) {
+    if (component.area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();
     }
   }
@@ -1285,7 +1285,7 @@ export class SNComponentManager extends PureService {
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentAreas.Any)
+        handler.areas.includes(ComponentArea.Any)
       ) {
         handler.activationHandler && handler.activationHandler(component);
       }
@@ -1296,7 +1296,7 @@ export class SNComponentManager extends PureService {
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
       return o.component !== component;
     });
-    if (component.area === ComponentAreas.Themes) {
+    if (component.area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();
     }
   }
@@ -1366,8 +1366,8 @@ export class SNComponentManager extends PureService {
         element.setAttribute('style', `width:${widthString}; height:${heightString};`);
       }
     };
-    if (component.area === ComponentAreas.Rooms || component.area === ComponentAreas.Modal) {
-      const selector = component.area === ComponentAreas.Rooms ? 'inner' : 'outer';
+    if (component.area === ComponentArea.Rooms || component.area === ComponentArea.Modal) {
+      const selector = component.area === ComponentArea.Rooms ? 'inner' : 'outer';
       const content = document.getElementById(`component-content-${selector}-${component.uuid}`);
       if (content) {
         setSize(content, data);
@@ -1384,7 +1384,7 @@ export class SNComponentManager extends PureService {
        * this globally, otherwise, areas like the note-tags will not be able to expand 
        * outside of the bounds (to display autocomplete, for example).
        */
-      if (component.area === ComponentAreas.EditorStack) {
+      if (component.area === ComponentArea.EditorStack) {
         const parent = iframe.parentElement;
         if (parent) {
           setSize(parent, data);
@@ -1394,7 +1394,7 @@ export class SNComponentManager extends PureService {
   }
 
   editorForNote(note: SNNote) {
-    const editors = this.componentsForArea(ComponentAreas.Editor);
+    const editors = this.componentsForArea(ComponentArea.Editor);
     for (const editor of editors) {
       if (editor.isExplicitlyEnabledForItem(note)) {
         return editor;
@@ -1458,9 +1458,9 @@ export class SNComponentManager extends PureService {
         }
       } else if (permission.name === ComponentAction.StreamContextItem) {
         const mapping = {
-          [ComponentAreas.EditorStack]: 'working note',
-          [ComponentAreas.NoteTags]: 'working note',
-          [ComponentAreas.Editor]: 'working note'
+          [ComponentArea.EditorStack]: 'working note',
+          [ComponentArea.NoteTags]: 'working note',
+          [ComponentArea.Editor]: 'working note'
         };
         finalString += addSeparator(index, permissionsCount);
         finalString += (mapping as any)[component.area];

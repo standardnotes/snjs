@@ -1,3 +1,4 @@
+import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride } from '../../protocol/payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -41,6 +42,7 @@ export declare enum SingletonStrategies {
  */
 export declare class SNItem {
     readonly payload: PurePayload;
+    readonly conflictOf?: UuidString;
     private static sharedDateFormatter;
     constructor(payload: PurePayload);
     static DefaultAppDomain(): string;
@@ -147,6 +149,7 @@ export declare class ItemMutator {
     set errorDecrypting(errorDecrypting: boolean);
     set updated_at(updated_at: Date);
     set userModifiedDate(date: Date);
+    set conflictOf(conflictOf: UuidString | undefined);
     set protected(isProtected: boolean);
     set trashed(trashed: boolean);
     set pinned(pinned: boolean);

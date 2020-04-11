@@ -75,7 +75,7 @@ export declare class ItemManager extends PureService {
     /**
      * Returns all items that an item directly references
      */
-    referencesForItem(uuid: UuidString): (SNItem | undefined)[];
+    referencesForItem(uuid: UuidString): SNItem[];
     private onPayloadChange;
     private setPayloads;
     private notifyObservers;

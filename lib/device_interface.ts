@@ -10,7 +10,7 @@ export abstract class DeviceInterface {
 
   public timeout: any
   public interval: any
-  private namespace: string
+  protected namespace: string
 
   /**
     * @param {function} timeout

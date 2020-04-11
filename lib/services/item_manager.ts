@@ -163,7 +163,7 @@ export class ItemManager extends PureService {
     }
     const item = this.findItem(uuid)!;
     const uuids = item.references.map((ref) => ref.uuid);
-    return this.findItems(uuids);
+    return this.findItems(uuids) as SNItem[];
   }
 
   private async onPayloadChange(
