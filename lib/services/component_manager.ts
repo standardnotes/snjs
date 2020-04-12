@@ -78,12 +78,12 @@ type ComponentHandler = {
   focusHandler?: (component: SNComponent, focused: boolean) => void
 }
 
-type PermissionDialog = {
+export type PermissionDialog = {
   component: SNComponent
-  permissions: any[]
+  permissions: Permission[]
   permissionsString: string
-  actionBlock: any
-  callback: any
+  actionBlock: (approved: boolean) => void
+  callback: (approved: boolean) => void
 }
 
 type ComponentMessage = {
@@ -454,7 +454,12 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  setComponentHidden(component: SNComponent, hidden: boolean) {
+  public isComponentHidden(component: SNComponent) {
+    const componentState = this.findOrCreateDataForComponent(component);
+    return componentState.hidden;
+  }
+
+  public setComponentHidden(component: SNComponent, hidden: boolean) {
     /* A hidden component will not receive messages. However, when a component is unhidden, 
      * we need to send it any items it may have registered streaming for. */
     const componentState = this.findOrCreateDataForComponent(component);

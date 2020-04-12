@@ -1,3 +1,4 @@
+import { Uuids } from '@Models/generator';
 import { UuidString } from './../types';
 import { subtractFromArray } from '@Lib/utils';
 import { MutableCollection } from './../protocol/payloads/collection';
@@ -216,7 +217,8 @@ export class PayloadManager extends PureService {
       )
     );
     const collection = await delta.resultingCollection();
-    return this.emitCollection(collection);
+    await this.emitCollection(collection);
+    return Uuids(collection.payloads);
   }
 
   public removePayloadLocally(payload: PurePayload) {

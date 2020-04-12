@@ -1,3 +1,4 @@
+import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './migrations/types';
 import { UuidString } from './types';
@@ -8,7 +9,7 @@ import { BackupFile } from './services/protocol_service';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
@@ -93,7 +94,7 @@ export class SNApplication {
   private singletonManager?: SNSingletonManager
   public componentManager?: SNComponentManager
   public privilegesService?: SNPrivilegesService
-  private actionsManager?: SNActionsService
+  public actionsManager?: SNActionsService
   private historyManager?: SNHistoryManager
   private itemManager?: ItemManager
 
@@ -348,6 +349,14 @@ export class SNApplication {
     return this.itemManager!.itemsMatchingPredicate(predicate);
   }
 
+  /** 
+   * Finds an item by predicate.
+   */
+  public getAll(uuids: UuidString[]) {
+    return this.itemManager!.findItems(uuids);
+  }
+
+
   /**
    * Takes the values of the input item and emits it onto global state.
    */
@@ -363,7 +372,7 @@ export class SNApplication {
     contentType: ContentType,
     content: PayloadContent,
     needsSync = false,
-    override?: PurePayload
+    override?: PayloadOverride
   ) {
     const item = await this.itemManager!.createItem(
       contentType,
@@ -416,11 +425,11 @@ export class SNApplication {
   }
 
   /** 
-   * @param updateUserModifiedDate  Whether to change the modified date the user 
+   * @param isUserModified  Whether to change the modified date the user
    * sees of the item.
    */
-  public async setItemNeedsSync(item: SNItem, updateUserModifiedDate = false) {
-    return this.itemManager!.setItemDirty(item.uuid, updateUserModifiedDate);
+  public async setItemNeedsSync(item: SNItem, isUserModified = false) {
+    return this.itemManager!.setItemDirty(item.uuid, isUserModified);
   }
 
   public async setItemsNeedsSync(items: SNItem[]) {
@@ -462,10 +471,10 @@ export class SNApplication {
    */
   public async saveItem(uuid: UuidString) {
     const item = this.itemManager!.findItem(uuid);
-    if(!item) {
+    if (!item) {
       throw Error('Attempting to save non-inserted item');
     }
-    if(!item.dirty) {
+    if (!item.dirty) {
       await this.itemManager!.changeItem(uuid);
     }
     await this.syncService!.sync();
@@ -476,16 +485,53 @@ export class SNApplication {
    */
   public async changeAndSaveItem(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void
+    mutate?: (mutator: ItemMutator) => void,
+    isUserModified = false
   ) {
-    if(!isString(uuid)) {
+    if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
     await this.itemManager!.changeItems(
       [uuid],
-      mutate
+      mutate,
+      isUserModified ? MutationType.UserInteraction : undefined
     );
     await this.syncService!.sync();
+    return this.findItem(uuid);
+  }
+
+  /**
+  * Mutates pre-existing items, marks them as dirty, and syncs
+  */
+  public async changeAndSaveItems(
+    uuids: UuidString[],
+    mutate?: (mutator: ItemMutator) => void,
+    isUserModified = false
+  ) {
+    await this.itemManager!.changeItems(
+      uuids,
+      mutate,
+      isUserModified ? MutationType.UserInteraction : undefined
+    );
+    await this.syncService!.sync();
+  }
+
+  /**
+ * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
+ */
+  public async changeItem(
+    uuid: UuidString,
+    mutate?: (mutator: ItemMutator) => void,
+    isUserModified = false
+  ) {
+    if (!isString(uuid)) {
+      throw Error('Must use uuid to change item');
+    }
+    await this.itemManager!.changeItems(
+      [uuid],
+      mutate,
+      isUserModified ? MutationType.UserInteraction : undefined
+    );
     return this.findItem(uuid);
   }
 
@@ -501,9 +547,10 @@ export class SNApplication {
     return this.itemManager!.notesMatchingSmartTag(smartTag);
   }
 
+  /** Returns an item's direct references */
   public referencesForItem(item: SNItem, contentType?: ContentType) {
     let references = this.itemManager!.referencesForItem(item.uuid);
-    if(contentType) {
+    if (contentType) {
       references = references.filter((ref) => {
         return ref?.content_type === contentType;
       })
@@ -511,7 +558,18 @@ export class SNApplication {
     return references;
   }
 
-  public findTag(title: string) {
+  /** Returns items referencing an item */
+  public referencingForItem(item: SNItem, contentType?: ContentType) {
+    let references = this.itemManager!.itemsReferencingItem(item.uuid);
+    if (contentType) {
+      references = references.filter((ref) => {
+        return ref?.content_type === contentType;
+      })
+    }
+    return references as SNItem[];
+  }
+
+  public findTagByTitle(title: string) {
     return this.itemManager!.findTagByTitle(title);
   }
 
@@ -649,12 +707,29 @@ export class SNApplication {
     );
     const validPayloads = decryptedPayloads.filter((payload) => {
       return !payload.errorDecrypting;
-    });
-    const affectedItems = await this.modelManager!.importPayloads(validPayloads);
+    }).map((payload) => {
+      /* Don't want to activate any components during import process in
+       * case of exceptions breaking up the import proccess */
+      if (payload.content_type === ContentType.Component && payload.safeContent.active) {
+        return CopyPayload(
+          payload,
+          {
+            content: {
+              ...payload.safeContent,
+              active: false
+            }
+          }
+        )
+      } else {
+        return payload;
+      }
+    })
+    const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
     }
+    const affectedItems = this.getAll(affectedUuids) as SNItem[];
     return {
       affectedItems: affectedItems,
       errorCount: decryptedPayloads.length - validPayloads.length
@@ -693,15 +768,15 @@ export class SNApplication {
     return this.syncService!.resolveOutOfSync();
   }
 
-  public async setValue(key: string, value: any, mode: StorageValueModes) {
+  public async setValue(key: string, value: any, mode?: StorageValueModes) {
     return this.storageService!.setValue(key, value, mode);
   }
 
-  public async getValue(key: string, mode: StorageValueModes) {
+  public async getValue(key: string, mode?: StorageValueModes) {
     return this.storageService!.getValue(key, mode);
   }
 
-  public async removeValue(key: string, mode: StorageValueModes) {
+  public async removeValue(key: string, mode?: StorageValueModes) {
     return this.storageService!.removeValue(key, mode);
   }
 

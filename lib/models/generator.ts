@@ -28,7 +28,7 @@ export function CreateItemFromPayload(payload: PurePayload): SNItem {
 /**
  * Returns an array of uuids for the given items or payloads
  */
-export function Uuids(items: SNItem[] | PurePayload[]) {
+export function Uuids(items: SNItem[] | PurePayload[]): string[] {
   return (items as any).map((item: any) => {
     return item.uuid;
   })

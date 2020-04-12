@@ -7,7 +7,6 @@ import { SNPredicate } from '../core/predicate';
  */
 export declare class SNSmartTag extends SNTag {
     readonly predicate: SNPredicate;
-    readonly isTrashTag: boolean;
     constructor(payload: PurePayload);
     static systemSmartTags(): SNSmartTag[];
 }

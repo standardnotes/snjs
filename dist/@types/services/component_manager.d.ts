@@ -43,12 +43,12 @@ declare type ComponentHandler = {
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
     focusHandler?: (component: SNComponent, focused: boolean) => void;
 };
-declare type PermissionDialog = {
+export declare type PermissionDialog = {
     component: SNComponent;
-    permissions: any[];
+    permissions: Permission[];
     permissionsString: string;
-    actionBlock: any;
-    callback: any;
+    actionBlock: (approved: boolean) => void;
+    callback: (approved: boolean) => void;
 };
 declare type ComponentMessage = {
     action: ComponentAction;
@@ -135,6 +135,7 @@ export declare class SNComponentManager extends PureService {
     urlsForActiveThemes(): string[];
     postActiveThemesToComponent(component: SNComponent): void;
     contextItemDidChangeInArea(area: ComponentArea): void;
+    isComponentHidden(component: SNComponent): boolean;
     setComponentHidden(component: SNComponent, hidden: boolean): void;
     jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSource): ItemMessagePayload;
     sendItemsInReply(component: SNComponent, items: SNItem[], message: ComponentMessage, source?: PayloadSource): void;

@@ -5,7 +5,7 @@ export declare function CreateItemFromPayload(payload: PurePayload): SNItem;
 /**
  * Returns an array of uuids for the given items or payloads
  */
-export declare function Uuids(items: SNItem[] | PurePayload[]): any;
+export declare function Uuids(items: SNItem[] | PurePayload[]): string[];
 /**
  * Modifies the input object to fill in any missing required values from the
  * content body.

@@ -62,7 +62,7 @@ export declare class PayloadManager extends PureService {
      * and marks the items as dirty.
      * @returns Resulting items
      */
-    importPayloads(payloads: PurePayload[]): Promise<void>;
+    importPayloads(payloads: PurePayload[]): Promise<string[]>;
     removePayloadLocally(payload: PurePayload): void;
 }
 export {};

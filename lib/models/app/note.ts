@@ -1,5 +1,5 @@
 import { isNullOrUndefined } from '@Lib/utils';
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { SNItem, ItemMutator, AppDataField } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
 export interface NoteContent {
@@ -16,6 +16,9 @@ export class SNNote extends SNItem implements NoteContent {
   * so we'll just set a default here. */
   public readonly text: string = ''
   public readonly mobilePrefersPlainEditor?: boolean
+  public readonly hidePreview = false
+  public readonly preview_plain!: string
+  public readonly preview_html!: string
 
   constructor(
     payload: PurePayload
@@ -23,6 +26,9 @@ export class SNNote extends SNItem implements NoteContent {
     super(payload);
     this.title = this.payload.safeContent.title;
     this.text = this.payload.safeContent.text;
+    this.preview_plain = this.payload.safeContent.preview_plain;
+    this.preview_html = this.payload.safeContent.preview_html;
+    this.hidePreview = this.payload.safeContent.hidePreview;
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {
       this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
     }
@@ -34,6 +40,10 @@ export class SNNote extends SNItem implements NoteContent {
 
   safeTitle() {
     return this.title || '';
+  }
+
+  get prefersPlainEditor() {
+    return this.getAppDomainValue(AppDataField.PrefersPlainEditor);
   }
 
   static filterDummyNotes(notes: SNNote[]) {
@@ -50,5 +60,21 @@ export class NoteMutator extends ItemMutator {
 
   set text(text: string) {
     this.content!.text = text;
+  }
+
+  set hidePreview(hidePreview: boolean) {
+    this.content!.hidePreview = hidePreview;
+  }
+
+  set preview_plain(preview_plain: string) {
+    this.content!.preview_plain = preview_plain;
+  }
+
+  set preview_html(preview_html: string | undefined) {
+    this.content!.preview_html = preview_html;
+  }
+
+  set prefersPlainEditor(prefersPlainEditor: boolean) {
+    this.setAppDataItem(AppDataField.PrefersPlainEditor, prefersPlainEditor);
   }
 }

@@ -1,3 +1,4 @@
+import { PayloadOverride } from './protocol/payloads/generator';
 import { UuidString } from './types';
 import { ApplicationEvent } from './events';
 import { StorageEncryptionPolicies } from './services/storage_service';
@@ -16,7 +17,7 @@ import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
 import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
-import { SNPrivilegesService, SNAlertService, SNComponentManager } from './services';
+import { SNActionsService, SNPrivilegesService, SNAlertService, SNComponentManager } from './services';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
@@ -45,7 +46,7 @@ export declare class SNApplication {
     private singletonManager?;
     componentManager?: SNComponentManager;
     privilegesService?: SNPrivilegesService;
-    private actionsManager?;
+    actionsManager?: SNActionsService;
     private historyManager?;
     private itemManager?;
     private eventHandlers;
@@ -118,6 +119,10 @@ export declare class SNApplication {
     */
     findItems(predicate: SNPredicate): SNItem[];
     /**
+     * Finds an item by predicate.
+     */
+    getAll(uuids: UuidString[]): (SNItem | undefined)[];
+    /**
      * Takes the values of the input item and emits it onto global state.
      */
     mergeItem(item: SNItem, source: PayloadSource): Promise<SNItem>;
@@ -125,7 +130,7 @@ export declare class SNApplication {
      * Creates a managed item.
      * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
      */
-    createManagedItem(contentType: ContentType, content: PayloadContent, needsSync?: boolean, override?: PurePayload): Promise<SNItem>;
+    createManagedItem(contentType: ContentType, content: PayloadContent, needsSync?: boolean, override?: PayloadOverride): Promise<SNItem>;
     /**
      * Creates an unmanaged item that can be added later.
      * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
@@ -146,10 +151,10 @@ export declare class SNApplication {
     getLastSyncDate(): Date | undefined;
     getSyncStatus(): import("./services/sync/sync_op_status").SyncOpStatus;
     /**
-     * @param updateUserModifiedDate  Whether to change the modified date the user
+     * @param isUserModified  Whether to change the modified date the user
      * sees of the item.
      */
-    setItemNeedsSync(item: SNItem, updateUserModifiedDate?: boolean): Promise<SNItem | undefined>;
+    setItemNeedsSync(item: SNItem, isUserModified?: boolean): Promise<SNItem | undefined>;
     setItemsNeedsSync(items: SNItem[]): Promise<(SNItem | undefined)[]>;
     deleteItem(item: SNItem): Promise<any>;
     deleteItemLocally(item: SNItem): Promise<void>;
@@ -168,12 +173,23 @@ export declare class SNApplication {
     /**
      * Mutates a pre-existing item, marks it as dirty, and syncs it
      */
-    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void): Promise<SNItem | undefined>;
+    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
+    /**
+    * Mutates pre-existing items, marks them as dirty, and syncs
+    */
+    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<void>;
+    /**
+   * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
+   */
+    changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     getDisplayableItems(contentType: ContentType): SNItem[];
     notesMatchingSmartTag(smartTag: SNSmartTag): SNItem[];
+    /** Returns an item's direct references */
     referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
-    findTag(title: string): import("./models").SNTag | undefined;
+    /** Returns items referencing an item */
+    referencingForItem(item: SNItem, contentType?: ContentType): SNItem[];
+    findTagByTitle(title: string): import("./models").SNTag | undefined;
     findOrCreateTag(title: string): Promise<import("./models").SNTag>;
     getSmartTags(): SNSmartTag[];
     getNoteCount(): number;
@@ -211,7 +227,7 @@ export declare class SNApplication {
      * .errorCount: The number of items that were not imported due to failure to decrypt.
      */
     importData(data: BackupFile, password?: string, awaitSync?: boolean): Promise<{
-        affectedItems: void;
+        affectedItems: SNItem[];
         errorCount: number;
     }>;
     /**
@@ -224,9 +240,9 @@ export declare class SNApplication {
     private unlockSyncing;
     sync(options?: SyncOptions): Promise<any>;
     resolveOutOfSync(): Promise<any>;
-    setValue(key: string, value: any, mode: StorageValueModes): Promise<void>;
-    getValue(key: string, mode: StorageValueModes): Promise<any>;
-    removeValue(key: string, mode: StorageValueModes): Promise<void>;
+    setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
+    getValue(key: string, mode?: StorageValueModes): Promise<any>;
+    removeValue(key: string, mode?: StorageValueModes): Promise<void>;
     /**
      * Deletes all payloads from storage.
      */

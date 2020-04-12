@@ -1,3 +1,5 @@
+import { addIfUnique, removeFromArray } from '@Lib/utils';
+import { UuidString } from './../../types';
 import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItem, ItemMutator } from '@Models/core/item';
@@ -155,10 +157,26 @@ export class ComponentMutator extends ItemMutator {
   }
 
   public associateWithItem(item: SNItem) {
-    this.content!.associatedItemIds.push(item.uuid);
+    const associated = this.content!.associatedItemIds;
+    addIfUnique(associated, item.uuid);
+    this.content!.associatedItemIds = associated;
+  }
+
+  public disassociateWithItem(item: SNItem) {
+    const disassociated = this.content!.disassociatedItemIds;
+    addIfUnique(disassociated, item.uuid);
+    this.content!.disassociatedItemIds = disassociated;
+  }
+
+  public removeAssociatedItemId(uuid: UuidString) {
+    removeFromArray(this.content!.associatedItemIds || [], uuid);
+  }
+
+  public removeDisassociatedItemId(uuid: UuidString) {
+    removeFromArray(this.content!.disassociatedItemIds || [], uuid);
   }
 
   public setLastSize(size: string) {
-    this.setAppDataItem('lastSize', size);
+    this.setAppDataItem(AppDataField.LastSize, size);
   }
 }

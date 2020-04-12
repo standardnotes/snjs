@@ -1,3 +1,4 @@
+import { UuidString } from './../../types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
 import { SNItem, ItemMutator } from '../core/item';
 import { ConflictStrategies } from '../../protocol/payloads/index';
@@ -62,5 +63,8 @@ export declare class ComponentMutator extends ItemMutator {
     set active(active: boolean);
     set componentData(componentData: Record<string, any>);
     associateWithItem(item: SNItem): void;
+    disassociateWithItem(item: SNItem): void;
+    removeAssociatedItemId(uuid: UuidString): void;
+    removeDisassociatedItemId(uuid: UuidString): void;
     setLastSize(size: string): void;
 }

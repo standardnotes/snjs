@@ -23,6 +23,18 @@ export class SNTag extends SNItem {
     return this.content_type === ContentType.SmartTag;
   }
 
+  public get isAllTag() {
+    return this.payload.safeContent.isAllTag;
+  }
+
+  public get isTrashTag() {
+    return this.payload.safeContent.isTrashTag;
+  }
+
+  public get isArchiveTag() {
+    return this.payload.safeContent.isArchivedTag;
+  }
+
   public static arrayToDisplayString(tags: SNTag[]) {
     return tags.sort((a, b) => {
       return a.title > b.title ? 1 : -1;

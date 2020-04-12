@@ -43,6 +43,8 @@ export declare enum SingletonStrategies {
 export declare class SNItem {
     readonly payload: PurePayload;
     readonly conflictOf?: UuidString;
+    readonly createdAtString?: string;
+    readonly updatedAtString?: string;
     private static sharedDateFormatter;
     constructor(payload: PurePayload);
     static DefaultAppDomain(): string;
@@ -123,8 +125,6 @@ export declare class SNItem {
     strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;
     isItemContentEqualWith(otherItem: SNItem): boolean;
     satisfiesPredicate(predicate: SNPredicate): any;
-    createdAtString(): string | undefined;
-    updatedAtString(): string;
     updatedAtTimestamp(): number;
     private dateToLocalizedString;
 }
@@ -134,7 +134,7 @@ export declare class SNItem {
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export declare class ItemMutator {
-    protected readonly item: SNItem;
+    readonly item: SNItem;
     protected readonly type: MutationType;
     protected payload: PurePayload;
     protected content?: PayloadContent;
@@ -164,7 +164,7 @@ export declare class ItemMutator {
      * Then sets data[key] = value
      */
     setDomainDataKey(key: string, value: any, domain: string): undefined;
-    setAppDataItem(key: string, value: any): void;
+    setAppDataItem(key: AppDataField, value: any): void;
     addItemAsRelationship(item: SNItem): void;
     removeItemAsRelationship(item: SNItem): void;
 }

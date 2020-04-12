@@ -54,6 +54,8 @@ export class SNItem {
 
   public readonly payload: PurePayload
   public readonly conflictOf?: UuidString
+  public readonly createdAtString?: string
+  public readonly updatedAtString?: string
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
@@ -68,6 +70,8 @@ export class SNItem {
     }
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
+    this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
+    this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
       deepFreeze(this);
@@ -307,16 +311,6 @@ export class SNItem {
     return SNPredicate.ItemSatisfiesPredicate(this, predicate);
   }
 
-  public createdAtString() {
-    if (this.created_at) {
-      return this.dateToLocalizedString(this.created_at);
-    }
-  }
-
-  public updatedAtString() {
-    return this.dateToLocalizedString(this.userModifiedDate);
-  }
-
   public updatedAtTimestamp() {
     return this.updated_at?.getTime();
   }
@@ -354,7 +348,7 @@ export class SNItem {
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export class ItemMutator {
-  protected readonly item: SNItem
+  public readonly item: SNItem
   protected readonly type: MutationType
   protected payload: PurePayload
   protected content?: PayloadContent
@@ -404,6 +398,7 @@ export class ItemMutator {
           content: this.content,
           dirty: true,
           dirtiedDate: new Date(),
+          dummy: false
         }
       )
     }
@@ -515,7 +510,7 @@ export class ItemMutator {
     domainData[key] = value;
   }
 
-  public setAppDataItem(key: string, value: any) {
+  public setAppDataItem(key: AppDataField, value: any) {
     this.setDomainDataKey(key, value, SNItem.DefaultAppDomain());
   }
 

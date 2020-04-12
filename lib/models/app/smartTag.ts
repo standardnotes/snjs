@@ -17,14 +17,12 @@ const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
 export class SNSmartTag extends SNTag {
 
   public readonly predicate!: SNPredicate
-  public readonly isTrashTag: boolean
 
   constructor(payload: PurePayload) {
     super(payload);
     if(payload.safeContent.predicate) {
       this.predicate = SNPredicate.FromJson(payload.safeContent.predicate);
     }
-    this.isTrashTag = payload.safeContent.isTrashTag;
   }
 
   static systemSmartTags() {
