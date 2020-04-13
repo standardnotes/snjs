@@ -17,7 +17,6 @@ export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadFormat as PayloadFormat } from '@Payloads/formats';
 
 export {
-  ConflictStrategies,
   PayloadsDelta,
   DeltaFileImport,
   DeltaOutOfSync,

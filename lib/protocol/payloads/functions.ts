@@ -7,12 +7,6 @@ import { extendArray } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { PurePayload } from '@Payloads/pure_payload';
 
-export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload) {
-  const itemA = CreateItemFromPayload(payloadA);
-  const itemB = CreateItemFromPayload(payloadB);
-  return itemA.isItemContentEqualWith(itemB);
-}
-
 /**
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
@@ -149,4 +143,14 @@ async function PayloadsByUpdatingReferences(
     results.push(result);
   }
   return results;
+}
+
+/**
+ * Compares the .content fields for equality, creating new SNItem objects
+ * to properly handle .content intricacies.
+ */
+export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload) {
+  const itemA = CreateItemFromPayload(payloadA);
+  const itemB = CreateItemFromPayload(payloadB);
+  return itemA.isItemContentEqualWith(itemB);
 }

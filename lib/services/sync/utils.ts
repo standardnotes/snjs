@@ -1,4 +1,4 @@
-import { PayloadField } from '@Payloads/index';
+import { PayloadField } from './../../protocol/payloads/fields';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 /**

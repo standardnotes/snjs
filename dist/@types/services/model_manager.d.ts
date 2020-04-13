@@ -1,9 +1,9 @@
+import { PayloadSource } from './../protocol/payloads/sources';
+import { ContentType } from './../models/content_types';
 import { UuidString } from './../types';
-import { MutableCollection } from './../protocol/payloads/collection';
+import { MutableCollection, ImmutablePayloadCollection } from './../protocol/payloads/collection';
 import { PurePayload } from '../protocol/payloads/pure_payload';
-import { ContentType } from '../models/index';
 import { PureService } from './pure_service';
-import { PayloadSource, ImmutablePayloadCollection } from '../protocol/payloads/index';
 declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source?: PayloadSource, sourceKey?: string) => Promise<void>;
 /**
  * The model manager is responsible for keeping state regarding what items exist in the

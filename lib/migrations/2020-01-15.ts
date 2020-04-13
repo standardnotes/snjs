@@ -1,19 +1,21 @@
+import { ContentType } from './../models/content_types';
+import { SNItemsKey } from './../models/app/items_key';
+import { SNRootKey } from './../protocol/root_key';
+import { EncryptionIntent } from './../protocol/intents';
+import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
 import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
-import { FillItemContent } from '@Models/generator';
+import { FillItemContent } from '@Models/functions';
 import { OrchestratorFill } from './../services/challenge_service';
 import { PurePayload } from '@Payloads/pure_payload';
-import { StorageValuesObject } from './../services/storage_service';
+import { StorageValuesObject, SNStorageService } from './../services/storage_service';
 import { Migration } from '@Lib/migrations/migration';
-import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/index';
+import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
 import {
   Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
 } from '@Lib/utils';
-import { ProtocolVersion, EncryptionIntent, SNRootKey } from '@Protocol/index';
-import { SNItemsKey, ContentType } from '@Models/index';
-import { SNStorageService } from '@Services/index';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { Session } from '@Services/api/session';

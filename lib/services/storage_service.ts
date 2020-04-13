@@ -1,12 +1,11 @@
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
-import { PayloadContent } from '@Payloads/generator';
+import { PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';

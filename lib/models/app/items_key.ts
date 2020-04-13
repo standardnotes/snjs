@@ -1,5 +1,5 @@
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { SNItem, ItemMutator } from '@Models/core/item';
-import { ConflictStrategies } from '@Payloads/index';
 import { ProtocolVersion } from '@Protocol/versions';
 
 /**
@@ -13,7 +13,7 @@ export class SNItemsKey extends SNItem {
       return super.strategyWhenConflictingWithItem(item);
     }
 
-    return ConflictStrategies.KeepLeft;
+    return ConflictStrategy.KeepLeft;
   }
 
   get version() {

@@ -1,7 +1,24 @@
+import { Uuids, FillItemContent } from '@Models/functions';
+import { EncryptionIntent } from './../protocol/intents';
+import { compareVersions } from '@Protocol/versions';
+import { ProtocolVersion } from './../protocol/versions';
+import { CreateKeyParams } from '@Protocol/key_params';
+import { SNProtocolOperator004 } from './../protocol/operator/004/operator_004';
+import { SNProtocolOperator003 } from './../protocol/operator/003/operator_003';
+import { SNProtocolOperator002 } from './../protocol/operator/002/operator_002';
+import { SNProtocolOperator001 } from './../protocol/operator/001/operator_001';
+import { PayloadFormat } from './../protocol/payloads/formats';
+import { PayloadSource } from './../protocol/payloads/sources';
+import {
+  CreateEncryptionParameters,
+  CreateIntentPayloadFromObject,
+  CreateSourcedPayloadFromObject,
+  CreateMaxPayloadFromAnyObject
+} from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '@Lib/events';
-import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
@@ -14,37 +31,19 @@ import { PureService } from '@Lib/services/pure_service';
 import { SNWebCrypto, isWebCryptoAvailable, SNPureCrypto } from 'sncrypto';
 import { Uuid } from '@Lib/uuid';
 import {
-  CreateEncryptionParameters,
-  CreateIntentPayloadFromObject,
-  CreateSourcedPayloadFromObject,
-  CreateMaxPayloadFromAnyObject,
-  PayloadSource,
-  PayloadFormat
-} from '@Payloads/index';
-import {
   isWebEnvironment,
   isString,
   isNullOrUndefined,
   isFunction,
   removeFromArray
 } from '@Lib/utils';
-import {
-  isDecryptedIntent,
-  intentRequiresEncryption,
-  SNProtocolOperator001,
-  SNProtocolOperator002,
-  SNProtocolOperator003,
-  SNProtocolOperator004,
-  CreateKeyParams,
-  ProtocolVersion,
-  compareVersions,
-  EncryptionIntent
-} from '@Protocol/index';
+
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '@Models/content_types';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
+import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
 
 export type BackupFile = {
   keyParams?: any
@@ -140,7 +139,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     this.removeMappingObserver = this.modelManager.addChangeObserver(
       [ContentType.ItemsKey],
       async (_, inserted) => {
-        if(inserted.length > 0) {
+        if (inserted.length > 0) {
           await this.decryptErroredItems();
         }
       }
@@ -418,11 +417,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     payload: PurePayload,
     intent: EncryptionIntent,
     key?: SNRootKey | SNItemsKey,
-  ) : Promise<PurePayload> {
+  ): Promise<PurePayload> {
     if (payload.errorDecrypting) {
       return payload;
     }
-    if(payload.deleted) {
+    if (payload.deleted) {
       return payload;
     }
     if (isNullOrUndefined(intent)) {

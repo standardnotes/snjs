@@ -6,7 +6,7 @@ export { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004';
 export { DeviceInterface } from '@Lib/device_interface';
 export {
-  SNItem, ItemMutator,
+  SNItem, ItemMutator, AppDataField,
   SNItemsKey,
   SNPredicate,
   SNNote, NoteMutator,
@@ -15,7 +15,7 @@ export {
   SNActionsExtension,
   Action,
   SNTheme,
-  SNComponent, ComponentAction,
+  SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
   SNUserPrefs, UserPrefsMutator, WebPrefKey
 } from './models';
@@ -90,7 +90,8 @@ export {
   intentRequiresEncryption
 } from '@Protocol/intents';
 export { ContentType } from '@Models/content_types';
-export { CreateItemFromPayload, Uuids } from '@Models/generator';
+export { CreateItemFromPayload } from '@Models/generator';
+export { Uuids, FillItemContent } from '@Models/functions';
 
 export {
   ApplicationEvent
@@ -113,6 +114,7 @@ export {
   CreateSourcedPayloadFromObject,
   CreateIntentPayloadFromObject,
   CreateEncryptionParameters,
+  PayloadByMerging,
   CopyPayload
 } from '@Payloads/generator';
 export {

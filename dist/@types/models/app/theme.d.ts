@@ -1,11 +1,11 @@
 import { SNItem, ItemMutator } from '../core/item';
-import { ConflictStrategies } from '../../protocol/payloads/deltas';
+import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies';
 import { SNComponent, ComponentArea } from './component';
 export declare class SNTheme extends SNComponent {
     area: ComponentArea;
     isLayerable(): any;
     /** Do not duplicate under most circumstances. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
     getMobileRules(): any;
     /** Same as getMobileRules but without default value. */
     hasMobileRules(): any;

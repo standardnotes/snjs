@@ -5,7 +5,7 @@ export { SNProtocolOperator002 } from './protocol/operator/002/operator_002';
 export { SNProtocolOperator003 } from './protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from './protocol/operator/004/operator_004';
 export { DeviceInterface } from './device_interface';
-export { SNItem, ItemMutator, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey } from './models';
+export { SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey } from './models';
 export { ComponentArea } from './models/app/component';
 export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from './services/history/history_session';
@@ -33,7 +33,8 @@ export { findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex
 export { Uuid } from './uuid';
 export { EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption } from './protocol/intents';
 export { ContentType } from './models/content_types';
-export { CreateItemFromPayload, Uuids } from './models/generator';
+export { CreateItemFromPayload } from './models/generator';
+export { Uuids, FillItemContent } from './models/functions';
 export { ApplicationEvent } from './events';
 export { Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString } from './platforms';
 export { SyncEvent } from './services/sync/events';

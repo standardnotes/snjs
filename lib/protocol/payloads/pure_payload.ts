@@ -1,10 +1,10 @@
+import { FillItemContent } from '@Models/functions';
+import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
-import { PayloadField } from '@Payloads/index';
 import { ContentType } from '@Models/content_types';
-import { CreateItemFromPayload, FillItemContent } from '@Models/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { isString, isObject, deepFreeze } from '@Lib/utils';
-import { CopyPayload, PayloadOverride, RawPayload, PayloadContent } from '@Payloads/generator';
+import { RawPayload, PayloadContent } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
 /**
@@ -155,32 +155,11 @@ export class PurePayload {
     return this.content as string;
   }
 
-  mergedWith(otherPayload: PurePayload) {
-    const override: PayloadOverride = {};
-    for (const field of otherPayload.fields) {
-      override[field] = otherPayload[field];
-    }
-    return CopyPayload(
-      this,
-      override
-    );
-  }
-
   /**
    * Whether a payload can be discarded and removed from storage.
    * This value is true if a payload is marked as deleted and not dirty.
    */
   get discardable() {
     return this.deleted && !this.dirty;
-  }
-
-  /**
-   * Compares the .content fields for equality, creating new SNItem objects
-   * to properly handle .content intricacies.
-   */
-  compareContentFields(otherPayload: PurePayload) {
-    const left = CreateItemFromPayload(this);
-    const right = CreateItemFromPayload(otherPayload);
-    return left.isItemContentEqualWith(right);
   }
 }

@@ -1,6 +1,6 @@
+import { PurePayload } from './pure_payload';
 import { PayloadSource } from './sources';
 import { ContentType } from '../../models/content_types';
-import { PurePayload } from './index';
 import { EncryptionIntent } from '../intents';
 import { PayloadField } from './fields';
 export declare type ContentReference = {
@@ -46,6 +46,7 @@ export declare type RawEncryptionParameters = {
     auth_params?: any;
 };
 export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, source?: PayloadSource, intent?: EncryptionIntent, override?: PayloadOverride): PurePayload;
+export declare function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload): PurePayload;
 export declare function CreateIntentPayloadFromObject(object: RawPayload, intent: EncryptionIntent, override?: PayloadOverride): PurePayload;
 export declare function CreateSourcedPayloadFromObject(object: RawPayload, source: PayloadSource, override?: PayloadOverride): PurePayload;
 export declare function CopyPayload(payload: PurePayload, override?: PayloadOverride): PurePayload;

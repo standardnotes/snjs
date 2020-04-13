@@ -1,15 +1,14 @@
+import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
-import { PurePayload } from '@Payloads/pure_payload';
 import { SNPredicate } from '@Models/core/predicate';
-import { SNItem } from '@Models/core/item';
+import { SNItem, SingletonStrategy } from '@Models/core/item';
 import { PureService } from '@Lib/services/pure_service';
-import { SingletonStrategies, ContentType } from '@Models/index';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
-import { CopyPayload, PayloadOverride, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
-import { Uuids } from '../models/generator';
+import { Uuids } from '@Models/functions';
 
 /**
  * The singleton manager allow consumers to ensure that only 1 item exists of a certain
@@ -161,8 +160,8 @@ export class SNSingletonManager extends PureService {
     }
   }
 
-  private async handleStrategy(items: SNItem[], strategy: SingletonStrategies) {
-    if (strategy !== SingletonStrategies.KeepEarliest) {
+  private async handleStrategy(items: SNItem[], strategy: SingletonStrategy) {
+    if (strategy !== SingletonStrategy.KeepEarliest) {
       throw 'Unhandled singleton strategy';
     }
     const earliestFirst = items.sort((a, b) => {

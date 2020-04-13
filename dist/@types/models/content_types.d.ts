@@ -1,3 +1,4 @@
+export declare const DefaultAppDomain = "org.standardnotes.sn";
 export declare enum ContentType {
     Any = "*",
     Item = "SF|Item",

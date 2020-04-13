@@ -1,7 +1,8 @@
+import { Action } from './../models/app/action';
+import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNItemsKey } from '@Models/app/items_key';
 import { SNActionsExtension } from './../models/app/extension';
 import { SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
@@ -12,7 +13,6 @@ import { SNAlertService } from './alert_service';
 import { PayloadSource } from '@Payloads/sources';
 import { EncryptionIntent } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
-import { ContentType, Action } from '@Models/index';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 

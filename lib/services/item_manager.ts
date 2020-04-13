@@ -1,9 +1,9 @@
+import { SNItemsKey } from '@Models/app/items_key';
 import { PrivilegeMutator } from './../models/app/privileges';
 import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
 import { SNNote, NoteMutator } from './../models/app/note';
-import { SNItemsKey } from '@Models/index';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
@@ -11,7 +11,8 @@ import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
 import { MutableCollection } from './../protocol/payloads/collection';
-import { Uuids, FillItemContent, CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload } from '@Models/generator';
+import { Uuids, FillItemContent } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
@@ -68,7 +69,7 @@ export class ItemManager extends PureService {
     this.collection = new MutableCollection();
     this.unsubChangeObserver = this.modelManager
       .addChangeObserver(ContentType.Any, this.onPayloadChange.bind(this));
-    this.systemSmartTags = SNSmartTag.systemSmartTags();
+    this.systemSmartTags = BuildSmartTags();
   }
 
   public deinit() {
@@ -760,4 +761,55 @@ export class ItemManager extends PureService {
     this.collection.discard(item);
     this.modelManager!.removePayloadLocally(item.payload);
   }
+}
+
+const SYSTEM_TAG_ALL_NOTES = 'all-notes';
+const SYSTEM_TAG_ARCHIVED_NOTES = 'archived-notes';
+const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
+
+function BuildSmartTags() {
+  const allNotes = CreateMaxPayloadFromAnyObject(
+    {
+      uuid: SYSTEM_TAG_ALL_NOTES,
+      content_type: ContentType.SmartTag,
+      dummy: true,
+      content: FillItemContent({
+        title: 'All notes',
+        isSystemTag: true,
+        isAllTag: true,
+        predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
+      })
+    }
+  );
+  const archived = CreateMaxPayloadFromAnyObject(
+    {
+      uuid: SYSTEM_TAG_ARCHIVED_NOTES,
+      content_type: ContentType.SmartTag,
+      dummy: true,
+      content: FillItemContent({
+        title: 'Archived',
+        isSystemTag: true,
+        isArchiveTag: true,
+        predicate: SNPredicate.FromArray(['archived', '=', JSON.stringify(true)])
+      })
+    }
+  );
+  const trash = CreateMaxPayloadFromAnyObject(
+    {
+      uuid: SYSTEM_TAG_TRASHED_NOTES,
+      content_type: ContentType.SmartTag,
+      dummy: true,
+      content: FillItemContent({
+        title: 'Trash',
+        isSystemTag: true,
+        isTrashTag: true,
+        predicate: SNPredicate.FromArray(['content.trashed', '=', JSON.stringify(true)])
+      })
+    }
+  );
+  return [
+    CreateItemFromPayload(allNotes) as SNSmartTag,
+    CreateItemFromPayload(archived) as SNSmartTag,
+    CreateItemFromPayload(trash) as SNSmartTag
+  ];
 }

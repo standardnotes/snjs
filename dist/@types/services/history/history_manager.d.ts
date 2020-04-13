@@ -1,6 +1,6 @@
+import { SNStorageService } from '../storage_service';
 import { ItemManager } from '../item_manager';
 import { SNItem } from '../../models/core/item';
-import { SNStorageService } from '../index';
 import { ContentType } from '../../models/content_types';
 import { PureService } from '../pure_service';
 /**

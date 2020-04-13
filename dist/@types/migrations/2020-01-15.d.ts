@@ -1,6 +1,6 @@
+import { SNRootKey } from './../protocol/root_key';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { Migration } from './migration';
-import { SNRootKey } from '../protocol/index';
 export declare class Migration20200115 extends Migration {
     static timestamp(): number;
     protected registerStageHandlers(): void;

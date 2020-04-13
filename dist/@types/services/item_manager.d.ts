@@ -1,7 +1,7 @@
+import { SNItemsKey } from '../models/app/items_key';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '../models/app/tag';
 import { SNNote, NoteMutator } from './../models/app/note';
-import { SNItemsKey } from '../models/index';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';

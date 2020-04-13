@@ -1,4 +1,4 @@
-export { SNItem, ItemMutator, SingletonStrategies } from './core/item';
+export { SNItem, ItemMutator, SingletonStrategy, AppDataField } from './core/item';
 export { SNItemsKey } from './app/items_key';
 export { SNPredicate } from './core/predicate';
 export { SNComponent, ComponentMutator, ComponentAction } from './app/component';

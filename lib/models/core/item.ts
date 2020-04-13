@@ -1,11 +1,13 @@
+import { PayloadFormat } from './../../protocol/payloads/formats';
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride, CopyPayload } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { deepFreeze, Copy, isObject } from '@Lib/utils';
+import { deepFreeze, Copy, sortedCopy, omitInPlace } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
-import { ItemContentsEqual, ItemContentsDiffer } from '@Models/core/functions';
-import { ConflictStrategies, PayloadFormat, } from '@Payloads/index';
+import { DefaultAppDomain } from '../content_types';
+import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 
 export enum MutationType {
   /**
@@ -44,7 +46,7 @@ type AppData = {
   [key in AppDataField]?: any
 }
 
-export enum SingletonStrategies {
+export enum SingletonStrategy {
   KeepEarliest = 1
 };
 
@@ -72,7 +74,9 @@ export class SNItem {
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
-    this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
+    if(payload.format === PayloadFormat.DecryptedBareObject) {
+      this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
+    }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
       deepFreeze(this);
@@ -80,7 +84,7 @@ export class SNItem {
   }
 
   public static DefaultAppDomain() {
-    return 'org.standardnotes.sn';
+    return DefaultAppDomain;
   }
 
   get uuid() {
@@ -198,6 +202,9 @@ export class SNItem {
 
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
+    if(!appData) {
+      console.log("app data is null for item", this);
+    }
     return appData[key];
   }
 
@@ -259,14 +266,14 @@ export class SNItem {
   }
 
   public get singletonStrategy() {
-    return SingletonStrategies.KeepEarliest;
+    return SingletonStrategy.KeepEarliest;
   }
 
   /**
    * Subclasses can override this method and provide their own opinion on whether
    * they want to be duplicated. For example, if this.content.x = 12 and
    * item.content.x = 13, this function can be overriden to always return
-   * ConflictStrategies.KeepLeft to say 'don't create a duplicate at all, the
+   * ConflictStrategy.KeepLeft to say 'don't create a duplicate at all, the
    * change is not important.'
    *
    * In the default implementation, we create a duplicate if content differs.
@@ -274,17 +281,17 @@ export class SNItem {
    */
   public strategyWhenConflictingWithItem(item: SNItem) {
     if (this.errorDecrypting) {
-      return ConflictStrategies.KeepLeftDuplicateRight;
+      return ConflictStrategy.KeepLeftDuplicateRight;
     }
     if (this.isSingleton) {
-      return ConflictStrategies.KeepLeft;
+      return ConflictStrategy.KeepLeft;
     }
     if (this.deleted || item.deleted) {
-      return ConflictStrategies.KeepRight;
+      return ConflictStrategy.KeepRight;
     }
     const contentDiffers = ItemContentsDiffer(this, item);
     if (!contentDiffers) {
-      return ConflictStrategies.KeepRight;
+      return ConflictStrategy.KeepRight;
     }
     const differsExclRefs = ItemContentsDiffer(
       this,
@@ -292,10 +299,10 @@ export class SNItem {
       ['references']
     );
     if (differsExclRefs) {
-      return ConflictStrategies.KeepLeftDuplicateRight;
+      return ConflictStrategy.KeepLeftDuplicateRight;
     } else {
       /** Is only references change */
-      return ConflictStrategies.KeepLeftMergeRefs;
+      return ConflictStrategy.KeepLeftMergeRefs;
     }
   }
 
@@ -407,7 +414,7 @@ export class ItemMutator {
 
   /** Merges the input payload with the base payload */
   public mergePayload(payload: PurePayload) {
-    this.payload = this.payload.mergedWith(payload);
+    this.payload = PayloadByMerging(this.payload, payload);
   }
 
   public setContent(content: PayloadContent) {
@@ -535,4 +542,64 @@ export class ItemMutator {
     references = references.filter((r) => r.uuid !== item.uuid);
     this.content!.references = references;
   }
+}
+
+function ItemContentsDiffer(
+  item1: SNItem,
+  item2: SNItem,
+  excludeContentKeys?: string[]
+) {
+  if (!excludeContentKeys) {
+    excludeContentKeys = [];
+  }
+  return !ItemContentsEqual(
+    item1.content as PayloadContent,
+    item2.content as PayloadContent,
+    item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
+    item1.appDataContentKeysToIgnoreWhenCheckingEquality()
+  );
+}
+
+function ItemContentsEqual(
+  leftContent: PayloadContent,
+  rightContent: PayloadContent,
+  keysToIgnore: string[],
+  appDataKeysToIgnore: string[]
+) {
+  /* Create copies of objects before running omit as not to modify source values directly. */
+  leftContent = sortedCopy(leftContent);
+  if (leftContent.appData) {
+    const domainData = leftContent.appData[DefaultAppDomain];
+    omitInPlace(domainData, appDataKeysToIgnore);
+    /**
+     * We don't want to disqualify comparison if one object contains an empty domain object
+     * and the other doesn't contain a domain object. This can happen if you create an item
+     * without setting dirty, which means it won't be initialized with a client_updated_at
+     */
+    if (domainData) {
+      if (Object.keys(domainData).length === 0) {
+        delete leftContent.appData;
+      }
+    } else {
+      delete leftContent.appData;
+    }
+
+  }
+  omitInPlace(leftContent, keysToIgnore);
+
+  rightContent = sortedCopy(rightContent);
+  if (rightContent.appData) {
+    const domainData = rightContent.appData[DefaultAppDomain];
+    omitInPlace(domainData, appDataKeysToIgnore);
+    if (domainData) {
+      if (Object.keys(domainData).length === 0) {
+        delete rightContent.appData;
+      }
+    } else {
+      delete rightContent.appData;
+    }
+  }
+  omitInPlace(rightContent, keysToIgnore);
+
+  return JSON.stringify(leftContent) === JSON.stringify(rightContent);
 }

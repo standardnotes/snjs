@@ -1,5 +1,5 @@
+import { PayloadField } from './fields';
 import { PayloadSource } from './sources';
-import { PayloadField } from './index';
 import { ContentType } from '../../models/content_types';
 import { ProtocolVersion } from '../versions';
 import { RawPayload, PayloadContent } from './generator';
@@ -56,15 +56,9 @@ export declare class PurePayload {
     get safeReferences(): import("./generator").ContentReference[];
     get contentObject(): PayloadContent;
     get contentString(): string;
-    mergedWith(otherPayload: PurePayload): PurePayload;
     /**
      * Whether a payload can be discarded and removed from storage.
      * This value is true if a payload is marked as deleted and not dirty.
      */
     get discardable(): boolean | undefined;
-    /**
-     * Compares the .content fields for equality, creating new SNItem objects
-     * to properly handle .content intricacies.
-     */
-    compareContentFields(otherPayload: PurePayload): boolean;
 }

@@ -1,11 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
 import { PurePayload } from '@Payloads/pure_payload';
-import { CreateItemFromPayload } from '@Models/generator';
 import { ImmutablePayloadCollection } from '@Payloads/collection';
-import { ConflictStrategy } from '@Payloads/deltas/strategies';
-import { CopyPayload } from '@Payloads/generator';
-import { PayloadsByDuplicating } from '@Payloads/functions';
-import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 
 export abstract class SinglePayloadDelta {
 

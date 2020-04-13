@@ -1,9 +1,8 @@
+import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
-import { SNStorageService } from '@Services/index';
 import { ContentType } from '@Models/content_types';
-import { PayloadManager } from './../model_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { HistorySession } from '@Services/history/history_session';
 import { PayloadSource } from '@Payloads/sources';

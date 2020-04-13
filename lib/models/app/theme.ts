@@ -1,6 +1,6 @@
 import { AppDataField } from './../core/item';
 import { SNItem, ItemMutator } from '@Models/core/item';
-import { ConflictStrategies } from '@Payloads/deltas';
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { SNComponent, ComponentArea } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
@@ -17,7 +17,7 @@ export class SNTheme extends SNComponent {
       return super.strategyWhenConflictingWithItem(item);
     }
 
-    return ConflictStrategies.KeepLeft;
+    return ConflictStrategy.KeepLeft;
   }
 
   getMobileRules() {

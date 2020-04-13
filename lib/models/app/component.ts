@@ -1,10 +1,10 @@
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
 import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItem, ItemMutator } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
-import { ConflictStrategies } from '@Payloads/index';
 
 export enum ComponentArea {
   Editor = 'editor-editor',
@@ -104,7 +104,7 @@ export class SNComponent extends SNItem {
       return super.strategyWhenConflictingWithItem(item);
     }
 
-    return ConflictStrategies.KeepLeft;
+    return ConflictStrategy.KeepLeft;
   }
 
   public isEditor() {

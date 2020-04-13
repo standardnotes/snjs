@@ -136,7 +136,7 @@ describe('payload', () => {
         dirtiedDate: new Date()
       }
     );
-    const merged = payload.mergedWith(otherPayload);
+    const merged = PayloadByMerging(payload, otherPayload);
 
     expect(merged.content).to.eql(payload.content);
     expect(merged.uuid).to.equal(payload.uuid);
@@ -151,7 +151,7 @@ describe('payload', () => {
         content: undefined,
       }
     );
-    const merged = payload.mergedWith(otherPayload);
+    const merged = PayloadByMerging(payload, otherPayload);
 
     expect(merged.uuid).to.equal(payload.uuid);
     expect(merged.content).to.not.be.ok;

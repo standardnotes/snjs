@@ -1,3 +1,4 @@
+import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './migrations/types';
@@ -21,7 +22,7 @@ import { removeFromArray, isNullOrUndefined, isString } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
-import { Uuids, CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload } from '@Models/generator';
 import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service';
 import {
   SNMigrationService,

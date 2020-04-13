@@ -1,20 +1,13 @@
-import { Uuids } from '@Models/generator';
+import { removeFromArray } from '@Lib/utils';
+import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
+import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
+import { PayloadSource } from './../protocol/payloads/sources';
+import { ContentType } from './../models/content_types';
+import { Uuids } from '@Models/functions';
 import { UuidString } from './../types';
-import { subtractFromArray } from '@Lib/utils';
-import { MutableCollection } from './../protocol/payloads/collection';
+import { MutableCollection, ImmutablePayloadCollection } from './../protocol/payloads/collection';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItem } from '@Models/core/item';
-import remove from 'lodash/remove';
-import pull from 'lodash/pull';
-import {
-  ContentType,
-} from '@Models/index';
 import { PureService } from '@Lib/services/pure_service';
-import {
-  PayloadSource,
-  ImmutablePayloadCollection,
-  DeltaFileImport,
-} from '@Payloads/index';
 
 type ChangeCallback = (
   changed: PurePayload[],
@@ -128,7 +121,7 @@ export class PayloadManager extends PureService {
         continue;
       }
       const masterPayload = this.collection.find(payload.uuid!);
-      const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload;
+      const newPayload = masterPayload ? PayloadByMerging(masterPayload, payload) : payload;
       /** The item has been deleted and synced, 
        * and can thus be removed from our local record */
       if (newPayload.discardable) {
@@ -167,7 +160,7 @@ export class PayloadManager extends PureService {
     };
     this.changeObservers.push(observer);
     return () => {
-      pull(this.changeObservers, observer);
+      removeFromArray(this.changeObservers, observer);
     };
   }
 

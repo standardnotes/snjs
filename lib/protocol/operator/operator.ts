@@ -1,5 +1,6 @@
+import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
-import { FillItemContent, CreateItemFromPayload } from '@Models/generator';
+import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
 import { SNRootKeyParams } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';

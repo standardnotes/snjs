@@ -1,4 +1,4 @@
-import { FillItemContent } from '@Models/generator';
+import { FillItemContent } from '@Models/functions';
 import { ItemManager } from '@Services/item_manager';
 import { SNSessionManager } from './api/session_manager';
 import { SNStorageService } from '@Services/storage_service';

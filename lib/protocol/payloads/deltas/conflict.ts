@@ -1,7 +1,7 @@
 import { SinglePayloadDelta } from './single_payload_delta';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ImmutablePayloadCollection } from '@Payloads/collection';
-import { ConflictStrategy } from '@Payloads/deltas/strategies';
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';

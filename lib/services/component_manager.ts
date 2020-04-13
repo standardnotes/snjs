@@ -1,4 +1,7 @@
-import { RawPayload } from '@Payloads/generator';
+import { CreateItemFromPayload } from '@Models/generator';
+import { ContentType, displayStringForContentType } from './../models/content_types';
+import { PayloadSource } from './../protocol/payloads/sources';
+import { RawPayload, CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -10,13 +13,6 @@ import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import remove from 'lodash/remove';
 import { PureService } from '@Lib/services/pure_service';
-import {
-  CreateSourcedPayloadFromObject,
-  PayloadSource
-} from '@Payloads/index';
-import {
-  ContentType, displayStringForContentType, CreateItemFromPayload
-} from '@Models/index';
 import {
   ComponentArea,
   SNComponent,

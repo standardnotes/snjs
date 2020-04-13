@@ -1,6 +1,6 @@
+import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
-import { PurePayload } from '@Payloads/index';
 import { EncryptionIntent } from '@Protocol/intents';
 import {
   Copy,
@@ -176,6 +176,17 @@ export function CreateMaxPayloadFromAnyObject(
     object,
     MaxPayloadFields.slice(),
     source,
+    override
+  );
+}
+
+export function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload) {
+  const override: PayloadOverride = {};
+  for (const field of mergeWith.fields) {
+    override[field] = mergeWith[field];
+  }
+  return CopyPayload(
+    payload,
     override
   );
 }

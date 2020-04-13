@@ -1,6 +1,5 @@
 import { ImmutablePayloadCollection } from './collection';
 import { PurePayload } from './pure_payload';
-export declare function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload): boolean;
 /**
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
@@ -13,3 +12,8 @@ export declare function PayloadsByDuplicating(payload: PurePayload, baseCollecti
  * @returns An array of payloads that have changed as a result of copying.
  */
 export declare function PayloadsByAlternatingUuid(payload: PurePayload, baseCollection: ImmutablePayloadCollection): Promise<PurePayload[]>;
+/**
+ * Compares the .content fields for equality, creating new SNItem objects
+ * to properly handle .content intricacies.
+ */
+export declare function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload): boolean;

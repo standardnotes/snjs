@@ -1,8 +1,8 @@
+import { ContentType } from './../models/content_types';
 import { ItemManager } from './item_manager';
 import { SNPredicate } from '../models/core/predicate';
 import { SNItem } from '../models/core/item';
 import { PureService } from './pure_service';
-import { ContentType } from '../models/index';
 import { PayloadContent } from '../protocol/payloads/generator';
 import { SNSyncService } from './sync/sync_service';
 /**

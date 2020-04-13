@@ -1,4 +1,4 @@
-import { FillItemContent } from '@Models/generator';
+import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';

@@ -1,9 +1,7 @@
+import { DeltaRemoteConflicts } from './remote_conflicts';
+import { DeltaRemoteSaved } from './remote_saved';
+import { DeltaRemoteRetrieved } from './remote_retrieved';
 import { PayloadSource } from '@Payloads/sources';
-import {
-  DeltaRemoteRetrieved,
-  DeltaRemoteSaved,
-  DeltaRemoteConflicts
-} from './index';
 
 export function DeltaClassForSource(source: PayloadSource) {
   if(source === PayloadSource.RemoteRetrieved) {

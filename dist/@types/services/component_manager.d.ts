@@ -1,3 +1,5 @@
+import { ContentType } from './../models/content_types';
+import { PayloadSource } from './../protocol/payloads/sources';
 import { ItemManager } from './item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -6,8 +8,6 @@ import { SNAlertService } from './alert_service';
 import { SNSyncService } from './sync/sync_service';
 import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
-import { PayloadSource } from '../protocol/payloads/index';
-import { ContentType } from '../models/index';
 import { ComponentArea, SNComponent, ComponentAction, ComponentPermission } from '../models/app/component';
 import { Platform, Environment } from '../platforms';
 declare type ComponentHandler = {

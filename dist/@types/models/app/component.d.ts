@@ -1,8 +1,8 @@
+import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
 import { SNItem, ItemMutator } from '../core/item';
 import { ContentType } from '../content_types';
-import { ConflictStrategies } from '../../protocol/payloads/index';
 export declare enum ComponentArea {
     Editor = "editor-editor",
     Themes = "themes",
@@ -65,7 +65,7 @@ export declare class SNComponent extends SNItem {
     readonly legacy_url: string;
     constructor(payload: PurePayload);
     /** Do not duplicate components under most circumstances. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
     isEditor(): boolean;
     isTheme(): boolean;
     isDefaultEditor(): boolean;

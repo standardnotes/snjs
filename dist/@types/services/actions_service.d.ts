@@ -1,3 +1,4 @@
+import { Action } from './../models/app/action';
 import { ItemManager } from './item_manager';
 import { SNActionsExtension } from './../models/app/extension';
 import { SNItem } from '../models/core/item';
@@ -7,7 +8,6 @@ import { PayloadManager } from './model_manager';
 import { SNHttpService, HttpResponse } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PureService } from './pure_service';
-import { Action } from '../models/index';
 import { DeviceInterface } from '../device_interface';
 declare type PasswordRequestHandler = () => Promise<string>;
 export declare type ActionResponse = {

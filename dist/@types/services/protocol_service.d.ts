@@ -1,3 +1,5 @@
+import { EncryptionIntent } from './../protocol/intents';
+import { ProtocolVersion } from './../protocol/versions';
 import { ItemManager } from './item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '../events';
@@ -10,7 +12,6 @@ import { SNRootKey } from '../protocol/root_key';
 import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
 import { SNPureCrypto } from 'sncrypto';
-import { ProtocolVersion, EncryptionIntent } from '../protocol/index';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '../models/content_types';
 import { DeviceInterface } from '../device_interface';

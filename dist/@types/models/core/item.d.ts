@@ -1,9 +1,9 @@
+import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { PayloadOverride } from '../../protocol/payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { SNPredicate } from './predicate';
-import { ConflictStrategies } from '../../protocol/payloads/index';
 export declare enum MutationType {
     /**
      * The item was changed as part of a user interaction. This means that the item's
@@ -35,7 +35,7 @@ export declare enum AppDataField {
     PrefersPlainEditor = "prefersPlainEditor",
     ComponentInstallError = "installError"
 }
-export declare enum SingletonStrategies {
+export declare enum SingletonStrategy {
     KeepEarliest = 1
 }
 /**
@@ -54,7 +54,7 @@ export declare class SNItem {
     get safeContent(): PayloadContent;
     get references(): import("../../protocol/payloads/generator").ContentReference[];
     get deleted(): boolean | undefined;
-    get content_type(): import("..").ContentType;
+    get content_type(): import("../content_types").ContentType;
     get created_at(): Date;
     get updated_at(): Date;
     get userModifiedDate(): Date;
@@ -112,18 +112,18 @@ export declare class SNItem {
     get isSingleton(): boolean;
     /** The predicate by which singleton items should be unique */
     get singletonPredicate(): SNPredicate;
-    get singletonStrategy(): SingletonStrategies;
+    get singletonStrategy(): SingletonStrategy;
     /**
      * Subclasses can override this method and provide their own opinion on whether
      * they want to be duplicated. For example, if this.content.x = 12 and
      * item.content.x = 13, this function can be overriden to always return
-     * ConflictStrategies.KeepLeft to say 'don't create a duplicate at all, the
+     * ConflictStrategy.KeepLeft to say 'don't create a duplicate at all, the
      * change is not important.'
      *
      * In the default implementation, we create a duplicate if content differs.
      * However, if they only differ by references, we KEEP_LEFT_MERGE_REFS.
      */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
     isItemContentEqualWith(otherItem: SNItem): boolean;
     satisfiesPredicate(predicate: SNPredicate): any;
     updatedAtTimestamp(): number;

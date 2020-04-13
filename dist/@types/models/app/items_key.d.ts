@@ -1,11 +1,11 @@
+import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies';
 import { SNItem, ItemMutator } from '../core/item';
-import { ConflictStrategies } from '../../protocol/payloads/index';
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
 export declare class SNItemsKey extends SNItem {
     /** Do not duplicate items keys. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategies.KeepLeft | ConflictStrategies.KeepRight | ConflictStrategies.KeepLeftDuplicateRight | ConflictStrategies.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
     get version(): any;
     get isItemsKey(): boolean;
     get isDefault(): any;
