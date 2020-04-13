@@ -15,13 +15,13 @@ export {
   SNActionsExtension,
   Action,
   SNTheme,
-  SNComponent,
+  SNComponent, ComponentAction,
   SNEditor,
-  SNUserPrefs
+  SNUserPrefs, UserPrefsMutator, WebPrefKey
 } from './models';
 export { ComponentArea } from './models/app/component';
 
-export { SNComponentManager, ComponentAction } from './services/component_manager';
+export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from '@Services/history/history_session';
 export { ItemHistory } from '@Services/history/item_history';
 export { ItemHistoryEntry } from '@Services/history/item_history_entry';

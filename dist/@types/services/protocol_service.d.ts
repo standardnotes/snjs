@@ -189,7 +189,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @param returnIfEmpty Returns null if there are no items to make backup of.
      * @returns JSON stringified representation of data, including keyParams.
      */
-    createBackupFile(subItems?: SNItem[], intent?: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | null>;
+    createBackupFile(subItems?: SNItem[], intent?: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | undefined>;
     /**
      * Register a callback to be notified when root key status changes.
      * @param callback  A function that takes in a content type to call back when root

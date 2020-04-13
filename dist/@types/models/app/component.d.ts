@@ -1,6 +1,7 @@
 import { UuidString } from './../../types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
 import { SNItem, ItemMutator } from '../core/item';
+import { ContentType } from '../content_types';
 import { ConflictStrategies } from '../../protocol/payloads/index';
 export declare enum ComponentArea {
     Editor = "editor-editor",
@@ -12,6 +13,34 @@ export declare enum ComponentArea {
     Modal = "modal",
     Any = "*"
 }
+export declare enum ComponentAction {
+    SetSize = "set-size",
+    StreamItems = "stream-items",
+    StreamContextItem = "stream-context-item",
+    SaveItems = "save-items",
+    SelectItem = "select-item",
+    AssociateItem = "associate-item",
+    DeassociateItem = "deassociate-item",
+    ClearSelection = "clear-selection",
+    CreateItem = "create-item",
+    CreateItems = "create-items",
+    DeleteItems = "delete-items",
+    SetComponentData = "set-component-data",
+    InstallLocalComponent = "install-local-component",
+    ToggleActivateComponent = "toggle-activate-component",
+    RequestPermissions = "request-permissions",
+    PresentConflictResolution = "present-conflict-resolution",
+    DuplicateItem = "duplicate-item",
+    ComponentRegistered = "component-registered",
+    ActivateThemes = "themes",
+    Reply = "reply",
+    SaveSuccess = "save-success",
+    SaveError = "save-error"
+}
+export declare type ComponentPermission = {
+    name: ComponentAction;
+    content_types?: ContentType[];
+};
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
@@ -30,7 +59,7 @@ export declare class SNComponent extends SNItem {
     readonly autoupdateDisabled: boolean;
     readonly package_info: any;
     readonly area: ComponentArea;
-    readonly permissions: any[];
+    readonly permissions: ComponentPermission[];
     readonly valid_until: Date;
     readonly active: boolean;
     readonly legacy_url: string;
@@ -61,7 +90,12 @@ export declare class SNComponent extends SNItem {
 }
 export declare class ComponentMutator extends ItemMutator {
     set active(active: boolean);
+    set defaultEditor(defaultEditor: boolean);
     set componentData(componentData: Record<string, any>);
+    set package_info(package_info: any);
+    set local_url(local_url: string);
+    set hosted_url(hosted_url: string);
+    set permissions(permimssions: ComponentPermission[]);
     associateWithItem(item: SNItem): void;
     disassociateWithItem(item: SNItem): void;
     removeAssociatedItemId(uuid: UuidString): void;

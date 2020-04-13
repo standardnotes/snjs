@@ -85,17 +85,17 @@ export class SNApplication {
   public alertService?: SNAlertService
   private httpService?: SNHttpService
   private modelManager?: PayloadManager
-  private protocolService?: SNProtocolService
+  public protocolService?: SNProtocolService
   private storageService?: SNStorageService
   private apiService?: SNApiService
   private sessionManager?: SNSessionManager
   private syncService?: SNSyncService
   private challengeService?: ChallengeService
-  private singletonManager?: SNSingletonManager
+  public singletonManager?: SNSingletonManager
   public componentManager?: SNComponentManager
   public privilegesService?: SNPrivilegesService
   public actionsManager?: SNActionsService
-  private historyManager?: SNHistoryManager
+  public historyManager?: SNHistoryManager
   private itemManager?: ItemManager
 
   private eventHandlers: ApplicationObserver[] = [];
@@ -343,6 +343,13 @@ export class SNApplication {
   }
 
   /** 
+   * Returns all items.
+   */
+  public allItems() {
+    return this.itemManager!.items;
+  }
+
+  /** 
    * Finds an item by predicate.
   */
   public findItems(predicate: SNPredicate) {
@@ -486,7 +493,8 @@ export class SNApplication {
   public async changeAndSaveItem(
     uuid: UuidString,
     mutate?: (mutator: ItemMutator) => void,
-    isUserModified = false
+    isUserModified = false,
+    payloadSource?: PayloadSource
   ) {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -494,7 +502,8 @@ export class SNApplication {
     await this.itemManager!.changeItems(
       [uuid],
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined
+      isUserModified ? MutationType.UserInteraction : undefined,
+      payloadSource
     );
     await this.syncService!.sync();
     return this.findItem(uuid);
@@ -506,12 +515,14 @@ export class SNApplication {
   public async changeAndSaveItems(
     uuids: UuidString[],
     mutate?: (mutator: ItemMutator) => void,
-    isUserModified = false
+    isUserModified = false,
+    payloadSource?: PayloadSource
   ) {
     await this.itemManager!.changeItems(
       uuids,
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined
+      isUserModified ? MutationType.UserInteraction : undefined,
+      payloadSource
     );
     await this.syncService!.sync();
   }
@@ -741,11 +752,15 @@ export class SNApplication {
    * if supplied.
    */
   public async createBackupFile(
-    subItems: SNItem[],
-    intent: EncryptionIntent,
+    subItems?: SNItem[],
+    intent?: EncryptionIntent,
     returnIfEmpty = false
   ) {
-    return this.protocolService!.createBackupFile(subItems, intent, returnIfEmpty);
+    return this.protocolService!.createBackupFile(
+      subItems,
+      intent,
+      returnIfEmpty
+    );
   }
 
   public isEphemeralSession() {
@@ -762,6 +777,10 @@ export class SNApplication {
 
   public async sync(options?: SyncOptions) {
     return this.syncService!.sync(options);
+  }
+
+  public async isOutOfSync() {
+    return this.syncService!.isOutOfSync();
   }
 
   public async resolveOutOfSync() {

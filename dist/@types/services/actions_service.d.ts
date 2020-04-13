@@ -4,12 +4,19 @@ import { SNItem } from '../models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './model_manager';
-import { SNHttpService } from './api/http_service';
+import { SNHttpService, HttpResponse } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PureService } from './pure_service';
 import { Action } from '../models/index';
 import { DeviceInterface } from '../device_interface';
 declare type PasswordRequestHandler = () => Promise<string>;
+export declare type ActionResponse = {
+    response?: HttpResponse;
+    error?: {
+        message: string;
+    };
+    item?: any;
+};
 /**
  * The Actions Service allows clients to interact with action-based extensions.
  * Action-based extensions are mostly RESTful actions that can push a local value or
@@ -44,7 +51,7 @@ export declare class SNActionsService extends PureService {
      * just displayed as a one-time thing.
     */
     loadExtensionInContextOfItem(extension: SNActionsExtension, item: SNItem): Promise<SNActionsExtension | null>;
-    runAction(action: Action, item: SNItem, passwordRequestHandler: PasswordRequestHandler): Promise<unknown>;
+    runAction(action: Action, item: SNItem, passwordRequestHandler: PasswordRequestHandler): Promise<ActionResponse>;
     private handleGetAction;
     private runConfirmedGetAction;
     private handleRenderAction;

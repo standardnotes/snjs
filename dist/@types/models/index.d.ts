@@ -1,13 +1,13 @@
 export { SNItem, ItemMutator, SingletonStrategies } from './core/item';
 export { SNItemsKey } from './app/items_key';
 export { SNPredicate } from './core/predicate';
-export { SNComponent, ComponentMutator } from './app/component';
+export { SNComponent, ComponentMutator, ComponentAction } from './app/component';
 export { SNEditor } from './app/editor';
 export { SNActionsExtension } from './app/extension';
 export { Action } from './app/action';
 export { SNNote, NoteMutator } from './app/note';
 export { SNTag } from './app/tag';
-export { SNUserPrefs } from './app/userPrefs';
+export { SNUserPrefs, UserPrefsMutator, WebPrefKey } from './app/userPrefs';
 export { SNPrivileges, PrivilegeMutator } from './app/privileges';
 export { SNSmartTag } from './app/smartTag';
 export { SNTheme, ThemeMutator } from './app/theme';

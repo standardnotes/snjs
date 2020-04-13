@@ -17,6 +17,36 @@ export enum ComponentArea {
   Any = '*'
 };
 
+export enum ComponentAction {
+  SetSize = 'set-size',
+  StreamItems = 'stream-items',
+  StreamContextItem = 'stream-context-item',
+  SaveItems = 'save-items',
+  SelectItem = 'select-item',
+  AssociateItem = 'associate-item',
+  DeassociateItem = 'deassociate-item',
+  ClearSelection = 'clear-selection',
+  CreateItem = 'create-item',
+  CreateItems = 'create-items',
+  DeleteItems = 'delete-items',
+  SetComponentData = 'set-component-data',
+  InstallLocalComponent = 'install-local-component',
+  ToggleActivateComponent = 'toggle-activate-component',
+  RequestPermissions = 'request-permissions',
+  PresentConflictResolution = 'present-conflict-resolution',
+  DuplicateItem = 'duplicate-item',
+  ComponentRegistered = 'component-registered',
+  ActivateThemes = 'themes',
+  Reply = 'reply',
+  SaveSuccess = 'save-success',
+  SaveError = 'save-error'
+};
+
+export type ComponentPermission = {
+  name: ComponentAction
+  content_types?: ContentType[]
+}
+
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
@@ -36,7 +66,7 @@ export class SNComponent extends SNItem {
   public readonly autoupdateDisabled: boolean
   public readonly package_info: any
   public readonly area: ComponentArea
-  public readonly permissions: any[] = []
+  public readonly permissions: ComponentPermission[] = []
   public readonly valid_until: Date
   public readonly active: boolean
   public readonly legacy_url: string
@@ -152,8 +182,28 @@ export class ComponentMutator extends ItemMutator {
     this.content!.active = active;
   }
 
+  set defaultEditor(defaultEditor: boolean) {
+    this.setAppDataItem(AppDataField.DefaultEditor, defaultEditor);
+  }
+
   set componentData(componentData: Record<string, any>) {
     this.content!.componentData = componentData;
+  }
+
+  set package_info(package_info: any) {
+    this.content!.package_info = package_info;
+  }
+
+  set local_url(local_url: string) {
+    this.content!.local_url = local_url;
+  }
+
+  set hosted_url(hosted_url: string) {
+    this.content!.hosted_url = hosted_url;
+  }
+
+  set permissions(permimssions: ComponentPermission[]) {
+    this.content!.permimssions = permimssions;
   }
 
   public associateWithItem(item: SNItem) {

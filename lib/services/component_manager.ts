@@ -17,7 +17,12 @@ import {
 import {
   ContentType, displayStringForContentType, CreateItemFromPayload
 } from '@Models/index';
-import { ComponentArea, SNComponent } from '@Models/app/component';
+import {
+  ComponentArea,
+  SNComponent,
+  ComponentAction,
+  ComponentPermission
+} from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
 import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
@@ -31,31 +36,6 @@ const ANDROID_LOCAL_HOST = '10.0.2.2';
 type ComponentRawPayload = RawPayload & {
   clientData: any
 }
-
-export enum ComponentAction {
-  SetSize = 'set-size',
-  StreamItems = 'stream-items',
-  StreamContextItem = 'stream-context-item',
-  SaveItems = 'save-items',
-  SelectItem = 'select-item',
-  AssociateItem = 'associate-item',
-  DeassociateItem = 'deassociate-item',
-  ClearSelection = 'clear-selection',
-  CreateItem = 'create-item',
-  CreateItems = 'create-items',
-  DeleteItems = 'delete-items',
-  SetComponentData = 'set-component-data',
-  InstallLocalComponent = 'install-local-component',
-  ToggleActivateComponent = 'toggle-activate-component',
-  RequestPermissions = 'request-permissions',
-  PresentConflictResolution = 'present-conflict-resolution',
-  DuplicateItem = 'duplicate-item',
-  ComponentRegistered = 'component-registered',
-  ActivateThemes = 'themes',
-  Reply = 'reply',
-  SaveSuccess = 'save-success',
-  SaveError = 'save-error'
-};
 
 /* This domain will be used to save context item client data */
 const ComponentDataDomain = 'org.standardnotes.sn.components';
@@ -80,7 +60,7 @@ type ComponentHandler = {
 
 export type PermissionDialog = {
   component: SNComponent
-  permissions: Permission[]
+  permissions: ComponentPermission[]
   permissionsString: string
   actionBlock: (approved: boolean) => void
   callback: (approved: boolean) => void
@@ -122,11 +102,6 @@ type ItemMessagePayload = {
   * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
   isMetadataUpdate: any
 };
-
-type Permission = {
-  name: ComponentAction
-  content_types?: ContentType[]
-}
 
 type ComponentState = {
   window?: Window
@@ -281,7 +256,7 @@ export class SNComponentManager extends PureService {
       if (relevantItems.length === 0) {
         continue;
       }
-      const requiredPermissions: Permission[] = [{
+      const requiredPermissions: ComponentPermission[] = [{
         name: ComponentAction.StreamItems,
         content_types: observer.contentTypes!.sort()
       }];
@@ -291,7 +266,7 @@ export class SNComponentManager extends PureService {
     }
     const requiredContextPermissions = [{
       name: ComponentAction.StreamContextItem
-    }] as Permission[];
+    }] as ComponentPermission[];
     for (const observer of this.contextStreamObservers) {
       if (sourceKey && sourceKey === observer.component.uuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
@@ -600,6 +575,11 @@ export class SNComponentManager extends PureService {
     })[0];
   }
 
+  public sessionKeyForComponent(component: SNComponent) {
+    const componentState = this.findOrCreateDataForComponent(component);
+    return componentState.sessionKey;
+  }
+
   componentForSessionKey(key: string): SNComponent | undefined {
     let component;
     for (const uuid of Object.keys(this.componentState)) {
@@ -739,7 +719,7 @@ export class SNComponentManager extends PureService {
   }
 
   handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage) {
-    const requiredPermissions: Permission[] = [
+    const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamContextItem
       }
@@ -812,7 +792,7 @@ export class SNComponentManager extends PureService {
       requiredPermissions.push({
         name: ComponentAction.StreamItems,
         content_types: requiredContentTypes
-      } as Permission);
+      } as ComponentPermission);
     }
     this.runWithPermissions(component, requiredPermissions, async () => {
       this.removePrivatePropertiesFromResponseItems(
@@ -915,7 +895,7 @@ export class SNComponentManager extends PureService {
     const uniqueContentTypes = uniq(
       responseItems.map((item: any) => { return item.content_type; })
     ) as ContentType[];
-    const requiredPermissions: Permission[] = [
+    const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamItems,
         content_types: uniqueContentTypes
@@ -958,7 +938,7 @@ export class SNComponentManager extends PureService {
     const requiredContentTypes = uniq(
       message.data.items.map((item: any) => { return item.content_type; })
     ).sort() as ContentType[];
-    const requiredPermissions: Permission[] = [
+    const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamItems,
         content_types: requiredContentTypes
@@ -1060,11 +1040,11 @@ export class SNComponentManager extends PureService {
 
   runWithPermissions(
     component: SNComponent,
-    requiredPermissions: Permission[],
+    requiredPermissions: ComponentPermission[],
     runFunction: () => void
   ) {
     /* Make copy as not to mutate input values */
-    requiredPermissions = Copy(requiredPermissions) as Permission[];
+    requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
     const acquiredPermissions = component.permissions;
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
@@ -1080,7 +1060,7 @@ export class SNComponentManager extends PureService {
         removeFromArray(requiredPermissions, required);
         continue;
       }
-      for (const acquiredContentType of respectiveAcquired.content_types) {
+      for (const acquiredContentType of respectiveAcquired.content_types!) {
         removeFromArray(requiredContentTypes, acquiredContentType);
       }
       if (requiredContentTypes.length === 0) {
@@ -1101,7 +1081,7 @@ export class SNComponentManager extends PureService {
 
   promptForPermissions(
     component: SNComponent,
-    permissions: Permission[],
+    permissions: ComponentPermission[],
     callback: (approved: boolean) => Promise<void>
   ) {
     const params: PermissionDialog = {
@@ -1119,7 +1099,7 @@ export class SNComponentManager extends PureService {
             } else {
               /* Permission already exists, but content_types may have been expanded */
               const contentTypes = matchingPermission.content_types || [];
-              matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types));
+              matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types!));
             }
           }
           await this.itemManager!.setItemDirty(component.uuid);
@@ -1132,8 +1112,8 @@ export class SNComponentManager extends PureService {
             return false;
           }
           const containsObjectSubset = (
-            source: Permission[],
-            target: Permission[]
+            source: ComponentPermission[],
+            target: ComponentPermission[]
           ) => {
             return !target.some(
               val => !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val))
@@ -1421,7 +1401,7 @@ export class SNComponentManager extends PureService {
     throw 'Must override'
   }
 
-  permissionsStringForPermissions(permissions: Permission[], component: SNComponent) {
+  permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent) {
     let finalString = '';
     const permissionsCount = permissions.length;
     const addSeparator = (index: number, length: number) => {

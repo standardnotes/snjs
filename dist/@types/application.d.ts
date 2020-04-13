@@ -17,7 +17,7 @@ import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
 import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
-import { SNActionsService, SNPrivilegesService, SNAlertService, SNComponentManager } from './services';
+import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
@@ -37,17 +37,17 @@ export declare class SNApplication {
     alertService?: SNAlertService;
     private httpService?;
     private modelManager?;
-    private protocolService?;
+    protocolService?: SNProtocolService;
     private storageService?;
     private apiService?;
     private sessionManager?;
     private syncService?;
     private challengeService?;
-    private singletonManager?;
+    singletonManager?: SNSingletonManager;
     componentManager?: SNComponentManager;
     privilegesService?: SNPrivilegesService;
     actionsManager?: SNActionsService;
-    private historyManager?;
+    historyManager?: SNHistoryManager;
     private itemManager?;
     private eventHandlers;
     private services;
@@ -115,6 +115,10 @@ export declare class SNApplication {
      */
     findItem(uuid: string): SNItem | undefined;
     /**
+     * Returns all items.
+     */
+    allItems(): SNItem[];
+    /**
      * Finds an item by predicate.
     */
     findItems(predicate: SNPredicate): SNItem[];
@@ -173,11 +177,11 @@ export declare class SNApplication {
     /**
      * Mutates a pre-existing item, marks it as dirty, and syncs it
      */
-    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
+    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource): Promise<SNItem | undefined>;
     /**
     * Mutates pre-existing items, marks them as dirty, and syncs
     */
-    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<void>;
+    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource): Promise<void>;
     /**
    * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
    */
@@ -234,11 +238,12 @@ export declare class SNApplication {
      * Creates a JSON string representing the backup format of all items, or just subItems
      * if supplied.
      */
-    createBackupFile(subItems: SNItem[], intent: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | null>;
+    createBackupFile(subItems?: SNItem[], intent?: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | undefined>;
     isEphemeralSession(): boolean;
     private lockSyncing;
     private unlockSyncing;
     sync(options?: SyncOptions): Promise<any>;
+    isOutOfSync(): Promise<boolean>;
     resolveOutOfSync(): Promise<any>;
     setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
     getValue(key: string, mode?: StorageValueModes): Promise<any>;

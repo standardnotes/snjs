@@ -36,7 +36,8 @@ export enum AppDataField {
   NotAvailableOnMobile = 'notAvailableOnMobile',
   MobileActive = 'mobileActive',
   LastSize = 'lastSize',
-  PrefersPlainEditor = 'prefersPlainEditor'
+  PrefersPlainEditor = 'prefersPlainEditor',
+  ComponentInstallError = 'installError'
 }
 
 type AppData = {
@@ -407,6 +408,10 @@ export class ItemMutator {
   /** Merges the input payload with the base payload */
   public mergePayload(payload: PurePayload) {
     this.payload = this.payload.mergedWith(payload);
+  }
+
+  public setContent(content: PayloadContent) {
+    this.content = content;
   }
 
   public setDeleted() {

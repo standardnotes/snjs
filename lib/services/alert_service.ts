@@ -18,10 +18,10 @@ export class SNAlertService extends PureService {
   }
 
   async alert(
-    text: string,
-    title?: string,
-    closeButtonText?: string,
-    onClose?: any
+    title: string,
+    text?: string,
+    closeButtonText = 'OK',
+    onClose?: () => void
   ) {
     return new Promise((resolve, reject) => {
       window.alert(text);
@@ -30,13 +30,13 @@ export class SNAlertService extends PureService {
   }
 
   async confirm(
-    text: string,
-    title?: string,
-    confirmButtonText?: string,
-    cancelButtonText?: string,
-    onConfirm?: any,
-    onCancel?: any,
-    destructive?: boolean
+    title: string,
+    text?: string,
+    confirmButtonText = 'Confirm',
+    cancelButtonText = 'Cancel',
+    onConfirm?: () => void,
+    onCancel?: () => void,
+    destructive = false
   ) {
     return new Promise((resolve, reject) => {
       if (window.confirm(text)) {

@@ -28,7 +28,7 @@ export class SNHistoryManager extends PureService {
   private historySession?: HistorySession
   private removeChangeObserver: any
   private persistable = false
-  private autoOptimize = false
+  public autoOptimize = false
   private saveTimeout: any
 
   constructor(

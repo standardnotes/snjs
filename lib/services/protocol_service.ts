@@ -657,7 +657,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   ) {
     const items = subItems || this.itemManager!.items;
     if (returnIfEmpty && items.length === 0) {
-      return null;
+      return undefined;
     }
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(item);

@@ -31,7 +31,6 @@ export declare class SNPrivilegesService extends PureService {
     private sessionManager?;
     private availableActions;
     private availableCredentials;
-    private sessionLengths;
     constructor(itemManager: ItemManager, syncService: SNSyncService, singletonManager: SNSingletonManager, protocolService: SNProtocolService, storageService: SNStorageService, sessionManager: SNSessionManager);
     deinit(): void;
     private loadDefaults;
@@ -42,7 +41,6 @@ export declare class SNPrivilegesService extends PureService {
      */
     netCredentialsForAction(action: ProtectedAction): Promise<PrivilegeCredential[]>;
     getPrivileges(): Promise<SNPrivileges>;
-    savePrivileges(): Promise<any>;
     setSessionLength(length: PrivilegeSessionLength): Promise<void>;
     clearSession(): Promise<void>;
     getSelectedSessionLength(): Promise<any>;

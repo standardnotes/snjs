@@ -18,7 +18,7 @@ export declare class SNHistoryManager extends PureService {
     private historySession?;
     private removeChangeObserver;
     private persistable;
-    private autoOptimize;
+    autoOptimize: boolean;
     private saveTimeout;
     constructor(itemManager: ItemManager, storageService: SNStorageService, contentTypes: ContentType[], timeout: any);
     deinit(): void;

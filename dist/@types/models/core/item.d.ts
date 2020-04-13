@@ -32,7 +32,8 @@ export declare enum AppDataField {
     NotAvailableOnMobile = "notAvailableOnMobile",
     MobileActive = "mobileActive",
     LastSize = "lastSize",
-    PrefersPlainEditor = "prefersPlainEditor"
+    PrefersPlainEditor = "prefersPlainEditor",
+    ComponentInstallError = "installError"
 }
 export declare enum SingletonStrategies {
     KeepEarliest = 1
@@ -144,6 +145,7 @@ export declare class ItemMutator {
     getResult(): PurePayload;
     /** Merges the input payload with the base payload */
     mergePayload(payload: PurePayload): void;
+    setContent(content: PayloadContent): void;
     setDeleted(): void;
     set lastSyncBegan(began: Date);
     set errorDecrypting(errorDecrypting: boolean);

@@ -8,32 +8,8 @@ import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
 import { PayloadSource } from '../protocol/payloads/index';
 import { ContentType } from '../models/index';
-import { ComponentArea, SNComponent } from '../models/app/component';
+import { ComponentArea, SNComponent, ComponentAction, ComponentPermission } from '../models/app/component';
 import { Platform, Environment } from '../platforms';
-export declare enum ComponentAction {
-    SetSize = "set-size",
-    StreamItems = "stream-items",
-    StreamContextItem = "stream-context-item",
-    SaveItems = "save-items",
-    SelectItem = "select-item",
-    AssociateItem = "associate-item",
-    DeassociateItem = "deassociate-item",
-    ClearSelection = "clear-selection",
-    CreateItem = "create-item",
-    CreateItems = "create-items",
-    DeleteItems = "delete-items",
-    SetComponentData = "set-component-data",
-    InstallLocalComponent = "install-local-component",
-    ToggleActivateComponent = "toggle-activate-component",
-    RequestPermissions = "request-permissions",
-    PresentConflictResolution = "present-conflict-resolution",
-    DuplicateItem = "duplicate-item",
-    ComponentRegistered = "component-registered",
-    ActivateThemes = "themes",
-    Reply = "reply",
-    SaveSuccess = "save-success",
-    SaveError = "save-error"
-}
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
@@ -45,7 +21,7 @@ declare type ComponentHandler = {
 };
 export declare type PermissionDialog = {
     component: SNComponent;
-    permissions: Permission[];
+    permissions: ComponentPermission[];
     permissionsString: string;
     actionBlock: (approved: boolean) => void;
     callback: (approved: boolean) => void;
@@ -82,10 +58,6 @@ declare type ItemMessagePayload = {
     * extension currently has. Changes are always metadata updates if the mapping source
     * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
     isMetadataUpdate: any;
-};
-declare type Permission = {
-    name: ComponentAction;
-    content_types?: ContentType[];
 };
 declare type ComponentState = {
     window?: Window;
@@ -144,6 +116,7 @@ export declare class SNComponentManager extends PureService {
     sendMessageToComponent(component: SNComponent, message: ComponentMessage | MessageReply): void;
     urlForComponent(component: SNComponent): string | null;
     componentForUrl(url: string): SNComponent;
+    sessionKeyForComponent(component: SNComponent): string | undefined;
     componentForSessionKey(key: string): SNComponent | undefined;
     handleMessage(component: SNComponent, message: ComponentMessage): void;
     removePrivatePropertiesFromResponseItems(responseItems: any[], component: SNComponent, includeUrls?: boolean): void;
@@ -161,8 +134,8 @@ export declare class SNComponentManager extends PureService {
     handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage): void;
     toggleComponent(component: SNComponent): Promise<void>;
     handleInstallLocalComponentMessage(sourceComponent: SNComponent, message: ComponentMessage): void;
-    runWithPermissions(component: SNComponent, requiredPermissions: Permission[], runFunction: () => void): void;
-    promptForPermissions(component: SNComponent, permissions: Permission[], callback: (approved: boolean) => Promise<void>): void;
+    runWithPermissions(component: SNComponent, requiredPermissions: ComponentPermission[], runFunction: () => void): void;
+    promptForPermissions(component: SNComponent, permissions: ComponentPermission[], callback: (approved: boolean) => Promise<void>): void;
     presentPermissionsDialog(dialog: PermissionDialog): void;
     openModalComponent(component: SNComponent): void;
     registerHandler(handler: ComponentHandler): () => void;
@@ -184,6 +157,6 @@ export declare class SNComponentManager extends PureService {
     handleSetSizeEvent(component: SNComponent, data: any): void;
     editorForNote(note: SNNote): SNComponent | undefined;
     getDefaultEditor(): SNComponent;
-    permissionsStringForPermissions(permissions: Permission[], component: SNComponent): string;
+    permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent): string;
 }
 export {};

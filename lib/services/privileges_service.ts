@@ -71,7 +71,7 @@ export class SNPrivilegesService extends PureService {
 
   private availableActions: ProtectedAction[] = []
   private availableCredentials: PrivilegeCredential[] = []
-  private sessionLengths: PrivilegeSessionLength[] = []
+  // private sessionLengths: PrivilegeSessionLength[] = []
 
   constructor(
     itemManager: ItemManager,
@@ -111,12 +111,12 @@ export class SNPrivilegesService extends PureService {
       PrivilegeCredential.LocalPasscode
     ];
 
-    this.sessionLengths = [
-      PrivilegeSessionLength.None,
-      PrivilegeSessionLength.FiveMinutes,
-      PrivilegeSessionLength.OneHour,
-      PrivilegeSessionLength.OneWeek
-    ];
+    // this.sessionLengths = [
+    //   PrivilegeSessionLength.None,
+    //   PrivilegeSessionLength.FiveMinutes,
+    //   PrivilegeSessionLength.OneHour,
+    //   PrivilegeSessionLength.OneWeek
+    // ];
   }
 
   getAvailableActions() {
@@ -158,12 +158,6 @@ export class SNPrivilegesService extends PureService {
       contentType,
       FillItemContent({})
     ) as Promise<SNPrivileges>;
-  }
-
-  async savePrivileges() {
-    const privileges = await this.getPrivileges();
-    await this.itemManager!.setItemDirty(privileges.uuid);
-    return this.syncService!.sync();
   }
 
   async setSessionLength(length: PrivilegeSessionLength) {
