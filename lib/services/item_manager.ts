@@ -190,18 +190,21 @@ export class ItemManager extends PureService {
     source?: PayloadSource,
     sourceKey?: string,
   ) {
-
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
     const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
     this.collection.set(changedOrInserted)
-
     const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
     for (const item of discardedItems) {
       this.collection.discard(item);
     }
-
-    await this.notifyObservers(changedItems, insertedItems, discardedItems, source, sourceKey);
+    await this.notifyObservers(
+      changedItems,
+      insertedItems,
+      discardedItems,
+      source,
+      sourceKey
+    );
   }
 
   private async notifyObservers(
@@ -211,19 +214,29 @@ export class ItemManager extends PureService {
     source?: PayloadSource,
     sourceKey?: string
   ) {
+    const filter = (items: SNItem[], types: ContentType[]) => {
+      return items.filter((item) => {
+        return (
+          types.includes(ContentType.Any) ||
+          types.includes(item.content_type)
+        )
+      });
+    }
     for (const observer of this.observers) {
-      const filter = (items: SNItem[], types: ContentType[]) => {
-        return items.filter((item) => {
-          return (
-            types.includes(ContentType.Any) ||
-            types.includes(item.content_type)
-          )
-        });
+      const filteredChanged = filter(changed, observer.contentType);
+      const filteredInserted = filter(inserted, observer.contentType);
+      const filteredDiscarded = filter(discarded, observer.contentType);
+      if (
+        filteredChanged.length === 0 &&
+        filteredInserted.length === 0 &&
+        filteredDiscarded.length === 0
+      ) {
+        continue;
       }
       await observer.callback(
-        filter(changed, observer.contentType),
-        filter(inserted, observer.contentType),
-        filter(discarded, observer.contentType),
+        filteredChanged,
+        filteredInserted,
+        filteredDiscarded,
         source,
         sourceKey
       );
@@ -246,7 +259,7 @@ export class ItemManager extends PureService {
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
   ) {
-    if(!isString(uuid)) {
+    if (!isString(uuid)) {
       throw Error('Invalid uuid for changeItem');
     }
     const results = await this.changeItems(
@@ -260,19 +273,19 @@ export class ItemManager extends PureService {
   }
 
   private createMutatorForItem(item: SNItem, type: MutationType) {
-    if(item.content_type === ContentType.Note) {
+    if (item.content_type === ContentType.Note) {
       return new NoteMutator(item, type);
     } else if (item.content_type === ContentType.Tag) {
       return new TagMutator(item, type);
-    } else if(item.content_type === ContentType.Component) {
+    } else if (item.content_type === ContentType.Component) {
       return new ComponentMutator(item, type);
     } else if (item.content_type === ContentType.ActionsExtension) {
       return new ActionsExtensionMutator(item, type);
     } else if (item.content_type === ContentType.ItemsKey) {
       return new ItemsKeyMutator(item, type);
-    } else if(item.content_type === ContentType.Privileges) {
+    } else if (item.content_type === ContentType.Privileges) {
       return new PrivilegeMutator(item, type);
-    } 
+    }
     else {
       return new ItemMutator(item, type);
     }
@@ -448,7 +461,7 @@ export class ItemManager extends PureService {
     return this.items.filter((item) => {
       /* An item that has an error decrypting can be synced only if it is being deleted.
         Otherwise, we don't want to send corrupt content up to the server. */
-      return item.dirty && !item.dummy && (!item.errorDecrypting || item.deleted);
+      return item.dirty && (!item.errorDecrypting || item.deleted);
     });
   }
 
@@ -588,20 +601,11 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Returns a detached array of all items which are not dummys
-   */
-  public get allNondummyItems() {
-    return this.items.filter((item) => {
-      return !item.dummy;
-    });
-  }
-
-  /**
    * Returns a detached array of all items which are not deleted
    */
   public get nonDeletedItems() {
     return this.items.filter((item) => {
-      return !item.dummy && !item.deleted;
+      return !item.deleted;
     });
   }
 
@@ -613,7 +617,7 @@ export class ItemManager extends PureService {
   public getItems(contentType: ContentType | ContentType[]): SNItem[] {
     if (Array.isArray(contentType)) {
       return this.items.filter((item) => {
-        return !item.dummy && contentType.includes(item.content_type!);
+        return contentType.includes(item.content_type!);
       });
     } else {
       return this.collection.all(contentType);
@@ -699,8 +703,7 @@ export class ItemManager extends PureService {
       const notTrashedPredicate = new SNPredicate('content.trashed', '=', false);
       predicates.push(notTrashedPredicate);
     }
-    const results = this.itemsMatchingPredicates(predicates);
-    return results;
+    return this.itemsMatchingPredicates(predicates) as SNNote[];
   }
 
   /**
@@ -740,7 +743,7 @@ export class ItemManager extends PureService {
    * The number of notes currently managed
    */
   public get noteCount() {
-    return this.notes.filter((n) => !n.dummy).length;
+    return this.notes.length;
   }
 
   /**
@@ -772,7 +775,6 @@ function BuildSmartTags() {
     {
       uuid: SYSTEM_TAG_ALL_NOTES,
       content_type: ContentType.SmartTag,
-      dummy: true,
       content: FillItemContent({
         title: 'All notes',
         isSystemTag: true,
@@ -785,7 +787,6 @@ function BuildSmartTags() {
     {
       uuid: SYSTEM_TAG_ARCHIVED_NOTES,
       content_type: ContentType.SmartTag,
-      dummy: true,
       content: FillItemContent({
         title: 'Archived',
         isSystemTag: true,
@@ -798,7 +799,6 @@ function BuildSmartTags() {
     {
       uuid: SYSTEM_TAG_TRASHED_NOTES,
       content_type: ContentType.SmartTag,
-      dummy: true,
       content: FillItemContent({
         title: 'Trash',
         isSystemTag: true,

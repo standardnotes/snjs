@@ -29,7 +29,7 @@ export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
-export { findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys } from './utils';
+export { findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Copy } from './utils';
 export { Uuid } from './uuid';
 export { EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption } from './protocol/intents';
 export { ContentType } from './models/content_types';
@@ -40,7 +40,7 @@ export { Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, 
 export { SyncEvent } from './services/sync/events';
 /** Payloads */
 export { MutableCollection, ImmutablePayloadCollection } from './protocol/payloads/collection';
-export { CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, CopyPayload } from './protocol/payloads/generator';
+export { CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload } from './protocol/payloads/generator';
 export { PayloadSource, isPayloadSourceRetrieved } from './protocol/payloads/sources';
 export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';

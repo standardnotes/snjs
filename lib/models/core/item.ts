@@ -132,10 +132,6 @@ export class SNItem {
     return this.payload.dirty;
   }
 
-  get dummy() {
-    return this.payload.dummy;
-  }
-
   get errorDecrypting() {
     return this.payload.errorDecrypting;
   }
@@ -202,9 +198,6 @@ export class SNItem {
 
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
-    if(!appData) {
-      console.log("app data is null for item", this);
-    }
     return appData[key];
   }
 
@@ -405,8 +398,7 @@ export class ItemMutator {
         {
           content: this.content,
           dirty: true,
-          dirtiedDate: new Date(),
-          dummy: false
+          dirtiedDate: new Date()
         }
       )
     }

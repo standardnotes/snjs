@@ -104,6 +104,9 @@ export class PayloadManager extends PureService {
     source: PayloadSource,
     sourceKey?: string
   ) {
+    if (payloads.length === 0) {
+      console.warn("Attempting to emit 0 payloads.");
+    }
     /** First loop should process payloads and add items only; no relationship handling. */
     const { changed, inserted, discarded } = await this.mergePayloadsOntoMaster(payloads);
     await this.notifyChangeObservers(changed, inserted, discarded, source, sourceKey);

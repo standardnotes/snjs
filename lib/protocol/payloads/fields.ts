@@ -14,7 +14,6 @@ export enum PayloadField {
   WaitingForKey = 'waitingForKey',
   ErrorDecrypting = 'errorDecrypting',
   ErrorDecryptingChanged = 'errorDecryptingValueChanged',
-  Dummy = 'dummy',
   LastSyncBegan = 'lastSyncBegan',
   LastSyncEnd = 'lastSyncEnd'
 };

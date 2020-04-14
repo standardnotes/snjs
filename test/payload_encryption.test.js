@@ -43,7 +43,6 @@ describe('payload encryption', () => {
         dirtiedDate: new Date(),
         lastSyncBegan: new Date(),
         waitingForKey: false,
-        dummy: true,
         errorDecrypting: false
       }
     );
@@ -58,7 +57,6 @@ describe('payload encryption', () => {
     expect(encryptedPayload.errorDecryptingValueChanged).to.not.be.ok;
     expect(encryptedPayload.waitingForKey).to.not.be.ok;
     expect(encryptedPayload.lastSyncBegan).to.not.be.ok;
-    expect(encryptedPayload.dummy).to.not.be.ok;
   });
 
   it('creating payload with override properties', async () => {

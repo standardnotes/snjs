@@ -25,7 +25,6 @@ export declare type RawPayload = {
     updated_at?: Date;
     dirtiedDate?: Date;
     dirty?: boolean;
-    dummy?: boolean;
     errorDecrypting?: boolean;
     waitingForKey?: boolean;
     errorDecryptingValueChanged?: boolean;

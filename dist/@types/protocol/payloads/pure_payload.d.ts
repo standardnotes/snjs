@@ -37,7 +37,6 @@ export declare class PurePayload {
     readonly updated_at?: Date;
     readonly dirtiedDate?: Date;
     readonly dirty?: boolean;
-    readonly dummy?: boolean;
     readonly errorDecrypting?: boolean;
     readonly waitingForKey?: boolean;
     readonly errorDecryptingValueChanged?: boolean;

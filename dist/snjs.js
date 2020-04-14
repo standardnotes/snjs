@@ -1187,6 +1187,9 @@ var SNApplication = /*#__PURE__*/function () {
                 return this.itemManager.changeItems([insertedItem.uuid]);
 
               case 5:
+                return _context18.abrupt("return", this.findItem(item.uuid));
+
+              case 6:
               case "end":
                 return _context18.stop();
             }
@@ -3461,7 +3464,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.ts ***!
   \**********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, ComponentArea, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, ComponentArea, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Copy, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3654,6 +3657,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return _utils__WEBPACK_IMPORTED_MODULE_31__["truncateHexString"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return _utils__WEBPACK_IMPORTED_MODULE_31__["jsonParseEmbeddedKeys"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return _utils__WEBPACK_IMPORTED_MODULE_31__["Copy"]; });
 
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_32__["Uuid"]; });
@@ -6035,13 +6040,6 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
     get: function get() {
       return this.getAppDomainValue(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["AppDataField"].PrefersPlainEditor);
     }
-  }], [{
-    key: "filterDummyNotes",
-    value: function filterDummyNotes(notes) {
-      return notes.filter(function (note) {
-        return !note.dummy;
-      });
-    }
   }]);
 
   return SNNote;
@@ -6887,11 +6885,6 @@ var SNItem = /*#__PURE__*/function () {
     key: "getAppDomainValue",
     value: function getAppDomainValue(key) {
       var appData = this.getDomainData(SNItem.DefaultAppDomain());
-
-      if (!appData) {
-        console.log("app data is null for item", this);
-      }
-
       return appData[key];
     }
   }, {
@@ -7059,11 +7052,6 @@ var SNItem = /*#__PURE__*/function () {
       return this.payload.dirty;
     }
   }, {
-    key: "dummy",
-    get: function get() {
-      return this.payload.dummy;
-    }
-  }, {
     key: "errorDecrypting",
     get: function get() {
       return this.payload.errorDecrypting;
@@ -7227,8 +7215,7 @@ var ItemMutator = /*#__PURE__*/function () {
         return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["CopyPayload"])(this.payload, {
           content: this.content,
           dirty: true,
-          dirtiedDate: new Date(),
-          dummy: false
+          dirtiedDate: new Date()
         });
       }
     }
@@ -12465,7 +12452,6 @@ var PayloadField;
   PayloadField["WaitingForKey"] = "waitingForKey";
   PayloadField["ErrorDecrypting"] = "errorDecrypting";
   PayloadField["ErrorDecryptingChanged"] = "errorDecryptingValueChanged";
-  PayloadField["Dummy"] = "dummy";
   PayloadField["LastSyncBegan"] = "lastSyncBegan";
   PayloadField["LastSyncEnd"] = "lastSyncEnd";
 })(PayloadField || (PayloadField = {}));
@@ -12906,7 +12892,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /** The MaxItemPayload represents a payload with all possible fields */
-var MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Dummy, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].LastSyncEnd];
+var MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].LastSyncEnd];
 var EncryptionParametersFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].WaitingForKey];
 var FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthHash];
 var StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].WaitingForKey];
@@ -13144,8 +13130,6 @@ var PurePayload = /*#__PURE__*/function () {
 
     _defineProperty(this, "dirty", void 0);
 
-    _defineProperty(this, "dummy", void 0);
-
     _defineProperty(this, "errorDecrypting", void 0);
 
     _defineProperty(this, "waitingForKey", void 0);
@@ -13203,7 +13187,6 @@ var PurePayload = /*#__PURE__*/function () {
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
     this.dirtiedDate = new Date(rawPayload.dirtiedDate);
     this.dirty = rawPayload.dirty;
-    this.dummy = rawPayload.dummy;
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
@@ -14551,7 +14534,7 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "alert",
     value: function () {
-      var _alert = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(title, text) {
+      var _alert = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(text, title) {
         var closeButtonText,
             onClose,
             _args = arguments;
@@ -14583,7 +14566,7 @@ var SNAlertService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "confirm",
     value: function () {
-      var _confirm = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(title, text) {
+      var _confirm = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(text, title) {
         var confirmButtonText,
             cancelButtonText,
             onConfirm,
@@ -21223,80 +21206,91 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "notifyObservers",
     value: function () {
       var _notifyObservers = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(changed, inserted, discarded, source, sourceKey) {
-        var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, observer, filter;
+        var filter, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, observer, filteredChanged, filteredInserted, filteredDiscarded;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _iteratorNormalCompletion2 = true;
-                _didIteratorError2 = false;
-                _iteratorError2 = undefined;
-                _context3.prev = 3;
-                _iterator2 = this.observers[Symbol.iterator]();
-
-              case 5:
-                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context3.next = 13;
-                  break;
-                }
-
-                observer = _step2.value;
-
                 filter = function filter(items, types) {
                   return items.filter(function (item) {
                     return types.includes(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Any) || types.includes(item.content_type);
                   });
                 };
 
-                _context3.next = 10;
-                return observer.callback(filter(changed, observer.contentType), filter(inserted, observer.contentType), filter(discarded, observer.contentType), source, sourceKey);
-
-              case 10:
                 _iteratorNormalCompletion2 = true;
-                _context3.next = 5;
-                break;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+                _context3.prev = 4;
+                _iterator2 = this.observers[Symbol.iterator]();
+
+              case 6:
+                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+                  _context3.next = 18;
+                  break;
+                }
+
+                observer = _step2.value;
+                filteredChanged = filter(changed, observer.contentType);
+                filteredInserted = filter(inserted, observer.contentType);
+                filteredDiscarded = filter(discarded, observer.contentType);
+
+                if (!(filteredChanged.length === 0 && filteredInserted.length === 0 && filteredDiscarded.length === 0)) {
+                  _context3.next = 13;
+                  break;
+                }
+
+                return _context3.abrupt("continue", 15);
 
               case 13:
-                _context3.next = 19;
-                break;
+                _context3.next = 15;
+                return observer.callback(filteredChanged, filteredInserted, filteredDiscarded, source, sourceKey);
 
               case 15:
-                _context3.prev = 15;
-                _context3.t0 = _context3["catch"](3);
+                _iteratorNormalCompletion2 = true;
+                _context3.next = 6;
+                break;
+
+              case 18:
+                _context3.next = 24;
+                break;
+
+              case 20:
+                _context3.prev = 20;
+                _context3.t0 = _context3["catch"](4);
                 _didIteratorError2 = true;
                 _iteratorError2 = _context3.t0;
 
-              case 19:
-                _context3.prev = 19;
-                _context3.prev = 20;
+              case 24:
+                _context3.prev = 24;
+                _context3.prev = 25;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                   _iterator2.return();
                 }
 
-              case 22:
-                _context3.prev = 22;
+              case 27:
+                _context3.prev = 27;
 
                 if (!_didIteratorError2) {
-                  _context3.next = 25;
+                  _context3.next = 30;
                   break;
                 }
 
                 throw _iteratorError2;
 
-              case 25:
-                return _context3.finish(22);
+              case 30:
+                return _context3.finish(27);
 
-              case 26:
-                return _context3.finish(19);
+              case 31:
+                return _context3.finish(24);
 
-              case 27:
+              case 32:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, this, [[3, 15, 19, 27], [20,, 22, 26]]);
+        }, _callee3, this, [[4, 20, 24, 32], [25,, 27, 31]]);
       }));
 
       function notifyObservers(_x11, _x12, _x13, _x14, _x15) {
@@ -21813,7 +21807,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       return this.items.filter(function (item) {
         /* An item that has an error decrypting can be synced only if it is being deleted.
           Otherwise, we don't want to send corrupt content up to the server. */
-        return item.dirty && !item.dummy && (!item.errorDecrypting || item.deleted);
+        return item.dirty && (!item.errorDecrypting || item.deleted);
       });
     }
     /**
@@ -22286,7 +22280,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     value: function getItems(contentType) {
       if (Array.isArray(contentType)) {
         return this.items.filter(function (item) {
-          return !item.dummy && contentType.includes(item.content_type);
+          return contentType.includes(item.content_type);
         });
       } else {
         return this.collection.all(contentType);
@@ -22449,8 +22443,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
         predicates.push(notTrashedPredicate);
       }
 
-      var results = this.itemsMatchingPredicates(predicates);
-      return results;
+      return this.itemsMatchingPredicates(predicates);
     }
     /**
      * Returns the smart tag corresponding to the "Trash" tag.
@@ -22586,17 +22579,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       return this.collection.all();
     }
     /**
-     * Returns a detached array of all items which are not dummys
-     */
-
-  }, {
-    key: "allNondummyItems",
-    get: function get() {
-      return this.items.filter(function (item) {
-        return !item.dummy;
-      });
-    }
-    /**
      * Returns a detached array of all items which are not deleted
      */
 
@@ -22604,7 +22586,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "nonDeletedItems",
     get: function get() {
       return this.items.filter(function (item) {
-        return !item.dummy && !item.deleted;
+        return !item.deleted;
       });
     }
   }, {
@@ -22626,9 +22608,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "noteCount",
     get: function get() {
-      return this.notes.filter(function (n) {
-        return !n.dummy;
-      }).length;
+      return this.notes.length;
     }
   }]);
 
@@ -22642,7 +22622,6 @@ function BuildSmartTags() {
   var allNotes = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
     uuid: SYSTEM_TAG_ALL_NOTES,
     content_type: _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].SmartTag,
-    dummy: true,
     content: Object(_Models_functions__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])({
       title: 'All notes',
       isSystemTag: true,
@@ -22653,7 +22632,6 @@ function BuildSmartTags() {
   var archived = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
     uuid: SYSTEM_TAG_ARCHIVED_NOTES,
     content_type: _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].SmartTag,
-    dummy: true,
     content: Object(_Models_functions__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])({
       title: 'Archived',
       isSystemTag: true,
@@ -22664,7 +22642,6 @@ function BuildSmartTags() {
   var trash = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_15__["CreateMaxPayloadFromAnyObject"])({
     uuid: SYSTEM_TAG_TRASHED_NOTES,
     content_type: _models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].SmartTag,
-    dummy: true,
     content: Object(_Models_functions__WEBPACK_IMPORTED_MODULE_11__["FillItemContent"])({
       title: 'Trash',
       isSystemTag: true,
@@ -23388,18 +23365,24 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _context3.next = 2;
+                if (payloads.length === 0) {
+                  console.warn("Attempting to emit 0 payloads.");
+                }
+                /** First loop should process payloads and add items only; no relationship handling. */
+
+
+                _context3.next = 3;
                 return this.mergePayloadsOntoMaster(payloads);
 
-              case 2:
+              case 3:
                 _ref = _context3.sent;
                 changed = _ref.changed;
                 inserted = _ref.inserted;
                 discarded = _ref.discarded;
-                _context3.next = 8;
+                _context3.next = 9;
                 return this.notifyChangeObservers(changed, inserted, discarded, source, sourceKey);
 
-              case 8:
+              case 9:
               case "end":
                 return _context3.stop();
             }
@@ -30964,7 +30947,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 }
 
                 /** Make a copy of the array, as alternating uuid will affect array */
-                _items = this.itemManager.allNondummyItems.filter(function (item) {
+                _items = this.itemManager.items.filter(function (item) {
                   return !item.errorDecrypting;
                 }).slice();
                 _iteratorNormalCompletion = true;
@@ -31023,7 +31006,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 return _context11.finish(21);
 
               case 29:
-                items = this.itemManager.allNondummyItems;
+                items = this.itemManager.items;
                 payloads = items.map(function (item) {
                   return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_18__["CreateMaxPayloadFromAnyObject"])(item, undefined, undefined, {
                     dirty: true,
@@ -31317,12 +31300,18 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                  */
 
                 beginDate = new Date();
-                _context13.next = 42;
+
+                if (!(items.length > 0)) {
+                  _context13.next = 43;
+                  break;
+                }
+
+                _context13.next = 43;
                 return this.itemManager.changeItems(Object(_Models_functions__WEBPACK_IMPORTED_MODULE_22__["Uuids"])(items), function (mutator) {
                   mutator.lastSyncBegan = beginDate;
                 }, _Models_core_item__WEBPACK_IMPORTED_MODULE_3__["MutationType"].NonDirtying);
 
-              case 42:
+              case 43:
                 online = this.sessionManager.online();
 
                 useMode = function (tryMode) {
@@ -31338,80 +31327,80 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 uploadPayloads = [];
 
                 if (!(useMode === SyncModes.Default)) {
-                  _context13.next = 57;
+                  _context13.next = 58;
                   break;
                 }
 
                 if (!(online && !this.completedOnlineDownloadFirstSync)) {
-                  _context13.next = 48;
+                  _context13.next = 49;
                   break;
                 }
 
                 throw 'Attempting to default mode sync without having completed initial.';
 
-              case 48:
+              case 49:
                 if (!online) {
-                  _context13.next = 54;
+                  _context13.next = 55;
                   break;
                 }
 
-                _context13.next = 51;
+                _context13.next = 52;
                 return this.payloadsByPreparingForServer(decryptedPayloads);
 
-              case 51:
+              case 52:
                 uploadPayloads = _context13.sent;
-                _context13.next = 55;
+                _context13.next = 56;
                 break;
-
-              case 54:
-                uploadPayloads = decryptedPayloads;
 
               case 55:
-                _context13.next = 58;
+                uploadPayloads = decryptedPayloads;
+
+              case 56:
+                _context13.next = 59;
                 break;
 
-              case 57:
+              case 58:
                 if (useMode === SyncModes.DownloadFirst) {
                   uploadPayloads = [];
                 }
 
-              case 58:
+              case 59:
                 if (!online) {
-                  _context13.next = 64;
+                  _context13.next = 65;
                   break;
                 }
 
-                _context13.next = 61;
+                _context13.next = 62;
                 return this.syncOnlineOperation(uploadPayloads, options.checkIntegrity, options.source, useMode);
 
-              case 61:
+              case 62:
                 operation = _context13.sent;
-                _context13.next = 67;
+                _context13.next = 68;
                 break;
 
-              case 64:
-                _context13.next = 66;
+              case 65:
+                _context13.next = 67;
                 return this.syncOfflineOperation(uploadPayloads, options.source, useMode);
 
-              case 66:
+              case 67:
                 operation = _context13.sent;
 
-              case 67:
-                _context13.next = 69;
+              case 68:
+                _context13.next = 70;
                 return operation.run();
 
-              case 69:
+              case 70:
                 this.opStatus.setDidEnd();
                 releaseLock();
 
                 if (!this.opStatus.hasError()) {
-                  _context13.next = 73;
+                  _context13.next = 74;
                   break;
                 }
 
                 return _context13.abrupt("return");
 
-              case 73:
+              case 74:
                 this.opStatus.reset();
                 this.state.lastSyncDate = new Date();
 
@@ -31419,23 +31408,28 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].MajorDataChange);
                 }
 
-                _context13.next = 78;
-                return this.handleNeverSyncedDeleted(neverSyncedDeleted);
-
-              case 78:
-                if (!(useMode !== SyncModes.DownloadFirst)) {
-                  _context13.next = 81;
+                if (!(neverSyncedDeleted.length > 0)) {
+                  _context13.next = 80;
                   break;
                 }
 
-                _context13.next = 81;
+                _context13.next = 80;
+                return this.handleNeverSyncedDeleted(neverSyncedDeleted);
+
+              case 80:
+                if (!(useMode !== SyncModes.DownloadFirst)) {
+                  _context13.next = 83;
+                  break;
+                }
+
+                _context13.next = 83;
                 return this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].FullSyncCompleted, {
                   source: options.source
                 });
 
-              case 81:
+              case 83:
                 if (!(useMode === SyncModes.DownloadFirst)) {
-                  _context13.next = 89;
+                  _context13.next = 91;
                   break;
                 }
 
@@ -31443,23 +31437,23 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   this.completedOnlineDownloadFirstSync = true;
                 }
 
-                _context13.next = 85;
+                _context13.next = 87;
                 return this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].DownloadFirstSyncCompleted);
 
-              case 85:
-                _context13.next = 87;
+              case 87:
+                _context13.next = 89;
                 return this.sync({
                   source: SyncSources.AfterDownloadFirst,
                   checkIntegrity: true
                 });
 
-              case 87:
-                _context13.next = 115;
+              case 89:
+                _context13.next = 117;
                 break;
 
-              case 89:
+              case 91:
                 if (!(!this.popSpawnQueue() && this.resolveQueue.length > 0)) {
-                  _context13.next = 97;
+                  _context13.next = 99;
                   break;
                 }
 
@@ -31471,46 +31465,46 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 });
 
                 if (!options.awaitAll) {
-                  _context13.next = 95;
+                  _context13.next = 97;
                   break;
                 }
 
-                _context13.next = 95;
+                _context13.next = 97;
                 return promise;
 
-              case 95:
-                _context13.next = 115;
+              case 97:
+                _context13.next = 117;
                 break;
 
-              case 97:
-                _context13.next = 99;
+              case 99:
+                _context13.next = 101;
                 return this.itemsNeedingSync();
 
-              case 99:
+              case 101:
                 _context13.t0 = _context13.sent.length;
 
                 if (!(_context13.t0 > 0)) {
-                  _context13.next = 105;
+                  _context13.next = 107;
                   break;
                 }
 
-                _context13.next = 103;
+                _context13.next = 105;
                 return this.sync({
                   source: SyncSources.MoreDirtyItems
                 });
 
-              case 103:
-                _context13.next = 115;
+              case 105:
+                _context13.next = 117;
                 break;
 
-              case 105:
+              case 107:
                 if (!(operation instanceof _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_11__["AccountSyncOperation"] && operation.checkIntegrity)) {
-                  _context13.next = 114;
+                  _context13.next = 116;
                   break;
                 }
 
                 if (!(this.state.needsSync && operation.done)) {
-                  _context13.next = 112;
+                  _context13.next = 114;
                   break;
                 }
 
@@ -31522,21 +31516,21 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 });
 
                 if (!options.awaitAll) {
-                  _context13.next = 112;
+                  _context13.next = 114;
                   break;
                 }
 
-                _context13.next = 112;
+                _context13.next = 114;
                 return _promise;
 
-              case 112:
-                _context13.next = 115;
+              case 114:
+                _context13.next = 117;
                 break;
 
-              case 114:
+              case 116:
                 this.state.clearIntegrityHashes();
 
-              case 115:
+              case 117:
                 /**
                  * For timing strategy SyncQueueStrategy.ResolveOnNext.
                  * Execute any callbacks pulled before this sync request began.
@@ -31547,52 +31541,52 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _iteratorNormalCompletion2 = true;
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
-                _context13.prev = 118;
+                _context13.prev = 120;
 
                 for (_iterator2 = inTimeResolveQueue[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                   callback = _step2.value;
                   callback.resolve();
                 }
 
-                _context13.next = 126;
+                _context13.next = 128;
                 break;
 
-              case 122:
-                _context13.prev = 122;
-                _context13.t1 = _context13["catch"](118);
+              case 124:
+                _context13.prev = 124;
+                _context13.t1 = _context13["catch"](120);
                 _didIteratorError2 = true;
                 _iteratorError2 = _context13.t1;
 
-              case 126:
-                _context13.prev = 126;
-                _context13.prev = 127;
+              case 128:
+                _context13.prev = 128;
+                _context13.prev = 129;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                   _iterator2.return();
                 }
 
-              case 129:
-                _context13.prev = 129;
+              case 131:
+                _context13.prev = 131;
 
                 if (!_didIteratorError2) {
-                  _context13.next = 132;
+                  _context13.next = 134;
                   break;
                 }
 
                 throw _iteratorError2;
 
-              case 132:
-                return _context13.finish(129);
-
-              case 133:
-                return _context13.finish(126);
-
               case 134:
+                return _context13.finish(131);
+
+              case 135:
+                return _context13.finish(128);
+
+              case 136:
               case "end":
                 return _context13.stop();
             }
           }
-        }, _callee13, this, [[118, 122, 126, 134], [127,, 129, 133]]);
+        }, _callee13, this, [[120, 124, 128, 136], [129,, 131, 135]]);
       }));
 
       function sync() {

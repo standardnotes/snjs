@@ -16,7 +16,6 @@ export declare class SNNote extends SNItem implements NoteContent {
     safeText(): string;
     safeTitle(): string;
     get prefersPlainEditor(): any;
-    static filterDummyNotes(notes: SNNote[]): SNNote[];
 }
 export declare class NoteMutator extends ItemMutator {
     set title(title: string);

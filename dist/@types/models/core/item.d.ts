@@ -60,7 +60,6 @@ export declare class SNItem {
     get userModifiedDate(): Date;
     get dirtiedDate(): Date | undefined;
     get dirty(): boolean | undefined;
-    get dummy(): boolean | undefined;
     get errorDecrypting(): boolean | undefined;
     get waitingForKey(): boolean | undefined;
     get errorDecryptingValueChanged(): boolean | undefined;

@@ -383,14 +383,14 @@ export class SNSyncService extends PureService {
     this.log('Marking all items as needing sync');
     if (alternateUuids) {
       /** Make a copy of the array, as alternating uuid will affect array */
-      const items = this.itemManager!.allNondummyItems.filter((item) => {
+      const items = this.itemManager!.items.filter((item) => {
         return !item.errorDecrypting;
       }).slice();
       for (const item of items) {
         await this.alternateUuidForItem(item.uuid);
       }
     }
-    const items = this.itemManager!.allNondummyItems;
+    const items = this.itemManager!.items;
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(
         item,
@@ -576,13 +576,15 @@ export class SNSyncService extends PureService {
      * Setting this value means the item was 100% sent to the server.
      */
     const beginDate = new Date();
-    await this.itemManager!.changeItems(
-      Uuids(items),
-      (mutator) => {
-        mutator.lastSyncBegan = beginDate;
-      },
-      MutationType.NonDirtying
-    );
+    if(items.length > 0) {
+      await this.itemManager!.changeItems(
+        Uuids(items),
+        (mutator) => {
+          mutator.lastSyncBegan = beginDate;
+        },
+        MutationType.NonDirtying
+      );
+    }
 
     const online = this.sessionManager!.online();
     const useMode = ((tryMode) => {
@@ -640,7 +642,9 @@ export class SNSyncService extends PureService {
     ) {
       this.notifyEvent(SyncEvent.MajorDataChange);
     }
-    await this.handleNeverSyncedDeleted(neverSyncedDeleted);
+    if(neverSyncedDeleted.length > 0) {
+      await this.handleNeverSyncedDeleted(neverSyncedDeleted);
+    }
     if (useMode !== SyncModes.DownloadFirst) {
       await this.notifyEvent(SyncEvent.FullSyncCompleted, { source: options.source });
     }

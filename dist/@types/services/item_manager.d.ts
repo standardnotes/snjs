@@ -145,10 +145,6 @@ export declare class ItemManager extends PureService {
      */
     get items(): SNItem[];
     /**
-     * Returns a detached array of all items which are not dummys
-     */
-    get allNondummyItems(): SNItem[];
-    /**
      * Returns a detached array of all items which are not deleted
      */
     get nonDeletedItems(): SNItem[];
@@ -190,7 +186,7 @@ export declare class ItemManager extends PureService {
     /**
      * Returns all notes matching the smart tag
      */
-    notesMatchingSmartTag(smartTag: SNSmartTag): SNItem[];
+    notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[];
     /**
      * Returns the smart tag corresponding to the "Trash" tag.
      */
@@ -198,7 +194,7 @@ export declare class ItemManager extends PureService {
     /**
      * Returns all items currently in the trash
      */
-    get trashedItems(): SNItem[];
+    get trashedItems(): SNNote[];
     /**
      * Permanently deletes any items currently in the trash. Consumer must manually call sync.
      */

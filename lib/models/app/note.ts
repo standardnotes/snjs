@@ -45,12 +45,6 @@ export class SNNote extends SNItem implements NoteContent {
   get prefersPlainEditor() {
     return this.getAppDomainValue(AppDataField.PrefersPlainEditor);
   }
-
-  static filterDummyNotes(notes: SNNote[]) {
-    return notes.filter((note) => {
-      return !note.dummy;
-    });
-  }
 }
 
 export class NoteMutator extends ItemMutator {

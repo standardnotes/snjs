@@ -7,6 +7,6 @@ import { DeviceInterface } from '../device_interface';
 export declare class SNAlertService extends PureService {
     constructor(deviceInterface: DeviceInterface);
     deinit(): void;
-    alert(title: string, text?: string, closeButtonText?: string, onClose?: () => void): Promise<unknown>;
-    confirm(title: string, text?: string, confirmButtonText?: string, cancelButtonText?: string, onConfirm?: () => void, onCancel?: () => void, destructive?: boolean): Promise<unknown>;
+    alert(text?: string, title?: string, closeButtonText?: string, onClose?: () => void): Promise<unknown>;
+    confirm(text?: string, title?: string, confirmButtonText?: string, cancelButtonText?: string, onConfirm?: () => void, onCancel?: () => void, destructive?: boolean): Promise<unknown>;
 }

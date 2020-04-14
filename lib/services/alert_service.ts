@@ -18,8 +18,8 @@ export class SNAlertService extends PureService {
   }
 
   async alert(
-    title: string,
     text?: string,
+    title?: string,
     closeButtonText = 'OK',
     onClose?: () => void
   ) {
@@ -30,8 +30,8 @@ export class SNAlertService extends PureService {
   }
 
   async confirm(
-    title: string,
     text?: string,
+    title?: string,
     confirmButtonText = 'Confirm',
     cancelButtonText = 'Cancel',
     onConfirm?: () => void,

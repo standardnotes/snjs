@@ -40,7 +40,6 @@ export class PurePayload {
   readonly updated_at?: Date
   readonly dirtiedDate?: Date
   readonly dirty?: boolean
-  readonly dummy?: boolean
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
   readonly errorDecryptingValueChanged?: boolean
@@ -91,7 +90,6 @@ export class PurePayload {
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
     this.dirtiedDate = new Date(rawPayload.dirtiedDate!);
     this.dirty = rawPayload.dirty;
-    this.dummy = rawPayload.dummy;
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;

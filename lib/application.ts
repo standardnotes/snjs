@@ -471,6 +471,7 @@ export class SNApplication {
     const insertedItem = await this.itemManager!.insertItem(item);
     /* Now change the item so that it's marked as dirty */
     await this.itemManager!.changeItems([insertedItem.uuid]);
+    return this.findItem(item.uuid)!;
   }
 
   /**

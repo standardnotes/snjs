@@ -79,7 +79,8 @@ export {
   getGlobalScope,
   removeFromArray,
   truncateHexString,
-  jsonParseEmbeddedKeys
+  jsonParseEmbeddedKeys,
+  Copy
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

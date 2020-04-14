@@ -163,12 +163,12 @@ export declare class SNApplication {
     deleteItem(item: SNItem): Promise<any>;
     deleteItemLocally(item: SNItem): Promise<void>;
     emptyTrash(): Promise<any>;
-    getTrashedItems(): SNItem[];
+    getTrashedItems(): import("./models").SNNote[];
     /**
      * Inserts the input item by its payload properties, and marks the item as dirty.
      * A sync is not performed after an item is inserted. This must be handled by the caller.
      */
-    insertItem(item: SNItem): Promise<void>;
+    insertItem(item: SNItem): Promise<SNItem>;
     /**
      * Saves the item by uuid by finding it, setting it as dirty if its not already,
      * and performing a sync request.
@@ -188,7 +188,7 @@ export declare class SNApplication {
     changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     getDisplayableItems(contentType: ContentType): SNItem[];
-    notesMatchingSmartTag(smartTag: SNSmartTag): SNItem[];
+    notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
     /** Returns an item's direct references */
     referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
     /** Returns items referencing an item */

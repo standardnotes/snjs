@@ -35,7 +35,6 @@ export type RawPayload = {
   updated_at?: Date
   dirtiedDate?: Date
   dirty?: boolean
-  dummy?: boolean
   errorDecrypting?: boolean
   waitingForKey?: boolean
   errorDecryptingValueChanged?: boolean
@@ -74,7 +73,6 @@ const MaxPayloadFields = [
   PayloadField.ErrorDecrypting,
   PayloadField.ErrorDecryptingChanged,
   PayloadField.WaitingForKey,
-  PayloadField.Dummy,
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
 ]
