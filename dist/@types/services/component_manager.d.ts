@@ -144,11 +144,10 @@ export declare class SNComponentManager extends PureService {
     getReadonlyStateForComponent(component: SNComponent): ComponentState;
     /** Called by other views when the iframe is ready */
     registerComponentWindow(component: SNComponent, componentWindow: Window): Promise<void>;
-    markComponentActive(component: SNComponent, active: boolean): Promise<void>;
     registerComponent(component: SNComponent): void;
     activateComponent(component: SNComponent): Promise<void>;
     deregisterComponent(component: SNComponent): void;
-    deactivateComponent(component: SNComponent, dontSync?: boolean): Promise<void>;
+    deactivateComponent(component: SNComponent): Promise<void>;
     reloadComponent(component: SNComponent): Promise<unknown>;
     deleteComponent(component: SNComponent): Promise<void>;
     isComponentActive(component: SNComponent): boolean;

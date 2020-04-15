@@ -532,7 +532,7 @@ export class ItemManager extends PureService {
       {
         uuid: await Uuid.GenerateUuid(),
         content_type: contentType,
-        content: content ? FillItemContent(content) : undefined
+        content: FillItemContent(content || {})
       }
     );
     return CreateItemFromPayload(payload);

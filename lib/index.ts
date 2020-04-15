@@ -20,6 +20,7 @@ export {
   SNUserPrefs, UserPrefsMutator, WebPrefKey
 } from './models';
 export { ComponentArea } from './models/app/component';
+export { LiveItem } from './models/live_item';
 
 export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from '@Services/history/history_session';

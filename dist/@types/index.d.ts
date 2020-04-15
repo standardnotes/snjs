@@ -7,6 +7,7 @@ export { SNProtocolOperator004 } from './protocol/operator/004/operator_004';
 export { DeviceInterface } from './device_interface';
 export { SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey } from './models';
 export { ComponentArea } from './models/app/component';
+export { LiveItem } from './models/live_item';
 export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from './services/history/history_session';
 export { ItemHistory } from './services/history/item_history';

@@ -63,6 +63,7 @@ export declare class SNComponent extends SNItem {
     readonly valid_until: Date;
     readonly active: boolean;
     readonly legacy_url: string;
+    readonly isMobileDefault: boolean;
     constructor(payload: PurePayload);
     /** Do not duplicate components under most circumstances. Always keep original */
     strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;

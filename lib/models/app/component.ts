@@ -70,6 +70,7 @@ export class SNComponent extends SNItem {
   public readonly valid_until: Date
   public readonly active: boolean
   public readonly legacy_url: string
+  public readonly isMobileDefault: boolean
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -88,6 +89,7 @@ export class SNComponent extends SNItem {
     this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled;
     this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || [];
     this.associatedItemIds = this.payload.safeContent.associatedItemIds || [];
+    this.isMobileDefault = this.payload.safeContent.isMobileDefault;
     /**
     * @legacy
     * We don't want to set the url directly, as we'd like to phase it out.

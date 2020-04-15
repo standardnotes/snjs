@@ -20,7 +20,7 @@ import {
   ComponentPermission
 } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
-import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays } from '@Lib/utils';
+import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays, findInArray } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
 
@@ -959,7 +959,7 @@ export class SNComponentManager extends PureService {
             continue;
           }
           if ([ContentType.Component, ContentType.Theme].includes(item.content_type!)) {
-            await this.deactivateComponent(item as SNComponent, true);
+            await this.deactivateComponent(item as SNComponent);
           }
           await this.itemManager!.setItemToBeDeleted(item.uuid);
         }
@@ -1228,14 +1228,8 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  async markComponentActive(component: SNComponent, active: boolean) {
-    if (active) {
-
-    }
-  }
-
   registerComponent(component: SNComponent) {
-    if (!this.activeComponents.includes(component)) {
+    if (!findInArray(this.activeComponents, 'uuid', component.uuid)) {
       this.activeComponents.push(component);
     }
     for (const handler of this.handlers) {
@@ -1252,17 +1246,18 @@ export class SNComponentManager extends PureService {
   }
 
   async activateComponent(component: SNComponent) {
-    if (component.active) {
-      return;
+    if (!component.active) {
+      await this.itemManager!.changeComponent(component.uuid, (mutator) => {
+        mutator.active = true;
+      });
     }
-    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
-      mutator.active = true;
-    });
+    this.registerComponent(component);
     this.syncService!.sync();
   }
 
   deregisterComponent(component: SNComponent) {
     removeFromArray(this.activeComponents, component);
+    delete this.componentState[component.uuid];
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
@@ -1282,13 +1277,12 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  async deactivateComponent(component: SNComponent, dontSync = false) {
-    if (!component.active) {
-      return;
+  async deactivateComponent(component: SNComponent) {
+    if (component.active) {
+      await this.itemManager!.changeComponent(component.uuid, (mutator) => {
+        mutator.active = false;
+      });
     }
-    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
-      mutator.active = false;
-    });
     this.findOrCreateDataForComponent(component).sessionKey = undefined;
     this.deregisterComponent(component);
     this.syncService!.sync();
@@ -1381,20 +1375,33 @@ export class SNComponentManager extends PureService {
         return editor;
       }
     }
+    let defaultEditor;
     /* No editor found for note. Use default editor, if note does not prefer system editor */
     if (this.isMobile) {
       if (!note.mobilePrefersPlainEditor) {
-        return this.getDefaultEditor();
+        defaultEditor = this.getDefaultEditor();
       }
     } else {
-      if (!note.getAppDomainValue(AppDataField.PrefersPlainEditor)) {
-        return editors.filter((e) => { return e.isDefaultEditor(); })[0];
+      if (!note.prefersPlainEditor) {
+        defaultEditor = this.getDefaultEditor();
       }
+    }
+    if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note)) {
+      return defaultEditor;
+    } else {
+      return undefined;
     }
   }
 
-  getDefaultEditor(): SNComponent {
-    throw 'Must override'
+  getDefaultEditor() {
+    const editors = this.componentsForArea(ComponentArea.Editor);
+    if (this.isMobile) {
+      return editors.filter(e => {
+        return e.isMobileDefault;
+      })[0];
+    } else {
+      return editors.filter((e) => e.isDefaultEditor())[0];
+    }
   }
 
   permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent) {
