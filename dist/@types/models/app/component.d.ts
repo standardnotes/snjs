@@ -41,12 +41,31 @@ export declare type ComponentPermission = {
     name: ComponentAction;
     content_types?: ContentType[];
 };
+interface ComponentContent {
+    componentData: Record<string, any>;
+    /** Items that have requested a component to be disabled in its context */
+    disassociatedItemIds: string[];
+    /** Items that have requested a component to be enabled in its context */
+    associatedItemIds: string[];
+    local_url: string;
+    hosted_url: string;
+    offlineOnly: boolean;
+    name: string;
+    autoupdateDisabled: boolean;
+    package_info: any;
+    area: ComponentArea;
+    permissions: ComponentPermission[];
+    valid_until: Date;
+    active: boolean;
+    legacy_url: string;
+    isMobileDefault: boolean;
+}
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
  * only by its url.
  */
-export declare class SNComponent extends SNItem {
+export declare class SNComponent extends SNItem implements ComponentContent {
     readonly componentData: Record<string, any>;
     /** Items that have requested a component to be disabled in its context */
     readonly disassociatedItemIds: string[];
@@ -90,16 +109,18 @@ export declare class SNComponent extends SNItem {
     isExplicitlyDisabledForItem(item: SNItem): boolean;
 }
 export declare class ComponentMutator extends ItemMutator {
+    get typedContent(): Partial<ComponentContent>;
     set active(active: boolean);
     set defaultEditor(defaultEditor: boolean);
     set componentData(componentData: Record<string, any>);
     set package_info(package_info: any);
     set local_url(local_url: string);
     set hosted_url(hosted_url: string);
-    set permissions(permimssions: ComponentPermission[]);
+    set permissions(permissions: ComponentPermission[]);
     associateWithItem(item: SNItem): void;
     disassociateWithItem(item: SNItem): void;
     removeAssociatedItemId(uuid: UuidString): void;
     removeDisassociatedItemId(uuid: UuidString): void;
     setLastSize(size: string): void;
 }
+export {};

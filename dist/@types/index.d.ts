@@ -30,7 +30,7 @@ export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
-export { findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Copy } from './utils';
+export { findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, Copy } from './utils';
 export { Uuid } from './uuid';
 export { EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption } from './protocol/intents';
 export { ContentType } from './models/content_types';

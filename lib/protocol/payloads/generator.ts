@@ -143,6 +143,15 @@ const ComponentRetrievedPayloadFields = [
   PayloadField.CreatedAt
 ]
 
+/** Represents a payload with permissible fields for when a
+ * component wants to create a new item */
+const ComponentCreatedPayloadFields = [
+  PayloadField.Uuid,
+  PayloadField.Content,
+  PayloadField.ContentType,
+  PayloadField.CreatedAt
+]
+
 /**
  * The saved server item payload represents the payload we want to map
  * when mapping saved_items from the server. We only want to map the
@@ -311,6 +320,10 @@ export function payloadFieldsForSource(source: PayloadSource) {
 
   if (source === PayloadSource.ComponentRetrieved) {
     return ComponentRetrievedPayloadFields.slice();
+  }
+
+  if (source === PayloadSource.ComponentCreated) {
+    return ComponentCreatedPayloadFields.slice();
   }
 
   if ((

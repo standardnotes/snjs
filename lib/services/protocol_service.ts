@@ -581,9 +581,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Here we find such items, and attempt to decrypt them again.
    */
   public async decryptErroredItems() {
-    const items = this.itemManager!.items.filter((item) => {
-      return item.waitingForKey || item.errorDecrypting;
-    });
+    const items = this.itemManager!.invalidItems;
     if (items.length === 0) {
       return;
     }

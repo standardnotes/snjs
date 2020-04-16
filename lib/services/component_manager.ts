@@ -1,3 +1,5 @@
+import { Uuids } from '@Models/functions';
+import { ComponentMutator } from './../models/app/component';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ContentType, displayStringForContentType } from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
@@ -5,10 +7,9 @@ import { RawPayload, CreateSourcedPayloadFromObject } from '@Payloads/generator'
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
-import { SNItem, AppDataField, MutationType } from '@Models/core/item';
+import { SNItem, MutationType } from '@Models/core/item';
 import { SNAlertService } from './alert_service';
 import { SNSyncService } from './sync/sync_service';
-import { PayloadManager } from './model_manager';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import remove from 'lodash/remove';
@@ -20,7 +21,10 @@ import {
   ComponentPermission
 } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
-import { Copy, isString, extendArray, removeFromArray, searchArray, concatArrays, findInArray } from '@Lib/utils';
+import {
+  Copy, isString, extendArray, removeFromArray,
+  searchArray, concatArrays, addIfUnique
+} from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
 
@@ -115,10 +119,9 @@ type ComponentState = {
  */
 export class SNComponentManager extends PureService {
 
-  private itemManager?: ItemManager
-  private modelManager?: PayloadManager
-  private syncService?: SNSyncService
-  private alertService?: SNAlertService
+  private itemManager!: ItemManager
+  private syncService!: SNSyncService
+  private alertService!: SNAlertService
   private environment: Environment
   private platform: Platform
   private timeout: any
@@ -128,13 +131,12 @@ export class SNComponentManager extends PureService {
   private removeItemObserver?: any
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
-  private activeComponents: SNComponent[] = [];
+  private activeComponents: UuidString[] = []
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
   constructor(
     itemManager: ItemManager,
-    modelManager: PayloadManager,
     syncService: SNSyncService,
     alertService: SNAlertService,
     environment: Environment,
@@ -144,7 +146,6 @@ export class SNComponentManager extends PureService {
     super();
     this.timeout = timeout || setTimeout.bind(window);
     this.itemManager = itemManager;
-    this.modelManager = modelManager;
     this.syncService = syncService;
     this.alertService = alertService;
     this.environment = environment;
@@ -184,10 +185,9 @@ export class SNComponentManager extends PureService {
     this.activeComponents.length = 0;
     this.permissionDialogs.length = 0;
     this.handlers.length = 0;
-    this.itemManager = undefined;
-    this.modelManager = undefined;
-    this.syncService = undefined;
-    this.alertService = undefined;
+    (this.itemManager as any) = undefined;
+    (this.syncService as any) = undefined;
+    (this.alertService as any) = undefined;
     this.removeItemObserver();
     this.removeItemObserver = null;
     if (window) {
@@ -225,9 +225,9 @@ export class SNComponentManager extends PureService {
         for (const component of syncedComponents) {
           const activeComponent = find(this.activeComponents, { uuid: component.uuid });
           if (component.active && !component.deleted && !activeComponent) {
-            await this.activateComponent(component);
+            await this.activateComponent(component.uuid);
           } else if (!component.active && activeComponent) {
-            await this.deactivateComponent(component);
+            await this.deactivateComponent(component.uuid);
           }
         }
         /* LocalChanged is not interesting to send to observers. For local changes,
@@ -312,8 +312,9 @@ export class SNComponentManager extends PureService {
   }
 
   detectFocusChange = () => {
-    for (const component of this.activeComponents) {
-      if (document.activeElement === this.iframeForComponent(component)) {
+    const activeComponents = this.itemManager.findItems(this.activeComponents) as SNComponent[];
+    for (const component of activeComponents) {
+      if (document.activeElement === this.iframeForComponent(component.uuid)) {
         this.timeout(() => {
           this.focusChangedForComponent(component);
         });
@@ -707,7 +708,7 @@ export class SNComponentManager extends PureService {
       for (const contentType of message.data.content_types) {
         extendArray(
           items,
-          items.concat(this.itemManager!.validItemsForContentType(contentType))
+          this.itemManager!.validItemsForContentType(contentType)
         );
       }
       this.sendItemsInReply(component, items, message);
@@ -798,7 +799,7 @@ export class SNComponentManager extends PureService {
       );
 
       /* Filter locked items */
-      const uuids = responsePayloads.map((item: ComponentRawPayload) => item.uuid!);
+      const uuids = Uuids(responsePayloads);
       const items = this.itemManager!.findItems(uuids, true);
       let lockedCount = 0;
       items.forEach((item, index) => {
@@ -832,14 +833,14 @@ export class SNComponentManager extends PureService {
         return CreateSourcedPayloadFromObject(
           responseItem,
           PayloadSource.ComponentRetrieved
-        );
-      });
+          );
+        });
       await this.itemManager!.changeItems(
         uuids,
         (mutator) => {
-          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() })!;
           const payload = searchArray(payloads, { uuid: mutator.getUuid() })!;
           mutator.mergePayload(payload);
+          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() })!;
           if (responseItem.clientData) {
             const allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
             allComponentData[component.getClientDataKey()!] = responseItem.clientData;
@@ -901,9 +902,12 @@ export class SNComponentManager extends PureService {
       this.removePrivatePropertiesFromResponseItems(responseItems, component);
       const processedItems = [];
       for (const responseItem of responseItems) {
+        if(!responseItem.uuid) {
+          responseItem.uuid = await Uuid.GenerateUuid();
+        }
         const payload = CreateSourcedPayloadFromObject(
           responseItem,
-          PayloadSource.RemoteRetrieved
+          PayloadSource.ComponentCreated
         );
         const template = CreateItemFromPayload(payload);
         const item = await this.itemManager!.insertItem(template);
@@ -917,7 +921,7 @@ export class SNComponentManager extends PureService {
             }
           },
           MutationType.UserInteraction,
-          PayloadSource.ComponentRetrieved,
+          PayloadSource.ComponentCreated,
           component.uuid
         );
         processedItems.push(item);
@@ -959,7 +963,7 @@ export class SNComponentManager extends PureService {
             continue;
           }
           if ([ContentType.Component, ContentType.Theme].includes(item.content_type!)) {
-            await this.deactivateComponent(item as SNComponent);
+            await this.deactivateComponent(item.uuid);
           }
           await this.itemManager!.setItemToBeDeleted(item.uuid);
         }
@@ -998,25 +1002,25 @@ export class SNComponentManager extends PureService {
       this.openModalComponent(component);
     } else {
       if (component.active) {
-        await this.deactivateComponent(component);
+        await this.deactivateComponent(component.uuid);
       } else {
         if (component.content_type === ContentType.Theme) {
           const theme = component as SNTheme;
           /* Deactive currently active theme if new theme is not layerable */
           const activeThemes = this.getActiveThemes();
           /* Activate current before deactivating others, so as not to flicker */
-          await this.activateComponent(component);
+          await this.activateComponent(component.uuid);
           if (!theme.isLayerable()) {
             setTimeout(async () => {
               for (const candidate of activeThemes) {
                 if (candidate && !candidate.isLayerable()) {
-                  await this.deactivateComponent(candidate);
+                  await this.deactivateComponent(candidate.uuid);
                 }
               }
             }, 10);
           }
         } else {
-          await this.activateComponent(component);
+          await this.activateComponent(component.uuid);
         }
       }
     }
@@ -1087,18 +1091,22 @@ export class SNComponentManager extends PureService {
       actionBlock: callback,
       callback: async (approved: boolean) => {
         if (approved) {
-          for (const permission of permissions) {
-            const matchingPermission = component.permissions
-              .find((candidate) => candidate.name === permission.name);
-            if (!matchingPermission) {
-              component.permissions.push(permission);
-            } else {
-              /* Permission already exists, but content_types may have been expanded */
-              const contentTypes = matchingPermission.content_types || [];
-              matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types!));
+          await this.itemManager!.changeItem(component.uuid, (m) => {
+            const componentPermissions = Copy(component.permissions) as ComponentPermission[];
+            for (const permission of permissions) {
+              const matchingPermission = componentPermissions
+                .find((candidate) => candidate.name === permission.name);
+              if (!matchingPermission) {
+                componentPermissions.push(permission);
+              } else {
+                /* Permission already exists, but content_types may have been expanded */
+                const contentTypes = matchingPermission.content_types || [];
+                matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types!));
+              }
             }
-          }
-          await this.itemManager!.setItemDirty(component.uuid);
+            const mutator = m as ComponentMutator;
+            mutator.permissions = componentPermissions;
+          })
           this.syncService!.sync();
         }
         this.permissionDialogs = this.permissionDialogs.filter((pendingDialog) => {
@@ -1203,7 +1211,10 @@ export class SNComponentManager extends PureService {
   }
 
   /** Called by other views when the iframe is ready */
-  async registerComponentWindow(component: SNComponent, componentWindow: Window) {
+  public async registerComponentWindow(
+    component: SNComponent,
+    componentWindow: Window
+  ) {
     const data = this.findOrCreateDataForComponent(component);
     if (data.window === componentWindow) {
       this.log('Web|componentManager', 'attempting to re-register same component window.');
@@ -1228,10 +1239,9 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  registerComponent(component: SNComponent) {
-    if (!findInArray(this.activeComponents, 'uuid', component.uuid)) {
-      this.activeComponents.push(component);
-    }
+  registerComponent(uuid: UuidString) {
+    addIfUnique(this.activeComponents, uuid);
+    const component = this.itemManager.findItem(uuid) as SNComponent;
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
@@ -1245,18 +1255,20 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  async activateComponent(component: SNComponent) {
+  async activateComponent(uuid: UuidString) {
+    const component = this.itemManager.findItem(uuid) as SNComponent;
     if (!component.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.active = true;
       });
     }
-    this.registerComponent(component);
+    this.registerComponent(uuid);
     this.syncService!.sync();
   }
 
-  deregisterComponent(component: SNComponent) {
-    removeFromArray(this.activeComponents, component);
+  deregisterComponent(uuid: UuidString) {
+    const component = this.itemManager.findItem(uuid) as SNComponent;
+    removeFromArray(this.activeComponents, uuid);
     delete this.componentState[component.uuid];
     for (const handler of this.handlers) {
       if (
@@ -1267,33 +1279,35 @@ export class SNComponentManager extends PureService {
       }
     }
     this.streamObservers = this.streamObservers.filter((o) => {
-      return o.component !== component;
+      return o.component.uuid !== uuid;
     });
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
-      return o.component !== component;
+      return o.component.uuid !== uuid;
     });
     if (component.area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();
     }
   }
 
-  async deactivateComponent(component: SNComponent) {
+  async deactivateComponent(uuid: UuidString) {
+    const component = this.itemManager?.findItem(uuid) as SNComponent;
     if (component.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.active = false;
       });
     }
     this.findOrCreateDataForComponent(component).sessionKey = undefined;
-    this.deregisterComponent(component);
+    this.deregisterComponent(uuid);
     this.syncService!.sync();
   }
 
-  async reloadComponent(component: SNComponent) {
+  async reloadComponent(uuid: UuidString) {
     /* Do soft deactivate */
+    const component = this.itemManager?.findItem(uuid) as SNComponent;
     await this.itemManager!.changeComponent(component.uuid, (mutator) => {
       mutator.active = false;
     });
-    this.deregisterComponent(component);
+    this.deregisterComponent(component.uuid);
 
     /* Do soft activate */
     return new Promise((resolve) => {
@@ -1301,14 +1315,14 @@ export class SNComponentManager extends PureService {
         await this.itemManager!.changeComponent(component.uuid, (mutator) => {
           mutator.active = true;
         });
-        this.registerComponent(component);
+        this.registerComponent(component.uuid);
         resolve();
       });
     });
   }
 
-  async deleteComponent(component: SNComponent) {
-    await this.itemManager!.setItemToBeDeleted(component.uuid);
+  async deleteComponent(uuid: UuidString) {
+    await this.itemManager!.setItemToBeDeleted(uuid);
     this.syncService!.sync();
   }
 
@@ -1316,17 +1330,18 @@ export class SNComponentManager extends PureService {
     return component.active;
   }
 
-  iframeForComponent(component: SNComponent) {
-    for (const frame of Array.from(document.getElementsByTagName('iframe'))) {
+  iframeForComponent(uuid: UuidString) {
+    const iframes = Array.from(document.getElementsByTagName('iframe'));
+    for (const frame of iframes) {
       const componentId = frame.dataset.componentId;
-      if (componentId === component.uuid) {
+      if (componentId === uuid) {
         return frame;
       }
     }
   }
 
-  focusChangedForComponent(component: SNComponent) {
-    const focused = document.activeElement === this.iframeForComponent(component);
+  private focusChangedForComponent(component: SNComponent) {
+    const focused = document.activeElement === this.iframeForComponent(component.uuid);
     for (const handler of this.handlers) {
       /* Notify all handlers, and not just ones that match this component type */
       handler.focusHandler && handler.focusHandler(component, focused);
@@ -1348,7 +1363,7 @@ export class SNComponentManager extends PureService {
         setSize(content, data);
       }
     } else {
-      const iframe = this.iframeForComponent(component);
+      const iframe = this.iframeForComponent(component.uuid);
       if (!iframe) {
         return;
       }

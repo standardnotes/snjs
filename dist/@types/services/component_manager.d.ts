@@ -6,10 +6,10 @@ import { SNTheme } from './../models/app/theme';
 import { SNItem } from '../models/core/item';
 import { SNAlertService } from './alert_service';
 import { SNSyncService } from './sync/sync_service';
-import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
 import { ComponentArea, SNComponent, ComponentAction, ComponentPermission } from '../models/app/component';
 import { Platform, Environment } from '../platforms';
+import { UuidString } from '../types';
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
@@ -72,10 +72,9 @@ declare type ComponentState = {
  * sending and receiving messages to and from frames via the postMessage API.
  */
 export declare class SNComponentManager extends PureService {
-    private itemManager?;
-    private modelManager?;
-    private syncService?;
-    private alertService?;
+    private itemManager;
+    private syncService;
+    private alertService;
     private environment;
     private platform;
     private timeout;
@@ -87,7 +86,7 @@ export declare class SNComponentManager extends PureService {
     private activeComponents;
     private permissionDialogs;
     private handlers;
-    constructor(itemManager: ItemManager, modelManager: PayloadManager, syncService: SNSyncService, alertService: SNAlertService, environment: Environment, platform: Platform, timeout: any);
+    constructor(itemManager: ItemManager, syncService: SNSyncService, alertService: SNAlertService, environment: Environment, platform: Platform, timeout: any);
     get isDesktop(): boolean;
     get isMobile(): boolean;
     get components(): SNComponent[];
@@ -144,15 +143,15 @@ export declare class SNComponentManager extends PureService {
     getReadonlyStateForComponent(component: SNComponent): ComponentState;
     /** Called by other views when the iframe is ready */
     registerComponentWindow(component: SNComponent, componentWindow: Window): Promise<void>;
-    registerComponent(component: SNComponent): void;
-    activateComponent(component: SNComponent): Promise<void>;
-    deregisterComponent(component: SNComponent): void;
-    deactivateComponent(component: SNComponent): Promise<void>;
-    reloadComponent(component: SNComponent): Promise<unknown>;
-    deleteComponent(component: SNComponent): Promise<void>;
+    registerComponent(uuid: UuidString): void;
+    activateComponent(uuid: UuidString): Promise<void>;
+    deregisterComponent(uuid: UuidString): void;
+    deactivateComponent(uuid: UuidString): Promise<void>;
+    reloadComponent(uuid: UuidString): Promise<unknown>;
+    deleteComponent(uuid: UuidString): Promise<void>;
     isComponentActive(component: SNComponent): boolean;
-    iframeForComponent(component: SNComponent): HTMLIFrameElement | undefined;
-    focusChangedForComponent(component: SNComponent): void;
+    iframeForComponent(uuid: UuidString): HTMLIFrameElement | undefined;
+    private focusChangedForComponent;
     handleSetSizeEvent(component: SNComponent, data: any): void;
     editorForNote(note: SNNote): SNComponent | undefined;
     getDefaultEditor(): SNComponent;

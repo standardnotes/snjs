@@ -1,6 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
 import { UuidMap } from './uuid_map';
-import { isString } from '@Lib/utils';
+import { isString, addIfUnique, removeArray, extendArray } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@Models/content_types';
@@ -13,6 +13,16 @@ export class MutableCollection<T extends Payloadable> {
 
   protected readonly map: Partial<Record<UuidString, T>> = {}
   protected readonly typedMap: Partial<Record<ContentType, T[]>> = {} = {}
+  
+  /** An array of uuids of items that are dirty */
+  protected dirtyIndex: Set<UuidString> = new Set();
+
+  /** An array of uuids of items that are errorDecrypting or waitingForKey */
+  protected invalidsIndex: Set<UuidString> = new Set();
+
+  /** An array of uuids of items that are not marked as deleted */
+  protected nondeletedIndex: Set<UuidString> = new Set();
+
   /** Maintains an index where the direct map for each item id is an array 
    * of item ids that the item references. This is essentially equivalent to 
    * item.content.references, but keeps state even when the item is deleted. 
@@ -67,9 +77,17 @@ export class MutableCollection<T extends Payloadable> {
     return Object.keys(this.map);
   }
 
-  public all(contentType?: ContentType) {
+  public all(contentType?: ContentType | ContentType[]) {
     if (contentType) {
-      return this.typedMap[contentType] || [];
+      if(Array.isArray(contentType)) {
+        const elements = [] as T[];
+        for(const type of contentType) {
+          extendArray(elements, this.typedMap[type] || []);
+        }
+        return elements;
+      } else {
+        return this.typedMap[contentType] || [];
+      }
     } else {
       return Object.keys(this.map).map((uuid: UuidString) => {
         return this.map[uuid]!;
@@ -79,6 +97,24 @@ export class MutableCollection<T extends Payloadable> {
 
   public find(uuid: UuidString) {
     return this.map[uuid];
+  }
+
+  /** Returns all elements that are marked as dirty */
+  public dirtyElements() {
+    const uuids = Array.from(this.dirtyIndex);
+    return this.findAll(uuids) as T[];
+  }
+
+  /** Returns all elements that are errorDecrypting or waitingForKey */
+  public invalidElements() {
+    const uuids = Array.from(this.invalidsIndex);
+    return this.findAll(uuids) as T[];
+  }
+
+  /** Returns all elements that are not marked as deleted */
+  public nondeletedElements() {
+    const uuids = Array.from(this.nondeletedIndex);
+    return this.findAll(uuids) as T[];
   }
 
   /**
@@ -101,9 +137,26 @@ export class MutableCollection<T extends Payloadable> {
     for (const element of elements) {
       this.map[element.uuid!] = element;
       this.setToTypedMap(element);
+      
+      /** Dirty index */
+      if(element.dirty) {
+        this.dirtyIndex.add(element.uuid);
+      } else {
+        this.dirtyIndex.delete(element.uuid);
+      }
+      
+      /** Invalids index */
+      if(element.errorDecrypting || element.waitingForKey) {
+        this.invalidsIndex.add(element.uuid);
+      } else {
+        this.invalidsIndex.delete(element.uuid);
+      }
+
       if (element.deleted) {
         this.referenceMap.removeFromMap(element.uuid!);
+        this.nondeletedIndex.delete(element.uuid);
       } else {
+        this.nondeletedIndex.add(element.uuid);
         const conflictOf = element.safeContent.conflict_of;
         if (conflictOf) {
           this.conflictMap.establishRelationship(conflictOf, element.uuid);

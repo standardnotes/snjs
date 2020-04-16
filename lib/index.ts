@@ -60,6 +60,7 @@ export {
   SyncModes,
   SyncQueueStrategy,
 } from './services/sync/sync_service';
+export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
 export { SNAlertService } from './services/alert_service';
@@ -79,6 +80,8 @@ export {
   greaterOfTwoDates,
   getGlobalScope,
   removeFromArray,
+  addIfUnique,
+  dictToArray,
   truncateHexString,
   jsonParseEmbeddedKeys,
   Copy

@@ -4,6 +4,6 @@ import { SNItem } from './core/item';
 export declare class LiveItem<T extends SNItem> {
     item: T;
     private removeObserver;
-    constructor(uuid: string, application: SNApplication);
+    constructor(uuid: string, application: SNApplication, onChange?: (item: T) => void);
     deinit(): void;
 }

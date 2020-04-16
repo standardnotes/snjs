@@ -268,7 +268,11 @@ export class SNSyncService extends PureService {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.';
     }
-
+    if(rawPayloads.length === 0) {
+      this.databaseLoaded = true;
+      this.opStatus!.setDatabaseLoadStatus(0, 0, true);
+      return;
+    }
     const unsortedPayloads = rawPayloads.map((rawPayload) => {
       return CreateMaxPayloadFromAnyObject(
         rawPayload
@@ -278,7 +282,6 @@ export class SNSyncService extends PureService {
       unsortedPayloads,
       this.localLoadPriorty
     );
-
     /** Decrypt and map items keys first */
     const itemsKeysPayloads = payloads.filter((payload: PurePayload) => {
       return payload.content_type === ContentType.ItemsKey;
@@ -290,7 +293,6 @@ export class SNSyncService extends PureService {
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
-
     /** Map in batches to give interface a chance to update */
     const payloadCount = payloads.length;
     const batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
@@ -515,10 +517,8 @@ export class SNSyncService extends PureService {
     }
 
     const items = await this.itemsNeedingSync();
-    /**
-     * Items that have never been synced and marked as deleted should not be
-     * uploaded to server, and instead deleted directly after sync completion.
-     */
+    /** Items that have never been synced and marked as deleted should not be
+     * uploaded to server, and instead deleted directly after sync completion. */
     const neverSyncedDeleted = items.filter((item) => {
       return item.neverSynced && item.deleted;
     });
@@ -571,10 +571,8 @@ export class SNSyncService extends PureService {
     resolves are triggered at the end of this function call */
     subtractFromArray(this.resolveQueue, inTimeResolveQueue);
 
-    /** 
-     * lastSyncBegan must be set *after* any point we may have returned above. 
-     * Setting this value means the item was 100% sent to the server.
-     */
+    /** lastSyncBegan must be set *after* any point we may have returned above. 
+     * Setting this value means the item was 100% sent to the server. */
     const beginDate = new Date();
     if(items.length > 0) {
       await this.itemManager!.changeItems(
@@ -758,12 +756,14 @@ export class SNSyncService extends PureService {
   private async handleOfflineResponse(response: SyncResponse) {
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
-    await this.modelManager!.emitPayloads(
-      payloadsToEmit,
-      PayloadSource.LocalSaved
-    );
-    const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
-    await this.persistPayloads(payloadsToPersist);
+    if(payloadsToEmit.length > 0) {
+      await this.modelManager!.emitPayloads(
+        payloadsToEmit,
+        PayloadSource.LocalSaved
+      );
+      const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
+      await this.persistPayloads(payloadsToPersist);
+    }
    
     const deletedPayloads = response.deletedPayloads;
     if (deletedPayloads.length > 0) {

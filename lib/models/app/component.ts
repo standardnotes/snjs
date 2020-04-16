@@ -47,12 +47,32 @@ export type ComponentPermission = {
   content_types?: ContentType[]
 }
 
+interface ComponentContent {
+  componentData: Record<string, any>
+  /** Items that have requested a component to be disabled in its context */
+  disassociatedItemIds: string[]
+  /** Items that have requested a component to be enabled in its context */
+  associatedItemIds: string[]
+  local_url: string
+  hosted_url: string
+  offlineOnly: boolean
+  name: string
+  autoupdateDisabled: boolean
+  package_info: any
+  area: ComponentArea
+  permissions: ComponentPermission[]
+  valid_until: Date
+  active: boolean
+  legacy_url: string
+  isMobileDefault: boolean
+}
+
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
  * only by its url.
  */
-export class SNComponent extends SNItem {
+export class SNComponent extends SNItem implements ComponentContent {
 
   public readonly componentData: Record<string, any>
   /** Items that have requested a component to be disabled in its context */
@@ -180,8 +200,12 @@ export class SNComponent extends SNItem {
 
 export class ComponentMutator extends ItemMutator {
 
+  get typedContent() {
+    return this.content! as Partial<ComponentContent>;
+  }
+
   set active(active: boolean) {
-    this.content!.active = active;
+    this.typedContent.active = active;
   }
 
   set defaultEditor(defaultEditor: boolean) {
@@ -189,43 +213,43 @@ export class ComponentMutator extends ItemMutator {
   }
 
   set componentData(componentData: Record<string, any>) {
-    this.content!.componentData = componentData;
+    this.typedContent.componentData = componentData;
   }
 
   set package_info(package_info: any) {
-    this.content!.package_info = package_info;
+    this.typedContent.package_info = package_info;
   }
 
   set local_url(local_url: string) {
-    this.content!.local_url = local_url;
+    this.typedContent.local_url = local_url;
   }
 
   set hosted_url(hosted_url: string) {
-    this.content!.hosted_url = hosted_url;
+    this.typedContent.hosted_url = hosted_url;
   }
 
-  set permissions(permimssions: ComponentPermission[]) {
-    this.content!.permimssions = permimssions;
+  set permissions(permissions: ComponentPermission[]) {
+    this.typedContent!.permissions = permissions;
   }
 
   public associateWithItem(item: SNItem) {
-    const associated = this.content!.associatedItemIds;
+    const associated = this.typedContent.associatedItemIds || [];
     addIfUnique(associated, item.uuid);
-    this.content!.associatedItemIds = associated;
+    this.typedContent.associatedItemIds = associated;
   }
 
   public disassociateWithItem(item: SNItem) {
-    const disassociated = this.content!.disassociatedItemIds;
+    const disassociated = this.typedContent.disassociatedItemIds || [];
     addIfUnique(disassociated, item.uuid);
-    this.content!.disassociatedItemIds = disassociated;
+    this.typedContent.disassociatedItemIds = disassociated;
   }
 
   public removeAssociatedItemId(uuid: UuidString) {
-    removeFromArray(this.content!.associatedItemIds || [], uuid);
+    removeFromArray(this.typedContent.associatedItemIds || [], uuid);
   }
 
   public removeDisassociatedItemId(uuid: UuidString) {
-    removeFromArray(this.content!.disassociatedItemIds || [], uuid);
+    removeFromArray(this.typedContent.disassociatedItemIds || [], uuid);
   }
 
   public setLastSize(size: string) {

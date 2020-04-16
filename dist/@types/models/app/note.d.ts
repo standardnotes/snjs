@@ -3,6 +3,10 @@ import { PurePayload } from './../../protocol/payloads/pure_payload';
 export interface NoteContent {
     title: string;
     text: string;
+    mobilePrefersPlainEditor?: boolean;
+    hidePreview: boolean;
+    preview_plain?: string;
+    preview_html?: string;
 }
 /** A note item */
 export declare class SNNote extends SNItem implements NoteContent {
@@ -18,6 +22,7 @@ export declare class SNNote extends SNItem implements NoteContent {
     get prefersPlainEditor(): any;
 }
 export declare class NoteMutator extends ItemMutator {
+    get typedContent(): Partial<NoteContent>;
     set title(title: string);
     set text(text: string);
     set hidePreview(hidePreview: boolean);

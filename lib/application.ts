@@ -1190,7 +1190,6 @@ export class SNApplication {
     }
     this.componentManager = new SNComponentManager(
       this.itemManager!,
-      this.modelManager!,
       this.syncService!,
       this.alertService!,
       this.environment!,

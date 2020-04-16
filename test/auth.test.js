@@ -131,7 +131,7 @@ describe('basic auth', () => {
     
     expect(response.error).to.not.be.ok;
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-    expect(this.application.itemManager.invalidItems().length).to.equal(0);
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
     
     await this.application.syncService.markAllItemsAsNeedingSync();
     await this.application.syncService.sync();
@@ -160,7 +160,7 @@ describe('basic auth', () => {
     expect(signinResponse.error).to.not.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-    expect(this.application.itemManager.invalidItems().length).to.equal(0);
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
   }).timeout(20000);
 
   it('changes password many times', async function () {
@@ -189,13 +189,13 @@ describe('basic auth', () => {
       newPassword = Factory.randomString();
 
       expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-      expect(this.application.itemManager.invalidItems().length).to.equal(0);
+      expect(this.application.itemManager.invalidItems.length).to.equal(0);
 
       await this.application.syncService.markAllItemsAsNeedingSync();
       await this.application.syncService.sync();
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
       expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
-      expect(this.application.itemManager.invalidItems().length).to.equal(0);
+      expect(this.application.itemManager.invalidItems.length).to.equal(0);
 
       /** Should login with new password */
       const signinResponse = await this.application.signIn(

@@ -5,6 +5,10 @@ import { PurePayload } from './../../protocol/payloads/pure_payload';
 export interface NoteContent {
   title: string
   text: string
+  mobilePrefersPlainEditor?: boolean
+  hidePreview: boolean
+  preview_plain?: string
+  preview_html?: string
 }
 
 /** A note item */
@@ -48,24 +52,29 @@ export class SNNote extends SNItem implements NoteContent {
 }
 
 export class NoteMutator extends ItemMutator {
+  
+  get typedContent() {
+    return this.content! as Partial<NoteContent>;
+  }
+
   set title(title: string) {
-    this.content!.title = title;
+    this.typedContent.title = title;
   }
 
   set text(text: string) {
-    this.content!.text = text;
+    this.typedContent.text = text;
   }
 
   set hidePreview(hidePreview: boolean) {
-    this.content!.hidePreview = hidePreview;
+    this.typedContent.hidePreview = hidePreview;
   }
 
   set preview_plain(preview_plain: string) {
-    this.content!.preview_plain = preview_plain;
+    this.typedContent.preview_plain = preview_plain;
   }
 
   set preview_html(preview_html: string | undefined) {
-    this.content!.preview_html = preview_html;
+    this.typedContent.preview_html = preview_html;
   }
 
   set prefersPlainEditor(prefersPlainEditor: boolean) {

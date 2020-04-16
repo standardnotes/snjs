@@ -12,6 +12,10 @@ export function getGlobalScope() {
     : (typeof global !== 'undefined' ? global : null);
 }
 
+export function dictToArray<T>(dict: Record<any, T>) {
+  return Object.keys(dict).map((key) => dict[key]!);
+}
+
 /**
  * Whether we are in a web browser
  */

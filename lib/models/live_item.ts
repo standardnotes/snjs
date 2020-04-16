@@ -7,16 +7,22 @@ export class LiveItem<T extends SNItem> {
   public item: T
   private removeObserver: any
 
-  constructor(uuid: string, application: SNApplication) {
+  constructor(
+    uuid: string,
+    application: SNApplication,
+    onChange?: (item: T) => void
+  ) {
     this.item = application.findItem(uuid)! as T;
+    onChange && onChange(this.item);
     this.removeObserver = application.streamItems(
-      ContentType.Note,
+      this.item.content_type,
       async (items) => {
         const matchingItem = items.find((item) => {
           return item.uuid === uuid;
         });
         if (matchingItem) {
           this.item = matchingItem as T;
+          onChange && onChange(this.item);
         }
       }
     );

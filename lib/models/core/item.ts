@@ -74,7 +74,7 @@ export class SNItem {
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
-    if(payload.format === PayloadFormat.DecryptedBareObject) {
+    if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
@@ -359,6 +359,7 @@ export class ItemMutator {
     this.type = type;
     this.payload = item.payload;
     if (this.payload.content) {
+      /** this.content needs to be mutable, so we make a copy */
       this.content = Copy(this.payload.content);
     }
   }
@@ -407,6 +408,12 @@ export class ItemMutator {
   /** Merges the input payload with the base payload */
   public mergePayload(payload: PurePayload) {
     this.payload = PayloadByMerging(this.payload, payload);
+    if (this.payload.content) {
+      /** this.content needs to be mutable, so we make a copy */
+      this.content = Copy(this.payload.safeContent);
+    } else {
+      this.content = undefined;
+    }
   }
 
   public setContent(content: PayloadContent) {

@@ -3048,7 +3048,7 @@ var SNApplication = /*#__PURE__*/function () {
         return;
       }
 
-      this.componentManager = new _services__WEBPACK_IMPORTED_MODULE_13__["SNComponentManager"](this.itemManager, this.modelManager, this.syncService, this.alertService, this.environment, this.platform, this.deviceInterface.timeout);
+      this.componentManager = new _services__WEBPACK_IMPORTED_MODULE_13__["SNComponentManager"](this.itemManager, this.syncService, this.alertService, this.environment, this.platform, this.deviceInterface.timeout);
       this.services.push(this.componentManager);
     }
   }, {
@@ -3464,7 +3464,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.ts ***!
   \**********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, truncateHexString, jsonParseEmbeddedKeys, Copy, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, Copy, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3613,140 +3613,148 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncQueueStrategy", function() { return _services_sync_sync_service__WEBPACK_IMPORTED_MODULE_24__["SyncQueueStrategy"]; });
 
-/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_25__["SNSessionManager"]; });
+/* harmony import */ var _services_sync_utils__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./services/sync/utils */ "./lib/services/sync/utils.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SortPayloadsByRecentAndContentPriority", function() { return _services_sync_utils__WEBPACK_IMPORTED_MODULE_25__["SortPayloadsByRecentAndContentPriority"]; });
 
-/* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_26__["SNMigrationService"]; });
+/* harmony import */ var _services_api_session_manager__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./services/api/session_manager */ "./lib/services/api/session_manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSessionManager", function() { return _services_api_session_manager__WEBPACK_IMPORTED_MODULE_26__["SNSessionManager"]; });
 
-/* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _services_alert_service__WEBPACK_IMPORTED_MODULE_27__["SNAlertService"]; });
+/* harmony import */ var _services_migration_service__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./services/migration_service */ "./lib/services/migration_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNMigrationService", function() { return _services_migration_service__WEBPACK_IMPORTED_MODULE_27__["SNMigrationService"]; });
 
-/* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_28__["SNHistoryManager"]; });
+/* harmony import */ var _services_alert_service__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./services/alert_service */ "./lib/services/alert_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNAlertService", function() { return _services_alert_service__WEBPACK_IMPORTED_MODULE_28__["SNAlertService"]; });
 
-/* harmony import */ var _services_privileges_service__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/privileges_service */ "./lib/services/privileges_service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_29__["SNPrivilegesService"]; });
+/* harmony import */ var _services_history_history_manager__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./services/history/history_manager */ "./lib/services/history/history_manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { return _services_history_history_manager__WEBPACK_IMPORTED_MODULE_29__["SNHistoryManager"]; });
 
-/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_30__["SNSingletonManager"]; });
+/* harmony import */ var _services_privileges_service__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./services/privileges_service */ "./lib/services/privileges_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_30__["SNPrivilegesService"]; });
 
-/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_31__["SNApiService"]; });
+/* harmony import */ var _services_singleton_manager__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./services/singleton_manager */ "./lib/services/singleton_manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return _services_singleton_manager__WEBPACK_IMPORTED_MODULE_31__["SNSingletonManager"]; });
 
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./utils */ "./lib/utils.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["findInArray"]; });
+/* harmony import */ var _services_api_api_service__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./services/api/api_service */ "./lib/services/api/api_service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_32__["SNApiService"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["isNullOrUndefined"]; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./utils */ "./lib/utils.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["findInArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["deepMerge"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["isNullOrUndefined"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["extendArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "deepMerge", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["deepMerge"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["removeFromIndex"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "extendArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["extendArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["subtractFromArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["removeFromIndex"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["arrayByDifference"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["subtractFromArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["uniqCombineObjArrays"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["arrayByDifference"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["greaterOfTwoDates"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["uniqCombineObjArrays"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["getGlobalScope"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["greaterOfTwoDates"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["removeFromArray"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["getGlobalScope"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["truncateHexString"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["removeFromArray"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["jsonParseEmbeddedKeys"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "addIfUnique", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["addIfUnique"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return _utils__WEBPACK_IMPORTED_MODULE_32__["Copy"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "dictToArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["dictToArray"]; });
 
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_33__["Uuid"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["truncateHexString"]; });
 
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__["EncryptionIntent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["jsonParseEmbeddedKeys"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__["isLocalStorageIntent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return _utils__WEBPACK_IMPORTED_MODULE_33__["Copy"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__["isFileIntent"]; });
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_34__["Uuid"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__["isDecryptedIntent"]; });
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__["EncryptionIntent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_34__["intentRequiresEncryption"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__["isLocalStorageIntent"]; });
 
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_35__["ContentType"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__["isFileIntent"]; });
 
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_36__["CreateItemFromPayload"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__["isDecryptedIntent"]; });
 
-/* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Models/functions */ "./lib/models/functions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuids", function() { return _Models_functions__WEBPACK_IMPORTED_MODULE_37__["Uuids"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return _Protocol_intents__WEBPACK_IMPORTED_MODULE_35__["intentRequiresEncryption"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "FillItemContent", function() { return _Models_functions__WEBPACK_IMPORTED_MODULE_37__["FillItemContent"]; });
+/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return _Models_content_types__WEBPACK_IMPORTED_MODULE_36__["ContentType"]; });
 
-/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Lib/events */ "./lib/events.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvent", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_38__["ApplicationEvent"]; });
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return _Models_generator__WEBPACK_IMPORTED_MODULE_37__["CreateItemFromPayload"]; });
 
-/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environment", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__["Environment"]; });
+/* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! @Models/functions */ "./lib/models/functions.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuids", function() { return _Models_functions__WEBPACK_IMPORTED_MODULE_38__["Uuids"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platform", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__["Platform"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "FillItemContent", function() { return _Models_functions__WEBPACK_IMPORTED_MODULE_38__["FillItemContent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__["isEnvironmentWebOrDesktop"]; });
+/* harmony import */ var _Lib_events__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! @Lib/events */ "./lib/events.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApplicationEvent", function() { return _Lib_events__WEBPACK_IMPORTED_MODULE_39__["ApplicationEvent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__["isEnvironmentMobile"]; });
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Environment", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__["Environment"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_39__["platformFromString"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Platform", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__["Platform"]; });
 
-/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvent", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_40__["SyncEvent"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentWebOrDesktop", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__["isEnvironmentWebOrDesktop"]; });
 
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_41__["MutableCollection"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isEnvironmentMobile", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__["isEnvironmentMobile"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_41__["ImmutablePayloadCollection"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "platformFromString", function() { return _Lib_platforms__WEBPACK_IMPORTED_MODULE_40__["platformFromString"]; });
 
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["CreateMaxPayloadFromAnyObject"]; });
+/* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvent", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_41__["SyncEvent"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["CreateSourcedPayloadFromObject"]; });
+/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_42__["MutableCollection"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateIntentPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["CreateIntentPayloadFromObject"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_42__["ImmutablePayloadCollection"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["CreateEncryptionParameters"]; });
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["CreateMaxPayloadFromAnyObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadByMerging", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["PayloadByMerging"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["CreateSourcedPayloadFromObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_42__["CopyPayload"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateIntentPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["CreateIntentPayloadFromObject"]; });
 
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_43__["PayloadSource"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["CreateEncryptionParameters"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_43__["isPayloadSourceRetrieved"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadByMerging", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["PayloadByMerging"]; });
 
-/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_44__["ProtocolVersion"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_43__["CopyPayload"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_45__["PayloadFormat"]; });
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_44__["PayloadSource"]; });
 
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_46__["PurePayload"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_44__["isPayloadSourceRetrieved"]; });
 
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_47__["PayloadField"]; });
+/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_45__["ProtocolVersion"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_48__["StorageKey"]; });
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_46__["PayloadFormat"]; });
 
-/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_49__["BaseMigration"]; });
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_47__["PurePayload"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_29__["PrivilegeSessionLength"]; });
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_48__["PayloadField"]; });
+
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_49__["StorageKey"]; });
+
+/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_50__["BaseMigration"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_30__["PrivilegeSessionLength"]; });
+
 
 
 
@@ -5586,26 +5594,26 @@ var ComponentMutator = /*#__PURE__*/function (_ItemMutator) {
   _createClass(ComponentMutator, [{
     key: "associateWithItem",
     value: function associateWithItem(item) {
-      var associated = this.content.associatedItemIds;
+      var associated = this.typedContent.associatedItemIds || [];
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(associated, item.uuid);
-      this.content.associatedItemIds = associated;
+      this.typedContent.associatedItemIds = associated;
     }
   }, {
     key: "disassociateWithItem",
     value: function disassociateWithItem(item) {
-      var disassociated = this.content.disassociatedItemIds;
+      var disassociated = this.typedContent.disassociatedItemIds || [];
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(disassociated, item.uuid);
-      this.content.disassociatedItemIds = disassociated;
+      this.typedContent.disassociatedItemIds = disassociated;
     }
   }, {
     key: "removeAssociatedItemId",
     value: function removeAssociatedItemId(uuid) {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.content.associatedItemIds || [], uuid);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.typedContent.associatedItemIds || [], uuid);
     }
   }, {
     key: "removeDisassociatedItemId",
     value: function removeDisassociatedItemId(uuid) {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.content.disassociatedItemIds || [], uuid);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["removeFromArray"])(this.typedContent.disassociatedItemIds || [], uuid);
     }
   }, {
     key: "setLastSize",
@@ -5613,9 +5621,14 @@ var ComponentMutator = /*#__PURE__*/function (_ItemMutator) {
       this.setAppDataItem(_core_item__WEBPACK_IMPORTED_MODULE_2__["AppDataField"].LastSize, size);
     }
   }, {
+    key: "typedContent",
+    get: function get() {
+      return this.content;
+    }
+  }, {
     key: "active",
     set: function set(active) {
-      this.content.active = active;
+      this.typedContent.active = active;
     }
   }, {
     key: "defaultEditor",
@@ -5625,27 +5638,27 @@ var ComponentMutator = /*#__PURE__*/function (_ItemMutator) {
   }, {
     key: "componentData",
     set: function set(componentData) {
-      this.content.componentData = componentData;
+      this.typedContent.componentData = componentData;
     }
   }, {
     key: "package_info",
     set: function set(package_info) {
-      this.content.package_info = package_info;
+      this.typedContent.package_info = package_info;
     }
   }, {
     key: "local_url",
     set: function set(local_url) {
-      this.content.local_url = local_url;
+      this.typedContent.local_url = local_url;
     }
   }, {
     key: "hosted_url",
     set: function set(hosted_url) {
-      this.content.hosted_url = hosted_url;
+      this.typedContent.hosted_url = hosted_url;
     }
   }, {
     key: "permissions",
-    set: function set(permimssions) {
-      this.content.permimssions = permimssions;
+    set: function set(permissions) {
+      this.typedContent.permissions = permissions;
     }
   }]);
 
@@ -6061,29 +6074,34 @@ var NoteMutator = /*#__PURE__*/function (_ItemMutator) {
   }
 
   _createClass(NoteMutator, [{
+    key: "typedContent",
+    get: function get() {
+      return this.content;
+    }
+  }, {
     key: "title",
     set: function set(title) {
-      this.content.title = title;
+      this.typedContent.title = title;
     }
   }, {
     key: "text",
     set: function set(text) {
-      this.content.text = text;
+      this.typedContent.text = text;
     }
   }, {
     key: "hidePreview",
     set: function set(hidePreview) {
-      this.content.hidePreview = hidePreview;
+      this.typedContent.hidePreview = hidePreview;
     }
   }, {
     key: "preview_plain",
     set: function set(preview_plain) {
-      this.content.preview_plain = preview_plain;
+      this.typedContent.preview_plain = preview_plain;
     }
   }, {
     key: "preview_html",
     set: function set(preview_html) {
-      this.content.preview_html = preview_html;
+      this.typedContent.preview_html = preview_html;
     }
   }, {
     key: "prefersPlainEditor",
@@ -7183,6 +7201,7 @@ var ItemMutator = /*#__PURE__*/function () {
     this.payload = item.payload;
 
     if (this.payload.content) {
+      /** this.content needs to be mutable, so we make a copy */
       this.content = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["Copy"])(this.payload.content);
     }
   }
@@ -7232,6 +7251,13 @@ var ItemMutator = /*#__PURE__*/function () {
     key: "mergePayload",
     value: function mergePayload(payload) {
       this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__["PayloadByMerging"])(this.payload, payload);
+
+      if (this.payload.content) {
+        /** this.content needs to be mutable, so we make a copy */
+        this.content = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["Copy"])(this.payload.safeContent);
+      } else {
+        this.content = undefined;
+      }
     }
   }, {
     key: "setContent",
@@ -7968,7 +7994,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LiveItem", function() { return LiveItem; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_content_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/content_types */ "./lib/models/content_types.ts");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -7983,11 +8008,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-
-
 /** Keeps an item reference up to date with changes */
 var LiveItem = /*#__PURE__*/function () {
-  function LiveItem(uuid, application) {
+  function LiveItem(uuid, application, onChange) {
     var _this = this;
 
     _classCallCheck(this, LiveItem);
@@ -7997,7 +8020,8 @@ var LiveItem = /*#__PURE__*/function () {
     _defineProperty(this, "removeObserver", void 0);
 
     this.item = application.findItem(uuid);
-    this.removeObserver = application.streamItems(_Models_content_types__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Note, /*#__PURE__*/function () {
+    onChange && onChange(this.item);
+    this.removeObserver = application.streamItems(this.item.content_type, /*#__PURE__*/function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(items) {
         var matchingItem;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
@@ -8010,6 +8034,7 @@ var LiveItem = /*#__PURE__*/function () {
 
                 if (matchingItem) {
                   _this.item = matchingItem;
+                  onChange && onChange(_this.item);
                 }
 
               case 2:
@@ -10624,6 +10649,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 var MutableCollection = /*#__PURE__*/function () {
+  /** An array of uuids of items that are dirty */
+
+  /** An array of uuids of items that are errorDecrypting or waitingForKey */
+
+  /** An array of uuids of items that are not marked as deleted */
+
   /** Maintains an index where the direct map for each item id is an array 
    * of item ids that the item references. This is essentially equivalent to 
    * item.content.references, but keeps state even when the item is deleted. 
@@ -10651,6 +10682,12 @@ var MutableCollection = /*#__PURE__*/function () {
     _defineProperty(this, "map", {});
 
     _defineProperty(this, "typedMap", (_ref = {}, _objectDestructuringEmpty(_ref), _ref));
+
+    _defineProperty(this, "dirtyIndex", new Set());
+
+    _defineProperty(this, "invalidsIndex", new Set());
+
+    _defineProperty(this, "nondeletedIndex", new Set());
 
     _defineProperty(this, "referenceMap", void 0);
 
@@ -10688,7 +10725,36 @@ var MutableCollection = /*#__PURE__*/function () {
       var _this = this;
 
       if (contentType) {
-        return this.typedMap[contentType] || [];
+        if (Array.isArray(contentType)) {
+          var elements = [];
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = contentType[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var type = _step.value;
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["extendArray"])(elements, this.typedMap[type] || []);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          return elements;
+        } else {
+          return this.typedMap[contentType] || [];
+        }
       } else {
         return Object.keys(this.map).map(function (uuid) {
           return _this.map[uuid];
@@ -10700,6 +10766,30 @@ var MutableCollection = /*#__PURE__*/function () {
     value: function find(uuid) {
       return this.map[uuid];
     }
+    /** Returns all elements that are marked as dirty */
+
+  }, {
+    key: "dirtyElements",
+    value: function dirtyElements() {
+      var uuids = Array.from(this.dirtyIndex);
+      return this.findAll(uuids);
+    }
+    /** Returns all elements that are errorDecrypting or waitingForKey */
+
+  }, {
+    key: "invalidElements",
+    value: function invalidElements() {
+      var uuids = Array.from(this.invalidsIndex);
+      return this.findAll(uuids);
+    }
+    /** Returns all elements that are not marked as deleted */
+
+  }, {
+    key: "nondeletedElements",
+    value: function nondeletedElements() {
+      var uuids = Array.from(this.nondeletedIndex);
+      return this.findAll(uuids);
+    }
     /**
      * @param includeBlanks If true and an item is not found, an `undefined` element
      * will be inserted into the array.
@@ -10710,62 +10800,17 @@ var MutableCollection = /*#__PURE__*/function () {
     value: function findAll(uuids) {
       var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var results = [];
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = uuids[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var id = _step.value;
-          var element = this.map[id];
-
-          if (element || includeBlanks) {
-            results.push(element);
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      return results;
-    }
-  }, {
-    key: "set",
-    value: function set(elements) {
-      elements = Array.isArray(elements) ? elements : [elements];
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var element = _step2.value;
-          this.map[element.uuid] = element;
-          this.setToTypedMap(element);
+        for (var _iterator2 = uuids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var id = _step2.value;
+          var element = this.map[id];
 
-          if (element.deleted) {
-            this.referenceMap.removeFromMap(element.uuid);
-          } else {
-            var conflictOf = element.safeContent.conflict_of;
-
-            if (conflictOf) {
-              this.conflictMap.establishRelationship(conflictOf, element.uuid);
-            }
-
-            this.referenceMap.setAllRelationships(element.uuid, element.references.map(function (r) {
-              return r.uuid;
-            }));
+          if (element || includeBlanks) {
+            results.push(element);
           }
         }
       } catch (err) {
@@ -10782,10 +10827,12 @@ var MutableCollection = /*#__PURE__*/function () {
           }
         }
       }
+
+      return results;
     }
   }, {
-    key: "discard",
-    value: function discard(elements) {
+    key: "set",
+    value: function set(elements) {
       elements = Array.isArray(elements) ? elements : [elements];
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
@@ -10794,10 +10841,39 @@ var MutableCollection = /*#__PURE__*/function () {
       try {
         for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
           var element = _step3.value;
-          this.conflictMap.removeFromMap(element.uuid);
-          this.referenceMap.removeFromMap(element.uuid);
-          this.deleteFromTypedMap(element);
-          delete this.map[element.uuid];
+          this.map[element.uuid] = element;
+          this.setToTypedMap(element);
+          /** Dirty index */
+
+          if (element.dirty) {
+            this.dirtyIndex.add(element.uuid);
+          } else {
+            this.dirtyIndex.delete(element.uuid);
+          }
+          /** Invalids index */
+
+
+          if (element.errorDecrypting || element.waitingForKey) {
+            this.invalidsIndex.add(element.uuid);
+          } else {
+            this.invalidsIndex.delete(element.uuid);
+          }
+
+          if (element.deleted) {
+            this.referenceMap.removeFromMap(element.uuid);
+            this.nondeletedIndex.delete(element.uuid);
+          } else {
+            this.nondeletedIndex.add(element.uuid);
+            var conflictOf = element.safeContent.conflict_of;
+
+            if (conflictOf) {
+              this.conflictMap.establishRelationship(conflictOf, element.uuid);
+            }
+
+            this.referenceMap.setAllRelationships(element.uuid, element.references.map(function (r) {
+              return r.uuid;
+            }));
+          }
         }
       } catch (err) {
         _didIteratorError3 = true;
@@ -10810,6 +10886,37 @@ var MutableCollection = /*#__PURE__*/function () {
         } finally {
           if (_didIteratorError3) {
             throw _iteratorError3;
+          }
+        }
+      }
+    }
+  }, {
+    key: "discard",
+    value: function discard(elements) {
+      elements = Array.isArray(elements) ? elements : [elements];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = elements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var element = _step4.value;
+          this.conflictMap.removeFromMap(element.uuid);
+          this.referenceMap.removeFromMap(element.uuid);
+          this.deleteFromTypedMap(element);
+          delete this.map[element.uuid];
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -12992,6 +13099,10 @@ var SessionHistoryPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__
  * payload is retrieved from a component for saving */
 
 var ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt];
+/** Represents a payload with permissible fields for when a
+ * component wants to create a new item */
+
+var ComponentCreatedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__["PayloadField"].CreatedAt];
 /**
  * The saved server item payload represents the payload we want to map
  * when mapping saved_items from the server. We only want to map the
@@ -13118,6 +13229,10 @@ function payloadFieldsForSource(source) {
 
   if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSource"].ComponentRetrieved) {
     return ComponentRetrievedPayloadFields.slice();
+  }
+
+  if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSource"].ComponentCreated) {
+    return ComponentCreatedPayloadFields.slice();
   }
 
   if (source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSource"].LocalRetrieved || source === _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__["PayloadSource"].LocalChanged) {
@@ -13393,6 +13508,7 @@ var PayloadSource;
   PayloadSource[PayloadSource["ConflictData"] = 15] = "ConflictData";
   PayloadSource[PayloadSource["SessionHistory"] = 16] = "SessionHistory";
   PayloadSource[PayloadSource["Constructor"] = 17] = "Constructor";
+  PayloadSource[PayloadSource["ComponentCreated"] = 18] = "ComponentCreated";
 })(PayloadSource || (PayloadSource = {}));
 
 ;
@@ -17152,22 +17268,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNComponentManager", function() { return SNComponentManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../models/content_types */ "./lib/models/content_types.ts");
-/* harmony import */ var _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash/uniq */ "./node_modules/lodash/uniq.js");
-/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
+/* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/functions */ "./lib/models/functions.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../models/content_types */ "./lib/models/content_types.ts");
+/* harmony import */ var _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lodash/uniq */ "./node_modules/lodash/uniq.js");
+/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Models_app_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/app/component */ "./lib/models/app/component.ts");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Lib_platforms__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Lib/platforms */ "./lib/platforms.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17211,6 +17328,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 var DESKTOP_URL_PREFIX = 'sn://';
 var LOCAL_HOST = 'localhost';
 var CUSTOM_LOCAL_HOST = 'sn.local';
@@ -17227,7 +17345,7 @@ var ComponentDataDomain = 'org.standardnotes.sn.components';
 var SNComponentManager = /*#__PURE__*/function (_PureService) {
   _inherits(SNComponentManager, _PureService);
 
-  function SNComponentManager(itemManager, modelManager, syncService, alertService, environment, platform, timeout) {
+  function SNComponentManager(itemManager, syncService, alertService, environment, platform, timeout) {
     var _this;
 
     _classCallCheck(this, SNComponentManager);
@@ -17235,8 +17353,6 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SNComponentManager).call(this));
 
     _defineProperty(_assertThisInitialized(_this), "itemManager", void 0);
-
-    _defineProperty(_assertThisInitialized(_this), "modelManager", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "syncService", void 0);
 
@@ -17265,6 +17381,8 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     _defineProperty(_assertThisInitialized(_this), "handlers", []);
 
     _defineProperty(_assertThisInitialized(_this), "detectFocusChange", function () {
+      var activeComponents = _this.itemManager.findItems(_this.activeComponents);
+
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -17273,7 +17391,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         var _loop = function _loop() {
           var component = _step.value;
 
-          if (document.activeElement === _this.iframeForComponent(component)) {
+          if (document.activeElement === _this.iframeForComponent(component.uuid)) {
             _this.timeout(function () {
               _this.focusChangedForComponent(component);
             });
@@ -17282,7 +17400,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           }
         };
 
-        for (var _iterator = _this.activeComponents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = activeComponents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var _ret = _loop();
 
           if (_ret === "break") break;
@@ -17315,7 +17433,6 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
     _this.timeout = timeout || setTimeout.bind(window);
     _this.itemManager = itemManager;
-    _this.modelManager = modelManager;
     _this.syncService = syncService;
     _this.alertService = alertService;
     _this.environment = environment;
@@ -17323,7 +17440,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
     _this.configureForGeneralUsage();
 
-    if (environment !== _Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["Environment"].Mobile) {
+    if (environment !== _Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["Environment"].Mobile) {
       _this.configureForNonMobileUsage();
     }
 
@@ -17350,7 +17467,6 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       this.permissionDialogs.length = 0;
       this.handlers.length = 0;
       this.itemManager = undefined;
-      this.modelManager = undefined;
       this.syncService = undefined;
       this.alertService = undefined;
       this.removeItemObserver();
@@ -17373,7 +17489,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function configureForGeneralUsage() {
       var _this2 = this;
 
-      this.removeItemObserver = this.itemManager.addObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Any, /*#__PURE__*/function () {
+      this.removeItemObserver = this.itemManager.addObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Any, /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(changed, inserted, discarded, source, sourceKey) {
           var items, syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _component, activeComponent;
 
@@ -17381,16 +17497,16 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  items = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["concatArrays"])(changed, inserted, discarded);
+                  items = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["concatArrays"])(changed, inserted, discarded);
                   syncedComponents = items.filter(function (item) {
-                    return item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Component || item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme;
+                    return item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Component || item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme;
                   });
                   /**
                    * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid 
                    * recursion caused by the component being modified and saved after it is updated.
                   */
 
-                  if (syncedComponents.length > 0 && source !== _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteSaved) {
+                  if (syncedComponents.length > 0 && source !== _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].RemoteSaved) {
                     /* Ensure any component in our data is installed by the system */
                     if (_this2.isDesktop) {
                       _this2.desktopManager.syncComponentsInstallation(syncedComponents);
@@ -17410,7 +17526,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   }
 
                   _component = _step2.value;
-                  activeComponent = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(_this2.activeComponents, {
+                  activeComponent = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(_this2.activeComponents, {
                     uuid: _component.uuid
                   });
 
@@ -17420,7 +17536,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   }
 
                   _context.next = 14;
-                  return _this2.activateComponent(_component);
+                  return _this2.activateComponent(_component.uuid);
 
                 case 14:
                   _context.next = 19;
@@ -17433,7 +17549,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   }
 
                   _context.next = 19;
-                  return _this2.deactivateComponent(_component);
+                  return _this2.deactivateComponent(_component.uuid);
 
                 case 19:
                   _iteratorNormalCompletion2 = true;
@@ -17478,7 +17594,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   /* LocalChanged is not interesting to send to observers. For local changes,
                   we wait until the item is set to dirty before notifying observers, where the mapping
                   source would be PayloadSource.LocalChanged */
-                  if (source !== _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].LocalChanged) {
+                  if (source !== _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalChanged) {
                     _this2.notifyStreamObservers(items, source, sourceKey);
                   }
 
@@ -17522,7 +17638,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           }
 
           var requiredPermissions = [{
-            name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+            name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
             content_types: observer.contentTypes.sort()
           }];
 
@@ -17552,7 +17668,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
 
       var requiredContextPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamContextItem
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamContextItem
       }];
       var _iteratorNormalCompletion4 = true;
       var _didIteratorError4 = false;
@@ -17575,7 +17691,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
             for (var _iterator5 = _this3.handlers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
               var handler = _step5.value;
 
-              if (!handler.areas.includes(observer.component.area) && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Any)) {
+              if (!handler.areas.includes(observer.component.area) && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
                 continue;
               }
 
@@ -17584,7 +17700,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
                 if (itemInContext) {
                   var _ret4 = function () {
-                    var matchingItem = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(allItems, {
+                    var matchingItem = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(allItems, {
                       uuid: itemInContext.uuid
                     });
 
@@ -17706,7 +17822,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getActiveThemes",
     value: function getActiveThemes() {
-      return this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Themes).filter(function (theme) {
+      return this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Themes).filter(function (theme) {
         return theme.active;
       });
     }
@@ -17753,7 +17869,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         themes: urls
       };
       var message = {
-        action: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].ActivateThemes,
+        action: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ActivateThemes,
         data: data
       };
       this.sendMessageToComponent(component, message);
@@ -17769,7 +17885,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator8 = this.handlers[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
           var handler = _step8.value;
 
-          if (handler.areas.includes(area) === false && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Any)) {
+          if (handler.areas.includes(area) === false && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
             continue;
           }
 
@@ -17839,7 +17955,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         componentState.hidden = true;
       } else if (componentState.hidden) {
         componentState.hidden = false;
-        var contextObserver = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(this.contextStreamObservers, {
+        var contextObserver = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(this.contextStreamObservers, {
           identifier: component.uuid
         });
 
@@ -17847,7 +17963,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           this.handleStreamContextItemMessage(component, contextObserver.originalMessage);
         }
 
-        var streamObserver = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(this.streamObservers, {
+        var streamObserver = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(this.streamObservers, {
           identifier: component.uuid
         });
 
@@ -17859,7 +17975,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "jsonForItem",
     value: function jsonForItem(item, component, source) {
-      var isMetadatUpdate = source === _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteSaved || source === _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].LocalSaved;
+      var isMetadatUpdate = source === _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].RemoteSaved || source === _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].LocalSaved;
       /** The data all components store into */
 
       var componentData = item.getDomainData(ComponentDataDomain) || {};
@@ -17905,7 +18021,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     key: "replyToMessage",
     value: function replyToMessage(component, originalMessage, replyData) {
       var reply = {
-        action: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].Reply,
+        action: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].Reply,
         original: originalMessage,
         data: replyData
       };
@@ -17914,7 +18030,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "sendMessageToComponent",
     value: function sendMessageToComponent(component, message) {
-      var permissibleActionsWhileHidden = [_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].ComponentRegistered, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].ActivateThemes];
+      var permissibleActionsWhileHidden = [_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ComponentRegistered, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ActivateThemes];
       var componentState = this.findOrCreateDataForComponent(component);
 
       if (componentState.hidden && !permissibleActionsWhileHidden.includes(message.action)) {
@@ -17952,7 +18068,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         var url = component.hosted_url || component.legacy_url;
 
         if (this.isMobile) {
-          var localReplacement = this.platform === _Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["Platform"].Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+          var localReplacement = this.platform === _Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["Platform"].Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
           url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement);
         }
 
@@ -18043,7 +18159,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         return;
       }
 
-      var readwriteActions = [_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SaveItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].AssociateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].DeassociateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].CreateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].CreateItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].DeleteItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SetComponentData];
+      var readwriteActions = [_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SaveItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].AssociateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].DeassociateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].CreateItem, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].CreateItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].DeleteItems, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SetComponentData];
       var readonlyState = this.getReadonlyStateForComponent(component);
 
       if (readonlyState.readonly && readwriteActions.includes(message.action)) {
@@ -18051,26 +18167,26 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         return;
       }
 
-      if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems) {
+      if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems) {
         this.handleStreamItemsMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamContextItem) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamContextItem) {
         this.handleStreamContextItemMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SetComponentData) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SetComponentData) {
         this.handleSetComponentDataMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].DeleteItems) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].DeleteItems) {
         this.handleDeleteItemsMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].CreateItems || message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].CreateItem) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].CreateItems || message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].CreateItem) {
         this.handleCreateItemsMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SaveItems) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SaveItems) {
         this.handleSaveItemsMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].ToggleActivateComponent) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ToggleActivateComponent) {
         var componentToToggle = this.itemManager.findItem(message.data.uuid);
         this.handleToggleComponentMessage(componentToToggle, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].RequestPermissions) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].RequestPermissions) {
         this.handleRequestPermissionsMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].InstallLocalComponent) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].InstallLocalComponent) {
         this.handleInstallLocalComponentMessage(component, message);
-      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].DuplicateItem) {
+      } else if (message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].DuplicateItem) {
         this.handleDuplicateItemMessage(component, message);
       }
 
@@ -18082,7 +18198,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         var _loop5 = function _loop5() {
           var handler = _step11.value;
 
-          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Any))) {
+          if (handler.actionHandler && (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any))) {
             _this7.timeout(function () {
               handler.actionHandler(component, message.action, message.data);
             });
@@ -18179,11 +18295,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var _this8 = this;
 
       var requiredPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
         content_types: message.data.content_types.sort()
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
-        if (!lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(_this8.streamObservers, {
+        if (!lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(_this8.streamObservers, {
           identifier: component.uuid
         })) {
           /* For pushing laster as changes come in */
@@ -18205,7 +18321,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         try {
           for (var _iterator14 = message.data.content_types[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
             var contentType = _step14.value;
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["extendArray"])(items, items.concat(_this8.itemManager.validItemsForContentType(contentType)));
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["extendArray"])(items, _this8.itemManager.validItemsForContentType(contentType));
           }
         } catch (err) {
           _didIteratorError14 = true;
@@ -18231,10 +18347,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var _this9 = this;
 
       var requiredPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamContextItem
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamContextItem
       }];
       this.runWithPermissions(component, requiredPermissions, function () {
-        if (!lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(_this9.contextStreamObservers, {
+        if (!lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(_this9.contextStreamObservers, {
           identifier: component.uuid
         })) {
           _this9.contextStreamObservers.push({
@@ -18366,9 +18482,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 requiredPermissions.push({
-                  name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamContextItem
+                  name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamContextItem
                 });
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(pendingResponseItems, responseItem);
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(pendingResponseItems, responseItem);
                 /* We break because there can only be one context item */
 
                 return _context3.abrupt("break", 18);
@@ -18415,11 +18531,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
               case 32:
                 /* Check to see if additional privileges are required */
                 if (pendingResponseItems.length > 0) {
-                  requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_7___default()(pendingResponseItems.map(function (item) {
+                  requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_8___default()(pendingResponseItems.map(function (item) {
                     return item.content_type;
                   })).sort();
                   requiredPermissions.push({
-                    name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+                    name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
                     content_types: requiredContentTypes
                   });
                 }
@@ -18434,9 +18550,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           /* Filter locked items */
 
 
-                          uuids = responsePayloads.map(function (item) {
-                            return item.uuid;
-                          });
+                          uuids = Object(_Models_functions__WEBPACK_IMPORTED_MODULE_1__["Uuids"])(responsePayloads);
                           items = _this10.itemManager.findItems(uuids, true);
                           lockedCount = 0;
                           items.forEach(function (item, index) {
@@ -18449,7 +18563,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                             }
 
                             if (item.locked) {
-                              lodash_remove__WEBPACK_IMPORTED_MODULE_8___default()(responsePayloads, {
+                              lodash_remove__WEBPACK_IMPORTED_MODULE_9___default()(responsePayloads, {
                                 uuid: item.uuid
                               });
                               lockedCount++;
@@ -18470,40 +18584,40 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
                         case 10:
                           payloads = responsePayloads.map(function (responseItem) {
-                            return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(responseItem, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ComponentRetrieved);
+                            return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].ComponentRetrieved);
                           });
                           _context2.next = 13;
                           return _this10.itemManager.changeItems(uuids, function (mutator) {
-                            var responseItem = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["searchArray"])(responsePayloads, {
-                              uuid: mutator.getUuid()
-                            });
-                            var payload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["searchArray"])(payloads, {
+                            var payload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["searchArray"])(payloads, {
                               uuid: mutator.getUuid()
                             });
                             mutator.mergePayload(payload);
+                            var responseItem = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["searchArray"])(responsePayloads, {
+                              uuid: mutator.getUuid()
+                            });
 
                             if (responseItem.clientData) {
                               var allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
                               allComponentData[component.getClientDataKey()] = responseItem.clientData;
                               mutator.setDomainData(allComponentData, ComponentDataDomain);
                             }
-                          }, _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["MutationType"].UserInteraction, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ComponentRetrieved, component.uuid);
+                          }, _Models_core_item__WEBPACK_IMPORTED_MODULE_6__["MutationType"].UserInteraction, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].ComponentRetrieved, component.uuid);
 
                         case 13:
                           _this10.syncService.sync().then(function () {
                             /* Allow handlers to be notified when a save begins and ends, to update the UI */
                             var saveMessage = Object.assign({}, message);
-                            saveMessage.action = _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SaveSuccess;
+                            saveMessage.action = _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SaveSuccess;
 
                             _this10.replyToMessage(component, message, {});
 
                             _this10.handleMessage(component, saveMessage);
                           }).catch(function () {
                             var saveMessage = Object.assign({}, message);
-                            saveMessage.action = _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SaveError;
+                            saveMessage.action = _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SaveError;
 
                             _this10.replyToMessage(component, message, {
-                              error: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].SaveError
+                              error: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].SaveError
                             });
 
                             _this10.handleMessage(component, saveMessage);
@@ -18539,7 +18653,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var itemParams = message.data.item;
       var item = this.itemManager.findItem(itemParams.uuid);
       var requiredPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
         content_types: [item.content_type]
       }];
       this.runWithPermissions(component, requiredPermissions, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
@@ -18574,11 +18688,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var _this12 = this;
 
       var responseItems = message.data.item ? [message.data.item] : message.data.items;
-      var uniqueContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_7___default()(responseItems.map(function (item) {
+      var uniqueContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_8___default()(responseItems.map(function (item) {
         return item.content_type;
       }));
       var requiredPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
         content_types: uniqueContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5() {
@@ -18602,26 +18716,39 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                       switch (_context5.prev = _context5.next) {
                         case 0:
                           responseItem = _step18.value;
-                          payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_4__["CreateSourcedPayloadFromObject"])(responseItem, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved);
-                          template = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(payload);
-                          _context5.next = 5;
-                          return _this12.itemManager.insertItem(template);
+
+                          if (responseItem.uuid) {
+                            _context5.next = 5;
+                            break;
+                          }
+
+                          _context5.next = 4;
+                          return _Lib_uuid__WEBPACK_IMPORTED_MODULE_12__["Uuid"].GenerateUuid();
+
+                        case 4:
+                          responseItem.uuid = _context5.sent;
 
                         case 5:
+                          payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateSourcedPayloadFromObject"])(responseItem, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].ComponentCreated);
+                          template = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_2__["CreateItemFromPayload"])(payload);
+                          _context5.next = 9;
+                          return _this12.itemManager.insertItem(template);
+
+                        case 9:
                           item = _context5.sent;
-                          _context5.next = 8;
+                          _context5.next = 12;
                           return _this12.itemManager.changeItem(item.uuid, function (mutator) {
                             if (responseItem.clientData) {
                               var allComponentData = item.getDomainData(ComponentDataDomain);
                               allComponentData[component.getClientDataKey()] = responseItem.clientData;
                               mutator.setDomainData(allComponentData, ComponentDataDomain);
                             }
-                          }, _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["MutationType"].UserInteraction, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ComponentRetrieved, component.uuid);
+                          }, _Models_core_item__WEBPACK_IMPORTED_MODULE_6__["MutationType"].UserInteraction, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].ComponentCreated, component.uuid);
 
-                        case 8:
+                        case 12:
                           processedItems.push(item);
 
-                        case 9:
+                        case 13:
                         case "end":
                           return _context5.stop();
                       }
@@ -18680,7 +18807,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
               case 27:
                 _this12.syncService.sync();
 
-                reply = message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].CreateItem ? {
+                reply = message.action === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].CreateItem ? {
                   item: _this12.jsonForItem(processedItems[0], component)
                 } : {
                   items: processedItems.map(function (item) {
@@ -18703,11 +18830,11 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function handleDeleteItemsMessage(component, message) {
       var _this13 = this;
 
-      var requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_7___default()(message.data.items.map(function (item) {
+      var requiredContentTypes = lodash_uniq__WEBPACK_IMPORTED_MODULE_8___default()(message.data.items.map(function (item) {
         return item.content_type;
       })).sort();
       var requiredPermissions = [{
-        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems,
+        name: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems,
         content_types: requiredContentTypes
       }];
       this.runWithPermissions(component, requiredPermissions, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6() {
@@ -18758,13 +18885,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 return _context7.abrupt("continue", 23);
 
               case 18:
-                if (![_models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Component, _models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme].includes(item.content_type)) {
+                if (![_models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Component, _models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme].includes(item.content_type)) {
                   _context7.next = 21;
                   break;
                 }
 
                 _context7.next = 21;
-                return _this13.deactivateComponent(item);
+                return _this13.deactivateComponent(item.uuid);
 
               case 21:
                 _context7.next = 23;
@@ -18889,7 +19016,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                if (!(component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Modal)) {
+                if (!(component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Modal)) {
                   _context10.next = 4;
                   break;
                 }
@@ -18905,14 +19032,14 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context10.next = 7;
-                return this.deactivateComponent(component);
+                return this.deactivateComponent(component.uuid);
 
               case 7:
                 _context10.next = 19;
                 break;
 
               case 9:
-                if (!(component.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme)) {
+                if (!(component.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme)) {
                   _context10.next = 17;
                   break;
                 }
@@ -18924,7 +19051,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 /* Activate current before deactivating others, so as not to flicker */
 
                 _context10.next = 14;
-                return this.activateComponent(component);
+                return this.activateComponent(component.uuid);
 
               case 14:
                 if (!theme.isLayerable()) {
@@ -18955,7 +19082,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                             }
 
                             _context9.next = 10;
-                            return _this16.deactivateComponent(candidate);
+                            return _this16.deactivateComponent(candidate.uuid);
 
                           case 10:
                             _iteratorNormalCompletion20 = true;
@@ -19010,7 +19137,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
               case 17:
                 _context10.next = 19;
-                return this.activateComponent(component);
+                return this.activateComponent(component.uuid);
 
               case 19:
               case "end":
@@ -19041,7 +19168,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     key: "runWithPermissions",
     value: function runWithPermissions(component, requiredPermissions, runFunction) {
       /* Make copy as not to mutate input values */
-      requiredPermissions = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["Copy"])(requiredPermissions);
+      requiredPermissions = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["Copy"])(requiredPermissions);
       var acquiredPermissions = component.permissions;
       var _iteratorNormalCompletion21 = true;
       var _didIteratorError21 = false;
@@ -19067,7 +19194,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           if (!requiredContentTypes) {
             /* If this permission does not require any content types (i.e stream-context-item)
               then we can remove this from required since we match by name (respectiveAcquired.name === required.name) */
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(requiredPermissions, required);
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(requiredPermissions, required);
             return "continue";
           }
 
@@ -19078,7 +19205,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           try {
             for (var _iterator22 = respectiveAcquired.content_types[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
               var acquiredContentType = _step22.value;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(requiredContentTypes, acquiredContentType);
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(requiredContentTypes, acquiredContentType);
             }
           } catch (err) {
             _didIteratorError22 = true;
@@ -19097,7 +19224,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
           if (requiredContentTypes.length === 0) {
             /* We've removed all acquired and end up with zero, means we already have all these permissions */
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(requiredPermissions, required);
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(requiredPermissions, required);
           }
         };
 
@@ -19160,82 +19287,64 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         actionBlock: callback,
         callback: function () {
           var _callback = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(approved) {
-            var _iteratorNormalCompletion23, _didIteratorError23, _iteratorError23, _loop8, _iterator23, _step23;
-
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context12) {
               while (1) {
                 switch (_context12.prev = _context12.next) {
                   case 0:
                     if (!approved) {
-                      _context12.next = 24;
+                      _context12.next = 4;
                       break;
                     }
 
-                    _iteratorNormalCompletion23 = true;
-                    _didIteratorError23 = false;
-                    _iteratorError23 = undefined;
-                    _context12.prev = 4;
+                    _context12.next = 3;
+                    return _this17.itemManager.changeItem(component.uuid, function (m) {
+                      var componentPermissions = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["Copy"])(component.permissions);
+                      var _iteratorNormalCompletion23 = true;
+                      var _didIteratorError23 = false;
+                      var _iteratorError23 = undefined;
 
-                    _loop8 = function _loop8() {
-                      var permission = _step23.value;
-                      var matchingPermission = component.permissions.find(function (candidate) {
-                        return candidate.name === permission.name;
-                      });
+                      try {
+                        var _loop8 = function _loop8() {
+                          var permission = _step23.value;
+                          var matchingPermission = componentPermissions.find(function (candidate) {
+                            return candidate.name === permission.name;
+                          });
 
-                      if (!matchingPermission) {
-                        component.permissions.push(permission);
-                      } else {
-                        /* Permission already exists, but content_types may have been expanded */
-                        var contentTypes = matchingPermission.content_types || [];
-                        matchingPermission.content_types = lodash_uniq__WEBPACK_IMPORTED_MODULE_7___default()(contentTypes.concat(permission.content_types));
+                          if (!matchingPermission) {
+                            componentPermissions.push(permission);
+                          } else {
+                            /* Permission already exists, but content_types may have been expanded */
+                            var contentTypes = matchingPermission.content_types || [];
+                            matchingPermission.content_types = lodash_uniq__WEBPACK_IMPORTED_MODULE_8___default()(contentTypes.concat(permission.content_types));
+                          }
+                        };
+
+                        for (var _iterator23 = permissions[Symbol.iterator](), _step23; !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
+                          _loop8();
+                        }
+                      } catch (err) {
+                        _didIteratorError23 = true;
+                        _iteratorError23 = err;
+                      } finally {
+                        try {
+                          if (!_iteratorNormalCompletion23 && _iterator23.return != null) {
+                            _iterator23.return();
+                          }
+                        } finally {
+                          if (_didIteratorError23) {
+                            throw _iteratorError23;
+                          }
+                        }
                       }
-                    };
 
-                    for (_iterator23 = permissions[Symbol.iterator](); !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
-                      _loop8();
-                    }
+                      var mutator = m;
+                      mutator.permissions = componentPermissions;
+                    });
 
-                    _context12.next = 13;
-                    break;
-
-                  case 9:
-                    _context12.prev = 9;
-                    _context12.t0 = _context12["catch"](4);
-                    _didIteratorError23 = true;
-                    _iteratorError23 = _context12.t0;
-
-                  case 13:
-                    _context12.prev = 13;
-                    _context12.prev = 14;
-
-                    if (!_iteratorNormalCompletion23 && _iterator23.return != null) {
-                      _iterator23.return();
-                    }
-
-                  case 16:
-                    _context12.prev = 16;
-
-                    if (!_didIteratorError23) {
-                      _context12.next = 19;
-                      break;
-                    }
-
-                    throw _iteratorError23;
-
-                  case 19:
-                    return _context12.finish(16);
-
-                  case 20:
-                    return _context12.finish(13);
-
-                  case 21:
-                    _context12.next = 23;
-                    return _this17.itemManager.setItemDirty(component.uuid);
-
-                  case 23:
+                  case 3:
                     _this17.syncService.sync();
 
-                  case 24:
+                  case 4:
                     _this17.permissionDialogs = _this17.permissionDialogs.filter(function (pendingDialog) {
                       /* Remove self */
                       if (pendingDialog === params) {
@@ -19271,12 +19380,12 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                       _this17.presentPermissionsDialog(_this17.permissionDialogs[0]);
                     }
 
-                  case 26:
+                  case 6:
                   case "end":
                     return _context12.stop();
                 }
               }
-            }, _callee11, null, [[4, 9, 13, 21], [14,, 16, 20]]);
+            }, _callee11);
           }));
 
           function callback(_x10) {
@@ -19291,7 +19400,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
        * We only want to present one and trigger all callbacks based on one modal result
        */
 
-      var existingDialog = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(this.permissionDialogs, {
+      var existingDialog = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(this.permissionDialogs, {
         component: component
       });
       this.permissionDialogs.push(params);
@@ -19319,7 +19428,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
       this.handlers.push(handler);
       return function () {
-        var matching = lodash_find__WEBPACK_IMPORTED_MODULE_6___default()(_this18.handlers, {
+        var matching = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(_this18.handlers, {
           identifier: handler.identifier
         });
 
@@ -19329,7 +19438,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           return;
         }
 
-        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(_this18.handlers, matching);
+        Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(_this18.handlers, matching);
       };
     }
   }, {
@@ -19381,18 +19490,18 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 this.log('Web|componentManager|registerComponentWindow', component);
                 data.window = componentWindow;
                 _context13.next = 6;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_11__["Uuid"].GenerateUuid();
+                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_12__["Uuid"].GenerateUuid();
 
               case 6:
                 data.sessionKey = _context13.sent;
                 this.sendMessageToComponent(component, {
-                  action: _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].ComponentRegistered,
+                  action: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ComponentRegistered,
                   sessionKey: data.sessionKey,
                   componentData: component.componentData,
                   data: {
                     uuid: component.uuid,
-                    environment: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["environmentToString"])(this.environment),
-                    platform: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["platformToString"])(this.platform),
+                    environment: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["environmentToString"])(this.environment),
+                    platform: Object(_Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["platformToString"])(this.platform),
                     activeThemeUrls: this.urlsForActiveThemes()
                   }
                 });
@@ -19418,11 +19527,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     }()
   }, {
     key: "registerComponent",
-    value: function registerComponent(component) {
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["findInArray"])(this.activeComponents, 'uuid', component.uuid)) {
-        this.activeComponents.push(component);
-      }
-
+    value: function registerComponent(uuid) {
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["addIfUnique"])(this.activeComponents, uuid);
+      var component = this.itemManager.findItem(uuid);
       var _iteratorNormalCompletion24 = true;
       var _didIteratorError24 = false;
       var _iteratorError24 = undefined;
@@ -19431,7 +19538,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator24 = this.handlers[Symbol.iterator](), _step24; !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {
           var handler = _step24.value;
 
-          if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Any)) {
+          if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
             handler.activationHandler && handler.activationHandler(component);
           }
         }
@@ -19450,33 +19557,36 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         }
       }
 
-      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Themes) {
+      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Themes) {
         this.postActiveThemesToAllComponents();
       }
     }
   }, {
     key: "activateComponent",
     value: function () {
-      var _activateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(component) {
+      var _activateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(uuid) {
+        var component;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
+                component = this.itemManager.findItem(uuid);
+
                 if (component.active) {
-                  _context14.next = 3;
+                  _context14.next = 4;
                   break;
                 }
 
-                _context14.next = 3;
+                _context14.next = 4;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = true;
                 });
 
-              case 3:
-                this.registerComponent(component);
+              case 4:
+                this.registerComponent(uuid);
                 this.syncService.sync();
 
-              case 5:
+              case 6:
               case "end":
                 return _context14.stop();
             }
@@ -19492,8 +19602,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     }()
   }, {
     key: "deregisterComponent",
-    value: function deregisterComponent(component) {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["removeFromArray"])(this.activeComponents, component);
+    value: function deregisterComponent(uuid) {
+      var component = this.itemManager.findItem(uuid);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(this.activeComponents, uuid);
       delete this.componentState[component.uuid];
       var _iteratorNormalCompletion25 = true;
       var _didIteratorError25 = false;
@@ -19503,7 +19614,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator25 = this.handlers[Symbol.iterator](), _step25; !(_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done); _iteratorNormalCompletion25 = true) {
           var handler = _step25.value;
 
-          if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Any)) {
+          if (handler.areas.includes(component.area) || handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
             handler.activationHandler && handler.activationHandler(component);
           }
         }
@@ -19523,40 +19634,45 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       }
 
       this.streamObservers = this.streamObservers.filter(function (o) {
-        return o.component !== component;
+        return o.component.uuid !== uuid;
       });
       this.contextStreamObservers = this.contextStreamObservers.filter(function (o) {
-        return o.component !== component;
+        return o.component.uuid !== uuid;
       });
 
-      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Themes) {
+      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Themes) {
         this.postActiveThemesToAllComponents();
       }
     }
   }, {
     key: "deactivateComponent",
     value: function () {
-      var _deactivateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(component) {
+      var _deactivateComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(uuid) {
+        var _this$itemManager;
+
+        var component;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
+                component = (_this$itemManager = this.itemManager) === null || _this$itemManager === void 0 ? void 0 : _this$itemManager.findItem(uuid);
+
                 if (!component.active) {
-                  _context15.next = 3;
+                  _context15.next = 4;
                   break;
                 }
 
-                _context15.next = 3;
+                _context15.next = 4;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = false;
                 });
 
-              case 3:
+              case 4:
                 this.findOrCreateDataForComponent(component).sessionKey = undefined;
-                this.deregisterComponent(component);
+                this.deregisterComponent(uuid);
                 this.syncService.sync();
 
-              case 6:
+              case 7:
               case "end":
                 return _context15.stop();
             }
@@ -19573,20 +19689,24 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "reloadComponent",
     value: function () {
-      var _reloadComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(component) {
-        var _this19 = this;
+      var _reloadComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16(uuid) {
+        var _this$itemManager2,
+            _this19 = this;
 
+        var component;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context17) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                _context17.next = 2;
+                /* Do soft deactivate */
+                component = (_this$itemManager2 = this.itemManager) === null || _this$itemManager2 === void 0 ? void 0 : _this$itemManager2.findItem(uuid);
+                _context17.next = 3;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = false;
                 });
 
-              case 2:
-                this.deregisterComponent(component);
+              case 3:
+                this.deregisterComponent(component.uuid);
                 /* Do soft activate */
 
                 return _context17.abrupt("return", new Promise(function (resolve) {
@@ -19601,7 +19721,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                             });
 
                           case 2:
-                            _this19.registerComponent(component);
+                            _this19.registerComponent(component.uuid);
 
                             resolve();
 
@@ -19614,7 +19734,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   })));
                 }));
 
-              case 4:
+              case 5:
               case "end":
                 return _context17.stop();
             }
@@ -19631,13 +19751,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "deleteComponent",
     value: function () {
-      var _deleteComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(component) {
+      var _deleteComponent = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee17(uuid) {
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee17$(_context18) {
           while (1) {
             switch (_context18.prev = _context18.next) {
               case 0:
                 _context18.next = 2;
-                return this.itemManager.setItemToBeDeleted(component.uuid);
+                return this.itemManager.setItemToBeDeleted(uuid);
 
               case 2:
                 this.syncService.sync();
@@ -19663,12 +19783,14 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     }
   }, {
     key: "iframeForComponent",
-    value: function iframeForComponent(component) {
-      for (var _i2 = 0, _Array$from = Array.from(document.getElementsByTagName('iframe')); _i2 < _Array$from.length; _i2++) {
-        var frame = _Array$from[_i2];
+    value: function iframeForComponent(uuid) {
+      var iframes = Array.from(document.getElementsByTagName('iframe'));
+
+      for (var _i2 = 0, _iframes = iframes; _i2 < _iframes.length; _i2++) {
+        var frame = _iframes[_i2];
         var componentId = frame.dataset.componentId;
 
-        if (componentId === component.uuid) {
+        if (componentId === uuid) {
           return frame;
         }
       }
@@ -19676,7 +19798,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "focusChangedForComponent",
     value: function focusChangedForComponent(component) {
-      var focused = document.activeElement === this.iframeForComponent(component);
+      var focused = document.activeElement === this.iframeForComponent(component.uuid);
       var _iteratorNormalCompletion26 = true;
       var _didIteratorError26 = false;
       var _iteratorError26 = undefined;
@@ -19707,23 +19829,23 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     key: "handleSetSizeEvent",
     value: function handleSetSizeEvent(component, data) {
       var setSize = function setSize(element, size) {
-        var widthString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["isString"])(size.width) ? size.width : "".concat(data.width, "px");
-        var heightString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_12__["isString"])(size.height) ? size.height : "".concat(data.height, "px");
+        var widthString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(size.width) ? size.width : "".concat(data.width, "px");
+        var heightString = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["isString"])(size.height) ? size.height : "".concat(data.height, "px");
 
         if (element) {
           element.setAttribute('style', "width:".concat(widthString, "; height:").concat(heightString, ";"));
         }
       };
 
-      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Rooms || component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Modal) {
-        var selector = component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Rooms ? 'inner' : 'outer';
+      if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Rooms || component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Modal) {
+        var selector = component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Rooms ? 'inner' : 'outer';
         var content = document.getElementById("component-content-".concat(selector, "-").concat(component.uuid));
 
         if (content) {
           setSize(content, data);
         }
       } else {
-        var iframe = this.iframeForComponent(component);
+        var iframe = this.iframeForComponent(component.uuid);
 
         if (!iframe) {
           return;
@@ -19737,7 +19859,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
          * outside of the bounds (to display autocomplete, for example).
          */
 
-        if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].EditorStack) {
+        if (component.area === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].EditorStack) {
           var parent = iframe.parentElement;
 
           if (parent) {
@@ -19749,7 +19871,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "editorForNote",
     value: function editorForNote(note) {
-      var editors = this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Editor);
+      var editors = this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Editor);
       var _iteratorNormalCompletion27 = true;
       var _didIteratorError27 = false;
       var _iteratorError27 = undefined;
@@ -19799,7 +19921,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getDefaultEditor",
     value: function getDefaultEditor() {
-      var editors = this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Editor);
+      var editors = this.componentsForArea(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Editor);
 
       if (this.isMobile) {
         return editors.filter(function (e) {
@@ -19834,9 +19956,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       };
 
       permissions.forEach(function (permission, index) {
-        if (permission.name === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamItems) {
+        if (permission.name === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamItems) {
           var types = permission.content_types.map(function (type) {
-            var desc = Object(_models_content_types__WEBPACK_IMPORTED_MODULE_2__["displayStringForContentType"])(type);
+            var desc = Object(_models_content_types__WEBPACK_IMPORTED_MODULE_3__["displayStringForContentType"])(type);
 
             if (desc) {
               return desc + 's';
@@ -19860,10 +19982,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                permission coming up, add a comma */
             finalString += ', ';
           }
-        } else if (permission.name === _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentAction"].StreamContextItem) {
+        } else if (permission.name === _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].StreamContextItem) {
           var _mapping;
 
-          var mapping = (_mapping = {}, _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].EditorStack, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].NoteTags, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_10__["ComponentArea"].Editor, 'working note'), _mapping);
+          var mapping = (_mapping = {}, _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].EditorStack, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].NoteTags, 'working note'), _defineProperty(_mapping, _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Editor, 'working note'), _mapping);
           finalString += addSeparator(index, permissionsCount);
           finalString += mapping[component.area];
         }
@@ -19873,22 +19995,22 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "isDesktop",
     get: function get() {
-      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["Environment"].Desktop;
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["Environment"].Desktop;
     }
   }, {
     key: "isMobile",
     get: function get() {
-      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_13__["Environment"].Mobile;
+      return this.environment === _Lib_platforms__WEBPACK_IMPORTED_MODULE_14__["Environment"].Mobile;
     }
   }, {
     key: "components",
     get: function get() {
-      return this.itemManager.getItems([_models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Component, _models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].Theme]);
+      return this.itemManager.getItems([_models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Component, _models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Theme]);
     }
   }]);
 
   return SNComponentManager;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_9__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_10__["PureService"]);
 
 /***/ }),
 
@@ -21116,8 +21238,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       return this.collection.findAll(uuids, includeBlanks);
     }
-    /**
-     * Returns all non-deleted items keys
+    /** 
+     * Returns a detached array of all items
      */
 
   }, {
@@ -21877,10 +21999,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getDirtyItems",
     value: function getDirtyItems() {
-      return this.items.filter(function (item) {
+      var dirty = this.collection.dirtyElements();
+      return dirty.filter(function (item) {
         /* An item that has an error decrypting can be synced only if it is being deleted.
           Otherwise, we don't want to send corrupt content up to the server. */
-        return item.dirty && (!item.errorDecrypting || item.deleted);
+        return !item.errorDecrypting || item.deleted;
       });
     }
     /**
@@ -22338,37 +22461,16 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
 
       return setItemsToBeDeleted;
     }()
-    /** 
-     * Returns a detached array of all items
-     */
-
-  }, {
-    key: "getItems",
-
     /**
      * Returns all items of a certain type
      * @param contentType - A string or array of strings representing
      *    content types.
      */
-    value: function getItems(contentType) {
-      if (Array.isArray(contentType)) {
-        return this.items.filter(function (item) {
-          return contentType.includes(item.content_type);
-        });
-      } else {
-        return this.collection.all(contentType);
-      }
-    }
-    /** 
-     * Returns all items that have not been able to decrypt.
-     */
 
   }, {
-    key: "invalidItems",
-    value: function invalidItems() {
-      return this.items.filter(function (item) {
-        return item.errorDecrypting;
-      });
+    key: "getItems",
+    value: function getItems(contentType) {
+      return this.collection.all(contentType);
     }
     /**
      * Returns all items which are properly decrypted
@@ -22379,7 +22481,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     value: function validItemsForContentType(contentType) {
       var items = this.collection.all(contentType);
       return items.filter(function (item) {
-        return !item.errorDecrypting;
+        return !item.errorDecrypting && !item.waitingForKey;
       });
     }
     /**
@@ -22615,6 +22717,33 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       this.modelManager.removePayloadLocally(item.payload);
     }
   }, {
+    key: "items",
+    get: function get() {
+      return this.collection.all();
+    }
+    /**
+     * Returns a detached array of all items which are not deleted
+     */
+
+  }, {
+    key: "nonDeletedItems",
+    get: function get() {
+      return this.collection.nondeletedElements();
+    }
+    /** 
+     * Returns all items that have not been able to decrypt.
+     */
+
+  }, {
+    key: "invalidItems",
+    get: function get() {
+      return this.collection.invalidElements();
+    }
+    /**
+     * Returns all non-deleted items keys
+     */
+
+  }, {
     key: "itemsKeys",
     get: function get() {
       return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].ItemsKey));
@@ -22645,22 +22774,6 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "components",
     get: function get() {
       return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_18__["ContentType"].Component));
-    }
-  }, {
-    key: "items",
-    get: function get() {
-      return this.collection.all();
-    }
-    /**
-     * Returns a detached array of all items which are not deleted
-     */
-
-  }, {
-    key: "nonDeletedItems",
-    get: function get() {
-      return this.items.filter(function (item) {
-        return !item.deleted;
-      });
     }
   }, {
     key: "trashSmartTag",
@@ -23439,6 +23552,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 if (payloads.length === 0) {
+                  debugger;
                   console.warn("Attempting to emit 0 payloads.");
                 }
                 /** First loop should process payloads and add items only; no relationship handling. */
@@ -25631,9 +25745,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                items = this.itemManager.items.filter(function (item) {
-                  return item.waitingForKey || item.errorDecrypting;
-                });
+                items = this.itemManager.invalidItems;
 
                 if (!(items.length === 0)) {
                   _context13.next = 3;
@@ -30698,6 +30810,16 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to initialize already initialized local database.';
 
               case 2:
+                if (!(rawPayloads.length === 0)) {
+                  _context3.next = 6;
+                  break;
+                }
+
+                this.databaseLoaded = true;
+                this.opStatus.setDatabaseLoadStatus(0, 0, true);
+                return _context3.abrupt("return");
+
+              case 6:
                 unsortedPayloads = rawPayloads.map(function (rawPayload) {
                   return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_18__["CreateMaxPayloadFromAnyObject"])(rawPayload);
                 });
@@ -30708,51 +30830,51 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                   return payload.content_type === _Models_content_types__WEBPACK_IMPORTED_MODULE_20__["ContentType"].ItemsKey;
                 });
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["subtractFromArray"])(payloads, itemsKeysPayloads);
-                _context3.next = 8;
+                _context3.next = 12;
                 return this.protocolService.payloadsByDecryptingPayloads(itemsKeysPayloads);
 
-              case 8:
+              case 12:
                 decryptedItemsKeys = _context3.sent;
-                _context3.next = 11;
+                _context3.next = 15;
                 return this.modelManager.emitPayloads(decryptedItemsKeys, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalRetrieved);
 
-              case 11:
+              case 15:
                 /** Map in batches to give interface a chance to update */
                 payloadCount = payloads.length;
                 batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
                 numBatches = Math.ceil(payloadCount / batchSize);
                 batchIndex = 0;
 
-              case 15:
+              case 19:
                 if (!(batchIndex < numBatches)) {
-                  _context3.next = 28;
+                  _context3.next = 32;
                   break;
                 }
 
                 currentPosition = batchIndex * batchSize;
                 batch = payloads.slice(currentPosition, currentPosition + batchSize);
-                _context3.next = 20;
+                _context3.next = 24;
                 return this.protocolService.payloadsByDecryptingPayloads(batch);
 
-              case 20:
+              case 24:
                 decrypted = _context3.sent;
-                _context3.next = 23;
+                _context3.next = 27;
                 return this.modelManager.emitPayloads(decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalRetrieved);
 
-              case 23:
+              case 27:
                 this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].LocalDataIncrementalLoad);
                 this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false);
 
-              case 25:
+              case 29:
                 batchIndex++;
-                _context3.next = 15;
+                _context3.next = 19;
                 break;
 
-              case 28:
+              case 32:
                 this.databaseLoaded = true;
                 this.opStatus.setDatabaseLoadStatus(0, 0, true);
 
-              case 30:
+              case 34:
               case "end":
                 return _context3.stop();
             }
@@ -31303,10 +31425,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 14:
                 items = _context13.sent;
 
-                /**
-                 * Items that have never been synced and marked as deleted should not be
-                 * uploaded to server, and instead deleted directly after sync completion.
-                 */
+                /** Items that have never been synced and marked as deleted should not be
+                 * uploaded to server, and instead deleted directly after sync completion. */
                 neverSyncedDeleted = items.filter(function (item) {
                   return item.neverSynced && item.deleted;
                 });
@@ -31367,10 +31487,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 resolves are triggered at the end of this function call */
 
                 Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["subtractFromArray"])(this.resolveQueue, inTimeResolveQueue);
-                /** 
-                 * lastSyncBegan must be set *after* any point we may have returned above. 
-                 * Setting this value means the item was 100% sent to the server.
-                 */
+                /** lastSyncBegan must be set *after* any point we may have returned above. 
+                 * Setting this value means the item was 100% sent to the server. */
 
                 beginDate = new Date();
 
@@ -31858,32 +31976,38 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
               case 0:
                 this.log('Offline Sync Response', response.rawResponse);
                 payloadsToEmit = response.savedPayloads;
-                _context19.next = 4;
-                return this.modelManager.emitPayloads(payloadsToEmit, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalSaved);
 
-              case 4:
-                payloadsToPersist = this.modelManager.find(Object(_Models_functions__WEBPACK_IMPORTED_MODULE_22__["Uuids"])(payloadsToEmit));
-                _context19.next = 7;
-                return this.persistPayloads(payloadsToPersist);
-
-              case 7:
-                deletedPayloads = response.deletedPayloads;
-
-                if (!(deletedPayloads.length > 0)) {
-                  _context19.next = 11;
+                if (!(payloadsToEmit.length > 0)) {
+                  _context19.next = 8;
                   break;
                 }
 
-                _context19.next = 11;
+                _context19.next = 5;
+                return this.modelManager.emitPayloads(payloadsToEmit, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].LocalSaved);
+
+              case 5:
+                payloadsToPersist = this.modelManager.find(Object(_Models_functions__WEBPACK_IMPORTED_MODULE_22__["Uuids"])(payloadsToEmit));
+                _context19.next = 8;
+                return this.persistPayloads(payloadsToPersist);
+
+              case 8:
+                deletedPayloads = response.deletedPayloads;
+
+                if (!(deletedPayloads.length > 0)) {
+                  _context19.next = 12;
+                  break;
+                }
+
+                _context19.next = 12;
                 return this.deletePayloads(deletedPayloads);
 
-              case 11:
+              case 12:
                 this.opStatus.clearError();
                 this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
-                _context19.next = 15;
+                _context19.next = 16;
                 return this.notifyEvent(_Services_sync_events__WEBPACK_IMPORTED_MODULE_1__["SyncEvent"].SingleSyncCompleted, response);
 
-              case 15:
+              case 16:
               case "end":
                 return _context19.stop();
             }
@@ -32683,12 +32807,13 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.ts ***!
   \**********************/
-/*! exports provided: getGlobalScope, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return getGlobalScope; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dictToArray", function() { return dictToArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isWebEnvironment", function() { return isWebEnvironment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return findInArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "searchArray", function() { return searchArray; });
@@ -32753,6 +32878,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 function getGlobalScope() {
   return typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : null;
+}
+function dictToArray(dict) {
+  return Object.keys(dict).map(function (key) {
+    return dict[key];
+  });
 }
 /**
  * Whether we are in a web browser

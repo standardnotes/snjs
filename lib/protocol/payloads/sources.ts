@@ -6,7 +6,7 @@ export enum PayloadSource {
   LocalRetrieved = 4,
   /* Payload when a client modifies item property then maps it to update UI. 
   This also indicates that the item was dirtied*/
-  LocalChanged= 5,
+  LocalChanged = 5,
   /** Payloads retrieved from an external
    extension/component */
   ComponentRetrieved = 6,
@@ -33,7 +33,9 @@ export enum PayloadSource {
    * Payloads with a source of Constructor means that the payload was created
    * in isolated space by the caller, and does not yet have any app-related affiliation.
    */
-  Constructor = 17
+  Constructor = 17,
+  /** Payloads received from an external component with the intention of creating a new item */
+  ComponentCreated = 18,
 };
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {

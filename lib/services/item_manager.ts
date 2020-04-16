@@ -99,6 +99,29 @@ export class ItemManager extends PureService {
     return this.collection.findAll(uuids, includeBlanks);
   }
 
+  /** 
+   * Returns a detached array of all items
+   */
+  public get items() {
+    return this.collection.all();
+  }
+
+  /**
+   * Returns a detached array of all items which are not deleted
+   */
+  public get nonDeletedItems() {
+    return this.collection.nondeletedElements();
+  }
+
+  /** 
+   * Returns all items that have not been able to decrypt.
+   */
+  public get invalidItems() {
+    return this.collection.invalidElements();
+  }
+
+
+
   /**
    * Returns all non-deleted items keys
    */
@@ -458,10 +481,11 @@ export class ItemManager extends PureService {
    * Returns an array of items that need to be synced.
    */
   public getDirtyItems() {
-    return this.items.filter((item) => {
+    const dirty = this.collection.dirtyElements();
+    return dirty.filter((item) => {
       /* An item that has an error decrypting can be synced only if it is being deleted.
         Otherwise, we don't want to send corrupt content up to the server. */
-      return item.dirty && (!item.errorDecrypting || item.deleted);
+      return !item.errorDecrypting || item.deleted;
     });
   }
 
@@ -593,44 +617,13 @@ export class ItemManager extends PureService {
     return changedItems;
   }
 
-  /** 
-   * Returns a detached array of all items
-   */
-  public get items() {
-    return this.collection.all();
-  }
-
-  /**
-   * Returns a detached array of all items which are not deleted
-   */
-  public get nonDeletedItems() {
-    return this.items.filter((item) => {
-      return !item.deleted;
-    });
-  }
-
   /**
    * Returns all items of a certain type
    * @param contentType - A string or array of strings representing
    *    content types.
    */
   public getItems(contentType: ContentType | ContentType[]): SNItem[] {
-    if (Array.isArray(contentType)) {
-      return this.items.filter((item) => {
-        return contentType.includes(item.content_type!);
-      });
-    } else {
-      return this.collection.all(contentType);
-    }
-  }
-
-  /** 
-   * Returns all items that have not been able to decrypt.
-   */
-  public invalidItems() {
-    return this.items.filter((item) => {
-      return item.errorDecrypting;
-    });
+    return this.collection.all(contentType);
   }
 
   /**
@@ -638,7 +631,7 @@ export class ItemManager extends PureService {
    */
   validItemsForContentType(contentType: ContentType) {
     const items = this.collection.all(contentType);
-    return items.filter((item) => !item.errorDecrypting);
+    return items.filter((item) => !item.errorDecrypting && !item.waitingForKey);
   }
 
   /**

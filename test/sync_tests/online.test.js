@@ -968,33 +968,18 @@ describe('online syncing', () => {
   it('load local items should respect sort priority', async function () {
     const contentTypes = ['A', 'B', 'C'];
     const itemCount = 6;
+    const originalPayloads = [];
     for (let i = 0; i < itemCount; i++) {
       const payload = Factory.createStorageItemPayload(contentTypes[Math.floor(i / 2)]);
-      const item = await this.application.itemManager.emitItemFromPayload(
-        payload,
-        PayloadSource.LocalChanged
-      );
-      await this.application.itemManager.setItemDirty(item.uuid);
+      originalPayloads.push(payload);
     }
-    this.expectedItemCount += itemCount;
-
-    await this.application.syncService.sync(syncOptions);
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
-
-    this.application.syncService.ut_setDatabaseLoaded(false);
-    this.application.syncService.clearSyncPositionTokens();
-    this.application.modelManager.resetState();
-    await this.application.itemManager.resetState();
-
-    this.application.syncService.localLoadPriorty = ['C', 'A', 'B'];
-    const databasePayloads = await this.application.storageService.getAllRawPayloads();
-    await this.application.syncService.loadDatabasePayloads(databasePayloads);
-
-    const items = this.application.itemManager.getItems(contentTypes);
-    expect(items[0].content_type).to.equal('C');
-    expect(items[2].content_type).to.equal('A');
-    expect(items[4].content_type).to.equal('B');
+    const sorted = SortPayloadsByRecentAndContentPriority(
+      originalPayloads,
+      ['C', 'A', 'B']
+    );
+    expect(sorted[0].content_type).to.equal('C');
+    expect(sorted[2].content_type).to.equal('A');
+    expect(sorted[4].content_type).to.equal('B');
   }).timeout(10000);
 
   it('handles stale data in bulk', async function () {
