@@ -1470,7 +1470,9 @@ var SNApplication = /*#__PURE__*/function () {
       return this.itemManager.noteCount;
     }
     /** 
-     * Begin streaming items to display in the UI.
+     * Begin streaming items to display in the UI. The stream callback will be called 
+     * immediately with the present items that match the constraint, and over time whenever
+     * items matching the constraint are added, changed, or deleted.
      */
 
   }, {
@@ -1500,6 +1502,9 @@ var SNApplication = /*#__PURE__*/function () {
           return _ref4.apply(this, arguments);
         };
       }());
+      /** Push current values now */
+
+      stream(this.itemManager.getItems(contentType));
       this.streamRemovers.push(observer);
       return function () {
         observer();
@@ -17885,7 +17890,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator8 = this.handlers[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
           var handler = _step8.value;
 
-          if (handler.areas.includes(area) === false && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
+          if (!handler.areas.includes(area) && !handler.areas.includes(_Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentArea"].Any)) {
             continue;
           }
 
@@ -31652,7 +31657,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 /** No need to await. */
 
                 promise = this.sync({
-                  source: SyncSources.ResolveQueue
+                  source: SyncSources.ResolveQueue,
+                  checkIntegrity: options.checkIntegrity
                 });
 
                 if (!options.awaitAll) {
@@ -31681,7 +31687,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
                 _context13.next = 105;
                 return this.sync({
-                  source: SyncSources.MoreDirtyItems
+                  source: SyncSources.MoreDirtyItems,
+                  checkIntegrity: options.checkIntegrity
                 });
 
               case 105:
@@ -31797,7 +31804,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                this.log('Syncing online user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
+                this.log('Syncing online user', 'source:', source, "integrity check", checkIntegrity, 'mode:', mode, 'payloads:', payloads);
                 _context15.t0 = _Services_sync_account_operation__WEBPACK_IMPORTED_MODULE_11__["AccountSyncOperation"];
                 _context15.t1 = payloads;
 

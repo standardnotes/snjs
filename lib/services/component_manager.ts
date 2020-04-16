@@ -403,7 +403,7 @@ export class SNComponentManager extends PureService {
   contextItemDidChangeInArea(area: ComponentArea) {
     for (const handler of this.handlers) {
       if (
-        handler.areas.includes(area) === false &&
+        !handler.areas.includes(area) &&
         !handler.areas.includes(ComponentArea.Any)
       ) {
         continue;

@@ -600,7 +600,9 @@ export class SNApplication {
 
 
   /** 
-   * Begin streaming items to display in the UI.
+   * Begin streaming items to display in the UI. The stream callback will be called 
+   * immediately with the present items that match the constraint, and over time whenever
+   * items matching the constraint are added, changed, or deleted.
    */
   public streamItems(
     contentType: ContentType | ContentType[],
@@ -613,6 +615,8 @@ export class SNApplication {
         stream(all, source);
       }
     );
+    /** Push current values now */
+    stream(this.itemManager!.getItems(contentType));
     this.streamRemovers.push(observer);
     return () => {
       observer();

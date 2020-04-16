@@ -268,7 +268,7 @@ export class SNSyncService extends PureService {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.';
     }
-    if(rawPayloads.length === 0) {
+    if (rawPayloads.length === 0) {
       this.databaseLoaded = true;
       this.opStatus!.setDatabaseLoadStatus(0, 0, true);
       return;
@@ -574,7 +574,7 @@ export class SNSyncService extends PureService {
     /** lastSyncBegan must be set *after* any point we may have returned above. 
      * Setting this value means the item was 100% sent to the server. */
     const beginDate = new Date();
-    if(items.length > 0) {
+    if (items.length > 0) {
       await this.itemManager!.changeItems(
         Uuids(items),
         (mutator) => {
@@ -640,7 +640,7 @@ export class SNSyncService extends PureService {
     ) {
       this.notifyEvent(SyncEvent.MajorDataChange);
     }
-    if(neverSyncedDeleted.length > 0) {
+    if (neverSyncedDeleted.length > 0) {
       await this.handleNeverSyncedDeleted(neverSyncedDeleted);
     }
     if (useMode !== SyncModes.DownloadFirst) {
@@ -660,7 +660,10 @@ export class SNSyncService extends PureService {
     } else if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
       this.log('Syncing again from resolve queue');
       /** No need to await. */
-      const promise = this.sync({ source: SyncSources.ResolveQueue });
+      const promise = this.sync({
+        source: SyncSources.ResolveQueue,
+        checkIntegrity: options.checkIntegrity
+      });
       if (options.awaitAll) {
         await promise;
       }
@@ -670,7 +673,10 @@ export class SNSyncService extends PureService {
        * been dirtied (like conflicts), and the caller may want to await the
        * full resolution of these items.
        */
-      await this.sync({ source: SyncSources.MoreDirtyItems });
+      await this.sync({
+        source: SyncSources.MoreDirtyItems,
+        checkIntegrity: options.checkIntegrity
+      });
     } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
       if (this.state!.needsSync && operation.done) {
         this.log('Syncing again from integrity check');
@@ -704,7 +710,10 @@ export class SNSyncService extends PureService {
     source: SyncSources,
     mode: SyncModes
   ) {
-    this.log('Syncing online user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
+    this.log(
+      'Syncing online user', 'source:', source, "integrity check",
+      checkIntegrity, 'mode:', mode, 'payloads:', payloads
+    );
     const operation = new AccountSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse) => {
@@ -756,7 +765,7 @@ export class SNSyncService extends PureService {
   private async handleOfflineResponse(response: SyncResponse) {
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
-    if(payloadsToEmit.length > 0) {
+    if (payloadsToEmit.length > 0) {
       await this.modelManager!.emitPayloads(
         payloadsToEmit,
         PayloadSource.LocalSaved
@@ -764,7 +773,7 @@ export class SNSyncService extends PureService {
       const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
     }
-   
+
     const deletedPayloads = response.deletedPayloads;
     if (deletedPayloads.length > 0) {
       await this.deletePayloads(deletedPayloads);
@@ -834,7 +843,6 @@ export class SNSyncService extends PureService {
       SyncEvent.SingleSyncCompleted,
       response
     );
-
     if (response.checkIntegrity) {
       const clientHash = await this.computeDataIntegrityHash();
       await this.state!.setIntegrityHashes(
