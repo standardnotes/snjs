@@ -32,7 +32,7 @@ export class SNTag extends SNItem {
   }
 
   public get isArchiveTag() {
-    return this.payload.safeContent.isArchivedTag;
+    return this.payload.safeContent.isArchiveTag;
   }
 
   public static arrayToDisplayString(tags: SNTag[]) {

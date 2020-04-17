@@ -52,6 +52,18 @@ export declare class ItemManager extends PureService {
      */
     findItems(uuids: UuidString[], includeBlanks?: boolean): (SNItem | undefined)[];
     /**
+     * Returns a detached array of all items
+     */
+    get items(): SNItem[];
+    /**
+     * Returns a detached array of all items which are not deleted
+     */
+    get nonDeletedItems(): SNItem[];
+    /**
+     * Returns all items that have not been able to decrypt.
+     */
+    get invalidItems(): SNItem[];
+    /**
      * Returns all non-deleted items keys
      */
     get itemsKeys(): SNItemsKey[];
@@ -141,23 +153,11 @@ export declare class ItemManager extends PureService {
      */
     setItemsToBeDeleted(uuids: UuidString[]): Promise<(SNItem | undefined)[]>;
     /**
-     * Returns a detached array of all items
-     */
-    get items(): SNItem[];
-    /**
-     * Returns a detached array of all items which are not deleted
-     */
-    get nonDeletedItems(): SNItem[];
-    /**
      * Returns all items of a certain type
      * @param contentType - A string or array of strings representing
      *    content types.
      */
     getItems(contentType: ContentType | ContentType[]): SNItem[];
-    /**
-     * Returns all items that have not been able to decrypt.
-     */
-    invalidItems(): SNItem[];
     /**
      * Returns all items which are properly decrypted
      */

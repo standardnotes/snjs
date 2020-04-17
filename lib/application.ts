@@ -530,8 +530,8 @@ export class SNApplication {
   }
 
   /**
- * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
- */
+  * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
+  */
   public async changeItem(
     uuid: UuidString,
     mutate?: (mutator: ItemMutator) => void,
@@ -546,6 +546,21 @@ export class SNApplication {
       isUserModified ? MutationType.UserInteraction : undefined
     );
     return this.findItem(uuid);
+  }
+
+  /**
+   * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
+   */
+  public async changeItems(
+    uuids: UuidString[],
+    mutate?: (mutator: ItemMutator) => void,
+    isUserModified = false
+  ) {
+    return this.itemManager!.changeItems(
+      uuids,
+      mutate,
+      isUserModified ? MutationType.UserInteraction : undefined
+    );
   }
 
   public getItems(contentType: ContentType | ContentType[]) {

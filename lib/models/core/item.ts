@@ -381,28 +381,27 @@ export class ItemMutator {
         }
       )
     }
-    else {
-      if (!this.payload.deleted) {
-        if (this.type === MutationType.UserInteraction) {
-          // Set the user modified date to now if marking the item as dirty
-          this.userModifiedDate = new Date();
-        } else {
-          const currentValue = this.item.userModifiedDate;
-          if (!currentValue) {
-            // if we don't have an explcit raw value, we initialize client_updated_at.
-            this.userModifiedDate = new Date(this.item.updated_at!);
-          }
+    if (!this.payload.deleted) {
+      if (this.type === MutationType.UserInteraction) {
+        // Set the user modified date to now if marking the item as dirty
+        this.userModifiedDate = new Date();
+      } else {
+        const currentValue = this.item.userModifiedDate;
+        if (!currentValue) {
+          // if we don't have an explcit raw value, we initialize client_updated_at.
+          this.userModifiedDate = new Date(this.item.updated_at!);
         }
       }
-      return CopyPayload(
-        this.payload,
-        {
-          content: this.content,
-          dirty: true,
-          dirtiedDate: new Date()
-        }
-      )
     }
+    const result = CopyPayload(
+      this.payload,
+      {
+        content: this.content,
+        dirty: true,
+        dirtiedDate: new Date()
+      }
+    )
+    return result;
   }
 
   /** Merges the input payload with the base payload */

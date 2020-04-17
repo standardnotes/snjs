@@ -1,3 +1,4 @@
+import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PrivilegeMutator } from './../models/app/privileges';
 import { TagMutator } from './../models/app/tag';
@@ -308,7 +309,9 @@ export class ItemManager extends PureService {
       return new ItemsKeyMutator(item, type);
     } else if (item.content_type === ContentType.Privileges) {
       return new PrivilegeMutator(item, type);
-    }
+    } else if (item.content_type === ContentType.UserPrefs) {
+      return new UserPrefsMutator(item, type);
+    } 
     else {
       return new ItemMutator(item, type);
     }
@@ -796,7 +799,7 @@ function BuildSmartTags() {
         title: 'Trash',
         isSystemTag: true,
         isTrashTag: true,
-        predicate: SNPredicate.FromArray(['content.trashed', '=', JSON.stringify(true)])
+        predicate: SNPredicate.FromArray(['trashed', '=', JSON.stringify(true)])
       })
     }
   );

@@ -8,6 +8,12 @@ declare type Payloadable = PurePayload | SNItem;
 export declare class MutableCollection<T extends Payloadable> {
     protected readonly map: Partial<Record<UuidString, T>>;
     protected readonly typedMap: Partial<Record<ContentType, T[]>>;
+    /** An array of uuids of items that are dirty */
+    protected dirtyIndex: Set<UuidString>;
+    /** An array of uuids of items that are errorDecrypting or waitingForKey */
+    protected invalidsIndex: Set<UuidString>;
+    /** An array of uuids of items that are not marked as deleted */
+    protected nondeletedIndex: Set<UuidString>;
     /** Maintains an index where the direct map for each item id is an array
      * of item ids that the item references. This is essentially equivalent to
      * item.content.references, but keeps state even when the item is deleted.
@@ -24,8 +30,14 @@ export declare class MutableCollection<T extends Payloadable> {
     constructor(elements?: T[], copy?: boolean, mapCopy?: Partial<Record<UuidString, T>>, typedMapCopy?: Partial<Record<ContentType, T[]>>, referenceMapCopy?: UuidMap, conflictMapCopy?: UuidMap);
     immutablePayloadCopy(): ImmutablePayloadCollection;
     uuids(): string[];
-    all(contentType?: ContentType): T[];
+    all(contentType?: ContentType | ContentType[]): T[];
     find(uuid: UuidString): T | undefined;
+    /** Returns all elements that are marked as dirty */
+    dirtyElements(): T[];
+    /** Returns all elements that are errorDecrypting or waitingForKey */
+    invalidElements(): T[];
+    /** Returns all elements that are not marked as deleted */
+    nondeletedElements(): T[];
     /**
      * @param includeBlanks If true and an item is not found, an `undefined` element
      * will be inserted into the array.

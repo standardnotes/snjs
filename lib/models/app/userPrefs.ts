@@ -14,8 +14,7 @@ export enum WebPrefKey {
   NotesShowArchived = 'showArchived',
   NotesHidePinned = 'hidePinned',
   NotesHideNotePreview = 'hideNotePreview',
-  NotesHideDate = 'hideDate',
-  NotesHideTags = 'hideTags'
+  NotesHideDate = 'hideDate'
 };
 
 export class SNUserPrefs extends SNItem {

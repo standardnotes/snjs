@@ -116,6 +116,16 @@ describe('mutator', () => {
     expect(payload.dirty).to.equal(true);
   });
 
+  it('mutate app data', function () {
+    const item = this.createNote();
+    const mutator = new ItemMutator(item, MutationType.UserInteraction);
+    mutator.setAppDataItem('foo', 'bar');
+    mutator.setAppDataItem('bar', 'foo');
+    const payload = mutator.getResult();
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].foo).to.equal('bar');
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].bar).to.equal('foo');
+  });
+
   it('mutate add item as relationship', function () {
     const note = this.createNote();
     const tag = this.createTag();

@@ -1,6 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
 import { UuidMap } from './uuid_map';
-import { isString, addIfUnique, removeArray, extendArray } from '@Lib/utils';
+import { isString, extendArray } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@Models/content_types';

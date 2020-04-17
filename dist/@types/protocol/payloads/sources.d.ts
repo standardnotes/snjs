@@ -26,10 +26,14 @@ export declare enum PayloadSource {
     ConflictUuid = 14,
     ConflictData = 15,
     SessionHistory = 16,
-    /**
-     * Payloads with a source of Constructor means that the payload was created
-     * in isolated space by the caller, and does not yet have any app-related affiliation.
-     */
-    Constructor = 17
+    /** Payloads with a source of Constructor means that the payload was created
+     * in isolated space by the caller, and does not yet have any app-related affiliation. */
+    Constructor = 17,
+    /** Payloads received from an external component with the intention of creating a new item */
+    ComponentCreated = 18,
+    /** When the payloads are about to sync, they are emitted by the sync service with updated
+     * values of lastSyncBegan. Payloads emitted from this source indicate that these payloads
+     * have been saved to disk, and are about to be synced */
+    PreSyncSave = 19
 }
 export declare function isPayloadSourceRetrieved(source: PayloadSource): boolean;

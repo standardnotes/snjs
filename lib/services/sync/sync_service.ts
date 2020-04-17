@@ -580,7 +580,8 @@ export class SNSyncService extends PureService {
         (mutator) => {
           mutator.lastSyncBegan = beginDate;
         },
-        MutationType.NonDirtying
+        MutationType.NonDirtying,
+        PayloadSource.PreSyncSave
       );
     }
 

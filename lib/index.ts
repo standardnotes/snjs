@@ -19,6 +19,7 @@ export {
   SNEditor,
   SNUserPrefs, UserPrefsMutator, WebPrefKey
 } from './models';
+export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
 

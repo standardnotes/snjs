@@ -183,9 +183,13 @@ export declare class SNApplication {
     */
     changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource): Promise<void>;
     /**
-   * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
-   */
+    * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
+    */
     changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
+    /**
+     * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
+     */
+    changeItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     getDisplayableItems(contentType: ContentType): SNItem[];
     notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
@@ -198,7 +202,9 @@ export declare class SNApplication {
     getSmartTags(): SNSmartTag[];
     getNoteCount(): number;
     /**
-     * Begin streaming items to display in the UI.
+     * Begin streaming items to display in the UI. The stream callback will be called
+     * immediately with the present items that match the constraint, and over time whenever
+     * items matching the constraint are added, changed, or deleted.
      */
     streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
     /**
