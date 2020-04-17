@@ -10,12 +10,12 @@ export declare function isWebEnvironment(): boolean;
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export declare function findInArray<T>(array: T[], key: string, value: any): T | undefined;
+export declare function findInArray<T>(array: T[], key: keyof T, value: any): T | undefined;
 /**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export declare function searchArray<T>(array: T[], predicate: Record<string, any>): T | undefined;
+export declare function searchArray<T>(array: T[], predicate: Partial<T>): T | undefined;
 /**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
@@ -85,9 +85,7 @@ export declare function addIfUnique<T>(array: T[], value: T): void;
  * Removes an object from the array by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
-export declare function filterFromArray(array: any, predicate: Record<string, any>): {
-    [x: string]: any;
-}[];
+export declare function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>): T[];
 /**
  * Returns a new array by removing all elements in subtract from array
  */
@@ -98,7 +96,6 @@ export declare function arrayByDifference<T>(array: T[], subtract: T[]): T[];
 export declare function removeFromIndex(array: any[], index: number): void;
 /**
  * Returns a new array by removeing the value from the array at the given index
- * @returns {Array}
  */
 export declare function arrayByRemovingFromIndex<T>(array: T[], index: number): T[];
 /**
@@ -112,6 +109,8 @@ export declare function objectToValueArray(object: AnyRecord): any[];
  * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
  */
 export declare function sortedCopy(object: any): any;
+/** Compares for equality by comparing top-level keys value equality (===) */
+export declare function topLevelCompare<T>(left: T, right: T): boolean;
 /**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
@@ -119,11 +118,11 @@ export declare function jsonParseEmbeddedKeys(object: AnyRecord): Partial<Record
 /**
  * Deletes keys of the input object.
  */
-export declare function omitInPlace(object: any, keys: string[]): void;
+export declare function omitInPlace<T>(object: T, keys: Array<keyof T>): void;
 /**
  * Creates a new object by omitting `keys` from `object`
  */
-export declare function omitByCopy(object: any, keys: string[]): any;
+export declare function omitByCopy<T>(object: T, keys: Array<keyof T>): {} & T;
 /**
  * Similiar to Node's path.join, this function combines an array of paths into
  * one resolved path.
@@ -142,7 +141,7 @@ export declare function deepMerge(a: AnyRecord, b: AnyRecord): Partial<Record<st
 /**
  * Returns a new object by selecting certain keys from input object.
  */
-export declare function pickByCopy(object: AnyRecord, keys: string[]): any;
+export declare function pickByCopy<T>(object: T, keys: Array<keyof T>): any;
 /**
  * Recursively makes an object immutable via Object.freeze
  */

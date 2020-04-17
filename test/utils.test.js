@@ -6,7 +6,7 @@ const expect = chai.expect;
 describe('utils', () => {
   it('findInArray', async () => {
     expect(findInArray).to.not.be.null;
-    const array = [{id: 1},{id: 2},{id: 3},{id: 4}];
+    const array = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
     expect(findInArray(array, 'id', 1)).to.be.ok;
     expect(findInArray(array, 'id', 'foo')).to.not.be.ok;
   });
@@ -28,10 +28,20 @@ describe('utils', () => {
     expect(array).to.eql(original.concat(extended));
   });
 
+  it.only('top level compare', () => {
+    const left = { a: 1, b: 2 };
+    const right = { a: 1, b: 2 };
+    const middle = { a: 2, b: 1 };
+    expect(topLevelCompare(left, right)).to.equal(true);
+    expect(topLevelCompare(right, left)).to.equal(true);
+    expect(topLevelCompare(left, middle)).to.equal(false);
+    expect(topLevelCompare(middle, right)).to.equal(false);
+  });
+
   it('jsonParseEmbeddedKeys', () => {
     const object = {
-      a: {foo: 'bar'},
-      b: JSON.stringify({foo: 'bar'})
+      a: { foo: 'bar' },
+      b: JSON.stringify({ foo: 'bar' })
     };
     const parsed = jsonParseEmbeddedKeys(object);
     expect(typeof parsed.a).to.equal('object');
@@ -73,12 +83,12 @@ describe('utils', () => {
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {
-        references: [{a: 'a'}]
+        references: [{ a: 'a' }]
       }
     };
     const b = {
       content: {
-        references: [ ]
+        references: []
       }
     };
     // merging a with b should replace total content

@@ -105,7 +105,6 @@ export class PayloadManager extends PureService {
     sourceKey?: string
   ) {
     if (payloads.length === 0) {
-      debugger;
       console.warn("Attempting to emit 0 payloads.");
     }
     /** First loop should process payloads and add items only; no relationship handling. */

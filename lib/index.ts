@@ -70,6 +70,7 @@ export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export {
+  Copy,
   findInArray,
   isNullOrUndefined,
   deepMerge,
@@ -85,7 +86,7 @@ export {
   dictToArray,
   truncateHexString,
   jsonParseEmbeddedKeys,
-  Copy
+  topLevelCompare
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

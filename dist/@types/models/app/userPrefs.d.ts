@@ -13,8 +13,7 @@ export declare enum WebPrefKey {
     NotesShowArchived = "showArchived",
     NotesHidePinned = "hidePinned",
     NotesHideNotePreview = "hideNotePreview",
-    NotesHideDate = "hideDate",
-    NotesHideTags = "hideTags"
+    NotesHideDate = "hideDate"
 }
 export declare class SNUserPrefs extends SNItem {
     get isSingleton(): boolean;

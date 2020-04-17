@@ -27,7 +27,11 @@ export function isWebEnvironment() {
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function findInArray<T>(array: T[], key: string, value: any): T | undefined {
+export function findInArray<T>(
+  array: T[],
+  key: keyof T,
+  value: any
+): T | undefined {
   return array.find((item: any) => item[key] === value) as T;
 }
 
@@ -35,7 +39,7 @@ export function findInArray<T>(array: T[], key: string, value: any): T | undefin
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function searchArray<T>(array: T[], predicate: Record<string, any>): T | undefined {
+export function searchArray<T>(array: T[], predicate: Partial<T>): T | undefined {
   return find(array, predicate) as T;
 }
 
@@ -45,7 +49,7 @@ export function searchArray<T>(array: T[], predicate: Record<string, any>): T | 
  */
 export function concatArrays(...args: any[]) {
   let result: any[] = [];
-  for(const array of args) {
+  for (const array of args) {
     result = result.concat(array);
   }
   return result;
@@ -167,7 +171,7 @@ export function removeFromArray<T>(array: T[], value: T) {
  * The array is searched via array.indexOf
  */
 export function addIfUnique<T>(array: T[], value: T) {
-  if(!existsInArray(array, value)) {
+  if (!existsInArray(array, value)) {
     array.push(value);
   }
 }
@@ -176,7 +180,7 @@ export function addIfUnique<T>(array: T[], value: T) {
  * Removes an object from the array by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
-export function filterFromArray(array: any, predicate: Record<string, any>) {
+export function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>) {
   return remove(array, predicate);
 }
 
@@ -198,7 +202,6 @@ export function removeFromIndex(array: any[], index: number) {
 
 /** 
  * Returns a new array by removeing the value from the array at the given index 
- * @returns {Array}
  */
 export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
   const copy = array.slice();
@@ -226,10 +229,25 @@ export function objectToValueArray(object: AnyRecord) {
 export function sortedCopy(object: any) {
   const keys = Object.keys(object).sort();
   const result: any = {};
-  for(const key of keys) {
+  for (const key of keys) {
     result[key] = object[key];
   }
   return Copy(result);
+}
+
+/** Compares for equality by comparing top-level keys value equality (===) */
+export function topLevelCompare<T>(left: T, right: T) {
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if(leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+  for(const key of leftKeys) {
+    if((left as any)[key] !== (right as any)[key]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -252,7 +270,7 @@ export function jsonParseEmbeddedKeys(object: AnyRecord) {
 /**
  * Deletes keys of the input object.
  */
-export function omitInPlace(object: any, keys: string[]) {
+export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
   if (!object) {
     return;
   }
@@ -264,7 +282,7 @@ export function omitInPlace(object: any, keys: string[]) {
 /** 
  * Creates a new object by omitting `keys` from `object`
  */
-export function omitByCopy(object: any, keys: string[]) {
+export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
   const newObject = Object.assign({}, object);
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior
@@ -322,8 +340,8 @@ export function deepMerge(a: AnyRecord, b: AnyRecord) {
 /** 
  * Returns a new object by selecting certain keys from input object.
  */
-export function pickByCopy(object: AnyRecord, keys: string[]) {
-  const result: AnyRecord = {};
+export function pickByCopy<T>(object: T, keys: Array<keyof T>) {
+  const result = {} as T;
   for (const key of keys) {
     result[key] = object[key];
   }

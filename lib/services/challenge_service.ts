@@ -388,6 +388,9 @@ export class ChallengeService extends PureService {
   }
 
   private async submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
+    if(values.length === 0) {
+      throw Error('Attempting to submit 0 values for challenge');
+    }
     const operation = this.getChallengeOperation(challenge);
     if (operation.validate) {
       for (const value of values) {

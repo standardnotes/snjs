@@ -164,6 +164,7 @@ export class SNSyncService extends PureService {
     this.storageService = storageService;
     this.apiService = apiService;
     this.interval = interval;
+    this.loggingEnabled = true;
 
     this.initializeStatus();
     this.initializeState();
@@ -563,7 +564,6 @@ export class SNSyncService extends PureService {
         throw `Unhandled timing strategy ${useStrategy}`;
       }
     }
-
     /** Lock syncing immediately after checking in progress above */
     this.opStatus!.setDidBegin();
     this.notifyEvent(SyncEvent.SyncWillBegin);

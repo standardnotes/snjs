@@ -150,6 +150,7 @@ export class SNComponentManager extends PureService {
     this.alertService = alertService;
     this.environment = environment;
     this.platform = platform;
+    this.loggingEnabled = true;
     this.configureForGeneralUsage();
     if (environment !== Environment.Mobile) {
       this.configureForNonMobileUsage();
@@ -223,10 +224,10 @@ export class SNComponentManager extends PureService {
           }
         }
         for (const component of syncedComponents) {
-          const activeComponent = find(this.activeComponents, { uuid: component.uuid });
-          if (component.active && !component.deleted && !activeComponent) {
+          const isInActive = this.activeComponents.includes(component.uuid);
+          if (component.active && !component.deleted && !isInActive) {
             await this.activateComponent(component.uuid);
-          } else if (!component.active && activeComponent) {
+          } else if (!component.active && isInActive) {
             await this.deactivateComponent(component.uuid);
           }
         }
@@ -324,9 +325,9 @@ export class SNComponentManager extends PureService {
   };
 
   onWindowMessage = (event: MessageEvent) => {
-    this.log('Web app: received message', event);
     /** Make sure this message is for us */
     if (event.data.sessionKey) {
+      this.log('Component manager received message', event.data);
       this.handleMessage(
         this.componentForSessionKey(event.data.sessionKey)!,
         event.data
@@ -481,7 +482,7 @@ export class SNComponentManager extends PureService {
     message: ComponentMessage,
     source?: PayloadSource
   ) {
-    this.log('Web|componentManager|sendItemsInReply', component, items, message);
+    this.log('Component manager send items in reply', component, items, message);
     const responseData: MessageReplyData = {};
     const mapped = items.map((item) => {
       return this.jsonForItem(item, component, source);
@@ -496,7 +497,7 @@ export class SNComponentManager extends PureService {
     originalMessage: ComponentMessage,
     source?: PayloadSource
   ) {
-    this.log('Web|componentManager|sendContextItemInReply', component, item, originalMessage);
+    this.log('Component manager send context item in reply', component, item, originalMessage);
     const response: MessageReplyData = {
       item: this.jsonForItem(item, component, source)
     };
@@ -526,7 +527,7 @@ export class SNComponentManager extends PureService {
       this.log('Component disabled for current item, ignoring messages.', component.name);
       return;
     }
-    this.log('Web|sendMessageToComponent', component, message);
+    this.log('Component manager send message to component', component, message);
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
       this.alertService!.alert(
@@ -1091,6 +1092,7 @@ export class SNComponentManager extends PureService {
       actionBlock: callback,
       callback: async (approved: boolean) => {
         if (approved) {
+          this.log("Changing component to expand permissions", component);
           await this.itemManager!.changeItem(component.uuid, (m) => {
             const componentPermissions = Copy(component.permissions) as ComponentPermission[];
             for (const permission of permissions) {
@@ -1215,6 +1217,7 @@ export class SNComponentManager extends PureService {
     component: SNComponent,
     componentWindow: Window
   ) {
+    this.log('Register component window', component);
     const data = this.findOrCreateDataForComponent(component);
     if (data.window === componentWindow) {
       this.log('Web|componentManager', 'attempting to re-register same component window.');
@@ -1240,6 +1243,7 @@ export class SNComponentManager extends PureService {
   }
 
   registerComponent(uuid: UuidString) {
+    this.log('Registering component', uuid);
     addIfUnique(this.activeComponents, uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
     for (const handler of this.handlers) {
@@ -1256,6 +1260,7 @@ export class SNComponentManager extends PureService {
   }
 
   async activateComponent(uuid: UuidString) {
+    this.log('Activating component', uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
     if (!component.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
@@ -1267,6 +1272,7 @@ export class SNComponentManager extends PureService {
   }
 
   deregisterComponent(uuid: UuidString) {
+    this.log('Degregistering component', uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
     removeFromArray(this.activeComponents, uuid);
     delete this.componentState[component.uuid];
@@ -1290,6 +1296,7 @@ export class SNComponentManager extends PureService {
   }
 
   async deactivateComponent(uuid: UuidString) {
+    this.log('Deactivating component', uuid);
     const component = this.itemManager?.findItem(uuid) as SNComponent;
     if (component.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
@@ -1302,6 +1309,7 @@ export class SNComponentManager extends PureService {
   }
 
   async reloadComponent(uuid: UuidString) {
+    this.log('Reloading component', uuid);
     /* Do soft deactivate */
     const component = this.itemManager?.findItem(uuid) as SNComponent;
     await this.itemManager!.changeComponent(component.uuid, (mutator) => {

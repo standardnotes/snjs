@@ -239,7 +239,7 @@ export function CopyPayload(
 }
 
 function CreatePayload(
-  object: object,
+  object: any,
   fields: PayloadField[],
   source?: PayloadSource,
   override?: PayloadOverride

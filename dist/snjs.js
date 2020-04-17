@@ -3500,7 +3500,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.ts ***!
   \**********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, Copy, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3677,6 +3677,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return _services_api_api_service__WEBPACK_IMPORTED_MODULE_33__["SNApiService"]; });
 
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./utils */ "./lib/utils.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["Copy"]; });
+
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "findInArray", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["findInArray"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["isNullOrUndefined"]; });
@@ -3707,7 +3709,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["jsonParseEmbeddedKeys"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Copy", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["Copy"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return _utils__WEBPACK_IMPORTED_MODULE_34__["topLevelCompare"]; });
 
 /* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Uuid", function() { return _Lib_uuid__WEBPACK_IMPORTED_MODULE_35__["Uuid"]; });
@@ -17190,88 +17192,96 @@ var ChallengeService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
+                if (!(values.length === 0)) {
+                  _context5.next = 2;
+                  break;
+                }
+
+                throw Error('Attempting to submit 0 values for challenge');
+
+              case 2:
                 operation = this.getChallengeOperation(challenge);
 
                 if (!operation.validate) {
-                  _context5.next = 34;
+                  _context5.next = 36;
                   break;
                 }
 
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context5.prev = 5;
+                _context5.prev = 7;
                 _iterator = values[Symbol.iterator]();
 
-              case 7:
+              case 9:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context5.next = 18;
+                  _context5.next = 20;
                   break;
                 }
 
                 _value = _step.value;
-                _context5.next = 11;
+                _context5.next = 13;
                 return this.validateChallengeValue(_value);
 
-              case 11:
+              case 13:
                 _ref = _context5.sent;
                 _valid = _ref.valid;
                 _artifacts = _ref.artifacts;
                 this.setValidationStatusForChallenge(challenge, _value, _valid, _artifacts);
 
-              case 15:
+              case 17:
                 _iteratorNormalCompletion = true;
-                _context5.next = 7;
-                break;
-
-              case 18:
-                _context5.next = 24;
+                _context5.next = 9;
                 break;
 
               case 20:
-                _context5.prev = 20;
-                _context5.t0 = _context5["catch"](5);
+                _context5.next = 26;
+                break;
+
+              case 22:
+                _context5.prev = 22;
+                _context5.t0 = _context5["catch"](7);
                 _didIteratorError = true;
                 _iteratorError = _context5.t0;
 
-              case 24:
-                _context5.prev = 24;
-                _context5.prev = 25;
+              case 26:
+                _context5.prev = 26;
+                _context5.prev = 27;
 
                 if (!_iteratorNormalCompletion && _iterator.return != null) {
                   _iterator.return();
                 }
 
-              case 27:
-                _context5.prev = 27;
+              case 29:
+                _context5.prev = 29;
 
                 if (!_didIteratorError) {
-                  _context5.next = 30;
+                  _context5.next = 32;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 30:
-                return _context5.finish(27);
-
-              case 31:
-                return _context5.finish(24);
-
               case 32:
-                _context5.next = 36;
-                break;
+                return _context5.finish(29);
+
+              case 33:
+                return _context5.finish(26);
 
               case 34:
+                _context5.next = 38;
+                break;
+
+              case 36:
                 _response = new _Lib_challenges__WEBPACK_IMPORTED_MODULE_5__["ChallengeResponse"](challenge, values);
                 operation.complete(_response);
 
-              case 36:
+              case 38:
               case "end":
                 return _context5.stop();
             }
           }
-        }, _callee5, this, [[5, 20, 24, 32], [25,, 27, 31]]);
+        }, _callee5, this, [[7, 22, 26, 34], [27,, 29, 33]]);
       }));
 
       function submitValuesForChallenge(_x3, _x4) {
@@ -17463,11 +17473,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "onWindowMessage", function (event) {
-      _this.log('Web app: received message', event);
       /** Make sure this message is for us */
-
-
       if (event.data.sessionKey) {
+        _this.log('Component manager received message', event.data);
+
         _this.handleMessage(_this.componentForSessionKey(event.data.sessionKey), event.data);
       }
     });
@@ -17478,6 +17487,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     _this.alertService = alertService;
     _this.environment = environment;
     _this.platform = platform;
+    _this.loggingEnabled = true;
 
     _this.configureForGeneralUsage();
 
@@ -17532,7 +17542,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
       this.removeItemObserver = this.itemManager.addObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_3__["ContentType"].Any, /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(changed, inserted, discarded, source, sourceKey) {
-          var items, syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _component, activeComponent;
+          var items, syncedComponents, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _component, isInActive;
 
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
             while (1) {
@@ -17567,11 +17577,9 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   }
 
                   _component = _step2.value;
-                  activeComponent = lodash_find__WEBPACK_IMPORTED_MODULE_7___default()(_this2.activeComponents, {
-                    uuid: _component.uuid
-                  });
+                  isInActive = _this2.activeComponents.includes(_component.uuid);
 
-                  if (!(_component.active && !_component.deleted && !activeComponent)) {
+                  if (!(_component.active && !_component.deleted && !isInActive)) {
                     _context.next = 16;
                     break;
                   }
@@ -17584,7 +17592,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   break;
 
                 case 16:
-                  if (!(!_component.active && activeComponent)) {
+                  if (!(!_component.active && isInActive)) {
                     _context.next = 19;
                     break;
                   }
@@ -18041,7 +18049,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     value: function sendItemsInReply(component, items, message, source) {
       var _this5 = this;
 
-      this.log('Web|componentManager|sendItemsInReply', component, items, message);
+      this.log('Component manager send items in reply', component, items, message);
       var responseData = {};
       var mapped = items.map(function (item) {
         return _this5.jsonForItem(item, component, source);
@@ -18052,7 +18060,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "sendContextItemInReply",
     value: function sendContextItemInReply(component, item, originalMessage, source) {
-      this.log('Web|componentManager|sendContextItemInReply', component, item, originalMessage);
+      this.log('Component manager send context item in reply', component, item, originalMessage);
       var response = {
         item: this.jsonForItem(item, component, source)
       };
@@ -18079,7 +18087,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         return;
       }
 
-      this.log('Web|sendMessageToComponent', component, message);
+      this.log('Component manager send message to component', component, message);
       var origin = this.urlForComponent(component);
 
       if (!origin || !componentState.window) {
@@ -19333,11 +19341,13 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                 switch (_context12.prev = _context12.next) {
                   case 0:
                     if (!approved) {
-                      _context12.next = 4;
+                      _context12.next = 5;
                       break;
                     }
 
-                    _context12.next = 3;
+                    _this17.log("Changing component to expand permissions", component);
+
+                    _context12.next = 4;
                     return _this17.itemManager.changeItem(component.uuid, function (m) {
                       var componentPermissions = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["Copy"])(component.permissions);
                       var _iteratorNormalCompletion23 = true;
@@ -19382,10 +19392,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                       mutator.permissions = componentPermissions;
                     });
 
-                  case 3:
+                  case 4:
                     _this17.syncService.sync();
 
-                  case 4:
+                  case 5:
                     _this17.permissionDialogs = _this17.permissionDialogs.filter(function (pendingDialog) {
                       /* Remove self */
                       if (pendingDialog === params) {
@@ -19421,7 +19431,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                       _this17.presentPermissionsDialog(_this17.permissionDialogs[0]);
                     }
 
-                  case 6:
+                  case 7:
                   case "end":
                     return _context12.stop();
                 }
@@ -19522,6 +19532,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
+                this.log('Register component window', component);
                 data = this.findOrCreateDataForComponent(component);
 
                 if (data.window === componentWindow) {
@@ -19530,10 +19541,10 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
 
                 this.log('Web|componentManager|registerComponentWindow', component);
                 data.window = componentWindow;
-                _context13.next = 6;
+                _context13.next = 7;
                 return _Lib_uuid__WEBPACK_IMPORTED_MODULE_12__["Uuid"].GenerateUuid();
 
-              case 6:
+              case 7:
                 data.sessionKey = _context13.sent;
                 this.sendMessageToComponent(component, {
                   action: _Models_app_component__WEBPACK_IMPORTED_MODULE_11__["ComponentAction"].ComponentRegistered,
@@ -19552,7 +19563,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   this.desktopManager.notifyComponentActivation(component);
                 }
 
-              case 10:
+              case 11:
               case "end":
                 return _context13.stop();
             }
@@ -19569,6 +19580,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "registerComponent",
     value: function registerComponent(uuid) {
+      this.log('Registering component', uuid);
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["addIfUnique"])(this.activeComponents, uuid);
       var component = this.itemManager.findItem(uuid);
       var _iteratorNormalCompletion24 = true;
@@ -19611,23 +19623,24 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
+                this.log('Activating component', uuid);
                 component = this.itemManager.findItem(uuid);
 
                 if (component.active) {
-                  _context14.next = 4;
+                  _context14.next = 5;
                   break;
                 }
 
-                _context14.next = 4;
+                _context14.next = 5;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = true;
                 });
 
-              case 4:
+              case 5:
                 this.registerComponent(uuid);
                 this.syncService.sync();
 
-              case 6:
+              case 7:
               case "end":
                 return _context14.stop();
             }
@@ -19644,6 +19657,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "deregisterComponent",
     value: function deregisterComponent(uuid) {
+      this.log('Degregistering component', uuid);
       var component = this.itemManager.findItem(uuid);
       Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["removeFromArray"])(this.activeComponents, uuid);
       delete this.componentState[component.uuid];
@@ -19696,24 +19710,25 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
+                this.log('Deactivating component', uuid);
                 component = (_this$itemManager = this.itemManager) === null || _this$itemManager === void 0 ? void 0 : _this$itemManager.findItem(uuid);
 
                 if (!component.active) {
-                  _context15.next = 4;
+                  _context15.next = 5;
                   break;
                 }
 
-                _context15.next = 4;
+                _context15.next = 5;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = false;
                 });
 
-              case 4:
+              case 5:
                 this.findOrCreateDataForComponent(component).sessionKey = undefined;
                 this.deregisterComponent(uuid);
                 this.syncService.sync();
 
-              case 7:
+              case 8:
               case "end":
                 return _context15.stop();
             }
@@ -19739,14 +19754,16 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
+                this.log('Reloading component', uuid);
                 /* Do soft deactivate */
+
                 component = (_this$itemManager2 = this.itemManager) === null || _this$itemManager2 === void 0 ? void 0 : _this$itemManager2.findItem(uuid);
-                _context17.next = 3;
+                _context17.next = 4;
                 return this.itemManager.changeComponent(component.uuid, function (mutator) {
                   mutator.active = false;
                 });
 
-              case 3:
+              case 4:
                 this.deregisterComponent(component.uuid);
                 /* Do soft activate */
 
@@ -19775,7 +19792,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                   })));
                 }));
 
-              case 5:
+              case 6:
               case "end":
                 return _context17.stop();
             }
@@ -23597,7 +23614,6 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 if (payloads.length === 0) {
-                  debugger;
                   console.warn("Attempting to emit 0 payloads.");
                 }
                 /** First loop should process payloads and add items only; no relationship handling. */
@@ -30671,6 +30687,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     _this.storageService = storageService;
     _this.apiService = apiService;
     _this.interval = interval;
+    _this.loggingEnabled = true;
 
     _this.initializeStatus();
 
@@ -32854,7 +32871,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.ts ***!
   \**********************/
-/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, topLevelCompare, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -32884,6 +32901,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "objectToValueArray", function() { return objectToValueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortedCopy", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return topLevelCompare; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return jsonParseEmbeddedKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitInPlace", function() { return omitInPlace; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "omitByCopy", function() { return omitByCopy; });
@@ -33189,7 +33207,6 @@ function removeFromIndex(array, index) {
 }
 /** 
  * Returns a new array by removeing the value from the array at the given index 
- * @returns {Array}
  */
 
 function arrayByRemovingFromIndex(array, index) {
@@ -33247,6 +33264,26 @@ function sortedCopy(object) {
 
   return Copy(result);
 }
+/** Compares for equality by comparing top-level keys value equality (===) */
+
+function topLevelCompare(left, right) {
+  var leftKeys = Object.keys(left);
+  var rightKeys = Object.keys(right);
+
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+
+  for (var _i3 = 0, _leftKeys = leftKeys; _i3 < _leftKeys.length; _i3++) {
+    var key = _leftKeys[_i3];
+
+    if (left[key] !== right[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
 /**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
@@ -33254,8 +33291,8 @@ function sortedCopy(object) {
 function jsonParseEmbeddedKeys(object) {
   var result = {};
 
-  for (var _i3 = 0, _Object$keys2 = Object.keys(object); _i3 < _Object$keys2.length; _i3++) {
-    var key = _Object$keys2[_i3];
+  for (var _i4 = 0, _Object$keys2 = Object.keys(object); _i4 < _Object$keys2.length; _i4++) {
+    var key = _Object$keys2[_i4];
     var value = void 0;
 
     try {

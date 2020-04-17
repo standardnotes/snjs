@@ -31,5 +31,5 @@ export declare class SNRootKeyParams {
      * When saving in a file or communicating with server,
      * use the original values.
      */
-    getPortableValue(): any;
+    getPortableValue(): KeyParamsContent;
 }
