@@ -164,7 +164,6 @@ export class SNSyncService extends PureService {
     this.storageService = storageService;
     this.apiService = apiService;
     this.interval = interval;
-    this.loggingEnabled = true;
 
     this.initializeStatus();
     this.initializeState();

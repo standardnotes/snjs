@@ -105,8 +105,8 @@ export function createStorageItemPayload(contentType) {
   );
 }
 
-export function createNotePayload() {
-  return CreateMaxPayloadFromAnyObject(createNoteParams());
+export function createNotePayload(title) {
+  return CreateMaxPayloadFromAnyObject(createNoteParams({ title }));
 }
 
 export function createStorageItemTagPayload() {
@@ -166,7 +166,7 @@ export async function loginToApplication({ application, email, password, ephemer
     password,
     undefined,
     ephemeral,
-    undefined, 
+    undefined,
     undefined,
     mergeLocal,
     true
@@ -246,6 +246,10 @@ export async function storagePayloadCount(application) {
 
 export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
+}
+
+export function tomorrow() {
+  return new Date(new Date().setDate(new Date().getDate() + 1));
 }
 
 export async function sleep(seconds) {

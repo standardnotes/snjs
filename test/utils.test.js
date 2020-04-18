@@ -28,7 +28,7 @@ describe('utils', () => {
     expect(array).to.eql(original.concat(extended));
   });
 
-  it.only('top level compare', () => {
+  it('top level compare', () => {
     const left = { a: 1, b: 2 };
     const right = { a: 1, b: 2 };
     const middle = { a: 2, b: 1 };

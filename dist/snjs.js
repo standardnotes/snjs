@@ -3500,7 +3500,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.ts ***!
   \**********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CollectionSort, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3757,6 +3757,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["MutableCollection"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["ImmutablePayloadCollection"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["CollectionSort"]; });
 
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CreateMaxPayloadFromAnyObject"]; });
@@ -10654,11 +10656,12 @@ var SNProtocolOperator = /*#__PURE__*/function () {
 /*!*********************************************!*\
   !*** ./lib/protocol/payloads/collection.ts ***!
   \*********************************************/
-/*! exports provided: MutableCollection, ImmutablePayloadCollection */
+/*! exports provided: CollectionSort, MutableCollection, ImmutablePayloadCollection */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return CollectionSort; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return MutableCollection; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return ImmutablePayloadCollection; });
 /* harmony import */ var _uuid_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./uuid_map */ "./lib/protocol/payloads/uuid_map.ts");
@@ -10689,6 +10692,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+var CollectionSort;
+
+(function (CollectionSort) {
+  CollectionSort["CreatedAt"] = "created_at";
+  CollectionSort["UpdatedAt"] = "userModifiedDate";
+  CollectionSort["Title"] = "title";
+})(CollectionSort || (CollectionSort = {}));
 
 var MutableCollection = /*#__PURE__*/function () {
   /** An array of uuids of items that are dirty */
@@ -10734,6 +10745,14 @@ var MutableCollection = /*#__PURE__*/function () {
     _defineProperty(this, "referenceMap", void 0);
 
     _defineProperty(this, "conflictMap", void 0);
+
+    _defineProperty(this, "displaySortBy", {});
+
+    _defineProperty(this, "displayFilter", {});
+
+    _defineProperty(this, "filteredMap", {});
+
+    _defineProperty(this, "sortedMap", {});
 
     if (copy) {
       this.map = mapCopy;
@@ -10849,10 +10868,10 @@ var MutableCollection = /*#__PURE__*/function () {
       try {
         for (var _iterator2 = uuids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var id = _step2.value;
-          var element = this.map[id];
+          var _element = this.map[id];
 
-          if (element || includeBlanks) {
-            results.push(element);
+          if (_element || includeBlanks) {
+            results.push(_element);
           }
         }
       } catch (err) {
@@ -10882,37 +10901,41 @@ var MutableCollection = /*#__PURE__*/function () {
 
       try {
         for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var element = _step3.value;
-          this.map[element.uuid] = element;
-          this.setToTypedMap(element);
+          var _element2 = _step3.value;
+          this.map[_element2.uuid] = _element2;
+          this.setToTypedMap(_element2);
           /** Dirty index */
 
-          if (element.dirty) {
-            this.dirtyIndex.add(element.uuid);
+          if (_element2.dirty) {
+            this.dirtyIndex.add(_element2.uuid);
           } else {
-            this.dirtyIndex.delete(element.uuid);
+            this.dirtyIndex.delete(_element2.uuid);
           }
           /** Invalids index */
 
 
-          if (element.errorDecrypting || element.waitingForKey) {
-            this.invalidsIndex.add(element.uuid);
+          if (_element2.errorDecrypting || _element2.waitingForKey) {
+            this.invalidsIndex.add(_element2.uuid);
           } else {
-            this.invalidsIndex.delete(element.uuid);
+            this.invalidsIndex.delete(_element2.uuid);
           }
+          /** Display filter/sort */
 
-          if (element.deleted) {
-            this.referenceMap.removeFromMap(element.uuid);
-            this.nondeletedIndex.delete(element.uuid);
+
+          this.filterSortElements([_element2], _element2.content_type);
+
+          if (_element2.deleted) {
+            this.referenceMap.removeFromMap(_element2.uuid);
+            this.nondeletedIndex.delete(_element2.uuid);
           } else {
-            this.nondeletedIndex.add(element.uuid);
-            var conflictOf = element.safeContent.conflict_of;
+            this.nondeletedIndex.add(_element2.uuid);
+            var conflictOf = _element2.safeContent.conflict_of;
 
             if (conflictOf) {
-              this.conflictMap.establishRelationship(conflictOf, element.uuid);
+              this.conflictMap.establishRelationship(conflictOf, _element2.uuid);
             }
 
-            this.referenceMap.setAllRelationships(element.uuid, element.references.map(function (r) {
+            this.referenceMap.setAllRelationships(_element2.uuid, _element2.references.map(function (r) {
               return r.uuid;
             }));
           }
@@ -10942,11 +10965,11 @@ var MutableCollection = /*#__PURE__*/function () {
 
       try {
         for (var _iterator4 = elements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var element = _step4.value;
-          this.conflictMap.removeFromMap(element.uuid);
-          this.referenceMap.removeFromMap(element.uuid);
-          this.deleteFromTypedMap(element);
-          delete this.map[element.uuid];
+          var _element3 = _step4.value;
+          this.conflictMap.removeFromMap(_element3.uuid);
+          this.referenceMap.removeFromMap(_element3.uuid);
+          this.deleteFromTypedMap(_element3);
+          delete this.map[_element3.uuid];
         }
       } catch (err) {
         _didIteratorError4 = true;
@@ -11002,6 +11025,217 @@ var MutableCollection = /*#__PURE__*/function () {
     value: function conflictsOf(uuid) {
       var uuids = this.conflictMap.getDirectRelationships(uuid);
       return this.findAll(uuids);
+    }
+  }, {
+    key: "setDisplayOptions",
+
+    /**
+     * Sets an optional sortBy and filter for a given content type. These options will be
+     * applied against a separate "display-only" record and not the master record. Passing
+     * null options removes any existing options. sortBy is always required, but a filter is 
+     * not always required. 
+     * @param filter A function that receives an element and returns a boolean indicating
+     * whether the element passes the filter and should be in displayable results.
+     */
+    value: function setDisplayOptions(contentType, sortBy, direction, filter) {
+      this.displaySortBy[contentType] = sortBy ? {
+        key: sortBy,
+        dir: direction
+      } : undefined;
+      this.displayFilter[contentType] = filter;
+      /** Reset existing maps */
+
+      this.filteredMap[contentType] = {};
+      this.sortedMap[contentType] = [];
+      /** Re-process all elements */
+
+      var elements = this.all(contentType);
+      this.filterSortElements(elements, contentType);
+    }
+    /** Returns the filtered and sorted list of elements for this content type,
+     * according to the options set via `setDisplayOptions` */
+
+  }, {
+    key: "displayElements",
+    value: function displayElements(contentType) {
+      var elements = this.sortedMap[contentType];
+
+      if (!elements) {
+        throw Error('Attempting to access display elements for non-configured content type');
+      }
+
+      return elements;
+    }
+  }, {
+    key: "filterSortElements",
+    value: function filterSortElements(elements, contentType) {
+      var sortBy = this.displaySortBy[contentType];
+      /** Sort by is required, but filter is not */
+
+      if (!sortBy) {
+        return;
+      }
+
+      var filter = this.displayFilter[contentType];
+      /** Filtered content type map */
+
+      var filteredCTMap = this.filteredMap[contentType];
+      var sortedElements = this.sortedMap[contentType];
+      /** If true, the entire sorted array will need to be re-sorted. The reason for
+       * sorting the entire array and not just inserting an element using binary search
+       * is that we need to keep track of the sorted index of an item so that we can
+       * look up and change its value without having to search the array for it. */
+
+      var needsResort = false;
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = elements[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var _element5 = _step5.value;
+
+          /** If no filter the element passes by default */
+          var passes = _element5.deleted ? false : filter ? filter(_element5) : true;
+          var _currentIndex = filteredCTMap[_element5.uuid];
+
+          if (passes) {
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(_currentIndex)) {
+              /** Check to see if the element has changed its sort value. If so, we need to re-sort */
+              var previousValue = sortedElements[_currentIndex][sortBy.key];
+              var newValue = _element5[sortBy.key];
+              /** Replace the current element with the new one. */
+
+              sortedElements[_currentIndex] = _element5;
+
+              if (previousValue !== newValue) {
+                /** Needs resort because its re-sort value has changed, 
+                 * and thus its position might change */
+                needsResort = true;
+              }
+            } else {
+              /** Has not yet been inserted */
+              sortedElements.push(_element5);
+              /** Needs re-sort because we're just pushing the element to the end here */
+
+              needsResort = true;
+            }
+          } else {
+            /** Doesn't pass filter, remove from sorted and filtered */
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(_currentIndex)) {
+              delete filteredCTMap[_element5.uuid];
+              /** We don't yet remove the element directly from the array, since mutating
+               * the array inside a loop could render all other upcoming indexes invalid */
+
+              sortedElements[_currentIndex] = undefined;
+              /** Since an element is being removed from the array, we need to recompute
+               * the new positions for elements that are staying */
+
+              needsResort = true;
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      if (needsResort) {
+        /** Resort the elements array, and update the saved positions */
+
+        /** @O(n * log(n)) */
+        var resorted = sortedElements.sort(function (a, b) {
+          /** If the elements are undefined, move to beginning */
+          if (!a) {
+            return -1;
+          }
+
+          if (!b) {
+            return 1;
+          }
+
+          var aValue = a[sortBy.key] || '';
+          var bValue = b[sortBy.key] || '';
+          var vector = 1;
+
+          if (sortBy.dir === 'asc') {
+            vector *= -1;
+          }
+
+          if (sortBy.key === CollectionSort.Title) {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+
+            if (aValue.length === 0 && bValue.length === 0) {
+              return 0;
+            } else if (aValue.length === 0 && bValue.length !== 0) {
+              return 1 * vector;
+            } else if (aValue.length !== 0 && bValue.length === 0) {
+              return -1 * vector;
+            } else {
+              vector *= -1;
+            }
+          }
+
+          if (aValue > bValue) {
+            return -1 * vector;
+          } else if (aValue < bValue) {
+            return 1 * vector;
+          }
+
+          return 0;
+        });
+        /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+         * we create another array that filters out any of the undefinedes. We also keep track of the
+         * current index while we loop and set that in the filteredCTMap. */
+
+        var cleaned = [];
+        var currentIndex = 0;
+        /** @O(n) */
+
+        var _iteratorNormalCompletion6 = true;
+        var _didIteratorError6 = false;
+        var _iteratorError6 = undefined;
+
+        try {
+          for (var _iterator6 = resorted[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+            var _element4 = _step6.value;
+
+            if (!_element4) {
+              continue;
+            }
+
+            cleaned.push(_element4);
+            filteredCTMap[_element4.uuid] = currentIndex;
+            currentIndex++;
+          }
+        } catch (err) {
+          _didIteratorError6 = true;
+          _iteratorError6 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+              _iterator6.return();
+            }
+          } finally {
+            if (_didIteratorError6) {
+              throw _iteratorError6;
+            }
+          }
+        }
+
+        this.sortedMap[contentType] = cleaned;
+      }
     }
   }]);
 
@@ -17487,7 +17721,6 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
     _this.alertService = alertService;
     _this.environment = environment;
     _this.platform = platform;
-    _this.loggingEnabled = true;
 
     _this.configureForGeneralUsage();
 
@@ -30687,7 +30920,6 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
     _this.storageService = storageService;
     _this.apiService = apiService;
     _this.interval = interval;
-    _this.loggingEnabled = true;
 
     _this.initializeStatus();
 
@@ -32871,7 +33103,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.ts ***!
   \**********************/
-/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, topLevelCompare, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, addAtIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, topLevelCompare, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -32898,6 +33130,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterFromArray", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addAtIndex", function() { return addAtIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "objectToValueArray", function() { return objectToValueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortedCopy", function() { return sortedCopy; });
@@ -33163,7 +33396,7 @@ function existsInArray(inArray, value) {
   return inArray.indexOf(value) >= 0;
 }
 /** 
- * Removes an object from the array by value 
+ * Removes an object from the array by reference equality or shallow value equality 
  */
 
 function removeFromArray(array, value) {
@@ -33180,12 +33413,12 @@ function addIfUnique(array, value) {
   }
 }
 /** 
- * Removes an object from the array by searching for an object where all the
+ * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
 
 function filterFromArray(array, predicate) {
-  return lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(array, predicate);
+  lodash_remove__WEBPACK_IMPORTED_MODULE_1___default()(array, predicate);
 }
 /** 
  * Returns a new array by removing all elements in subtract from array 
@@ -33204,6 +33437,13 @@ function arrayByDifference(array, subtract) {
 
 function removeFromIndex(array, index) {
   array.splice(index, 1);
+}
+/** 
+ * Adds the value from the array at the given index, in-place. 
+ */
+
+function addAtIndex(array, element, index) {
+  array.splice(index, 0, element);
 }
 /** 
  * Returns a new array by removeing the value from the array at the given index 
@@ -33398,12 +33638,19 @@ function joinPaths() {
   }).join('/');
 }
 /**
- * Creates a copy of the input object by JSON stringifying the object
- * then JSON parsing the string.
+ * Creates a copy of the input object by JSON stringifying the object then JSON parsing 
+ * the string (if the input is an object). If input is date, a Date copy will be created,
+ * and if input is a primitive value, it will be returned as-is.
  */
 
 function Copy(object) {
-  return JSON.parse(JSON.stringify(object));
+  if (object instanceof Date) {
+    return new Date(object);
+  } else if (isObject(object)) {
+    return JSON.parse(JSON.stringify(object));
+  } else {
+    return object;
+  }
 }
 /**
  * Merges the second object parameter into the first object, in-place.

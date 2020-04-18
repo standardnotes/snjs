@@ -160,7 +160,7 @@ export function existsInArray<T>(inArray: T[], value: T) {
 }
 
 /** 
- * Removes an object from the array by value 
+ * Removes an object from the array by reference equality or shallow value equality 
  */
 export function removeFromArray<T>(array: T[], value: T) {
   array.splice(array.indexOf(value), 1);
@@ -177,11 +177,11 @@ export function addIfUnique<T>(array: T[], value: T) {
 }
 
 /** 
- * Removes an object from the array by searching for an object where all the
+ * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
 export function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>) {
-  return remove(array, predicate);
+  remove(array, predicate);
 }
 
 /** 
@@ -198,6 +198,13 @@ export function arrayByDifference<T>(array: T[], subtract: T[]) {
  */
 export function removeFromIndex(array: any[], index: number) {
   array.splice(index, 1);
+}
+
+/** 
+ * Adds the value from the array at the given index, in-place. 
+ */
+export function addAtIndex<T>(array: T[], element: T, index: number) {
+  array.splice(index, 0, element);
 }
 
 /** 
@@ -239,11 +246,11 @@ export function sortedCopy(object: any) {
 export function topLevelCompare<T>(left: T, right: T) {
   const leftKeys = Object.keys(left);
   const rightKeys = Object.keys(right);
-  if(leftKeys.length !== rightKeys.length) {
+  if (leftKeys.length !== rightKeys.length) {
     return false;
   }
-  for(const key of leftKeys) {
-    if((left as any)[key] !== (right as any)[key]) {
+  for (const key of leftKeys) {
+    if ((left as any)[key] !== (right as any)[key]) {
       return false;
     }
   }
@@ -309,11 +316,18 @@ export function joinPaths(...args: string[]) {
 }
 
 /**
- * Creates a copy of the input object by JSON stringifying the object
- * then JSON parsing the string.
+ * Creates a copy of the input object by JSON stringifying the object then JSON parsing 
+ * the string (if the input is an object). If input is date, a Date copy will be created,
+ * and if input is a primitive value, it will be returned as-is.
  */
 export function Copy(object: any) {
-  return JSON.parse(JSON.stringify(object));
+  if (object instanceof Date) {
+    return new Date(object);
+  } else if (isObject(object)) {
+    return JSON.parse(JSON.stringify(object));
+  } else {
+    return object;
+  }
 }
 
 /**

@@ -150,7 +150,6 @@ export class SNComponentManager extends PureService {
     this.alertService = alertService;
     this.environment = environment;
     this.platform = platform;
-    this.loggingEnabled = true;
     this.configureForGeneralUsage();
     if (environment !== Environment.Mobile) {
       this.configureForNonMobileUsage();
