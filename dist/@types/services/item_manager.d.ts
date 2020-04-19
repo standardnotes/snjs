@@ -6,6 +6,7 @@ import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
 import { UuidString } from './../types';
+import { CollectionSort, SortDirection } from './../protocol/payloads/collection';
 import { PureService } from './pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '../models/app/component';
@@ -39,6 +40,8 @@ export declare class ItemManager extends PureService {
     private collection;
     private systemSmartTags;
     constructor(modelManager: PayloadManager);
+    setDisplayOptions(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
+    getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
     deinit(): void;
     private resetState;
     /**
@@ -161,7 +164,7 @@ export declare class ItemManager extends PureService {
     /**
      * Returns all items which are properly decrypted
      */
-    validItemsForContentType(contentType: ContentType): SNItem[];
+    nonErroredItemsForContentType(contentType: ContentType): SNItem[];
     /**
      * Returns all items matching a given predicate
      */

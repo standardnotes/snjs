@@ -11,7 +11,7 @@ import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
-import { MutableCollection } from './../protocol/payloads/collection';
+import { MutableCollection, CollectionSort, SortDirection } from './../protocol/payloads/collection';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
@@ -36,10 +36,6 @@ type ObserverCallback = (
   source?: PayloadSource,
   sourceKey?: string
 ) => Promise<void>
-
-const nondeleted = (items: SNItem[]) => {
-  return items.filter((item) => !item.deleted);
-}
 
 type Observer = {
   contentType: ContentType[]
@@ -71,6 +67,25 @@ export class ItemManager extends PureService {
     this.unsubChangeObserver = this.modelManager
       .addChangeObserver(ContentType.Any, this.onPayloadChange.bind(this));
     this.systemSmartTags = BuildSmartTags();
+
+    this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
+    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
+    this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
+  }
+
+  public setDisplayOptions(
+    contentType: ContentType,
+    sortBy?: CollectionSort,
+    direction?: SortDirection,
+    filter?: (element: any) => boolean
+  ) {
+    this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  public getDisplayableItems(contentType: ContentType) {
+    return this.collection.displayElements(contentType);
   }
 
   public deinit() {
@@ -121,34 +136,32 @@ export class ItemManager extends PureService {
     return this.collection.invalidElements();
   }
 
-
-
   /**
    * Returns all non-deleted items keys
    */
   get itemsKeys() {
-    return nondeleted(this.collection.all(ContentType.ItemsKey)) as SNItemsKey[];
+    return this.collection.displayElements(ContentType.ItemsKey) as SNItemsKey[];
   }
 
   /**
   * Returns all non-deleted notes
   */
   get notes() {
-    return nondeleted(this.collection.all(ContentType.Note)) as SNNote[];
+    return this.collection.displayElements(ContentType.Note) as SNNote[];
   }
 
   /**
   * Returns all non-deleted tags
   */
   get tags() {
-    return nondeleted(this.collection.all(ContentType.Tag)) as SNTag[];
+    return this.collection.displayElements(ContentType.Tag) as SNTag[];
   }
 
   /**
   * Returns all non-deleted components
   */
   get components() {
-    return nondeleted(this.collection.all(ContentType.Component)) as SNComponent[];
+    return this.collection.displayElements(ContentType.Component) as SNComponent[];
   }
 
   public addObserver(
@@ -311,7 +324,7 @@ export class ItemManager extends PureService {
       return new PrivilegeMutator(item, type);
     } else if (item.content_type === ContentType.UserPrefs) {
       return new UserPrefsMutator(item, type);
-    } 
+    }
     else {
       return new ItemMutator(item, type);
     }
@@ -632,7 +645,7 @@ export class ItemManager extends PureService {
   /**
    * Returns all items which are properly decrypted
    */
-  validItemsForContentType(contentType: ContentType) {
+  nonErroredItemsForContentType(contentType: ContentType) {
     const items = this.collection.all(contentType);
     return items.filter((item) => !item.errorDecrypting && !item.waitingForKey);
   }
@@ -728,18 +741,15 @@ export class ItemManager extends PureService {
    * Returns all smart tags, sorted by title.
    */
   public getSmartTags() {
-    const userTags = this.validItemsForContentType(ContentType.SmartTag) as SNSmartTag[];
-    const sortedUserTags = userTags.sort((a, b) => {
-      return a.title < b.title ? -1 : 1;
-    }) as SNSmartTag[];
-    return this.systemSmartTags.concat(sortedUserTags);
+    const userTags = this.collection.displayElements(ContentType.SmartTag) as SNSmartTag[];
+    return this.systemSmartTags.concat(userTags);
   }
 
   /**
    * The number of notes currently managed
    */
   public get noteCount() {
-    return this.notes.length;
+    return this.collection.all(ContentType.Note).length;
   }
 
   /**

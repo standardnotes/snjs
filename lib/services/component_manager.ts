@@ -708,7 +708,7 @@ export class SNComponentManager extends PureService {
       for (const contentType of message.data.content_types) {
         extendArray(
           items,
-          this.itemManager!.validItemsForContentType(contentType)
+          this.itemManager!.nonErroredItemsForContentType(contentType)
         );
       }
       this.sendItemsInReply(component, items, message);

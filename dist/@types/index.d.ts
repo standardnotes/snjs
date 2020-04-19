@@ -42,7 +42,7 @@ export { ApplicationEvent } from './events';
 export { Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString } from './platforms';
 export { SyncEvent } from './services/sync/events';
 /** Payloads */
-export { MutableCollection, ImmutablePayloadCollection } from './protocol/payloads/collection';
+export { MutableCollection, ImmutablePayloadCollection, CollectionSort } from './protocol/payloads/collection';
 export { CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload } from './protocol/payloads/generator';
 export { PayloadSource, isPayloadSourceRetrieved } from './protocol/payloads/sources';
 export { ProtocolVersion } from './protocol/versions';

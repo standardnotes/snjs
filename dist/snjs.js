@@ -1164,6 +1164,16 @@ var SNApplication = /*#__PURE__*/function () {
     value: function getTrashedItems() {
       return this.itemManager.trashedItems;
     }
+  }, {
+    key: "setDisplayOptions",
+    value: function setDisplayOptions(contentType, sortBy, direction, filter) {
+      this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
+    }
+  }, {
+    key: "getDisplayableItems",
+    value: function getDisplayableItems(contentType) {
+      return this.itemManager.getDisplayableItems(contentType);
+    }
     /**
      * Inserts the input item by its payload properties, and marks the item as dirty.
      * A sync is not performed after an item is inserted. This must be handled by the caller.
@@ -1420,11 +1430,6 @@ var SNApplication = /*#__PURE__*/function () {
     key: "getItems",
     value: function getItems(contentType) {
       return this.itemManager.getItems(contentType);
-    }
-  }, {
-    key: "getDisplayableItems",
-    value: function getDisplayableItems(contentType) {
-      return this.itemManager.validItemsForContentType(contentType);
     }
   }, {
     key: "notesMatchingSmartTag",
@@ -10919,10 +10924,6 @@ var MutableCollection = /*#__PURE__*/function () {
           } else {
             this.invalidsIndex.delete(_element2.uuid);
           }
-          /** Display filter/sort */
-
-
-          this.filterSortElements([_element2], _element2.content_type);
 
           if (_element2.deleted) {
             this.referenceMap.removeFromMap(_element2.uuid);
@@ -10940,6 +10941,8 @@ var MutableCollection = /*#__PURE__*/function () {
             }));
           }
         }
+        /** Display filter/sort */
+
       } catch (err) {
         _didIteratorError3 = true;
         _iteratorError3 = err;
@@ -10954,6 +10957,8 @@ var MutableCollection = /*#__PURE__*/function () {
           }
         }
       }
+
+      this.filterSortElements(elements);
     }
   }, {
     key: "discard",
@@ -11034,10 +11039,21 @@ var MutableCollection = /*#__PURE__*/function () {
      * applied against a separate "display-only" record and not the master record. Passing
      * null options removes any existing options. sortBy is always required, but a filter is 
      * not always required. 
+     * Note that sorting and filtering only applies to collections of type SNItem, and not
+     * payloads. This is because we access item properties such as `pinned` and `title`.
      * @param filter A function that receives an element and returns a boolean indicating
      * whether the element passes the filter and should be in displayable results.
      */
     value: function setDisplayOptions(contentType, sortBy, direction, filter) {
+      var existingSortBy = this.displaySortBy[contentType];
+      var existingFilter = this.displayFilter[contentType];
+      /** If the sort value is unchanged, and we are not setting a new filter,
+       * we return, as to not rebuild and resort all elements */
+
+      if (existingSortBy && existingSortBy.key === sortBy && existingSortBy.dir === direction && !existingFilter && !filter) {
+        return;
+      }
+
       this.displaySortBy[contentType] = sortBy ? {
         key: sortBy,
         dir: direction
@@ -11050,7 +11066,7 @@ var MutableCollection = /*#__PURE__*/function () {
       /** Re-process all elements */
 
       var elements = this.all(contentType);
-      this.filterSortElements(elements, contentType);
+      this.filterSortElements(elements);
     }
     /** Returns the filtered and sorted list of elements for this content type,
      * according to the options set via `setDisplayOptions` */
@@ -11061,77 +11077,85 @@ var MutableCollection = /*#__PURE__*/function () {
       var elements = this.sortedMap[contentType];
 
       if (!elements) {
-        throw Error('Attempting to access display elements for non-configured content type');
+        throw Error("Attempting to access display elements for non-configured content type ".concat(contentType));
       }
 
       return elements;
     }
   }, {
     key: "filterSortElements",
-    value: function filterSortElements(elements, contentType) {
-      var sortBy = this.displaySortBy[contentType];
-      /** Sort by is required, but filter is not */
+    value: function filterSortElements(elements) {
+      var _this2 = this;
 
-      if (!sortBy) {
+      if (Object.keys(this.displaySortBy).length === 0) {
         return;
       }
+      /** If a content type is added to this set, we are indicating the entire sorted 
+       * array will need to be re-sorted. The reason for sorting the entire array and not 
+       * just inserting an element using binary search is that we need to keep track of the 
+       * sorted index of an item so that we can look up and change its value without having
+       * to search the array for it. */
 
-      var filter = this.displayFilter[contentType];
-      /** Filtered content type map */
 
-      var filteredCTMap = this.filteredMap[contentType];
-      var sortedElements = this.sortedMap[contentType];
-      /** If true, the entire sorted array will need to be re-sorted. The reason for
-       * sorting the entire array and not just inserting an element using binary search
-       * is that we need to keep track of the sorted index of an item so that we can
-       * look up and change its value without having to search the array for it. */
-
-      var needsResort = false;
+      var typesNeedingResort = new Set();
       var _iteratorNormalCompletion5 = true;
       var _didIteratorError5 = false;
       var _iteratorError5 = undefined;
 
       try {
         for (var _iterator5 = elements[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var _element5 = _step5.value;
+          var _element4 = _step5.value;
+          var contentType = _element4.content_type;
+          var sortBy = this.displaySortBy[contentType];
+          /** Sort by is required, but filter is not */
 
+          if (!sortBy) {
+            continue;
+          }
+
+          var filter = this.displayFilter[contentType];
+          /** Filtered content type map */
+
+          var filteredCTMap = this.filteredMap[contentType];
+          var sortedElements = this.sortedMap[contentType];
           /** If no filter the element passes by default */
-          var passes = _element5.deleted ? false : filter ? filter(_element5) : true;
-          var _currentIndex = filteredCTMap[_element5.uuid];
+
+          var passes = _element4.deleted ? false : filter ? filter(_element4) : true;
+          var currentIndex = filteredCTMap[_element4.uuid];
 
           if (passes) {
-            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(_currentIndex)) {
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
               /** Check to see if the element has changed its sort value. If so, we need to re-sort */
-              var previousValue = sortedElements[_currentIndex][sortBy.key];
-              var newValue = _element5[sortBy.key];
+              var previousValue = sortedElements[currentIndex][sortBy.key];
+              var newValue = _element4[sortBy.key];
               /** Replace the current element with the new one. */
 
-              sortedElements[_currentIndex] = _element5;
+              sortedElements[currentIndex] = _element4;
 
-              if (previousValue !== newValue) {
+              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["compareValues"])(previousValue, newValue)) {
                 /** Needs resort because its re-sort value has changed, 
                  * and thus its position might change */
-                needsResort = true;
+                typesNeedingResort.add(contentType);
               }
             } else {
               /** Has not yet been inserted */
-              sortedElements.push(_element5);
+              sortedElements.push(_element4);
               /** Needs re-sort because we're just pushing the element to the end here */
 
-              needsResort = true;
+              typesNeedingResort.add(contentType);
             }
           } else {
             /** Doesn't pass filter, remove from sorted and filtered */
-            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(_currentIndex)) {
-              delete filteredCTMap[_element5.uuid];
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
+              delete filteredCTMap[_element4.uuid];
               /** We don't yet remove the element directly from the array, since mutating
                * the array inside a loop could render all other upcoming indexes invalid */
 
-              sortedElements[_currentIndex] = undefined;
+              sortedElements[currentIndex] = undefined;
               /** Since an element is being removed from the array, we need to recompute
                * the new positions for elements that are staying */
 
-              needsResort = true;
+              typesNeedingResort.add(contentType);
             }
           }
         }
@@ -11150,91 +11174,139 @@ var MutableCollection = /*#__PURE__*/function () {
         }
       }
 
-      if (needsResort) {
-        /** Resort the elements array, and update the saved positions */
+      var _iteratorNormalCompletion6 = true;
+      var _didIteratorError6 = false;
+      var _iteratorError6 = undefined;
 
-        /** @O(n * log(n)) */
-        var resorted = sortedElements.sort(function (a, b) {
-          /** If the elements are undefined, move to beginning */
-          if (!a) {
-            return -1;
-          }
+      try {
+        var _loop = function _loop() {
+          var contentType = _step6.value;
+          var sortedElements = _this2.sortedMap[contentType];
+          var sortBy = _this2.displaySortBy[contentType];
+          var filteredCTMap = _this2.filteredMap[contentType];
+          /** Resort the elements array, and update the saved positions */
 
-          if (!b) {
-            return 1;
-          }
+          /** @O(n * log(n)) */
 
-          var aValue = a[sortBy.key] || '';
-          var bValue = b[sortBy.key] || '';
-          var vector = 1;
+          var sortFn = function sortFn(a, b) {
+            var skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-          if (sortBy.dir === 'asc') {
-            vector *= -1;
-          }
+            /** If the elements are undefined, move to beginning */
+            if (!a) {
+              return -1;
+            }
 
-          if (sortBy.key === CollectionSort.Title) {
-            aValue = aValue.toLowerCase();
-            bValue = bValue.toLowerCase();
+            if (!b) {
+              return 1;
+            }
 
-            if (aValue.length === 0 && bValue.length === 0) {
-              return 0;
-            } else if (aValue.length === 0 && bValue.length !== 0) {
-              return 1 * vector;
-            } else if (aValue.length !== 0 && bValue.length === 0) {
-              return -1 * vector;
-            } else {
+            if (!skipPinnedCheck) {
+              if (a.pinned && b.pinned) {
+                return sortFn(a, b, true);
+              }
+
+              if (a.pinned) {
+                return -1;
+              }
+
+              if (b.pinned) {
+                return 1;
+              }
+            }
+
+            var aValue = a[sortBy.key] || '';
+            var bValue = b[sortBy.key] || '';
+            var vector = 1;
+
+            if (sortBy.dir === 'asc') {
               vector *= -1;
             }
-          }
 
-          if (aValue > bValue) {
-            return -1 * vector;
-          } else if (aValue < bValue) {
-            return 1 * vector;
-          }
+            if (sortBy.key === CollectionSort.Title) {
+              aValue = aValue.toLowerCase();
+              bValue = bValue.toLowerCase();
 
-          return 0;
-        });
-        /** Now that resorted contains the sorted elements (but also can contain undefined element) 
-         * we create another array that filters out any of the undefinedes. We also keep track of the
-         * current index while we loop and set that in the filteredCTMap. */
-
-        var cleaned = [];
-        var currentIndex = 0;
-        /** @O(n) */
-
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
-
-        try {
-          for (var _iterator6 = resorted[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var _element4 = _step6.value;
-
-            if (!_element4) {
-              continue;
+              if (aValue.length === 0 && bValue.length === 0) {
+                return 0;
+              } else if (aValue.length === 0 && bValue.length !== 0) {
+                return 1 * vector;
+              } else if (aValue.length !== 0 && bValue.length === 0) {
+                return -1 * vector;
+              } else {
+                vector *= -1;
+              }
             }
 
-            cleaned.push(_element4);
-            filteredCTMap[_element4.uuid] = currentIndex;
-            currentIndex++;
-          }
-        } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
-        } finally {
+            if (aValue > bValue) {
+              return -1 * vector;
+            } else if (aValue < bValue) {
+              return 1 * vector;
+            }
+
+            return 0;
+          };
+
+          var resorted = sortedElements.sort(function (a, b) {
+            return sortFn(a, b);
+          });
+          /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+           * we create another array that filters out any of the undefinedes. We also keep track of the
+           * current index while we loop and set that in the filteredCTMap. */
+
+          var cleaned = [];
+          var currentIndex = 0;
+          /** @O(n) */
+
+          var _iteratorNormalCompletion7 = true;
+          var _didIteratorError7 = false;
+          var _iteratorError7 = undefined;
+
           try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-              _iterator6.return();
+            for (var _iterator7 = resorted[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+              var _element5 = _step7.value;
+
+              if (!_element5) {
+                continue;
+              }
+
+              cleaned.push(_element5);
+              filteredCTMap[_element5.uuid] = currentIndex;
+              currentIndex++;
             }
+          } catch (err) {
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
           } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
+            try {
+              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                _iterator7.return();
+              }
+            } finally {
+              if (_didIteratorError7) {
+                throw _iteratorError7;
+              }
             }
+          }
+
+          _this2.sortedMap[contentType] = cleaned;
+        };
+
+        for (var _iterator6 = typesNeedingResort.values()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          _loop();
+        }
+      } catch (err) {
+        _didIteratorError6 = true;
+        _iteratorError6 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+            _iterator6.return();
+          }
+        } finally {
+          if (_didIteratorError6) {
+            throw _iteratorError6;
           }
         }
-
-        this.sortedMap[contentType] = cleaned;
       }
     }
   }]);
@@ -11249,7 +11321,7 @@ var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
   _inherits(ImmutablePayloadCollection, _MutableCollection);
 
   function ImmutablePayloadCollection() {
-    var _this2;
+    var _this3;
 
     var payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     var source = arguments.length > 1 ? arguments[1] : undefined;
@@ -11261,13 +11333,13 @@ var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
 
     _classCallCheck(this, ImmutablePayloadCollection);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ImmutablePayloadCollection).call(this, payloads, copy, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy));
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(ImmutablePayloadCollection).call(this, payloads, copy, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy));
 
-    _defineProperty(_assertThisInitialized(_this2), "source", void 0);
+    _defineProperty(_assertThisInitialized(_this3), "source", void 0);
 
-    _this2.source = source;
-    Object.freeze(_assertThisInitialized(_this2));
-    return _this2;
+    _this3.source = source;
+    Object.freeze(_assertThisInitialized(_this3));
+    return _this3;
   }
 
   _createClass(ImmutablePayloadCollection, [{
@@ -14366,7 +14438,7 @@ var SNActionsService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getExtensions",
     value: function getExtensions() {
-      return this.itemManager.validItemsForContentType(_models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].ActionsExtension);
+      return this.itemManager.nonErroredItemsForContentType(_models_content_types__WEBPACK_IMPORTED_MODULE_2__["ContentType"].ActionsExtension);
     }
   }, {
     key: "extensionsInContextOfItem",
@@ -18603,7 +18675,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         try {
           for (var _iterator14 = message.data.content_types[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
             var contentType = _step14.value;
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["extendArray"])(items, _this8.itemManager.validItemsForContentType(contentType));
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["extendArray"])(items, _this8.itemManager.nonErroredItemsForContentType(contentType));
           }
         } catch (err) {
           _didIteratorError14 = true;
@@ -21454,12 +21526,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var nondeleted = function nondeleted(items) {
-  return items.filter(function (item) {
-    return !item.deleted;
-  });
-};
-
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a 
  * more user-friendly or item-specific interface to creating and updating data. 
@@ -21494,10 +21560,31 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     _this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
     _this.unsubChangeObserver = _this.modelManager.addChangeObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Any, _this.onPayloadChange.bind(_assertThisInitialized(_this)));
     _this.systemSmartTags = BuildSmartTags();
+
+    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'dsc');
+
+    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
+
+    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
+
+    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
+
+    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
+
     return _this;
   }
 
   _createClass(ItemManager, [{
+    key: "setDisplayOptions",
+    value: function setDisplayOptions(contentType, sortBy, direction, filter) {
+      this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
+    }
+  }, {
+    key: "getDisplayableItems",
+    value: function getDisplayableItems(contentType) {
+      return this.collection.displayElements(contentType);
+    }
+  }, {
     key: "deinit",
     value: function deinit() {
       this.unsubChangeObserver();
@@ -22772,8 +22859,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
      */
 
   }, {
-    key: "validItemsForContentType",
-    value: function validItemsForContentType(contentType) {
+    key: "nonErroredItemsForContentType",
+    value: function nonErroredItemsForContentType(contentType) {
       var items = this.collection.all(contentType);
       return items.filter(function (item) {
         return !item.errorDecrypting && !item.waitingForKey;
@@ -22956,11 +23043,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getSmartTags",
     value: function getSmartTags() {
-      var userTags = this.validItemsForContentType(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag);
-      var sortedUserTags = userTags.sort(function (a, b) {
-        return a.title < b.title ? -1 : 1;
-      });
-      return this.systemSmartTags.concat(sortedUserTags);
+      var userTags = this.collection.displayElements(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag);
+      return this.systemSmartTags.concat(userTags);
     }
     /**
      * The number of notes currently managed
@@ -23041,7 +23125,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsKeys",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey));
+      return this.collection.displayElements(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey);
     }
     /**
     * Returns all non-deleted notes
@@ -23050,7 +23134,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "notes",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note));
+      return this.collection.displayElements(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note);
     }
     /**
     * Returns all non-deleted tags
@@ -23059,7 +23143,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "tags",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag));
+      return this.collection.displayElements(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag);
     }
     /**
     * Returns all non-deleted components
@@ -23068,7 +23152,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "components",
     get: function get() {
-      return nondeleted(this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component));
+      return this.collection.displayElements(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component);
     }
   }, {
     key: "trashSmartTag",
@@ -23089,7 +23173,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "noteCount",
     get: function get() {
-      return this.notes.length;
+      return this.collection.all(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note).length;
     }
   }]);
 
@@ -33103,7 +33187,7 @@ function namespacedKey(namespace, key) {
 /*!**********************!*\
   !*** ./lib/utils.ts ***!
   \**********************/
-/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, removeFromIndex, addAtIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, topLevelCompare, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
+/*! exports provided: getGlobalScope, dictToArray, isWebEnvironment, findInArray, searchArray, concatArrays, isObject, isFunction, isNullOrUndefined, isString, greaterOfTwoDates, uniqCombineObjArrays, uniqueArray, lastElement, extendArray, subtractFromArray, existsInArray, removeFromArray, addIfUnique, filterFromArray, arrayByDifference, compareValues, removeFromIndex, addAtIndex, arrayByRemovingFromIndex, objectToValueArray, sortedCopy, topLevelCompare, jsonParseEmbeddedKeys, omitInPlace, omitByCopy, joinPaths, Copy, deepMerge, pickByCopy, deepFreeze, hasGetter, truncateHexString, sleep */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -33129,6 +33213,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addIfUnique", function() { return addIfUnique; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterFromArray", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return arrayByDifference; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compareValues", function() { return compareValues; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return removeFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addAtIndex", function() { return addAtIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayByRemovingFromIndex", function() { return arrayByRemovingFromIndex; });
@@ -33430,6 +33515,19 @@ function arrayByDifference(array, subtract) {
   }).concat(subtract.filter(function (x) {
     return !array.includes(x);
   }));
+}
+function compareValues(left, right) {
+  if (left && !right || !left && right) {
+    return false;
+  }
+
+  if (left instanceof Date && right instanceof Date) {
+    return left.getTime() === right.getTime();
+  } else if (left instanceof String && right instanceof String) {
+    return left === right;
+  } else {
+    return topLevelCompare(left, right);
+  }
 }
 /** 
  * Removes the value from the array at the given index, in-place. 

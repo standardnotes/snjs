@@ -1,6 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
 import { UuidMap } from './uuid_map';
-import { isString, extendArray, addAtIndex, isNullOrUndefined, removeFromIndex } from '@Lib/utils';
+import { isString, extendArray, addAtIndex, isNullOrUndefined, removeFromIndex, compareValues } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@Models/content_types';
@@ -15,7 +15,7 @@ export enum CollectionSort {
   UpdatedAt = 'userModifiedDate',
   Title = 'title'
 }
-type SortDirection = 'asc' | 'dsc'
+export type SortDirection = 'asc' | 'dsc'
 
 export class MutableCollection<T extends Payloadable> {
 
@@ -160,9 +160,6 @@ export class MutableCollection<T extends Payloadable> {
         this.invalidsIndex.delete(element.uuid);
       }
 
-      /** Display filter/sort */
-      this.filterSortElements([element], element.content_type);
-
       if (element.deleted) {
         this.referenceMap.removeFromMap(element.uuid!);
         this.nondeletedIndex.delete(element.uuid);
@@ -178,6 +175,8 @@ export class MutableCollection<T extends Payloadable> {
         );
       }
     }
+    /** Display filter/sort */
+    this.filterSortElements(elements);
   }
 
   public discard(elements: T | T[]) {
@@ -237,6 +236,8 @@ export class MutableCollection<T extends Payloadable> {
    * applied against a separate "display-only" record and not the master record. Passing
    * null options removes any existing options. sortBy is always required, but a filter is 
    * not always required. 
+   * Note that sorting and filtering only applies to collections of type SNItem, and not
+   * payloads. This is because we access item properties such as `pinned` and `title`.
    * @param filter A function that receives an element and returns a boolean indicating
    * whether the element passes the filter and should be in displayable results.
    */
@@ -246,6 +247,17 @@ export class MutableCollection<T extends Payloadable> {
     direction?: SortDirection,
     filter?: (element: T) => boolean
   ) {
+    const existingSortBy = this.displaySortBy[contentType];
+    const existingFilter = this.displayFilter[contentType];
+    /** If the sort value is unchanged, and we are not setting a new filter,
+     * we return, as to not rebuild and resort all elements */
+    if (
+      existingSortBy && 
+      existingSortBy.key === sortBy && existingSortBy.dir === direction &&
+      !existingFilter && !filter
+    ) {
+      return;
+    }
     this.displaySortBy[contentType] = sortBy ? { key: sortBy, dir: direction! } : undefined;
     this.displayFilter[contentType] = filter;
     /** Reset existing maps */
@@ -253,7 +265,7 @@ export class MutableCollection<T extends Payloadable> {
     this.sortedMap[contentType] = [];
     /** Re-process all elements */
     const elements = this.all(contentType);
-    this.filterSortElements(elements, contentType);
+    this.filterSortElements(elements);
   }
 
   /** Returns the filtered and sorted list of elements for this content type,
@@ -261,27 +273,32 @@ export class MutableCollection<T extends Payloadable> {
   public displayElements(contentType: ContentType) {
     const elements = this.sortedMap[contentType];
     if (!elements) {
-      throw Error('Attempting to access display elements for non-configured content type');
+      throw Error(`Attempting to access display elements for non-configured content type ${contentType}`);
     }
     return elements;
   }
 
-  private filterSortElements(elements: T[], contentType: ContentType) {
-    const sortBy = this.displaySortBy[contentType];
-    /** Sort by is required, but filter is not */
-    if (!sortBy) {
+  private filterSortElements(elements: T[]) {
+    if (Object.keys(this.displaySortBy).length === 0) {
       return;
     }
-    const filter = this.displayFilter[contentType];
-    /** Filtered content type map */
-    const filteredCTMap = this.filteredMap[contentType]!;
-    const sortedElements = this.sortedMap[contentType]!;
-    /** If true, the entire sorted array will need to be re-sorted. The reason for
-     * sorting the entire array and not just inserting an element using binary search
-     * is that we need to keep track of the sorted index of an item so that we can
-     * look up and change its value without having to search the array for it. */
-    let needsResort = false;
+    /** If a content type is added to this set, we are indicating the entire sorted 
+     * array will need to be re-sorted. The reason for sorting the entire array and not 
+     * just inserting an element using binary search is that we need to keep track of the 
+     * sorted index of an item so that we can look up and change its value without having
+     * to search the array for it. */
+    const typesNeedingResort = new Set<ContentType>();
     for (const element of elements) {
+      const contentType = element.content_type;
+      const sortBy = this.displaySortBy[contentType];
+      /** Sort by is required, but filter is not */
+      if (!sortBy) {
+        continue;
+      }
+      const filter = this.displayFilter[contentType];
+      /** Filtered content type map */
+      const filteredCTMap = this.filteredMap[contentType]!;
+      const sortedElements = this.sortedMap[contentType]!;
       /** If no filter the element passes by default */
       const passes = element.deleted ? false : (filter ? filter(element) : true);
       const currentIndex = filteredCTMap[element.uuid];
@@ -292,16 +309,16 @@ export class MutableCollection<T extends Payloadable> {
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
           sortedElements[currentIndex] = element;
-          if (previousValue !== newValue) {
+          if (!compareValues(previousValue, newValue)) {
             /** Needs resort because its re-sort value has changed, 
              * and thus its position might change */
-            needsResort = true;
+            typesNeedingResort.add(contentType);
           }
         } else {
           /** Has not yet been inserted */
           sortedElements.push(element);
           /** Needs re-sort because we're just pushing the element to the end here */
-          needsResort = true;
+          typesNeedingResort.add(contentType);
         }
       } else {
         /** Doesn't pass filter, remove from sorted and filtered */
@@ -312,17 +329,28 @@ export class MutableCollection<T extends Payloadable> {
           (sortedElements[currentIndex] as any) = undefined;
           /** Since an element is being removed from the array, we need to recompute
            * the new positions for elements that are staying */
-          needsResort = true;
+          typesNeedingResort.add(contentType);
         }
       }
     }
-    if (needsResort) {
+
+    for (const contentType of typesNeedingResort.values()) {
+      const sortedElements = this.sortedMap[contentType]!;
+      const sortBy = this.displaySortBy[contentType]!;
+      const filteredCTMap = this.filteredMap[contentType]!;
       /** Resort the elements array, and update the saved positions */
       /** @O(n * log(n)) */
-      const resorted = sortedElements.sort((a, b) => {
+      const sortFn = (a?: any, b?: any, skipPinnedCheck = false): number => {
         /** If the elements are undefined, move to beginning */
         if (!a) { return -1; }
         if (!b) { return 1; }
+        if (!skipPinnedCheck) {
+          if (a.pinned && b.pinned) {
+            return sortFn(a, b, true);
+          }
+          if (a.pinned) { return -1; }
+          if (b.pinned) { return 1; }
+        }
         let aValue = (a as any)[sortBy.key] || '';
         let bValue = (b as any)[sortBy.key] || '';
         let vector = 1;
@@ -345,8 +373,10 @@ export class MutableCollection<T extends Payloadable> {
         if (aValue > bValue) { return -1 * vector; }
         else if (aValue < bValue) { return 1 * vector; }
         return 0;
+      }
+      const resorted = sortedElements.sort((a, b) => {
+        return sortFn(a, b);
       });
-
       /** Now that resorted contains the sorted elements (but also can contain undefined element) 
        * we create another array that filters out any of the undefinedes. We also keep track of the
        * current index while we loop and set that in the filteredCTMap. */

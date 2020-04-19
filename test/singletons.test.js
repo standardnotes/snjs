@@ -208,7 +208,7 @@ describe('singletons', () => {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrivs = await this.application.privilegesService.getPrivileges();
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.itemManager.validItemsForContentType(ogPrivs.content_type);
+    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
   }).timeout(Factory.TestTimeout);
 
@@ -230,7 +230,7 @@ describe('singletons', () => {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrivs = await this.application.privilegesService.getPrivileges();
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.itemManager.validItemsForContentType(ogPrivs.content_type);
+    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
   }).timeout(Factory.TestTimeout);
 

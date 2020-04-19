@@ -71,7 +71,7 @@ describe('mapping performance', () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for (const note of application.itemManager.validItemsForContentType(ContentType.Note)) {
+    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
       expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.be.above(0);
     }
     await application.deinit();
@@ -141,8 +141,8 @@ describe('mapping performance', () => {
     const EXPECTED_RUN_TIME = 8.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
-    application.itemManager.validItemsForContentType(ContentType.Tag)[0];
-    for (const note of application.itemManager.validItemsForContentType(ContentType.Note)) {
+    application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0];
+    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
       expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
     }
     await application.deinit();

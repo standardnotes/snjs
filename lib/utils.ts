@@ -193,6 +193,19 @@ export function arrayByDifference<T>(array: T[], subtract: T[]) {
     .concat(subtract.filter(x => !array.includes(x)));
 }
 
+export function compareValues<T>(left: T, right: T) {
+  if((left && !right) || (!left && right)) {
+    return false;
+  }
+  if(left instanceof Date && right instanceof Date) {
+    return left.getTime() === right.getTime();
+  } else if (left instanceof String && right instanceof String) {
+    return left === right;
+  } else {
+    return topLevelCompare(left, right);
+  }
+}
+
 /** 
  * Removes the value from the array at the given index, in-place. 
  */

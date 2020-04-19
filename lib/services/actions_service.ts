@@ -83,7 +83,7 @@ export class SNActionsService extends PureService {
 
   public getExtensions(): SNActionsExtension[] {
     return this.itemManager!
-      .validItemsForContentType(ContentType.ActionsExtension) as SNActionsExtension[];
+      .nonErroredItemsForContentType(ContentType.ActionsExtension) as SNActionsExtension[];
   }
 
   public extensionsInContextOfItem(item: SNItem) {

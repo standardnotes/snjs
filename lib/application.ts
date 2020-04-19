@@ -1,3 +1,4 @@
+import { CollectionSort, SortDirection } from './protocol/payloads/collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
@@ -462,6 +463,19 @@ export class SNApplication {
     return this.itemManager!.trashedItems;
   }
 
+  public setDisplayOptions<T extends SNItem>(
+    contentType: ContentType,
+    sortBy?: CollectionSort,
+    direction?: SortDirection,
+    filter?: (element: T) => boolean
+  ) {
+    this.itemManager!.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  public getDisplayableItems(contentType: ContentType) {
+    return this.itemManager!.getDisplayableItems(contentType);
+  }
+
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
@@ -565,10 +579,6 @@ export class SNApplication {
 
   public getItems(contentType: ContentType | ContentType[]) {
     return this.itemManager!.getItems(contentType);
-  }
-
-  public getDisplayableItems(contentType: ContentType) {
-    return this.itemManager!.validItemsForContentType(contentType);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag) {

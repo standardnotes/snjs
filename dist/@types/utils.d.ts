@@ -73,7 +73,7 @@ export declare function subtractFromArray<T>(inArray: T[], toSubtract: T[]): voi
  */
 export declare function existsInArray<T>(inArray: T[], value: T): boolean;
 /**
- * Removes an object from the array by value
+ * Removes an object from the array by reference equality or shallow value equality
  */
 export declare function removeFromArray<T>(array: T[], value: T): void;
 /**
@@ -82,10 +82,10 @@ export declare function removeFromArray<T>(array: T[], value: T): void;
  */
 export declare function addIfUnique<T>(array: T[], value: T): void;
 /**
- * Removes an object from the array by searching for an object where all the
+ * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
-export declare function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>): T[];
+export declare function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>): void;
 /**
  * Returns a new array by removing all elements in subtract from array
  */
@@ -94,6 +94,10 @@ export declare function arrayByDifference<T>(array: T[], subtract: T[]): T[];
  * Removes the value from the array at the given index, in-place.
  */
 export declare function removeFromIndex(array: any[], index: number): void;
+/**
+ * Adds the value from the array at the given index, in-place.
+ */
+export declare function addAtIndex<T>(array: T[], element: T, index: number): void;
 /**
  * Returns a new array by removeing the value from the array at the given index
  */
@@ -129,8 +133,9 @@ export declare function omitByCopy<T>(object: T, keys: Array<keyof T>): {} & T;
  */
 export declare function joinPaths(...args: string[]): string;
 /**
- * Creates a copy of the input object by JSON stringifying the object
- * then JSON parsing the string.
+ * Creates a copy of the input object by JSON stringifying the object then JSON parsing
+ * the string (if the input is an object). If input is date, a Date copy will be created,
+ * and if input is a primitive value, it will be returned as-is.
  */
 export declare function Copy(object: any): any;
 /**

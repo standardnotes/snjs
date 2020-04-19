@@ -1,3 +1,4 @@
+import { CollectionSort, SortDirection } from './protocol/payloads/collection';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { UuidString } from './types';
 import { ApplicationEvent } from './events';
@@ -164,6 +165,8 @@ export declare class SNApplication {
     deleteItemLocally(item: SNItem): Promise<void>;
     emptyTrash(): Promise<any>;
     getTrashedItems(): import("./models").SNNote[];
+    setDisplayOptions<T extends SNItem>(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: T) => boolean): void;
+    getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
     /**
      * Inserts the input item by its payload properties, and marks the item as dirty.
      * A sync is not performed after an item is inserted. This must be handled by the caller.
@@ -191,7 +194,6 @@ export declare class SNApplication {
      */
     changeItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
-    getDisplayableItems(contentType: ContentType): SNItem[];
     notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
     /** Returns an item's direct references */
     referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
@@ -205,8 +207,10 @@ export declare class SNApplication {
      * Begin streaming items to display in the UI. The stream callback will be called
      * immediately with the present items that match the constraint, and over time whenever
      * items matching the constraint are added, changed, or deleted.
+     * @param pushImmediate Whether to call the callback immediately with the existing
+     * values matching the content type. Defaults to true.
      */
-    streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
+    streamItems(contentType: ContentType | ContentType[], stream: ItemStream, pushImmediate?: boolean): () => void;
     /**
      * Set the server's URL
      */
