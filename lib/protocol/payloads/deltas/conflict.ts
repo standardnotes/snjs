@@ -3,7 +3,7 @@ import { CreateItemFromPayload } from '@Models/generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
-import { PayloadsByDuplicating } from '@Payloads/functions';
+import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 
 export class ConflictDelta extends SinglePayloadDelta {
@@ -17,6 +17,16 @@ export class ConflictDelta extends SinglePayloadDelta {
   }
 
   private async payloadsByHandlingStrategy(strategy: ConflictStrategy) {
+    /** Ensure no conflict has already been created with the incoming content.
+     * This can occur in a multi-page sync request where in the middle of the request,
+     * we make changes to many items, including duplicating, but since we are still not
+     * uploading the changes until after the multi-page request completes, we may have
+     * already conflicted this item. */
+    const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0];
+    if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
+      /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
+      return [];
+    }
     if (strategy === ConflictStrategy.KeepLeft) {
       return [this.basePayload];
     }
@@ -70,7 +80,7 @@ export class ConflictDelta extends SinglePayloadDelta {
           updated_at: updatedAt,
           dirty: true,
           dirtiedDate: new Date(),
-          content: { 
+          content: {
             ...this.basePayload.safeContent,
             references: refs
           }

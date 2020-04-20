@@ -67,7 +67,7 @@ export class MutableCollection<T extends Payloadable> {
         }
         return elements;
       } else {
-        return this.typedMap[contentType] || [];
+        return this.typedMap[contentType]?.slice() || [];
       }
     } else {
       return Object.keys(this.map).map((uuid: UuidString) => {
@@ -194,5 +194,3 @@ export class MutableCollection<T extends Payloadable> {
     return this.findAll(uuids) as T[];
   }
 }
-
-

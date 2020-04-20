@@ -93,7 +93,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
         non-configured content type ${contentType}`
       );
     }
-    return elements;
+    return elements.slice();
   }
 
   private filterSortElements(elements: SNItem[]) {

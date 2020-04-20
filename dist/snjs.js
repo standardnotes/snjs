@@ -8305,7 +8305,9 @@ var MutableCollection = /*#__PURE__*/function () {
 
           return elements;
         } else {
-          return this.typedMap[contentType] || [];
+          var _this$typedMap$conten;
+
+          return ((_this$typedMap$conten = this.typedMap[contentType]) === null || _this$typedMap$conten === void 0 ? void 0 : _this$typedMap$conten.slice()) || [];
         }
       } else {
         return Object.keys(this.map).map(function (uuid) {
@@ -8717,7 +8719,7 @@ var ItemCollection = /*#__PURE__*/function (_MutableCollection) {
         throw Error("Attempting to access display elements for \n        non-configured content type ".concat(contentType));
       }
 
-      return elements;
+      return elements.slice();
     }
   }, {
     key: "filterSortElements",
@@ -11835,30 +11837,45 @@ var ConflictDelta = /*#__PURE__*/function (_SinglePayloadDelta) {
     key: "payloadsByHandlingStrategy",
     value: function () {
       var _payloadsByHandlingStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(strategy) {
-        var updatedAt, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt, payload;
+        var existingConflict, updatedAt, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt, payload;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                /** Ensure no conflict has already been created with the incoming content.
+                 * This can occur in a multi-page sync request where in the middle of the request,
+                 * we make changes to many items, including duplicating, but since we are still not
+                 * uploading the changes until after the multi-page request completes, we may have
+                 * already conflicted this item. */
+                existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0];
+
+                if (!(existingConflict && Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadContentsEqual"])(existingConflict, this.applyPayload))) {
+                  _context2.next = 3;
+                  break;
+                }
+
+                return _context2.abrupt("return", []);
+
+              case 3:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeft)) {
-                  _context2.next = 2;
+                  _context2.next = 5;
                   break;
                 }
 
                 return _context2.abrupt("return", [this.basePayload]);
 
-              case 2:
+              case 5:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepRight)) {
-                  _context2.next = 4;
+                  _context2.next = 7;
                   break;
                 }
 
                 return _context2.abrupt("return", [this.applyPayload]);
 
-              case 4:
+              case 7:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeftDuplicateRight)) {
-                  _context2.next = 11;
+                  _context2.next = 14;
                   break;
                 }
 
@@ -11868,30 +11885,30 @@ var ConflictDelta = /*#__PURE__*/function (_SinglePayloadDelta) {
                   dirty: true,
                   dirtiedDate: new Date()
                 });
-                _context2.next = 9;
+                _context2.next = 12;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
 
-              case 9:
+              case 12:
                 rightPayloads = _context2.sent;
                 return _context2.abrupt("return", [leftPayload].concat(rightPayloads));
 
-              case 11:
+              case 14:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].DuplicateLeftKeepRight)) {
-                  _context2.next = 17;
+                  _context2.next = 20;
                   break;
                 }
 
-                _context2.next = 14;
+                _context2.next = 17;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_6__["PayloadsByDuplicating"])(this.basePayload, this.baseCollection, true);
 
-              case 14:
+              case 17:
                 leftPayloads = _context2.sent;
                 rightPayload = this.applyPayload;
                 return _context2.abrupt("return", leftPayloads.concat([rightPayload]));
 
-              case 17:
+              case 20:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeftMergeRefs)) {
-                  _context2.next = 22;
+                  _context2.next = 25;
                   break;
                 }
 
@@ -11907,10 +11924,10 @@ var ConflictDelta = /*#__PURE__*/function (_SinglePayloadDelta) {
                 });
                 return _context2.abrupt("return", [payload]);
 
-              case 22:
+              case 25:
                 throw 'Unhandled strategy';
 
-              case 23:
+              case 26:
               case "end":
                 return _context2.stop();
             }
@@ -12849,10 +12866,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeltaRemoteRetrieved", function() { return DeltaRemoteRetrieved; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
-/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
+/* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
+/* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
+/* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 
 
@@ -12896,7 +12913,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
     key: "resultingCollection",
     value: function () {
       var _resultingCollection = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var filtered, conflicted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, received, savedOrSaving, decrypted, base, conflictResults, _i, _conflicted, conflict, _decrypted, current, differs, existingConflict, copyResults;
+        var filtered, conflicted, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, received, savedOrSaving, decrypted, base, conflictResults, _i, _conflicted, conflict, _decrypted, current, delta, deltaCollection, payloads;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -12922,8 +12939,8 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 }
 
                 received = _step.value;
-                savedOrSaving = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].SavedOrSaving);
-                decrypted = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient);
+                savedOrSaving = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].SavedOrSaving);
+                decrypted = this.findRelatedPayload(received.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].DecryptedTransient);
 
                 if (decrypted) {
                   _context.next = 16;
@@ -13014,19 +13031,19 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
 
               case 43:
                 if (!(_i < _conflicted.length)) {
-                  _context.next = 63;
+                  _context.next = 60;
                   break;
                 }
 
                 conflict = _conflicted[_i];
-                _decrypted = this.findRelatedPayload(conflict.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient);
+                _decrypted = this.findRelatedPayload(conflict.uuid, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].DecryptedTransient);
 
                 if (_decrypted) {
                   _context.next = 48;
                   break;
                 }
 
-                return _context.abrupt("continue", 60);
+                return _context.abrupt("continue", 57);
 
               case 48:
                 current = this.findBasePayload(conflict.uuid);
@@ -13036,49 +13053,27 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                   break;
                 }
 
-                return _context.abrupt("continue", 60);
+                return _context.abrupt("continue", 57);
 
               case 51:
-                differs = !Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadContentsEqual"])(current, _decrypted);
+                delta = new _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_1__["ConflictDelta"](this.baseCollection, current, _decrypted, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].ConflictData);
+                _context.next = 54;
+                return delta.resultingCollection();
 
-                if (!differs) {
-                  _context.next = 60;
-                  break;
-                }
+              case 54:
+                deltaCollection = _context.sent;
+                payloads = deltaCollection.all();
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["extendArray"])(conflictResults, payloads);
 
-                /**
-                 * Ensure no conflict has already been created with the incoming content.
-                 * This can occur in a multi-page sync request where in the middle of the request,
-                 * we make changes to many items, including duplicating, but since we are still not
-                 * uploading the changes until after the multi-page request completes, we may have
-                 * already conflicted this item.
-                 */
-                existingConflict = this.findConflictOf(conflict.uuid);
-
-                if (!(existingConflict && Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadContentsEqual"])(existingConflict, _decrypted))) {
-                  _context.next = 56;
-                  break;
-                }
-
-                return _context.abrupt("continue", 60);
-
-              case 56:
-                _context.next = 58;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_4__["PayloadsByDuplicating"])(_decrypted, this.baseCollection, true);
-
-              case 58:
-                copyResults = _context.sent;
-                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_5__["extendArray"])(conflictResults, copyResults);
-
-              case 60:
+              case 57:
                 _i++;
                 _context.next = 43;
                 break;
 
-              case 63:
-                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
+              case 60:
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollection"].WithPayloads(filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
 
-              case 64:
+              case 61:
               case "end":
                 return _context.stop();
             }
@@ -13092,16 +13087,10 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
 
       return resultingCollection;
     }()
-  }, {
-    key: "findConflictOf",
-    value: function findConflictOf(uuid) {
-      var conflictsOf = this.baseCollection.conflictsOf(uuid);
-      return conflictsOf[0];
-    }
   }]);
 
   return DeltaRemoteRetrieved;
-}(_Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__["PayloadsDelta"]);
+}(_Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_2__["PayloadsDelta"]);
 
 /***/ }),
 

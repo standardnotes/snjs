@@ -8,7 +8,8 @@ describe('online syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
-    checkIntegrity: true
+    checkIntegrity: true,
+    awaitAll: true
   };
 
   before(async function () {
@@ -90,7 +91,7 @@ describe('online syncing', () => {
     const count = 0;
     await Factory.createManyMappedNotes(this.application, count);
     this.expectedItemCount += count;
-    await this.application.sync();
+    await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
     const promise = Factory.loginToApplication({
@@ -101,11 +102,13 @@ describe('online syncing', () => {
     /** Throw in some random syncs to cause trouble */
     const syncCount = 30;
     for (let i = 0; i < syncCount; i++) {
-      this.application.sync();
+      this.application.sync(syncOptions);
       await Factory.sleep(0.01);
     }
     await promise;
     expect(promise).to.be.fulfilled;
+    /** Allow any unwaited syncs in for loop to complete */
+    await Factory.sleep(0.5);
   }).timeout(20000);
 
   it('marking all items as needing sync with alternation should delete original payload', async function () {
@@ -377,7 +380,6 @@ describe('online syncing', () => {
     const note2 = this.application.itemManager.notes[1];
     expect(note1.content.title).to.not.equal(note2.content.title);
   }).timeout(10000);
-
 
   it('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application);
@@ -982,7 +984,7 @@ describe('online syncing', () => {
     expect(sorted[4].content_type).to.equal('B');
   }).timeout(10000);
 
-  it.only('handles stale data in bulk', async function () {
+  it('handles stale data in bulk', async function () {
     /** This number must be greater than the pagination limit per sync request. 
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
@@ -999,6 +1001,7 @@ describe('online syncing', () => {
      * gives us everything it has.
      */
     const yesterday = Factory.yesterday();
+
     for (const note of this.application.itemManager.notes) {
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
         mutator.text = `${Math.random()}`;
@@ -1010,9 +1013,7 @@ describe('online syncing', () => {
 
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);
-    
-    const notes = this.application.itemManager.notes;
-    expect(notes.length).to.equal(largeItemCount * 2);
+    expect(this.application.itemManager.notes.length).to.equal(largeItemCount * 2);
   }).timeout(60000);
 
   it('should sign in and retrieve large number of items', async function () {

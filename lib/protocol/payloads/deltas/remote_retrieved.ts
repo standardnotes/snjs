@@ -1,8 +1,7 @@
+import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
-import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
-
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
@@ -62,38 +61,20 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       if (!current) {
         continue;
       }
-      const differs = !PayloadContentsEqual(current, decrypted);
-      if (differs) {
-        /**
-         * Ensure no conflict has already been created with the incoming content.
-         * This can occur in a multi-page sync request where in the middle of the request,
-         * we make changes to many items, including duplicating, but since we are still not
-         * uploading the changes until after the multi-page request completes, we may have
-         * already conflicted this item.
-         */
-        const existingConflict = this.findConflictOf(conflict.uuid!);
-        if (existingConflict && PayloadContentsEqual(existingConflict, decrypted)) {
-          /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
-          continue;
-        }
-
-        const copyResults = await PayloadsByDuplicating(
-          decrypted,
-          this.baseCollection,
-          true
-        );
-        extendArray(conflictResults, copyResults);
-      }
+      const delta = new ConflictDelta(
+        this.baseCollection,
+        current,
+        decrypted,
+        PayloadSource.ConflictData
+      );
+      const deltaCollection = await delta.resultingCollection();
+      const payloads = deltaCollection.all();
+      extendArray(conflictResults, payloads);
     }
 
     return ImmutablePayloadCollection.WithPayloads(
       filtered.concat(conflictResults),
       PayloadSource.RemoteRetrieved
     );
-  }
-
-  private findConflictOf(uuid: string) {
-    const conflictsOf = this.baseCollection.conflictsOf(uuid);
-    return conflictsOf[0];
   }
 }

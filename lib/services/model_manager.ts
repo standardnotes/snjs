@@ -116,9 +116,7 @@ export class PayloadManager extends PureService {
     await this.notifyChangeObservers(changed, inserted, discarded, source, sourceKey);
   }
 
-  private async mergePayloadsOntoMaster(
-    payloads: PurePayload[]
-  ) {
+  private async mergePayloadsOntoMaster(payloads: PurePayload[]) {
     const changed: PurePayload[] = [];
     const inserted: PurePayload[] = [];
     const discarded: PurePayload[] = [];

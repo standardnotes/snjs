@@ -148,6 +148,7 @@ describe('payload collections', () => {
     const present = Factory.createNotePayload();
     collection.set([present]);
 
+    expect(collection.all(ContentType.Note).length).to.equal(1);
     expect(collection.displayElements(ContentType.Note).length).to.equal(1);
 
     const deleted = CopyPayload(
@@ -158,6 +159,7 @@ describe('payload collections', () => {
     );
     collection.set([deleted]);
 
+    expect(collection.all(ContentType.Note).filter((n) => !n.deleted).length).to.equal(0);
     expect(collection.displayElements(ContentType.Note).length).to.equal(0);
   });
 
