@@ -379,7 +379,7 @@ describe('online syncing', () => {
   }).timeout(10000);
 
 
-  it('basic conflict with clearing local state', async function () {
+  it.only('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application);
     await this.application.saveItem(note.uuid);
     this.expectedItemCount += 1;

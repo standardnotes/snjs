@@ -61,7 +61,9 @@ export class MutableCollection<T extends Payloadable> {
     } else {
       this.referenceMap = new UuidMap();
       this.conflictMap = new UuidMap();
-      this.set(elements);
+      if (elements.length > 0) {
+        this.set(elements);
+      }
     }
   }
 
@@ -142,6 +144,10 @@ export class MutableCollection<T extends Payloadable> {
 
   public set(elements: T | T[]) {
     elements = Array.isArray(elements) ? elements : [elements];
+    if (elements.length === 0) {
+      console.warn('Attempting to set 0 elements onto collection');
+      return;
+    }
     for (const element of elements) {
       this.map[element.uuid!] = element;
       this.setToTypedMap(element);
@@ -187,6 +193,7 @@ export class MutableCollection<T extends Payloadable> {
       this.deleteFromTypedMap(element);
       delete this.map[element.uuid!];
     }
+    this.filterSortElements(elements);
   }
 
   private setToTypedMap(element: T) {
@@ -220,7 +227,7 @@ export class MutableCollection<T extends Payloadable> {
   }
 
   private displaySortBy: Partial<Record<ContentType, { key: CollectionSort, dir: SortDirection }>> = {};
-  private displayFilter: Partial<Record<ContentType, (element: T) => boolean>> = {};
+  private displayFilter: Partial<Record<ContentType, (element: SNItem) => boolean>> = {};
 
   /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
    * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
@@ -229,7 +236,7 @@ export class MutableCollection<T extends Payloadable> {
   private filteredMap: Partial<Record<ContentType, Record<UuidString, number>>> = {};
   /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
    * an array of sorted elements, based on the current displaySortBy */
-  private sortedMap: Partial<Record<ContentType, Array<T | undefined>>> = {};
+  private sortedMap: Partial<Record<ContentType, Array<SNItem | undefined>>> = {};
 
   /**
    * Sets an optional sortBy and filter for a given content type. These options will be
@@ -245,14 +252,14 @@ export class MutableCollection<T extends Payloadable> {
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: SortDirection,
-    filter?: (element: T) => boolean
+    filter?: (element: SNItem) => boolean
   ) {
     const existingSortBy = this.displaySortBy[contentType];
     const existingFilter = this.displayFilter[contentType];
     /** If the sort value is unchanged, and we are not setting a new filter,
      * we return, as to not rebuild and resort all elements */
     if (
-      existingSortBy && 
+      existingSortBy &&
       existingSortBy.key === sortBy && existingSortBy.dir === direction &&
       !existingFilter && !filter
     ) {
@@ -265,7 +272,9 @@ export class MutableCollection<T extends Payloadable> {
     this.sortedMap[contentType] = [];
     /** Re-process all elements */
     const elements = this.all(contentType);
-    this.filterSortElements(elements);
+    if (elements.length > 0) {
+      this.filterSortElements(elements);
+    }
   }
 
   /** Returns the filtered and sorted list of elements for this content type,
@@ -299,8 +308,10 @@ export class MutableCollection<T extends Payloadable> {
       /** Filtered content type map */
       const filteredCTMap = this.filteredMap[contentType]!;
       const sortedElements = this.sortedMap[contentType]!;
-      /** If no filter the element passes by default */
-      const passes = element.deleted ? false : (filter ? filter(element) : true);
+      /** If the element is deleted, or if it no longer exists in the primary map (because
+       * it was discarded without neccessarily being marked as deleted), it does not pass 
+       * the filter. If no filter the element passes by default. */
+      const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
       const currentIndex = filteredCTMap[element.uuid];
       if (passes) {
         if (!isNullOrUndefined(currentIndex)) {
@@ -335,66 +346,71 @@ export class MutableCollection<T extends Payloadable> {
     }
 
     for (const contentType of typesNeedingResort.values()) {
-      const sortedElements = this.sortedMap[contentType]!;
-      const sortBy = this.displaySortBy[contentType]!;
-      const filteredCTMap = this.filteredMap[contentType]!;
-      /** Resort the elements array, and update the saved positions */
-      /** @O(n * log(n)) */
-      const sortFn = (a?: any, b?: any, skipPinnedCheck = false): number => {
-        /** If the elements are undefined, move to beginning */
-        if (!a) { return -1; }
-        if (!b) { return 1; }
-        if (!skipPinnedCheck) {
-          if (a.pinned && b.pinned) {
-            return sortFn(a, b, true);
-          }
-          if (a.pinned) { return -1; }
-          if (b.pinned) { return 1; }
-        }
-        let aValue = (a as any)[sortBy.key] || '';
-        let bValue = (b as any)[sortBy.key] || '';
-        let vector = 1;
-        if (sortBy.dir === 'asc') {
-          vector *= -1;
-        }
-        if (sortBy.key === CollectionSort.Title) {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
-          if (aValue.length === 0 && bValue.length === 0) {
-            return 0;
-          } else if (aValue.length === 0 && bValue.length !== 0) {
-            return 1 * vector;
-          } else if (aValue.length !== 0 && bValue.length === 0) {
-            return -1 * vector;
-          } else {
-            vector *= -1;
-          }
-        }
-        if (aValue > bValue) { return -1 * vector; }
-        else if (aValue < bValue) { return 1 * vector; }
-        return 0;
-      }
-      const resorted = sortedElements.sort((a, b) => {
-        return sortFn(a, b);
-      });
-      /** Now that resorted contains the sorted elements (but also can contain undefined element) 
-       * we create another array that filters out any of the undefinedes. We also keep track of the
-       * current index while we loop and set that in the filteredCTMap. */
-      const cleaned = [] as T[];
-      let currentIndex = 0;
-      /** @O(n) */
-      for (const element of resorted) {
-        if (!element) {
-          continue;
-        }
-        cleaned.push(element);
-        filteredCTMap[element.uuid] = currentIndex;
-        currentIndex++;
-      }
-      this.sortedMap[contentType] = cleaned;
+      this.resortContentType(contentType);
     }
   }
+
+  private resortContentType(contentType: ContentType) {
+    const sortedElements = this.sortedMap[contentType]!;
+    const sortBy = this.displaySortBy[contentType]!;
+    const filteredCTMap = this.filteredMap[contentType]!;
+    /** Resort the elements array, and update the saved positions */
+    /** @O(n * log(n)) */
+    const sortFn = (a?: SNItem, b?: SNItem, skipPinnedCheck = false): number => {
+      /** If the elements are undefined, move to beginning */
+      if (!a) { return -1; }
+      if (!b) { return 1; }
+      if (!skipPinnedCheck) {
+        if (a.pinned && b.pinned) {
+          return sortFn(a, b, true);
+        }
+        if (a.pinned) { return -1; }
+        if (b.pinned) { return 1; }
+      }
+      let aValue = (a as any)[sortBy.key] || '';
+      let bValue = (b as any)[sortBy.key] || '';
+      let vector = 1;
+      if (sortBy.dir === 'asc') {
+        vector *= -1;
+      }
+      if (sortBy.key === CollectionSort.Title) {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+        if (aValue.length === 0 && bValue.length === 0) {
+          return 0;
+        } else if (aValue.length === 0 && bValue.length !== 0) {
+          return 1 * vector;
+        } else if (aValue.length !== 0 && bValue.length === 0) {
+          return -1 * vector;
+        } else {
+          vector *= -1;
+        }
+      }
+      if (aValue > bValue) { return -1 * vector; }
+      else if (aValue < bValue) { return 1 * vector; }
+      return 0;
+    }
+    const resorted = sortedElements.sort((a, b) => {
+      return sortFn(a, b);
+    });
+    /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+     * we create another array that filters out any of the undefinedes. We also keep track of the
+     * current index while we loop and set that in the filteredCTMap. */
+    const cleaned = [] as T[];
+    let currentIndex = 0;
+    /** @O(n) */
+    for (const element of resorted) {
+      if (!element) {
+        continue;
+      }
+      cleaned.push(element);
+      filteredCTMap[element.uuid] = currentIndex;
+      currentIndex++;
+    }
+    this.sortedMap[contentType] = cleaned;
+  }
 }
+
 
 /**
  * A collection of payloads coming from a single source.

@@ -5,14 +5,9 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('notes + tags syncing', async function() {
-  const sharedApplication = Factory.createApplication();
-  before(async function() {
-    await Factory.initializeApplication(sharedApplication);
-  });
-  
+
   after(async function () {
     localStorage.clear();
-    await sharedApplication.deinit();
   });
 
   beforeEach(async function() {

@@ -57,22 +57,16 @@ export class ItemManager extends PureService {
   private modelManager?: PayloadManager
   private unsubChangeObserver: any
   private observers: Observer[] = []
-  private collection: MutableCollection<SNItem>
+  private collection!: MutableCollection<SNItem>
   private systemSmartTags: SNSmartTag[]
 
   constructor(modelManager: PayloadManager) {
     super();
     this.modelManager = modelManager;
-    this.collection = new MutableCollection();
+    this.createCollection();
     this.unsubChangeObserver = this.modelManager
       .addChangeObserver(ContentType.Any, this.onPayloadChange.bind(this));
     this.systemSmartTags = BuildSmartTags();
-
-    this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
-    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
-    this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
-    this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
-    this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
   }
 
   public setDisplayOptions(
@@ -92,11 +86,20 @@ export class ItemManager extends PureService {
     this.unsubChangeObserver();
     this.unsubChangeObserver = undefined;
     this.modelManager = undefined;
-    this.resetState();
+    (this.collection as any) = undefined;
   }
 
-  private resetState() {
+  resetState() {
+    this.createCollection();
+  }
+
+  private createCollection() {
     this.collection = new MutableCollection();
+    this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
+    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
+    this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
   }
 
   /**
@@ -230,7 +233,9 @@ export class ItemManager extends PureService {
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
     const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
-    this.collection.set(changedOrInserted)
+    if(changedOrInserted.length > 0) {
+      this.collection.set(changedOrInserted)
+    }
     const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
     for (const item of discardedItems) {
       this.collection.discard(item);

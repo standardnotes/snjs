@@ -6889,6 +6889,16 @@ var SNItem = /*#__PURE__*/function () {
 
     _defineProperty(this, "updatedAtString", void 0);
 
+    _defineProperty(this, "protected", false);
+
+    _defineProperty(this, "trashed", false);
+
+    _defineProperty(this, "pinned", false);
+
+    _defineProperty(this, "archived", false);
+
+    _defineProperty(this, "locked", false);
+
     if (!payload.uuid || !payload.content_type) {
       throw Error('Cannot create item without both uuid and content_type');
     }
@@ -6903,6 +6913,11 @@ var SNItem = /*#__PURE__*/function () {
 
     if (payload.format === _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__["PayloadFormat"].DecryptedBareObject) {
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
+      this.protected = this.payload.safeContent.protected;
+      this.trashed = this.payload.safeContent.trashed;
+      this.pinned = this.getAppDomainValue(AppDataField.Pinned);
+      this.archived = this.getAppDomainValue(AppDataField.Archived);
+      this.locked = this.getAppDomainValue(AppDataField.Locked);
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
 
@@ -6960,15 +6975,15 @@ var SNItem = /*#__PURE__*/function () {
       var appData = this.getDomainData(SNItem.DefaultAppDomain());
       return appData[key];
     }
-  }, {
-    key: "contentKeysToIgnoreWhenCheckingEquality",
-
     /**
      * During sync conflicts, when determing whether to create a duplicate for an item, 
      * we can omit keys that have no meaningful weight and can be ignored. For example, 
      * if one component has active = true and another component has active = false, 
      * it would be needless to duplicate them, so instead we ignore that value.
      */
+
+  }, {
+    key: "contentKeysToIgnoreWhenCheckingEquality",
     value: function contentKeysToIgnoreWhenCheckingEquality() {
       return ['conflict_of'];
     }
@@ -7162,31 +7177,6 @@ var SNItem = /*#__PURE__*/function () {
     key: "auth_params",
     get: function get() {
       return this.payload.auth_params;
-    }
-  }, {
-    key: "protected",
-    get: function get() {
-      return this.payload.safeContent.protected;
-    }
-  }, {
-    key: "trashed",
-    get: function get() {
-      return this.payload.safeContent.trashed;
-    }
-  }, {
-    key: "pinned",
-    get: function get() {
-      return this.getAppDomainValue(AppDataField.Pinned);
-    }
-  }, {
-    key: "archived",
-    get: function get() {
-      return this.getAppDomainValue(AppDataField.Archived);
-    }
-  }, {
-    key: "locked",
-    get: function get() {
-      return this.getAppDomainValue(AppDataField.Locked);
     }
   }, {
     key: "neverSynced",
@@ -10767,7 +10757,10 @@ var MutableCollection = /*#__PURE__*/function () {
     } else {
       this.referenceMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
       this.conflictMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
-      this.set(elements);
+
+      if (elements.length > 0) {
+        this.set(elements);
+      }
     }
   }
 
@@ -10900,6 +10893,12 @@ var MutableCollection = /*#__PURE__*/function () {
     key: "set",
     value: function set(elements) {
       elements = Array.isArray(elements) ? elements : [elements];
+
+      if (elements.length === 0) {
+        console.warn('Attempting to set 0 elements onto collection');
+        return;
+      }
+
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
@@ -10990,6 +10989,8 @@ var MutableCollection = /*#__PURE__*/function () {
           }
         }
       }
+
+      this.filterSortElements(elements);
     }
   }, {
     key: "setToTypedMap",
@@ -11066,7 +11067,10 @@ var MutableCollection = /*#__PURE__*/function () {
       /** Re-process all elements */
 
       var elements = this.all(contentType);
-      this.filterSortElements(elements);
+
+      if (elements.length > 0) {
+        this.filterSortElements(elements);
+      }
     }
     /** Returns the filtered and sorted list of elements for this content type,
      * according to the options set via `setDisplayOptions` */
@@ -11085,8 +11089,6 @@ var MutableCollection = /*#__PURE__*/function () {
   }, {
     key: "filterSortElements",
     value: function filterSortElements(elements) {
-      var _this2 = this;
-
       if (Object.keys(this.displaySortBy).length === 0) {
         return;
       }
@@ -11118,9 +11120,11 @@ var MutableCollection = /*#__PURE__*/function () {
 
           var filteredCTMap = this.filteredMap[contentType];
           var sortedElements = this.sortedMap[contentType];
-          /** If no filter the element passes by default */
+          /** If the element is deleted, or if it no longer exists in the primary map (because
+           * it was discarded without neccessarily being marked as deleted), it does not pass 
+           * the filter. If no filter the element passes by default. */
 
-          var passes = _element4.deleted ? false : filter ? filter(_element4) : true;
+          var passes = _element4.deleted || !this.map[_element4.uuid] ? false : filter ? filter(_element4) : true;
           var currentIndex = filteredCTMap[_element4.uuid];
 
           if (passes) {
@@ -11179,120 +11183,9 @@ var MutableCollection = /*#__PURE__*/function () {
       var _iteratorError6 = undefined;
 
       try {
-        var _loop = function _loop() {
-          var contentType = _step6.value;
-          var sortedElements = _this2.sortedMap[contentType];
-          var sortBy = _this2.displaySortBy[contentType];
-          var filteredCTMap = _this2.filteredMap[contentType];
-          /** Resort the elements array, and update the saved positions */
-
-          /** @O(n * log(n)) */
-
-          var sortFn = function sortFn(a, b) {
-            var skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-            /** If the elements are undefined, move to beginning */
-            if (!a) {
-              return -1;
-            }
-
-            if (!b) {
-              return 1;
-            }
-
-            if (!skipPinnedCheck) {
-              if (a.pinned && b.pinned) {
-                return sortFn(a, b, true);
-              }
-
-              if (a.pinned) {
-                return -1;
-              }
-
-              if (b.pinned) {
-                return 1;
-              }
-            }
-
-            var aValue = a[sortBy.key] || '';
-            var bValue = b[sortBy.key] || '';
-            var vector = 1;
-
-            if (sortBy.dir === 'asc') {
-              vector *= -1;
-            }
-
-            if (sortBy.key === CollectionSort.Title) {
-              aValue = aValue.toLowerCase();
-              bValue = bValue.toLowerCase();
-
-              if (aValue.length === 0 && bValue.length === 0) {
-                return 0;
-              } else if (aValue.length === 0 && bValue.length !== 0) {
-                return 1 * vector;
-              } else if (aValue.length !== 0 && bValue.length === 0) {
-                return -1 * vector;
-              } else {
-                vector *= -1;
-              }
-            }
-
-            if (aValue > bValue) {
-              return -1 * vector;
-            } else if (aValue < bValue) {
-              return 1 * vector;
-            }
-
-            return 0;
-          };
-
-          var resorted = sortedElements.sort(function (a, b) {
-            return sortFn(a, b);
-          });
-          /** Now that resorted contains the sorted elements (but also can contain undefined element) 
-           * we create another array that filters out any of the undefinedes. We also keep track of the
-           * current index while we loop and set that in the filteredCTMap. */
-
-          var cleaned = [];
-          var currentIndex = 0;
-          /** @O(n) */
-
-          var _iteratorNormalCompletion7 = true;
-          var _didIteratorError7 = false;
-          var _iteratorError7 = undefined;
-
-          try {
-            for (var _iterator7 = resorted[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-              var _element5 = _step7.value;
-
-              if (!_element5) {
-                continue;
-              }
-
-              cleaned.push(_element5);
-              filteredCTMap[_element5.uuid] = currentIndex;
-              currentIndex++;
-            }
-          } catch (err) {
-            _didIteratorError7 = true;
-            _iteratorError7 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-                _iterator7.return();
-              }
-            } finally {
-              if (_didIteratorError7) {
-                throw _iteratorError7;
-              }
-            }
-          }
-
-          _this2.sortedMap[contentType] = cleaned;
-        };
-
         for (var _iterator6 = typesNeedingResort.values()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-          _loop();
+          var _contentType = _step6.value;
+          this.resortContentType(_contentType);
         }
       } catch (err) {
         _didIteratorError6 = true;
@@ -11309,6 +11202,118 @@ var MutableCollection = /*#__PURE__*/function () {
         }
       }
     }
+  }, {
+    key: "resortContentType",
+    value: function resortContentType(contentType) {
+      var sortedElements = this.sortedMap[contentType];
+      var sortBy = this.displaySortBy[contentType];
+      var filteredCTMap = this.filteredMap[contentType];
+      /** Resort the elements array, and update the saved positions */
+
+      /** @O(n * log(n)) */
+
+      var sortFn = function sortFn(a, b) {
+        var skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        /** If the elements are undefined, move to beginning */
+        if (!a) {
+          return -1;
+        }
+
+        if (!b) {
+          return 1;
+        }
+
+        if (!skipPinnedCheck) {
+          if (a.pinned && b.pinned) {
+            return sortFn(a, b, true);
+          }
+
+          if (a.pinned) {
+            return -1;
+          }
+
+          if (b.pinned) {
+            return 1;
+          }
+        }
+
+        var aValue = a[sortBy.key] || '';
+        var bValue = b[sortBy.key] || '';
+        var vector = 1;
+
+        if (sortBy.dir === 'asc') {
+          vector *= -1;
+        }
+
+        if (sortBy.key === CollectionSort.Title) {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+
+          if (aValue.length === 0 && bValue.length === 0) {
+            return 0;
+          } else if (aValue.length === 0 && bValue.length !== 0) {
+            return 1 * vector;
+          } else if (aValue.length !== 0 && bValue.length === 0) {
+            return -1 * vector;
+          } else {
+            vector *= -1;
+          }
+        }
+
+        if (aValue > bValue) {
+          return -1 * vector;
+        } else if (aValue < bValue) {
+          return 1 * vector;
+        }
+
+        return 0;
+      };
+
+      var resorted = sortedElements.sort(function (a, b) {
+        return sortFn(a, b);
+      });
+      /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+       * we create another array that filters out any of the undefinedes. We also keep track of the
+       * current index while we loop and set that in the filteredCTMap. */
+
+      var cleaned = [];
+      var currentIndex = 0;
+      /** @O(n) */
+
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
+
+      try {
+        for (var _iterator7 = resorted[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var _element5 = _step7.value;
+
+          if (!_element5) {
+            continue;
+          }
+
+          cleaned.push(_element5);
+          filteredCTMap[_element5.uuid] = currentIndex;
+          currentIndex++;
+        }
+      } catch (err) {
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+            _iterator7.return();
+          }
+        } finally {
+          if (_didIteratorError7) {
+            throw _iteratorError7;
+          }
+        }
+      }
+
+      this.sortedMap[contentType] = cleaned;
+    }
   }]);
 
   return MutableCollection;
@@ -11321,7 +11326,7 @@ var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
   _inherits(ImmutablePayloadCollection, _MutableCollection);
 
   function ImmutablePayloadCollection() {
-    var _this3;
+    var _this2;
 
     var payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     var source = arguments.length > 1 ? arguments[1] : undefined;
@@ -11333,13 +11338,13 @@ var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
 
     _classCallCheck(this, ImmutablePayloadCollection);
 
-    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(ImmutablePayloadCollection).call(this, payloads, copy, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy));
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ImmutablePayloadCollection).call(this, payloads, copy, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy));
 
-    _defineProperty(_assertThisInitialized(_this3), "source", void 0);
+    _defineProperty(_assertThisInitialized(_this2), "source", void 0);
 
-    _this3.source = source;
-    Object.freeze(_assertThisInitialized(_this3));
-    return _this3;
+    _this2.source = source;
+    Object.freeze(_assertThisInitialized(_this2));
+    return _this2;
   }
 
   _createClass(ImmutablePayloadCollection, [{
@@ -21557,20 +21562,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     _defineProperty(_assertThisInitialized(_this), "systemSmartTags", void 0);
 
     _this.modelManager = modelManager;
-    _this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
+
+    _this.createCollection();
+
     _this.unsubChangeObserver = _this.modelManager.addChangeObserver(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Any, _this.onPayloadChange.bind(_assertThisInitialized(_this)));
     _this.systemSmartTags = BuildSmartTags();
-
-    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'dsc');
-
-    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
-
-    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
-
-    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
-
-    _this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
-
     return _this;
   }
 
@@ -21590,12 +21586,22 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
       this.unsubChangeObserver();
       this.unsubChangeObserver = undefined;
       this.modelManager = undefined;
-      this.resetState();
+      this.collection = undefined;
     }
   }, {
     key: "resetState",
     value: function resetState() {
+      this.createCollection();
+    }
+  }, {
+    key: "createCollection",
+    value: function createCollection() {
       this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'dsc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
     }
     /**
      * Returns an item for a given id
@@ -21712,7 +21718,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(p);
                 });
                 changedOrInserted = changedItems.concat(insertedItems);
-                this.collection.set(changedOrInserted);
+
+                if (changedOrInserted.length > 0) {
+                  this.collection.set(changedOrInserted);
+                }
+
                 discardedItems = discarded.map(function (p) {
                   return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(p);
                 });

@@ -59,6 +59,11 @@ export class SNItem {
   public readonly conflictOf?: UuidString
   public readonly createdAtString?: string
   public readonly updatedAtString?: string
+  public readonly protected = false
+  public readonly trashed = false
+  public readonly pinned = false
+  public readonly archived = false
+  public readonly locked = false
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
@@ -76,6 +81,11 @@ export class SNItem {
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
+      this.protected = this.payload.safeContent.protected;
+      this.trashed = this.payload.safeContent.trashed;
+      this.pinned = this.getAppDomainValue(AppDataField.Pinned);
+      this.archived = this.getAppDomainValue(AppDataField.Archived);
+      this.locked = this.getAppDomainValue(AppDataField.Locked);
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -199,26 +209,6 @@ export class SNItem {
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
     return appData[key];
-  }
-
-  public get protected() {
-    return this.payload.safeContent.protected;
-  }
-
-  public get trashed() {
-    return this.payload.safeContent.trashed;
-  }
-
-  public get pinned() {
-    return this.getAppDomainValue(AppDataField.Pinned);
-  }
-
-  public get archived() {
-    return this.getAppDomainValue(AppDataField.Archived);
-  }
-
-  public get locked() {
-    return this.getAppDomainValue(AppDataField.Locked);
   }
 
   /**
