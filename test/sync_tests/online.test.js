@@ -379,7 +379,7 @@ describe('online syncing', () => {
   }).timeout(10000);
 
 
-  it.only('basic conflict with clearing local state', async function () {
+  it('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application);
     await this.application.saveItem(note.uuid);
     this.expectedItemCount += 1;
@@ -982,7 +982,7 @@ describe('online syncing', () => {
     expect(sorted[4].content_type).to.equal('B');
   }).timeout(10000);
 
-  it('handles stale data in bulk', async function () {
+  it.only('handles stale data in bulk', async function () {
     /** This number must be greater than the pagination limit per sync request. 
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
@@ -1010,9 +1010,9 @@ describe('online syncing', () => {
 
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);
-
-    const allItems2 = this.application.itemManager.items;
-    expect(allItems2.length).to.equal(this.expectedItemCount);
+    
+    const notes = this.application.itemManager.notes;
+    expect(notes.length).to.equal(largeItemCount * 2);
   }).timeout(60000);
 
   it('should sign in and retrieve large number of items', async function () {

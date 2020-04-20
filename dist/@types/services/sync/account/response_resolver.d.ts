@@ -1,6 +1,6 @@
 import { PurePayload } from '../../../protocol/payloads/pure_payload';
 import { SyncResponse } from '../response';
-import { ImmutablePayloadCollection } from '../../../protocol/payloads/collection';
+import { ImmutablePayloadCollection } from "../../../protocol/collection/payload_collection";
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
  * of the current base state, and returns what the new global state should look like.

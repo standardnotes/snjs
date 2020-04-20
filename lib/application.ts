@@ -1,4 +1,4 @@
-import { CollectionSort, SortDirection } from './protocol/payloads/collection';
+import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';

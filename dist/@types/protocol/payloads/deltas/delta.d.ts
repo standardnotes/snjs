@@ -1,6 +1,6 @@
 import { PayloadSource } from '../sources';
-import { ImmutablePayloadCollectionSet } from '../collection_set';
-import { ImmutablePayloadCollection } from '../collection';
+import { ImmutablePayloadCollectionSet } from '../../collection/collection_set';
+import { ImmutablePayloadCollection } from "../../collection/payload_collection";
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,

@@ -1,4 +1,4 @@
-import { CollectionSort, SortDirection } from './protocol/payloads/collection';
+import { CollectionSort, SortDirection } from './protocol/collection/item_collection';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { UuidString } from './types';
 import { ApplicationEvent } from './events';
@@ -207,10 +207,8 @@ export declare class SNApplication {
      * Begin streaming items to display in the UI. The stream callback will be called
      * immediately with the present items that match the constraint, and over time whenever
      * items matching the constraint are added, changed, or deleted.
-     * @param pushImmediate Whether to call the callback immediately with the existing
-     * values matching the content type. Defaults to true.
      */
-    streamItems(contentType: ContentType | ContentType[], stream: ItemStream, pushImmediate?: boolean): () => void;
+    streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
     /**
      * Set the server's URL
      */

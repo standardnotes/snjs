@@ -1,7 +1,7 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
@@ -49,7 +49,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       const payloads = deltaCollection.all();
       extendArray(results, payloads);
     }
-    return new ImmutablePayloadCollection(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
   }
 
   /**
@@ -71,6 +71,6 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       extendArray(results, alternateResults);
     }
 
-    return new ImmutablePayloadCollection(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
   }
 }

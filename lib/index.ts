@@ -115,9 +115,9 @@ export {
 } from '@Lib/services/sync/events';
 
 /** Payloads */
-export {
-  MutableCollection, ImmutablePayloadCollection, CollectionSort
-} from '@Payloads/collection';
+export { MutableCollection } from '@Protocol/collection/collection';
+export { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
+export { ItemCollection, CollectionSort } from '@Protocol/collection/item_collection';
 export {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,

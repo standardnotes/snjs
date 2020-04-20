@@ -3505,7 +3505,7 @@ function applicationEventForSyncEvent(syncEvent) {
 /*!**********************!*\
   !*** ./lib/index.ts ***!
   \**********************/
-/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, CollectionSort, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
+/*! exports provided: SNApplication, SNProtocolService, KeyMode, SNProtocolOperator001, SNProtocolOperator002, SNProtocolOperator003, SNProtocolOperator004, DeviceInterface, SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, SNSmartTag, SNActionsExtension, Action, SNTheme, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, MutationType, ComponentArea, LiveItem, SNComponentManager, HistorySession, ItemHistory, ItemHistoryEntry, SNPrivileges, ProtectedAction, PrivilegeCredential, SNWebCrypto, PayloadManager, ItemManager, SNHttpService, ChallengeService, ChallengeOrchestrator, PureService, ApplicationService, SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys, Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, SortPayloadsByRecentAndContentPriority, SNSessionManager, SNMigrationService, SNAlertService, SNHistoryManager, SNPrivilegesService, SNSingletonManager, SNApiService, Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, Uuid, EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentType, CreateItemFromPayload, Uuids, FillItemContent, ApplicationEvent, Environment, Platform, isEnvironmentWebOrDesktop, isEnvironmentMobile, platformFromString, SyncEvent, MutableCollection, ImmutablePayloadCollection, ItemCollection, CollectionSort, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload, PayloadSource, isPayloadSourceRetrieved, ProtocolVersion, PayloadFormat, PurePayload, PayloadField, StorageKey, BaseMigration, PrivilegeSessionLength */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3758,48 +3758,52 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! @Lib/services/sync/events */ "./lib/services/sync/events.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncEvent", function() { return _Lib_services_sync_events__WEBPACK_IMPORTED_MODULE_42__["SyncEvent"]; });
 
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["MutableCollection"]; });
+/* harmony import */ var _Protocol_collection_collection__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! @Protocol/collection/collection */ "./lib/protocol/collection/collection.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return _Protocol_collection_collection__WEBPACK_IMPORTED_MODULE_43__["MutableCollection"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["ImmutablePayloadCollection"]; });
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_44__["ImmutablePayloadCollection"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return _Payloads_collection__WEBPACK_IMPORTED_MODULE_43__["CollectionSort"]; });
+/* harmony import */ var _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Protocol/collection/item_collection */ "./lib/protocol/collection/item_collection.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ItemCollection", function() { return _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_45__["ItemCollection"]; });
 
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CreateMaxPayloadFromAnyObject"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_45__["CollectionSort"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CreateSourcedPayloadFromObject"]; });
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateMaxPayloadFromAnyObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["CreateMaxPayloadFromAnyObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateIntentPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CreateIntentPayloadFromObject"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateSourcedPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["CreateSourcedPayloadFromObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CreateEncryptionParameters"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateIntentPayloadFromObject", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["CreateIntentPayloadFromObject"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadByMerging", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["PayloadByMerging"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["CreateEncryptionParameters"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_44__["CopyPayload"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadByMerging", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["PayloadByMerging"]; });
 
-/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["PayloadSource"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return _Payloads_generator__WEBPACK_IMPORTED_MODULE_46__["CopyPayload"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_45__["isPayloadSourceRetrieved"]; });
+/* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Lib/protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_47__["PayloadSource"]; });
 
-/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_46__["ProtocolVersion"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_47__["isPayloadSourceRetrieved"]; });
 
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_47__["PayloadFormat"]; });
+/* harmony import */ var _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! @Lib/protocol/versions */ "./lib/protocol/versions.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return _Lib_protocol_versions__WEBPACK_IMPORTED_MODULE_48__["ProtocolVersion"]; });
 
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_48__["PurePayload"]; });
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! @Payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return _Payloads_formats__WEBPACK_IMPORTED_MODULE_49__["PayloadFormat"]; });
 
-/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_49__["PayloadField"]; });
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! @Payloads/pure_payload */ "./lib/protocol/payloads/pure_payload.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_50__["PurePayload"]; });
 
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_50__["StorageKey"]; });
+/* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return _Payloads_fields__WEBPACK_IMPORTED_MODULE_51__["PayloadField"]; });
 
-/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_51__["BaseMigration"]; });
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_52__["StorageKey"]; });
+
+/* harmony import */ var _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! @Lib/migrations/2020-01-01-base */ "./lib/migrations/2020-01-01-base.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return _Lib_migrations_2020_01_01_base__WEBPACK_IMPORTED_MODULE_53__["BaseMigration"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return _services_privileges_service__WEBPACK_IMPORTED_MODULE_31__["PrivilegeSessionLength"]; });
 
@@ -3847,6 +3851,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /** Payloads */
+
+
 
 
 
@@ -8178,6 +8184,1086 @@ function isEnvironmentMobile(environment) {
 
 /***/ }),
 
+/***/ "./lib/protocol/collection/collection.ts":
+/*!***********************************************!*\
+  !*** ./lib/protocol/collection/collection.ts ***!
+  \***********************************************/
+/*! exports provided: MutableCollection */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return MutableCollection; });
+/* harmony import */ var _uuid_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./uuid_map */ "./lib/protocol/collection/uuid_map.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
+function _objectDestructuringEmpty(obj) { if (obj == null) throw new TypeError("Cannot destructure undefined"); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
+var MutableCollection = /*#__PURE__*/function () {
+  /** An array of uuids of items that are dirty */
+
+  /** An array of uuids of items that are errorDecrypting or waitingForKey */
+
+  /** An array of uuids of items that are not marked as deleted */
+
+  /** Maintains an index where the direct map for each item id is an array 
+   * of item ids that the item references. This is essentially equivalent to 
+   * item.content.references, but keeps state even when the item is deleted. 
+   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid]. 
+   * The inverse map for each item is an array of item ids where the items reference the 
+   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid]. 
+   * This allows callers to determine for a given item, who references it? 
+   * It would be prohibitive to look this up on demand */
+
+  /** Maintains an index for each item uuid where the value is an array of uuids that are
+   * conflicts of that item. So if Note B and C are conflicts of Note A, 
+   * conflictMap[A.uuid] == [B.uuid, C.uuid] */
+  function MutableCollection() {
+    var _ref;
+
+    var copy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    var mapCopy = arguments.length > 1 ? arguments[1] : undefined;
+    var typedMapCopy = arguments.length > 2 ? arguments[2] : undefined;
+    var referenceMapCopy = arguments.length > 3 ? arguments[3] : undefined;
+    var conflictMapCopy = arguments.length > 4 ? arguments[4] : undefined;
+
+    _classCallCheck(this, MutableCollection);
+
+    _defineProperty(this, "map", {});
+
+    _defineProperty(this, "typedMap", (_ref = {}, _objectDestructuringEmpty(_ref), _ref));
+
+    _defineProperty(this, "dirtyIndex", new Set());
+
+    _defineProperty(this, "invalidsIndex", new Set());
+
+    _defineProperty(this, "nondeletedIndex", new Set());
+
+    _defineProperty(this, "referenceMap", void 0);
+
+    _defineProperty(this, "conflictMap", void 0);
+
+    if (copy) {
+      this.map = mapCopy;
+      this.typedMap = typedMapCopy;
+      this.referenceMap = referenceMapCopy;
+      this.conflictMap = conflictMapCopy;
+    } else {
+      this.referenceMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
+      this.conflictMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
+    }
+  }
+
+  _createClass(MutableCollection, [{
+    key: "uuids",
+    value: function uuids() {
+      return Object.keys(this.map);
+    }
+  }, {
+    key: "all",
+    value: function all(contentType) {
+      var _this = this;
+
+      if (contentType) {
+        if (Array.isArray(contentType)) {
+          var elements = [];
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = contentType[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var type = _step.value;
+              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["extendArray"])(elements, this.typedMap[type] || []);
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          return elements;
+        } else {
+          return this.typedMap[contentType] || [];
+        }
+      } else {
+        return Object.keys(this.map).map(function (uuid) {
+          return _this.map[uuid];
+        });
+      }
+    }
+  }, {
+    key: "find",
+    value: function find(uuid) {
+      return this.map[uuid];
+    }
+    /** Returns all elements that are marked as dirty */
+
+  }, {
+    key: "dirtyElements",
+    value: function dirtyElements() {
+      var uuids = Array.from(this.dirtyIndex);
+      return this.findAll(uuids);
+    }
+    /** Returns all elements that are errorDecrypting or waitingForKey */
+
+  }, {
+    key: "invalidElements",
+    value: function invalidElements() {
+      var uuids = Array.from(this.invalidsIndex);
+      return this.findAll(uuids);
+    }
+    /** Returns all elements that are not marked as deleted */
+
+  }, {
+    key: "nondeletedElements",
+    value: function nondeletedElements() {
+      var uuids = Array.from(this.nondeletedIndex);
+      return this.findAll(uuids);
+    }
+    /**
+     * @param includeBlanks If true and an item is not found, an `undefined` element
+     * will be inserted into the array.
+     */
+
+  }, {
+    key: "findAll",
+    value: function findAll(uuids) {
+      var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var results = [];
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = uuids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var id = _step2.value;
+          var element = this.map[id];
+
+          if (element || includeBlanks) {
+            results.push(element);
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return results;
+    }
+  }, {
+    key: "set",
+    value: function set(elements) {
+      elements = Array.isArray(elements) ? elements : [elements];
+
+      if (elements.length === 0) {
+        console.warn('Attempting to set 0 elements onto collection');
+        return;
+      }
+
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var element = _step3.value;
+          this.map[element.uuid] = element;
+          this.setToTypedMap(element);
+          /** Dirty index */
+
+          if (element.dirty) {
+            this.dirtyIndex.add(element.uuid);
+          } else {
+            this.dirtyIndex.delete(element.uuid);
+          }
+          /** Invalids index */
+
+
+          if (element.errorDecrypting || element.waitingForKey) {
+            this.invalidsIndex.add(element.uuid);
+          } else {
+            this.invalidsIndex.delete(element.uuid);
+          }
+
+          if (element.deleted) {
+            this.referenceMap.removeFromMap(element.uuid);
+            this.nondeletedIndex.delete(element.uuid);
+          } else {
+            this.nondeletedIndex.add(element.uuid);
+            var conflictOf = element.safeContent.conflict_of;
+
+            if (conflictOf) {
+              this.conflictMap.establishRelationship(conflictOf, element.uuid);
+            }
+
+            this.referenceMap.setAllRelationships(element.uuid, element.references.map(function (r) {
+              return r.uuid;
+            }));
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+    }
+  }, {
+    key: "discard",
+    value: function discard(elements) {
+      elements = Array.isArray(elements) ? elements : [elements];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = elements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var element = _step4.value;
+          this.conflictMap.removeFromMap(element.uuid);
+          this.referenceMap.removeFromMap(element.uuid);
+          this.deleteFromTypedMap(element);
+          delete this.map[element.uuid];
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+    }
+  }, {
+    key: "setToTypedMap",
+    value: function setToTypedMap(element) {
+      var array = this.typedMap[element.content_type] || [];
+      lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(array, {
+        uuid: element.uuid
+      });
+      array.push(element);
+      this.typedMap[element.content_type] = array;
+    }
+  }, {
+    key: "deleteFromTypedMap",
+    value: function deleteFromTypedMap(element) {
+      var array = this.typedMap[element.content_type] || [];
+      lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(array, {
+        uuid: element.uuid
+      });
+      this.typedMap[element.content_type] = array;
+    }
+  }, {
+    key: "uuidsThatReferenceUuid",
+    value: function uuidsThatReferenceUuid(uuid) {
+      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isString"])(uuid)) {
+        throw Error('Must use uuid string');
+      }
+
+      return this.referenceMap.getInverseRelationships(uuid);
+    }
+  }, {
+    key: "elementsReferencingElement",
+    value: function elementsReferencingElement(element) {
+      var uuids = this.uuidsThatReferenceUuid(element.uuid);
+      return this.findAll(uuids);
+    }
+  }, {
+    key: "conflictsOf",
+    value: function conflictsOf(uuid) {
+      var uuids = this.conflictMap.getDirectRelationships(uuid);
+      return this.findAll(uuids);
+    }
+  }]);
+
+  return MutableCollection;
+}();
+
+/***/ }),
+
+/***/ "./lib/protocol/collection/collection_set.ts":
+/*!***************************************************!*\
+  !*** ./lib/protocol/collection/collection_set.ts ***!
+  \***************************************************/
+/*! exports provided: ImmutablePayloadCollectionSet */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollectionSet", function() { return ImmutablePayloadCollectionSet; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var ImmutablePayloadCollectionSet = /*#__PURE__*/function () {
+  /**
+   * @param collections An array of ImmutablePayloadCollection objects.
+   */
+  function ImmutablePayloadCollectionSet(collections) {
+    _classCallCheck(this, ImmutablePayloadCollectionSet);
+
+    _defineProperty(this, "collections", void 0);
+
+    this.collections = collections;
+    Object.freeze(this);
+  }
+
+  _createClass(ImmutablePayloadCollectionSet, [{
+    key: "collectionForSource",
+    value: function collectionForSource(source) {
+      return this.collections.find(function (collection) {
+        return collection.source === source;
+      });
+    }
+  }]);
+
+  return ImmutablePayloadCollectionSet;
+}();
+
+/***/ }),
+
+/***/ "./lib/protocol/collection/item_collection.ts":
+/*!****************************************************!*\
+  !*** ./lib/protocol/collection/item_collection.ts ***!
+  \****************************************************/
+/*! exports provided: CollectionSort, ItemCollection */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return CollectionSort; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemCollection", function() { return ItemCollection; });
+/* harmony import */ var _collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collection */ "./lib/protocol/collection/collection.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+var CollectionSort;
+
+(function (CollectionSort) {
+  CollectionSort["CreatedAt"] = "created_at";
+  CollectionSort["UpdatedAt"] = "userModifiedDate";
+  CollectionSort["Title"] = "title";
+})(CollectionSort || (CollectionSort = {}));
+
+/** The item collection class builds on mutable collection by providing an option to keep
+ * items sorted and filtered. */
+var ItemCollection = /*#__PURE__*/function (_MutableCollection) {
+  _inherits(ItemCollection, _MutableCollection);
+
+  function ItemCollection() {
+    var _getPrototypeOf2;
+
+    var _this;
+
+    _classCallCheck(this, ItemCollection);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ItemCollection)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "displaySortBy", {});
+
+    _defineProperty(_assertThisInitialized(_this), "displayFilter", {});
+
+    _defineProperty(_assertThisInitialized(_this), "filteredMap", {});
+
+    _defineProperty(_assertThisInitialized(_this), "sortedMap", {});
+
+    return _this;
+  }
+
+  _createClass(ItemCollection, [{
+    key: "set",
+    value: function set(elements) {
+      elements = Array.isArray(elements) ? elements : [elements];
+
+      _get(_getPrototypeOf(ItemCollection.prototype), "set", this).call(this, elements);
+
+      this.filterSortElements(elements);
+    }
+  }, {
+    key: "discard",
+    value: function discard(elements) {
+      elements = Array.isArray(elements) ? elements : [elements];
+
+      _get(_getPrototypeOf(ItemCollection.prototype), "discard", this).call(this, elements);
+
+      this.filterSortElements(elements);
+    }
+    /**
+     * Sets an optional sortBy and filter for a given content type. These options will be
+     * applied against a separate "display-only" record and not the master record. Passing
+     * null options removes any existing options. sortBy is always required, but a filter is 
+     * not always required. 
+     * Note that sorting and filtering only applies to collections of type SNItem, and not
+     * payloads. This is because we access item properties such as `pinned` and `title`.
+     * @param filter A function that receives an element and returns a boolean indicating
+     * whether the element passes the filter and should be in displayable results.
+     */
+
+  }, {
+    key: "setDisplayOptions",
+    value: function setDisplayOptions(contentType, sortBy, direction, filter) {
+      var existingSortBy = this.displaySortBy[contentType];
+      var existingFilter = this.displayFilter[contentType];
+      /** If the sort value is unchanged, and we are not setting a new filter,
+       * we return, as to not rebuild and resort all elements */
+
+      if (existingSortBy && existingSortBy.key === sortBy && existingSortBy.dir === direction && !existingFilter && !filter) {
+        return;
+      }
+
+      this.displaySortBy[contentType] = sortBy ? {
+        key: sortBy,
+        dir: direction
+      } : undefined;
+      this.displayFilter[contentType] = filter;
+      /** Reset existing maps */
+
+      this.filteredMap[contentType] = {};
+      this.sortedMap[contentType] = [];
+      /** Re-process all elements */
+
+      var elements = this.all(contentType);
+
+      if (elements.length > 0) {
+        this.filterSortElements(elements);
+      }
+    }
+    /** Returns the filtered and sorted list of elements for this content type,
+     * according to the options set via `setDisplayOptions` */
+
+  }, {
+    key: "displayElements",
+    value: function displayElements(contentType) {
+      var elements = this.sortedMap[contentType];
+
+      if (!elements) {
+        throw Error("Attempting to access display elements for \n        non-configured content type ".concat(contentType));
+      }
+
+      return elements;
+    }
+  }, {
+    key: "filterSortElements",
+    value: function filterSortElements(elements) {
+      if (Object.keys(this.displaySortBy).length === 0) {
+        return;
+      }
+      /** If a content type is added to this set, we are indicating the entire sorted 
+       * array will need to be re-sorted. The reason for sorting the entire array and not 
+       * just inserting an element using binary search is that we need to keep track of the 
+       * sorted index of an item so that we can look up and change its value without having
+       * to search the array for it. */
+
+
+      var typesNeedingResort = new Set();
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _element = _step.value;
+          var contentType = _element.content_type;
+          var sortBy = this.displaySortBy[contentType];
+          /** Sort by is required, but filter is not */
+
+          if (!sortBy) {
+            continue;
+          }
+
+          var filter = this.displayFilter[contentType];
+          /** Filtered content type map */
+
+          var filteredCTMap = this.filteredMap[contentType];
+          var sortedElements = this.sortedMap[contentType];
+          /** If the element is deleted, or if it no longer exists in the primary map (because
+           * it was discarded without neccessarily being marked as deleted), it does not pass 
+           * the filter. If no filter the element passes by default. */
+
+          var passes = _element.deleted || !this.map[_element.uuid] ? false : filter ? filter(_element) : true;
+          var currentIndex = filteredCTMap[_element.uuid];
+
+          if (passes) {
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
+              /** Check to see if the element has changed its sort value. If so, we need to re-sort */
+              var previousValue = sortedElements[currentIndex][sortBy.key];
+              var newValue = _element[sortBy.key];
+              /** Replace the current element with the new one. */
+
+              sortedElements[currentIndex] = _element;
+
+              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["compareValues"])(previousValue, newValue)) {
+                /** Needs resort because its re-sort value has changed, 
+                 * and thus its position might change */
+                typesNeedingResort.add(contentType);
+              }
+            } else {
+              /** Has not yet been inserted */
+              sortedElements.push(_element);
+              /** Needs re-sort because we're just pushing the element to the end here */
+
+              typesNeedingResort.add(contentType);
+            }
+          } else {
+            /** Doesn't pass filter, remove from sorted and filtered */
+            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
+              delete filteredCTMap[_element.uuid];
+              /** We don't yet remove the element directly from the array, since mutating
+               * the array inside a loop could render all other upcoming indexes invalid */
+
+              sortedElements[currentIndex] = undefined;
+              /** Since an element is being removed from the array, we need to recompute
+               * the new positions for elements that are staying */
+
+              typesNeedingResort.add(contentType);
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = typesNeedingResort.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var _contentType = _step2.value;
+          this.resortContentType(_contentType);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }
+  }, {
+    key: "resortContentType",
+    value: function resortContentType(contentType) {
+      var sortedElements = this.sortedMap[contentType];
+      var sortBy = this.displaySortBy[contentType];
+      var filteredCTMap = this.filteredMap[contentType];
+      /** Resort the elements array, and update the saved positions */
+
+      /** @O(n * log(n)) */
+
+      var sortFn = function sortFn(a, b) {
+        var skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        /** If the elements are undefined, move to beginning */
+        if (!a) {
+          return -1;
+        }
+
+        if (!b) {
+          return 1;
+        }
+
+        if (!skipPinnedCheck) {
+          if (a.pinned && b.pinned) {
+            return sortFn(a, b, true);
+          }
+
+          if (a.pinned) {
+            return -1;
+          }
+
+          if (b.pinned) {
+            return 1;
+          }
+        }
+
+        var aValue = a[sortBy.key] || '';
+        var bValue = b[sortBy.key] || '';
+        var vector = 1;
+
+        if (sortBy.dir === 'asc') {
+          vector *= -1;
+        }
+
+        if (sortBy.key === CollectionSort.Title) {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+
+          if (aValue.length === 0 && bValue.length === 0) {
+            return 0;
+          } else if (aValue.length === 0 && bValue.length !== 0) {
+            return 1 * vector;
+          } else if (aValue.length !== 0 && bValue.length === 0) {
+            return -1 * vector;
+          } else {
+            vector *= -1;
+          }
+        }
+
+        if (aValue > bValue) {
+          return -1 * vector;
+        } else if (aValue < bValue) {
+          return 1 * vector;
+        }
+
+        return 0;
+      };
+
+      var resorted = sortedElements.sort(function (a, b) {
+        return sortFn(a, b);
+      });
+      /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+       * we create another array that filters out any of the undefinedes. We also keep track of the
+       * current index while we loop and set that in the filteredCTMap. */
+
+      var cleaned = [];
+      var currentIndex = 0;
+      /** @O(n) */
+
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = resorted[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var _element2 = _step3.value;
+
+          if (!_element2) {
+            continue;
+          }
+
+          cleaned.push(_element2);
+          filteredCTMap[_element2.uuid] = currentIndex;
+          currentIndex++;
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+
+      this.sortedMap[contentType] = cleaned;
+    }
+  }]);
+
+  return ItemCollection;
+}(_collection__WEBPACK_IMPORTED_MODULE_0__["MutableCollection"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/collection/payload_collection.ts":
+/*!*******************************************************!*\
+  !*** ./lib/protocol/collection/payload_collection.ts ***!
+  \*******************************************************/
+/*! exports provided: ImmutablePayloadCollection */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return ImmutablePayloadCollection; });
+/* harmony import */ var _collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collection */ "./lib/protocol/collection/collection.ts");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+/**
+ * A collection of payloads coming from a single source.
+ */
+var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
+  _inherits(ImmutablePayloadCollection, _MutableCollection);
+
+  function ImmutablePayloadCollection() {
+    var _getPrototypeOf2;
+
+    var _this;
+
+    _classCallCheck(this, ImmutablePayloadCollection);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ImmutablePayloadCollection)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    _defineProperty(_assertThisInitialized(_this), "source", void 0);
+
+    return _this;
+  }
+
+  _createClass(ImmutablePayloadCollection, [{
+    key: "payloads",
+    get: function get() {
+      return this.all();
+    }
+  }], [{
+    key: "WithPayloads",
+
+    /** We don't use a constructor for this because we don't want the constructor to have
+     * side-effects, such as calling collection.set(). */
+    value: function WithPayloads() {
+      var payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var source = arguments.length > 1 ? arguments[1] : undefined;
+      var collection = new ImmutablePayloadCollection();
+      collection.source = source;
+
+      if (payloads.length > 0) {
+        collection.set(payloads);
+      }
+
+      Object.freeze(collection);
+      return collection;
+    }
+  }, {
+    key: "FromCollection",
+    value: function FromCollection(collection) {
+      var mapCopy = Object.freeze(Object.assign({}, collection.map));
+      var typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap));
+      var referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy());
+      var conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy());
+      var result = new ImmutablePayloadCollection(true, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy);
+      Object.freeze(result);
+      return result;
+    }
+  }]);
+
+  return ImmutablePayloadCollection;
+}(_collection__WEBPACK_IMPORTED_MODULE_0__["MutableCollection"]);
+
+/***/ }),
+
+/***/ "./lib/protocol/collection/uuid_map.ts":
+/*!*********************************************!*\
+  !*** ./lib/protocol/collection/uuid_map.ts ***!
+  \*********************************************/
+/*! exports provided: UuidMap */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UuidMap", function() { return UuidMap; });
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+var UuidMap = /*#__PURE__*/function () {
+  function UuidMap() {
+    _classCallCheck(this, UuidMap);
+
+    _defineProperty(this, "directMap", {});
+
+    _defineProperty(this, "inverseMap", {});
+  }
+
+  _createClass(UuidMap, [{
+    key: "makeCopy",
+    value: function makeCopy() {
+      var copy = new UuidMap();
+      copy.directMap = Object.assign({}, this.directMap);
+      copy.inverseMap = Object.assign({}, this.inverseMap);
+      return copy;
+    }
+  }, {
+    key: "getDirectRelationships",
+    value: function getDirectRelationships(uuid) {
+      return this.directMap[uuid] || [];
+    }
+  }, {
+    key: "getInverseRelationships",
+    value: function getInverseRelationships(uuid) {
+      return this.inverseMap[uuid] || [];
+    }
+  }, {
+    key: "establishRelationship",
+    value: function establishRelationship(uuidA, uuidB) {
+      this.establishDirectRelationship(uuidA, uuidB);
+      this.establishInverseRelationship(uuidA, uuidB);
+    }
+  }, {
+    key: "deestablishRelationship",
+    value: function deestablishRelationship(uuidA, uuidB) {
+      this.deestablishDirectRelationship(uuidA, uuidB);
+      this.deestablishInverseRelationship(uuidA, uuidB);
+    }
+  }, {
+    key: "setAllRelationships",
+    value: function setAllRelationships(uuid, relationships) {
+      var previousDirect = this.directMap[uuid] || [];
+      this.directMap[uuid] = relationships;
+      /** Remove all previous values in case relationships have changed 
+       * The updated references will be added afterwards.
+      */
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = previousDirect[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var previousRelationship = _step.value;
+          this.deestablishInverseRelationship(uuid, previousRelationship);
+        }
+        /** Now map current relationships */
+
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = relationships[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var newRelationship = _step2.value;
+          this.establishInverseRelationship(uuid, newRelationship);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }
+  }, {
+    key: "removeFromMap",
+    value: function removeFromMap(uuid) {
+      /** Items that we reference */
+      var directReferences = this.directMap[uuid] || [];
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = directReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var directReference = _step3.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.inverseMap[directReference] || [], uuid);
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+
+      delete this.directMap[uuid];
+      /** Items that are referencing us */
+
+      var inverseReferences = this.inverseMap[uuid] || [];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = inverseReferences[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var inverseReference = _step4.value;
+          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.directMap[inverseReference] || [], uuid);
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      delete this.inverseMap[uuid];
+    }
+  }, {
+    key: "establishDirectRelationship",
+    value: function establishDirectRelationship(uuidA, uuidB) {
+      var index = this.directMap[uuidA] || [];
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["addIfUnique"])(index, uuidB);
+      this.directMap[uuidA] = index;
+    }
+  }, {
+    key: "establishInverseRelationship",
+    value: function establishInverseRelationship(uuidA, uuidB) {
+      var inverseIndex = this.inverseMap[uuidB] || [];
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["addIfUnique"])(inverseIndex, uuidA);
+      this.inverseMap[uuidB] = inverseIndex;
+    }
+  }, {
+    key: "deestablishDirectRelationship",
+    value: function deestablishDirectRelationship(uuidA, uuidB) {
+      var index = this.directMap[uuidA] || [];
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(index, uuidB);
+      this.directMap[uuidA] = index;
+    }
+  }, {
+    key: "deestablishInverseRelationship",
+    value: function deestablishInverseRelationship(uuidA, uuidB) {
+      var inverseIndex = this.inverseMap[uuidB] || [];
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(inverseIndex, uuidA);
+      this.inverseMap[uuidB] = inverseIndex;
+    }
+  }]);
+
+  return UuidMap;
+}();
+
+/***/ }),
+
 /***/ "./lib/protocol/index.ts":
 /*!*******************************!*\
   !*** ./lib/protocol/index.ts ***!
@@ -10647,763 +11733,6 @@ var SNProtocolOperator = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./lib/protocol/payloads/collection.ts":
-/*!*********************************************!*\
-  !*** ./lib/protocol/payloads/collection.ts ***!
-  \*********************************************/
-/*! exports provided: CollectionSort, MutableCollection, ImmutablePayloadCollection */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CollectionSort", function() { return CollectionSort; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MutableCollection", function() { return MutableCollection; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollection", function() { return ImmutablePayloadCollection; });
-/* harmony import */ var _uuid_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./uuid_map */ "./lib/protocol/payloads/uuid_map.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _objectDestructuringEmpty(obj) { if (obj == null) throw new TypeError("Cannot destructure undefined"); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-
-
-var CollectionSort;
-
-(function (CollectionSort) {
-  CollectionSort["CreatedAt"] = "created_at";
-  CollectionSort["UpdatedAt"] = "userModifiedDate";
-  CollectionSort["Title"] = "title";
-})(CollectionSort || (CollectionSort = {}));
-
-var MutableCollection = /*#__PURE__*/function () {
-  /** An array of uuids of items that are dirty */
-
-  /** An array of uuids of items that are errorDecrypting or waitingForKey */
-
-  /** An array of uuids of items that are not marked as deleted */
-
-  /** Maintains an index where the direct map for each item id is an array 
-   * of item ids that the item references. This is essentially equivalent to 
-   * item.content.references, but keeps state even when the item is deleted. 
-   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid]. 
-   * The inverse map for each item is an array of item ids where the items reference the 
-   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid]. 
-   * This allows callers to determine for a given item, who references it? 
-   * It would be prohibitive to look this up on demand */
-
-  /** Maintains an index for each item uuid where the value is an array of uuids that are
-   * conflicts of that item. So if Note B and C are conflicts of Note A, 
-   * conflictMap[A.uuid] == [B.uuid, C.uuid] */
-  function MutableCollection() {
-    var _ref;
-
-    var elements = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var copy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var mapCopy = arguments.length > 2 ? arguments[2] : undefined;
-    var typedMapCopy = arguments.length > 3 ? arguments[3] : undefined;
-    var referenceMapCopy = arguments.length > 4 ? arguments[4] : undefined;
-    var conflictMapCopy = arguments.length > 5 ? arguments[5] : undefined;
-
-    _classCallCheck(this, MutableCollection);
-
-    _defineProperty(this, "map", {});
-
-    _defineProperty(this, "typedMap", (_ref = {}, _objectDestructuringEmpty(_ref), _ref));
-
-    _defineProperty(this, "dirtyIndex", new Set());
-
-    _defineProperty(this, "invalidsIndex", new Set());
-
-    _defineProperty(this, "nondeletedIndex", new Set());
-
-    _defineProperty(this, "referenceMap", void 0);
-
-    _defineProperty(this, "conflictMap", void 0);
-
-    _defineProperty(this, "displaySortBy", {});
-
-    _defineProperty(this, "displayFilter", {});
-
-    _defineProperty(this, "filteredMap", {});
-
-    _defineProperty(this, "sortedMap", {});
-
-    if (copy) {
-      this.map = mapCopy;
-      this.typedMap = typedMapCopy;
-      this.referenceMap = referenceMapCopy;
-      this.conflictMap = conflictMapCopy;
-    } else {
-      this.referenceMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
-      this.conflictMap = new _uuid_map__WEBPACK_IMPORTED_MODULE_0__["UuidMap"]();
-
-      if (elements.length > 0) {
-        this.set(elements);
-      }
-    }
-  }
-
-  _createClass(MutableCollection, [{
-    key: "immutablePayloadCopy",
-    value: function immutablePayloadCopy() {
-      var mapCopy = Object.freeze(Object.assign({}, this.map));
-      var typedMapCopy = Object.freeze(Object.assign({}, this.typedMap));
-      var referenceMapCopy = Object.freeze(this.referenceMap.makeCopy());
-      var conflictMapCopy = Object.freeze(this.conflictMap.makeCopy());
-      return new ImmutablePayloadCollection(undefined, undefined, true, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy);
-    }
-  }, {
-    key: "uuids",
-    value: function uuids() {
-      return Object.keys(this.map);
-    }
-  }, {
-    key: "all",
-    value: function all(contentType) {
-      var _this = this;
-
-      if (contentType) {
-        if (Array.isArray(contentType)) {
-          var elements = [];
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = contentType[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var type = _step.value;
-              Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["extendArray"])(elements, this.typedMap[type] || []);
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          return elements;
-        } else {
-          return this.typedMap[contentType] || [];
-        }
-      } else {
-        return Object.keys(this.map).map(function (uuid) {
-          return _this.map[uuid];
-        });
-      }
-    }
-  }, {
-    key: "find",
-    value: function find(uuid) {
-      return this.map[uuid];
-    }
-    /** Returns all elements that are marked as dirty */
-
-  }, {
-    key: "dirtyElements",
-    value: function dirtyElements() {
-      var uuids = Array.from(this.dirtyIndex);
-      return this.findAll(uuids);
-    }
-    /** Returns all elements that are errorDecrypting or waitingForKey */
-
-  }, {
-    key: "invalidElements",
-    value: function invalidElements() {
-      var uuids = Array.from(this.invalidsIndex);
-      return this.findAll(uuids);
-    }
-    /** Returns all elements that are not marked as deleted */
-
-  }, {
-    key: "nondeletedElements",
-    value: function nondeletedElements() {
-      var uuids = Array.from(this.nondeletedIndex);
-      return this.findAll(uuids);
-    }
-    /**
-     * @param includeBlanks If true and an item is not found, an `undefined` element
-     * will be inserted into the array.
-     */
-
-  }, {
-    key: "findAll",
-    value: function findAll(uuids) {
-      var includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var results = [];
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = uuids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var id = _step2.value;
-          var _element = this.map[id];
-
-          if (_element || includeBlanks) {
-            results.push(_element);
-          }
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      return results;
-    }
-  }, {
-    key: "set",
-    value: function set(elements) {
-      elements = Array.isArray(elements) ? elements : [elements];
-
-      if (elements.length === 0) {
-        console.warn('Attempting to set 0 elements onto collection');
-        return;
-      }
-
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var _element2 = _step3.value;
-          this.map[_element2.uuid] = _element2;
-          this.setToTypedMap(_element2);
-          /** Dirty index */
-
-          if (_element2.dirty) {
-            this.dirtyIndex.add(_element2.uuid);
-          } else {
-            this.dirtyIndex.delete(_element2.uuid);
-          }
-          /** Invalids index */
-
-
-          if (_element2.errorDecrypting || _element2.waitingForKey) {
-            this.invalidsIndex.add(_element2.uuid);
-          } else {
-            this.invalidsIndex.delete(_element2.uuid);
-          }
-
-          if (_element2.deleted) {
-            this.referenceMap.removeFromMap(_element2.uuid);
-            this.nondeletedIndex.delete(_element2.uuid);
-          } else {
-            this.nondeletedIndex.add(_element2.uuid);
-            var conflictOf = _element2.safeContent.conflict_of;
-
-            if (conflictOf) {
-              this.conflictMap.establishRelationship(conflictOf, _element2.uuid);
-            }
-
-            this.referenceMap.setAllRelationships(_element2.uuid, _element2.references.map(function (r) {
-              return r.uuid;
-            }));
-          }
-        }
-        /** Display filter/sort */
-
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
-      this.filterSortElements(elements);
-    }
-  }, {
-    key: "discard",
-    value: function discard(elements) {
-      elements = Array.isArray(elements) ? elements : [elements];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = elements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var _element3 = _step4.value;
-          this.conflictMap.removeFromMap(_element3.uuid);
-          this.referenceMap.removeFromMap(_element3.uuid);
-          this.deleteFromTypedMap(_element3);
-          delete this.map[_element3.uuid];
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      this.filterSortElements(elements);
-    }
-  }, {
-    key: "setToTypedMap",
-    value: function setToTypedMap(element) {
-      var array = this.typedMap[element.content_type] || [];
-      lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(array, {
-        uuid: element.uuid
-      });
-      array.push(element);
-      this.typedMap[element.content_type] = array;
-    }
-  }, {
-    key: "deleteFromTypedMap",
-    value: function deleteFromTypedMap(element) {
-      var array = this.typedMap[element.content_type] || [];
-      lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(array, {
-        uuid: element.uuid
-      });
-      this.typedMap[element.content_type] = array;
-    }
-  }, {
-    key: "uuidsThatReferenceUuid",
-    value: function uuidsThatReferenceUuid(uuid) {
-      if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isString"])(uuid)) {
-        throw Error('Must use uuid string');
-      }
-
-      return this.referenceMap.getInverseRelationships(uuid);
-    }
-  }, {
-    key: "elementsReferencingElement",
-    value: function elementsReferencingElement(element) {
-      var uuids = this.uuidsThatReferenceUuid(element.uuid);
-      return this.findAll(uuids);
-    }
-  }, {
-    key: "conflictsOf",
-    value: function conflictsOf(uuid) {
-      var uuids = this.conflictMap.getDirectRelationships(uuid);
-      return this.findAll(uuids);
-    }
-  }, {
-    key: "setDisplayOptions",
-
-    /**
-     * Sets an optional sortBy and filter for a given content type. These options will be
-     * applied against a separate "display-only" record and not the master record. Passing
-     * null options removes any existing options. sortBy is always required, but a filter is 
-     * not always required. 
-     * Note that sorting and filtering only applies to collections of type SNItem, and not
-     * payloads. This is because we access item properties such as `pinned` and `title`.
-     * @param filter A function that receives an element and returns a boolean indicating
-     * whether the element passes the filter and should be in displayable results.
-     */
-    value: function setDisplayOptions(contentType, sortBy, direction, filter) {
-      var existingSortBy = this.displaySortBy[contentType];
-      var existingFilter = this.displayFilter[contentType];
-      /** If the sort value is unchanged, and we are not setting a new filter,
-       * we return, as to not rebuild and resort all elements */
-
-      if (existingSortBy && existingSortBy.key === sortBy && existingSortBy.dir === direction && !existingFilter && !filter) {
-        return;
-      }
-
-      this.displaySortBy[contentType] = sortBy ? {
-        key: sortBy,
-        dir: direction
-      } : undefined;
-      this.displayFilter[contentType] = filter;
-      /** Reset existing maps */
-
-      this.filteredMap[contentType] = {};
-      this.sortedMap[contentType] = [];
-      /** Re-process all elements */
-
-      var elements = this.all(contentType);
-
-      if (elements.length > 0) {
-        this.filterSortElements(elements);
-      }
-    }
-    /** Returns the filtered and sorted list of elements for this content type,
-     * according to the options set via `setDisplayOptions` */
-
-  }, {
-    key: "displayElements",
-    value: function displayElements(contentType) {
-      var elements = this.sortedMap[contentType];
-
-      if (!elements) {
-        throw Error("Attempting to access display elements for non-configured content type ".concat(contentType));
-      }
-
-      return elements;
-    }
-  }, {
-    key: "filterSortElements",
-    value: function filterSortElements(elements) {
-      if (Object.keys(this.displaySortBy).length === 0) {
-        return;
-      }
-      /** If a content type is added to this set, we are indicating the entire sorted 
-       * array will need to be re-sorted. The reason for sorting the entire array and not 
-       * just inserting an element using binary search is that we need to keep track of the 
-       * sorted index of an item so that we can look up and change its value without having
-       * to search the array for it. */
-
-
-      var typesNeedingResort = new Set();
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-
-      try {
-        for (var _iterator5 = elements[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var _element4 = _step5.value;
-          var contentType = _element4.content_type;
-          var sortBy = this.displaySortBy[contentType];
-          /** Sort by is required, but filter is not */
-
-          if (!sortBy) {
-            continue;
-          }
-
-          var filter = this.displayFilter[contentType];
-          /** Filtered content type map */
-
-          var filteredCTMap = this.filteredMap[contentType];
-          var sortedElements = this.sortedMap[contentType];
-          /** If the element is deleted, or if it no longer exists in the primary map (because
-           * it was discarded without neccessarily being marked as deleted), it does not pass 
-           * the filter. If no filter the element passes by default. */
-
-          var passes = _element4.deleted || !this.map[_element4.uuid] ? false : filter ? filter(_element4) : true;
-          var currentIndex = filteredCTMap[_element4.uuid];
-
-          if (passes) {
-            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
-              /** Check to see if the element has changed its sort value. If so, we need to re-sort */
-              var previousValue = sortedElements[currentIndex][sortBy.key];
-              var newValue = _element4[sortBy.key];
-              /** Replace the current element with the new one. */
-
-              sortedElements[currentIndex] = _element4;
-
-              if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["compareValues"])(previousValue, newValue)) {
-                /** Needs resort because its re-sort value has changed, 
-                 * and thus its position might change */
-                typesNeedingResort.add(contentType);
-              }
-            } else {
-              /** Has not yet been inserted */
-              sortedElements.push(_element4);
-              /** Needs re-sort because we're just pushing the element to the end here */
-
-              typesNeedingResort.add(contentType);
-            }
-          } else {
-            /** Doesn't pass filter, remove from sorted and filtered */
-            if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(currentIndex)) {
-              delete filteredCTMap[_element4.uuid];
-              /** We don't yet remove the element directly from the array, since mutating
-               * the array inside a loop could render all other upcoming indexes invalid */
-
-              sortedElements[currentIndex] = undefined;
-              /** Since an element is being removed from the array, we need to recompute
-               * the new positions for elements that are staying */
-
-              typesNeedingResort.add(contentType);
-            }
-          }
-        }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-            _iterator5.return();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
-      }
-
-      var _iteratorNormalCompletion6 = true;
-      var _didIteratorError6 = false;
-      var _iteratorError6 = undefined;
-
-      try {
-        for (var _iterator6 = typesNeedingResort.values()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-          var _contentType = _step6.value;
-          this.resortContentType(_contentType);
-        }
-      } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-            _iterator6.return();
-          }
-        } finally {
-          if (_didIteratorError6) {
-            throw _iteratorError6;
-          }
-        }
-      }
-    }
-  }, {
-    key: "resortContentType",
-    value: function resortContentType(contentType) {
-      var sortedElements = this.sortedMap[contentType];
-      var sortBy = this.displaySortBy[contentType];
-      var filteredCTMap = this.filteredMap[contentType];
-      /** Resort the elements array, and update the saved positions */
-
-      /** @O(n * log(n)) */
-
-      var sortFn = function sortFn(a, b) {
-        var skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        /** If the elements are undefined, move to beginning */
-        if (!a) {
-          return -1;
-        }
-
-        if (!b) {
-          return 1;
-        }
-
-        if (!skipPinnedCheck) {
-          if (a.pinned && b.pinned) {
-            return sortFn(a, b, true);
-          }
-
-          if (a.pinned) {
-            return -1;
-          }
-
-          if (b.pinned) {
-            return 1;
-          }
-        }
-
-        var aValue = a[sortBy.key] || '';
-        var bValue = b[sortBy.key] || '';
-        var vector = 1;
-
-        if (sortBy.dir === 'asc') {
-          vector *= -1;
-        }
-
-        if (sortBy.key === CollectionSort.Title) {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
-
-          if (aValue.length === 0 && bValue.length === 0) {
-            return 0;
-          } else if (aValue.length === 0 && bValue.length !== 0) {
-            return 1 * vector;
-          } else if (aValue.length !== 0 && bValue.length === 0) {
-            return -1 * vector;
-          } else {
-            vector *= -1;
-          }
-        }
-
-        if (aValue > bValue) {
-          return -1 * vector;
-        } else if (aValue < bValue) {
-          return 1 * vector;
-        }
-
-        return 0;
-      };
-
-      var resorted = sortedElements.sort(function (a, b) {
-        return sortFn(a, b);
-      });
-      /** Now that resorted contains the sorted elements (but also can contain undefined element) 
-       * we create another array that filters out any of the undefinedes. We also keep track of the
-       * current index while we loop and set that in the filteredCTMap. */
-
-      var cleaned = [];
-      var currentIndex = 0;
-      /** @O(n) */
-
-      var _iteratorNormalCompletion7 = true;
-      var _didIteratorError7 = false;
-      var _iteratorError7 = undefined;
-
-      try {
-        for (var _iterator7 = resorted[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-          var _element5 = _step7.value;
-
-          if (!_element5) {
-            continue;
-          }
-
-          cleaned.push(_element5);
-          filteredCTMap[_element5.uuid] = currentIndex;
-          currentIndex++;
-        }
-      } catch (err) {
-        _didIteratorError7 = true;
-        _iteratorError7 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
-            _iterator7.return();
-          }
-        } finally {
-          if (_didIteratorError7) {
-            throw _iteratorError7;
-          }
-        }
-      }
-
-      this.sortedMap[contentType] = cleaned;
-    }
-  }]);
-
-  return MutableCollection;
-}();
-/**
- * A collection of payloads coming from a single source.
- */
-
-var ImmutablePayloadCollection = /*#__PURE__*/function (_MutableCollection) {
-  _inherits(ImmutablePayloadCollection, _MutableCollection);
-
-  function ImmutablePayloadCollection() {
-    var _this2;
-
-    var payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var source = arguments.length > 1 ? arguments[1] : undefined;
-    var copy = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var mapCopy = arguments.length > 3 ? arguments[3] : undefined;
-    var typedMapCopy = arguments.length > 4 ? arguments[4] : undefined;
-    var referenceMapCopy = arguments.length > 5 ? arguments[5] : undefined;
-    var conflictMapCopy = arguments.length > 6 ? arguments[6] : undefined;
-
-    _classCallCheck(this, ImmutablePayloadCollection);
-
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ImmutablePayloadCollection).call(this, payloads, copy, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy));
-
-    _defineProperty(_assertThisInitialized(_this2), "source", void 0);
-
-    _this2.source = source;
-    Object.freeze(_assertThisInitialized(_this2));
-    return _this2;
-  }
-
-  _createClass(ImmutablePayloadCollection, [{
-    key: "payloads",
-    get: function get() {
-      return this.all();
-    }
-  }]);
-
-  return ImmutablePayloadCollection;
-}(MutableCollection);
-
-/***/ }),
-
-/***/ "./lib/protocol/payloads/collection_set.ts":
-/*!*************************************************!*\
-  !*** ./lib/protocol/payloads/collection_set.ts ***!
-  \*************************************************/
-/*! exports provided: ImmutablePayloadCollectionSet */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImmutablePayloadCollectionSet", function() { return ImmutablePayloadCollectionSet; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var ImmutablePayloadCollectionSet = /*#__PURE__*/function () {
-  /**
-   * @param collections An array of ImmutablePayloadCollection objects.
-   */
-  function ImmutablePayloadCollectionSet(collections) {
-    _classCallCheck(this, ImmutablePayloadCollectionSet);
-
-    _defineProperty(this, "collections", void 0);
-
-    this.collections = collections;
-    Object.freeze(this);
-  }
-
-  _createClass(ImmutablePayloadCollectionSet, [{
-    key: "collectionForSource",
-    value: function collectionForSource(source) {
-      return this.collections.find(function (collection) {
-        return collection.source === source;
-      });
-    }
-  }]);
-
-  return ImmutablePayloadCollectionSet;
-}();
-
-/***/ }),
-
 /***/ "./lib/protocol/payloads/deltas/conflict.ts":
 /*!**************************************************!*\
   !*** ./lib/protocol/payloads/deltas/conflict.ts ***!
@@ -11418,7 +11747,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _single_payload_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./single_payload_delta */ "./lib/protocol/payloads/deltas/single_payload_delta.ts");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/payloads/deltas/strategies */ "./lib/protocol/payloads/deltas/strategies.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
@@ -11486,7 +11815,7 @@ var ConflictDelta = /*#__PURE__*/function (_SinglePayloadDelta) {
 
               case 5:
                 results = _context.sent;
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](results, this.source));
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(results, this.source));
 
               case 7:
               case "end":
@@ -11729,7 +12058,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 
 
@@ -11848,7 +12177,7 @@ var DeltaFileImport = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(22);
 
               case 30:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_5__["ImmutablePayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_5__["ImmutablePayloadCollection"].WithPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
 
               case 31:
               case "end":
@@ -12028,7 +12357,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 
@@ -12167,7 +12496,7 @@ var DeltaOutOfSync = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(28);
 
               case 36:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
 
               case 37:
               case "end":
@@ -12205,7 +12534,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_deltas_conflict__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/deltas/conflict */ "./lib/protocol/payloads/deltas/conflict.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 
@@ -12391,7 +12720,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context2.finish(33);
 
               case 41:
-                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
+                return _context2.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollection"].WithPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
 
               case 42:
               case "end":
@@ -12485,7 +12814,7 @@ var DeltaRemoteConflicts = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context3.finish(22);
 
               case 30:
-                return _context3.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollection"](results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
+                return _context3.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollection"].WithPayloads(results, _Payloads_sources__WEBPACK_IMPORTED_MODULE_3__["PayloadSource"].RemoteRetrieved));
 
               case 31:
               case "end":
@@ -12522,7 +12851,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
 
@@ -12747,7 +13076,7 @@ var DeltaRemoteRetrieved = /*#__PURE__*/function (_PayloadsDelta) {
                 break;
 
               case 63:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(filtered.concat(conflictResults), _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteRetrieved));
 
               case 64:
               case "end":
@@ -12790,7 +13119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_delta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/delta */ "./lib/protocol/payloads/deltas/delta.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
@@ -12894,7 +13223,7 @@ var DeltaRemoteSaved = /*#__PURE__*/function (_PayloadsDelta) {
                 return _context.finish(12);
 
               case 20:
-                return _context.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](processed, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved));
+                return _context.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(processed, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].RemoteSaved));
 
               case 21:
               case "end":
@@ -13869,218 +14198,6 @@ var PayloadSource;
 function isPayloadSourceRetrieved(source) {
   return [PayloadSource.RemoteRetrieved, PayloadSource.ComponentRetrieved, PayloadSource.RemoteActionRetrieved].includes(source);
 }
-
-/***/ }),
-
-/***/ "./lib/protocol/payloads/uuid_map.ts":
-/*!*******************************************!*\
-  !*** ./lib/protocol/payloads/uuid_map.ts ***!
-  \*******************************************/
-/*! exports provided: UuidMap */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UuidMap", function() { return UuidMap; });
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-var UuidMap = /*#__PURE__*/function () {
-  function UuidMap() {
-    _classCallCheck(this, UuidMap);
-
-    _defineProperty(this, "directMap", {});
-
-    _defineProperty(this, "inverseMap", {});
-  }
-
-  _createClass(UuidMap, [{
-    key: "makeCopy",
-    value: function makeCopy() {
-      var copy = new UuidMap();
-      copy.directMap = Object.assign({}, this.directMap);
-      copy.inverseMap = Object.assign({}, this.inverseMap);
-      return copy;
-    }
-  }, {
-    key: "getDirectRelationships",
-    value: function getDirectRelationships(uuid) {
-      return this.directMap[uuid] || [];
-    }
-  }, {
-    key: "getInverseRelationships",
-    value: function getInverseRelationships(uuid) {
-      return this.inverseMap[uuid] || [];
-    }
-  }, {
-    key: "establishRelationship",
-    value: function establishRelationship(uuidA, uuidB) {
-      this.establishDirectRelationship(uuidA, uuidB);
-      this.establishInverseRelationship(uuidA, uuidB);
-    }
-  }, {
-    key: "deestablishRelationship",
-    value: function deestablishRelationship(uuidA, uuidB) {
-      this.deestablishDirectRelationship(uuidA, uuidB);
-      this.deestablishInverseRelationship(uuidA, uuidB);
-    }
-  }, {
-    key: "setAllRelationships",
-    value: function setAllRelationships(uuid, relationships) {
-      var previousDirect = this.directMap[uuid] || [];
-      this.directMap[uuid] = relationships;
-      /** Remove all previous values in case relationships have changed 
-       * The updated references will be added afterwards.
-      */
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = previousDirect[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var previousRelationship = _step.value;
-          this.deestablishInverseRelationship(uuid, previousRelationship);
-        }
-        /** Now map current relationships */
-
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = relationships[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var newRelationship = _step2.value;
-          this.establishInverseRelationship(uuid, newRelationship);
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-    }
-  }, {
-    key: "removeFromMap",
-    value: function removeFromMap(uuid) {
-      /** Items that we reference */
-      var directReferences = this.directMap[uuid] || [];
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = directReferences[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var directReference = _step3.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.inverseMap[directReference] || [], uuid);
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
-      delete this.directMap[uuid];
-      /** Items that are referencing us */
-
-      var inverseReferences = this.inverseMap[uuid] || [];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = inverseReferences[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var inverseReference = _step4.value;
-          Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(this.directMap[inverseReference] || [], uuid);
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      delete this.inverseMap[uuid];
-    }
-  }, {
-    key: "establishDirectRelationship",
-    value: function establishDirectRelationship(uuidA, uuidB) {
-      var index = this.directMap[uuidA] || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["addIfUnique"])(index, uuidB);
-      this.directMap[uuidA] = index;
-    }
-  }, {
-    key: "establishInverseRelationship",
-    value: function establishInverseRelationship(uuidA, uuidB) {
-      var inverseIndex = this.inverseMap[uuidB] || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["addIfUnique"])(inverseIndex, uuidA);
-      this.inverseMap[uuidB] = inverseIndex;
-    }
-  }, {
-    key: "deestablishDirectRelationship",
-    value: function deestablishDirectRelationship(uuidA, uuidB) {
-      var index = this.directMap[uuidA] || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(index, uuidB);
-      this.directMap[uuidA] = index;
-    }
-  }, {
-    key: "deestablishInverseRelationship",
-    value: function deestablishInverseRelationship(uuidA, uuidB) {
-      var inverseIndex = this.inverseMap[uuidB] || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["removeFromArray"])(inverseIndex, uuidA);
-      this.inverseMap[uuidB] = inverseIndex;
-    }
-  }]);
-
-  return UuidMap;
-}();
 
 /***/ }),
 
@@ -21466,16 +21583,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ItemManager", function() { return ItemManager; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _models_app_userPrefs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../models/app/userPrefs */ "./lib/models/app/userPrefs.ts");
-/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../models/app/privileges */ "./lib/models/app/privileges.ts");
-/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../models/app/tag */ "./lib/models/app/tag.ts");
-/* harmony import */ var _models_app_items_key__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../models/app/items_key */ "./lib/models/app/items_key.ts");
-/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../models/app/note */ "./lib/models/app/note.ts");
-/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./../models/app/extension */ "./lib/models/app/extension.ts");
-/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../models/core/predicate */ "./lib/models/core/predicate.ts");
-/* harmony import */ var _uuid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./../uuid */ "./lib/uuid.ts");
-/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
-/* harmony import */ var _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./../protocol/payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Protocol/collection/item_collection */ "./lib/protocol/collection/item_collection.ts");
+/* harmony import */ var _models_app_userPrefs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../models/app/userPrefs */ "./lib/models/app/userPrefs.ts");
+/* harmony import */ var _models_app_privileges__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../models/app/privileges */ "./lib/models/app/privileges.ts");
+/* harmony import */ var _models_app_tag__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../models/app/tag */ "./lib/models/app/tag.ts");
+/* harmony import */ var _models_app_items_key__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../models/app/items_key */ "./lib/models/app/items_key.ts");
+/* harmony import */ var _models_app_note__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./../models/app/note */ "./lib/models/app/note.ts");
+/* harmony import */ var _models_app_extension__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../models/app/extension */ "./lib/models/app/extension.ts");
+/* harmony import */ var _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./../models/core/predicate */ "./lib/models/core/predicate.ts");
+/* harmony import */ var _uuid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./../uuid */ "./lib/uuid.ts");
+/* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
 /* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @Models/functions */ "./lib/models/functions.ts");
 /* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
@@ -21596,12 +21713,12 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "createCollection",
     value: function createCollection() {
-      this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["MutableCollection"]();
-      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'dsc');
-      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
-      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
-      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].CreatedAt, 'asc');
-      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag, _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_10__["CollectionSort"].Title, 'asc');
+      this.collection = new _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["ItemCollection"]();
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note, _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["CollectionSort"].CreatedAt, 'dsc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag, _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["CollectionSort"].Title, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey, _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["CollectionSort"].CreatedAt, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component, _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["CollectionSort"].CreatedAt, 'asc');
+      this.collection.setDisplayOptions(_models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].SmartTag, _Protocol_collection_item_collection__WEBPACK_IMPORTED_MODULE_1__["CollectionSort"].Title, 'asc');
     }
     /**
      * Returns an item for a given id
@@ -21944,19 +22061,19 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
     key: "createMutatorForItem",
     value: function createMutatorForItem(item, type) {
       if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note) {
-        return new _models_app_note__WEBPACK_IMPORTED_MODULE_5__["NoteMutator"](item, type);
+        return new _models_app_note__WEBPACK_IMPORTED_MODULE_6__["NoteMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Tag) {
-        return new _models_app_tag__WEBPACK_IMPORTED_MODULE_3__["TagMutator"](item, type);
+        return new _models_app_tag__WEBPACK_IMPORTED_MODULE_4__["TagMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Component) {
         return new _models_app_component__WEBPACK_IMPORTED_MODULE_14__["ComponentMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ActionsExtension) {
-        return new _models_app_extension__WEBPACK_IMPORTED_MODULE_6__["ActionsExtensionMutator"](item, type);
+        return new _models_app_extension__WEBPACK_IMPORTED_MODULE_7__["ActionsExtensionMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].ItemsKey) {
-        return new _models_app_items_key__WEBPACK_IMPORTED_MODULE_4__["ItemsKeyMutator"](item, type);
+        return new _models_app_items_key__WEBPACK_IMPORTED_MODULE_5__["ItemsKeyMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Privileges) {
-        return new _models_app_privileges__WEBPACK_IMPORTED_MODULE_2__["PrivilegeMutator"](item, type);
+        return new _models_app_privileges__WEBPACK_IMPORTED_MODULE_3__["PrivilegeMutator"](item, type);
       } else if (item.content_type === _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].UserPrefs) {
-        return new _models_app_userPrefs__WEBPACK_IMPORTED_MODULE_1__["UserPrefsMutator"](item, type);
+        return new _models_app_userPrefs__WEBPACK_IMPORTED_MODULE_2__["UserPrefsMutator"](item, type);
       } else {
         return new _models_core_item__WEBPACK_IMPORTED_MODULE_17__["ItemMutator"](item, type);
       }
@@ -22115,7 +22232,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant note');
 
               case 6:
-                mutator = new _models_app_note__WEBPACK_IMPORTED_MODULE_5__["NoteMutator"](note, mutationType);
+                mutator = new _models_app_note__WEBPACK_IMPORTED_MODULE_6__["NoteMutator"](note, mutationType);
                 return _context6.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -22203,7 +22320,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant extension');
 
               case 6:
-                mutator = new _models_app_extension__WEBPACK_IMPORTED_MODULE_6__["ActionsExtensionMutator"](extension, mutationType);
+                mutator = new _models_app_extension__WEBPACK_IMPORTED_MODULE_7__["ActionsExtensionMutator"](extension, mutationType);
                 return _context8.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -22247,7 +22364,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 throw Error('Attempting to change non-existant itemsKey');
 
               case 6:
-                mutator = new _models_app_items_key__WEBPACK_IMPORTED_MODULE_4__["ItemsKeyMutator"](itemsKey, mutationType);
+                mutator = new _models_app_items_key__WEBPACK_IMPORTED_MODULE_5__["ItemsKeyMutator"](itemsKey, mutationType);
                 return _context9.abrupt("return", this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey));
 
               case 8:
@@ -22458,7 +22575,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                 item = this.findItem(uuid);
                 payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])(item);
                 _context14.next = 5;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_9__["PayloadsByDuplicating"])(payload, this.modelManager.getMasterCollection(), isConflict);
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_10__["PayloadsByDuplicating"])(payload, this.modelManager.getMasterCollection(), isConflict);
 
               case 5:
                 resultingPayloads = _context14.sent;
@@ -22513,7 +22630,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 4:
                 _context15.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"];
                 _context15.next = 7;
-                return _uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
+                return _uuid__WEBPACK_IMPORTED_MODULE_9__["Uuid"].GenerateUuid();
 
               case 7:
                 _context15.t1 = _context15.sent;
@@ -22561,7 +22678,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 _context16.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"];
                 _context16.next = 3;
-                return _uuid__WEBPACK_IMPORTED_MODULE_8__["Uuid"].GenerateUuid();
+                return _uuid__WEBPACK_IMPORTED_MODULE_9__["Uuid"].GenerateUuid();
 
               case 3:
                 _context16.t1 = _context16.sent;
@@ -23002,11 +23119,11 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "notesMatchingSmartTag",
     value: function notesMatchingSmartTag(smartTag) {
-      var contentTypePredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"]('content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note);
+      var contentTypePredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SNPredicate"]('content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note);
       var predicates = [contentTypePredicate, smartTag.predicate];
 
       if (!smartTag.isTrashTag) {
-        var notTrashedPredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"]('content.trashed', '=', false);
+        var notTrashedPredicate = new _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SNPredicate"]('content.trashed', '=', false);
         predicates.push(notTrashedPredicate);
       }
 
@@ -23201,7 +23318,7 @@ function BuildSmartTags() {
       title: 'All notes',
       isSystemTag: true,
       isAllTag: true,
-      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"].FromArray(['content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note])
+      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SNPredicate"].FromArray(['content_type', '=', _models_content_types__WEBPACK_IMPORTED_MODULE_19__["ContentType"].Note])
     })
   });
   var archived = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])({
@@ -23211,7 +23328,7 @@ function BuildSmartTags() {
       title: 'Archived',
       isSystemTag: true,
       isArchiveTag: true,
-      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"].FromArray(['archived', '=', JSON.stringify(true)])
+      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SNPredicate"].FromArray(['archived', '=', JSON.stringify(true)])
     })
   });
   var trash = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_16__["CreateMaxPayloadFromAnyObject"])({
@@ -23221,7 +23338,7 @@ function BuildSmartTags() {
       title: 'Trash',
       isSystemTag: true,
       isTrashTag: true,
-      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_7__["SNPredicate"].FromArray(['trashed', '=', JSON.stringify(true)])
+      predicate: _models_core_predicate__WEBPACK_IMPORTED_MODULE_8__["SNPredicate"].FromArray(['trashed', '=', JSON.stringify(true)])
     })
   });
   return [Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(allNotes), Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(archived), Object(_Models_generator__WEBPACK_IMPORTED_MODULE_11__["CreateItemFromPayload"])(trash)];
@@ -23767,8 +23884,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../protocol/payloads/sources */ "./lib/protocol/payloads/sources.ts");
 /* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../models/content_types */ "./lib/models/content_types.ts");
 /* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Models/functions */ "./lib/models/functions.ts");
-/* harmony import */ var _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../protocol/payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Lib_protocol_collection_collection__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/protocol/collection/collection */ "./lib/protocol/collection/collection.ts");
+/* harmony import */ var _Lib_protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @Lib/protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -23808,6 +23926,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
@@ -23832,7 +23951,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
 
     _defineProperty(_assertThisInitialized(_this), "collection", void 0);
 
-    _this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_7__["MutableCollection"]();
+    _this.collection = new _Lib_protocol_collection_collection__WEBPACK_IMPORTED_MODULE_8__["MutableCollection"]();
     return _this;
   }
   /**
@@ -23845,7 +23964,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
   _createClass(PayloadManager, [{
     key: "getMasterCollection",
     value: function getMasterCollection() {
-      return this.collection.immutablePayloadCopy();
+      return _Lib_protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_9__["ImmutablePayloadCollection"].FromCollection(this.collection);
     }
   }, {
     key: "deinit",
@@ -23858,7 +23977,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "resetState",
     value: function resetState() {
-      this.collection = new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_7__["MutableCollection"]();
+      this.collection = new _Lib_protocol_collection_collection__WEBPACK_IMPORTED_MODULE_8__["MutableCollection"]();
     }
   }, {
     key: "find",
@@ -24222,7 +24341,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                delta = new _protocol_payloads_deltas_file_import__WEBPACK_IMPORTED_MODULE_3__["DeltaFileImport"](this.getMasterCollection(), new _protocol_payloads_collection__WEBPACK_IMPORTED_MODULE_7__["ImmutablePayloadCollection"](payloads, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
+                delta = new _protocol_payloads_deltas_file_import__WEBPACK_IMPORTED_MODULE_3__["DeltaFileImport"](this.getMasterCollection(), _Lib_protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_9__["ImmutablePayloadCollection"].WithPayloads(payloads, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_4__["PayloadSource"].FileImport));
                 _context6.next = 3;
                 return delta.resultingCollection();
 
@@ -24256,7 +24375,7 @@ var PayloadManager = /*#__PURE__*/function (_PureService) {
   }]);
 
   return PayloadManager;
-}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_8__["PureService"]);
+}(_Lib_services_pure_service__WEBPACK_IMPORTED_MODULE_7__["PureService"]);
 
 /***/ }),
 
@@ -30091,8 +30210,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Payloads/deltas/generator */ "./lib/protocol/payloads/deltas/generator.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
-/* harmony import */ var _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Payloads/collection_set */ "./lib/protocol/payloads/collection_set.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
+/* harmony import */ var _Protocol_collection_collection_set__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Protocol/collection/collection_set */ "./lib/protocol/collection/collection_set.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 
 
@@ -30132,7 +30251,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
 
     this.response = response;
     this.baseCollection = baseCollection;
-    this.relatedCollectionSet = new _Payloads_collection_set__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollectionSet"]([new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](decryptedResponsePayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](payloadsSavedOrSaving, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].SavedOrSaving)]);
+    this.relatedCollectionSet = new _Protocol_collection_collection_set__WEBPACK_IMPORTED_MODULE_4__["ImmutablePayloadCollectionSet"]([_Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(decryptedResponsePayloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].DecryptedTransient), _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(payloadsSavedOrSaving, _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__["PayloadSource"].SavedOrSaving)]);
   }
 
   _createClass(SyncResponseResolver, [{
@@ -30224,7 +30343,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                collection = new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](payloads, source);
+                collection = _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(payloads, source);
                 deltaClass = Object(_Payloads_deltas_generator__WEBPACK_IMPORTED_MODULE_1__["DeltaClassForSource"])(source); // eslint-disable-next-line new-cap
 
                 delta = new deltaClass(this.baseCollection, collection, this.relatedCollectionSet);
@@ -30241,7 +30360,7 @@ var SyncResponseResolver = /*#__PURE__*/function () {
                     dirtiedDate: stillDirty ? new Date() : undefined
                   });
                 });
-                return _context2.abrupt("return", new _Payloads_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"](updatedDirtyPayloads, source));
+                return _context2.abrupt("return", _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_3__["ImmutablePayloadCollection"].WithPayloads(updatedDirtyPayloads, source));
 
               case 8:
               case "end":
@@ -30836,7 +30955,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Payloads_deltas__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Payloads/deltas */ "./lib/protocol/payloads/deltas/index.ts");
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Payloads/fields */ "./lib/protocol/payloads/fields.ts");
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @Payloads/sources */ "./lib/protocol/payloads/sources.ts");
-/* harmony import */ var _Payloads_collection__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Payloads/collection */ "./lib/protocol/payloads/collection.ts");
+/* harmony import */ var _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @Protocol/collection/payload_collection */ "./lib/protocol/collection/payload_collection.ts");
 /* harmony import */ var _Payloads_functions__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @Payloads/functions */ "./lib/protocol/payloads/functions.ts");
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
 /* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @Protocol/intents */ "./lib/protocol/intents.ts");
@@ -32816,7 +32935,7 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
 
               case 3:
                 payloads = _context26.sent;
-                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_13__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), new _Payloads_collection__WEBPACK_IMPORTED_MODULE_16__["ImmutablePayloadCollection"](payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].RemoteRetrieved));
+                delta = new _Payloads_deltas__WEBPACK_IMPORTED_MODULE_13__["DeltaOutOfSync"](this.modelManager.getMasterCollection(), _Protocol_collection_payload_collection__WEBPACK_IMPORTED_MODULE_16__["ImmutablePayloadCollection"].WithPayloads(payloads, _Payloads_sources__WEBPACK_IMPORTED_MODULE_15__["PayloadSource"].RemoteRetrieved));
                 _context26.next = 7;
                 return delta.resultingCollection();
 

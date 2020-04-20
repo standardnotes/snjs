@@ -15,7 +15,7 @@ describe('payload collections', () => {
 
   it('find', async () => {
     const payload = Factory.createNotePayload();
-    const collection = new ImmutablePayloadCollection(
+    const collection = ImmutablePayloadCollection.WithPayloads(
       [payload]
     );
     expect(collection.find(payload.uuid)).to.be.ok;
@@ -25,7 +25,7 @@ describe('payload collections', () => {
     const payloads = Factory.createRelatedNoteTagPairPayload();
     const notePayload = payloads[0];
     const tagPayload = payloads[1];
-    const collection = new ImmutablePayloadCollection(
+    const collection = ImmutablePayloadCollection.WithPayloads(
       [notePayload, tagPayload]
     );
     const referencing = collection.elementsReferencingElement(notePayload);
@@ -34,7 +34,8 @@ describe('payload collections', () => {
 
   it('conflict map', async () => {
     const payload = Factory.createNotePayload();
-    const collection = new MutableCollection([payload]);
+    const collection = new ItemCollection();
+    collection.set([payload]);
     const conflict = CopyPayload(
       payload,
       {
@@ -55,7 +56,7 @@ describe('payload collections', () => {
   });
 
   it('display sort asc', async () => {
-    const collection = new MutableCollection([]);
+    const collection = new ItemCollection();
     collection.setDisplayOptions(
       ContentType.Note,
       CollectionSort.CreatedAt,
@@ -85,7 +86,7 @@ describe('payload collections', () => {
   });
 
   it('display sort dsc', async () => {
-    const collection = new MutableCollection([]);
+    const collection = new ItemCollection();
     collection.setDisplayOptions(
       ContentType.Note,
       CollectionSort.CreatedAt,
@@ -115,7 +116,7 @@ describe('payload collections', () => {
   });
 
   it('display sort filter asc', async () => {
-    const collection = new MutableCollection([]);
+    const collection = new ItemCollection();
     const filterFor = 'fo';
     collection.setDisplayOptions(
       ContentType.Note,
@@ -138,7 +139,7 @@ describe('payload collections', () => {
   });
 
   it('deleting should remove from displayed elements', async () => {
-    const collection = new MutableCollection([]);
+    const collection = new ItemCollection();
     collection.setDisplayOptions(
       ContentType.Note,
       CollectionSort.CreatedAt,
@@ -161,7 +162,7 @@ describe('payload collections', () => {
   });
 
   it('changing element should update sort order', async () => {
-    const collection = new MutableCollection([]);
+    const collection = new ItemCollection();
     const copyPayload = (payload, timestamp, changeUuid) => {
       return CopyPayload(
         payload,

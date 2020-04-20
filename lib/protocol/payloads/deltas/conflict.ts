@@ -1,6 +1,6 @@
 import { SinglePayloadDelta } from './single_payload_delta';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
@@ -13,7 +13,7 @@ export class ConflictDelta extends SinglePayloadDelta {
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
     const results = await this.payloadsByHandlingStrategy(strategy);
-    return new ImmutablePayloadCollection(results, this.source);
+    return ImmutablePayloadCollection.WithPayloads(results, this.source);
   }
 
   private async payloadsByHandlingStrategy(strategy: ConflictStrategy) {

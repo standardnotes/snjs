@@ -1,5 +1,3 @@
-export { ImmutablePayloadCollection } from './collection';
-export { ImmutablePayloadCollectionSet } from './collection_set';
 export { CreateMaxPayloadFromAnyObject, CreateEncryptionParameters, CopyPayload, CopyEncryptionParameters, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, payloadFieldsForSource } from './generator';
 export { PayloadsByDuplicating, PayloadsByAlternatingUuid } from './functions';
 export { PayloadField } from './fields';

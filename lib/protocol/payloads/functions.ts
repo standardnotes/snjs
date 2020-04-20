@@ -1,5 +1,5 @@
 import { ContentReference } from './generator';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { CreateItemFromPayload } from '@Models/generator';
 import remove from 'lodash/remove';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';

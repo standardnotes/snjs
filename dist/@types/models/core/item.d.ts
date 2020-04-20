@@ -46,6 +46,11 @@ export declare class SNItem {
     readonly conflictOf?: UuidString;
     readonly createdAtString?: string;
     readonly updatedAtString?: string;
+    readonly protected = false;
+    readonly trashed = false;
+    readonly pinned = false;
+    readonly archived = false;
+    readonly locked = false;
     private static sharedDateFormatter;
     constructor(payload: PurePayload);
     static DefaultAppDomain(): string;
@@ -87,11 +92,6 @@ export declare class SNItem {
      */
     getDomainData(domain: string): any;
     getAppDomainValue(key: AppDataField): any;
-    get protected(): any;
-    get trashed(): any;
-    get pinned(): any;
-    get archived(): any;
-    get locked(): any;
     /**
      * During sync conflicts, when determing whether to create a duplicate for an item,
      * we can omit keys that have no meaningful weight and can be ignored. For example,

@@ -39,7 +39,7 @@ describe('payload manager', () => {
 
   it('emit collection', async function () {
     const payload = await this.createNotePayload();
-    const collection = new ImmutablePayloadCollection([payload], PayloadSource.RemoteRetrieved);
+    const collection = ImmutablePayloadCollection.WithPayloads([payload], PayloadSource.RemoteRetrieved);
     await this.modelManager.emitCollection(collection);
 
     expect(this.modelManager.collection.find(payload.uuid)).to.be.ok;

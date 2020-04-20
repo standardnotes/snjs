@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
@@ -86,7 +86,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       }
     }
 
-    return new ImmutablePayloadCollection(
+    return ImmutablePayloadCollection.WithPayloads(
       filtered.concat(conflictResults),
       PayloadSource.RemoteRetrieved
     );

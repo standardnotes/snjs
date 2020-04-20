@@ -5,12 +5,6 @@ import { ContentType } from '../../models/content_types';
 import { UuidString } from './../../types';
 import { PurePayload } from './pure_payload';
 declare type Payloadable = PurePayload | SNItem;
-export declare enum CollectionSort {
-    CreatedAt = "created_at",
-    UpdatedAt = "userModifiedDate",
-    Title = "title"
-}
-export declare type SortDirection = 'asc' | 'dsc';
 export declare class MutableCollection<T extends Payloadable> {
     protected readonly map: Partial<Record<UuidString, T>>;
     protected readonly typedMap: Partial<Record<ContentType, T[]>>;
@@ -56,29 +50,6 @@ export declare class MutableCollection<T extends Payloadable> {
     uuidsThatReferenceUuid(uuid: UuidString): string[];
     elementsReferencingElement(element: T): T[];
     conflictsOf(uuid: UuidString): T[];
-    private displaySortBy;
-    private displayFilter;
-    /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
-     * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
-     * in the sorted array. We keep track of positions so that when we want to re-sort or remove
-     * and element, we don't have to search the entire sorted array to do so. */
-    private filteredMap;
-    /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
-     * an array of sorted elements, based on the current displaySortBy */
-    private sortedMap;
-    /**
-     * Sets an optional sortBy and filter for a given content type. These options will be
-     * applied against a separate "display-only" record and not the master record. Passing
-     * null options removes any existing options. sortBy is always required, but a filter is
-     * not always required.
-     * @param filter A function that receives an element and returns a boolean indicating
-     * whether the element passes the filter and should be in displayable results.
-     */
-    setDisplayOptions(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: T) => boolean): void;
-    /** Returns the filtered and sorted list of elements for this content type,
-     * according to the options set via `setDisplayOptions` */
-    displayElements(contentType: ContentType): (T | undefined)[];
-    private filterSortElements;
 }
 /**
  * A collection of payloads coming from a single source.

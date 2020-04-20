@@ -1,3 +1,4 @@
+import { ItemCollection, CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PrivilegeMutator } from './../models/app/privileges';
@@ -11,7 +12,6 @@ import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { UuidString } from './../types';
-import { MutableCollection, CollectionSort, SortDirection } from './../protocol/payloads/collection';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
@@ -57,7 +57,7 @@ export class ItemManager extends PureService {
   private modelManager?: PayloadManager
   private unsubChangeObserver: any
   private observers: Observer[] = []
-  private collection!: MutableCollection<SNItem>
+  private collection!: ItemCollection
   private systemSmartTags: SNSmartTag[]
 
   constructor(modelManager: PayloadManager) {
@@ -94,7 +94,7 @@ export class ItemManager extends PureService {
   }
 
   private createCollection() {
-    this.collection = new MutableCollection();
+    this.collection = new ItemCollection();
     this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
     this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
     this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');

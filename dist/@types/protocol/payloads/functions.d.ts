@@ -1,4 +1,4 @@
-import { ImmutablePayloadCollection } from './collection';
+import { ImmutablePayloadCollection } from "../collection/payload_collection";
 import { PurePayload } from './pure_payload';
 /**
  * Copies payload and assigns it a new uuid.

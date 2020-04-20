@@ -5,9 +5,10 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { ContentType } from './../models/content_types';
 import { Uuids } from '@Models/functions';
 import { UuidString } from './../types';
-import { MutableCollection, ImmutablePayloadCollection } from './../protocol/payloads/collection';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
+import { MutableCollection } from '@Lib/protocol/collection/collection';
+import { ImmutablePayloadCollection } from '@Lib/protocol/collection/payload_collection';
 
 type ChangeCallback = (
   changed: PurePayload[],
@@ -49,7 +50,7 @@ export class PayloadManager extends PureService {
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return this.collection.immutablePayloadCopy();
+    return ImmutablePayloadCollection.FromCollection(this.collection);
   }
 
   public deinit() {
@@ -70,7 +71,10 @@ export class PayloadManager extends PureService {
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
+  public async emitCollection(
+    collection: ImmutablePayloadCollection,
+    sourceKey?: string
+  ) {
     return this.emitPayloads(
       collection.all(),
       collection.source!,
@@ -207,7 +211,7 @@ export class PayloadManager extends PureService {
   public async importPayloads(payloads: PurePayload[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      new ImmutablePayloadCollection(
+      ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.FileImport
       )

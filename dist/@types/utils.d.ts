@@ -90,6 +90,7 @@ export declare function filterFromArray<T>(array: T[], predicate: Record<keyof T
  * Returns a new array by removing all elements in subtract from array
  */
 export declare function arrayByDifference<T>(array: T[], subtract: T[]): T[];
+export declare function compareValues<T>(left: T, right: T): boolean;
 /**
  * Removes the value from the array at the given index, in-place.
  */

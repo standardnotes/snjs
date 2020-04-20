@@ -1,10 +1,9 @@
 import { PurePayload } from '@Payloads/pure_payload';
 import { SyncResponse } from '@Services/sync/response';
-
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
-import { ImmutablePayloadCollectionSet } from '@Payloads/collection_set';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { CopyPayload } from '@Payloads/generator';
 
 /**
@@ -28,11 +27,11 @@ export class SyncResponseResolver {
     this.response = response;
     this.baseCollection = baseCollection;
     this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
-      new ImmutablePayloadCollection(
+      ImmutablePayloadCollection.WithPayloads(
         decryptedResponsePayloads,
         PayloadSource.DecryptedTransient
       ),
-      new ImmutablePayloadCollection(
+      ImmutablePayloadCollection.WithPayloads(
         payloadsSavedOrSaving,
         PayloadSource.SavedOrSaving
       )
@@ -85,7 +84,7 @@ export class SyncResponseResolver {
     payloads: PurePayload[],
     source: PayloadSource
   ) {
-    const collection = new ImmutablePayloadCollection(
+    const collection = ImmutablePayloadCollection.WithPayloads(
       payloads,
       source
     );
@@ -107,7 +106,7 @@ export class SyncResponseResolver {
         }
       );
     });
-    return new ImmutablePayloadCollection(
+    return ImmutablePayloadCollection.WithPayloads(
       updatedDirtyPayloads,
       source
     );

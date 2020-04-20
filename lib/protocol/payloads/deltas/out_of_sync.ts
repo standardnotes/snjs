@@ -1,6 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
@@ -35,6 +35,6 @@ export class DeltaOutOfSync extends PayloadsDelta {
       );
       extendArray(results, copyResults);
     }
-    return new ImmutablePayloadCollection(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
   }
 }

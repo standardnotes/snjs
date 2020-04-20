@@ -1,3 +1,4 @@
+import { CollectionSort, SortDirection } from '../protocol/collection/item_collection';
 import { SNItemsKey } from '../models/app/items_key';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '../models/app/tag';
@@ -6,7 +7,6 @@ import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
 import { UuidString } from './../types';
-import { CollectionSort, SortDirection } from './../protocol/payloads/collection';
 import { PureService } from './pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '../models/app/component';
@@ -43,7 +43,8 @@ export declare class ItemManager extends PureService {
     setDisplayOptions(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
     getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
     deinit(): void;
-    private resetState;
+    resetState(): void;
+    private createCollection;
     /**
      * Returns an item for a given id
      */

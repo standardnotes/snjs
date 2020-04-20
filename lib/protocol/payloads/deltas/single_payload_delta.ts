@@ -1,6 +1,6 @@
 import { PayloadSource } from '@Payloads/sources';
 import { PurePayload } from '@Payloads/pure_payload';
-import { ImmutablePayloadCollection } from '@Payloads/collection';
+import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 
 export abstract class SinglePayloadDelta {
 
