@@ -7309,7 +7309,7 @@ var ItemMutator = /*#__PURE__*/function () {
   }, {
     key: "setContent",
     value: function setContent(content) {
-      this.content = content;
+      this.content = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__["Copy"])(content);
     }
   }, {
     key: "setDeleted",
@@ -22688,17 +22688,15 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
                   content: _context15.t3,
                   dirty: _context15.t4
                 };
-                _context15.t6 = undefined;
-                _context15.t7 = undefined;
-                _context15.t8 = override;
-                payload = (0, _context15.t0)(_context15.t5, _context15.t6, _context15.t7, _context15.t8);
-                _context15.next = 18;
+                _context15.t6 = override;
+                payload = (0, _context15.t0)(_context15.t5, _context15.t6);
+                _context15.next = 16;
                 return this.modelManager.emitPayload(payload, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_18__["PayloadSource"].Constructor);
 
-              case 18:
+              case 16:
                 return _context15.abrupt("return", this.findItem(payload.uuid));
 
-              case 19:
+              case 17:
               case "end":
                 return _context15.stop();
             }
@@ -33800,6 +33798,14 @@ function sortedCopy(object) {
 /** Compares for equality by comparing top-level keys value equality (===) */
 
 function topLevelCompare(left, right) {
+  if (!left && !right) {
+    return true;
+  }
+
+  if (!left || !right) {
+    return false;
+  }
+
   var leftKeys = Object.keys(left);
   var rightKeys = Object.keys(right);
 

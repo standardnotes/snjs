@@ -44,7 +44,7 @@ export declare type RawEncryptionParameters = {
     auth_hash?: string;
     auth_params?: any;
 };
-export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, source?: PayloadSource, intent?: EncryptionIntent, override?: PayloadOverride): PurePayload;
+export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, override?: PayloadOverride): PurePayload;
 export declare function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload): PurePayload;
 export declare function CreateIntentPayloadFromObject(object: RawPayload, intent: EncryptionIntent, override?: PayloadOverride): PurePayload;
 export declare function CreateSourcedPayloadFromObject(object: RawPayload, source: PayloadSource, override?: PayloadOverride): PurePayload;

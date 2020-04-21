@@ -39,7 +39,7 @@ export declare class Migration20200115 extends Migration {
      * Web/desktop only
      * Encrypt storage with account key
      */
-    webDesktopHelperEncryptStorage(key: SNRootKey, decryptedStoragePayload: PurePayload, storageValueStore: Record<string, any>): Promise<PurePayload>;
+    webDesktopHelperEncryptStorage(key: SNRootKey, decryptedStoragePayload: PurePayload, storageValueStore: Record<string, any>): Promise<import("../protocol/payloads/generator").RawPayload>;
     /**
      * Mobile
      * On mobile legacy structure is mostly similar to new structure,

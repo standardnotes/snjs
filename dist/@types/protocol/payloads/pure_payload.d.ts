@@ -49,6 +49,13 @@ export declare class PurePayload {
     readonly format: PayloadFormat;
     readonly version?: ProtocolVersion;
     constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource);
+    /**
+     * Returns a generic object with all payload fields except any that are meta-data
+     * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for
+     * generic, non-contextual consumption, such as saving to a backup file or syncing
+     * with a server.
+     */
+    ejected(): RawPayload;
     get safeContent(): PayloadContent;
     /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */
     get references(): import("./generator").ContentReference[];

@@ -406,7 +406,7 @@ export class ItemMutator {
   }
 
   public setContent(content: PayloadContent) {
-    this.content = content;
+    this.content = Copy(content);
   }
 
   public setDeleted() {

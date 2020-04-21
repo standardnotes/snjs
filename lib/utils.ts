@@ -194,10 +194,10 @@ export function arrayByDifference<T>(array: T[], subtract: T[]) {
 }
 
 export function compareValues<T>(left: T, right: T) {
-  if((left && !right) || (!left && right)) {
+  if ((left && !right) || (!left && right)) {
     return false;
   }
-  if(left instanceof Date && right instanceof Date) {
+  if (left instanceof Date && right instanceof Date) {
     return left.getTime() === right.getTime();
   } else if (left instanceof String && right instanceof String) {
     return left === right;
@@ -257,6 +257,12 @@ export function sortedCopy(object: any) {
 
 /** Compares for equality by comparing top-level keys value equality (===) */
 export function topLevelCompare<T>(left: T, right: T) {
+  if (!left && !right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
   const leftKeys = Object.keys(left);
   const rightKeys = Object.keys(right);
   if (leftKeys.length !== rightKeys.length) {

@@ -561,8 +561,6 @@ export class ItemManager extends PureService {
         content: content ? FillItemContent(content) : undefined,
         dirty: needsSync
       },
-      undefined,
-      undefined,
       override
     );
     await this.modelManager!.emitPayload(payload, PayloadSource.Constructor);
