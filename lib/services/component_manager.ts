@@ -23,7 +23,7 @@ import {
 import { Uuid } from '@Lib/uuid';
 import {
   Copy, isString, extendArray, removeFromArray,
-  searchArray, concatArrays, addIfUnique
+  searchArray, concatArrays, addIfUnique, filterFromArray
 } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
@@ -42,7 +42,8 @@ const ComponentDataDomain = 'org.standardnotes.sn.components';
 
 type StreamObserver = {
   identifier: string
-  component: SNComponent,
+  componentUuid: UuidString,
+  area: ComponentArea
   originalMessage: any,
   /** contentTypes is optional in the case of a context stream observer */
   contentTypes?: ContentType[]
@@ -53,7 +54,7 @@ type ComponentHandler = {
   areas: ComponentArea[]
   activationHandler?: (component: SNComponent) => void
   actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
-  contextRequestHandler?: (component: SNComponent) => SNItem | undefined
+  contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
   componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
   focusHandler?: (component: SNComponent, focused: boolean) => void
 }
@@ -242,7 +243,7 @@ export class SNComponentManager extends PureService {
 
   notifyStreamObservers(allItems: SNItem[], source?: PayloadSource, sourceKey?: string) {
     for (const observer of this.streamObservers) {
-      if (sourceKey && sourceKey === observer.component.uuid) {
+      if (sourceKey && sourceKey === observer.componentUuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
         continue;
       }
@@ -256,27 +257,27 @@ export class SNComponentManager extends PureService {
         name: ComponentAction.StreamItems,
         content_types: observer.contentTypes!.sort()
       }];
-      this.runWithPermissions(observer.component, requiredPermissions, () => {
-        this.sendItemsInReply(observer.component, relevantItems, observer.originalMessage);
+      this.runWithPermissions(observer.componentUuid, requiredPermissions, () => {
+        this.sendItemsInReply(observer.componentUuid, relevantItems, observer.originalMessage);
       });
     }
     const requiredContextPermissions = [{
       name: ComponentAction.StreamContextItem
     }] as ComponentPermission[];
     for (const observer of this.contextStreamObservers) {
-      if (sourceKey && sourceKey === observer.component.uuid) {
+      if (sourceKey && sourceKey === observer.componentUuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
         continue;
       }
       for (const handler of this.handlers) {
         if (
-          !handler.areas.includes(observer.component.area) &&
+          !handler.areas.includes(observer.area) &&
           !handler.areas.includes(ComponentArea.Any)
         ) {
           continue;
         }
         if (handler.contextRequestHandler) {
-          const itemInContext = handler.contextRequestHandler(observer.component);
+          const itemInContext = handler.contextRequestHandler(observer.componentUuid);
           if (itemInContext) {
             const matchingItem = find(allItems, { uuid: itemInContext.uuid });
             if (matchingItem) {
@@ -284,11 +285,11 @@ export class SNComponentManager extends PureService {
                 continue;
               }
               this.runWithPermissions(
-                observer.component,
+                observer.componentUuid,
                 requiredContextPermissions,
                 () => {
                   this.sendContextItemInReply(
-                    observer.component,
+                    observer.componentUuid,
                     matchingItem,
                     observer.originalMessage,
                     source
@@ -409,14 +410,14 @@ export class SNComponentManager extends PureService {
         continue;
       }
       const observers = this.contextStreamObservers.filter((observer) => {
-        return observer.component.area === area;
+        return observer.area === area;
       });
       for (const observer of observers) {
         if (handler.contextRequestHandler) {
-          const itemInContext = handler.contextRequestHandler(observer.component);
+          const itemInContext = handler.contextRequestHandler(observer.componentUuid);
           if (itemInContext) {
             this.sendContextItemInReply(
-              observer.component,
+              observer.componentUuid,
               itemInContext,
               observer.originalMessage
             );
@@ -476,11 +477,12 @@ export class SNComponentManager extends PureService {
   }
 
   sendItemsInReply(
-    component: SNComponent,
+    componentUuid: UuidString,
     items: SNItem[],
     message: ComponentMessage,
     source?: PayloadSource
   ) {
+    const component = this.itemManager.findItem(componentUuid) as SNComponent;
     this.log('Component manager send items in reply', component, items, message);
     const responseData: MessageReplyData = {};
     const mapped = items.map((item) => {
@@ -491,11 +493,12 @@ export class SNComponentManager extends PureService {
   }
 
   sendContextItemInReply(
-    component: SNComponent,
+    componentUuid: UuidString,
     item: SNItem,
     originalMessage: ComponentMessage,
     source?: PayloadSource
   ) {
+    const component = this.itemManager.findItem(componentUuid) as SNComponent;
     this.log('Component manager send context item in reply', component, item, originalMessage);
     const response: MessageReplyData = {
       item: this.jsonForItem(item, component, source)
@@ -693,12 +696,13 @@ export class SNComponentManager extends PureService {
         content_types: message.data.content_types.sort()
       }
     ];
-    this.runWithPermissions(component, requiredPermissions, () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, () => {
       if (!find(this.streamObservers, { identifier: component.uuid })) {
         /* For pushing laster as changes come in */
         this.streamObservers.push({
           identifier: component.uuid,
-          component: component,
+          componentUuid: component.uuid,
+          area: component.area,
           originalMessage: message,
           contentTypes: message.data.content_types
         });
@@ -711,7 +715,7 @@ export class SNComponentManager extends PureService {
           this.itemManager!.nonErroredItemsForContentType(contentType)
         );
       }
-      this.sendItemsInReply(component, items, message);
+      this.sendItemsInReply(component.uuid, items, message);
     });
   }
 
@@ -721,19 +725,20 @@ export class SNComponentManager extends PureService {
         name: ComponentAction.StreamContextItem
       }
     ];
-    this.runWithPermissions(component, requiredPermissions, () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, () => {
       if (!find(this.contextStreamObservers, { identifier: component.uuid })) {
         this.contextStreamObservers.push({
           identifier: component.uuid,
-          component: component,
+          componentUuid: component.uuid,
+          area: component.area,
           originalMessage: message
         });
       }
       for (const handler of this.handlersForArea(component.area)) {
         if (handler.contextRequestHandler) {
-          const itemInContext = handler.contextRequestHandler(component);
+          const itemInContext = handler.contextRequestHandler(component.uuid);
           if (itemInContext) {
-            this.sendContextItemInReply(component, itemInContext, message);
+            this.sendContextItemInReply(component.uuid, itemInContext, message);
           }
         }
       }
@@ -750,7 +755,7 @@ export class SNComponentManager extends PureService {
     const itemIds = [];
     for (const handler of this.handlersForArea(component.area)) {
       if (handler.contextRequestHandler) {
-        const itemInContext = handler.contextRequestHandler(component);
+        const itemInContext = handler.contextRequestHandler(component.uuid);
         if (itemInContext) {
           itemIds.push(itemInContext.uuid);
         }
@@ -791,7 +796,7 @@ export class SNComponentManager extends PureService {
         content_types: requiredContentTypes
       } as ComponentPermission);
     }
-    this.runWithPermissions(component, requiredPermissions, async () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       this.removePrivatePropertiesFromResponseItems(
         responsePayloads,
         component,
@@ -876,7 +881,7 @@ export class SNComponentManager extends PureService {
         content_types: [item.content_type!]
       }
     ];
-    this.runWithPermissions(component, requiredPermissions, async () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       const duplicate = await this.itemManager!.duplicateItem(item.uuid);
       this.syncService!.sync();
       this.replyToMessage(
@@ -898,7 +903,7 @@ export class SNComponentManager extends PureService {
         content_types: uniqueContentTypes
       }
     ];
-    this.runWithPermissions(component, requiredPermissions, async () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       this.removePrivatePropertiesFromResponseItems(responseItems, component);
       const processedItems = [];
       for (const responseItem of responseItems) {
@@ -944,7 +949,7 @@ export class SNComponentManager extends PureService {
         content_types: requiredContentTypes
       }
     ];
-    this.runWithPermissions(component, requiredPermissions, async () => {
+    this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       const itemsData = message.data.items;
       const noun = itemsData.length === 1 ? 'item' : 'items';
       let reply = null;
@@ -978,14 +983,14 @@ export class SNComponentManager extends PureService {
   }
 
   handleRequestPermissionsMessage(component: SNComponent, message: ComponentMessage) {
-    this.runWithPermissions(component, message.data.permissions, () => {
+    this.runWithPermissions(component.uuid, message.data.permissions, () => {
       this.replyToMessage(component, message, { approved: true });
     });
   }
 
   handleSetComponentDataMessage(component: SNComponent, message: ComponentMessage) {
     /* A component setting its own data does not require special permissions */
-    this.runWithPermissions(component, [], async () => {
+    this.runWithPermissions(component.uuid, [], async () => {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.componentData = message.data.componentData;
       })
@@ -1039,10 +1044,11 @@ export class SNComponentManager extends PureService {
   }
 
   runWithPermissions(
-    component: SNComponent,
+    componentUuid: UuidString,
     requiredPermissions: ComponentPermission[],
     runFunction: () => void
   ) {
+    const component = this.itemManager.findItem(componentUuid) as SNComponent;
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
     const acquiredPermissions = component.permissions;
@@ -1057,7 +1063,7 @@ export class SNComponentManager extends PureService {
       if (!requiredContentTypes) {
         /* If this permission does not require any content types (i.e stream-context-item)
           then we can remove this from required since we match by name (respectiveAcquired.name === required.name) */
-        removeFromArray(requiredPermissions, required);
+        filterFromArray(requiredPermissions, required);
         continue;
       }
       for (const acquiredContentType of respectiveAcquired.content_types!) {
@@ -1065,7 +1071,7 @@ export class SNComponentManager extends PureService {
       }
       if (requiredContentTypes.length === 0) {
         /* We've removed all acquired and end up with zero, means we already have all these permissions */
-        removeFromArray(requiredPermissions, required);
+        filterFromArray(requiredPermissions, required);
       }
     }
     if (requiredPermissions.length > 0) {
@@ -1284,10 +1290,10 @@ export class SNComponentManager extends PureService {
       }
     }
     this.streamObservers = this.streamObservers.filter((o) => {
-      return o.component.uuid !== uuid;
+      return o.componentUuid !== uuid;
     });
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
-      return o.component.uuid !== uuid;
+      return o.componentUuid !== uuid;
     });
     if (component.area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();

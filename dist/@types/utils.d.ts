@@ -85,7 +85,7 @@ export declare function addIfUnique<T>(array: T[], value: T): void;
  * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
-export declare function filterFromArray<T>(array: T[], predicate: Record<keyof T, any>): void;
+export declare function filterFromArray<T>(array: T[], predicate: Partial<Record<keyof T, any>>): void;
 /**
  * Returns a new array by removing all elements in subtract from array
  */
