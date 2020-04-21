@@ -28,8 +28,6 @@ describe('model manager mapping', () => {
   it('mapping nonexistent deleted item doesnt create it', async function () {
     const payload = CreateMaxPayloadFromAnyObject(
       Factory.createNoteParams(),
-      null,
-      null,
       {
         dirty: false,
         deleted: true
@@ -74,8 +72,6 @@ describe('model manager mapping', () => {
 
     const changedParams = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         dirty: false,
         deleted: true
@@ -119,8 +115,6 @@ describe('model manager mapping', () => {
     const newTitle = 'updated title';
     const mutated = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         content: {
           ...payload.safeContent,

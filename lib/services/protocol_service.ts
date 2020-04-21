@@ -1,3 +1,4 @@
+import { RawPayload } from './../protocol/payloads/generator';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { EncryptionIntent } from './../protocol/intents';
 import { compareVersions } from '@Protocol/versions';
@@ -504,8 +505,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       if (!key) {
         return CreateMaxPayloadFromAnyObject(
           payload,
-          undefined,
-          undefined,
           {
             waitingForKey: true,
             errorDecrypting: true
@@ -522,8 +521,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     );
     return CreateMaxPayloadFromAnyObject(
       payload,
-      undefined,
-      undefined,
       decryptedParameters
     );
   }
@@ -561,8 +558,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       } catch (e) {
         decryptedPayloads.push(CreateMaxPayloadFromAnyObject(
           encryptedPayload,
-          undefined,
-          undefined,
           {
             errorDecrypting: true,
             errorDecryptingValueChanged: !encryptedPayload.errorDecrypting
@@ -657,14 +652,17 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return undefined;
     }
     const payloads = items.map((item) => {
-      return CreateMaxPayloadFromAnyObject(item);
+      return CreateSourcedPayloadFromObject(
+        item,
+        PayloadSource.FileImport
+      );
     });
     const encryptedPayloads = await this.payloadsByEncryptingPayloads(
       payloads,
       intent
     );
     const data: BackupFile = {
-      items: encryptedPayloads
+      items: encryptedPayloads.map((p) => p.ejected())
     };
     const keyParams = await this.getRootKeyParams();
     if (keyParams && intent !== EncryptionIntent.FileDecrypted) {
@@ -770,11 +768,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async getRootKeyParams() {
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.getRootKeyWrapperKeyParams();
-    } else if ((
+    } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
-    )) {
+    ) {
       return this.getAccountKeyParams();
+    } else if (this.keyMode === KeyMode.RootKeyNone) {
+      return undefined;
     } else {
       throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`;
     }
@@ -915,8 +915,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private async wrapAndPersistRootKey(wrappingKey: SNRootKey) {
     const payload = CreateMaxPayloadFromAnyObject(
       this.rootKey!,
-      undefined,
-      undefined,
       {
         content: this.rootKey!.getPersistableValue()
       }
@@ -928,7 +926,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     );
     await this.storageService!.setValue(
       StorageKey.WrappedRootKey,
-      wrappedKey,
+      wrappedKey.ejected(),
       StorageValueModes.Nonwrapped
     );
   }

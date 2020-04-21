@@ -82,8 +82,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const wrappedKey = CreateMaxPayloadFromAnyObject(
       keyPayload,
-      null,
-      null,
       encryptedKeyParams
     );
     await application.deviceInterface.setRawStorageValue(
@@ -109,8 +107,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
@@ -227,8 +223,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
@@ -347,8 +341,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
@@ -449,8 +441,6 @@ describe('2020-01-15 mobile migration', () => {
     );
     const noteProcessedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       noteParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload);

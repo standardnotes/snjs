@@ -258,6 +258,17 @@ describe('storage manager', () => {
     expect(payload.content.references).to.be.ok;
   });
 
+  it('stored payloads should not contain metadata fields', async function () {
+    await this.application.setPasscode('123');
+    await Factory.createSyncedNote(this.application);
+    const payloads = await this.application.storageService.getAllRawPayloads();
+    const payload = payloads[0];
+    expect(payload.fields).to.not.be.ok;
+    expect(payload.source).to.not.be.ok;
+    expect(payload.format).to.not.be.ok;
+    expect(payload.dirtiedDate).to.not.be.ok;
+  });
+
   it('signing out should clear unwrapped value store', async function () {
     await Factory.registerUserToApplication({
       application: this.application,

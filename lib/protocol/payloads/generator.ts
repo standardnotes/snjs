@@ -169,20 +169,12 @@ const ServerSavedPayloadFields = [
 
 export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
-  source?: PayloadSource,
-  intent?: EncryptionIntent,
   override?: PayloadOverride
 ) {
-  if (!isNullOrUndefined(source as any)) {
-    throw 'Use CreateSourcedPayloadFromObject if creating payload with source.';
-  }
-  if (!isNullOrUndefined(intent as any)) {
-    throw 'Use CreateIntentPayloadFromObject if creating payload with intent.';
-  }
   return CreatePayload(
     object,
     MaxPayloadFields.slice(),
-    source,
+    undefined,
     override
   );
 }

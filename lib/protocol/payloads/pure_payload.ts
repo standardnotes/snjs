@@ -3,7 +3,7 @@ import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
 import { ProtocolVersion } from '@Protocol/versions';
-import { isString, isObject, deepFreeze } from '@Lib/utils';
+import { isString, isObject, deepFreeze, isNullOrUndefined } from '@Lib/utils';
 import { RawPayload, PayloadContent } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
@@ -74,8 +74,8 @@ export class PurePayload {
       throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
     }
     this.content_type = rawPayload.content_type!;
-    if(rawPayload.content) {
-      if(isObject(rawPayload.content)) {
+    if (rawPayload.content) {
+      if (isObject(rawPayload.content)) {
         this.content = FillItemContent(rawPayload.content as PayloadContent);
       } else {
         this.content = rawPayload.content;
@@ -122,8 +122,41 @@ export class PurePayload {
     deepFreeze(this);
   }
 
+  /** 
+   * Returns a generic object with all payload fields except any that are meta-data
+   * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for 
+   * generic, non-contextual consumption, such as saving to a backup file or syncing 
+   * with a server.
+   */
+  ejected() {
+    const optionalFields = [
+      PayloadField.Legacy003AuthHash,
+      PayloadField.Deleted
+    ];
+    const nonRequiredFields = [
+      PayloadField.DirtiedDate,
+      PayloadField.ErrorDecrypting,
+      PayloadField.ErrorDecryptingChanged,
+      PayloadField.WaitingForKey,
+      PayloadField.LastSyncBegan,
+      PayloadField.LastSyncEnd
+    ];
+    const result = {} as RawPayload;
+    for (const field of this.fields) {
+      if(nonRequiredFields.includes(field)) {
+        continue;
+      }
+      const value = this[field];
+      if (isNullOrUndefined(value) && optionalFields.includes(field)) {
+        continue;
+      }
+      result[field] = value;
+    }
+    return result;
+  }
+
   get safeContent() {
-    if(this.format === PayloadFormat.DecryptedBareObject) {
+    if (this.format === PayloadFormat.DecryptedBareObject) {
       return this.content as PayloadContent;
     } else {
       return {} as PayloadContent;

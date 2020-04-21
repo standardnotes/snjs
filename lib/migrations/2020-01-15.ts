@@ -243,7 +243,7 @@ export class Migration20200115 extends Migration {
     }
     return {
       accountKey: accountKey,
-      wrappedKey: encryptedAccountKey
+      wrappedKey: encryptedAccountKey?.ejected()
     };
   }
 
@@ -269,7 +269,7 @@ export class Migration20200115 extends Migration {
         EncryptionIntent.LocalStoragePreferEncrypted,
         key,
       );
-    return wrapped;
+    return wrapped.ejected();
   }
 
   /**
@@ -369,7 +369,7 @@ export class Migration20200115 extends Migration {
           EncryptionIntent.LocalStoragePreferEncrypted,
           passcodeKey,
         );
-        rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey;
+        rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
         await this.services.deviceInterface.clearKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
@@ -387,7 +387,7 @@ export class Migration20200115 extends Migration {
           EncryptionIntent.LocalStoragePreferEncrypted,
           passcodeKey,
         );
-        rawStructure.wrapped = wrapped;
+        rawStructure.wrapped = wrapped.ejected();
         await this.services.deviceInterface.clearKeychainValue();
       }
     } else {

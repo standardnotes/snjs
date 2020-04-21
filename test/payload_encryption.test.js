@@ -36,8 +36,6 @@ describe('payload encryption', () => {
     const rawPayload = Factory.createNotePayload();
     const notePayload = CreateMaxPayloadFromAnyObject(
       rawPayload,
-      null,
-      null,
       {
         dirty: true,
         dirtiedDate: new Date(),
@@ -65,8 +63,6 @@ describe('payload encryption', () => {
     const changedUuid = 'foo';
     const changedPayload = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         uuid: changedUuid
       }
@@ -82,8 +78,6 @@ describe('payload encryption', () => {
     const changedText = `${Math.random()}`;
     const changedPayload = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         content: {
           ...payload.safeContent,
@@ -102,8 +96,6 @@ describe('payload encryption', () => {
     const payload = CreateMaxPayloadFromAnyObject(item);
     const mutated = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         content: {
           foo: 'bar'
@@ -120,8 +112,6 @@ describe('payload encryption', () => {
 
     const mutated = CreateMaxPayloadFromAnyObject(
       tagPayload,
-      null,
-      null,
       {
         content: {
           ...tagPayload.safeContent,
@@ -209,8 +199,6 @@ describe('payload encryption', () => {
     const payload = Factory.createNotePayload();
     const mutatedPayload = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         errorDecrypting: true
       }

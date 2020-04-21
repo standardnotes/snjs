@@ -57,8 +57,6 @@ describe('notes and tags', () => {
 
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
-      null,
-      null,
       {
         content: {
           ...tagPayload.safeContent,
@@ -68,8 +66,6 @@ describe('notes and tags', () => {
     );
     const mutatedNote = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       {
         content: {
           references: [
@@ -156,8 +152,6 @@ describe('notes and tags', () => {
 
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
-      null,
-      null,
       {
         content: {
           ...tagPayload.safeContent,

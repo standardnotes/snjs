@@ -13,6 +13,16 @@ describe('payload collections', () => {
     localStorage.clear();
   });
 
+  const copyPayload = (payload, timestamp, changeUuid) => {
+    return CopyPayload(
+      payload,
+      {
+        uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
+        created_at: timestamp ? new Date(timestamp) : new Date()
+      }
+    );
+  };
+
   it('find', async () => {
     const payload = Factory.createNotePayload();
     const collection = ImmutablePayloadCollection.WithPayloads(
@@ -165,15 +175,6 @@ describe('payload collections', () => {
 
   it('changing element should update sort order', async () => {
     const collection = new ItemCollection();
-    const copyPayload = (payload, timestamp, changeUuid) => {
-      return CopyPayload(
-        payload,
-        {
-          uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
-          created_at: new Date(timestamp)
-        }
-      );
-    };
     collection.setDisplayOptions(
       ContentType.Note,
       CollectionSort.CreatedAt,
@@ -201,5 +202,42 @@ describe('payload collections', () => {
     expect(displayed[1].uuid).to.equal(payload3.uuid);
     expect(displayed[2].uuid).to.equal(payload2.uuid);
   });
+
+  it('pinning note should update sort', async () => {
+    const collection = new ItemCollection();
+    collection.setDisplayOptions(
+      ContentType.Note,
+      CollectionSort.CreatedAt,
+      'asc'
+    );
+    const unpinned1 = CreateItemFromPayload(Factory.createNotePayload('fo'));
+    const unpinned2 = CreateItemFromPayload(Factory.createNotePayload('foo'));
+
+    collection.set([unpinned1, unpinned2]);
+    const sorted = collection.displayElements(ContentType.Note);
+
+    expect(sorted[0].uuid).to.equal(unpinned1.uuid);
+    expect(sorted[1].uuid).to.equal(unpinned2.uuid);
+
+    const pinned2 = CreateItemFromPayload(CopyPayload(
+      unpinned2.payload,
+      {
+        content: {
+          ...unpinned1.content,
+          appData: {
+            [SNItem.DefaultAppDomain()]: {
+              pinned: true
+            }
+          }
+        }
+      }
+    ));
+    collection.set(pinned2);
+    const resorted = collection.displayElements(ContentType.Note);
+
+    expect(resorted[0].uuid).to.equal(unpinned2.uuid);
+    expect(resorted[1].uuid).to.equal(unpinned1.uuid);
+  });
+
 
 });

@@ -396,8 +396,6 @@ export class SNSyncService extends PureService {
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(
         item,
-        undefined,
-        undefined,
         {
           dirty: true,
           dirtiedDate: new Date()
@@ -467,7 +465,7 @@ export class SNSyncService extends PureService {
    * Certain content types should not be encrypted when sending to server, 
    * such as server extensions 
    */
-  private payloadsByPreparingForServer(payloads: PurePayload[]) {
+  private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     return this.protocolService!.payloadsByEncryptingPayloads(
       payloads,
       (payload) => {

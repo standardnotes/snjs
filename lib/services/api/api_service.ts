@@ -213,7 +213,7 @@ export class SNApiService extends PureService {
   ) {
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
-      [ApiEndpointParam.SyncPayloads]: payloads,
+      [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
       [ApiEndpointParam.PaginationToken]: paginationToken,
       [ApiEndpointParam.IntegrityCheck]: checkIntegrity,

@@ -162,8 +162,6 @@ export class SNStorageService extends PureService {
 
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue,
-      undefined,
-      undefined,
       {
         content_type: ContentType.EncryptedStorage
       }
@@ -207,7 +205,7 @@ export class SNStorageService extends PureService {
       payload,
       EncryptionIntent.LocalStoragePreferEncrypted
     );
-    rawContent[ValueModesKeys.Wrapped] = encryptedPayload;
+    rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected();
     rawContent[ValueModesKeys.Unwrapped] = undefined;
     return rawContent;
   }
@@ -312,12 +310,12 @@ export class SNStorageService extends PureService {
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       return;
     }
-    const deleted = [];
+
     const nondeleted = [];
     for (const payload of decryptedPayloads) {
       if (payload.discardable) {
         /** If the payload is deleted and not dirty, remove it from db. */
-        deleted.push(payload);
+        await this.deletePayloadWithId(payload.uuid!);
       } else {
         if(!payload.uuid) {
           throw Error('Attempting to persist payload with no uuid');
@@ -328,11 +326,8 @@ export class SNStorageService extends PureService {
             ? EncryptionIntent.LocalStoragePreferEncrypted
             : EncryptionIntent.LocalStorageDecrypted
         );
-        nondeleted.push(encrypted);
+        nondeleted.push(encrypted.ejected());
       }
-    }
-    if (deleted.length > 0) {
-      await this.deletePayloads(deleted);
     }
     await this.deviceInterface!.saveRawDatabasePayloads(nondeleted);
   }

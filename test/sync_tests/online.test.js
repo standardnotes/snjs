@@ -288,8 +288,6 @@ describe('online syncing', () => {
     );
     const errorred = CreateMaxPayloadFromAnyObject(
       encrypted,
-      null,
-      null,
       {
         errorDecrypting: true
       }
@@ -574,8 +572,6 @@ describe('online syncing', () => {
     // Add the item back and say it's not deleted
     const mutatedPayload = CreateMaxPayloadFromAnyObject(
       originalPayload,
-      null,
-      null,
       {
         deleted: false,
         updated_at: Factory.yesterday()

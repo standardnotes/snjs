@@ -125,11 +125,14 @@ export class ItemCollection extends MutableCollection<SNItem> {
       if (passes) {
         if (!isNullOrUndefined(currentIndex)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort */
-          const previousValue = (sortedElements[currentIndex] as any)[sortBy.key];
+          const currentElement = sortedElements[currentIndex];
+          const previousValue = (currentElement as any)[sortBy.key];
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
           sortedElements[currentIndex] = element;
-          if (!compareValues(previousValue, newValue)) {
+          /** If the pinned status of the element has changed, it needs to be resorted */
+          const pinChanged = currentElement!.pinned !== element.pinned;
+          if (!compareValues(previousValue, newValue) || pinChanged) {
             /** Needs resort because its re-sort value has changed, 
              * and thus its position might change */
             typesNeedingResort.add(contentType);

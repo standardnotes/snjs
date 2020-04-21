@@ -65,8 +65,6 @@ describe('importing', () => {
     this.expectedItemCount++;
     const mutatedNote = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       {
         content: {
           ...notePayload.content,
@@ -100,8 +98,6 @@ describe('importing', () => {
     );
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
-      null,
-      null,
       {
         content: {
           ...tagPayload.safeContent,
@@ -135,8 +131,6 @@ describe('importing', () => {
     const tag = this.application.itemManager.tags[0];
     const mutatedNote = CreateMaxPayloadFromAnyObject(
       notePayload,
-      null,
-      null,
       {
         content: {
           ...notePayload.safeContent,
@@ -146,8 +140,6 @@ describe('importing', () => {
     );
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
-      null,
-      null,
       {
         content: {
           ...tagPayload.safeContent,

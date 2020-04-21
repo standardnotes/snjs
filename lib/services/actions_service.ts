@@ -334,9 +334,10 @@ export class SNActionsService extends PureService {
     const intent = decrypted
       ? EncryptionIntent.FileDecrypted
       : EncryptionIntent.FileEncrypted;
-    return this.protocolService!.payloadByEncryptingPayload(
+    const encrypted = await this.protocolService!.payloadByEncryptingPayload(
       item.payloadRepresentation(),
       intent
     );
+    return encrypted.ejected();
   }
 }

@@ -57,8 +57,6 @@ describe('app models', () => {
 
     const mutated = CreateMaxPayloadFromAnyObject(
       params1,
-      null,
-      null,
       {
         content: {
           ...params1.safeContent,
@@ -93,8 +91,6 @@ describe('app models', () => {
     const payload = Factory.createNotePayload();
     const mutated = CreateMaxPayloadFromAnyObject(
       payload,
-      null,
-      null,
       {
         content: {
           ...payload.safeContent,

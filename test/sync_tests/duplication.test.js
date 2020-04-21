@@ -44,8 +44,6 @@ describe('duplication', () => {
     };
     const payload = CreateMaxPayloadFromAnyObject(
       params,
-      null,
-      null,
       {
         dirty: true,
         dirtiedDate: new Date()
