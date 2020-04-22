@@ -110,13 +110,6 @@ export class SNPrivilegesService extends PureService {
       PrivilegeCredential.AccountPassword,
       PrivilegeCredential.LocalPasscode
     ];
-
-    // this.sessionLengths = [
-    //   PrivilegeSessionLength.None,
-    //   PrivilegeSessionLength.FiveMinutes,
-    //   PrivilegeSessionLength.OneHour,
-    //   PrivilegeSessionLength.OneWeek
-    // ];
   }
 
   getAvailableActions() {

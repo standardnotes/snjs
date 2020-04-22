@@ -1,3 +1,4 @@
+import { PayloadFormat } from './../../protocol/payloads/formats';
 import { isNullOrUndefined } from '@Lib/utils';
 import { SNItem, ItemMutator, AppDataField } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -23,6 +24,7 @@ export class SNNote extends SNItem implements NoteContent {
   public readonly hidePreview = false
   public readonly preview_plain!: string
   public readonly preview_html!: string
+  public readonly prefersPlainEditor!: boolean
 
   constructor(
     payload: PurePayload
@@ -33,6 +35,9 @@ export class SNNote extends SNItem implements NoteContent {
     this.preview_plain = this.payload.safeContent.preview_plain;
     this.preview_html = this.payload.safeContent.preview_html;
     this.hidePreview = this.payload.safeContent.hidePreview;
+    if (payload.format === PayloadFormat.DecryptedBareObject) {
+      this.prefersPlainEditor = this.getAppDomainValue(AppDataField.PrefersPlainEditor);
+    }
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {
       this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
     }
@@ -44,10 +49,6 @@ export class SNNote extends SNItem implements NoteContent {
 
   safeTitle() {
     return this.title || '';
-  }
-
-  get prefersPlainEditor() {
-    return this.getAppDomainValue(AppDataField.PrefersPlainEditor);
   }
 }
 

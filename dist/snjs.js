@@ -6038,8 +6038,9 @@ var ItemsKeyMutator = /*#__PURE__*/function (_ItemMutator) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNNote", function() { return SNNote; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NoteMutator", function() { return NoteMutator; });
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../../protocol/payloads/formats */ "./lib/protocol/payloads/formats.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Models_core_item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @Models/core/item */ "./lib/models/core/item.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6059,6 +6060,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -6089,13 +6091,19 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
 
     _defineProperty(_assertThisInitialized(_this), "preview_html", void 0);
 
+    _defineProperty(_assertThisInitialized(_this), "prefersPlainEditor", void 0);
+
     _this.title = _this.payload.safeContent.title;
     _this.text = _this.payload.safeContent.text;
     _this.preview_plain = _this.payload.safeContent.preview_plain;
     _this.preview_html = _this.payload.safeContent.preview_html;
     _this.hidePreview = _this.payload.safeContent.hidePreview;
 
-    if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__["isNullOrUndefined"])(_this.payload.safeContent.mobilePrefersPlainEditor)) {
+    if (payload.format === _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__["PayloadFormat"].DecryptedBareObject) {
+      _this.prefersPlainEditor = _this.getAppDomainValue(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["AppDataField"].PrefersPlainEditor);
+    }
+
+    if (!Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["isNullOrUndefined"])(_this.payload.safeContent.mobilePrefersPlainEditor)) {
       _this.mobilePrefersPlainEditor = _this.payload.safeContent.mobilePrefersPlainEditor;
     }
 
@@ -6112,15 +6120,10 @@ var SNNote = /*#__PURE__*/function (_SNItem) {
     value: function safeTitle() {
       return this.title || '';
     }
-  }, {
-    key: "prefersPlainEditor",
-    get: function get() {
-      return this.getAppDomainValue(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["AppDataField"].PrefersPlainEditor);
-    }
   }]);
 
   return SNNote;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["SNItem"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["SNItem"]);
 var NoteMutator = /*#__PURE__*/function (_ItemMutator) {
   _inherits(NoteMutator, _ItemMutator);
 
@@ -6163,12 +6166,12 @@ var NoteMutator = /*#__PURE__*/function (_ItemMutator) {
   }, {
     key: "prefersPlainEditor",
     set: function set(prefersPlainEditor) {
-      this.setAppDataItem(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["AppDataField"].PrefersPlainEditor, prefersPlainEditor);
+      this.setAppDataItem(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["AppDataField"].PrefersPlainEditor, prefersPlainEditor);
     }
   }]);
 
   return NoteMutator;
-}(_Models_core_item__WEBPACK_IMPORTED_MODULE_1__["ItemMutator"]);
+}(_Models_core_item__WEBPACK_IMPORTED_MODULE_2__["ItemMutator"]);
 
 /***/ }),
 
@@ -24581,12 +24584,7 @@ var SNPrivilegesService = /*#__PURE__*/function (_PureService) {
       this.availableActions = Object.keys(_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"]).map(function (key) {
         return _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["ProtectedAction"][key];
       });
-      this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode]; // this.sessionLengths = [
-      //   PrivilegeSessionLength.None,
-      //   PrivilegeSessionLength.FiveMinutes,
-      //   PrivilegeSessionLength.OneHour,
-      //   PrivilegeSessionLength.OneWeek
-      // ];
+      this.availableCredentials = [_Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].AccountPassword, _Models_app_privileges__WEBPACK_IMPORTED_MODULE_6__["PrivilegeCredential"].LocalPasscode];
     }
   }, {
     key: "getAvailableActions",
@@ -28799,84 +28797,147 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "findOrCreateSingleton",
     value: function () {
-      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(predicate, createContentType, createContent) {
-        var items, refreshedItems, errorDecrypting, dirtyPayload, item;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
+      var _findOrCreateSingleton = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(predicate, createContentType, createContent) {
+        var _this4 = this;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                items = this.validItemsMatchingPredicate(predicate);
+                return _context7.abrupt("return", new Promise( /*#__PURE__*/function () {
+                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(resolve) {
+                    var matchingItems, didResolve, removeObserver, refreshedItems, errorDecrypting, dirtyPayload, item;
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
+                      while (1) {
+                        switch (_context6.prev = _context6.next) {
+                          case 0:
+                            matchingItems = _this4.validItemsMatchingPredicate(predicate);
 
-                if (!(items.length > 0)) {
-                  _context5.next = 3;
-                  break;
-                }
+                            if (!(matchingItems.length > 0)) {
+                              _context6.next = 3;
+                              break;
+                            }
 
-                return _context5.abrupt("return", items[0]);
+                            return _context6.abrupt("return", resolve(matchingItems[0]));
 
-              case 3:
-                if (this.syncService.getLastSyncDate()) {
-                  _context5.next = 6;
-                  break;
-                }
+                          case 3:
+                            if (_this4.syncService.getLastSyncDate()) {
+                              _context6.next = 14;
+                              break;
+                            }
 
-                _context5.next = 6;
-                return this.syncService.sync();
+                            /** Add a temporary observer in case of long-running sync request, where
+                             * the item we're looking for ends up resolving early or in the middle. */
+                            didResolve = false;
+                            removeObserver = _this4.itemManager.addObserver(createContentType, /*#__PURE__*/function () {
+                              var _ref4 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(_, inserted) {
+                                var _matchingItems;
 
-              case 6:
-                /** Check again */
-                refreshedItems = this.validItemsMatchingPredicate(predicate);
+                                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
+                                  while (1) {
+                                    switch (_context5.prev = _context5.next) {
+                                      case 0:
+                                        if (inserted.length > 0) {
+                                          _matchingItems = _this4.validItemsMatchingPredicate(predicate);
 
-                if (!(refreshedItems.length > 0)) {
-                  _context5.next = 9;
-                  break;
-                }
+                                          if (_matchingItems.length > 0) {
+                                            didResolve = true;
+                                            resolve(_matchingItems[0]);
+                                          }
+                                        }
 
-                return _context5.abrupt("return", refreshedItems[0]);
+                                      case 1:
+                                      case "end":
+                                        return _context5.stop();
+                                    }
+                                  }
+                                }, _callee5);
+                              }));
 
-              case 9:
-                /** Delete any items that are errored */
-                errorDecrypting = this.itemManager.itemsMatchingPredicate(predicate).filter(function (item) {
-                  return item.errorDecrypting;
-                });
-                _context5.next = 12;
-                return this.itemManager.setItemsToBeDeleted(Object(_Models_functions__WEBPACK_IMPORTED_MODULE_8__["Uuids"])(errorDecrypting));
+                              return function (_x12, _x13) {
+                                return _ref4.apply(this, arguments);
+                              };
+                            }());
+                            _context6.next = 8;
+                            return _this4.syncService.sync();
 
-              case 12:
-                _context5.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"];
-                _context5.next = 15;
-                return _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuid();
+                          case 8:
+                            removeObserver();
 
-              case 15:
-                _context5.t1 = _context5.sent;
-                _context5.t2 = createContentType;
-                _context5.t3 = createContent;
-                _context5.t4 = new Date();
-                _context5.t5 = {
-                  uuid: _context5.t1,
-                  content_type: _context5.t2,
-                  content: _context5.t3,
-                  dirty: true,
-                  dirtiedDate: _context5.t4
-                };
-                dirtyPayload = (0, _context5.t0)(_context5.t5);
-                _context5.next = 23;
-                return this.itemManager.emitItemFromPayload(dirtyPayload);
+                            if (!didResolve) {
+                              _context6.next = 11;
+                              break;
+                            }
 
-              case 23:
-                item = _context5.sent;
-                _context5.next = 26;
-                return this.syncService.sync();
+                            return _context6.abrupt("return");
 
-              case 26:
-                return _context5.abrupt("return", item);
+                          case 11:
+                            /** Check again */
+                            refreshedItems = _this4.validItemsMatchingPredicate(predicate);
 
-              case 27:
+                            if (!(refreshedItems.length > 0)) {
+                              _context6.next = 14;
+                              break;
+                            }
+
+                            return _context6.abrupt("return", resolve(refreshedItems[0]));
+
+                          case 14:
+                            /** Delete any items that are errored */
+                            errorDecrypting = _this4.itemManager.itemsMatchingPredicate(predicate).filter(function (item) {
+                              return item.errorDecrypting;
+                            });
+                            _context6.next = 17;
+                            return _this4.itemManager.setItemsToBeDeleted(Object(_Models_functions__WEBPACK_IMPORTED_MODULE_8__["Uuids"])(errorDecrypting));
+
+                          case 17:
+                            _context6.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CreateMaxPayloadFromAnyObject"];
+                            _context6.next = 20;
+                            return _Lib_uuid__WEBPACK_IMPORTED_MODULE_6__["Uuid"].GenerateUuid();
+
+                          case 20:
+                            _context6.t1 = _context6.sent;
+                            _context6.t2 = createContentType;
+                            _context6.t3 = createContent;
+                            _context6.t4 = new Date();
+                            _context6.t5 = {
+                              uuid: _context6.t1,
+                              content_type: _context6.t2,
+                              content: _context6.t3,
+                              dirty: true,
+                              dirtiedDate: _context6.t4
+                            };
+                            dirtyPayload = (0, _context6.t0)(_context6.t5);
+                            _context6.next = 28;
+                            return _this4.itemManager.emitItemFromPayload(dirtyPayload);
+
+                          case 28:
+                            item = _context6.sent;
+                            _context6.next = 31;
+                            return _this4.syncService.sync();
+
+                          case 31:
+                            return _context6.abrupt("return", resolve(item));
+
+                          case 32:
+                          case "end":
+                            return _context6.stop();
+                        }
+                      }
+                    }, _callee6);
+                  }));
+
+                  return function (_x11) {
+                    return _ref3.apply(this, arguments);
+                  };
+                }()));
+
+              case 1:
               case "end":
-                return _context5.stop();
+                return _context7.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee7);
       }));
 
       function findOrCreateSingleton(_x8, _x9, _x10) {
