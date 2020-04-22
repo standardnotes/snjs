@@ -195,7 +195,10 @@ export class SNSingletonManager extends PureService {
           createContentType,
           async (_, inserted) => {
             if (inserted.length > 0) {
-              const matchingItems = this.validItemsMatchingPredicate(predicate);
+              const matchingItems = this.itemManager!.subItemsMatchingPredicates(
+                inserted,
+                [predicate]
+              );
               if (matchingItems.length > 0) {
                 didResolve = true;
                 resolve(matchingItems[0]);

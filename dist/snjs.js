@@ -23061,7 +23061,7 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "itemsMatchingPredicates",
     value: function itemsMatchingPredicates(predicates) {
-      return this.filterItemsWithPredicates(this.items, predicates);
+      return this.subItemsMatchingPredicates(this.items, predicates);
     }
     /**
      * Performs actual predicate filtering for public methods above.
@@ -23069,8 +23069,8 @@ var ItemManager = /*#__PURE__*/function (_PureService) {
      */
 
   }, {
-    key: "filterItemsWithPredicates",
-    value: function filterItemsWithPredicates(items, predicates) {
+    key: "subItemsMatchingPredicates",
+    value: function subItemsMatchingPredicates(items, predicates) {
       var results = items.filter(function (item) {
         if (item.deleted) {
           return false;
@@ -28838,7 +28838,7 @@ var SNSingletonManager = /*#__PURE__*/function (_PureService) {
                                     switch (_context5.prev = _context5.next) {
                                       case 0:
                                         if (inserted.length > 0) {
-                                          _matchingItems = _this4.validItemsMatchingPredicate(predicate);
+                                          _matchingItems = _this4.itemManager.subItemsMatchingPredicates(inserted, [predicate]);
 
                                           if (_matchingItems.length > 0) {
                                             didResolve = true;

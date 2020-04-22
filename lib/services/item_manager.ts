@@ -664,14 +664,14 @@ export class ItemManager extends PureService {
   * Returns all items matching an array of predicates
   */
   public itemsMatchingPredicates(predicates: SNPredicate[]) {
-    return this.filterItemsWithPredicates(this.items, predicates);
+    return this.subItemsMatchingPredicates(this.items, predicates);
   }
 
   /**
    * Performs actual predicate filtering for public methods above.
    * Does not return deleted items.
    */
-  private filterItemsWithPredicates(items: SNItem[], predicates: SNPredicate[]) {
+  public subItemsMatchingPredicates(items: SNItem[], predicates: SNPredicate[]) {
     const results = items.filter((item) => {
       if (item.deleted) {
         return false;
