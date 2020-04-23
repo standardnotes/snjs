@@ -179,14 +179,32 @@ export function CreateMaxPayloadFromAnyObject(
   );
 }
 
-export function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload) {
-  const override: PayloadOverride = {};
-  for (const field of mergeWith.fields) {
-    override[field] = mergeWith[field];
+/**
+ * Makes a new payload by starting with input payload, then overriding values of all 
+ * keys of mergeWith.fields. If wanting to merge only specific fields, pass an array of
+ * fields. If override value is passed, values in here take final precedence, including
+ * above both payload and mergeWith values.
+ */
+export function PayloadByMerging(
+  payload: PurePayload,
+  mergeWith: PurePayload,
+  fields?: PayloadField[],
+  override?: PayloadOverride
+) {
+  const resultOverride: PayloadOverride = {};
+  const useFields = fields || mergeWith.fields;
+  for (const field of useFields) {
+    resultOverride[field] = mergeWith[field];
+  }
+  if (override) {
+    const keys = Object.keys(override) as PayloadField[];
+    for (const key of keys) {
+      resultOverride[key] = override[key];
+    }
   }
   return CopyPayload(
     payload,
-    override
+    resultOverride
   );
 }
 

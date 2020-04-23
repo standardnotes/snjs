@@ -80,7 +80,7 @@ export class SNHistoryManager extends PureService {
   addChangeObserver() {
     this.removeChangeObserver = this.itemManager!.addObserver(
       this.contentTypes,
-      async (changed, inserted, discarded, source) => {
+      (changed, inserted, discarded, source) => {
         const items = concatArrays(changed, inserted, discarded) as SNItem[];
         if (source === PayloadSource.LocalChanged) {
           return;

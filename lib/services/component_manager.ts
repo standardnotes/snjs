@@ -206,7 +206,7 @@ export class SNComponentManager extends PureService {
   configureForGeneralUsage() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      async (changed, inserted, discarded, source, sourceKey) => {
+      (changed, inserted, discarded, source, sourceKey) => {
         const items = concatArrays(changed, inserted, discarded) as SNItem[];
         const syncedComponents = items.filter((item) => {
           return (
@@ -226,9 +226,9 @@ export class SNComponentManager extends PureService {
         for (const component of syncedComponents) {
           const isInActive = this.activeComponents.includes(component.uuid);
           if (component.active && !component.deleted && !isInActive) {
-            await this.activateComponent(component.uuid);
+            this.activateComponent(component.uuid);
           } else if (!component.active && isInActive) {
-            await this.deactivateComponent(component.uuid);
+            this.deactivateComponent(component.uuid);
           }
         }
         /* LocalChanged is not interesting to send to observers. For local changes,

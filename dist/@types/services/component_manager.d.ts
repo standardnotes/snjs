@@ -15,7 +15,7 @@ declare type ComponentHandler = {
     areas: ComponentArea[];
     activationHandler?: (component: SNComponent) => void;
     actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
-    contextRequestHandler?: (component_uuid: UuidString) => SNItem | undefined;
+    contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
     focusHandler?: (component: SNComponent, focused: boolean) => void;
 };
@@ -109,8 +109,8 @@ export declare class SNComponentManager extends PureService {
     isComponentHidden(component: SNComponent): boolean;
     setComponentHidden(component: SNComponent, hidden: boolean): void;
     jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSource): ItemMessagePayload;
-    sendItemsInReply(component_uuid: UuidString, items: SNItem[], message: ComponentMessage, source?: PayloadSource): void;
-    sendContextItemInReply(component_uuid: UuidString, item: SNItem, originalMessage: ComponentMessage, source?: PayloadSource): void;
+    sendItemsInReply(componentUuid: UuidString, items: SNItem[], message: ComponentMessage, source?: PayloadSource): void;
+    sendContextItemInReply(componentUuid: UuidString, item: SNItem, originalMessage: ComponentMessage, source?: PayloadSource): void;
     replyToMessage(component: SNComponent, originalMessage: ComponentMessage, replyData: MessageReplyData): void;
     sendMessageToComponent(component: SNComponent, message: ComponentMessage | MessageReply): void;
     urlForComponent(component: SNComponent): string | null;
@@ -133,7 +133,7 @@ export declare class SNComponentManager extends PureService {
     handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage): void;
     toggleComponent(component: SNComponent): Promise<void>;
     handleInstallLocalComponentMessage(sourceComponent: SNComponent, message: ComponentMessage): void;
-    runWithPermissions(component_uuid: UuidString, requiredPermissions: ComponentPermission[], runFunction: () => void): void;
+    runWithPermissions(componentUuid: UuidString, requiredPermissions: ComponentPermission[], runFunction: () => void): void;
     promptForPermissions(component: SNComponent, permissions: ComponentPermission[], callback: (approved: boolean) => Promise<void>): void;
     presentPermissionsDialog(dialog: PermissionDialog): void;
     openModalComponent(component: SNComponent): void;

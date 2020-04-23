@@ -16,12 +16,19 @@ type ChangeCallback = (
   discarded: PurePayload[],
   source?: PayloadSource,
   sourceKey?: string
-) => Promise<void>
+) => void
 
 type ChangeObserver = {
   types: ContentType[]
   priority: number
   callback: ChangeCallback
+}
+
+type QueueElement = {
+  payloads: PurePayload[],
+  source: PayloadSource,
+  sourceKey?: string
+  resolve: () => void
 }
 
 /**
@@ -38,6 +45,7 @@ export class PayloadManager extends PureService {
 
   private changeObservers: ChangeObserver[] = []
   public collection: MutableCollection<PurePayload>
+  private emitQueue: QueueElement[] = []
 
   constructor() {
     super();
@@ -107,16 +115,35 @@ export class PayloadManager extends PureService {
     payloads: PurePayload[],
     source: PayloadSource,
     sourceKey?: string
-  ) {
+    ) {
     if (payloads.length === 0) {
       console.warn("Attempting to emit 0 payloads.");
     }
-    /** First loop should process payloads and add items only; no relationship handling. */
-    const { changed, inserted, discarded } = await this.mergePayloadsOntoMaster(payloads);
-    await this.notifyChangeObservers(changed, inserted, discarded, source, sourceKey);
+    return new Promise((resolve) => {
+      this.emitQueue.push({
+        payloads,
+        source,
+        sourceKey,
+        resolve
+      });
+      if (this.emitQueue.length === 1) {
+        this.popQueue();
+      }
+    })
   }
 
-  private async mergePayloadsOntoMaster(payloads: PurePayload[]) {
+  private async popQueue() {
+    const first = this.emitQueue[0];
+    const { changed, inserted, discarded } = this.mergePayloadsOntoMaster(first.payloads);
+    this.notifyChangeObservers(changed, inserted, discarded, first.source, first.sourceKey);
+    removeFromArray(this.emitQueue, first);
+    first.resolve();
+    if (this.emitQueue.length > 0) {
+      this.popQueue();
+    }
+  }
+
+  private mergePayloadsOntoMaster(payloads: PurePayload[]) {
     const changed: PurePayload[] = [];
     const inserted: PurePayload[] = [];
     const discarded: PurePayload[] = [];
@@ -150,7 +177,7 @@ export class PayloadManager extends PureService {
    * @param priority - The lower the priority, the earlier the function is called 
    *  wrt to other observers
    */
-  public addChangeObserver(
+  public addObserver(
     types: ContentType | ContentType[],
     callback: ChangeCallback,
     priority = 1
@@ -173,25 +200,26 @@ export class PayloadManager extends PureService {
    * This function is mostly for internal use, but can be used externally by consumers who
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
-  public async notifyChangeObservers(
+  public notifyChangeObservers(
     changed: PurePayload[],
     inserted: PurePayload[],
     discarded: PurePayload[],
     source: PayloadSource,
     sourceKey?: string
   ) {
-    const observers = this.changeObservers.sort((a, b) => {
+    /** Slice the observers array as sort modifies in-place */
+    const observers = this.changeObservers.slice().sort((a, b) => {
       return a.priority < b.priority ? -1 : 1;
     });
     const filter = (payloads: PurePayload[], types: ContentType[]) => {
       return types.includes(ContentType.Any)
-        ? payloads
-        : payloads.filter((payload) => {
+        ? payloads.slice()
+        : payloads.slice().filter((payload) => {
           return types.includes(payload.content_type!);
         });
     }
     for (const observer of observers) {
-      await observer.callback(
+      observer.callback(
         filter(changed, observer.types),
         filter(inserted, observer.types),
         filter(discarded, observer.types),

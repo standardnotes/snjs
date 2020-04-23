@@ -105,7 +105,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private keyMode = KeyMode.RootKeyNone
   private keyObservers: KeyChangeObserver[] = []
   private rootKey?: SNRootKey
-  private removeMappingObserver: any
+  private removeItemsObserver: any
 
   constructor(
     itemManager: ItemManager,
@@ -137,11 +137,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       enumerable: false,
       writable: true
     });
-    this.removeMappingObserver = this.modelManager.addChangeObserver(
+    this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
-      async (_, inserted) => {
+      (_, inserted) => {
         if (inserted.length > 0) {
-          await this.decryptErroredItems();
+          this.decryptErroredItems();
         }
       }
     );
@@ -157,8 +157,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     this.crypto = undefined;
     this.operators = {};
     this.keyObservers.length = 0;
-    this.removeMappingObserver();
-    this.removeMappingObserver = null;
+    this.removeItemsObserver();
+    this.removeItemsObserver = null;
     this.rootKey = undefined;
     super.deinit();
   }

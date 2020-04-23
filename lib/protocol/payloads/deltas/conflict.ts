@@ -1,12 +1,33 @@
-import { SinglePayloadDelta } from './single_payload_delta';
+import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
+import { PayloadSource } from './../sources';
+import { PurePayload } from './../pure_payload';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
 import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
+import { PayloadField } from '../fields';
 
-export class ConflictDelta extends SinglePayloadDelta {
+export class ConflictDelta {
+
+  protected readonly baseCollection: ImmutablePayloadCollection
+  protected readonly basePayload: PurePayload
+  protected readonly applyPayload: PurePayload
+  protected readonly source: PayloadSource
+
+  constructor(
+    baseCollection: ImmutablePayloadCollection,
+    basePayload: PurePayload,
+    applyPayload: PurePayload,
+    source: PayloadSource
+  ) {
+    this.baseCollection = baseCollection;
+    this.basePayload = basePayload;
+    this.applyPayload = applyPayload;
+    this.source = source;
+  }
+
 
   public async resultingCollection() {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
@@ -31,7 +52,15 @@ export class ConflictDelta extends SinglePayloadDelta {
       return [this.basePayload];
     }
     if (strategy === ConflictStrategy.KeepRight) {
-      return [this.applyPayload];
+      const result = PayloadByMerging(
+        this.applyPayload,
+        this.basePayload,
+        [PayloadField.LastSyncBegan],
+        {
+          lastSyncEnd: new Date()
+        }
+      )
+      return [result];
     }
     if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
@@ -43,7 +72,7 @@ export class ConflictDelta extends SinglePayloadDelta {
         {
           updated_at: updatedAt,
           dirty: true,
-          dirtiedDate: new Date()
+          dirtiedDate: new Date(),
         }
       );
       const rightPayloads = await PayloadsByDuplicating(
@@ -60,7 +89,14 @@ export class ConflictDelta extends SinglePayloadDelta {
         this.baseCollection,
         true,
       );
-      const rightPayload = this.applyPayload;
+      const rightPayload = PayloadByMerging(
+        this.applyPayload,
+        this.basePayload,
+        [PayloadField.LastSyncBegan],
+        {
+          lastSyncEnd: new Date()
+        }
+      );
       return leftPayloads.concat([rightPayload]);
     }
 

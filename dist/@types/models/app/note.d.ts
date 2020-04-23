@@ -16,10 +16,10 @@ export declare class SNNote extends SNItem implements NoteContent {
     readonly hidePreview = false;
     readonly preview_plain: string;
     readonly preview_html: string;
+    readonly prefersPlainEditor: boolean;
     constructor(payload: PurePayload);
     safeText(): string;
     safeTitle(): string;
-    get prefersPlainEditor(): any;
 }
 export declare class NoteMutator extends ItemMutator {
     get typedContent(): Partial<NoteContent>;

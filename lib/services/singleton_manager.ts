@@ -70,7 +70,7 @@ export class SNSingletonManager extends PureService {
   private addObservers() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      async (_, inserted) => {
+      (_, inserted) => {
         if (inserted.length > 0) {
           this.resolveQueue = this.resolveQueue.concat(inserted);
         }
@@ -193,7 +193,7 @@ export class SNSingletonManager extends PureService {
         let didResolve = false;
         const removeObserver = this.itemManager!.addObserver(
           createContentType,
-          async (_, inserted) => {
+          (_, inserted) => {
             if (inserted.length > 0) {
               const matchingItems = this.itemManager!.subItemsMatchingPredicates(
                 inserted,
@@ -234,6 +234,9 @@ export class SNSingletonManager extends PureService {
         }
       );
       const item = await this.itemManager!.emitItemFromPayload(dirtyPayload);
+      if(!item) {
+        throw Error(`Created singleton item should not be null ${createContentType}`);
+      }
       await this.syncService!.sync();
       return resolve(item);
     })

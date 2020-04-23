@@ -45,7 +45,13 @@ export declare type RawEncryptionParameters = {
     auth_params?: any;
 };
 export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, override?: PayloadOverride): PurePayload;
-export declare function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload): PurePayload;
+/**
+ * Makes a new payload by starting with input payload, then overriding values of all
+ * keys of mergeWith.fields. If wanting to merge only specific fields, pass an array of
+ * fields. If override value is passed, values in here take final precedence, including
+ * above both payload and mergeWith values.
+ */
+export declare function PayloadByMerging(payload: PurePayload, mergeWith: PurePayload, fields?: PayloadField[], override?: PayloadOverride): PurePayload;
 export declare function CreateIntentPayloadFromObject(object: RawPayload, intent: EncryptionIntent, override?: PayloadOverride): PurePayload;
 export declare function CreateSourcedPayloadFromObject(object: RawPayload, source: PayloadSource, override?: PayloadOverride): PurePayload;
 export declare function CopyPayload(payload: PurePayload, override?: PayloadOverride): PurePayload;

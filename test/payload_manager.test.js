@@ -67,7 +67,7 @@ describe('payload manager', () => {
 
   it('insertion observer', async function () {
     const observations = [];
-    this.modelManager.addChangeObserver(ContentType.Any, (_, inserted) => {
+    this.modelManager.addObserver(ContentType.Any, (_, inserted) => {
       observations.push({ inserted });
     });
     const payload = await this.createNotePayload();
@@ -79,7 +79,7 @@ describe('payload manager', () => {
 
   it('change observer', async function () {
     const observations = [];
-    this.modelManager.addChangeObserver(ContentType.Any, (changed) => {
+    this.modelManager.addObserver(ContentType.Any, (changed) => {
       if(changed.length > 0) {
         observations.push({ changed });
       }
@@ -101,7 +101,7 @@ describe('payload manager', () => {
   });
 
   it('reset state', async function () {
-    this.modelManager.addChangeObserver(ContentType.Any, (payloads) => {});
+    this.modelManager.addObserver(ContentType.Any, (payloads) => {});
     const payload = await this.createNotePayload();
     await this.modelManager.emitPayload(payload);
     await this.modelManager.resetState();

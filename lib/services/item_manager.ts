@@ -35,7 +35,7 @@ type ObserverCallback = (
   discarded: SNItem[],
   source?: PayloadSource,
   sourceKey?: string
-) => Promise<void>
+) => void
 
 type Observer = {
   contentType: ContentType[]
@@ -65,7 +65,7 @@ export class ItemManager extends PureService {
     this.modelManager = modelManager;
     this.createCollection();
     this.unsubChangeObserver = this.modelManager
-      .addChangeObserver(ContentType.Any, this.onPayloadChange.bind(this));
+      .addObserver(ContentType.Any, this.onPayloadChange.bind(this));
     this.systemSmartTags = BuildSmartTags();
   }
 
@@ -233,7 +233,7 @@ export class ItemManager extends PureService {
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
     const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
-    if(changedOrInserted.length > 0) {
+    if (changedOrInserted.length > 0) {
       this.collection.set(changedOrInserted)
     }
     const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
@@ -264,7 +264,8 @@ export class ItemManager extends PureService {
         )
       });
     }
-    for (const observer of this.observers) {
+    const observers = this.observers.slice();
+    for (const observer of observers) {
       const filteredChanged = filter(changed, observer.contentType);
       const filteredInserted = filter(inserted, observer.contentType);
       const filteredDiscarded = filter(discarded, observer.contentType);
@@ -762,9 +763,10 @@ export class ItemManager extends PureService {
    */
   public async removeAllItemsFromMemory() {
     const uuids = Uuids(this.items);
+    /** We don't want to set as dirty, since we want to dispose of immediately. */
     await this.changeItems(uuids, (mutator) => {
       mutator.setDeleted();
-    });
+    }, MutationType.NonDirtying);
     this.resetState();
     this.modelManager!.resetState();
   }

@@ -635,13 +635,16 @@ export class SNApplication {
   ) {
     const observer = this.itemManager!.addObserver(
       contentType,
-      async (changed, inserted, discarded, source) => {
+      (changed, inserted, discarded, source) => {
         const all = changed.concat(inserted).concat(discarded);
         stream(all, source);
       }
     );
     /** Push current values now */
-    stream(this.itemManager!.getItems(contentType));
+    const matches = this.itemManager!.getItems(contentType);
+    if(matches.length > 0) {
+      stream(matches);
+    }
     this.streamRemovers.push(observer);
     return () => {
       observer();

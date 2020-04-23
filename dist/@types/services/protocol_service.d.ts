@@ -67,7 +67,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     private keyMode;
     private keyObservers;
     private rootKey?;
-    private removeMappingObserver;
+    private removeItemsObserver;
     constructor(itemManager: ItemManager, modelManager: PayloadManager, deviceInterface: DeviceInterface, storageService: SNStorageService, crypto: SNPureCrypto);
     /** @override */
     deinit(): void;

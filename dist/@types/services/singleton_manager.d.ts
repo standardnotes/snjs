@@ -1,7 +1,6 @@
 import { ContentType } from './../models/content_types';
 import { ItemManager } from './item_manager';
 import { SNPredicate } from '../models/core/predicate';
-import { SNItem } from '../models/core/item';
 import { PureService } from './pure_service';
 import { PayloadContent } from '../protocol/payloads/generator';
 import { SNSyncService } from './sync/sync_service';
@@ -47,5 +46,5 @@ export declare class SNSingletonManager extends PureService {
     private validItemsMatchingPredicate;
     private resolveSingletonsForItems;
     private handleStrategy;
-    findOrCreateSingleton(predicate: SNPredicate, createContentType: ContentType, createContent: PayloadContent): Promise<SNItem>;
+    findOrCreateSingleton(predicate: SNPredicate, createContentType: ContentType, createContent: PayloadContent): Promise<unknown>;
 }

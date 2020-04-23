@@ -164,7 +164,7 @@ describe('item manager', () => {
       dirty: false
     });
     await this.itemManager.emitItemFromPayload(payload);
-    
+
     expect(payload.discardable).to.equal(true);
     expect(this.itemManager.findItem(note.uuid)).to.not.be.ok;
   });
@@ -182,7 +182,7 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      async (changed, inserted, discarded, source, sourceKey) => {
+      (changed, inserted, discarded, source, sourceKey) => {
         observed.push({ changed, inserted, discarded, source, sourceKey });
       },
     );
@@ -340,15 +340,15 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      async (items, source, sourceKey, type) => {
-        observed.push({ items, source, sourceKey, type });
+      (changed, inserted, discarded) => {
+        observed.push({ changed, inserted, discarded });
       },
     );
     await this.createNote();
     await this.itemManager.removeAllItemsFromMemory();
 
     const deletionEvent = observed[1];
-    expect(deletionEvent.items[0].deleted).to.equal(true);
+    expect(deletionEvent.discarded[0].deleted).to.equal(true);
     expect(this.itemManager.items.length).to.equal(0);
   });
 
@@ -356,8 +356,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      async (items, source, sourceKey, type) => {
-        observed.push({ items, source, sourceKey, type });
+      (changed, inserted, discarded) => {
+        observed.push({ changed, inserted, discarded });
       },
     );
     const note = await this.createNote();
@@ -365,5 +365,42 @@ describe('item manager', () => {
 
     expect(observed.length).to.equal(1);
     expect(this.itemManager.findItem(note.uuid)).to.not.be.ok;
+  });
+
+  it('emitting a payload from within observer should queue to end', async function () {
+    /**
+     * From within an item observer, we want to emit some changes and await them.
+     * We expect that the end result is that whatever was most recently emitted,
+     * is propagated to listeners after any pending observation events. That is, when you
+     * emit items, it should be done serially, so that emitting while you're emitting does
+     * not interrupt the current emission, but instead queues it. This is so that changes
+     * are not propagated out of order.
+     */
+    const payload = Factory.createNotePayload();
+    const changedTitle = 'changed title';
+    let didEmit = false;
+    let latestVersion;
+    this.itemManager.addObserver(
+      ContentType.Note,
+      (changed, inserted, discarded) => {
+        const all = changed.concat(inserted);
+        if (!didEmit) {
+          didEmit = true;
+          const changedPayload = CopyPayload(
+            payload,
+            {
+              content: {
+                ...payload.content,
+                title: changedTitle
+              }
+            }
+          );
+          this.itemManager.emitItemFromPayload(changedPayload);
+        }
+        latestVersion = all[0];
+      }
+    );
+    await this.itemManager.emitItemFromPayload(payload);
+    expect(latestVersion.title).to.equal(changedTitle);
   });
 });

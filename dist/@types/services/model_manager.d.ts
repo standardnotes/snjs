@@ -5,7 +5,7 @@ import { PurePayload } from '../protocol/payloads/pure_payload';
 import { PureService } from './pure_service';
 import { MutableCollection } from '../protocol/collection/collection';
 import { ImmutablePayloadCollection } from '../protocol/collection/payload_collection';
-declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source?: PayloadSource, sourceKey?: string) => Promise<void>;
+declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source?: PayloadSource, sourceKey?: string) => void;
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
@@ -19,6 +19,7 @@ declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], 
 export declare class PayloadManager extends PureService {
     private changeObservers;
     collection: MutableCollection<PurePayload>;
+    private emitQueue;
     constructor();
     /**
      * Our payload collection keeps the latest mapped payload for every payload
@@ -33,7 +34,7 @@ export declare class PayloadManager extends PureService {
      * One of many mapping helpers available.
      * This function maps a collection of payloads.
      */
-    emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string): Promise<void>;
+    emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string): Promise<unknown>;
     /**
      * One of many mapping helpers available.
      * This function maps a payload to an item
@@ -44,7 +45,8 @@ export declare class PayloadManager extends PureService {
      * This function maps multiple payloads to items, and is the authoratative mapping
      * function that all other mapping helpers rely on
      */
-    emitPayloads(payloads: PurePayload[], source: PayloadSource, sourceKey?: string): Promise<void>;
+    emitPayloads(payloads: PurePayload[], source: PayloadSource, sourceKey?: string): Promise<unknown>;
+    private popQueue;
     private mergePayloadsOntoMaster;
     /**
      * Notifies observers when an item has been mapped.
@@ -52,12 +54,12 @@ export declare class PayloadManager extends PureService {
      * @param priority - The lower the priority, the earlier the function is called
      *  wrt to other observers
      */
-    addChangeObserver(types: ContentType | ContentType[], callback: ChangeCallback, priority?: number): () => void;
+    addObserver(types: ContentType | ContentType[], callback: ChangeCallback, priority?: number): () => void;
     /**
      * This function is mostly for internal use, but can be used externally by consumers who
      * explicitely understand what they are doing (want to propagate model state without mapping)
      */
-    notifyChangeObservers(changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source: PayloadSource, sourceKey?: string): Promise<void>;
+    notifyChangeObservers(changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source: PayloadSource, sourceKey?: string): void;
     /**
      * Imports an array of payloads from an external source (such as a backup file)
      * and marks the items as dirty.

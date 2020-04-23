@@ -22,7 +22,7 @@ changed: SNItem[],
 /** The items have been newly inserted */
 inserted: SNItem[], 
 /** The items have been deleted from local state (and remote state if applicable) */
-discarded: SNItem[], source?: PayloadSource, sourceKey?: string) => Promise<void>;
+discarded: SNItem[], source?: PayloadSource, sourceKey?: string) => void;
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -178,7 +178,7 @@ export declare class ItemManager extends PureService {
      * Performs actual predicate filtering for public methods above.
      * Does not return deleted items.
      */
-    private filterItemsWithPredicates;
+    subItemsMatchingPredicates(items: SNItem[], predicates: SNPredicate[]): SNItem[];
     /**
      * Finds the first tag matching a given title
      */
