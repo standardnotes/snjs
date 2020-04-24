@@ -73,7 +73,7 @@ export class SNMigrationService extends PureService {
     if (event === ApplicationEvent.SignedIn) {
       await this.handleStage(ApplicationStage.SignedIn_30);
     }
-    else if (event === ApplicationEvent.CompletedSync) {
+    else if (event === ApplicationEvent.CompletedFullSync) {
       if(!this.handledFullSyncStage) {
         this.handledFullSyncStage = true;
         await this.handleStage(ApplicationStage.FullSyncCompleted_13);

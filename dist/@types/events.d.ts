@@ -3,7 +3,8 @@ export { SyncEvent };
 export declare enum ApplicationEvent {
     SignedIn = 2,
     SignedOut = 3,
-    CompletedSync = 5,
+    /** When a full, potentially multi-page sync completes */
+    CompletedFullSync = 5,
     FailedSync = 6,
     HighLatencySync = 7,
     EnteredOutOfSync = 8,
@@ -35,6 +36,9 @@ export declare enum ApplicationEvent {
     WillSync = 18,
     InvalidSyncSession = 19,
     LocalDatabaseReadError = 20,
-    LocalDatabaseWriteError = 21
+    LocalDatabaseWriteError = 21,
+    /** When a single roundtrip completes with sync, in a potentially multi-page sync request.
+     * If just a single roundtrip, this event will be triggered, along with CompletedFullSync */
+    CompletedIncrementalSync = 22
 }
 export declare function applicationEventForSyncEvent(syncEvent: SyncEvent): any;

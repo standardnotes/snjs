@@ -37,8 +37,10 @@ export class ApplicationService extends PureService {
         await this.onAppStart();
       } else if (event === ApplicationEvent.Launched) {
         await this.onAppLaunch();
-      } else if (event === ApplicationEvent.CompletedSync) {
-        this.onAppSync();
+      } else if (event === ApplicationEvent.CompletedFullSync) {
+        this.onAppFullSync();
+      } else if (event === ApplicationEvent.CompletedIncrementalSync) {
+        this.onAppIncrementalSync();
       } else if (event === ApplicationEvent.KeyStatusChanged) {
         this.onAppKeyChange();
       }
@@ -61,7 +63,11 @@ export class ApplicationService extends PureService {
     /** Optional override */
   }
 
-  onAppSync() {
+  onAppIncrementalSync() {
+    /** Optional override */
+  }
+
+  onAppFullSync() {
     /** Optional override */
   }
 

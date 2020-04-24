@@ -11,5 +11,6 @@ export declare class ApplicationService extends PureService {
     onAppStart(): Promise<void>;
     onAppLaunch(): Promise<void>;
     onAppKeyChange(): Promise<void>;
-    onAppSync(): void;
+    onAppIncrementalSync(): void;
+    onAppFullSync(): void;
 }

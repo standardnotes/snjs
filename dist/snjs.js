@@ -3464,7 +3464,7 @@ var ApplicationEvent;
 (function (ApplicationEvent) {
   ApplicationEvent[ApplicationEvent["SignedIn"] = 2] = "SignedIn";
   ApplicationEvent[ApplicationEvent["SignedOut"] = 3] = "SignedOut";
-  ApplicationEvent[ApplicationEvent["CompletedSync"] = 5] = "CompletedSync";
+  ApplicationEvent[ApplicationEvent["CompletedFullSync"] = 5] = "CompletedFullSync";
   ApplicationEvent[ApplicationEvent["FailedSync"] = 6] = "FailedSync";
   ApplicationEvent[ApplicationEvent["HighLatencySync"] = 7] = "HighLatencySync";
   ApplicationEvent[ApplicationEvent["EnteredOutOfSync"] = 8] = "EnteredOutOfSync";
@@ -3481,13 +3481,14 @@ var ApplicationEvent;
   ApplicationEvent[ApplicationEvent["InvalidSyncSession"] = 19] = "InvalidSyncSession";
   ApplicationEvent[ApplicationEvent["LocalDatabaseReadError"] = 20] = "LocalDatabaseReadError";
   ApplicationEvent[ApplicationEvent["LocalDatabaseWriteError"] = 21] = "LocalDatabaseWriteError";
+  ApplicationEvent[ApplicationEvent["CompletedIncrementalSync"] = 22] = "CompletedIncrementalSync";
 })(ApplicationEvent || (ApplicationEvent = {}));
 
 ;
 function applicationEventForSyncEvent(syncEvent) {
   var _SyncEvent$FullSyncCo;
 
-  return (_SyncEvent$FullSyncCo = {}, _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].FullSyncCompleted, ApplicationEvent.CompletedSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncError, ApplicationEvent.FailedSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncTakingTooLong, ApplicationEvent.HighLatencySync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].EnterOutOfSync, ApplicationEvent.EnteredOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].ExitOutOfSync, ApplicationEvent.ExitedOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataLoaded, ApplicationEvent.LocalDataLoaded), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].MajorDataChange, ApplicationEvent.MajorDataChange), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataIncrementalLoad, ApplicationEvent.LocalDataIncrementalLoad), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged, ApplicationEvent.SyncStatusChanged), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncWillBegin, ApplicationEvent.WillSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].InvalidSession, ApplicationEvent.InvalidSyncSession), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseReadError, ApplicationEvent.LocalDatabaseReadError), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseWriteError, ApplicationEvent.LocalDatabaseWriteError), _SyncEvent$FullSyncCo)[syncEvent];
+  return (_SyncEvent$FullSyncCo = {}, _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].FullSyncCompleted, ApplicationEvent.CompletedFullSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SingleSyncCompleted, ApplicationEvent.CompletedIncrementalSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncError, ApplicationEvent.FailedSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncTakingTooLong, ApplicationEvent.HighLatencySync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].EnterOutOfSync, ApplicationEvent.EnteredOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].ExitOutOfSync, ApplicationEvent.ExitedOutOfSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataLoaded, ApplicationEvent.LocalDataLoaded), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].MajorDataChange, ApplicationEvent.MajorDataChange), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].LocalDataIncrementalLoad, ApplicationEvent.LocalDataIncrementalLoad), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].StatusChanged, ApplicationEvent.SyncStatusChanged), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].SyncWillBegin, ApplicationEvent.WillSync), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].InvalidSession, ApplicationEvent.InvalidSyncSession), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseReadError, ApplicationEvent.LocalDatabaseReadError), _defineProperty(_SyncEvent$FullSyncCo, _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["SyncEvent"].DatabaseWriteError, ApplicationEvent.LocalDatabaseWriteError), _SyncEvent$FullSyncCo)[syncEvent];
 }
 
 /***/ }),
@@ -17001,8 +17002,10 @@ var ApplicationService = /*#__PURE__*/function (_PureService) {
                   break;
 
                 case 11:
-                  if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_2__["ApplicationEvent"].CompletedSync) {
-                    _this2.onAppSync();
+                  if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_2__["ApplicationEvent"].CompletedFullSync) {
+                    _this2.onAppFullSync();
+                  } else if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_2__["ApplicationEvent"].CompletedIncrementalSync) {
+                    _this2.onAppIncrementalSync();
                   } else if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_2__["ApplicationEvent"].KeyStatusChanged) {
                     _this2.onAppKeyChange();
                   }
@@ -17089,8 +17092,13 @@ var ApplicationService = /*#__PURE__*/function (_PureService) {
       return onAppKeyChange;
     }()
   }, {
-    key: "onAppSync",
-    value: function onAppSync() {
+    key: "onAppIncrementalSync",
+    value: function onAppIncrementalSync() {
+      /** Optional override */
+    }
+  }, {
+    key: "onAppFullSync",
+    value: function onAppFullSync() {
       /** Optional override */
     }
   }]);
@@ -23492,7 +23500,7 @@ var SNMigrationService = /*#__PURE__*/function (_PureService) {
                 break;
 
               case 5:
-                if (!(event === _events__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvent"].CompletedSync)) {
+                if (!(event === _events__WEBPACK_IMPORTED_MODULE_1__["ApplicationEvent"].CompletedFullSync)) {
                   _context4.next = 10;
                   break;
                 }

@@ -180,11 +180,11 @@ export declare class SNApplication {
     /**
      * Mutates a pre-existing item, marks it as dirty, and syncs it
      */
-    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource): Promise<SNItem | undefined>;
+    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<SNItem | undefined>;
     /**
     * Mutates pre-existing items, marks them as dirty, and syncs
     */
-    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource): Promise<void>;
+    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<void>;
     /**
     * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
     */
