@@ -1,3 +1,5 @@
+import { MutationType } from './../../models/core/item';
+import { SNComponent, ComponentArea, ComponentMutator } from './../../models/app/component';
 import { ContentReference } from './generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { CreateItemFromPayload } from '@Models/generator';
@@ -6,6 +8,39 @@ import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { extendArray } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { PurePayload } from '@Payloads/pure_payload';
+import { ContentType } from '@Lib/models';
+
+type AffectorFunction = (
+  basePayload: PurePayload,
+  duplicatePayload: PurePayload,
+  baseCollection: ImmutablePayloadCollection
+) => PurePayload[]
+
+function NoteDuplicationAffectedPayloads(
+  basePayload: PurePayload,
+  duplicatePayload: PurePayload,
+  baseCollection: ImmutablePayloadCollection
+) {
+  /** If note has editor, maintain editor relationship in duplicate note */
+  const components = baseCollection.all(ContentType.Component).map((payload) => {
+    return CreateItemFromPayload(payload);
+  }) as SNComponent[];
+  const editor = components.filter((c) => c.area === ComponentArea.Editor).find((e) => {
+    return e.isExplicitlyEnabledForItem(basePayload.uuid);
+  })
+  if (!editor) {
+    return undefined;
+  }
+  /** Modify the editor to include new note */
+  const mutator = new ComponentMutator(editor, MutationType.Internal);
+  mutator.associateWithItem(duplicatePayload.uuid);
+  const result = mutator.getResult();
+  return [result];
+}
+
+const AffectorMapping = {
+  [ContentType.Note]: NoteDuplicationAffectedPayloads
+} as Partial<Record<ContentType, AffectorFunction>>
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -49,6 +84,15 @@ export async function PayloadsByDuplicating(
     }]
   );
   extendArray(results, updatedReferencing);
+
+  const affector = AffectorMapping[payload.content_type];
+  if (affector) {
+    const affected = affector(payload, copy, baseCollection);
+    if(affected) {
+      extendArray(results, affected);
+    }
+  }
+
   return results;
 }
 

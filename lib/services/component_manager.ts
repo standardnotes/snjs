@@ -1398,7 +1398,7 @@ export class SNComponentManager extends PureService {
   editorForNote(note: SNNote) {
     const editors = this.componentsForArea(ComponentArea.Editor);
     for (const editor of editors) {
-      if (editor.isExplicitlyEnabledForItem(note)) {
+      if (editor.isExplicitlyEnabledForItem(note.uuid)) {
         return editor;
       }
     }
@@ -1413,7 +1413,7 @@ export class SNComponentManager extends PureService {
         defaultEditor = this.getDefaultEditor();
       }
     }
-    if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note)) {
+    if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note.uuid)) {
       return defaultEditor;
     } else {
       return undefined;

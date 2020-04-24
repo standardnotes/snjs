@@ -21,8 +21,7 @@ export function createApplication(namespace, environment, platform) {
     deviceInterface,
     namespace,
     undefined,
-    undefined,
-    [SNComponentManager]
+    undefined
   );
 }
 

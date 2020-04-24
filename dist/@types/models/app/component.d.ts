@@ -105,8 +105,8 @@ export declare class SNComponent extends SNItem implements ComponentContent {
      */
     static associativeAreas(): ComponentArea[];
     isAssociative(): boolean;
-    isExplicitlyEnabledForItem(item: SNItem): boolean;
-    isExplicitlyDisabledForItem(item: SNItem): boolean;
+    isExplicitlyEnabledForItem(uuid: UuidString): boolean;
+    isExplicitlyDisabledForItem(uuid: UuidString): boolean;
 }
 export declare class ComponentMutator extends ItemMutator {
     get typedContent(): Partial<ComponentContent>;
@@ -117,8 +117,8 @@ export declare class ComponentMutator extends ItemMutator {
     set local_url(local_url: string);
     set hosted_url(hosted_url: string);
     set permissions(permissions: ComponentPermission[]);
-    associateWithItem(item: SNItem): void;
-    disassociateWithItem(item: SNItem): void;
+    associateWithItem(uuid: UuidString): void;
+    disassociateWithItem(uuid: UuidString): void;
     removeAssociatedItemId(uuid: UuidString): void;
     removeDisassociatedItemId(uuid: UuidString): void;
     setLastSize(size: string): void;

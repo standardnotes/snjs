@@ -5614,13 +5614,13 @@ var SNComponent = /*#__PURE__*/function (_SNItem) {
     }
   }, {
     key: "isExplicitlyEnabledForItem",
-    value: function isExplicitlyEnabledForItem(item) {
-      return this.associatedItemIds.indexOf(item.uuid) !== -1;
+    value: function isExplicitlyEnabledForItem(uuid) {
+      return this.associatedItemIds.indexOf(uuid) !== -1;
     }
   }, {
     key: "isExplicitlyDisabledForItem",
-    value: function isExplicitlyDisabledForItem(item) {
-      return this.disassociatedItemIds.indexOf(item.uuid) !== -1;
+    value: function isExplicitlyDisabledForItem(uuid) {
+      return this.disassociatedItemIds.indexOf(uuid) !== -1;
     }
   }], [{
     key: "associativeAreas",
@@ -5642,16 +5642,16 @@ var ComponentMutator = /*#__PURE__*/function (_ItemMutator) {
 
   _createClass(ComponentMutator, [{
     key: "associateWithItem",
-    value: function associateWithItem(item) {
+    value: function associateWithItem(uuid) {
       var associated = this.typedContent.associatedItemIds || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(associated, item.uuid);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(associated, uuid);
       this.typedContent.associatedItemIds = associated;
     }
   }, {
     key: "disassociateWithItem",
-    value: function disassociateWithItem(item) {
+    value: function disassociateWithItem(uuid) {
       var disassociated = this.typedContent.disassociatedItemIds || [];
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(disassociated, item.uuid);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_1__["addIfUnique"])(disassociated, uuid);
       this.typedContent.disassociatedItemIds = disassociated;
     }
   }, {
@@ -13341,34 +13341,66 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PayloadContentsEqual", function() { return PayloadContentsEqual; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
-/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
+/* harmony import */ var _models_core_item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../../models/core/item */ "./lib/models/core/item.ts");
+/* harmony import */ var _models_app_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../../models/app/component */ "./lib/models/app/component.ts");
+/* harmony import */ var _Models_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Models/generator */ "./lib/models/generator.ts");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/remove */ "./node_modules/lodash/remove.js");
+/* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Payloads/generator */ "./lib/protocol/payloads/generator.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/uuid */ "./lib/uuid.ts");
+/* harmony import */ var _Lib_models__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/models */ "./lib/models/index.ts");
 
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
 
 
+
+
+
+
+function NoteDuplicationAffectedPayloads(basePayload, duplicatePayload, baseCollection) {
+  /** If note has editor, maintain editor relationship in duplicate note */
+  var components = baseCollection.all(_Lib_models__WEBPACK_IMPORTED_MODULE_8__["ContentType"].Component).map(function (payload) {
+    return Object(_Models_generator__WEBPACK_IMPORTED_MODULE_3__["CreateItemFromPayload"])(payload);
+  });
+  var editor = components.filter(function (c) {
+    return c.area === _models_app_component__WEBPACK_IMPORTED_MODULE_2__["ComponentArea"].Editor;
+  }).find(function (e) {
+    return e.isExplicitlyEnabledForItem(basePayload.uuid);
+  });
+
+  if (!editor) {
+    return undefined;
+  }
+  /** Modify the editor to include new note */
+
+
+  var mutator = new _models_app_component__WEBPACK_IMPORTED_MODULE_2__["ComponentMutator"](editor, _models_core_item__WEBPACK_IMPORTED_MODULE_1__["MutationType"].Internal);
+  mutator.associateWithItem(duplicatePayload.uuid);
+  var result = mutator.getResult();
+  return [result];
+}
+
+var AffectorMapping = _defineProperty({}, _Lib_models__WEBPACK_IMPORTED_MODULE_8__["ContentType"].Note, NoteDuplicationAffectedPayloads);
 /**
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
  */
+
+
 function PayloadsByDuplicating(_x, _x2, _x3) {
   return _PayloadsByDuplicating.apply(this, arguments);
 }
@@ -13381,14 +13413,14 @@ function PayloadsByDuplicating(_x, _x2, _x3) {
 
 function _PayloadsByDuplicating() {
   _PayloadsByDuplicating = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(payload, baseCollection, isConflict) {
-    var results, override, copy, referencing, updatedReferencing;
+    var results, override, copy, referencing, updatedReferencing, affector, affected;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             results = [];
             _context.next = 3;
-            return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
+            return _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
 
           case 3:
             _context.t0 = _context.sent;
@@ -13407,7 +13439,7 @@ function _PayloadsByDuplicating() {
               });
             }
 
-            copy = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, override);
+            copy = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(payload, override);
             results.push(copy);
             /**
              * Get the payloads that make reference to payload and add the copy.
@@ -13422,10 +13454,20 @@ function _PayloadsByDuplicating() {
 
           case 12:
             updatedReferencing = _context.sent;
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["extendArray"])(results, updatedReferencing);
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, updatedReferencing);
+            affector = AffectorMapping[payload.content_type];
+
+            if (affector) {
+              affected = affector(payload, copy, baseCollection);
+
+              if (affected) {
+                Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, affected);
+              }
+            }
+
             return _context.abrupt("return", results);
 
-          case 15:
+          case 17:
           case "end":
             return _context.stop();
         }
@@ -13452,10 +13494,10 @@ function _PayloadsByAlternatingUuid() {
             * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
             */
 
-            _context2.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"];
+            _context2.t0 = _Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"];
             _context2.t1 = payload;
             _context2.next = 5;
-            return _Lib_uuid__WEBPACK_IMPORTED_MODULE_5__["Uuid"].GenerateUuid();
+            return _Lib_uuid__WEBPACK_IMPORTED_MODULE_7__["Uuid"].GenerateUuid();
 
           case 5:
             _context2.t2 = _context2.sent;
@@ -13483,8 +13525,8 @@ function _PayloadsByAlternatingUuid() {
 
           case 13:
             updatedReferencing = _context2.sent;
-            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__["extendArray"])(results, updatedReferencing);
-            updatedSelf = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
+            Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["extendArray"])(results, updatedReferencing);
+            updatedSelf = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(payload, {
               deleted: true,
 
               /** Do not set as dirty; this item is non-syncable
@@ -13599,7 +13641,7 @@ function _PayloadsByUpdatingReferences() {
 
             for (_iterator3 = removeIds[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
               id = _step3.value;
-              lodash_remove__WEBPACK_IMPORTED_MODULE_2___default()(references, {
+              lodash_remove__WEBPACK_IMPORTED_MODULE_4___default()(references, {
                 uuid: id
               });
             }
@@ -13638,7 +13680,7 @@ function _PayloadsByUpdatingReferences() {
             return _context3.finish(41);
 
           case 49:
-            result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_3__["CopyPayload"])(payload, {
+            result = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_5__["CopyPayload"])(payload, {
               dirty: true,
               dirtiedDate: new Date(),
               content: _objectSpread({}, payload.safeContent, {
@@ -13700,8 +13742,8 @@ function _PayloadsByUpdatingReferences() {
 }
 
 function PayloadContentsEqual(payloadA, payloadB) {
-  var itemA = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(payloadA);
-  var itemB = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_1__["CreateItemFromPayload"])(payloadB);
+  var itemA = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_3__["CreateItemFromPayload"])(payloadA);
+  var itemB = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_3__["CreateItemFromPayload"])(payloadB);
   return itemA.isItemContentEqualWith(itemB);
 }
 
@@ -20347,7 +20389,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         for (var _iterator27 = editors[Symbol.iterator](), _step27; !(_iteratorNormalCompletion27 = (_step27 = _iterator27.next()).done); _iteratorNormalCompletion27 = true) {
           var editor = _step27.value;
 
-          if (editor.isExplicitlyEnabledForItem(note)) {
+          if (editor.isExplicitlyEnabledForItem(note.uuid)) {
             return editor;
           }
         }
@@ -20379,7 +20421,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
         }
       }
 
-      if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note)) {
+      if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note.uuid)) {
         return defaultEditor;
       } else {
         return undefined;

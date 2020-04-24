@@ -188,12 +188,12 @@ export class SNComponent extends SNItem implements ComponentContent {
     return SNComponent.associativeAreas().includes(this.area);
   }
 
-  public isExplicitlyEnabledForItem(item: SNItem) {
-    return this.associatedItemIds.indexOf(item.uuid!) !== -1;
+  public isExplicitlyEnabledForItem(uuid: UuidString) {
+    return this.associatedItemIds.indexOf(uuid) !== -1;
   }
 
-  public isExplicitlyDisabledForItem(item: SNItem) {
-    return this.disassociatedItemIds.indexOf(item.uuid!) !== -1;
+  public isExplicitlyDisabledForItem(uuid: UuidString) {
+    return this.disassociatedItemIds.indexOf(uuid) !== -1;
   }
 }
 
@@ -231,15 +231,15 @@ export class ComponentMutator extends ItemMutator {
     this.typedContent!.permissions = permissions;
   }
 
-  public associateWithItem(item: SNItem) {
+  public associateWithItem(uuid: UuidString) {
     const associated = this.typedContent.associatedItemIds || [];
-    addIfUnique(associated, item.uuid);
+    addIfUnique(associated, uuid);
     this.typedContent.associatedItemIds = associated;
   }
 
-  public disassociateWithItem(item: SNItem) {
+  public disassociateWithItem(uuid: UuidString) {
     const disassociated = this.typedContent.disassociatedItemIds || [];
-    addIfUnique(disassociated, item.uuid);
+    addIfUnique(disassociated, uuid);
     this.typedContent.disassociatedItemIds = disassociated;
   }
 

@@ -102,4 +102,56 @@ describe('duplication', () => {
     );
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
+
+  it('duplicating note should maintain editor ref', async function () {
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+    const basePayload = createDirtyPayload(ContentType.Component);
+    const payload = CopyPayload(
+      basePayload,
+      {
+        content: {
+          ...basePayload.content,
+          area: ComponentArea.Editor
+        }
+      }
+    );
+    const editor = await this.application.itemManager.emitItemFromPayload(
+      payload,
+      PayloadSource.LocalChanged
+    );
+    this.expectedItemCount++;
+    await this.application.syncService.sync(syncOptions);
+
+    await this.application.changeAndSaveItem(
+      editor.uuid,
+      (mutator) => {
+        mutator.associateWithItem(note.uuid);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
+    
+    expect(this.application.componentManager.editorForNote(note)).to.be.ok;
+
+    /** Conflict the note */
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.content.title = 'zar';
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
+    this.expectedItemCount++;
+
+    const duplicate = this.application.itemManager.notes.find((n) => {
+      return n.uuid !== note.uuid;
+    });
+    expect(duplicate).to.be.ok;
+    expect(this.application.componentManager.editorForNote(duplicate)).to.be.ok;
+  });
 });
