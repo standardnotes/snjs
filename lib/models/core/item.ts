@@ -197,7 +197,7 @@ export class SNItem {
    * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
    * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
    */
-  public getDomainData(domain: string) {
+  public getDomainData(domain: string) : undefined | Record<string, any> {
     const domainData = this.payload.safeContent.appData;
     if (!domainData) {
       return undefined;
@@ -208,7 +208,7 @@ export class SNItem {
 
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
-    return appData[key];
+    return appData![key];
   }
 
   /**

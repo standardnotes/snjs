@@ -18415,7 +18415,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
       var componentData = item.getDomainData(ComponentDataDomain) || {};
       /** The data for this particular component */
 
-      var clientData = componentData[component.getClientDataKey()];
+      var clientData = componentData[component.getClientDataKey()] || {};
       var params = {
         uuid: item.uuid,
         content_type: item.content_type,
@@ -19035,7 +19035,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                             });
 
                             if (responseItem.clientData) {
-                              var allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
+                              var allComponentData = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["Copy"])(mutator.getItem().getDomainData(ComponentDataDomain) || {});
                               allComponentData[component.getClientDataKey()] = responseItem.clientData;
                               mutator.setDomainData(allComponentData, ComponentDataDomain);
                             }
@@ -19177,7 +19177,7 @@ var SNComponentManager = /*#__PURE__*/function (_PureService) {
                           _context4.next = 12;
                           return _this12.itemManager.changeItem(item.uuid, function (mutator) {
                             if (responseItem.clientData) {
-                              var allComponentData = item.getDomainData(ComponentDataDomain);
+                              var allComponentData = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_13__["Copy"])(item.getDomainData(ComponentDataDomain) || {});
                               allComponentData[component.getClientDataKey()] = responseItem.clientData;
                               mutator.setDomainData(allComponentData, ComponentDataDomain);
                             }

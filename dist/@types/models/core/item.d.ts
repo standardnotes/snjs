@@ -90,7 +90,7 @@ export declare class SNItem {
      * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
      * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
      */
-    getDomainData(domain: string): any;
+    getDomainData(domain: string): undefined | Record<string, any>;
     getAppDomainValue(key: AppDataField): any;
     /**
      * During sync conflicts, when determing whether to create a duplicate for an item,

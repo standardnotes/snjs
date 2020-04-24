@@ -458,7 +458,7 @@ export class SNComponentManager extends PureService {
     /** The data all components store into */
     const componentData = item.getDomainData(ComponentDataDomain) || {};
     /** The data for this particular component */
-    const clientData = componentData[component.getClientDataKey()!];
+    const clientData = componentData[component.getClientDataKey()!] || {};
     const params: ItemMessagePayload = {
       uuid: item.uuid,
       content_type: item.content_type!,
@@ -838,8 +838,8 @@ export class SNComponentManager extends PureService {
         return CreateSourcedPayloadFromObject(
           responseItem,
           PayloadSource.ComponentRetrieved
-          );
-        });
+        );
+      });
       await this.itemManager!.changeItems(
         uuids,
         (mutator) => {
@@ -847,7 +847,7 @@ export class SNComponentManager extends PureService {
           mutator.mergePayload(payload);
           const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() })!;
           if (responseItem.clientData) {
-            const allComponentData = mutator.getItem().getDomainData(ComponentDataDomain);
+            const allComponentData = Copy(mutator.getItem().getDomainData(ComponentDataDomain) || {});
             allComponentData[component.getClientDataKey()!] = responseItem.clientData;
             mutator.setDomainData(allComponentData, ComponentDataDomain);
           }
@@ -856,7 +856,6 @@ export class SNComponentManager extends PureService {
         PayloadSource.ComponentRetrieved,
         component.uuid
       );
-
       this.syncService!.sync().then(() => {
         /* Allow handlers to be notified when a save begins and ends, to update the UI */
         const saveMessage = Object.assign({}, message);
@@ -907,7 +906,7 @@ export class SNComponentManager extends PureService {
       this.removePrivatePropertiesFromResponseItems(responseItems, component);
       const processedItems = [];
       for (const responseItem of responseItems) {
-        if(!responseItem.uuid) {
+        if (!responseItem.uuid) {
           responseItem.uuid = await Uuid.GenerateUuid();
         }
         const payload = CreateSourcedPayloadFromObject(
@@ -920,7 +919,7 @@ export class SNComponentManager extends PureService {
           item.uuid,
           (mutator) => {
             if (responseItem.clientData) {
-              const allComponentData = item.getDomainData(ComponentDataDomain);
+              const allComponentData = Copy(item.getDomainData(ComponentDataDomain) || {});
               allComponentData[component.getClientDataKey()!] = responseItem.clientData;
               mutator.setDomainData(allComponentData, ComponentDataDomain);
             }
