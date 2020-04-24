@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('application instances', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   before(async () => {
     localStorage.clear();
   });
@@ -33,13 +38,13 @@ describe('application instances', () => {
     const app2 = await Factory.createAndInitializeApplication('app2');
 
     await Factory.createMappedNote(app1);
-    await app1.syncService.sync();
+    await app1.syncService.sync(syncOptions);
 
     expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT);
 
     await Factory.createMappedNote(app2);
-    await app2.syncService.sync();
+    await app2.syncService.sync(syncOptions);
 
     expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1);

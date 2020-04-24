@@ -6,6 +6,12 @@ const expect = chai.expect;
 
 describe('notes and tags', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
+
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -122,7 +128,7 @@ describe('notes and tags', () => {
 
     expect(note.dirty).to.be.true;
     expect(tag.dirty).to.be.true;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
     expect(tag.content.references.length).to.equal(0);
     expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0);
     expect(tag.noteCount).to.equal(0);
@@ -148,7 +154,7 @@ describe('notes and tags', () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
@@ -202,9 +208,15 @@ describe('notes and tags', () => {
     expect(note.content.references.length).to.equal(0);
     expect(tag.content.references.length).to.equal(1);
 
-    tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
-      mutator.removeItemAsRelationship(note);
-    });
+    tag = await this.application.changeAndSaveItem(
+      tag.uuid,
+      (mutator) => {
+        mutator.removeItemAsRelationship(note);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0);
     expect(tag.noteCount).to.equal(0);
@@ -220,7 +232,7 @@ describe('notes and tags', () => {
     let tag = this.application.itemManager.tags[0];
 
     const duplicateTag = await this.application.itemManager.duplicateItem(tag.uuid, true);
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     note = this.application.itemManager.findItem(note.uuid);
     tag = this.application.itemManager.findItem(tag.uuid);
@@ -288,9 +300,15 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
-    note = await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.content.title = Math.random();
-    });
+    note = await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.content.title = Math.random();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(note.content.title).to.not.equal(notePayload.content.title);
   });
 
@@ -309,7 +327,7 @@ describe('notes and tags', () => {
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0];
 
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
     await this.application.itemManager.setItemToBeDeleted(tag.uuid);
 
     note = this.application.itemManager.findItem(note.uuid);
@@ -320,7 +338,7 @@ describe('notes and tags', () => {
   });
 
   it('setting a note dirty should collapse its properties into content', async function () {
-    let note = await this.application.createTemplateItem(ContentType.Note, { title: 'Foo' });    
+    let note = await this.application.createTemplateItem(ContentType.Note, { title: 'Foo' });
     await this.application.insertItem(note);
     note = this.application.itemManager.findItem(note.uuid);
     expect(note.content.title).to.equal('Foo');

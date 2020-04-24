@@ -510,7 +510,8 @@ export class SNApplication {
     uuid: UuidString,
     mutate?: (mutator: ItemMutator) => void,
     isUserModified = false,
-    payloadSource?: PayloadSource
+    payloadSource?: PayloadSource,
+    syncOptions?: SyncOptions
   ) {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -521,7 +522,7 @@ export class SNApplication {
       isUserModified ? MutationType.UserInteraction : undefined,
       payloadSource
     );
-    await this.syncService!.sync();
+    await this.syncService!.sync(syncOptions);
     return this.findItem(uuid);
   }
 
@@ -532,7 +533,8 @@ export class SNApplication {
     uuids: UuidString[],
     mutate?: (mutator: ItemMutator) => void,
     isUserModified = false,
-    payloadSource?: PayloadSource
+    payloadSource?: PayloadSource,
+    syncOptions?: SyncOptions
   ) {
     await this.itemManager!.changeItems(
       uuids,
@@ -540,7 +542,7 @@ export class SNApplication {
       isUserModified ? MutationType.UserInteraction : undefined,
       payloadSource
     );
-    await this.syncService!.sync();
+    await this.syncService!.sync(syncOptions);
   }
 
   /**

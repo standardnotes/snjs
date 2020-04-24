@@ -4,6 +4,11 @@ import WebDeviceInterface from './web_device_interface.js';
 
 export const TestTimeout = 10000;
 
+const syncOptions = {
+  checkIntegrity: true,
+  awaitAll: true
+};
+
 export function createApplication(namespace, environment, platform) {
   const deviceInterface = new WebDeviceInterface(
     namespace,
@@ -46,7 +51,9 @@ export async function initializeApplication(application) {
   await application.launch(true);
 }
 
-export async function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
+export async function registerUserToApplication(
+  { application, email, password, ephemeral, mergeLocal = true }
+) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   return application.register(email, password, ephemeral, mergeLocal);
@@ -64,7 +71,7 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
     keyParams
   );
   await application.rewriteItemsKeys();
-  await application.syncService.sync();
+  await application.syncService.sync(syncOptions);
 }
 
 /**
@@ -94,7 +101,8 @@ export async function registerOldUser({ application, email, password, version })
   );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
-    mode: SyncModes.DownloadFirst
+    mode: SyncModes.DownloadFirst,
+    ...syncOptions
   });
   application.protocolService.decryptErroredItems();
 }
@@ -140,7 +148,7 @@ export async function createSyncedNote(application) {
     PayloadSource.LocalChanged
   );
   await application.itemManager.setItemDirty(note.uuid);
-  await application.syncService.sync();
+  await application.syncService.sync(syncOptions);
   return note;
 }
 

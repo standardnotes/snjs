@@ -109,6 +109,7 @@ describe('device authentication', () => {
   it('handles application launch with passcode and account', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
+    application.syncService.loggingEnabled = true;
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({

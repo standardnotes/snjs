@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('sync discordance', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   before(async function () {
     localStorage.clear();
   });
@@ -57,7 +62,7 @@ describe('sync discordance', () => {
   }).timeout(10000);
 
   it('should increase discordance as client server mismatches', async function () {
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     const payload = Factory.createNotePayload();
     const item = await this.application.itemManager.emitItemFromPayload(
@@ -114,7 +119,7 @@ describe('sync discordance', () => {
     );
     this.expectedItemCount++;
 
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     // Delete item locally only without notifying server. We should then be in discordance.
     await this.application.itemManager.removeItemLocally(item);

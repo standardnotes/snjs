@@ -125,7 +125,6 @@ export class SNComponent extends SNItem implements ComponentContent {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item);
     }
-
     return ConflictStrategy.KeepLeft;
   }
 

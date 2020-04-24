@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('basic auth', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   before(async function () {
     localStorage.clear();
   });
@@ -15,18 +20,18 @@ describe('basic auth', () => {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     this.application.deinit();
   });
 
-  it('successfully register new account',  async function () {
+  it('successfully register new account', async function () {
     const response = await this.application.register(
       this.email,
       this.password
@@ -115,7 +120,7 @@ describe('basic auth', () => {
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
 
@@ -128,24 +133,30 @@ describe('basic auth', () => {
     this.expectedItemCount++;
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-    
+
     expect(response.error).to.not.be.ok;
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(this.application.itemManager.invalidItems.length).to.equal(0);
-    
+
     await this.application.syncService.markAllItemsAsNeedingSync();
-    await this.application.syncService.sync();
-    
+    await this.application.syncService.sync(syncOptions);
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-    
+
     /** Create conflict for a note */
     const note = this.application.itemManager.notes[0];
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.title = `${Math.random()}`;
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     this.expectedItemCount++;
-  
+
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Should login with new password */
     const signinResponse = await this.application.signIn(
@@ -172,12 +183,12 @@ describe('basic auth', () => {
     const noteCount = 10;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     const numTimesToChangePw = 5;
     let newPassword = Factory.randomString();
     let currentPassword = this.password;
-    for(let i = 0; i < numTimesToChangePw; i++) {
+    for (let i = 0; i < numTimesToChangePw; i++) {
       await this.application.changePassword(
         currentPassword,
         newPassword
@@ -192,7 +203,7 @@ describe('basic auth', () => {
       expect(this.application.itemManager.invalidItems.length).to.equal(0);
 
       await this.application.syncService.markAllItemsAsNeedingSync();
-      await this.application.syncService.sync();
+      await this.application.syncService.sync(syncOptions);
       this.application = await Factory.signOutApplicationAndReturnNew(this.application);
       expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
       expect(this.application.itemManager.invalidItems.length).to.equal(0);

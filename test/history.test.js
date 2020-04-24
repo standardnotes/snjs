@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('session history', () => {
   const largeCharacterChange = 15;
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   before(async function () {
     localStorage.clear();
   });
@@ -30,9 +35,15 @@ describe('session history', () => {
   });
 
   async function setTextAndSync(application, item, text) {
-    return application.changeAndSaveItem(item.uuid, (mutator) => {
-      mutator.text = text;
-    });
+    return application.changeAndSaveItem(
+      item.uuid,
+      (mutator) => {
+        mutator.text = text;
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
   }
 
   function deleteCharsFromString(string, amount) {
@@ -50,9 +61,15 @@ describe('session history', () => {
     expect(itemHistory.entries.length).to.equal(1);
 
     /** Sync with different contents, should create new entry */
-    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
-      mutator.title = Math.random();
-    });
+    await this.application.changeAndSaveItem(
+      item.uuid,
+      (mutator) => {
+        mutator.title = Math.random();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(itemHistory.entries.length).to.equal(2);
 
     this.historyManager.clearHistoryForItem(item);
@@ -132,7 +149,7 @@ describe('session history', () => {
       deleteCharsFromString(item.content.text, 1)
     );
     expect(itemHistory.entries.length).to.equal(5);
-    item =  await setTextAndSync(
+    item = await setTextAndSync(
       this.application,
       item,
       deleteCharsFromString(item.content.text, 1)
@@ -152,7 +169,7 @@ describe('session history', () => {
         PayloadSource.LocalChanged
       );
       await this.application.itemManager.setItemDirty(item.uuid);
-      await this.application.syncService.sync();
+      await this.application.syncService.sync(syncOptions);
       const itemHistory = this.historyManager.historyForItem(item);
       /** It should keep the first and last by default */
       item = await setTextAndSync(

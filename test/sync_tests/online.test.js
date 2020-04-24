@@ -116,7 +116,7 @@ describe('online syncing', () => {
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.syncService.markAllItemsAsNeedingSync(true);
-    await this.application.sync();
+    await this.application.sync(syncOptions);
 
     const notes = this.application.itemManager.notes;
     expect(notes.length).to.equal(1);
@@ -363,11 +363,17 @@ describe('online syncing', () => {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      // modify this item to have stale values
-      mutator.title = `${Math.random()}`;
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        // modify this item to have stale values
+        mutator.title = `${Math.random()}`;
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // We expect this item to be duplicated
     this.expectedItemCount++;
@@ -384,11 +390,17 @@ describe('online syncing', () => {
     await this.application.saveItem(note.uuid);
     this.expectedItemCount += 1;
 
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      /** Create conflict for a note */
-      mutator.title = `${Math.random()}`;
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        /** Create conflict for a note */
+        mutator.title = `${Math.random()}`;
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     this.expectedItemCount++;
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
@@ -398,7 +410,7 @@ describe('online syncing', () => {
     await this.application.storageService.clearAllPayloads();
     await this.application.modelManager.resetState();
     await this.application.itemManager.resetState();
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
@@ -467,16 +479,27 @@ describe('online syncing', () => {
     await this.application.itemManager.setItemDirty(note.uuid);
     this.expectedItemCount++;
 
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      // client A
-      mutator.content.conflict_of = 'foo';
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid, (mutator) => {
+        // client A
+        mutator.content.conflict_of = 'foo';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // client B
     await this.application.syncService.clearSyncPositionTokens();
-    await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-      mutator.content.conflict_of = 'bar';
-    });
+    await this.application.itemManager.changeItem(
+      note.uuid,
+      (mutator) => {
+        mutator.content.conflict_of = 'bar';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // conflict_of is a key to ignore when comparing content, so item should
     // not be duplicated.
@@ -488,17 +511,29 @@ describe('online syncing', () => {
     await this.application.itemManager.setItemDirty(note.uuid);
     this.expectedItemCount++;
 
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      // client A
-      mutator.content.foo = 'foo';
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        // client A
+        mutator.content.foo = 'foo';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // client B
     await this.application.syncService.clearSyncPositionTokens();
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.content.foo = 'bar';
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.content.foo = 'bar';
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     this.expectedItemCount++;
   }).timeout(10000);
 
@@ -604,10 +639,16 @@ describe('online syncing', () => {
 
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.setDeleted();
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.setDeleted();
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // We expect that this item maintained.
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
@@ -626,7 +667,7 @@ describe('online syncing', () => {
     this.expectedItemCount--;
     await sync;
     this.application.syncService.ut_endLatencySimulator();
-    await this.application.sync();
+    await this.application.sync(syncOptions);
 
     /** We expect that item has been deleted */
     // expect(note.deleted).to.equal(true);
@@ -641,10 +682,16 @@ describe('online syncing', () => {
     note = this.application.findItem(note.uuid);
     expect(note.dirty).to.equal(false);
     this.expectedItemCount++;
-    note = await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.text = 'Stale text';
-      mutator.updated_at = Factory.yesterday();
-    });
+    note = await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.text = 'Stale text';
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(note.dirty).to.equal(false);
 
     // We expect now that the item was conflicted
@@ -664,9 +711,15 @@ describe('online syncing', () => {
 
     await this.application.syncService.sync(syncOptions);
 
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   }).timeout(10000);
@@ -759,7 +812,7 @@ describe('online syncing', () => {
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     const foundNote = this.application.itemManager.findItem(note.uuid);
     expect(foundNote.dirty).to.equal(true);
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
   }).timeout(10000);
 
   it('duplicating an item should maintian its relationships', async function () {
@@ -907,9 +960,15 @@ describe('online syncing', () => {
   it('saving an item after sync should persist it with content property', async function () {
     const note = await Factory.createMappedNote(this.application);
     const text = Factory.randomString(10000);
-    await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.text = text;
-    });
+    await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.text = text;
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     this.expectedItemCount++;
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const notePayload = rawPayloads.find((p) => p.content_type === ContentType.Note);
@@ -1016,7 +1075,7 @@ describe('online syncing', () => {
     const largeItemCount = 50;
     await Factory.createManyMappedNotes(this.application, largeItemCount);
     this.expectedItemCount += largeItemCount;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
@@ -1047,9 +1106,15 @@ describe('online syncing', () => {
      */
     let tag = await Factory.createMappedTag(this.application);
     let note = await Factory.createMappedNote(this.application);
-    tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
-      mutator.addItemAsRelationship(note);
-    });
+    tag = await this.application.changeAndSaveItem(
+      tag.uuid,
+      (mutator) => {
+        mutator.addItemAsRelationship(note);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     await this.application.itemManager.setItemDirty(note.uuid);
     this.expectedItemCount += 2;
 
@@ -1057,15 +1122,27 @@ describe('online syncing', () => {
 
     // conflict the note
     const newText = `${Math.random()}`;
-    note = await this.application.changeAndSaveItem(note.uuid, (mutator) => {
-      mutator.updated_at = Factory.yesterday();
-      mutator.text = newText;
-    });
+    note = await this.application.changeAndSaveItem(
+      note.uuid,
+      (mutator) => {
+        mutator.updated_at = Factory.yesterday();
+        mutator.text = newText;
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     // conflict the tag but keep its content the same
-    tag = await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
-      mutator.updated_at = Factory.yesterday();
-    });
+    tag = await this.application.changeAndSaveItem(
+      tag.uuid,
+      (mutator) => {
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     /**
      * We expect now that the total item count has went up by just 1 (the note),
      * and not 2 (the note and tag)
@@ -1204,7 +1281,7 @@ describe('online syncing', () => {
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
     await this.application.deleteItem(note);
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
-    await this.application.sync();
+    await this.application.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   }).timeout(Factory.TestTimeout);
 });

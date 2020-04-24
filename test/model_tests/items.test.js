@@ -7,7 +7,12 @@ const expect = chai.expect;
 describe('items', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  beforeEach(async function() {
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   });
@@ -55,11 +60,17 @@ describe('items', () => {
     const item = this.application.itemManager.items[0];
     expect(item.pinned).to.not.be.ok;
 
-    const refreshedItem = await this.application.changeAndSaveItem(item.uuid, (mutator) => {
-      mutator.pinned = true;
-      mutator.archived = true;
-      mutator.locked = true;
-    });
+    const refreshedItem = await this.application.changeAndSaveItem(
+      item.uuid,
+      (mutator) => {
+        mutator.pinned = true;
+        mutator.archived = true;
+        mutator.locked = true;
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(refreshedItem.pinned).to.equal(true);
     expect(refreshedItem.archived).to.equal(true);
     expect(refreshedItem.locked).to.equal(true);
@@ -79,46 +90,92 @@ describe('items', () => {
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
     // items should ignore this field when checking for equality
-    item1 = await this.application.changeAndSaveItem(item1.uuid, (mutator) => {
-      mutator.userModifiedDate = new Date();
-    });
-    item2 = await this.application.changeAndSaveItem(item2.uuid, (mutator) => {
-      mutator.userModifiedDate = undefined;
-    });
+    item1 = await this.application.changeAndSaveItem(
+      item1.uuid, (mutator) => {
+        mutator.userModifiedDate = new Date();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
+    item2 = await this.application.changeAndSaveItem(
+      item2.uuid, (mutator) => {
+        mutator.userModifiedDate = undefined;
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
 
-    item1 = await this.application.changeAndSaveItem(item1.uuid, (mutator) => {
-      mutator.content.foo = 'bar';
-    });
+    item1 = await this.application.changeAndSaveItem(
+      item1.uuid,
+      (mutator) => {
+        mutator.content.foo = 'bar';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(false);
 
-    item2 = await this.application.changeAndSaveItem(item2.uuid, (mutator) => {
-      mutator.content.foo = 'bar';
-    });
+    item2 = await this.application.changeAndSaveItem(
+      item2.uuid,
+      (mutator) => {
+        mutator.content.foo = 'bar';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
     expect(item2.isItemContentEqualWith(item1)).to.equal(true);
 
-    item1 = await this.application.changeAndSaveItem(item1.uuid, (mutator) => {
-      mutator.addItemAsRelationship(item2);
-    });
-    item2 = await this.application.changeAndSaveItem(item2.uuid, (mutator) => {
-      mutator.addItemAsRelationship(item1);
-    });
+    item1 = await this.application.changeAndSaveItem(
+      item1.uuid,
+      (mutator) => {
+        mutator.addItemAsRelationship(item2);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
+    item2 = await this.application.changeAndSaveItem(
+      item2.uuid,
+      (mutator) => {
+        mutator.addItemAsRelationship(item1);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.content.references.length).to.equal(1);
     expect(item2.content.references.length).to.equal(1);
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(false);
 
-    item1 = await this.application.changeAndSaveItem(item1.uuid, (mutator) => {
-      mutator.removeItemAsRelationship(item2);
-    });
-    item2 = await this.application.changeAndSaveItem(item2.uuid, (mutator) => {
-      mutator.removeItemAsRelationship(item1);
-    });
+    item1 = await this.application.changeAndSaveItem(
+      item1.uuid,
+      (mutator) => {
+        mutator.removeItemAsRelationship(item2);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
+    item2 = await this.application.changeAndSaveItem(
+      item2.uuid,
+      (mutator) => {
+        mutator.removeItemAsRelationship(item1);
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true);
     expect(item1.content.references.length).to.equal(0);
@@ -136,9 +193,15 @@ describe('items', () => {
     let item1 = this.application.itemManager.notes[0];
     const item2 = this.application.itemManager.notes[1];
 
-    item1 = await this.application.changeAndSaveItem(item1.uuid, (mutator) => {
-      mutator.content.foo = 'bar';
-    });
+    item1 = await this.application.changeAndSaveItem(
+      item1.uuid,
+      (mutator) => {
+        mutator.content.foo = 'bar';
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
 
     expect(item1.content.foo).to.equal('bar');
 

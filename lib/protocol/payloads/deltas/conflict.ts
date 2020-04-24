@@ -49,7 +49,19 @@ export class ConflictDelta {
       return [];
     }
     if (strategy === ConflictStrategy.KeepLeft) {
-      return [this.basePayload];
+      const updatedAt = greaterOfTwoDates(
+        this.basePayload.updated_at!,
+        this.applyPayload.updated_at!
+      );
+      const leftPayload = CopyPayload(
+        this.basePayload,
+        {
+          updated_at: updatedAt,
+          dirty: true,
+          dirtiedDate: new Date(),
+        }
+      );
+      return [leftPayload];
     }
     if (strategy === ConflictStrategy.KeepRight) {
       const result = PayloadByMerging(

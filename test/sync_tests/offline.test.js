@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('offline syncing', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
   beforeEach(async function() {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -31,7 +36,7 @@ describe('offline syncing', () => {
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
     note = this.application.findItem(note.uuid);
     /** In rare cases a sync can complete so fast that the dates are equal; this is ok. */
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
@@ -61,7 +66,7 @@ describe('offline syncing', () => {
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads1.length).to.equal(this.expectedItemCount);
 
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
     this.expectedItemCount++;
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
@@ -76,7 +81,7 @@ describe('offline syncing', () => {
   it('signing out while offline should succeed', async function () {
     await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     expect(this.application.noAccount()).to.equal(true);
     expect(this.application.getUser()).to.not.be.ok;

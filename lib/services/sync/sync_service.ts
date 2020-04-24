@@ -653,7 +653,8 @@ export class SNSyncService extends PureService {
       /** Perform regular sync now that we've finished download first sync */
       await this.sync({
         source: SyncSources.AfterDownloadFirst,
-        checkIntegrity: true
+        checkIntegrity: true,
+        awaitAll: options.awaitAll
       });
     } else if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
       this.log('Syncing again from resolve queue');
@@ -673,7 +674,8 @@ export class SNSyncService extends PureService {
        */
       await this.sync({
         source: SyncSources.MoreDirtyItems,
-        checkIntegrity: options.checkIntegrity
+        checkIntegrity: options.checkIntegrity,
+        awaitAll: options.awaitAll
       });
     } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
       if (this.state!.needsSync && operation.done) {
@@ -681,7 +683,8 @@ export class SNSyncService extends PureService {
         const promise = this.sync({
           checkIntegrity: true,
           queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-          source: SyncSources.IntegrityCheck
+          source: SyncSources.IntegrityCheck,
+          awaitAll: options.awaitAll
         });
         if (options.awaitAll) {
           await promise;

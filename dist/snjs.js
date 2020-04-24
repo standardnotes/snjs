@@ -1273,6 +1273,7 @@ var SNApplication = /*#__PURE__*/function () {
       var _changeAndSaveItem = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee20(uuid, mutate) {
         var isUserModified,
             payloadSource,
+            syncOptions,
             _args20 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee20$(_context20) {
           while (1) {
@@ -1280,26 +1281,27 @@ var SNApplication = /*#__PURE__*/function () {
               case 0:
                 isUserModified = _args20.length > 2 && _args20[2] !== undefined ? _args20[2] : false;
                 payloadSource = _args20.length > 3 ? _args20[3] : undefined;
+                syncOptions = _args20.length > 4 ? _args20[4] : undefined;
 
                 if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["isString"])(uuid)) {
-                  _context20.next = 4;
+                  _context20.next = 5;
                   break;
                 }
 
                 throw Error('Must use uuid to change item');
 
-              case 4:
-                _context20.next = 6;
+              case 5:
+                _context20.next = 7;
                 return this.itemManager.changeItems([uuid], mutate, isUserModified ? _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["MutationType"].UserInteraction : undefined, payloadSource);
 
-              case 6:
-                _context20.next = 8;
-                return this.syncService.sync();
-
-              case 8:
-                return _context20.abrupt("return", this.findItem(uuid));
+              case 7:
+                _context20.next = 9;
+                return this.syncService.sync(syncOptions);
 
               case 9:
+                return _context20.abrupt("return", this.findItem(uuid));
+
+              case 10:
               case "end":
                 return _context20.stop();
             }
@@ -1323,6 +1325,7 @@ var SNApplication = /*#__PURE__*/function () {
       var _changeAndSaveItems = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee21(uuids, mutate) {
         var isUserModified,
             payloadSource,
+            syncOptions,
             _args21 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee21$(_context21) {
           while (1) {
@@ -1330,14 +1333,15 @@ var SNApplication = /*#__PURE__*/function () {
               case 0:
                 isUserModified = _args21.length > 2 && _args21[2] !== undefined ? _args21[2] : false;
                 payloadSource = _args21.length > 3 ? _args21[3] : undefined;
-                _context21.next = 4;
+                syncOptions = _args21.length > 4 ? _args21[4] : undefined;
+                _context21.next = 5;
                 return this.itemManager.changeItems(uuids, mutate, isUserModified ? _Models_core_item__WEBPACK_IMPORTED_MODULE_5__["MutationType"].UserInteraction : undefined, payloadSource);
 
-              case 4:
-                _context21.next = 6;
-                return this.syncService.sync();
+              case 5:
+                _context21.next = 7;
+                return this.syncService.sync(syncOptions);
 
-              case 6:
+              case 7:
               case "end":
                 return _context21.stop();
             }
@@ -11831,7 +11835,7 @@ var ConflictDelta = /*#__PURE__*/function () {
     key: "payloadsByHandlingStrategy",
     value: function () {
       var _payloadsByHandlingStrategy = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(strategy) {
-        var existingConflict, result, updatedAt, leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt, payload;
+        var existingConflict, updatedAt, leftPayload, result, _updatedAt, _leftPayload, rightPayloads, leftPayloads, rightPayload, refs, _updatedAt2, payload;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
@@ -11853,26 +11857,7 @@ var ConflictDelta = /*#__PURE__*/function () {
 
               case 3:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeft)) {
-                  _context2.next = 5;
-                  break;
-                }
-
-                return _context2.abrupt("return", [this.basePayload]);
-
-              case 5:
-                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepRight)) {
-                  _context2.next = 8;
-                  break;
-                }
-
-                result = Object(_Lib_protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["PayloadByMerging"])(this.applyPayload, this.basePayload, [_fields__WEBPACK_IMPORTED_MODULE_7__["PayloadField"].LastSyncBegan], {
-                  lastSyncEnd: new Date()
-                });
-                return _context2.abrupt("return", [result]);
-
-              case 8:
-                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeftDuplicateRight)) {
-                  _context2.next = 15;
+                  _context2.next = 7;
                   break;
                 }
 
@@ -11882,39 +11867,64 @@ var ConflictDelta = /*#__PURE__*/function () {
                   dirty: true,
                   dirtiedDate: new Date()
                 });
-                _context2.next = 13;
-                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
+                return _context2.abrupt("return", [leftPayload]);
 
-              case 13:
-                rightPayloads = _context2.sent;
-                return _context2.abrupt("return", [leftPayload].concat(rightPayloads));
-
-              case 15:
-                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].DuplicateLeftKeepRight)) {
-                  _context2.next = 21;
+              case 7:
+                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepRight)) {
+                  _context2.next = 10;
                   break;
                 }
 
-                _context2.next = 18;
+                result = Object(_Lib_protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["PayloadByMerging"])(this.applyPayload, this.basePayload, [_fields__WEBPACK_IMPORTED_MODULE_7__["PayloadField"].LastSyncBegan], {
+                  lastSyncEnd: new Date()
+                });
+                return _context2.abrupt("return", [result]);
+
+              case 10:
+                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeftDuplicateRight)) {
+                  _context2.next = 17;
+                  break;
+                }
+
+                _updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+                _leftPayload = Object(_Lib_protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CopyPayload"])(this.basePayload, {
+                  updated_at: _updatedAt,
+                  dirty: true,
+                  dirtiedDate: new Date()
+                });
+                _context2.next = 15;
+                return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByDuplicating"])(this.applyPayload, this.baseCollection, true);
+
+              case 15:
+                rightPayloads = _context2.sent;
+                return _context2.abrupt("return", [_leftPayload].concat(rightPayloads));
+
+              case 17:
+                if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].DuplicateLeftKeepRight)) {
+                  _context2.next = 23;
+                  break;
+                }
+
+                _context2.next = 20;
                 return Object(_Payloads_functions__WEBPACK_IMPORTED_MODULE_5__["PayloadsByDuplicating"])(this.basePayload, this.baseCollection, true);
 
-              case 18:
+              case 20:
                 leftPayloads = _context2.sent;
                 rightPayload = Object(_Lib_protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["PayloadByMerging"])(this.applyPayload, this.basePayload, [_fields__WEBPACK_IMPORTED_MODULE_7__["PayloadField"].LastSyncBegan], {
                   lastSyncEnd: new Date()
                 });
                 return _context2.abrupt("return", leftPayloads.concat([rightPayload]));
 
-              case 21:
+              case 23:
                 if (!(strategy === _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_4__["ConflictStrategy"].KeepLeftMergeRefs)) {
-                  _context2.next = 26;
+                  _context2.next = 28;
                   break;
                 }
 
                 refs = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["uniqCombineObjArrays"])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
-                _updatedAt = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
+                _updatedAt2 = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["greaterOfTwoDates"])(this.basePayload.updated_at, this.applyPayload.updated_at);
                 payload = Object(_Lib_protocol_payloads_generator__WEBPACK_IMPORTED_MODULE_1__["CopyPayload"])(this.basePayload, {
-                  updated_at: _updatedAt,
+                  updated_at: _updatedAt2,
                   dirty: true,
                   dirtiedDate: new Date(),
                   content: _objectSpread({}, this.basePayload.safeContent, {
@@ -11923,10 +11933,10 @@ var ConflictDelta = /*#__PURE__*/function () {
                 });
                 return _context2.abrupt("return", [payload]);
 
-              case 26:
+              case 28:
                 throw 'Unhandled strategy';
 
-              case 27:
+              case 29:
               case "end":
                 return _context2.stop();
             }
@@ -32025,7 +32035,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _context14.next = 89;
                 return this.sync({
                   source: SyncSources.AfterDownloadFirst,
-                  checkIntegrity: true
+                  checkIntegrity: true,
+                  awaitAll: options.awaitAll
                 });
 
               case 89:
@@ -32073,7 +32084,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _context14.next = 105;
                 return this.sync({
                   source: SyncSources.MoreDirtyItems,
-                  checkIntegrity: options.checkIntegrity
+                  checkIntegrity: options.checkIntegrity,
+                  awaitAll: options.awaitAll
                 });
 
               case 105:
@@ -32095,7 +32107,8 @@ var SNSyncService = /*#__PURE__*/function (_PureService) {
                 _promise = this.sync({
                   checkIntegrity: true,
                   queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-                  source: SyncSources.IntegrityCheck
+                  source: SyncSources.IntegrityCheck,
+                  awaitAll: options.awaitAll
                 });
 
                 if (!options.awaitAll) {

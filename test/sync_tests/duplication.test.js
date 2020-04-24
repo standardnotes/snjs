@@ -7,15 +7,20 @@ const expect = chai.expect;
 describe('duplication', () => {
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
-  before(async function() {
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true
+  };
+
+  before(async function () {
     localStorage.clear();
   });
 
-  after(async function() {
+  after(async function () {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -27,7 +32,7 @@ describe('duplication', () => {
     });
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
@@ -52,37 +57,49 @@ describe('duplication', () => {
     return payload;
   }
 
-  it('components should not be duplicated under any circumstances', async function() {
+  it('components should not be duplicated under any circumstances', async function () {
     const payload = createDirtyPayload(ContentType.Component);
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
-    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
-      /** Conflict the item */
-      mutator.content.foo = 'zar';
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      item.uuid,
+      (mutator) => {
+        /** Conflict the item */
+        mutator.content.foo = 'zar';
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 
-  it('items keys should not be duplicated under any circumstances', async function() {
+  it('items keys should not be duplicated under any circumstances', async function () {
     const payload = createDirtyPayload(ContentType.ItemsKey);
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
-    await this.application.syncService.sync();
+    await this.application.syncService.sync(syncOptions);
 
-    await this.application.changeAndSaveItem(item.uuid, (mutator) => {
-      /** Conflict the item */
-      mutator.content.foo = 'zar';
-      mutator.updated_at = Factory.yesterday();
-    });
+    await this.application.changeAndSaveItem(
+      item.uuid,
+      (mutator) => {
+        /** Conflict the item */
+        mutator.content.foo = 'zar';
+        mutator.updated_at = Factory.yesterday();
+      },
+      undefined,
+      undefined,
+      syncOptions
+    );
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   });
 });
