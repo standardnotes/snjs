@@ -19,7 +19,7 @@ describe('storage manager', () => {
   });
 
   after(async function () {
-    // localStorage.clear();
+    localStorage.clear();
     await sharedApplication.deinit();
   });
 
@@ -33,7 +33,7 @@ describe('storage manager', () => {
 
   afterEach(async function() {
     await this.application.deinit();
-    // localStorage.clear();
+    localStorage.clear();
   });
 
   it('should set and retrieve values', async function () {

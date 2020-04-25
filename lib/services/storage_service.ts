@@ -115,13 +115,6 @@ export class SNStorageService extends PureService {
     this.setInitialValues(payload);
   }
 
-  private async persistAsValueToDisk(value: StorageValuesObject) {
-    await this.deviceInterface!.setRawStorageValue(
-      this.getPersistenceKey(),
-      JSON.stringify(value)
-    );
-  }
-
   /**
    * Called by platforms with the value they load from disk,
    * after they handle initializeFromDisk
@@ -210,6 +203,7 @@ export class SNStorageService extends PureService {
     return rawContent;
   }
 
+  /** @todo This function should be debounced. */
   private async repersistToDisk() {
     if (!this.storagePersistable) {
       return;
@@ -217,10 +211,15 @@ export class SNStorageService extends PureService {
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       return;
     }
-    const value = await this.generatePersistenceValue();
-    /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
-    this.values[ValueModesKeys.Wrapped] = value[ValueModesKeys.Wrapped];
-    return this.persistAsValueToDisk(value);
+    return this.executeCriticalFunction(async () => {
+      const value = await this.generatePersistenceValue();
+      /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
+      this.values[ValueModesKeys.Wrapped] = value[ValueModesKeys.Wrapped];
+      return this.deviceInterface!.setRawStorageValue(
+        this.getPersistenceKey(),
+        JSON.stringify(value)
+      );
+    });
   }
 
   public async setValue(key: string, value: any, mode = StorageValueModes.Default) {
@@ -311,13 +310,13 @@ export class SNStorageService extends PureService {
       return;
     }
 
-    const nondeleted = [];
+    const nondeleted: any[] = [];
     for (const payload of decryptedPayloads) {
       if (payload.discardable) {
         /** If the payload is deleted and not dirty, remove it from db. */
         await this.deletePayloadWithId(payload.uuid!);
       } else {
-        if(!payload.uuid) {
+        if (!payload.uuid) {
           throw Error('Attempting to persist payload with no uuid');
         }
         const encrypted = await this.encryptionDelegate!.payloadByEncryptingPayload(
@@ -329,7 +328,10 @@ export class SNStorageService extends PureService {
         nondeleted.push(encrypted.ejected());
       }
     }
-    await this.deviceInterface!.saveRawDatabasePayloads(nondeleted);
+
+    return this.executeCriticalFunction(async () => {
+      return this.deviceInterface!.saveRawDatabasePayloads(nondeleted);
+    });
   }
 
   public async deletePayloads(payloads: PurePayload[]) {
@@ -339,11 +341,15 @@ export class SNStorageService extends PureService {
   }
 
   public async deletePayloadWithId(id: string) {
-    return this.deviceInterface!.removeRawDatabasePayloadWithId(id);
+    return this.executeCriticalFunction(async () => {
+      return this.deviceInterface!.removeRawDatabasePayloadWithId(id);
+    });
   }
 
   public async clearAllPayloads() {
-    return this.deviceInterface!.removeAllRawDatabasePayloads();
+    return this.executeCriticalFunction(async () => {
+      return this.deviceInterface!.removeAllRawDatabasePayloads();
+    });
   }
 
   public async clearAllData() {

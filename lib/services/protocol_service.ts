@@ -716,7 +716,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw 'Should not be persisting wrapped key to keychain.';
     }
     const rawKey = this.rootKey!.getPersistableValue();
-    await this.deviceInterface!.setKeychainValue(rawKey);
+    return this.executeCriticalFunction(() => {
+      return this.deviceInterface!.setKeychainValue(rawKey);
+    })
   }
 
   /**

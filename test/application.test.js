@@ -51,4 +51,30 @@ describe('application instances', () => {
     await app1.deinit();
     await app2.deinit();
   });
+
+  it('deinit application while storage persisting should be handled gracefully', async () => {
+    /** This test will always succeed but should be observed for console exceptions */
+    const app = await Factory.createAndInitializeApplication('app');
+    /** Don't await */
+    app.storageService.repersistToDisk();
+    await app.prepareForDeinit();
+    app.deinit();
+  });
+
+  it('locking application while critical func in progress should wait up to a limit',
+    async () => {
+      /** This test will always succeed but should be observed for console exceptions */
+      const app = await Factory.createAndInitializeApplication('app');
+      /** Don't await */
+      const MaximumWaitTime = 0.5;
+      app.storageService.executeCriticalFunction(async () => {
+        /** If we sleep less than the maximum, locking should occur safely.
+         * If we sleep more than the maximum, locking should occur with exception on
+         * app deinit. */
+        await Factory.sleep(MaximumWaitTime - 0.05);
+        /** Access any deviceInterface function */
+        app.storageService.deviceInterface.getAllRawDatabasePayloads();
+      });
+      await app.lock();
+    });
 });

@@ -19,7 +19,7 @@ import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_se
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto';
 import { Environment, Platform } from './platforms';
-import { removeFromArray, isNullOrUndefined, isString } from '@Lib/utils';
+import { removeArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -857,6 +857,24 @@ export class SNApplication {
     await this.syncService!.persistPayloads(payloads);
   }
 
+  /** 
+   * Gives services a chance to complete any sensitive operations before yielding 
+   * @param maxWait The maximum number of milliseconds to wait for services
+   * to finish tasks. 0 means no limit.
+   */
+  async prepareForDeinit(maxWait = 0) {
+    const promise = Promise.all(this.services.map((service) => service.blockDeinit()));
+    if(maxWait === 0) {
+      await promise;
+    } else {
+      /** Await up to maxWait. If not resolved by then, return. */
+      await Promise.race([
+        promise,
+        sleep(maxWait)
+      ])
+    }
+  }
+
   /**
    * Destroys the application instance.
    */
@@ -1058,6 +1076,7 @@ export class SNApplication {
     await this.protocolService!.clearLocalKeyState();
     await this.storageService!.clearAllData();
     await this.notifyEvent(ApplicationEvent.SignedOut);
+    await this.prepareForDeinit();
     this.deinit();
   }
 
@@ -1086,6 +1105,10 @@ export class SNApplication {
   }
 
   public async lock() {
+    /** Because locking is a critical operation, we want to try to do it safely,
+     * but only up to a certain limit. */
+    const MaximumWaitTime = 500;
+    await this.prepareForDeinit(MaximumWaitTime);
     return this.deinit();
   }
 

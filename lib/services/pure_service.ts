@@ -9,6 +9,7 @@ export abstract class PureService {
   private eventObservers: EventObserver[] = []
   public loggingEnabled = false
   public deviceInterface?: DeviceInterface
+  private criticalPromises: Promise<void>[] = []
 
   public addEventObserver(observer: EventObserver) {
     this.eventObservers.push(observer);
@@ -23,6 +24,14 @@ export abstract class PureService {
     }
   }
 
+  /**
+   * Called by application to allow services to momentarily block deinit until
+   * sensitive operations complete.
+   */
+  public async blockDeinit() {
+    await Promise.all(this.criticalPromises);
+  }
+
   /** 
    * Called by application before restart. 
    * Subclasses should deregister any observers/timers 
@@ -31,6 +40,20 @@ export abstract class PureService {
     this.eventObservers.length = 0;
     this.deviceInterface = undefined;
   }
+
+  /** 
+   * A critical function is one that should block signing out or destroying application
+   * session until the crticial function has completed. For example, persisting keys to
+   * disk is a critical operation, and should be wrapped in this function call. The
+   * parent application instance will await all criticial functions via the `blockDeinit`
+   * function before signing out and deiniting.
+   */
+  protected async executeCriticalFunction(func: () => Promise<void>) {
+    const promise = func();
+    this.criticalPromises.push(promise);
+    return promise;
+  }
+
 
   /**
   * Application instances will call this function directly when they arrive
