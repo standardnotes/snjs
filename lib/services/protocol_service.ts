@@ -651,16 +651,23 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (returnIfEmpty && items.length === 0) {
       return undefined;
     }
-    const payloads = items.map((item) => {
-      return CreateSourcedPayloadFromObject(
-        item,
-        PayloadSource.FileImport
-      );
-    });
-    const encryptedPayloads = await this.payloadsByEncryptingPayloads(
-      payloads,
-      intent
-    );
+    const encryptedPayloads: PurePayload[] = [];
+    for (const item of items) {
+      if (item.errorDecrypting) {
+        /** Keep payload as-is */
+        encryptedPayloads.push(item.payload);
+      } else {
+        const payload = CreateSourcedPayloadFromObject(
+          item.payload,
+          PayloadSource.FileImport
+        );
+        const encrypted = await this.payloadByEncryptingPayload(
+          payload,
+          intent
+        );
+        encryptedPayloads.push(encrypted);
+      }
+    }
     const data: BackupFile = {
       items: encryptedPayloads.map((p) => p.ejected())
     };

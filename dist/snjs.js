@@ -26262,12 +26262,20 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
         var intent,
             returnIfEmpty,
             items,
-            payloads,
             encryptedPayloads,
+            _iteratorNormalCompletion3,
+            _didIteratorError3,
+            _iteratorError3,
+            _iterator3,
+            _step3,
+            item,
+            _payload2,
+            encrypted,
             data,
             keyParams,
             prettyPrint,
             _args14 = arguments;
+
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
@@ -26284,23 +26292,89 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 return _context14.abrupt("return", undefined);
 
               case 5:
-                payloads = items.map(function (item) {
-                  return Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_11__["CreateSourcedPayloadFromObject"])(item, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_10__["PayloadSource"].FileImport);
-                });
-                _context14.next = 8;
-                return this.payloadsByEncryptingPayloads(payloads, intent);
+                encryptedPayloads = [];
+                _iteratorNormalCompletion3 = true;
+                _didIteratorError3 = false;
+                _iteratorError3 = undefined;
+                _context14.prev = 9;
+                _iterator3 = items[Symbol.iterator]();
 
-              case 8:
-                encryptedPayloads = _context14.sent;
+              case 11:
+                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                  _context14.next = 25;
+                  break;
+                }
+
+                item = _step3.value;
+
+                if (!item.errorDecrypting) {
+                  _context14.next = 17;
+                  break;
+                }
+
+                /** Keep payload as-is */
+                encryptedPayloads.push(item.payload);
+                _context14.next = 22;
+                break;
+
+              case 17:
+                _payload2 = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_11__["CreateSourcedPayloadFromObject"])(item.payload, _protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_10__["PayloadSource"].FileImport);
+                _context14.next = 20;
+                return this.payloadByEncryptingPayload(_payload2, intent);
+
+              case 20:
+                encrypted = _context14.sent;
+                encryptedPayloads.push(encrypted);
+
+              case 22:
+                _iteratorNormalCompletion3 = true;
+                _context14.next = 11;
+                break;
+
+              case 25:
+                _context14.next = 31;
+                break;
+
+              case 27:
+                _context14.prev = 27;
+                _context14.t0 = _context14["catch"](9);
+                _didIteratorError3 = true;
+                _iteratorError3 = _context14.t0;
+
+              case 31:
+                _context14.prev = 31;
+                _context14.prev = 32;
+
+                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                  _iterator3.return();
+                }
+
+              case 34:
+                _context14.prev = 34;
+
+                if (!_didIteratorError3) {
+                  _context14.next = 37;
+                  break;
+                }
+
+                throw _iteratorError3;
+
+              case 37:
+                return _context14.finish(34);
+
+              case 38:
+                return _context14.finish(31);
+
+              case 39:
                 data = {
                   items: encryptedPayloads.map(function (p) {
                     return p.ejected();
                   })
                 };
-                _context14.next = 12;
+                _context14.next = 42;
                 return this.getRootKeyParams();
 
-              case 12:
+              case 42:
                 keyParams = _context14.sent;
 
                 if (keyParams && intent !== _protocol_intents__WEBPACK_IMPORTED_MODULE_2__["EncryptionIntent"].FileDecrypted) {
@@ -26310,12 +26384,12 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                 prettyPrint = 2;
                 return _context14.abrupt("return", JSON.stringify(data, null, prettyPrint));
 
-              case 16:
+              case 46:
               case "end":
                 return _context14.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee14, this, [[9, 27, 31, 39], [32,, 34, 38]]);
       }));
 
       function createBackupFile(_x16) {
@@ -26344,30 +26418,30 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
     key: "notifyObserversOfKeyChange",
     value: function () {
       var _notifyObserversOfKeyChange = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15() {
-        var _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, observer;
+        var _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, observer;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                _iteratorNormalCompletion3 = true;
-                _didIteratorError3 = false;
-                _iteratorError3 = undefined;
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
                 _context15.prev = 3;
-                _iterator3 = this.keyObservers[Symbol.iterator]();
+                _iterator4 = this.keyObservers[Symbol.iterator]();
 
               case 5:
-                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
                   _context15.next = 12;
                   break;
                 }
 
-                observer = _step3.value;
+                observer = _step4.value;
                 _context15.next = 9;
                 return observer();
 
               case 9:
-                _iteratorNormalCompletion3 = true;
+                _iteratorNormalCompletion4 = true;
                 _context15.next = 5;
                 break;
 
@@ -26378,26 +26452,26 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
               case 14:
                 _context15.prev = 14;
                 _context15.t0 = _context15["catch"](3);
-                _didIteratorError3 = true;
-                _iteratorError3 = _context15.t0;
+                _didIteratorError4 = true;
+                _iteratorError4 = _context15.t0;
 
               case 18:
                 _context15.prev = 18;
                 _context15.prev = 19;
 
-                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                  _iterator3.return();
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
                 }
 
               case 21:
                 _context15.prev = 21;
 
-                if (!_didIteratorError3) {
+                if (!_didIteratorError4) {
                   _context15.next = 24;
                   break;
                 }
 
-                throw _iteratorError3;
+                throw _iteratorError4;
 
               case 24:
                 return _context15.finish(21);
@@ -27908,7 +27982,7 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
     key: "createNewDefaultItemsKey",
     value: function () {
       var _createNewDefaultItemsKey = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee43() {
-        var rootKey, operatorVersion, itemTemplate, _payload2, currentDefault, itemsKey;
+        var rootKey, operatorVersion, itemTemplate, _payload3, currentDefault, itemsKey;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee43$(_context43) {
           while (1) {
@@ -27943,8 +28017,8 @@ var SNProtocolService = /*#__PURE__*/function (_PureService) {
                   content_type: _context43.t2,
                   content: _context43.t3
                 };
-                _payload2 = (0, _context43.t0)(_context43.t4);
-                itemTemplate = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_13__["CreateItemFromPayload"])(_payload2);
+                _payload3 = (0, _context43.t0)(_context43.t4);
+                itemTemplate = Object(_Models_generator__WEBPACK_IMPORTED_MODULE_13__["CreateItemFromPayload"])(_payload3);
                 _context43.next = 19;
                 break;
 

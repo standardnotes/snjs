@@ -142,12 +142,13 @@ export function createMappedTag(application) {
 
 export async function createSyncedNote(application) {
   const payload = createNotePayload();
-  const note = await application.itemManager.emitItemFromPayload(
+  await application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
   );
-  await application.itemManager.setItemDirty(note.uuid);
+  await application.itemManager.setItemDirty(payload.uuid);
   await application.syncService.sync(syncOptions);
+  const note = application.findItem(payload.uuid);
   return note;
 }
 

@@ -4,29 +4,36 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('payload encryption', () => {
-  const sharedApplication = Factory.createApplication();
-
-  before(async () => {
+describe('payload encryption', function () {
+  beforeEach(async function () {
     localStorage.clear();
-    await Factory.initializeApplication(sharedApplication);
-    await Factory.registerUserToApplication({ application: sharedApplication });
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
   });
 
-  after(async () => {
-    sharedApplication.deinit();
+  afterEach(async function () {
+    this.application.deinit();
+  });
+  
+  after(function () {
     localStorage.clear();
   });
 
-  it('creating payload from item should create copy not by reference', async () => {
-    const item = await Factory.createMappedNote(sharedApplication);
+  it('creating payload from item should create copy not by reference', async function () {
+    const item = await Factory.createMappedNote(this.application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     expect(item.content === payload.content).to.equal(false);
     expect(item.content.references === payload.content.references).to.equal(false);
   });
 
-  it('creating payload from item should preserve appData', async () => {
-    const item = await Factory.createMappedNote(sharedApplication);
+  it('creating payload from item should preserve appData', async function () {
+    const item = await Factory.createMappedNote(this.application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     expect(item.content.appData).to.be.ok;
     expect(JSON.stringify(item.content)).to.equal(JSON.stringify(payload.content));
@@ -45,7 +52,7 @@ describe('payload encryption', () => {
       }
     );
 
-    const encryptedPayload = await sharedApplication.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
       notePayload,
       EncryptionIntent.Sync
     );
@@ -57,7 +64,7 @@ describe('payload encryption', () => {
     expect(encryptedPayload.lastSyncBegan).to.not.be.ok;
   });
 
-  it('creating payload with override properties', async () => {
+  it('creating payload with override properties', async function () {
     const payload = Factory.createNotePayload();
     const uuid = payload.uuid;
     const changedUuid = 'foo';
@@ -72,7 +79,7 @@ describe('payload encryption', () => {
     expect(changedPayload.uuid).to.equal(changedUuid);
   });
 
-  it('creating payload with deep override properties', async () => {
+  it('creating payload with deep override properties', async function () {
     const payload = Factory.createNotePayload();
     const text = payload.content.text;
     const changedText = `${Math.random()}`;
@@ -91,8 +98,8 @@ describe('payload encryption', () => {
     expect(changedPayload.content.text).to.equal(changedText);
   });
 
-  it('copying payload with override content should override completely', async () => {
-    const item = await Factory.createMappedNote(sharedApplication);
+  it('copying payload with override content should override completely', async function () {
+    const item = await Factory.createMappedNote(this.application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     const mutated = CreateMaxPayloadFromAnyObject(
       payload,
@@ -105,8 +112,8 @@ describe('payload encryption', () => {
     expect(mutated.content.text).to.not.be.ok;
   });
 
-  it('copying payload with override should copy empty arrays', async () => {
-    const pair = await Factory.createRelatedNoteTagPairPayload(sharedApplication.modelManager);
+  it('copying payload with override should copy empty arrays', async function () {
+    const pair = await Factory.createRelatedNoteTagPairPayload(this.application.modelManager);
     const tagPayload = pair[1];
     expect(tagPayload.content.references.length).to.equal(1);
 
@@ -122,9 +129,9 @@ describe('payload encryption', () => {
     expect(mutated.content.references.length).to.equal(0);
   });
 
-  it('returns valid encrypted params for syncing', async () => {
+  it('returns valid encrypted params for syncing', async function () {
     const payload = Factory.createNotePayload();
-    const encryptedPayload = await sharedApplication.protocolService
+    const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         payload,
         EncryptionIntent.Sync
@@ -135,13 +142,13 @@ describe('payload encryption', () => {
     expect(encryptedPayload.content_type).to.not.be.null;
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
+      return string.startsWith(this.application.protocolService.getLatestVersion());
     });
   }).timeout(5000);
 
-  it('returns unencrypted params with no keys', async () => {
+  it('returns unencrypted params with no keys', async function () {
     const payload = Factory.createNotePayload();
-    const encodedPayload = await sharedApplication.protocolService
+    const encodedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         payload,
         EncryptionIntent.FileDecrypted
@@ -156,10 +163,10 @@ describe('payload encryption', () => {
     expect(encodedPayload.content.title).to.equal(payload.content.title);
   });
 
-  it('returns additional fields for local storage', async () => {
+  it('returns additional fields for local storage', async function () {
     const payload = Factory.createNotePayload();
 
-    const encryptedPayload = await sharedApplication.protocolService
+    const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         payload,
         EncryptionIntent.LocalStorageEncrypted
@@ -174,13 +181,13 @@ describe('payload encryption', () => {
     expect(encryptedPayload.deleted).to.not.be.null;
     expect(encryptedPayload.errorDecrypting).to.not.be.null;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
+      return string.startsWith(this.application.protocolService.getLatestVersion());
     });
   });
 
-  it('omits deleted for export file', async () => {
+  it('omits deleted for export file', async function () {
     const payload = Factory.createNotePayload();
-    const encryptedPayload = await sharedApplication.protocolService
+    const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         payload,
         EncryptionIntent.FileEncrypted
@@ -191,11 +198,11 @@ describe('payload encryption', () => {
     expect(encryptedPayload.created_at).to.not.be.null;
     expect(encryptedPayload.deleted).to.not.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(sharedApplication.protocolService.getLatestVersion());
+      return string.startsWith(this.application.protocolService.getLatestVersion());
     });
   });
 
-  it('items with error decrypting should remain as is', async () => {
+  it('items with error decrypting should remain as is', async function () {
     const payload = Factory.createNotePayload();
     const mutatedPayload = CreateMaxPayloadFromAnyObject(
       payload,
@@ -203,7 +210,7 @@ describe('payload encryption', () => {
         errorDecrypting: true
       }
     );
-    const encryptedPayload = await sharedApplication.protocolService
+    const encryptedPayload = await this.application.protocolService
       .payloadByEncryptingPayload(
         mutatedPayload,
         EncryptionIntent.Sync

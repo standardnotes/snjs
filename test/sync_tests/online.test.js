@@ -1284,4 +1284,28 @@ describe('online syncing', () => {
     await this.application.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
   }).timeout(Factory.TestTimeout);
+
+  it('errored items should not be synced', async function () {
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+    const lastSyncBegan = note.lastSyncBegan;
+    const lastSyncEnd = note.lastSyncEnd;
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.Sync
+    );
+    const errored = CopyPayload(
+      encrypted,
+      {
+        errorDecrypting: true,
+        dirty: true
+      }
+    );
+    await this.application.itemManager.emitItemFromPayload(errored);
+    await this.application.sync(syncOptions);
+
+    const updatedNote = this.application.findItem(note.uuid);
+    expect(updatedNote.lastSyncBegan.getTime()).to.equal(lastSyncBegan.getTime());
+    expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime());
+  }).timeout(Factory.TestTimeout);
 });

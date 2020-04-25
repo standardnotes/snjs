@@ -593,7 +593,7 @@ export class ItemManager extends PureService {
   public async emitItemsFromPayloads(
     payloads: PurePayload[],
     source = PayloadSource.Constructor
-  ) {
+    ) {
     await this.modelManager!.emitPayloads(payloads, source);
     const uuids = Uuids(payloads);
     return this.findItems(uuids);

@@ -52,4 +52,24 @@ describe('backups', () => {
     expect(item.updated_at).to.be.ok;
   });
 
+  it('downloading backup if item is error decrypting should succeed', async function () {
+    await Factory.createSyncedNote(this.application);
+    const note = await Factory.createSyncedNote(this.application);
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.FileEncrypted
+    );
+    const errored = CopyPayload(
+      encrypted,
+      {
+        errorDecrypting: true
+      }
+    );
+    const erroredItem = await this.application.itemManager.emitItemFromPayload(errored);
+    expect(erroredItem.errorDecrypting).to.equal(true);
+    const backupString = await this.application.createBackupFile();
+    const backupData = JSON.parse(backupString);
+
+    expect(backupData.items.length).to.equal(3);
+  });
 });
