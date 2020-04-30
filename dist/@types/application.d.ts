@@ -270,6 +270,12 @@ export declare class SNApplication {
      */
     private rewriteItemsKeys;
     /**
+     * Gives services a chance to complete any sensitive operations before yielding
+     * @param maxWait The maximum number of milliseconds to wait for services
+     * to finish tasks. 0 means no limit.
+     */
+    prepareForDeinit(maxWait?: number): Promise<void>;
+    /**
      * Destroys the application instance.
      */
     deinit(): void;

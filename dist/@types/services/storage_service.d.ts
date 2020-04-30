@@ -54,7 +54,6 @@ export declare class SNStorageService extends PureService {
     setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
     isEphemeralSession(): boolean;
     initializeFromDisk(): Promise<void>;
-    private persistAsValueToDisk;
     /**
      * Called by platforms with the value they load from disk,
      * after they handle initializeFromDisk
@@ -69,6 +68,7 @@ export declare class SNStorageService extends PureService {
      * either as a plain object, or an encrypted item.
      */
     private generatePersistenceValue;
+    /** @todo This function should be debounced. */
     private repersistToDisk;
     setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
     getValue(key: string, mode?: StorageValueModes): Promise<any>;

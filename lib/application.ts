@@ -19,7 +19,7 @@ import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_se
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto';
 import { Environment, Platform } from './platforms';
-import { removeArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
+import { removeFromArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
