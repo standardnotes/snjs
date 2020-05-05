@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+
 module.exports = {
   entry: {
     'snjs.js': './lib/index.ts'
@@ -47,9 +48,5 @@ module.exports = {
       // set the current working directory for displaying module paths
       cwd: process.cwd(),
     })
-  ],
-  stats: {
-    colors: true
-  },
-  devtool: 'source-map'
+  ]
 };

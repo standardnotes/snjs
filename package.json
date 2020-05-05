@@ -4,10 +4,11 @@
   "main": "dist/snjs.js",
   "types": "dist/@types",
   "scripts": {
-    "start": "webpack --mode development -w",
-    "bundle": "webpack --mode production",
+    "start": "webpack -w --config webpack.dev.js",
+    "bundle": "webpack --config webpack.prod.js",
     "docs": "jsdoc -c jsdoc.json",
-    "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types"
+    "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
+    "test": "node test-server.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -42,17 +43,18 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "exports-loader": "^0.7.0",
-    "tscpaths": "0.0.9",
     "lodash": "^4.17.15",
     "mocha": "^7.1.0",
     "regenerator-runtime": "^0.13.5",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
     "ts-loader": "^6.2.2",
+    "tscpaths": "0.0.9",
     "typescript": "^3.8.3",
     "typescript-eslint": "0.0.1-alpha.0",
     "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "sncrypto": "github:standardnotes/sncrypto#6625bbcc141161eb866475d9786238001f3c514d"
