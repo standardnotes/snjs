@@ -11,6 +11,9 @@ export const API_MESSAGE_CHANGE_PW_IN_PROGRESS     = 'An existing change passwor
 
 export const API_MESSAGE_FALLBACK_LOGIN_FAIL       = 'Invalid email or password.';
 
+export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL= `A server error occurred while trying to refresh your session.
+                                                      Please try again.`;
+
 export const UNSUPPORTED_PROTOCOL_VERSION          = `This version of the application does not support your
                                                       newer account type. Please upgrade to the latest version
                                                       of Standard Notes to sign in.`;

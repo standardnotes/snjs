@@ -16,6 +16,8 @@ const REQUEST_PATH_REGISTER = '/auth';
 const REQUEST_PATH_LOGIN = '/auth/sign_in';
 const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 const REQUEST_PATH_SYNC = '/items/sync';
+const REQUEST_PATH_LOGOUT = '/auth/sign_out';
+const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 
 const API_VERSION = '20200115';
 
@@ -172,6 +174,15 @@ export class SNApiService extends PureService {
     return response;
   }
 
+  async signOut() {
+    const url = await this.path(REQUEST_PATH_LOGOUT);
+    await this.httpService!.postAbsolute(
+      url,
+      {},
+      this.session!.accessToken
+    );
+  }
+
   async changePassword(
     currentServerPassword: string,
     newServerPassword: string,
@@ -190,7 +201,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.token
+      this.session!.accessToken
     ).catch((errorResponse) => {
       return this.errorResponseWithFallbackMessage(
         errorResponse,
@@ -224,7 +235,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.token
+      this.session!.accessToken
     ).catch((errorResponse) => {
       return this.errorResponseWithFallbackMessage(
         errorResponse,
@@ -232,6 +243,25 @@ export class SNApiService extends PureService {
       );
     });
 
+    return response;
+  }
+
+  async refreshSession(userUuid?: string) {
+    const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const params = this.params({
+      user_uuid: userUuid,
+      access_token: this.session!.accessToken,
+      refresh_token: this.session!.refreshToken
+    });
+    const response = await this.httpService!.postAbsolute(
+      url,
+      params
+    ).catch((errorResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
+      );
+    });
     return response;
   }
 }

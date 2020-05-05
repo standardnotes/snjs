@@ -35,7 +35,7 @@ const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
 const INVALID_SESSION_RESPONSE_STATUS = 401;
-
+const EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS = 498;
 
 export enum SyncQueueStrategy {
   /**
@@ -793,6 +793,9 @@ export class SNSyncService extends PureService {
     this.log('Sync Error', response);
     if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
       this.notifyEvent(SyncEvent.InvalidSession);
+    }
+    if (response.status === EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS) {
+      this.notifyEvent(SyncEvent.ExpiredAccessToken);
     }
 
     this.opStatus!.setError(response.error);

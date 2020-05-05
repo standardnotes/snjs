@@ -44,7 +44,8 @@ export enum ApplicationEvent {
   LocalDatabaseWriteError = 21,
   /** When a single roundtrip completes with sync, in a potentially multi-page sync request.
    * If just a single roundtrip, this event will be triggered, along with CompletedFullSync */
-  CompletedIncrementalSync = 22
+  CompletedIncrementalSync = 22,
+  ExpiredAccessToken = 23
 };
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
@@ -62,6 +63,7 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
     [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
     [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
-    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError
+    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
+    [SyncEvent.ExpiredAccessToken]: ApplicationEvent.ExpiredAccessToken
   } as any)[syncEvent];
 }

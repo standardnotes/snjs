@@ -15,7 +15,8 @@ export enum SyncEvent {
   ExitOutOfSync = 'exit-out-of-sync',
   StatusChanged = 'status-changed',
   DatabaseWriteError = 'database-write-error',
-  DatabaseReadError = 'database-read-error'
+  DatabaseReadError = 'database-read-error',
+  ExpiredAccessToken = 'expired-access-token'
 };
 
 
