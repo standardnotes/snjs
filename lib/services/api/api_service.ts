@@ -63,8 +63,9 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public setSession(session: Session) {
+  public async setSession(session: Session) {
     this.session = session;
+    await this.storageService!.setValue(StorageKey.Session, session);
   }
 
   private async path(path: string) {
@@ -181,7 +182,7 @@ export class SNApiService extends PureService {
     const url = await this.path(REQUEST_PATH_LOGOUT);
     await this.httpService!.postAbsolute(
       url,
-      {},
+      undefined,
       this.session!.accessToken
     );
   }
@@ -209,7 +210,9 @@ export class SNApiService extends PureService {
       params,
       this.session!.accessToken
     ).catch(async (errorResponse) => {
-      await this.checkForExpiredAccessToken(errorResponse);
+      if (this.expiredAccessToken(errorResponse)) {
+        await this.refreshSession();
+      }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
@@ -247,7 +250,9 @@ export class SNApiService extends PureService {
       params,
       this.session!.accessToken
     ).catch(async (errorResponse) => {
-      await this.checkForExpiredAccessToken(errorResponse);
+      if (this.expiredAccessToken(errorResponse)) {
+        await this.refreshSession();
+      }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -257,29 +262,17 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private async checkForExpiredAccessToken(errorResponse: HttpResponse) {
-    if (errorResponse.status !== EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS) {
-      return;
-    }
-    await this.refreshSession();
+  private expiredAccessToken(errorResponse: HttpResponse) {
+    return errorResponse.status === EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS;
   }
 
   private async refreshSession() {
     if (this.refreshingSession) {
       return;
     }
-    const user = await this.storageService!.getValue(StorageKey.User);
-    if (!user) {
-      return;
-    }
-    if (!user.uuid) {
-      return;
-    }
-    const userUuid = user.uuid;
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
     const params = this.params({
-      user_uuid: userUuid,
       access_token: this.session!.accessToken,
       refresh_token: this.session!.refreshToken
     });
@@ -287,8 +280,7 @@ export class SNApiService extends PureService {
       url,
       params
     ).then(async (response) => {
-      const session = this.newSessionFromResponse(response);
-      await this.storageService!.setValue(StorageKey.Session, session);
+      const session = Session.FromResponse(response);
       await this.setSession(session);
       return response;
     }).catch((errorResponse) => {
@@ -301,11 +293,4 @@ export class SNApiService extends PureService {
     return result;
   }
 
-  private newSessionFromResponse(response: HttpResponse) {
-    const accessToken: string = response.token;
-    const expireAt: number = response.session?.expire_at;
-    const refreshToken: string = response.session?.refresh_token;
-
-    return new Session(accessToken, expireAt, refreshToken);
-  }
 }

@@ -34,7 +34,7 @@ export class SNHttpService extends PureService {
 
   public async postAbsolute(
     url: string,
-    params: Params,
+    params?: Params,
     authentication?: string
   ): Promise<HttpResponse> {
     return this.runHttp(HttpVerb.Post, url, params, authentication);

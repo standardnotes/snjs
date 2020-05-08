@@ -10,7 +10,7 @@ declare type Params = Record<string, any>;
  */
 export declare class SNHttpService extends PureService {
     getAbsolute(url: string, params?: Params, authentication?: string): Promise<HttpResponse>;
-    postAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse>;
+    postAbsolute(url: string, params?: Params, authentication?: string): Promise<HttpResponse>;
     patchAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse>;
     private runHttp;
     private createRequest;

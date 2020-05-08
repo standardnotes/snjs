@@ -1383,5 +1383,4 @@ export class SNApplication {
       return base;
     }
   }
-
 }

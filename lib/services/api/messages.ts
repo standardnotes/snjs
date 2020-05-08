@@ -14,7 +14,8 @@ export const API_MESSAGE_FALLBACK_LOGIN_FAIL       = 'Invalid email or password.
 export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL= `A server error occurred while trying to refresh your session.
                                                       Please try again.`;
 
-export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = 'The session is being updated with new tokens, please standby.';
+export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = `Your account session is being renewed with the server.
+                                                      Please try your request again.`;
 
 export const UNSUPPORTED_PROTOCOL_VERSION          = `This version of the application does not support your
                                                       newer account type. Please upgrade to the latest version

@@ -1,3 +1,5 @@
+import { HttpResponse } from "./http_service";
+
 export class Session {
 
   public accessToken: string
@@ -8,17 +10,21 @@ export class Session {
     return new Session(raw.accessToken, raw.expireAt, raw.refreshToken);
   }
 
+  static FromResponse(response: HttpResponse) {
+    const accessToken: string = response.token;
+    const expireAt: number = response.session?.expire_at;
+    const refreshToken: string = response.session?.refresh_token;
+
+    return new Session(accessToken, expireAt, refreshToken);
+  }
+
   constructor(accessToken: string, expireAt?: number, refreshToken?: string) {
     this.accessToken = accessToken;
     this.expireAt = expireAt;
     this.refreshToken = refreshToken;
   }
 
-  private getCurrentTime() {
-    return Date.now();
-  }
-
-  private getExpireAt(): number {
+  private getExpireAt() {
     return this.expireAt || 0;
   }
 
@@ -30,6 +36,6 @@ export class Session {
     if (!this.canExpire()) {
       return false;
     }
-    return this.getExpireAt() < this.getCurrentTime();
+    return this.getExpireAt() < Date.now();
   }
 }

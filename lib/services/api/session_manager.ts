@@ -80,7 +80,7 @@ export class SNSessionManager extends PureService {
 
   private async setSession(session: Session) {
     this.session = session;
-    this.apiService!.setSession(this.session);
+    await this.apiService!.setSession(this.session);
   }
 
   public online() {
@@ -286,16 +286,7 @@ export class SNSessionManager extends PureService {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    const session = this.newSessionFromResponse(response);
-    await this.storageService!.setValue(StorageKey.Session, session);
+    const session = Session.FromResponse(response);
     await this.setSession(session);
-  }
-
-  private newSessionFromResponse(response: HttpResponse) {
-    const accessToken: string = response.token;
-    const expireAt: number = response.session?.expire_at;
-    const refreshToken: string = response.session?.refresh_token;
-
-    return new Session(accessToken, expireAt, refreshToken);
   }
 }

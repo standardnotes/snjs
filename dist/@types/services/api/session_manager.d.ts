@@ -39,6 +39,5 @@ export declare class SNSessionManager extends PureService {
     signIn(email: string, password: string, strict?: boolean, mfaKeyPath?: string, mfaCode?: string): Promise<SessionManagerResponse>;
     changePassword(currentPassword: string, currentKeyParams: SNRootKeyParams, newPassword: string): Promise<SessionManagerResponse>;
     private handleAuthResponse;
-    private newSessionFromResponse;
 }
 export {};
