@@ -97,10 +97,9 @@ export class SNSessionManager extends PureService {
 
   public async signOut() {
     this.user = undefined;
-
-    if (this.session && this.session.canExpire())
+    if (this.session && this.session.canExpire()) {
       this.apiService!.signOut();
-
+    }
     this.session = undefined;
   }
 
@@ -280,25 +279,6 @@ export class SNSessionManager extends PureService {
     });
   }
 
-  public async refreshSession() {
-    const userUuid = this.getUser()?.uuid;
-    const response = await this.apiService!.refreshSession(userUuid);
-
-    if (response.error) {
-      return {
-        response: this.apiService!.createErrorResponse(
-          messages.API_MESSAGE_GENERIC_INVALID_LOGIN
-        ),
-      } as SessionManagerResponse;
-    }
-
-    await this.handleRefreshSessionResponse(response);
-
-    return {
-      response
-    } as SessionManagerResponse;
-  }
-
   private async handleAuthResponse(response: HttpResponse) {
     if (response.error) {
       return;
@@ -306,21 +286,12 @@ export class SNSessionManager extends PureService {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    const session = this.initializeSessionFromResponse(response);
+    const session = this.newSessionFromResponse(response);
     await this.storageService!.setValue(StorageKey.Session, session);
     await this.setSession(session);
   }
 
-  private async handleRefreshSessionResponse(response: HttpResponse) {
-    if (response.error) {
-      return;
-    }
-    const session = this.initializeSessionFromResponse(response);
-    await this.storageService!.setValue(StorageKey.Session, session);
-    await this.setSession(session);
-  }
-
-  private initializeSessionFromResponse(response: HttpResponse) {
+  private newSessionFromResponse(response: HttpResponse) {
     const accessToken: string = response.token;
     const expireAt: number = response.session?.expire_at;
     const refreshToken: string = response.session?.refresh_token;

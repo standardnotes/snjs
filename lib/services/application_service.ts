@@ -43,8 +43,6 @@ export class ApplicationService extends PureService {
         this.onAppIncrementalSync();
       } else if (event === ApplicationEvent.KeyStatusChanged) {
         this.onAppKeyChange();
-      } else if (event === ApplicationEvent.ExpiredAccessToken) {
-        this.onAppExpiredToken();
       }
     });
   }
@@ -73,7 +71,4 @@ export class ApplicationService extends PureService {
     /** Optional override */
   }
 
-  async onAppExpiredToken() {
-    await this.application!.handleExpiredAccessToken();
-  }
 }

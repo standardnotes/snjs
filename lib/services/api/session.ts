@@ -27,9 +27,9 @@ export class Session {
   }
 
   public isExpired() {
-    if (!this.canExpire())
+    if (!this.canExpire()) {
       return false;
-
+    }
     return this.getExpireAt() < this.getCurrentTime();
   }
 }

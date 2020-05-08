@@ -21,6 +21,8 @@ const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 
 const API_VERSION = '20200115';
 
+const EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS = 498;
+
 export class SNApiService extends PureService {
   private httpService?: SNHttpService
   private storageService?: SNStorageService
@@ -30,6 +32,7 @@ export class SNApiService extends PureService {
   private registering = false
   private authenticating = false
   private changing = false
+  private refreshingSession = false
 
   constructor(httpService: SNHttpService, storageService: SNStorageService) {
     super();
@@ -191,6 +194,9 @@ export class SNApiService extends PureService {
     if (this.changing) {
       return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
     }
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
     const params = {
@@ -202,7 +208,8 @@ export class SNApiService extends PureService {
       url,
       params,
       this.session!.accessToken
-    ).catch((errorResponse) => {
+    ).catch(async (errorResponse) => {
+      await this.checkForExpiredAccessToken(errorResponse);
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
@@ -222,6 +229,9 @@ export class SNApiService extends PureService {
     contentType?: ContentType,
     customEvent?: string
   ) {
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
@@ -236,7 +246,8 @@ export class SNApiService extends PureService {
       url,
       params,
       this.session!.accessToken
-    ).catch((errorResponse) => {
+    ).catch(async (errorResponse) => {
+      await this.checkForExpiredAccessToken(errorResponse);
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -246,22 +257,55 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  async refreshSession(userUuid?: string) {
+  private async checkForExpiredAccessToken(errorResponse: HttpResponse) {
+    if (errorResponse.status !== EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS) {
+      return;
+    }
+    await this.refreshSession();
+  }
+
+  private async refreshSession() {
+    if (this.refreshingSession) {
+      return;
+    }
+    const user = await this.storageService!.getValue(StorageKey.User);
+    if (!user) {
+      return;
+    }
+    if (!user.uuid) {
+      return;
+    }
+    const userUuid = user.uuid;
+    this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
     const params = this.params({
       user_uuid: userUuid,
       access_token: this.session!.accessToken,
       refresh_token: this.session!.refreshToken
     });
-    const response = await this.httpService!.postAbsolute(
+    const result = await this.httpService!.postAbsolute(
       url,
       params
-    ).catch((errorResponse) => {
+    ).then(async (response) => {
+      const session = this.newSessionFromResponse(response);
+      await this.storageService!.setValue(StorageKey.Session, session);
+      await this.setSession(session);
+      return response;
+    }).catch((errorResponse) => {
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
       );
     });
-    return response;
+    this.refreshingSession = false;
+    return result;
+  }
+
+  private newSessionFromResponse(response: HttpResponse) {
+    const accessToken: string = response.token;
+    const expireAt: number = response.session?.expire_at;
+    const refreshToken: string = response.session?.refresh_token;
+
+    return new Session(accessToken, expireAt, refreshToken);
   }
 }

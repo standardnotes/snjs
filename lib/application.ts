@@ -115,8 +115,6 @@ export class SNApplication {
   private launched = false
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false
-  /** Whether the application is currently refreshing the session. */
-  private refreshingSession = false
 
   /**
    * @param environment The Environment that identifies your application.
@@ -1106,10 +1104,6 @@ export class SNApplication {
     return this.challengeService!.isPasscodeLocked();
   }
 
-  public isRefreshingSession() {
-    return this.refreshingSession;
-  }
-
   public async lock() {
     /** Because locking is a critical operation, we want to try to do it safely,
      * but only up to a certain limit. */
@@ -1390,20 +1384,4 @@ export class SNApplication {
     }
   }
 
-  public async handleExpiredAccessToken() {
-    if (this.isRefreshingSession()) {
-      return;
-    }
-    this.refreshingSession = true;
-    this.syncService!.lockSyncing();
-    const { response } = await this.sessionManager!.refreshSession();
-    if (!response.error) {
-      this.syncService!.unlockSyncing();
-      this.syncService!.resetSyncState();
-      await this.syncService!.sync();
-    } else {
-      this.notifyEvent(ApplicationEvent.InvalidSyncSession);
-    }
-    this.refreshingSession = false;
-  }
 }
