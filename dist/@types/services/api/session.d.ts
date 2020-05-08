@@ -1,5 +1,11 @@
 export declare class Session {
-    token: string;
+    accessToken: string;
+    expireAt?: number;
+    refreshToken?: string;
     static FromRaw(raw: any): Session;
-    constructor(token: string);
+    constructor(accessToken: string, expireAt?: number, refreshToken?: string);
+    private getCurrentTime;
+    private getExpireAt;
+    canExpire(): boolean;
+    isExpired(): boolean;
 }

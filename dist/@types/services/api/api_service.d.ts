@@ -13,6 +13,7 @@ export declare class SNApiService extends PureService {
     private registering;
     private authenticating;
     private changing;
+    private refreshingSession;
     constructor(httpService: SNHttpService, storageService: SNStorageService);
     /** @override */
     deinit(): void;
@@ -33,6 +34,10 @@ export declare class SNApiService extends PureService {
     getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
     register(email: string, serverPassword: string, keyParams: SNRootKeyParams): Promise<HttpResponse>;
     signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
+    signOut(): Promise<void>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<HttpResponse>;
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
+    private checkForExpiredAccessToken;
+    private refreshSession;
+    private newSessionFromResponse;
 }
