@@ -16,6 +16,7 @@ export type HttpResponse = {
 const REQUEST_READY_STATE_COMPLETED = 4;
 const HTTP_STATUS_MIN_SUCCESS = 200;
 const HTTP_STATUS_MAX_SUCCESS = 299;
+const HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 
 type Params = Record<string, any>
 
@@ -139,5 +140,9 @@ export class SNHttpService extends PureService {
     } else {
       return url + '?' + keyValueString;
     }
+  }
+
+  public isErrorResponseExpiredToken(errorResponse: HttpResponse) {
+    return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
   }
 }

@@ -21,8 +21,6 @@ const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 
 const API_VERSION = '20200115';
 
-const EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS = 498;
-
 export class SNApiService extends PureService {
   private httpService?: SNHttpService
   private storageService?: SNStorageService
@@ -63,9 +61,11 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public async setSession(session: Session) {
+  public async setSession(session: Session, fromDisk: boolean = false) {
     this.session = session;
-    await this.storageService!.setValue(StorageKey.Session, session);
+    if (!fromDisk) {
+      await this.storageService!.setValue(StorageKey.Session, session);
+    }
   }
 
   private async path(path: string) {
@@ -210,7 +210,7 @@ export class SNApiService extends PureService {
       params,
       this.session!.accessToken
     ).catch(async (errorResponse) => {
-      if (this.expiredAccessToken(errorResponse)) {
+      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
         await this.refreshSession();
       }
       return this.errorResponseWithFallbackMessage(
@@ -250,7 +250,7 @@ export class SNApiService extends PureService {
       params,
       this.session!.accessToken
     ).catch(async (errorResponse) => {
-      if (this.expiredAccessToken(errorResponse)) {
+      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
         await this.refreshSession();
       }
       return this.errorResponseWithFallbackMessage(
@@ -260,10 +260,6 @@ export class SNApiService extends PureService {
     });
 
     return response;
-  }
-
-  private expiredAccessToken(errorResponse: HttpResponse) {
-    return errorResponse.status === EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS;
   }
 
   private async refreshSession() {

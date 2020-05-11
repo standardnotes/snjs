@@ -17,5 +17,6 @@ export declare class SNHttpService extends PureService {
     private runRequest;
     private stateChangeHandlerForRequest;
     private urlForUrlAndParams;
+    isErrorResponseExpiredToken(errorResponse: HttpResponse): boolean;
 }
 export {};

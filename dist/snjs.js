@@ -15494,7 +15494,6 @@ var REQUEST_PATH_SYNC = '/items/sync';
 var REQUEST_PATH_LOGOUT = '/auth/sign_out';
 var REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 var API_VERSION = '20200115';
-var EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS = 498;
 var SNApiService = /*#__PURE__*/function (_PureService) {
   _inherits(SNApiService, _PureService);
 
@@ -15622,15 +15621,24 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
     key: "setSession",
     value: function () {
       var _setSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(session) {
+        var fromDisk,
+            _args4 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
+                fromDisk = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : false;
                 this.session = session;
-                _context4.next = 3;
+
+                if (fromDisk) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                _context4.next = 5;
                 return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_7__["StorageKey"].Session, session);
 
-              case 3:
+              case 5:
               case "end":
                 return _context4.stop();
             }
@@ -15955,7 +15963,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                       while (1) {
                         switch (_context10.prev = _context10.next) {
                           case 0:
-                            if (!_this5.expiredAccessToken(errorResponse)) {
+                            if (!_this5.httpService.isErrorResponseExpiredToken(errorResponse)) {
                               _context10.next = 3;
                               break;
                             }
@@ -16043,7 +16051,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                       while (1) {
                         switch (_context12.prev = _context12.next) {
                           case 0:
-                            if (!_this6.expiredAccessToken(errorResponse)) {
+                            if (!_this6.httpService.isErrorResponseExpiredToken(errorResponse)) {
                               _context12.next = 3;
                               break;
                             }
@@ -16085,11 +16093,6 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
       return sync;
     }()
-  }, {
-    key: "expiredAccessToken",
-    value: function expiredAccessToken(errorResponse) {
-      return errorResponse.status === EXPIRED_ACCESS_TOKEN_RESPONSE_STATUS;
-    }
   }, {
     key: "refreshSession",
     value: function () {
@@ -16224,6 +16227,7 @@ var HttpVerb;
 var REQUEST_READY_STATE_COMPLETED = 4;
 var HTTP_STATUS_MIN_SUCCESS = 200;
 var HTTP_STATUS_MAX_SUCCESS = 299;
+var HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
@@ -16430,6 +16434,11 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
       } else {
         return url + '?' + keyValueString;
       }
+    }
+  }, {
+    key: "isErrorResponseExpiredToken",
+    value: function isErrorResponseExpiredToken(errorResponse) {
+      return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
     }
   }]);
 
@@ -16739,7 +16748,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context.next = 14;
-                return this.setSession(_Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"].FromRaw(rawSession));
+                return this.setSession(_Lib_services_api_session__WEBPACK_IMPORTED_MODULE_4__["Session"].FromRaw(rawSession), true);
 
               case 14:
               case "end":
@@ -16759,15 +16768,18 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
     key: "setSession",
     value: function () {
       var _setSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(session) {
+        var fromDisk,
+            _args2 = arguments;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                fromDisk = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : false;
                 this.session = session;
-                _context2.next = 3;
-                return this.apiService.setSession(this.session);
+                _context2.next = 4;
+                return this.apiService.setSession(this.session, fromDisk);
 
-              case 3:
+              case 4:
               case "end":
                 return _context2.stop();
             }

@@ -74,13 +74,13 @@ export class SNSessionManager extends PureService {
 
     const rawSession = await this.storageService!.getValue(StorageKey.Session);
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession));
+      await this.setSession(Session.FromRaw(rawSession), true);
     }
   }
 
-  private async setSession(session: Session) {
+  private async setSession(session: Session, fromDisk: boolean = false) {
     this.session = session;
-    await this.apiService!.setSession(this.session);
+    await this.apiService!.setSession(this.session, fromDisk);
   }
 
   public online() {
