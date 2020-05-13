@@ -262,7 +262,7 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private async refreshSession() {
+  async refreshSession() {
     if (this.refreshingSession) {
       return;
     }

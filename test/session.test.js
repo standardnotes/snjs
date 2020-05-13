@@ -31,17 +31,6 @@ describe('server session', () => {
       email: this.email,
       password: this.password
     });
-    this.signOut = async () => {
-      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    };
-    this.signIn = async () => {
-      await this.application.signIn(
-        this.email,
-        this.password,
-        undefined, undefined, undefined, undefined, undefined,
-        true
-      );
-    };
   });
 
   afterEach(async function () {
@@ -53,21 +42,57 @@ describe('server session', () => {
     await this.application.deinit();
   });
 
+  function getDelayBeforeNextRequest(currentSession) {
+    const tokenExpireAt = currentSession.expireAt;
+    return Math.ceil(tokenExpireAt - Date.now() / 1000) + 1;
+  }
+
+  it.only('should fail when a sync request is perfomed with an expired access token', async function () {
+    const currentSession = this.application.apiService.session;
+
+    const delayBeforeNextRequest = getDelayBeforeNextRequest(currentSession);
+    await Factory.sleep(delayBeforeNextRequest);
+
+    const response = await this.application.apiService.sync([]);
+
+    expect(response).to.have.property('status');
+    expect(response.status).to.equal(498);
+
+    expect(response).to.have.property('error');
+
+    expect(response.error).to.have.property('tag');
+    expect(response.error.tag).to.equal('expired-access-token');
+
+    expect(response.error).to.have.property('message');
+    expect(response.error.message).to.equal('The provided access token has expired.');
+  }).timeout(10000);
+
+  it.only('should return the new session in the response when refreshed', async function () {
+    const response = await this.application.apiService.refreshSession();
+
+    expect(response).to.have.property('status');
+    expect(response.status).to.equal(200);
+
+    expect(response).to.have.property('token');
+    expect(response.token).to.be.a('string');
+    expect(response.token).to.not.be.empty;
+
+    expect(response).to.have.property('session');
+
+    expect(response.session).to.have.property('expire_at');
+    expect(response.session.expire_at).to.be.a('number');
+
+    expect(response.session).to.have.property('refresh_token');
+    expect(response.session.refresh_token).to.not.be.empty;
+  }).timeout(10000);
+
   it.only('should be refreshed if access token is expired', async function () {
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-
-    const promise = Factory.loginToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password
-    });
-    await promise;
-
     // Saving the current session information for later...
     const sessionBeforeSync = this.application.apiService.session;
 
     // Waiting enough time for the access token to expire, before performing a new sync request.
-    await Factory.sleep((Math.floor(sessionBeforeSync.expireAt - Date.now() / 1000) + 2));
+    const delayBeforeNextRequest = getDelayBeforeNextRequest(sessionBeforeSync);
+    await Factory.sleep(delayBeforeNextRequest);
 
     // Performing a sync request with an expired access token.
     await this.application.sync(syncOptions);
