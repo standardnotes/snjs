@@ -67,11 +67,10 @@ describe('server session', () => {
     const sessionBeforeSync = this.application.apiService.session;
 
     // Waiting enough time for the access token to expire, before performing a new sync request.
-    await Factory.sleep(3);
+    await Factory.sleep((Math.floor(sessionBeforeSync.expireAt - Date.now() / 1000) + 2));
 
     // Performing a sync request with an expired access token.
-    const sync = this.application.sync(syncOptions);
-    await sync;
+    await this.application.sync(syncOptions);
 
     // After the above sync request is completed, we obtain the session information.
     const sessionAfterSync = this.application.apiService.session;
