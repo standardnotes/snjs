@@ -43,13 +43,13 @@ type Observer = {
 }
 
 /**
- * The item manager is backed by the Payload Manager. Think of the item manager as a 
- * more user-friendly or item-specific interface to creating and updating data. 
- * The item manager listens for change events from the global payload manager, and 
- * converts any payloads to SNItems, then propagates those items to listeners on the 
- * item  manager. When the item manager makes a change to an item, it will modify items 
- * using a  mutator, then emit those payloads to the payload manager. The payload manager 
- * will then notify  its observers (which is us), we'll convert the payloads to items, 
+ * The item manager is backed by the Payload Manager. Think of the item manager as a
+ * more user-friendly or item-specific interface to creating and updating data.
+ * The item manager listens for change events from the global payload manager, and
+ * converts any payloads to SNItems, then propagates those items to listeners on the
+ * item  manager. When the item manager makes a change to an item, it will modify items
+ * using a  mutator, then emit those payloads to the payload manager. The payload manager
+ * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
 export class ItemManager extends PureService {
@@ -118,7 +118,7 @@ export class ItemManager extends PureService {
     return this.collection.findAll(uuids, includeBlanks);
   }
 
-  /** 
+  /**
    * Returns a detached array of all items
    */
   public get items() {
@@ -132,7 +132,7 @@ export class ItemManager extends PureService {
     return this.collection.nondeletedElements();
   }
 
-  /** 
+  /**
    * Returns all items that have not been able to decrypt.
    */
   public get invalidItems() {
@@ -512,7 +512,7 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Inserts the item as-is by reading its payload value. This function will not 
+   * Inserts the item as-is by reading its payload value. This function will not
    * modify item in any way (such as marking it as dirty). It is up to the caller
    * to pass in a dirtied item if that is their intention.
    */
@@ -612,7 +612,7 @@ export class ItemManager extends PureService {
       mutator.setDeleted();
     });
 
-    /** Handle indirect relationships. 
+    /** Handle indirect relationships.
      * (Direct relationships are cleared by clearing content above) */
     for (const referencingId of referencingIds) {
       const referencingItem = this.findItem(referencingId);

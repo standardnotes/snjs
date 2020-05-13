@@ -73,7 +73,7 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
  * handles delegation of a task to the respective protocol operator. Each version of the protocol
  * (001, 002, 003, 004, etc) uses a respective operator version to perform encryption operations.
  * Operators are located in /protocol/operator.
- * The protocol service depends on the keyManager for determining which key to use for the 
+ * The protocol service depends on the keyManager for determining which key to use for the
  * encryption and decryption of a particular payload.
  * The protocol service is also responsible for dictating which protocol versions are valid,
  * and which are no longer valid or not supported.
@@ -195,7 +195,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return ProtocolVersion.V004;
   }
 
-  /** 
+  /**
    * Returns the protocol version associated with the user's account
    */
   public async getUserVersion() {
@@ -203,7 +203,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return keyParams && keyParams.version;
   }
 
-  /** 
+  /**
    * Returns true if there is an upgrade available for the account or passcode
    */
   public async upgradeAvailable() {
@@ -212,7 +212,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return accountUpgradeAvailable || passcodeUpgradeAvailable;
   }
 
-  /** 
+  /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async accountUpgradeAvailable() {
@@ -223,7 +223,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return userVersion !== this.getLatestVersion();
   }
 
-  /** 
+  /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async passcodeUpgradeAvailable() {
@@ -242,7 +242,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     /**
      * If the version is 003 or lower, key derivation is supported unless the browser is
      * IE or Edge (or generally, where WebCrypto is not available).
-     * 
+     *
      * Versions 004 and above are always supported.
      */
     if (compareVersions(keyParams.version, ProtocolVersion.V004) >= 0) {
@@ -409,7 +409,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * If the input payload is not properly decrypted in the first place, it will be returned
    * as-is. If the payload is deleted, it will be returned as-is (assuming that the content field is null)
    * @param payload - The payload to encrypt
-   * @param key The key to use to encrypt the payload. 
+   * @param key The key to use to encrypt the payload.
    *   Will be looked up if not supplied.
    * @param intent - The target of the encryption
    * @returns The encrypted payload
@@ -486,7 +486,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Generates a new payload by decrypting the input payload.
    * If the input payload is already decrypted, it will be returned as-is.
    * @param payload - The payload to decrypt.
-   * @param key The key to use to decrypt the payload. 
+   * @param key The key to use to decrypt the payload.
    * If none is supplied, it will be automatically looked up.
    */
   public async payloadByDecryptingPayload(
@@ -637,8 +637,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Creates a JSON string representing the backup format of all items, or just subitems
    * if supplied.
-   * @param subItems An optional array of items to create backup of. 
-   * If not supplied, all items are backed up. 
+   * @param subItems An optional array of items to create backup of.
+   * If not supplied, all items are backed up.
    * @param returnIfEmpty Returns null if there are no items to make backup of.
    * @returns JSON stringified representation of data, including keyParams.
    */
@@ -917,7 +917,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
   }
 
-  /** 
+  /**
    * Wraps the current in-memory root key value using the wrappingKey,
    * then persists the wrapped value to disk.
    */
@@ -1150,12 +1150,12 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
   }
 
-  /** 
+  /**
    * When a download-first sync completes, it means we've completed a (potentially multipage)
    * sync where we only downloaded what the server had before uploading anything. We will be
    * allowed to make local accomadations here before the server begins with the upload
    * part of the sync (automatically runs after download-first sync completes).
-   * We use this to see if the server has any default itemsKeys, and if so, allows us to 
+   * We use this to see if the server has any default itemsKeys, and if so, allows us to
    * delete any never-synced items keys we have here locally.
    */
   private async handleDownloadFirstSyncCompletion() {
@@ -1257,7 +1257,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async reencryptItemsKeys() {
     const itemsKeys = this.itemsKeys();
     if (itemsKeys.length > 0) {
-      /** 
+      /**
        * Do not call sync after marking dirty.
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
@@ -1267,8 +1267,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /**
-   * When migrating from non-SNItemsKey architecture, many items will not have a 
-   * relationship with any key object. For those items, we can be sure that only 1 key 
+   * When migrating from non-SNItemsKey architecture, many items will not have a
+   * relationship with any key object. For those items, we can be sure that only 1 key
    * object will correspond to that protocol version.
    * @returns The SNItemsKey object to decrypt items encrypted
    * with previous protocol version.

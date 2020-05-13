@@ -121,11 +121,11 @@ export class SNApplication {
    * @param platform The Platform that identifies your application.
    * @param namespace A unique identifier to namespace storage and
    *  other persistent properties. Defaults to empty string.
-   * @param crypto The platform-dependent instance of SNCrypto to use. 
+   * @param crypto The platform-dependent instance of SNCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
-   * @param swapClasses Gives consumers the ability to provide their own custom 
-   * subclass for a service. swapClasses should be an array  of key/value pairs 
-   * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace, 
+   * @param swapClasses Gives consumers the ability to provide their own custom
+   * subclass for a service. swapClasses should be an array  of key/value pairs
+   * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace,
    * and 'with'  is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    */
@@ -186,8 +186,8 @@ export class SNApplication {
    * Runs migrations, handles device authentication, unlocks application, and
    * issues a callback if a device activation requires user input
    * (i.e local passcode or fingerprint).
-   * @param awaitDatabaseLoad  
-   * Option to await database load before marking the app as ready. 
+   * @param awaitDatabaseLoad
+   * Option to await database load before marking the app as ready.
    */
   public async launch(awaitDatabaseLoad = false) {
     this.launched = false;
@@ -254,7 +254,7 @@ export class SNApplication {
     }, DEFAULT_AUTO_SYNC_INTERVAL);
   }
 
-  /** 
+  /**
    * The migrations service is initialized with this function, so that it can retrieve
    * raw challenge values as necessary.
    */
@@ -278,7 +278,7 @@ export class SNApplication {
     }
   }
 
-  /** 
+  /**
    * @param singleEvent Whether to only listen for a particular event.
    */
   public addEventObserver(
@@ -315,7 +315,7 @@ export class SNApplication {
     this.migrationService!.handleApplicationEvent(event);
   }
 
-  /** 
+  /**
    * Whether the local database has completed loading local items.
    */
   public isDatabaseLoaded() {
@@ -337,28 +337,28 @@ export class SNApplication {
     await this.syncService!.sync();
   }
 
-  /** 
+  /**
    * Finds an item by UUID.
    */
   public findItem(uuid: string) {
     return this.itemManager!.findItem(uuid);
   }
 
-  /** 
+  /**
    * Returns all items.
    */
   public allItems() {
     return this.itemManager!.items;
   }
 
-  /** 
+  /**
    * Finds an item by predicate.
   */
   public findItems(predicate: SNPredicate) {
     return this.itemManager!.itemsMatchingPredicate(predicate);
   }
 
-  /** 
+  /**
    * Finds an item by predicate.
    */
   public getAll(uuids: UuidString[]) {
@@ -373,7 +373,7 @@ export class SNApplication {
     return this.itemManager!.emitItemFromPayload(item.payloadRepresentation(), source);
   }
 
-  /** 
+  /**
    * Creates a managed item.
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
@@ -392,7 +392,7 @@ export class SNApplication {
     return item;
   }
 
-  /** 
+  /**
    * Creates an unmanaged item that can be added later.
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
@@ -407,14 +407,14 @@ export class SNApplication {
     return item;
   }
 
-  /** 
+  /**
    * Creates an unmanaged item from a payload.
    */
   public createItemFromPayload(payload: PurePayload) {
     return CreateItemFromPayload(payload);
   }
 
-  /** 
+  /**
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
@@ -433,7 +433,7 @@ export class SNApplication {
     return this.syncService!.getStatus()!;
   }
 
-  /** 
+  /**
    * @param isUserModified  Whether to change the modified date the user
    * sees of the item.
    */
@@ -626,8 +626,8 @@ export class SNApplication {
   }
 
 
-  /** 
-   * Begin streaming items to display in the UI. The stream callback will be called 
+  /**
+   * Begin streaming items to display in the UI. The stream callback will be called
    * immediately with the present items that match the constraint, and over time whenever
    * items matching the constraint are added, changed, or deleted.
    */
@@ -654,7 +654,7 @@ export class SNApplication {
     };
   }
 
-  /** 
+  /**
    * Set the server's URL
    */
   public async setHost(host: string) {
@@ -690,7 +690,7 @@ export class SNApplication {
     return !isNullOrUndefined(this.getUser()) || this.hasPasscode();
   }
 
-  /** 
+  /**
    * @returns An array of errors, if any.
    */
   public async upgradeProtocolVersion() {
@@ -737,7 +737,7 @@ export class SNApplication {
     return isNullOrUndefined(user);
   }
 
-  /** 
+  /**
 
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
@@ -835,14 +835,14 @@ export class SNApplication {
     return this.storageService!.removeValue(key, mode);
   }
 
-  /** 
+  /**
    * Deletes all payloads from storage.
    */
   public async clearDatabase() {
     return this.storageService!.clearAllPayloads();
   }
 
-  /** 
+  /**
    * Allows items keys to be rewritten to local db on local credential status change,
    * such as if passcode is added, changed, or removed.
    * This allows IndexedDB unencrypted logs to be deleted
@@ -857,8 +857,8 @@ export class SNApplication {
     await this.syncService!.persistPayloads(payloads);
   }
 
-  /** 
-   * Gives services a chance to complete any sensitive operations before yielding 
+  /**
+   * Gives services a chance to complete any sensitive operations before yielding
    * @param maxWait The maximum number of milliseconds to wait for services
    * to finish tasks. 0 means no limit.
    */
@@ -906,10 +906,10 @@ export class SNApplication {
    * Returns the wrapping key for operations that require resaving the root key
    * (changing the account password, signing in, registering, or upgrading protocol)
    * Returns empty object if no passcode is configured.
-   * Otherwise returns {cancled: true} if the operation is canceled, or 
+   * Otherwise returns {cancled: true} if the operation is canceled, or
    * {wrappingKey} with the result.
    * @param passcode - If the consumer already has access to the passcode,
-   * they can pass it here so that the user is not prompted again. 
+   * they can pass it here so that the user is not prompted again.
    */
   private async getWrappingKeyIfNecessary(passcode?: string) {
     if (!this.hasPasscode()) {
@@ -976,7 +976,7 @@ export class SNApplication {
   }
 
   /**
-   * @param mergeLocal  Whether to merge existing offline data into account. 
+   * @param mergeLocal  Whether to merge existing offline data into account.
    * If false, any pre-existing data will be fully deleted upon success.
    */
   public async signIn(
@@ -1033,7 +1033,7 @@ export class SNApplication {
     return result.response;
   }
 
-  /** 
+  /**
    * @param passcode - Changing the account password requires the local
    * passcode if configured (to rewrap the account key with passcode). If the passcode
    * is not passed in, the user will be prompted for the passcode. However if the consumer
