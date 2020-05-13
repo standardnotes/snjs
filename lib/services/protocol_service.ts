@@ -1163,8 +1163,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.
     */
-    const itemsKeys = this.itemsKeys;
-    const neverSynced = itemsKeys.filter((key) => {
+    const itemsKeys = this.itemsKeys();
+    const neverSyncedKey = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
     /**
@@ -1177,7 +1177,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSynced));
+      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKey));
     } else {
       /**
        * No previous synced items key.
@@ -1187,13 +1187,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const rootKey = await this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
-        const toDelete = neverSynced.filter((itemsKey) => {
+        const toDelete = neverSyncedKey.filter((itemsKey) => {
           return itemsKey.version !== rootKey.version;
         });
         if (toDelete.length > 0) {
           await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
         }
-        if (itemsKeys.length === 0) {
+        if (this.itemsKeys().length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
@@ -1224,28 +1224,28 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /**
-   * @access public
    * @returns All SN|ItemsKey objects synced to the account.
    */
-  get itemsKeys() {
-    return this.itemManager!.itemsKeys;
+  itemsKeys() {
+    return this.itemManager!.itemsKeys();
   }
 
   /**
    * @returns The items key used to encrypt the payload
    */
   public itemsKeyForPayload(payload: PurePayload) {
-    return this.itemsKeys.find((key) => key.uuid === payload.items_key_id);
+    return this.itemsKeys().find((key) => key.uuid === payload.items_key_id);
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
   public getDefaultItemsKey() {
-    if (this.itemsKeys.length === 1) {
-      return this.itemsKeys[0];
+    const itemsKeys = this.itemsKeys();
+    if (itemsKeys.length === 1) {
+      return this.itemsKeys()[0];
     }
-    return this.itemsKeys.find((key) => {
+    return itemsKeys.find((key) => {
       return key.isDefault;
     });
   }
@@ -1255,7 +1255,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * keys with this new root key (by simply re-syncing).
    */
   public async reencryptItemsKeys() {
-    const itemsKeys = this.itemsKeys;
+    const itemsKeys = this.itemsKeys();
     if (itemsKeys.length > 0) {
       /** 
        * Do not call sync after marking dirty.
@@ -1274,7 +1274,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * with previous protocol version.
    */
   public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
-    return this.itemsKeys.find((key) => {
+    return this.itemsKeys().find((key) => {
       return key.version === version;
     });
   }

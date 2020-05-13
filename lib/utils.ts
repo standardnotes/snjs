@@ -74,7 +74,7 @@ export function isFunction(value: any) {
 /**
  * @returns True if the object is null or undefined, otherwise false
  */
-export function isNullOrUndefined(value: any) {
+export function isNullOrUndefined(value: any): value is null | undefined {
   return value === null || value === undefined;
 }
 

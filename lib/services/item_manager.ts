@@ -142,7 +142,7 @@ export class ItemManager extends PureService {
   /**
    * Returns all non-deleted items keys
    */
-  get itemsKeys() {
+  itemsKeys() {
     return this.collection.displayElements(ContentType.ItemsKey) as SNItemsKey[];
   }
 
