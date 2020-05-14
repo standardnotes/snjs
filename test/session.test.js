@@ -44,7 +44,12 @@ describe('server session', () => {
 
   function getDelayBeforeNextRequest(currentSession) {
     const tokenExpireAt = currentSession.expireAt;
-    return Math.ceil(tokenExpireAt - Date.now() / 1000) + 1;
+    const timeRemaining = Math.ceil(tokenExpireAt - Date.now() / 1000);
+    /* 
+      If the token has not expired yet, we will return the remaining time, plus one second.
+      Else, there's no need to add a delay.
+    */
+    return timeRemaining > 0 ? timeRemaining + 1 : 0;
   }
 
   it.only('should fail when a sync request is perfomed with an expired access token', async function () {
