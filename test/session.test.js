@@ -52,7 +52,7 @@ describe('server session', () => {
     return timeRemaining > 0 ? timeRemaining + 1 : 0;
   }
 
-  it.only('should fail when a sync request is perfomed with an expired access token', async function () {
+  it('should fail when a sync request is perfomed with an expired access token', async function () {
     const currentSession = this.application.apiService.session;
 
     const delayBeforeNextRequest = getDelayBeforeNextRequest(currentSession);
@@ -72,7 +72,7 @@ describe('server session', () => {
     expect(response.error.message).to.equal('The provided access token has expired.');
   }).timeout(10000);
 
-  it.only('should return the new session in the response when refreshed', async function () {
+  it('should return the new session in the response when refreshed', async function () {
     const response = await this.application.apiService.refreshSession();
 
     expect(response).to.have.property('status');
@@ -91,7 +91,7 @@ describe('server session', () => {
     expect(response.session.refresh_token).to.not.be.empty;
   }).timeout(10000);
 
-  it.only('should be refreshed if access token is expired', async function () {
+  it('should be refreshed if access token is expired', async function () {
     // Saving the current session information for later...
     const sessionBeforeSync = this.application.apiService.session;
 
