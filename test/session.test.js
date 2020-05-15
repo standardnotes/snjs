@@ -52,6 +52,10 @@ describe('server session', () => {
     return timeRemaining > 0 ? timeRemaining + 1 : 0;
   }
 
+  async function getSessionFromStorage(application) {
+    return application.storageService.getValue(StorageKey.Session);
+  }
+
   it('should fail when a sync request is perfomed with an expired access token', async function () {
     const currentSession = this.application.apiService.session;
 
@@ -110,4 +114,18 @@ describe('server session', () => {
     expect(sessionBeforeSync.refreshToken).to.not.equal(sessionAfterSync.refreshToken);
     expect(sessionBeforeSync.expireAt).to.be.lessThan(sessionAfterSync.expireAt);
   }).timeout(20000);
+
+  it('should keep session consistent between storage and apiService', async function () {
+    const sessionFromStorage = await getSessionFromStorage(this.application);
+    const sessionFromApiService = this.application.apiService.session;
+
+    expect(sessionFromStorage).to.equal(sessionFromApiService);
+
+    await this.application.apiService.refreshSession();
+
+    const updatedSessionFromStorage = await getSessionFromStorage(this.application);
+    const updatedSessionFromApiService = this.application.apiService.session;
+
+    expect(updatedSessionFromStorage).to.equal(updatedSessionFromApiService);
+  });
 });

@@ -25,7 +25,7 @@ export class SNApiService extends PureService {
   private httpService?: SNHttpService
   private storageService?: SNStorageService
   private host?: string
-  private session?: Session
+  public session?: Session
 
   private registering = false
   private authenticating = false

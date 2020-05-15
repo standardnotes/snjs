@@ -37,7 +37,6 @@ export class SNSessionManager extends PureService {
   private protocolService?: SNProtocolService
 
   private user?: User
-  private session?: Session
 
   constructor(
     storageService: SNStorageService,
@@ -58,7 +57,6 @@ export class SNSessionManager extends PureService {
     this.apiService = undefined;
     this.alertService = undefined;
     this.user = undefined;
-    this.session = undefined;
     super.deinit();
   }
 
@@ -79,8 +77,7 @@ export class SNSessionManager extends PureService {
   }
 
   private async setSession(session: Session, fromDisk: boolean = false) {
-    this.session = session;
-    await this.apiService!.setSession(this.session, fromDisk);
+    await this.apiService!.setSession(session, fromDisk);
   }
 
   public online() {
@@ -88,7 +85,7 @@ export class SNSessionManager extends PureService {
   }
 
   public offline() {
-    return isNullOrUndefined(this.session);
+    return isNullOrUndefined(this.apiService!.session);
   }
 
   public getUser() {
@@ -97,10 +94,9 @@ export class SNSessionManager extends PureService {
 
   public async signOut() {
     this.user = undefined;
-    if (this.session && this.session.canExpire()) {
+    if (this.apiService!.session && this.apiService!.session.canExpire()) {
       this.apiService!.signOut();
     }
-    this.session = undefined;
   }
 
   async register(email: string, password: string) {
