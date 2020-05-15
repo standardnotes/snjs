@@ -25,7 +25,7 @@ export class SNApiService extends PureService {
   private httpService?: SNHttpService
   private storageService?: SNStorageService
   private host?: string
-  public session?: Session
+  private session?: Session
 
   private registering = false
   private authenticating = false
@@ -180,7 +180,7 @@ export class SNApiService extends PureService {
 
   async signOut() {
     const url = await this.path(REQUEST_PATH_LOGOUT);
-    await this.httpService!.postAbsolute(
+    return this.httpService!.postAbsolute(
       url,
       undefined,
       this.session!.accessToken

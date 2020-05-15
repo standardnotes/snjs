@@ -115,7 +115,7 @@ describe('server session', () => {
     expect(sessionBeforeSync.expireAt).to.be.lessThan(sessionAfterSync.expireAt);
   }).timeout(20000);
 
-  it('should keep session consistent between storage and apiService', async function () {
+  it('should be consistent between storage and apiService', async function () {
     const sessionFromStorage = await getSessionFromStorage(this.application);
     const sessionFromApiService = this.application.apiService.session;
 
@@ -127,5 +127,34 @@ describe('server session', () => {
     const updatedSessionFromApiService = this.application.apiService.session;
 
     expect(updatedSessionFromStorage).to.equal(updatedSessionFromApiService);
+  });
+
+  describe('with expired access token', async function () {
+    describe('sign out request', async function () {
+      it('should be performed successfully and terminate session', async function () {
+        const sessionBeforeSignOut = this.application.apiService.session;
+
+        // Waiting enough time for the access token to expire, before performing a sign out request.
+        const delayBeforeNextRequest = getDelayBeforeNextRequest(sessionBeforeSignOut);
+        await Factory.sleep(delayBeforeNextRequest);
+  
+        const signOutResponse = await this.application.apiService.signOut();
+  
+        expect(signOutResponse.status).to.equal(204);
+
+        const syncResponse = await this.application.apiService.sync([]);
+  
+        expect(syncResponse).to.have.property('status');
+        expect(syncResponse.status).to.equal(401);
+
+        expect(syncResponse).to.have.property('error');
+
+        expect(syncResponse.error).to.have.property('tag');
+        expect(syncResponse.error.tag).to.equal('invalid-auth');
+
+        expect(syncResponse.error).to.have.property('message');
+        expect(syncResponse.error.message).to.equal('Invalid login credentials.');
+      }).timeout(10000);
+    });
   });
 });

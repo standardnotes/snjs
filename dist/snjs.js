@@ -15902,10 +15902,9 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
               case 2:
                 url = _context9.sent;
-                _context9.next = 5;
-                return this.httpService.postAbsolute(url, undefined, this.session.accessToken);
+                return _context9.abrupt("return", this.httpService.postAbsolute(url, undefined, this.session.accessToken));
 
-              case 5:
+              case 4:
               case "end":
                 return _context9.stop();
             }
@@ -16682,8 +16681,6 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
 
     _defineProperty(_assertThisInitialized(_this), "user", void 0);
 
-    _defineProperty(_assertThisInitialized(_this), "session", void 0);
-
     _this.protocolService = protocolService;
     _this.storageService = storageService;
     _this.apiService = apiService;
@@ -16699,7 +16696,6 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
       this.apiService = undefined;
       this.alertService = undefined;
       this.user = undefined;
-      this.session = undefined;
 
       _get(_getPrototypeOf(SNSessionManager.prototype), "deinit", this).call(this);
     }
@@ -16775,11 +16771,10 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 fromDisk = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : false;
-                this.session = session;
-                _context2.next = 4;
-                return this.apiService.setSession(this.session, fromDisk);
+                _context2.next = 3;
+                return this.apiService.setSession(session, fromDisk);
 
-              case 4:
+              case 3:
               case "end":
                 return _context2.stop();
             }
@@ -16801,7 +16796,7 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
   }, {
     key: "offline",
     value: function offline() {
-      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(this.session);
+      return Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_2__["isNullOrUndefined"])(this.apiService.session);
     }
   }, {
     key: "getUser",
@@ -16818,13 +16813,11 @@ var SNSessionManager = /*#__PURE__*/function (_PureService) {
               case 0:
                 this.user = undefined;
 
-                if (this.session && this.session.canExpire()) {
+                if (this.apiService.session && this.apiService.session.canExpire()) {
                   this.apiService.signOut();
                 }
 
-                this.session = undefined;
-
-              case 3:
+              case 2:
               case "end":
                 return _context3.stop();
             }
