@@ -26,7 +26,6 @@ export declare class SNSessionManager extends PureService {
     private alertService?;
     private protocolService?;
     private user?;
-    private session?;
     constructor(storageService: SNStorageService, apiService: SNApiService, alertService: SNAlertService, protocolService: SNProtocolService);
     deinit(): void;
     initializeFromDisk(): Promise<void>;

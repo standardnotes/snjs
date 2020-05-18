@@ -20,7 +20,8 @@ export declare class SNApiService extends PureService {
     loadHost(): Promise<void>;
     setHost(host: string): Promise<void>;
     getHost(): Promise<string | undefined>;
-    setSession(session: Session, fromDisk?: boolean): Promise<void>;
+    setSession(session: Session, persist?: boolean): Promise<void>;
+    getSession(): Promise<Session | undefined>;
     private path;
     private params;
     createErrorResponse(message: string): HttpResponse;
@@ -34,8 +35,8 @@ export declare class SNApiService extends PureService {
     getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
     register(email: string, serverPassword: string, keyParams: SNRootKeyParams): Promise<HttpResponse>;
     signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
-    signOut(): Promise<void>;
+    signOut(): Promise<HttpResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<HttpResponse>;
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
-    private refreshSession;
+    refreshSession(): Promise<HttpResponse | undefined>;
 }

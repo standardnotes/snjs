@@ -61,11 +61,15 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public async setSession(session: Session, fromDisk: boolean = false) {
+  public async setSession(session: Session, persist: boolean = true) {
     this.session = session;
-    if (!fromDisk) {
+    if (persist) {
       await this.storageService!.setValue(StorageKey.Session, session);
     }
+  }
+
+  public async getSession() {
+    return this.session;
   }
 
   private async path(path: string) {

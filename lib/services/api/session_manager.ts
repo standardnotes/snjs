@@ -72,12 +72,12 @@ export class SNSessionManager extends PureService {
 
     const rawSession = await this.storageService!.getValue(StorageKey.Session);
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession), true);
+      await this.setSession(Session.FromRaw(rawSession), false);
     }
   }
 
-  private async setSession(session: Session, fromDisk: boolean = false) {
-    await this.apiService!.setSession(session, fromDisk);
+  private async setSession(session: Session, persist: boolean = true) {
+    await this.apiService!.setSession(session, persist);
   }
 
   public online() {
@@ -85,7 +85,7 @@ export class SNSessionManager extends PureService {
   }
 
   public offline() {
-    return isNullOrUndefined(this.apiService!.session);
+    return isNullOrUndefined(this.apiService!.getSession());
   }
 
   public getUser() {
@@ -94,7 +94,8 @@ export class SNSessionManager extends PureService {
 
   public async signOut() {
     this.user = undefined;
-    if (this.apiService!.session && this.apiService!.session.canExpire()) {
+    const session = await this.apiService!.getSession();
+    if (session && session.canExpire()) {
       this.apiService!.signOut();
     }
   }
