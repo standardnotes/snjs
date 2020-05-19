@@ -1164,7 +1164,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     * that they haven't been synced yet.
     */
     const itemsKeys = this.itemsKeys();
-    const neverSyncedKey = itemsKeys.filter((key) => {
+    const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
     /**
@@ -1177,7 +1177,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKey));
+      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKeys));
     } else {
       /**
        * No previous synced items key.
@@ -1187,7 +1187,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const rootKey = await this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
-        const toDelete = neverSyncedKey.filter((itemsKey) => {
+        const toDelete = neverSyncedKeys.filter((itemsKey) => {
           return itemsKey.version !== rootKey.version;
         });
         if (toDelete.length > 0) {
