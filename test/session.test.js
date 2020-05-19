@@ -63,34 +63,18 @@ describe('server session', () => {
 
     const response = await this.application.apiService.sync([]);
 
-    expect(response).to.have.property('status');
     expect(response.status).to.equal(498);
-
-    expect(response).to.have.property('error');
-
-    expect(response.error).to.have.property('tag');
     expect(response.error.tag).to.equal('expired-access-token');
-
-    expect(response.error).to.have.property('message');
     expect(response.error.message).to.equal('The provided access token has expired.');
   }).timeout(10000);
 
   it('should return the new session in the response when refreshed', async function () {
     const response = await this.application.apiService.refreshSession();
 
-    expect(response).to.have.property('status');
     expect(response.status).to.equal(200);
-
-    expect(response).to.have.property('token');
     expect(response.token).to.be.a('string');
     expect(response.token).to.not.be.empty;
-
-    expect(response).to.have.property('session');
-
-    expect(response.session).to.have.property('expire_at');
     expect(response.session.expire_at).to.be.a('number');
-
-    expect(response.session).to.have.property('refresh_token');
     expect(response.session.refresh_token).to.not.be.empty;
   }).timeout(10000);
 
@@ -111,6 +95,7 @@ describe('server session', () => {
     expect(sessionBeforeSync.accessToken).to.not.equal(sessionAfterSync.accessToken);
     expect(sessionBeforeSync.refreshToken).to.not.equal(sessionAfterSync.refreshToken);
     expect(sessionBeforeSync.expireAt).to.be.lessThan(sessionAfterSync.expireAt);
+    expect(Date.now()).to.be.greaterThan(sessionAfterSync.expireAt);
   }).timeout(20000);
 
   it('should be consistent between storage and apiService', async function () {
@@ -141,15 +126,8 @@ describe('server session', () => {
 
         const syncResponse = await this.application.apiService.sync([]);
   
-        expect(syncResponse).to.have.property('status');
         expect(syncResponse.status).to.equal(401);
-
-        expect(syncResponse).to.have.property('error');
-
-        expect(syncResponse.error).to.have.property('tag');
         expect(syncResponse.error.tag).to.equal('invalid-auth');
-
-        expect(syncResponse.error).to.have.property('message');
         expect(syncResponse.error.message).to.equal('Invalid login credentials.');
       }).timeout(10000);
     });
