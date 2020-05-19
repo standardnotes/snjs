@@ -38,6 +38,9 @@ describe('basic auth', () => {
     );
     expect(response).to.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
+    const items = this.application.itemManager.items;
+    expect(items.length).to.equal(1);
+    expect(items[0].payload.content_type).to.equal(ContentType.ItemsKey);
   }).timeout(5000);
 
   it('fails register new account with short password', async function () {
