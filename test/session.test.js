@@ -42,14 +42,15 @@ describe('server session', () => {
     await this.application.deinit();
   });
 
-  function getDelayBeforeNextRequest(currentSession) {
+  async function sleepUntilSessionExpires(currentSession) {
     const tokenExpireAt = currentSession.expireAt;
     const timeRemaining = Math.ceil(tokenExpireAt - Date.now() / 1000);
     /* 
-      If the token has not expired yet, we will return the remaining time, plus one second.
+      If the token has not expired yet, we will return the remaining time.
       Else, there's no need to add a delay.
     */
-    return timeRemaining > 0 ? timeRemaining + 1 : 0;
+    const sleepTime = timeRemaining > 0 ? timeRemaining : 0;
+    await Factory.sleep(sleepTime);
   }
 
   async function getSessionFromStorage(application) {
@@ -57,10 +58,8 @@ describe('server session', () => {
   }
 
   it('should fail when a sync request is perfomed with an expired access token', async function () {
-    const currentSession = this.application.apiService.session;
-
-    const delayBeforeNextRequest = getDelayBeforeNextRequest(currentSession);
-    await Factory.sleep(delayBeforeNextRequest);
+    const currentSession = this.application.apiService.getSession();
+    await sleepUntilSessionExpires(currentSession);
 
     const response = await this.application.apiService.sync([]);
 
@@ -97,17 +96,16 @@ describe('server session', () => {
 
   it('should be refreshed if access token is expired', async function () {
     // Saving the current session information for later...
-    const sessionBeforeSync = this.application.apiService.session;
+    const sessionBeforeSync = this.application.apiService.getSession();
 
     // Waiting enough time for the access token to expire, before performing a new sync request.
-    const delayBeforeNextRequest = getDelayBeforeNextRequest(sessionBeforeSync);
-    await Factory.sleep(delayBeforeNextRequest);
+    await sleepUntilSessionExpires(sessionBeforeSync);
 
     // Performing a sync request with an expired access token.
     await this.application.sync(syncOptions);
 
     // After the above sync request is completed, we obtain the session information.
-    const sessionAfterSync = this.application.apiService.session;
+    const sessionAfterSync = this.application.apiService.getSession();
 
     expect(sessionBeforeSync).to.not.equal(sessionAfterSync);
     expect(sessionBeforeSync.accessToken).to.not.equal(sessionAfterSync.accessToken);
@@ -117,14 +115,14 @@ describe('server session', () => {
 
   it('should be consistent between storage and apiService', async function () {
     const sessionFromStorage = await getSessionFromStorage(this.application);
-    const sessionFromApiService = this.application.apiService.session;
+    const sessionFromApiService = this.application.apiService.getSession();
 
     expect(sessionFromStorage).to.equal(sessionFromApiService);
 
     await this.application.apiService.refreshSession();
 
     const updatedSessionFromStorage = await getSessionFromStorage(this.application);
-    const updatedSessionFromApiService = this.application.apiService.session;
+    const updatedSessionFromApiService = this.application.apiService.getSession();
 
     expect(updatedSessionFromStorage).to.equal(updatedSessionFromApiService);
   });
@@ -132,11 +130,10 @@ describe('server session', () => {
   describe('with expired access token', async function () {
     describe('sign out request', async function () {
       it('should be performed successfully and terminate session', async function () {
-        const sessionBeforeSignOut = this.application.apiService.session;
+        const sessionBeforeSignOut = this.application.apiService.getSession();
 
         // Waiting enough time for the access token to expire, before performing a sign out request.
-        const delayBeforeNextRequest = getDelayBeforeNextRequest(sessionBeforeSignOut);
-        await Factory.sleep(delayBeforeNextRequest);
+        await sleepUntilSessionExpires(sessionBeforeSignOut);
   
         const signOutResponse = await this.application.apiService.signOut();
   

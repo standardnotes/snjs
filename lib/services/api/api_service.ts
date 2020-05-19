@@ -68,7 +68,7 @@ export class SNApiService extends PureService {
     }
   }
 
-  public async getSession() {
+  public getSession() {
     return this.session;
   }
 

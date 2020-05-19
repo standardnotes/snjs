@@ -21,7 +21,7 @@ export declare class SNApiService extends PureService {
     setHost(host: string): Promise<void>;
     getHost(): Promise<string | undefined>;
     setSession(session: Session, persist?: boolean): Promise<void>;
-    getSession(): Promise<Session | undefined>;
+    getSession(): Session | undefined;
     private path;
     private params;
     createErrorResponse(message: string): HttpResponse;

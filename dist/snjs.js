@@ -15654,45 +15654,26 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
     }()
   }, {
     key: "getSession",
+    value: function getSession() {
+      return this.session;
+    }
+  }, {
+    key: "path",
     value: function () {
-      var _getSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5() {
+      var _path2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5(_path) {
+        var host;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                return _context5.abrupt("return", this.session);
-
-              case 1:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function getSession() {
-        return _getSession.apply(this, arguments);
-      }
-
-      return getSession;
-    }()
-  }, {
-    key: "path",
-    value: function () {
-      var _path2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(_path) {
-        var host;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
+                _context5.next = 2;
                 return this.getHost();
 
               case 2:
-                host = _context6.sent;
+                host = _context5.sent;
 
                 if (host) {
-                  _context6.next = 5;
+                  _context5.next = 5;
                   break;
                 }
 
@@ -15700,21 +15681,21 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
               case 5:
                 if (_path) {
-                  _context6.next = 7;
+                  _context5.next = 7;
                   break;
                 }
 
                 throw 'Attempting to build path with null path.';
 
               case 7:
-                return _context6.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["joinPaths"])(host, _path));
+                return _context5.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["joinPaths"])(host, _path));
 
               case 8:
               case "end":
-                return _context6.stop();
+                return _context5.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee5, this);
       }));
 
       function path(_x3) {
@@ -15757,19 +15738,19 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "getAccountKeyParams",
     value: function () {
-      var _getAccountKeyParams = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(email, mfaKeyPath, mfaCode) {
+      var _getAccountKeyParams = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(email, mfaKeyPath, mfaCode) {
         var _this2 = this;
 
         var url, params, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context7.next = 2;
+                _context6.next = 2;
                 return this.path(REQUEST_PATH_KEY_PARAMS);
 
               case 2:
-                url = _context7.sent;
+                url = _context6.sent;
                 params = this.params({
                   email: email
                 });
@@ -15778,21 +15759,21 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   params[mfaKeyPath] = mfaCode;
                 }
 
-                _context7.next = 7;
+                _context6.next = 7;
                 return this.httpService.getAbsolute(url, params).catch(function (errorResponse) {
                   return _this2.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
               case 7:
-                response = _context7.sent;
-                return _context7.abrupt("return", response);
+                response = _context6.sent;
+                return _context6.abrupt("return", response);
 
               case 9:
               case "end":
-                return _context7.stop();
+                return _context6.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee6, this);
       }));
 
       function getAccountKeyParams(_x4, _x5, _x6) {
@@ -15804,48 +15785,48 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "register",
     value: function () {
-      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(email, serverPassword, keyParams) {
+      var _register = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee7(email, serverPassword, keyParams) {
         var _this3 = this;
 
         var url, params, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 if (!this.registering) {
-                  _context8.next = 2;
+                  _context7.next = 2;
                   break;
                 }
 
-                return _context8.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
+                return _context7.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
 
               case 2:
                 this.registering = true;
-                _context8.next = 5;
+                _context7.next = 5;
                 return this.path(REQUEST_PATH_REGISTER);
 
               case 5:
-                url = _context8.sent;
+                url = _context7.sent;
                 params = this.params(_objectSpread({
                   password: serverPassword,
                   email: email
                 }, keyParams.getPortableValue()));
-                _context8.next = 9;
+                _context7.next = 9;
                 return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
                   return _this3.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
                 });
 
               case 9:
-                response = _context8.sent;
+                response = _context7.sent;
                 this.registering = false;
-                return _context8.abrupt("return", response);
+                return _context7.abrupt("return", response);
 
               case 12:
               case "end":
-                return _context8.stop();
+                return _context7.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee7, this);
       }));
 
       function register(_x7, _x8, _x9) {
@@ -15857,28 +15838,28 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "signIn",
     value: function () {
-      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9(email, serverPassword, mfaKeyPath, mfaCode) {
+      var _signIn = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee8(email, serverPassword, mfaKeyPath, mfaCode) {
         var _this4 = this;
 
         var url, params, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 if (!this.authenticating) {
-                  _context9.next = 2;
+                  _context8.next = 2;
                   break;
                 }
 
-                return _context9.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
+                return _context8.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
 
               case 2:
                 this.authenticating = true;
-                _context9.next = 5;
+                _context8.next = 5;
                 return this.path(REQUEST_PATH_LOGIN);
 
               case 5:
-                url = _context9.sent;
+                url = _context8.sent;
                 params = this.params({
                   email: email,
                   password: serverPassword
@@ -15888,22 +15869,22 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   params[mfaKeyPath] = mfaCode;
                 }
 
-                _context9.next = 10;
+                _context8.next = 10;
                 return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
                   return _this4.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
               case 10:
-                response = _context9.sent;
+                response = _context8.sent;
                 this.authenticating = false;
-                return _context9.abrupt("return", response);
+                return _context8.abrupt("return", response);
 
               case 13:
               case "end":
-                return _context9.stop();
+                return _context8.stop();
             }
           }
-        }, _callee9, this);
+        }, _callee8, this);
       }));
 
       function signIn(_x10, _x11, _x12, _x13) {
@@ -15915,25 +15896,25 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "signOut",
     value: function () {
-      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10() {
+      var _signOut = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee9() {
         var url;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                _context10.next = 2;
+                _context9.next = 2;
                 return this.path(REQUEST_PATH_LOGOUT);
 
               case 2:
-                url = _context10.sent;
-                return _context10.abrupt("return", this.httpService.postAbsolute(url, undefined, this.session.accessToken));
+                url = _context9.sent;
+                return _context9.abrupt("return", this.httpService.postAbsolute(url, undefined, this.session.accessToken));
 
               case 4:
               case "end":
-                return _context10.stop();
+                return _context9.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee9, this);
       }));
 
       function signOut() {
@@ -15945,64 +15926,64 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "changePassword",
     value: function () {
-      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(currentServerPassword, newServerPassword, newKeyParams) {
+      var _changePassword = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(currentServerPassword, newServerPassword, newKeyParams) {
         var _this5 = this;
 
         var url, params, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
                 if (!this.changing) {
-                  _context12.next = 2;
+                  _context11.next = 2;
                   break;
                 }
 
-                return _context12.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
+                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
 
               case 2:
                 if (!this.refreshingSession) {
-                  _context12.next = 4;
+                  _context11.next = 4;
                   break;
                 }
 
-                return _context12.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
+                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
 
               case 4:
                 this.changing = true;
-                _context12.next = 7;
+                _context11.next = 7;
                 return this.path(REQUEST_PATH_CHANGE_PW);
 
               case 7:
-                url = _context12.sent;
+                url = _context11.sent;
                 params = _objectSpread({
                   current_password: currentServerPassword,
                   new_password: newServerPassword
                 }, newKeyParams.getPortableValue());
-                _context12.next = 11;
+                _context11.next = 11;
                 return this.httpService.postAbsolute(url, params, this.session.accessToken).catch( /*#__PURE__*/function () {
-                  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee11(errorResponse) {
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee11$(_context11) {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee10(errorResponse) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee10$(_context10) {
                       while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context10.prev = _context10.next) {
                           case 0:
                             if (!_this5.httpService.isErrorResponseExpiredToken(errorResponse)) {
-                              _context11.next = 3;
+                              _context10.next = 3;
                               break;
                             }
 
-                            _context11.next = 3;
+                            _context10.next = 3;
                             return _this5.refreshSession();
 
                           case 3:
-                            return _context11.abrupt("return", _this5.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]));
+                            return _context10.abrupt("return", _this5.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]));
 
                           case 4:
                           case "end":
-                            return _context11.stop();
+                            return _context10.stop();
                         }
                       }
-                    }, _callee11);
+                    }, _callee10);
                   }));
 
                   return function (_x17) {
@@ -16011,16 +15992,16 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 }());
 
               case 11:
-                response = _context12.sent;
+                response = _context11.sent;
                 this.changing = false;
-                return _context12.abrupt("return", response);
+                return _context11.abrupt("return", response);
 
               case 14:
               case "end":
-                return _context12.stop();
+                return _context11.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee11, this);
       }));
 
       function changePassword(_x14, _x15, _x16) {
@@ -16032,7 +16013,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(payloads, lastSyncToken, paginationToken, limit) {
+      var _sync = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(payloads, lastSyncToken, paginationToken, limit) {
         var _this$params,
             _this6 = this;
 
@@ -16042,55 +16023,55 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
             url,
             params,
             response,
-            _args14 = arguments;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
+            _args13 = arguments;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                checkIntegrity = _args14.length > 4 && _args14[4] !== undefined ? _args14[4] : false;
-                contentType = _args14.length > 5 ? _args14[5] : undefined;
-                customEvent = _args14.length > 6 ? _args14[6] : undefined;
+                checkIntegrity = _args13.length > 4 && _args13[4] !== undefined ? _args13[4] : false;
+                contentType = _args13.length > 5 ? _args13[5] : undefined;
+                customEvent = _args13.length > 6 ? _args13[6] : undefined;
 
                 if (!this.refreshingSession) {
-                  _context14.next = 5;
+                  _context13.next = 5;
                   break;
                 }
 
-                return _context14.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
+                return _context13.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
 
               case 5:
-                _context14.next = 7;
+                _context13.next = 7;
                 return this.path(REQUEST_PATH_SYNC);
 
               case 7:
-                url = _context14.sent;
+                url = _context13.sent;
                 params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].SyncPayloads, payloads.map(function (p) {
                   return p.ejected();
                 })), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
-                _context14.next = 11;
+                _context13.next = 11;
                 return this.httpService.postAbsolute(url, params, this.session.accessToken).catch( /*#__PURE__*/function () {
-                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee13(errorResponse) {
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee13$(_context13) {
+                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(errorResponse) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee12$(_context12) {
                       while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context12.prev = _context12.next) {
                           case 0:
                             if (!_this6.httpService.isErrorResponseExpiredToken(errorResponse)) {
-                              _context13.next = 3;
+                              _context12.next = 3;
                               break;
                             }
 
-                            _context13.next = 3;
+                            _context12.next = 3;
                             return _this6.refreshSession();
 
                           case 3:
-                            return _context13.abrupt("return", _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_SYNC_FAIL"]));
+                            return _context12.abrupt("return", _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_SYNC_FAIL"]));
 
                           case 4:
                           case "end":
-                            return _context13.stop();
+                            return _context12.stop();
                         }
                       }
-                    }, _callee13);
+                    }, _callee12);
                   }));
 
                   return function (_x22) {
@@ -16099,15 +16080,15 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 }());
 
               case 11:
-                response = _context14.sent;
-                return _context14.abrupt("return", response);
+                response = _context13.sent;
+                return _context13.abrupt("return", response);
 
               case 13:
               case "end":
-                return _context14.stop();
+                return _context13.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee13, this);
       }));
 
       function sync(_x18, _x19, _x20, _x21) {
@@ -16119,53 +16100,53 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "refreshSession",
     value: function () {
-      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16() {
+      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15() {
         var _this7 = this;
 
         var url, params, result;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context16.prev = _context16.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 if (!this.refreshingSession) {
-                  _context16.next = 2;
+                  _context15.next = 2;
                   break;
                 }
 
-                return _context16.abrupt("return");
+                return _context15.abrupt("return");
 
               case 2:
                 this.refreshingSession = true;
-                _context16.next = 5;
+                _context15.next = 5;
                 return this.path(REQUEST_PATH_SESSION_REFRESH);
 
               case 5:
-                url = _context16.sent;
+                url = _context15.sent;
                 params = this.params({
                   access_token: this.session.accessToken,
                   refresh_token: this.session.refreshToken
                 });
-                _context16.next = 9;
+                _context15.next = 9;
                 return this.httpService.postAbsolute(url, params).then( /*#__PURE__*/function () {
-                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(response) {
+                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(response) {
                     var session;
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
                       while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context14.prev = _context14.next) {
                           case 0:
                             session = _session__WEBPACK_IMPORTED_MODULE_1__["Session"].FromResponse(response);
-                            _context15.next = 3;
+                            _context14.next = 3;
                             return _this7.setSession(session);
 
                           case 3:
-                            return _context15.abrupt("return", response);
+                            return _context14.abrupt("return", response);
 
                           case 4:
                           case "end":
-                            return _context15.stop();
+                            return _context14.stop();
                         }
                       }
-                    }, _callee15);
+                    }, _callee14);
                   }));
 
                   return function (_x23) {
@@ -16176,16 +16157,16 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 });
 
               case 9:
-                result = _context16.sent;
+                result = _context15.sent;
                 this.refreshingSession = false;
-                return _context16.abrupt("return", result);
+                return _context15.abrupt("return", result);
 
               case 12:
               case "end":
-                return _context16.stop();
+                return _context15.stop();
             }
           }
-        }, _callee16, this);
+        }, _callee15, this);
       }));
 
       function refreshSession() {
