@@ -159,11 +159,15 @@ export function existsInArray<T>(inArray: T[], value: T) {
   return inArray.indexOf(value) >= 0;
 }
 
-/**
- * Removes an object from the array by reference equality or shallow value equality
+ * Removes an object from the array by strict equality
  */
 export function removeFromArray<T>(array: T[], value: T) {
-  array.splice(array.indexOf(value), 1);
+  const valueIndex = array.indexOf(value);
+  if (valueIndex === -1) {
+    console.warn(`Tried to remove absent item ${value} from array ${array}`);
+    return;
+  }
+  array.splice(valueIndex, 1);
 }
 
 /**
