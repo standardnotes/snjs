@@ -1243,7 +1243,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public getDefaultItemsKey() {
     const itemsKeys = this.itemsKeys();
     if (itemsKeys.length === 1) {
-      return this.itemsKeys()[0];
+      return itemsKeys[0];
     }
     return itemsKeys.find((key) => {
       return key.isDefault;
