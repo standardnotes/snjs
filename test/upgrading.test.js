@@ -124,7 +124,7 @@ describe('upgrading', () => {
     /** Delete default items key that is created on launch */
     const itemsKey = this.application.protocolService.getDefaultItemsKey();
     await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid);
-    expect(this.application.protocolService.itemsKeys.length).to.equal(0);
+    expect(this.application.protocolService.itemsKeys().length).to.equal(0);
 
     /** Register with 003 version */
     await Factory.registerOldUser({
@@ -134,7 +134,7 @@ describe('upgrading', () => {
       version: ProtocolVersion.V003
     });
 
-    expect(this.application.protocolService.itemsKeys.length).to.equal(1);
+    expect(this.application.protocolService.itemsKeys().length).to.equal(1);
 
     expect(
       (await this.application.protocolService.getRootKeyParams()).version
