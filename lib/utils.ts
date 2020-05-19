@@ -153,12 +153,6 @@ export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
 }
 
 /**
- * Determines if value exists in array, by reference
- */
-export function existsInArray<T>(inArray: T[], value: T) {
-  return inArray.indexOf(value) >= 0;
-}
-
  * Removes an object from the array by strict equality
  */
 export function removeFromArray<T>(array: T[], value: T) {
@@ -175,7 +169,7 @@ export function removeFromArray<T>(array: T[], value: T) {
  * The array is searched via array.indexOf
  */
 export function addIfUnique<T>(array: T[], value: T) {
-  if (!existsInArray(array, value)) {
+  if (!array.includes(value)) {
     array.push(value);
   }
 }
