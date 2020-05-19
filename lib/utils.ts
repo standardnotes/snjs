@@ -148,12 +148,12 @@ export function extendArray<T>(inArray: T[], otherArray: T[]) {
  */
 export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
   for (const value of toSubtract) {
-    inArray.splice(inArray.indexOf(value), 1);
+    removeFromArray(inArray, value);
   }
 }
 
 /**
- * Removes an object from the array by strict equality
+ * Removes the first matching element of an array by strict equality
  */
 export function removeFromArray<T>(array: T[], value: T) {
   const valueIndex = array.indexOf(value);
