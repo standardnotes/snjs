@@ -132,4 +132,12 @@ describe('server session', () => {
       }).timeout(10000);
     });
   });
+
+  it('should sign out successfully with a valid access token', async function () {
+    // Waiting enough time for the access token to expire, before performing a sign out request.
+    await sleepUntilSessionExpires(sessionBeforeSync);
+    const signOutResponse = await this.application.apiService.signOut();
+
+    expect(signOutResponse.status).to.equal(204);
+  }).timeout(20000);
 });
