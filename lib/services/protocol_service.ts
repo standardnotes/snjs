@@ -432,7 +432,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       key = await this.keyToUseForEncryptionOfPayload(payload, intent);
     }
     if (!key && intentRequiresEncryption(intent)) {
-      throw 'Attempting to generate encrypted payload with no key.';
+      throw Error('Attempting to generate encrypted payload with no key.');
     }
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
       throw 'Attempting to encrypt already encrypted payload.';
@@ -891,7 +891,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else if (this.keyMode === KeyMode.RootKeyOnly) {
       this.keyMode = KeyMode.RootKeyPlusWrapper;
     } else {
-      throw 'Attempting to set wrapper on already wrapped key.';
+      throw Error('Attempting to set wrapper on already wrapped key.');
     }
     await this.deviceInterface!.clearKeychainValue();
     if ((
@@ -913,7 +913,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       );
       await this.notifyObserversOfKeyChange();
     } else {
-      throw 'Invalid keyMode on setNewRootKeyWrapper';
+      throw Error('Invalid keyMode on setNewRootKeyWrapper');
     }
   }
 
@@ -983,10 +983,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     wrappingKey?: SNRootKey
   ) {
     if (!keyParams) {
-      throw 'keyParams must be supplied if setting root key.';
+      throw Error('keyParams must be supplied if setting root key.');
     }
     if (this.rootKey === key) {
-      throw 'Attempting to set root key as same current value.';
+      throw Error('Attempting to set root key as same current value.');
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
       this.keyMode = KeyMode.RootKeyPlusWrapper;
@@ -999,7 +999,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       /** Root key is simply changing, mode stays the same */
       /** this.keyMode = this.keyMode; */
     } else {
-      throw `Unhandled key mode for setNewRootKey ${this.keyMode}`;
+      throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`);
     }
     this.rootKey = key;
     await this.storageService!.setValue(
