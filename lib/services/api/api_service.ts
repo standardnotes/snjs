@@ -188,7 +188,9 @@ export class SNApiService extends PureService {
       url,
       undefined,
       this.session!.accessToken
-    );
+    ).then(async (response) => {
+      return response;
+    });
   }
 
   async changePassword(
