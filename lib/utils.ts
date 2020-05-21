@@ -153,12 +153,12 @@ export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
 }
 
 /**
- * Removes the first matching element of an array by strict equality
+ * Removes the first matching element of an array by strict equality.
+ * If no matchin element is found, the array is left unchanged.
  */
 export function removeFromArray<T>(array: T[], value: T) {
   const valueIndex = array.indexOf(value);
   if (valueIndex === -1) {
-    console.warn(`Tried to remove absent item ${value} from array ${array}`);
     return;
   }
   array.splice(valueIndex, 1);
