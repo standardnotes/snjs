@@ -176,6 +176,16 @@ describe('keys', () => {
     expect(typeof rawNotePayload.content).to.equal('string');
   });
 
+  it('should create a new items key upon registration', async function () {
+    expect(this.application.protocolService.itemsKeys().length).to.equal(1);
+    const originalItemsKey = this.application.protocolService.itemsKeys()[0];
+    await this.application.register(this.email, this.password);
+
+    expect(this.application.protocolService.itemsKeys().length).to.equal(1);
+    const newestItemsKey = this.application.protocolService.itemsKeys()[0];
+    expect(newestItemsKey.uuid).to.not.equal(originalItemsKey.uuid);
+  }).timeout(5000);
+
   it('should use items key for encryption of note', async function () {
     const note = Factory.createNotePayload();
     const keyToUse = await this.application.protocolService.
