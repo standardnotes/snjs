@@ -284,6 +284,9 @@ export class SNSessionManager extends PureService {
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
     const session = Session.FromResponse(response);
-    await this.setSession(session);
+    
+    if (session.accessToken) {
+      await this.setSession(session);
+    }
   }
 }
