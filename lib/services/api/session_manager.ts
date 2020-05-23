@@ -283,9 +283,12 @@ export class SNSessionManager extends PureService {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    const session = Session.FromResponse(response);
-    
-    if (session.accessToken) {
+    /* 
+      The token from response can be undefined if the user is using JWTs (protocol version <= 003).
+      We should call setSession only if the session is updated with a new token.
+    */
+    if (response.token) {
+      const session = Session.FromResponse(response);
       await this.setSession(session);
     }
   }
