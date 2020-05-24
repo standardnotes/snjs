@@ -18,6 +18,7 @@ describe('server session', () => {
 
   after(async function () {
     this.application.deinit();
+    this.application = null;
     localStorage.clear();
   });
 
@@ -58,7 +59,7 @@ describe('server session', () => {
     expect(response.status).to.equal(498);
     expect(response.error.tag).to.equal('expired-access-token');
     expect(response.error.message).to.equal('The provided access token has expired.');
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('should return the new session in the response when refreshed', async function () {
     const response = await this.application.apiService.refreshSession();
@@ -68,7 +69,7 @@ describe('server session', () => {
     expect(response.token).to.not.be.empty;
     expect(response.session.expire_at).to.be.a('number');
     expect(response.session.refresh_token).to.not.be.empty;
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('should be refreshed if access token is expired', async function () {
     // Saving the current session information for later...
@@ -113,7 +114,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
     // Waiting enough time for the access token to expire, before performing a sign out request.
@@ -126,7 +127,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(10000);
+  }).timeout(20000);
 
   describe('change password request', async function () {
     beforeEach(async function () {
@@ -214,7 +215,7 @@ describe('server session', () => {
     expect(currentSession.accessToken).to.be.ok;
     expect(currentSession.refreshToken).to.be.ok;
     expect(currentSession.expireAt).to.be.greaterThan(Date.now());
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('should fail when renewing a session with an expired refresh token', async function () {
     await sleepUntilSessionExpires(this.application, false);
@@ -233,7 +234,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
     const fakeSession = this.application.apiService.getSession();
@@ -250,5 +251,15 @@ describe('server session', () => {
     // Access token should remain valid.
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(200);
-  }).timeout(10000);
+  }).timeout(20000);
+
+  it('should fail if syncing while a refresh token is in progress', async function () {
+    this.application.apiService.refreshSession();
+    const syncResponse = await this.application.apiService.sync([]);
+
+    expect(syncResponse.error).to.be.ok;
+
+    const errorMessage = 'Your account session is being renewed with the server. Please try your request again.';
+    expect(syncResponse.error.message).to.be.equal(errorMessage);
+  }).timeout(20000);
 });
