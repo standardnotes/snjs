@@ -16553,21 +16553,22 @@ var Session = /*#__PURE__*/function () {
   _createClass(Session, null, [{
     key: "FromRaw",
     value: function FromRaw(raw) {
-      return new Session(raw.accessToken, raw.expireAt, raw.refreshToken);
+      return new Session(raw.accessToken, raw.expireAt, raw.refreshToken, raw.validUntil);
     }
   }, {
     key: "FromResponse",
     value: function FromResponse(response) {
-      var _response$session, _response$session2;
+      var _response$session, _response$session2, _response$session3;
 
       var accessToken = response.token;
       var expireAt = (_response$session = response.session) === null || _response$session === void 0 ? void 0 : _response$session.expire_at;
       var refreshToken = (_response$session2 = response.session) === null || _response$session2 === void 0 ? void 0 : _response$session2.refresh_token;
-      return new Session(accessToken, expireAt, refreshToken);
+      var validUntil = (_response$session3 = response.session) === null || _response$session3 === void 0 ? void 0 : _response$session3.valid_until;
+      return new Session(accessToken, expireAt, refreshToken, validUntil);
     }
   }]);
 
-  function Session(accessToken, expireAt, refreshToken) {
+  function Session(accessToken, expireAt, refreshToken, validUntil) {
     _classCallCheck(this, Session);
 
     _defineProperty(this, "accessToken", void 0);
@@ -16576,9 +16577,12 @@ var Session = /*#__PURE__*/function () {
 
     _defineProperty(this, "refreshToken", void 0);
 
+    _defineProperty(this, "validUntil", void 0);
+
     this.accessToken = accessToken;
     this.expireAt = expireAt;
     this.refreshToken = refreshToken;
+    this.validUntil = validUntil;
   }
 
   _createClass(Session, [{
