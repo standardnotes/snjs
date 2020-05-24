@@ -17,6 +17,7 @@ describe('server session', () => {
   });
 
   after(async function () {
+    this.application.deinit();
     localStorage.clear();
   });
 
@@ -33,10 +34,10 @@ describe('server session', () => {
     });
   });
 
-  async function sleepUntilSessionExpires(application) {
+  async function sleepUntilSessionExpires(application, basedOnAccessToken = true) {
     const currentSession = application.apiService.getSession();
-    const tokenExpireAt = currentSession.expireAt;
-    const timeRemaining = (tokenExpireAt - Date.now()) / 1000; // in ms
+    const timestamp = basedOnAccessToken ? currentSession.expireAt : currentSession.validUntil;
+    const timeRemaining = (timestamp - Date.now()) / 1000; // in ms
     /* 
       If the token has not expired yet, we will return the remaining time.
       Else, there's no need to add a delay.
@@ -213,6 +214,25 @@ describe('server session', () => {
     expect(currentSession.accessToken).to.be.ok;
     expect(currentSession.refreshToken).to.be.ok;
     expect(currentSession.expireAt).to.be.greaterThan(Date.now());
+  }).timeout(10000);
+
+  it('should fail when renewing a session with an expired refresh token', async function () {
+    await sleepUntilSessionExpires(this.application, false);
+
+    const refreshSessionResponse = await this.application.apiService.refreshSession();
+
+    expect(refreshSessionResponse.status).to.equal(400);
+    expect(refreshSessionResponse.error.tag).to.equal('expired-refresh-token');
+    expect(refreshSessionResponse.error.message).to.equal('The refresh token has expired.');
+
+    /*
+      The access token and refresh token should be expired up to this point.
+      Here we make sure that any subsequent requests will fail.
+    */
+    const syncResponse = await this.application.apiService.sync([]);
+    expect(syncResponse.status).to.equal(401);
+    expect(syncResponse.error.tag).to.equal('invalid-auth');
+    expect(syncResponse.error.message).to.equal('Invalid login credentials.');
   }).timeout(10000);
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
