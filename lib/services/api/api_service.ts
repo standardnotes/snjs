@@ -3,7 +3,7 @@ import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { SNHttpService, HttpResponse } from './http_service';
+import { SNHttpService, HttpResponse, HttpVerb, HttpPendingRequest } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
@@ -215,7 +215,11 @@ export class SNApiService extends PureService {
       this.session!.accessToken
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
-        await this.refreshSession();
+        return this.refreshSession({
+          url,
+          params,
+          verb: HttpVerb.Post
+        });
       }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
@@ -255,7 +259,11 @@ export class SNApiService extends PureService {
       this.session!.accessToken
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
-        await this.refreshSession();
+        return this.refreshSession({
+          url,
+          params,
+          verb: HttpVerb.Post
+        });
       }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
@@ -266,7 +274,7 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  async refreshSession() {
+  async refreshSession(pendingApiRequest?: HttpPendingRequest) {
     if (this.refreshingSession) {
       return;
     }
@@ -282,6 +290,13 @@ export class SNApiService extends PureService {
     ).then(async (response) => {
       const session = Session.FromResponse(response);
       await this.setSession(session);
+      /*
+       * At this point, the request to refresh the session was successful.
+       * The pending request is sent again and the response is returned.
+       */
+      if (pendingApiRequest) {
+        return this.httpService!.processPendingRequest(pendingApiRequest, this.session!.accessToken);
+      }
       return response;
     }).catch((errorResponse) => {
       return this.errorResponseWithFallbackMessage(

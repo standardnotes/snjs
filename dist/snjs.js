@@ -15438,13 +15438,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _session__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./session */ "./lib/services/api/session.ts");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @Services/api/keys */ "./lib/services/api/keys.ts");
-/* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.ts");
-/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
-/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
-/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
+/* harmony import */ var _http_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./http_service */ "./lib/services/api/http_service.ts");
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/merge */ "./node_modules/lodash/merge.js");
+/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @Services/api/keys */ "./lib/services/api/keys.ts");
+/* harmony import */ var _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @Services/api/messages */ "./lib/services/api/messages.ts");
+/* harmony import */ var _Services_pure_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @Services/pure_service */ "./lib/services/pure_service.ts");
+/* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @Lib/utils */ "./lib/utils.ts");
+/* harmony import */ var _Lib_storage_keys__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @Lib/storage_keys */ "./lib/storage_keys.ts");
 
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -15478,6 +15479,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -15547,7 +15549,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_7__["StorageKey"].ServerHost);
+                return this.storageService.getValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_8__["StorageKey"].ServerHost);
 
               case 2:
                 storedValue = _context.sent;
@@ -15577,7 +15579,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
               case 0:
                 this.host = host;
                 _context2.next = 3;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_7__["StorageKey"].ServerHost, host);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_8__["StorageKey"].ServerHost, host);
 
               case 3:
               case "end":
@@ -15636,7 +15638,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 }
 
                 _context4.next = 5;
-                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_7__["StorageKey"].Session, session);
+                return this.storageService.setValue(_Lib_storage_keys__WEBPACK_IMPORTED_MODULE_8__["StorageKey"].Session, session);
 
               case 5:
               case "end":
@@ -15688,7 +15690,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 throw 'Attempting to build path with null path.';
 
               case 7:
-                return _context5.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_6__["joinPaths"])(host, _path));
+                return _context5.abrupt("return", Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_7__["joinPaths"])(host, _path));
 
               case 8:
               case "end":
@@ -15707,7 +15709,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "params",
     value: function params(inParams) {
-      var params = lodash_merge__WEBPACK_IMPORTED_MODULE_2___default()(inParams, _defineProperty({}, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].ApiVersion, API_VERSION));
+      var params = lodash_merge__WEBPACK_IMPORTED_MODULE_3___default()(inParams, _defineProperty({}, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].ApiVersion, API_VERSION));
       return params;
     }
   }, {
@@ -15761,7 +15763,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
                 _context6.next = 7;
                 return this.httpService.getAbsolute(url, params).catch(function (errorResponse) {
-                  return _this2.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
+                  return _this2.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
               case 7:
@@ -15798,7 +15800,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context7.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
+                return _context7.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_REGISTRATION_IN_PROGRESS"]));
 
               case 2:
                 this.registering = true;
@@ -15813,7 +15815,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                 }, keyParams.getPortableValue()));
                 _context7.next = 9;
                 return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
-                  return _this3.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
+                  return _this3.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_REGISTRATION_FAIL"]);
                 });
 
               case 9:
@@ -15851,7 +15853,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context8.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
+                return _context8.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_LOGIN_IN_PROGRESS"]));
 
               case 2:
                 this.authenticating = true;
@@ -15871,7 +15873,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
                 _context8.next = 10;
                 return this.httpService.postAbsolute(url, params).catch(function (errorResponse) {
-                  return _this4.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
+                  return _this4.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_INVALID_LOGIN"]);
                 });
 
               case 10:
@@ -15939,7 +15941,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
+                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_CHANGE_PW_IN_PROGRESS"]));
 
               case 2:
                 if (!this.refreshingSession) {
@@ -15947,7 +15949,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
+                return _context11.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
 
               case 4:
                 this.changing = true;
@@ -15968,17 +15970,20 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                         switch (_context10.prev = _context10.next) {
                           case 0:
                             if (!_this5.httpService.isErrorResponseExpiredToken(errorResponse)) {
-                              _context10.next = 3;
+                              _context10.next = 2;
                               break;
                             }
 
-                            _context10.next = 3;
-                            return _this5.refreshSession();
+                            return _context10.abrupt("return", _this5.refreshSession({
+                              url: url,
+                              params: params,
+                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post
+                            }));
+
+                          case 2:
+                            return _context10.abrupt("return", _this5.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]));
 
                           case 3:
-                            return _context10.abrupt("return", _this5.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_CHANGE_PW_FAIL"]));
-
-                          case 4:
                           case "end":
                             return _context10.stop();
                         }
@@ -16037,7 +16042,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                   break;
                 }
 
-                return _context13.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
+                return _context13.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
 
               case 5:
                 _context13.next = 7;
@@ -16045,9 +16050,9 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 
               case 7:
                 url = _context13.sent;
-                params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].SyncPayloads, payloads.map(function (p) {
+                params = this.params((_this$params = {}, _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].SyncPayloads, payloads.map(function (p) {
                   return p.ejected();
-                })), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_3__["ApiEndpointParam"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
+                })), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].LastSyncToken, lastSyncToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].PaginationToken, paginationToken), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].IntegrityCheck, checkIntegrity), _defineProperty(_this$params, _Services_api_keys__WEBPACK_IMPORTED_MODULE_4__["ApiEndpointParam"].SyncDlLimit, limit), _defineProperty(_this$params, "content_type", contentType), _defineProperty(_this$params, "event", customEvent), _this$params));
                 _context13.next = 11;
                 return this.httpService.postAbsolute(url, params, this.session.accessToken).catch( /*#__PURE__*/function () {
                   var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee12(errorResponse) {
@@ -16056,17 +16061,20 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                         switch (_context12.prev = _context12.next) {
                           case 0:
                             if (!_this6.httpService.isErrorResponseExpiredToken(errorResponse)) {
-                              _context12.next = 3;
+                              _context12.next = 2;
                               break;
                             }
 
-                            _context12.next = 3;
-                            return _this6.refreshSession();
+                            return _context12.abrupt("return", _this6.refreshSession({
+                              url: url,
+                              params: params,
+                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post
+                            }));
+
+                          case 2:
+                            return _context12.abrupt("return", _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_SYNC_FAIL"]));
 
                           case 3:
-                            return _context12.abrupt("return", _this6.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_SYNC_FAIL"]));
-
-                          case 4:
                           case "end":
                             return _context12.stop();
                         }
@@ -16100,7 +16108,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "refreshSession",
     value: function () {
-      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15() {
+      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(pendingApiRequest) {
         var _this7 = this;
 
         var url, params, result;
@@ -16139,9 +16147,17 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                             return _this7.setSession(session);
 
                           case 3:
+                            if (!pendingApiRequest) {
+                              _context14.next = 5;
+                              break;
+                            }
+
+                            return _context14.abrupt("return", _this7.httpService.processPendingRequest(pendingApiRequest, _this7.session.accessToken));
+
+                          case 5:
                             return _context14.abrupt("return", response);
 
-                          case 4:
+                          case 6:
                           case "end":
                             return _context14.stop();
                         }
@@ -16149,11 +16165,11 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                     }, _callee14);
                   }));
 
-                  return function (_x23) {
+                  return function (_x24) {
                     return _ref3.apply(this, arguments);
                   };
                 }()).catch(function (errorResponse) {
-                  return _this7.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_4__["API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL"]);
+                  return _this7.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL"]);
                 });
 
               case 9:
@@ -16169,7 +16185,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
         }, _callee15, this);
       }));
 
-      function refreshSession() {
+      function refreshSession(_x23) {
         return _refreshSession.apply(this, arguments);
       }
 
@@ -16178,7 +16194,7 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
   }]);
 
   return SNApiService;
-}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_5__["PureService"]);
+}(_Services_pure_service__WEBPACK_IMPORTED_MODULE_6__["PureService"]);
 
 /***/ }),
 
@@ -16186,11 +16202,12 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
 /*!******************************************!*\
   !*** ./lib/services/api/http_service.ts ***!
   \******************************************/
-/*! exports provided: SNHttpService */
+/*! exports provided: HttpVerb, SNHttpService */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HttpVerb", function() { return HttpVerb; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SNHttpService", function() { return SNHttpService; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -16444,6 +16461,30 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
     value: function isErrorResponseExpiredToken(errorResponse) {
       return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
     }
+  }, {
+    key: "processPendingRequest",
+    value: function () {
+      var _processPendingRequest = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(pendingApiRequest, authentication) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                return _context6.abrupt("return", this.runHttp(pendingApiRequest.verb, pendingApiRequest.url, pendingApiRequest.params, authentication));
+
+              case 1:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function processPendingRequest(_x17, _x18) {
+        return _processPendingRequest.apply(this, arguments);
+      }
+
+      return processPendingRequest;
+    }()
   }]);
 
   return SNHttpService;
