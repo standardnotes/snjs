@@ -25,15 +25,27 @@ describe('server session', () => {
   beforeEach(async function () {
     this.timeout(Factory.TestTimeout);
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password
-    });
+    await registerNewUser(this);
   });
+  
+  async function registerNewUser(self) {
+    self.application = await Factory.createInitAppWithRandNamespace();
+    self.email = Uuid.GenerateUuidSynchronously();
+    self.password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: self.application,
+      email: self.email,
+      password: self.password
+    });
+  }
+
+  async function loginExistingUser(application, email, password) {
+    return Factory.loginToApplication({
+      application,
+      email,
+      password
+    });
+  }
 
   async function sleepUntilSessionExpires(application, basedOnAccessToken = true) {
     const currentSession = application.apiService.getSession();
@@ -51,14 +63,12 @@ describe('server session', () => {
     return application.storageService.getValue(StorageKey.Session);
   }
 
-  it('should fail when a sync request is perfomed with an expired access token', async function () {
+  it('should succeed when a sync request is perfomed with an expired access token', async function () {
     await sleepUntilSessionExpires(this.application);
 
     const response = await this.application.apiService.sync([]);
 
-    expect(response.status).to.equal(498);
-    expect(response.error.tag).to.equal('expired-access-token');
-    expect(response.error.message).to.equal('The provided access token has expired.');
+    expect(response.status).to.equal(200);
   }).timeout(20000);
 
   it('should return the new session in the response when refreshed', async function () {
@@ -106,7 +116,7 @@ describe('server session', () => {
     expect(updatedSessionFromStorage).to.equal(updatedSessionFromApiService);
   });
 
-  it(' should be performed successfully and terminate session with a valid access token', async function () {
+  it('should be performed successfully and terminate session with a valid access token', async function () {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
@@ -131,8 +141,31 @@ describe('server session', () => {
 
   describe('change password request', async function () {
     beforeEach(async function () {
+      await registerNewUser(this);
       this.newPassword = Factory.randomString();
     });
+
+    async function expectSuccessfulLoginAfterPasswordChange(self) {
+      const loginResponse = await loginExistingUser(
+        self.application, 
+        self.email, 
+        self.newPassword
+      );
+
+      expect(loginResponse).to.be.ok;
+      expect(loginResponse.status).to.be.equal(200);
+    }
+
+    async function expectFailedLoginAfterPasswordChange(self) {
+      const loginResponse = await loginExistingUser(
+        self.application, 
+        self.email, 
+        self.newPassword
+      );
+
+      expect(loginResponse).to.be.ok;
+      expect(loginResponse.status).to.be.equal(401);
+    }
 
     it('should be successful with a valid access token', async function () {
       const changePasswordResponse = await this.application.changePassword(
@@ -143,61 +176,55 @@ describe('server session', () => {
       expect(changePasswordResponse.status).to.equal(200);
       expect(changePasswordResponse.user).to.be.ok;
 
-      const loginResponse = await Factory.loginToApplication({
-        application: this.application,
-        email: this.email,
-        password: this.newPassword // Using our new password.
-      });
-
-      expect(loginResponse).to.be.ok;
-      expect(loginResponse.status).to.be.equal(200);
-
-      this.password = this.newPassword;
+      await expectSuccessfulLoginAfterPasswordChange(this);
     }).timeout(20000);
 
-    describe('', async function () {
-      afterEach(async function () {
-        this.timeout(15000);
-  
-        // We will sign in to check that the password was not changed.
-        const loginResponse = await Factory.loginToApplication({
-          application: this.application,
-          email: this.email,
-          password: this.newPassword
-        });
-  
-        expect(loginResponse).to.be.ok;
-        expect(loginResponse.status).to.be.equal(401);
-      });
+    it('should be successful after the expired access token is refreshed', async function () {
+      // Waiting enough time for the access token to expire.
+      await sleepUntilSessionExpires(this.application);
 
-      it('should fail with expired access token', async function () {
-        // Waiting enough time for the access token to expire, before performing a sign out request.
-        await sleepUntilSessionExpires(this.application);
+      const changePasswordResponse = await this.application.changePassword(
+        this.password,
+        this.newPassword
+      );
 
-        const changePasswordResponse = await this.application.changePassword(
-          this.password,
-          this.newPassword
-        );
+      expect(changePasswordResponse).to.be.ok;
+      expect(changePasswordResponse.status).to.equal(200);
 
-        expect(changePasswordResponse.status).to.equal(498);
-        expect(changePasswordResponse.error.tag).to.equal('expired-access-token');
-        expect(changePasswordResponse.error.message).to.equal('The provided access token has expired.');
-      }).timeout(20000);
+      await expectSuccessfulLoginAfterPasswordChange(this);
+    }).timeout(20000);
 
-      it('should fail with invalid access token', async function () {
-        const fakeSession = this.application.apiService.getSession();
-        fakeSession.accessToken = 'this-is-a-fake-token-1234';
+    it('should fail with invalid access token', async function () {
+      const fakeSession = this.application.apiService.getSession();
+      fakeSession.accessToken = 'this-is-a-fake-token-1234';
 
-        const changePasswordResponse = await this.application.changePassword(
-          this.password,
-          this.newPassword
-        );
+      const changePasswordResponse = await this.application.changePassword(
+        this.password,
+        this.newPassword
+      );
 
-        expect(changePasswordResponse.status).to.equal(401);
-        expect(changePasswordResponse.error.tag).to.equal('invalid-auth');
-        expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
-      }).timeout(20000);
-    });
+      expect(changePasswordResponse.status).to.equal(401);
+      expect(changePasswordResponse.error.tag).to.equal('invalid-auth');
+      expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+
+      await expectFailedLoginAfterPasswordChange(this);
+    }).timeout(20000);
+
+    it('should fail with expired refresh token', async function () {
+      // Waiting for the refresh token to expire.
+      await sleepUntilSessionExpires(this.application, false);
+
+      const changePasswordResponse = await this.application.changePassword(
+        this.password,
+        this.newPassword
+      );
+
+      expect(changePasswordResponse.status).to.equal(401);
+      expect(changePasswordResponse.error.tag).to.equal('invalid-auth');
+      expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+
+      await expectFailedLoginAfterPasswordChange(this);
+    }).timeout(20000);
   });
 
   it('should sign in successfully after signing out', async function () {
