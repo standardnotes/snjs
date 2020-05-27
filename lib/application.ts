@@ -851,7 +851,7 @@ export class SNApplication {
    * https://github.com/standardnotes/desktop/issues/131
    */
   private async rewriteItemsKeys() {
-    const itemsKeys = this.protocolService!.itemsKeys();
+    const itemsKeys = this.itemManager!.itemsKeys();
     const payloads = itemsKeys.map((key) => key.payloadRepresentation());
     await this.storageService!.deletePayloads(payloads);
     await this.syncService!.persistPayloads(payloads);

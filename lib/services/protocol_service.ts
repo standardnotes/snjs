@@ -1163,7 +1163,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.
     */
-    const itemsKeys = this.itemsKeys();
+    const itemsKeys = this.latestItemsKeys();
     const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
@@ -1193,7 +1193,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         if (toDelete.length > 0) {
           await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
         }
-        if (this.itemsKeys().length === 0) {
+        if (this.latestItemsKeys().length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
@@ -1226,7 +1226,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * @returns All SN|ItemsKey objects synced to the account.
    */
-  itemsKeys() {
+  private latestItemsKeys() {
     return this.itemManager!.itemsKeys();
   }
 
@@ -1234,14 +1234,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns The items key used to encrypt the payload
    */
   public itemsKeyForPayload(payload: PurePayload) {
-    return this.itemsKeys().find((key) => key.uuid === payload.items_key_id);
+    return this.latestItemsKeys().find((key) => key.uuid === payload.items_key_id);
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
   public getDefaultItemsKey() {
-    const itemsKeys = this.itemsKeys();
+    const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
     }
@@ -1255,7 +1255,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * keys with this new root key (by simply re-syncing).
    */
   public async reencryptItemsKeys() {
-    const itemsKeys = this.itemsKeys();
+    const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length > 0) {
       /**
        * Do not call sync after marking dirty.
@@ -1274,7 +1274,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * with previous protocol version.
    */
   public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
-    return this.itemsKeys().find((key) => {
+    return this.latestItemsKeys().find((key) => {
       return key.version === version;
     });
   }
