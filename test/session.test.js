@@ -262,4 +262,30 @@ describe('server session', () => {
     const errorMessage = 'Your account session is being renewed with the server. Please try your request again.';
     expect(syncResponse.error.message).to.be.equal(errorMessage);
   }).timeout(20000);
+
+  it('notes should be synced as expected after refreshing a session', async function () {
+    const notesBeforeSync = await Factory.createManyMappedNotes(this.application, 5);
+
+    await sleepUntilSessionExpires(this.application);
+    await this.application.syncService.sync(syncOptions);
+    expect(this.application.syncService.isOutOfSync()).to.equal(false);
+
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined, undefined, undefined,
+      true
+    );
+
+    const expectedNotesUuids = notesBeforeSync.map(n => n.uuid);
+    const notesResults = await this.application.itemManager.findItems(expectedNotesUuids);
+
+    expect(notesResults.length).to.equal(notesBeforeSync.length);
+
+    for (const aNoteBeforeSync of notesBeforeSync) {
+      const noteResult = await this.application.itemManager.findItem(aNoteBeforeSync.uuid);
+      expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).to.equal(true);
+    }
+  }).timeout(20000);
 });

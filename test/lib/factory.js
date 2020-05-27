@@ -162,10 +162,13 @@ export async function getStoragePayloadsOfType(application, type) {
 }
 
 export async function createManyMappedNotes(application, count) {
+  const createdNotes = [];
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
+    createdNotes.push(note);
   }
+  return createdNotes;
 }
 
 export async function loginToApplication({ application, email, password, ephemeral, mergeLocal = true }) {

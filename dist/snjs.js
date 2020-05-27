@@ -16507,26 +16507,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StrictSignInFailed", function() { return StrictSignInFailed; });
 var API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
 var API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
-var API_MESSAGE_GENERIC_CHANGE_PW_FAIL = "Something went wrong while changing your password.\n                                                      Your password was not changed. Please try again.";
+var API_MESSAGE_GENERIC_CHANGE_PW_FAIL = "Something went wrong while changing your password. Your password was not changed. Please try again.";
 var API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
 var API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.';
 var API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.';
 var API_MESSAGE_CHANGE_PW_IN_PROGRESS = 'An existing change password request is already in progress.';
 var API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
-var API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = "A server error occurred while trying to refresh your session.\n                                                      Please try again.";
+var API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = "A server error occurred while trying to refresh your session. Please try again.";
 var API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = "Your account session is being renewed with the server. Please try your request again.";
-var UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not support your\n                                                      newer account type. Please upgrade to the latest version\n                                                      of Standard Notes to sign in.";
-var EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is\n                                                      outdated and no longer supported by this application.\n                                                      Please visit standardnotes.org/help/security for more\n                                                      information.";
-var OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and\n                                                      requires upgrade. You may proceed with login, but are\n                                                      advised to perform a security update using the web or\n                                                      desktop application. Please visit\n                                                      standardnotes.org/help/security for more information.";
-var UNSUPPORTED_KEY_DERIVATION = "Your account was created on a platform with higher security\n                                                      capabilities than this browser supports. If we attempted\n                                                      to generate your login keys here, it would take hours. Please\n                                                      use a browser with more up to date security capabilities,\n                                                      like Google Chrome or Firefox, to log in.";
-var INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters.\n                                                      Please visit standardnotes.org/help/security for\n                                                      more information.";
+var UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.";
+var EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.";
+var OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.";
+var UNSUPPORTED_KEY_DERIVATION = "Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.";
+var INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
 var OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
 var OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
 function InsufficientPasswordMessage(minimum) {
-  return "\n          Your password must be at least ".concat(minimum, " characters in length.\n          For your security, please choose a longer password or,\n          ideally, a passphrase, and try again.\n         ");
+  return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
 function StrictSignInFailed(current, latest) {
-  return "\n          Strict Sign In has refused the server's sign-in parameters.\n          The latest account version is ".concat(latest, ", but the server is reporting a \n          version of ").concat(current, " for your account. If you'd like to proceed\n          with sign in anyway, please disable Strict Sign In and try again.\n          ");
+  return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
 }
 
 /***/ }),
