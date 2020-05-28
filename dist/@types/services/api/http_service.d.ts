@@ -1,19 +1,30 @@
 import { PureService } from '../pure_service';
+export declare enum HttpVerb {
+    Get = "get",
+    Post = "post",
+    Patch = "patch"
+}
 export declare type HttpResponse = {
     status: number;
     error?: any;
     [key: string]: any;
 };
-declare type Params = Record<string, any>;
+declare type HttpParams = Record<string, any>;
+export declare type HttpRequest = {
+    url: string;
+    params?: HttpParams;
+    verb: HttpVerb;
+    authentication?: string;
+};
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export declare class SNHttpService extends PureService {
-    getAbsolute(url: string, params?: Params, authentication?: string): Promise<HttpResponse>;
-    postAbsolute(url: string, params?: Params, authentication?: string): Promise<HttpResponse>;
-    patchAbsolute(url: string, params: Params, authentication?: string): Promise<HttpResponse>;
-    private runHttp;
-    private createRequest;
+    getAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse>;
+    postAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse>;
+    patchAbsolute(url: string, params: HttpParams, authentication?: string): Promise<HttpResponse>;
+    runHttp(httpRequest: HttpRequest): Promise<HttpResponse>;
+    private createXmlRequest;
     private runRequest;
     private stateChangeHandlerForRequest;
     private urlForUrlAndParams;
