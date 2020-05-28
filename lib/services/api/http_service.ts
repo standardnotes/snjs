@@ -20,10 +20,11 @@ const HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 
 type HttpParams = Record<string, any>
 
-export type HttpPendingRequest = {
+export type HttpRequest = {
   url: string,
-  params: HttpParams,
-  verb: HttpVerb
+  params?: HttpParams,
+  verb: HttpVerb,
+  authentication?: string
 }
 
 /**
@@ -36,7 +37,7 @@ export class SNHttpService extends PureService {
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Get, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Get, authentication });
   }
 
   public async postAbsolute(
@@ -44,7 +45,7 @@ export class SNHttpService extends PureService {
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Post, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Post, authentication });
   }
 
   public async patchAbsolute(
@@ -52,42 +53,27 @@ export class SNHttpService extends PureService {
     params: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Patch, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication });
   }
 
-  private async runHttp(
-    verb: HttpVerb,
-    url: string,
-    params?: HttpParams,
-    authentication?: string
-  ): Promise<HttpResponse> {
-    const request = this.createRequest(
-      verb,
-      url,
-      params,
-      authentication
-    );
-    return this.runRequest(request, verb, params);
+  public async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
+    const request = this.createXmlRequest(httpRequest);
+    return this.runRequest(request, httpRequest.verb, httpRequest.params);
   }
 
-  private createRequest(
-    verb: HttpVerb,
-    url: string,
-    params?: HttpParams,
-    authentication?: string
-  ) {
+  private createXmlRequest(httpRequest: HttpRequest) {
     const request = new XMLHttpRequest();
     if (
-      params &&
-      verb === HttpVerb.Get
-      && Object.keys(params).length > 0
+      httpRequest.params &&
+      httpRequest.verb === HttpVerb.Get
+      && Object.keys(httpRequest.params).length > 0
     ) {
-      url = this.urlForUrlAndParams(url, params);
+      httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params);
     }
-    request.open(verb, url, true);
+    request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
-    if (authentication) {
-      request.setRequestHeader('Authorization', 'Bearer ' + authentication);
+    if (httpRequest.authentication) {
+      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication);
     }
     return request;
   }
@@ -152,15 +138,4 @@ export class SNHttpService extends PureService {
     return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
   }
 
-  public async processPendingRequest(
-    pendingApiRequest: HttpPendingRequest,
-    authentication: string
-  ) {
-    return this.runHttp(
-      pendingApiRequest.verb,
-      pendingApiRequest.url,
-      pendingApiRequest.params,
-      authentication
-    );
-  }
 }

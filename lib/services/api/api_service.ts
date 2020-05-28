@@ -3,7 +3,7 @@ import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { SNHttpService, HttpResponse, HttpVerb, HttpPendingRequest } from './http_service';
+import { SNHttpService, HttpResponse, HttpVerb, HttpRequest } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
@@ -215,10 +215,10 @@ export class SNApiService extends PureService {
       this.session!.accessToken
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSession({
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Post,
           url,
-          params,
-          verb: HttpVerb.Post
+          params
         });
       }
       return this.errorResponseWithFallbackMessage(
@@ -259,10 +259,10 @@ export class SNApiService extends PureService {
       this.session!.accessToken
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSession({
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Post,
           url,
-          params,
-          verb: HttpVerb.Post
+          params
         });
       }
       return this.errorResponseWithFallbackMessage(
@@ -274,9 +274,22 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  async refreshSession(pendingApiRequest?: HttpPendingRequest) {
+  private async refreshSessionThenRetryRequest(httpRequest: HttpRequest) {
+    return this.refreshSession().then((sessionResponse) => {
+      if (sessionResponse?.error) {
+        return sessionResponse;
+      } else {
+        return this.httpService!.runHttp({
+          ...httpRequest, 
+          authentication: this.session!.accessToken
+        });
+      }
+    });
+  }
+
+  async refreshSession() {
     if (this.refreshingSession) {
-      return;
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
     }
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
@@ -290,13 +303,6 @@ export class SNApiService extends PureService {
     ).then(async (response) => {
       const session = Session.FromResponse(response);
       await this.setSession(session);
-      /*
-       * At this point, the request to refresh the session was successful.
-       * The pending request is sent again and the response is returned.
-       */
-      if (pendingApiRequest) {
-        return this.httpService!.processPendingRequest(pendingApiRequest, this.session!.accessToken);
-      }
       return response;
     }).catch((errorResponse) => {
       return this.errorResponseWithFallbackMessage(

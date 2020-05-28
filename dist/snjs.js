@@ -15974,10 +15974,10 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                               break;
                             }
 
-                            return _context10.abrupt("return", _this5.refreshSession({
+                            return _context10.abrupt("return", _this5.refreshSessionThenRetryRequest({
+                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post,
                               url: url,
-                              params: params,
-                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post
+                              params: params
                             }));
 
                           case 2:
@@ -16065,10 +16065,10 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
                               break;
                             }
 
-                            return _context12.abrupt("return", _this6.refreshSession({
+                            return _context12.abrupt("return", _this6.refreshSessionThenRetryRequest({
+                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post,
                               url: url,
-                              params: params,
-                              verb: _http_service__WEBPACK_IMPORTED_MODULE_2__["HttpVerb"].Post
+                              params: params
                             }));
 
                           case 2:
@@ -16106,86 +16106,112 @@ var SNApiService = /*#__PURE__*/function (_PureService) {
       return sync;
     }()
   }, {
-    key: "refreshSession",
+    key: "refreshSessionThenRetryRequest",
     value: function () {
-      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(pendingApiRequest) {
+      var _refreshSessionThenRetryRequest = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(httpRequest) {
         var _this7 = this;
 
-        var url, params, result;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context14.prev = _context14.next) {
+              case 0:
+                return _context14.abrupt("return", this.refreshSession().then(function (sessionResponse) {
+                  if (sessionResponse === null || sessionResponse === void 0 ? void 0 : sessionResponse.error) {
+                    return sessionResponse;
+                  } else {
+                    return _this7.httpService.runHttp(_objectSpread({}, httpRequest, {
+                      authentication: _this7.session.accessToken
+                    }));
+                  }
+                }));
+
+              case 1:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function refreshSessionThenRetryRequest(_x23) {
+        return _refreshSessionThenRetryRequest.apply(this, arguments);
+      }
+
+      return refreshSessionThenRetryRequest;
+    }()
+  }, {
+    key: "refreshSession",
+    value: function () {
+      var _refreshSession = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee16() {
+        var _this8 = this;
+
+        var url, params, result;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 if (!this.refreshingSession) {
-                  _context15.next = 2;
+                  _context16.next = 2;
                   break;
                 }
 
-                return _context15.abrupt("return");
+                return _context16.abrupt("return", this.createErrorResponse(_Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS"]));
 
               case 2:
                 this.refreshingSession = true;
-                _context15.next = 5;
+                _context16.next = 5;
                 return this.path(REQUEST_PATH_SESSION_REFRESH);
 
               case 5:
-                url = _context15.sent;
+                url = _context16.sent;
                 params = this.params({
                   access_token: this.session.accessToken,
                   refresh_token: this.session.refreshToken
                 });
-                _context15.next = 9;
+                _context16.next = 9;
                 return this.httpService.postAbsolute(url, params).then( /*#__PURE__*/function () {
-                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee14(response) {
+                  var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee15(response) {
                     var session;
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee14$(_context14) {
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee15$(_context15) {
                       while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context15.prev = _context15.next) {
                           case 0:
                             session = _session__WEBPACK_IMPORTED_MODULE_1__["Session"].FromResponse(response);
-                            _context14.next = 3;
-                            return _this7.setSession(session);
+                            _context15.next = 3;
+                            return _this8.setSession(session);
 
                           case 3:
-                            if (!pendingApiRequest) {
-                              _context14.next = 5;
-                              break;
-                            }
+                            return _context15.abrupt("return", response);
 
-                            return _context14.abrupt("return", _this7.httpService.processPendingRequest(pendingApiRequest, _this7.session.accessToken));
-
-                          case 5:
-                            return _context14.abrupt("return", response);
-
-                          case 6:
+                          case 4:
                           case "end":
-                            return _context14.stop();
+                            return _context15.stop();
                         }
                       }
-                    }, _callee14);
+                    }, _callee15);
                   }));
 
                   return function (_x24) {
                     return _ref3.apply(this, arguments);
                   };
                 }()).catch(function (errorResponse) {
-                  return _this7.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL"]);
+                  return _this8.errorResponseWithFallbackMessage(errorResponse, _Services_api_messages__WEBPACK_IMPORTED_MODULE_5__["API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL"]);
                 });
 
               case 9:
-                result = _context15.sent;
+                result = _context16.sent;
                 this.refreshingSession = false;
-                return _context15.abrupt("return", result);
+                return _context16.abrupt("return", result);
 
               case 12:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee16, this);
       }));
 
-      function refreshSession(_x23) {
+      function refreshSession() {
         return _refreshSession.apply(this, arguments);
       }
 
@@ -16270,7 +16296,12 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                return _context.abrupt("return", this.runHttp(HttpVerb.Get, url, params, authentication));
+                return _context.abrupt("return", this.runHttp({
+                  url: url,
+                  params: params,
+                  verb: HttpVerb.Get,
+                  authentication: authentication
+                }));
 
               case 1:
               case "end":
@@ -16294,7 +16325,12 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                return _context2.abrupt("return", this.runHttp(HttpVerb.Post, url, params, authentication));
+                return _context2.abrupt("return", this.runHttp({
+                  url: url,
+                  params: params,
+                  verb: HttpVerb.Post,
+                  authentication: authentication
+                }));
 
               case 1:
               case "end":
@@ -16318,7 +16354,12 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                return _context3.abrupt("return", this.runHttp(HttpVerb.Patch, url, params, authentication));
+                return _context3.abrupt("return", this.runHttp({
+                  url: url,
+                  params: params,
+                  verb: HttpVerb.Patch,
+                  authentication: authentication
+                }));
 
               case 1:
               case "end":
@@ -16337,14 +16378,14 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
   }, {
     key: "runHttp",
     value: function () {
-      var _runHttp = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(verb, url, params, authentication) {
+      var _runHttp = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4(httpRequest) {
         var request;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                request = this.createRequest(verb, url, params, authentication);
-                return _context4.abrupt("return", this.runRequest(request, verb, params));
+                request = this.createXmlRequest(httpRequest);
+                return _context4.abrupt("return", this.runRequest(request, httpRequest.verb, httpRequest.params));
 
               case 2:
               case "end":
@@ -16354,26 +16395,26 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee4, this);
       }));
 
-      function runHttp(_x10, _x11, _x12, _x13) {
+      function runHttp(_x10) {
         return _runHttp.apply(this, arguments);
       }
 
       return runHttp;
     }()
   }, {
-    key: "createRequest",
-    value: function createRequest(verb, url, params, authentication) {
+    key: "createXmlRequest",
+    value: function createXmlRequest(httpRequest) {
       var request = new XMLHttpRequest();
 
-      if (params && verb === HttpVerb.Get && Object.keys(params).length > 0) {
-        url = this.urlForUrlAndParams(url, params);
+      if (httpRequest.params && httpRequest.verb === HttpVerb.Get && Object.keys(httpRequest.params).length > 0) {
+        httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params);
       }
 
-      request.open(verb, url, true);
+      request.open(httpRequest.verb, httpRequest.url, true);
       request.setRequestHeader('Content-type', 'application/json');
 
-      if (authentication) {
-        request.setRequestHeader('Authorization', 'Bearer ' + authentication);
+      if (httpRequest.authentication) {
+        request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication);
       }
 
       return request;
@@ -16408,7 +16449,7 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
         }, _callee5);
       }));
 
-      function runRequest(_x14, _x15, _x16) {
+      function runRequest(_x11, _x12, _x13) {
         return _runRequest.apply(this, arguments);
       }
 
@@ -16461,30 +16502,6 @@ var SNHttpService = /*#__PURE__*/function (_PureService) {
     value: function isErrorResponseExpiredToken(errorResponse) {
       return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
     }
-  }, {
-    key: "processPendingRequest",
-    value: function () {
-      var _processPendingRequest = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee6(pendingApiRequest, authentication) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                return _context6.abrupt("return", this.runHttp(pendingApiRequest.verb, pendingApiRequest.url, pendingApiRequest.params, authentication));
-
-              case 1:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function processPendingRequest(_x17, _x18) {
-        return _processPendingRequest.apply(this, arguments);
-      }
-
-      return processPendingRequest;
-    }()
   }]);
 
   return SNHttpService;
