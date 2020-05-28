@@ -1022,7 +1022,7 @@ export class SNApplication {
         mode: SyncModes.DownloadFirst,
         checkIntegrity: true,
         queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-        awaitAll: true,
+        awaitAll: awaitSync,
       });
       if (awaitSync) {
         await syncPromise;
