@@ -306,7 +306,7 @@ describe('keys', () => {
 
   it('signing into 003 account should delete latest offline items key and create 003 items key',
     async function () {
-      /** 
+      /**
        * When starting the application it will create an items key with the latest protocol version (004).
        * Upon signing into an 003 account, the application should delete any neverSynced items keys,
        * and create a new default items key that is the default for a given protocol version.
@@ -331,6 +331,39 @@ describe('keys', () => {
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
     });
+
+  it('reencrypts existing notes when logging into an 003 account', async function () {
+    await Factory.createManyMappedNotes(this.application, 10);
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersion.V003,
+    });
+
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys()[0].dirty).to.equal(false);
+
+    /** Sign out and back in */
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    expect(this.application.itemManager.notes.length).to.equal(10);
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
+  });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');
