@@ -1021,12 +1021,15 @@ export class SNApplication {
       const syncPromise = this.syncService!.sync({
         mode: SyncModes.DownloadFirst,
         checkIntegrity: true,
-        queueStrategy: SyncQueueStrategy.ForceSpawnNew
+        queueStrategy: SyncQueueStrategy.ForceSpawnNew,
+        awaitAll: true,
       });
       if (awaitSync) {
         await syncPromise;
+        await this.protocolService!.decryptErroredItems();
+      } else {
+        this.protocolService!.decryptErroredItems();
       }
-      this.protocolService!.decryptErroredItems();
     } else {
       this.unlockSyncing();
     }
