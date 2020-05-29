@@ -410,4 +410,28 @@ describe('predicates', async function () {
     );
     expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
   });
+
+  it('regex with flags', async function () {
+    const itemManager = this.itemManager;
+    await itemManager.createItem(
+      ContentType.Note,
+      {
+        title: 'FOO',
+        text: 'BAR'
+      }
+    );
+    await itemManager.createItem(
+      ContentType.Note,
+      {
+        title: 'Foo',
+        text: 'Bar'
+      }
+    );
+
+    const predicateWithoutFlags = new SNPredicate('content.title', 'matches', '^foo');
+    expect(itemManager.itemsMatchingPredicate(predicateWithoutFlags).length).to.equal(0);
+
+    const predicateWithFlags = new SNPredicate('content.title', 'matches', ['^foo', 'gmi']);
+    expect(itemManager.itemsMatchingPredicate(predicateWithFlags).length).to.equal(2);
+  });
 });

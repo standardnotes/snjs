@@ -158,7 +158,10 @@ export class SNPredicate {
       return this.resolveIncludesPredicate(valueAtKeyPath, targetValue);
     }
     else if (predicate.operator === 'matches') {
-      const regex = new RegExp(targetValue as string);
+      const regexParams = targetValue as any[];
+      const pattern = typeof (regexParams) === 'object' ? regexParams[0] : regexParams;
+      const flags = typeof (regexParams) === 'object' ? regexParams[1] : 'gm';
+      const regex = new RegExp(pattern, flags);
       return regex.test(valueAtKeyPath);
     }
     return false;
