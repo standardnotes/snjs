@@ -73,7 +73,7 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
  * handles delegation of a task to the respective protocol operator. Each version of the protocol
  * (001, 002, 003, 004, etc) uses a respective operator version to perform encryption operations.
  * Operators are located in /protocol/operator.
- * The protocol service depends on the keyManager for determining which key to use for the 
+ * The protocol service depends on the keyManager for determining which key to use for the
  * encryption and decryption of a particular payload.
  * The protocol service is also responsible for dictating which protocol versions are valid,
  * and which are no longer valid or not supported.
@@ -195,7 +195,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return ProtocolVersion.V004;
   }
 
-  /** 
+  /**
    * Returns the protocol version associated with the user's account
    */
   public async getUserVersion() {
@@ -203,7 +203,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return keyParams && keyParams.version;
   }
 
-  /** 
+  /**
    * Returns true if there is an upgrade available for the account or passcode
    */
   public async upgradeAvailable() {
@@ -212,7 +212,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return accountUpgradeAvailable || passcodeUpgradeAvailable;
   }
 
-  /** 
+  /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async accountUpgradeAvailable() {
@@ -223,7 +223,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return userVersion !== this.getLatestVersion();
   }
 
-  /** 
+  /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async passcodeUpgradeAvailable() {
@@ -242,7 +242,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     /**
      * If the version is 003 or lower, key derivation is supported unless the browser is
      * IE or Edge (or generally, where WebCrypto is not available).
-     * 
+     *
      * Versions 004 and above are always supported.
      */
     if (compareVersions(keyParams.version, ProtocolVersion.V004) >= 0) {
@@ -409,7 +409,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * If the input payload is not properly decrypted in the first place, it will be returned
    * as-is. If the payload is deleted, it will be returned as-is (assuming that the content field is null)
    * @param payload - The payload to encrypt
-   * @param key The key to use to encrypt the payload. 
+   * @param key The key to use to encrypt the payload.
    *   Will be looked up if not supplied.
    * @param intent - The target of the encryption
    * @returns The encrypted payload
@@ -432,7 +432,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       key = await this.keyToUseForEncryptionOfPayload(payload, intent);
     }
     if (!key && intentRequiresEncryption(intent)) {
-      throw 'Attempting to generate encrypted payload with no key.';
+      throw Error('Attempting to generate encrypted payload with no key.');
     }
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
       throw 'Attempting to encrypt already encrypted payload.';
@@ -486,7 +486,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Generates a new payload by decrypting the input payload.
    * If the input payload is already decrypted, it will be returned as-is.
    * @param payload - The payload to decrypt.
-   * @param key The key to use to decrypt the payload. 
+   * @param key The key to use to decrypt the payload.
    * If none is supplied, it will be automatically looked up.
    */
   public async payloadByDecryptingPayload(
@@ -637,8 +637,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Creates a JSON string representing the backup format of all items, or just subitems
    * if supplied.
-   * @param subItems An optional array of items to create backup of. 
-   * If not supplied, all items are backed up. 
+   * @param subItems An optional array of items to create backup of.
+   * If not supplied, all items are backed up.
    * @param returnIfEmpty Returns null if there are no items to make backup of.
    * @returns JSON stringified representation of data, including keyParams.
    */
@@ -891,7 +891,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else if (this.keyMode === KeyMode.RootKeyOnly) {
       this.keyMode = KeyMode.RootKeyPlusWrapper;
     } else {
-      throw 'Attempting to set wrapper on already wrapped key.';
+      throw Error('Attempting to set wrapper on already wrapped key.');
     }
     await this.deviceInterface!.clearKeychainValue();
     if ((
@@ -913,11 +913,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       );
       await this.notifyObserversOfKeyChange();
     } else {
-      throw 'Invalid keyMode on setNewRootKeyWrapper';
+      throw Error('Invalid keyMode on setNewRootKeyWrapper');
     }
   }
 
-  /** 
+  /**
    * Wraps the current in-memory root key value using the wrappingKey,
    * then persists the wrapped value to disk.
    */
@@ -983,10 +983,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     wrappingKey?: SNRootKey
   ) {
     if (!keyParams) {
-      throw 'keyParams must be supplied if setting root key.';
+      throw Error('keyParams must be supplied if setting root key.');
     }
     if (this.rootKey === key) {
-      throw 'Attempting to set root key as same current value.';
+      throw Error('Attempting to set root key as same current value.');
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
       this.keyMode = KeyMode.RootKeyPlusWrapper;
@@ -999,7 +999,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       /** Root key is simply changing, mode stays the same */
       /** this.keyMode = this.keyMode; */
     } else {
-      throw `Unhandled key mode for setNewRootKey ${this.keyMode}`;
+      throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`);
     }
     this.rootKey = key;
     await this.storageService!.setValue(
@@ -1150,12 +1150,12 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
   }
 
-  /** 
+  /**
    * When a download-first sync completes, it means we've completed a (potentially multipage)
    * sync where we only downloaded what the server had before uploading anything. We will be
    * allowed to make local accomadations here before the server begins with the upload
    * part of the sync (automatically runs after download-first sync completes).
-   * We use this to see if the server has any default itemsKeys, and if so, allows us to 
+   * We use this to see if the server has any default itemsKeys, and if so, allows us to
    * delete any never-synced items keys we have here locally.
    */
   private async handleDownloadFirstSyncCompletion() {
@@ -1163,8 +1163,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.
     */
-    const itemsKeys = this.itemsKeys;
-    const neverSynced = itemsKeys.filter((key) => {
+    const itemsKeys = this.latestItemsKeys();
+    const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
     /**
@@ -1177,7 +1177,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSynced));
+      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKeys));
     } else {
       /**
        * No previous synced items key.
@@ -1187,13 +1187,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const rootKey = await this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
-        const toDelete = neverSynced.filter((itemsKey) => {
+        const toDelete = neverSyncedKeys.filter((itemsKey) => {
           return itemsKey.version !== rootKey.version;
         });
         if (toDelete.length > 0) {
           await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
         }
-        if (itemsKeys.length === 0) {
+        if (this.latestItemsKeys().length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
@@ -1224,28 +1224,28 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /**
-   * @access public
    * @returns All SN|ItemsKey objects synced to the account.
    */
-  get itemsKeys() {
-    return this.itemManager!.itemsKeys;
+  private latestItemsKeys() {
+    return this.itemManager!.itemsKeys();
   }
 
   /**
    * @returns The items key used to encrypt the payload
    */
   public itemsKeyForPayload(payload: PurePayload) {
-    return this.itemsKeys.find((key) => key.uuid === payload.items_key_id);
+    return this.latestItemsKeys().find((key) => key.uuid === payload.items_key_id);
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
   public getDefaultItemsKey() {
-    if (this.itemsKeys.length === 1) {
-      return this.itemsKeys[0];
+    const itemsKeys = this.latestItemsKeys();
+    if (itemsKeys.length === 1) {
+      return itemsKeys[0];
     }
-    return this.itemsKeys.find((key) => {
+    return itemsKeys.find((key) => {
       return key.isDefault;
     });
   }
@@ -1255,9 +1255,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * keys with this new root key (by simply re-syncing).
    */
   public async reencryptItemsKeys() {
-    const itemsKeys = this.itemsKeys;
+    const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length > 0) {
-      /** 
+      /**
        * Do not call sync after marking dirty.
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
@@ -1267,14 +1267,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /**
-   * When migrating from non-SNItemsKey architecture, many items will not have a 
-   * relationship with any key object. For those items, we can be sure that only 1 key 
+   * When migrating from non-SNItemsKey architecture, many items will not have a
+   * relationship with any key object. For those items, we can be sure that only 1 key
    * object will correspond to that protocol version.
    * @returns The SNItemsKey object to decrypt items encrypted
    * with previous protocol version.
    */
   public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
-    return this.itemsKeys.find((key) => {
+    return this.latestItemsKeys().find((key) => {
       return key.version === version;
     });
   }

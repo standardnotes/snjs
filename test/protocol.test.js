@@ -76,13 +76,6 @@ describe('protocol', function () {
     expect(result.errorDecrypting).to.not.be.ok;
   });
 
-  it('decrypting already decrypted payload should return same payload', async function () {
-    const payload = Factory.createNotePayload();
-    const result = await this.application.protocolService.payloadByDecryptingPayload(payload);
-    expect(payload).to.equal(result);
-    expect(result.errorDecrypting).to.not.be.ok;
-  });
-
   it('ejected payload should not have meta fields', async function () {
     await this.application.setPasscode('123');
     const payload = Factory.createNotePayload();

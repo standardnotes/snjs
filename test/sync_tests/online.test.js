@@ -236,9 +236,9 @@ describe('online syncing', () => {
   });
 
   it('allows me to save data after Ive signed out', async function () {
-    expect(this.application.itemManager.itemsKeys.length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    expect(this.application.itemManager.itemsKeys.length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.itemManager.setItemDirty(note.uuid);
@@ -261,7 +261,7 @@ describe('online syncing', () => {
     });
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
-    expect(this.application.itemManager.itemsKeys.length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     expect(this.application.itemManager.notes.length).to.equal(1);
 

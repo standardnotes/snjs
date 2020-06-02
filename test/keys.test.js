@@ -87,7 +87,7 @@ describe('keys', () => {
   it('has root key and one items key after registering user', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
-    expect(this.application.protocolService.itemsKeys.length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
   }).timeout(5000);
 
   it('should use root key for encryption of storage', async function () {
@@ -166,7 +166,7 @@ describe('keys', () => {
   });
 
   it('should create random items key if no account and no passcode', async function () {
-    const itemsKeys = this.application.protocolService.itemsKeys;
+    const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);
     const notePayload = Factory.createNotePayload();
     await this.application.savePayload(notePayload);
@@ -175,6 +175,16 @@ describe('keys', () => {
     const rawNotePayload = rawPayloads.find((r) => r.content_type === ContentType.Note);
     expect(typeof rawNotePayload.content).to.equal('string');
   });
+
+  it('should create a new items key upon registration', async function () {
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    const originalItemsKey = this.application.itemManager.itemsKeys()[0];
+    await this.application.register(this.email, this.password);
+
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    const newestItemsKey = this.application.itemManager.itemsKeys()[0];
+    expect(newestItemsKey.uuid).to.not.equal(originalItemsKey.uuid);
+  }).timeout(5000);
 
   it('should use items key for encryption of note', async function () {
     const note = Factory.createNotePayload();
@@ -278,7 +288,7 @@ describe('keys', () => {
 
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.setPasscode('foo');
-    const itemsKey = this.application.protocolService.itemsKeys[0];
+    const itemsKey = this.application.itemManager.itemsKeys()[0];
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject(
@@ -296,7 +306,7 @@ describe('keys', () => {
 
   it('signing into 003 account should delete latest offline items key and create 003 items key',
     async function () {
-      /** 
+      /**
        * When starting the application it will create an items key with the latest protocol version (004).
        * Upon signing into an 003 account, the application should delete any neverSynced items keys,
        * and create a new default items key that is the default for a given protocol version.
@@ -313,7 +323,7 @@ describe('keys', () => {
         version: ProtocolVersion.V003
       });
 
-      const itemsKeys = this.application.protocolService.itemsKeys;
+      const itemsKeys = this.application.itemManager.itemsKeys();
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
       expect(newestItemsKey.version).to.equal(ProtocolVersion.V003);
@@ -322,10 +332,43 @@ describe('keys', () => {
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
     });
 
+  it('reencrypts existing notes when logging into an 003 account', async function () {
+    await Factory.createManyMappedNotes(this.application, 10);
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersion.V003,
+    });
+
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    expect(this.application.itemManager.itemsKeys()[0].dirty).to.equal(false);
+
+    /** Sign out and back in */
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+
+    expect(this.application.itemManager.itemsKeys().length).to.equal(1);
+    expect(this.application.itemManager.notes.length).to.equal(10);
+    expect(this.application.itemManager.invalidItems.length).to.equal(0);
+  });
+
   it('When root key changes, all items keys must be re-encrypted', async function () {
     await this.application.setPasscode('foo');
     await Factory.createSyncedNote(this.application);
-    const itemsKeys = this.application.protocolService.itemsKeys;
+    const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);
     const originalItemsKey = itemsKeys[0];
 
@@ -380,7 +423,7 @@ describe('keys', () => {
     await Factory.registerUserToApplication({
       application: this.application, email: this.email, password: this.password
     });
-    const itemsKeys = this.application.protocolService.itemsKeys;
+    const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
 
@@ -389,7 +432,7 @@ describe('keys', () => {
       'foobarfoo'
     );
 
-    expect(this.application.protocolService.itemsKeys.length).to.equal(2);
+    expect(this.application.itemManager.itemsKeys().length).to.equal(2);
     const newDefaultItemsKey = this.application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
   }).timeout(5000);

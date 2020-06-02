@@ -74,7 +74,7 @@ export function isFunction(value: any) {
 /**
  * @returns True if the object is null or undefined, otherwise false
  */
-export function isNullOrUndefined(value: any) {
+export function isNullOrUndefined(value: any): value is null | undefined {
   return value === null || value === undefined;
 }
 
@@ -124,7 +124,7 @@ export function uniqueArray(array: any[]): any[] {
   return uniq(array);
 }
 
-/** 
+/**
  * Returns the last element in the array.
  * @returns The last element in the array
  */
@@ -132,7 +132,7 @@ export function lastElement(array: any[]) {
   return array[array.length - 1];
 }
 
-/** 
+/**
  * Adds all items from otherArray into inArray, in-place.
  * Does not return a value.
  */
@@ -142,41 +142,39 @@ export function extendArray<T>(inArray: T[], otherArray: T[]) {
   }
 }
 
-/** 
- * Removes all items appearing in toSubtract from inArray, in-place 
+/**
+ * Removes all items appearing in toSubtract from inArray, in-place
  * @param toSubtract - The list of items to remove from inArray
  */
 export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
   for (const value of toSubtract) {
-    inArray.splice(inArray.indexOf(value), 1);
+    removeFromArray(inArray, value);
   }
 }
 
-/** 
- * Determines if value exists in array, by reference
- */
-export function existsInArray<T>(inArray: T[], value: T) {
-  return inArray.indexOf(value) >= 0;
-}
-
-/** 
- * Removes an object from the array by reference equality or shallow value equality 
+/**
+ * Removes the first matching element of an array by strict equality.
+ * If no matchin element is found, the array is left unchanged.
  */
 export function removeFromArray<T>(array: T[], value: T) {
-  array.splice(array.indexOf(value), 1);
+  const valueIndex = array.indexOf(value);
+  if (valueIndex === -1) {
+    return;
+  }
+  array.splice(valueIndex, 1);
 }
 
-/** 
+/**
  * Adds the element to the array if the array does not already include the value.
  * The array is searched via array.indexOf
  */
 export function addIfUnique<T>(array: T[], value: T) {
-  if (!existsInArray(array, value)) {
+  if (!array.includes(value)) {
     array.push(value);
   }
 }
 
-/** 
+/**
  * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
@@ -184,8 +182,8 @@ export function filterFromArray<T>(array: T[], predicate: Partial<Record<keyof T
   remove(array, predicate);
 }
 
-/** 
- * Returns a new array by removing all elements in subtract from array 
+/**
+ * Returns a new array by removing all elements in subtract from array
  */
 export function arrayByDifference<T>(array: T[], subtract: T[]) {
   return array
@@ -206,22 +204,22 @@ export function compareValues<T>(left: T, right: T) {
   }
 }
 
-/** 
- * Removes the value from the array at the given index, in-place. 
+/**
+ * Removes the value from the array at the given index, in-place.
  */
 export function removeFromIndex(array: any[], index: number) {
   array.splice(index, 1);
 }
 
-/** 
- * Adds the value from the array at the given index, in-place. 
+/**
+ * Adds the value from the array at the given index, in-place.
  */
 export function addAtIndex<T>(array: T[], element: T, index: number) {
   array.splice(index, 0, element);
 }
 
-/** 
- * Returns a new array by removeing the value from the array at the given index 
+/**
+ * Returns a new array by removeing the value from the array at the given index
  */
 export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
   const copy = array.slice();
@@ -305,7 +303,7 @@ export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
   }
 }
 
-/** 
+/**
  * Creates a new object by omitting `keys` from `object`
  */
 export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
@@ -335,7 +333,7 @@ export function joinPaths(...args: string[]) {
 }
 
 /**
- * Creates a copy of the input object by JSON stringifying the object then JSON parsing 
+ * Creates a copy of the input object by JSON stringifying the object then JSON parsing
  * the string (if the input is an object). If input is date, a Date copy will be created,
  * and if input is a primitive value, it will be returned as-is.
  */
@@ -370,7 +368,7 @@ export function deepMerge(a: AnyRecord, b: AnyRecord) {
   return a;
 }
 
-/** 
+/**
  * Returns a new object by selecting certain keys from input object.
  */
 export function pickByCopy<T>(object: T, keys: Array<keyof T>) {
@@ -431,4 +429,3 @@ export async function sleep(milliseconds: number) {
     }, milliseconds);
   });
 }
-

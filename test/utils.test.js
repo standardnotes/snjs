@@ -48,10 +48,35 @@ describe('utils', () => {
     expect(typeof parsed.b).to.equal('object');
   });
 
-  it('subtractFromArray', () => {
-    const array = [1, 2, 3, 4, 5];
-    subtractFromArray(array, [1, 3, 5]);
-    expect(array).to.eql([2, 4]);
+  describe('subtractFromArray', () => {
+    it('Removes all items appearing in the array', () => {
+      const array = [1, 2, 3, 4, 5];
+      subtractFromArray(array, [1, 3, 5]);
+      expect(array).to.eql([2, 4]);
+    });
+
+    it('Ignores items not appearing in the array', () => {
+      const array = [1, 2, 3, 4, 5];
+      subtractFromArray(array, [0, 1, 3, 5]);
+      expect(array).to.eql([2, 4]);
+    });
+  });
+
+  describe('removeFromArray', () => {
+    it('Removes the first item appearing in the array', () => {
+      const array = [1, 1, 2, 3];
+      removeFromArray(array, 1);
+      expect(array).to.eql([1, 2, 3]);
+      removeFromArray(array, 2);
+      expect(array).to.eql([1, 3]);
+    });
+
+    it('Ignores items not appearing in the array', () => {
+      const array = [1, 2, 3];
+      removeFromArray(array, 0);
+      expect(array).to.eql([1, 2, 3]);
+      removeFromArray(array, {});
+    });
   });
 
   it('removeFromIndex', () => {
