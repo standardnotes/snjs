@@ -204,11 +204,11 @@ export class SNApiService extends PureService {
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
-    const params = {
+    const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
       ...newKeyParams.getPortableValue()
-    };
+    });
     const response = await this.httpService!.postAbsolute(
       url,
       params,
