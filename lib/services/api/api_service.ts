@@ -3,7 +3,7 @@ import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { SNHttpService, HttpResponse } from './http_service';
+import { SNHttpService, HttpResponse, HttpVerb, HttpRequest } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
@@ -16,6 +16,8 @@ const REQUEST_PATH_REGISTER = '/auth';
 const REQUEST_PATH_LOGIN = '/auth/sign_in';
 const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 const REQUEST_PATH_SYNC = '/items/sync';
+const REQUEST_PATH_LOGOUT = '/auth/sign_out';
+const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 
 const API_VERSION = '20200115';
 
@@ -28,6 +30,7 @@ export class SNApiService extends PureService {
   private registering = false
   private authenticating = false
   private changing = false
+  private refreshingSession = false
 
   constructor(httpService: SNHttpService, storageService: SNStorageService) {
     super();
@@ -58,8 +61,15 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public setSession(session: Session) {
+  public async setSession(session: Session, persist: boolean = true) {
     this.session = session;
+    if (persist) {
+      await this.storageService!.setValue(StorageKey.Session, session);
+    }
+  }
+
+  public getSession() {
+    return this.session;
   }
 
   private async path(path: string) {
@@ -172,6 +182,15 @@ export class SNApiService extends PureService {
     return response;
   }
 
+  async signOut() {
+    const url = await this.path(REQUEST_PATH_LOGOUT);
+    return this.httpService!.postAbsolute(
+      url,
+      undefined,
+      this.session!.accessToken
+    );
+  }
+
   async changePassword(
     currentServerPassword: string,
     newServerPassword: string,
@@ -179,6 +198,9 @@ export class SNApiService extends PureService {
   ) {
     if (this.changing) {
       return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
+    }
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
@@ -190,8 +212,15 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.token
-    ).catch((errorResponse) => {
+      this.session!.accessToken
+    ).catch(async (errorResponse) => {
+      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Post,
+          url,
+          params
+        });
+      }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
@@ -211,6 +240,9 @@ export class SNApiService extends PureService {
     contentType?: ContentType,
     customEvent?: string
   ) {
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
@@ -224,8 +256,15 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.token
-    ).catch((errorResponse) => {
+      this.session!.accessToken
+    ).catch(async (errorResponse) => {
+      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Post,
+          url,
+          params
+        });
+      }
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -234,4 +273,45 @@ export class SNApiService extends PureService {
 
     return response;
   }
+
+  private async refreshSessionThenRetryRequest(httpRequest: HttpRequest) {
+    return this.refreshSession().then((sessionResponse) => {
+      if (sessionResponse?.error) {
+        return sessionResponse;
+      } else {
+        return this.httpService!.runHttp({
+          ...httpRequest, 
+          authentication: this.session!.accessToken
+        });
+      }
+    });
+  }
+
+  async refreshSession() {
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
+    this.refreshingSession = true;
+    const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const params = this.params({
+      access_token: this.session!.accessToken,
+      refresh_token: this.session!.refreshToken
+    });
+    const result = await this.httpService!.postAbsolute(
+      url,
+      params
+    ).then(async (response) => {
+      const session = Session.FromResponse(response);
+      await this.setSession(session);
+      return response;
+    }).catch((errorResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
+      );
+    });
+    this.refreshingSession = false;
+    return result;
+  }
+
 }

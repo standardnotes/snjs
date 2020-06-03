@@ -1,7 +1,7 @@
 import { PureService } from '@Lib/services/pure_service';
 import { isString, isObject } from '@Lib/utils';
 
-enum HttpVerb {
+export enum HttpVerb {
   Get = 'get',
   Post = 'post',
   Patch = 'patch'
@@ -16,8 +16,16 @@ export type HttpResponse = {
 const REQUEST_READY_STATE_COMPLETED = 4;
 const HTTP_STATUS_MIN_SUCCESS = 200;
 const HTTP_STATUS_MAX_SUCCESS = 299;
+const HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 
-type Params = Record<string, any>
+type HttpParams = Record<string, any>
+
+export type HttpRequest = {
+  url: string,
+  params?: HttpParams,
+  verb: HttpVerb,
+  authentication?: string
+}
 
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
@@ -26,61 +34,46 @@ export class SNHttpService extends PureService {
 
   public async getAbsolute(
     url: string,
-    params?: Params,
+    params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Get, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Get, authentication });
   }
 
   public async postAbsolute(
     url: string,
-    params: Params,
+    params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Post, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Post, authentication });
   }
 
   public async patchAbsolute(
     url: string,
-    params: Params,
+    params: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp(HttpVerb.Patch, url, params, authentication);
+    return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication });
   }
 
-  private async runHttp(
-    verb: HttpVerb,
-    url: string,
-    params?: Params,
-    authentication?: string
-  ): Promise<HttpResponse> {
-    const request = this.createRequest(
-      verb,
-      url,
-      params,
-      authentication
-    );
-    return this.runRequest(request, verb, params);
+  public async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
+    const request = this.createXmlRequest(httpRequest);
+    return this.runRequest(request, httpRequest.verb, httpRequest.params);
   }
 
-  private createRequest(
-    verb: HttpVerb,
-    url: string,
-    params?: Params,
-    authentication?: string
-  ) {
+  private createXmlRequest(httpRequest: HttpRequest) {
     const request = new XMLHttpRequest();
     if (
-      params &&
-      verb === HttpVerb.Get
-      && Object.keys(params).length > 0
+      httpRequest.params &&
+      httpRequest.verb === HttpVerb.Get
+      && Object.keys(httpRequest.params).length > 0
     ) {
-      url = this.urlForUrlAndParams(url, params);
+      httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params);
     }
-    request.open(verb, url, true);
+    request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
-    if (authentication) {
-      request.setRequestHeader('Authorization', 'Bearer ' + authentication);
+    if (httpRequest.authentication) {
+      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication);
     }
     return request;
   }
@@ -88,7 +81,7 @@ export class SNHttpService extends PureService {
   private async runRequest(
     request: XMLHttpRequest,
     verb: HttpVerb,
-    params?: Params
+    params?: HttpParams
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
@@ -129,7 +122,7 @@ export class SNHttpService extends PureService {
     }
   }
 
-  private urlForUrlAndParams(url: string, params: Params) {
+  private urlForUrlAndParams(url: string, params: HttpParams) {
     const keyValueString = Object.keys(params).map((key) => {
       return key + '=' + encodeURIComponent(params[key]);
     }).join('&');
@@ -140,4 +133,9 @@ export class SNHttpService extends PureService {
       return url + '?' + keyValueString;
     }
   }
+
+  public isErrorResponseExpiredToken(errorResponse: HttpResponse) {
+    return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
+  }
+
 }

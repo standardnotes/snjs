@@ -1,5 +1,13 @@
+import { HttpResponse } from "./http_service";
 export declare class Session {
-    token: string;
+    accessToken: string;
+    expireAt?: number;
+    refreshToken?: string;
+    validUntil?: number;
     static FromRaw(raw: any): Session;
-    constructor(token: string);
+    static FromResponse(response: HttpResponse): Session;
+    constructor(accessToken: string, expireAt?: number, refreshToken?: string, validUntil?: number);
+    private getExpireAt;
+    canExpire(): boolean;
+    isExpired(): boolean;
 }

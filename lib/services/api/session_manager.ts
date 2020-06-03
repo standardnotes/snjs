@@ -37,7 +37,6 @@ export class SNSessionManager extends PureService {
   private protocolService?: SNProtocolService
 
   private user?: User
-  private session?: Session
 
   constructor(
     storageService: SNStorageService,
@@ -58,7 +57,6 @@ export class SNSessionManager extends PureService {
     this.apiService = undefined;
     this.alertService = undefined;
     this.user = undefined;
-    this.session = undefined;
     super.deinit();
   }
 
@@ -74,13 +72,12 @@ export class SNSessionManager extends PureService {
 
     const rawSession = await this.storageService!.getValue(StorageKey.Session);
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession));
+      await this.setSession(Session.FromRaw(rawSession), false);
     }
   }
 
-  private async setSession(session: Session) {
-    this.session = session;
-    this.apiService!.setSession(this.session);
+  private async setSession(session: Session, persist: boolean = true) {
+    await this.apiService!.setSession(session, persist);
   }
 
   public online() {
@@ -88,7 +85,7 @@ export class SNSessionManager extends PureService {
   }
 
   public offline() {
-    return isNullOrUndefined(this.session);
+    return isNullOrUndefined(this.apiService!.getSession());
   }
 
   public getUser() {
@@ -97,7 +94,10 @@ export class SNSessionManager extends PureService {
 
   public async signOut() {
     this.user = undefined;
-    this.session = undefined;
+    const session = await this.apiService!.getSession();
+    if (session && session.canExpire()) {
+      this.apiService!.signOut();
+    }
   }
 
   async register(email: string, password: string) {
@@ -283,8 +283,13 @@ export class SNSessionManager extends PureService {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    const session = new Session(response.token);
-    await this.storageService!.setValue(StorageKey.Session, session);
-    await this.setSession(session);
+    /* 
+      The token from response can be undefined if the user is using session tokens (protocol version >= 004).
+      We should call setSession only if the session is updated with a new token.
+    */
+    if (response.token) {
+      const session = Session.FromResponse(response);
+      await this.setSession(session);
+    }
   }
 }

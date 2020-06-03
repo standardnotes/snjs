@@ -36,7 +36,6 @@ const DEFAULT_MAX_DISCORDANCE = 5;
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
 const INVALID_SESSION_RESPONSE_STATUS = 401;
 
-
 export enum SyncQueueStrategy {
   /**
    * Promise will be resolved on the next sync request after the current one completes.
