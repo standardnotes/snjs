@@ -29,14 +29,16 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
-import { SNWebCrypto, isWebCryptoAvailable, SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from '@Protocol/pure_crypto';
 import { Uuid } from '@Lib/uuid';
 import {
   isWebEnvironment,
+  isReactNativeEnvironment,
   isString,
   isNullOrUndefined,
   isFunction,
-  removeFromArray
+  removeFromArray,
+  isWebCryptoAvailable
 } from '@Lib/utils';
 
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
@@ -120,18 +122,19 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     this.deviceInterface = deviceInterface;
     this.storageService = storageService;
     this.crypto = crypto;
-    if (
-      !this.crypto &&
-      isWebEnvironment() &&
-      isWebCryptoAvailable()
-    ) {
-      /** IE and Edge do not support pbkdf2 in WebCrypto. */
-      this.crypto = new SNWebCrypto();
+
+    if (isReactNativeEnvironment()) {
+      Uuid.SetGenerators(
+        this.crypto.generateUUID,
+        undefined // no sync implementation on React Native
+      );
+    } else {
+      Uuid.SetGenerators(
+        this.crypto.generateUUID,
+        this.crypto.generateUUIDSync
+      );
     }
-    Uuid.SetGenerators(
-      this.crypto.generateUUIDSync,
-      this.crypto.generateUUID
-    );
+
     /** Hide rootKey enumeration */
     Object.defineProperty(this, 'rootKey', {
       enumerable: false,

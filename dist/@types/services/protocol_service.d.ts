@@ -11,7 +11,7 @@ import { SNStorageService } from './storage_service';
 import { SNRootKey } from '../protocol/root_key';
 import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
-import { SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from '../protocol/pure_crypto';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '../models/content_types';
 import { DeviceInterface } from '../device_interface';
@@ -343,10 +343,9 @@ export declare class SNProtocolService extends PureService implements Encryption
      */
     repersistAllItems(): Promise<void>;
     /**
-     * @access public
      * @returns All SN|ItemsKey objects synced to the account.
      */
-    get itemsKeys(): SNItemsKey[];
+    private latestItemsKeys;
     /**
      * @returns The items key used to encrypt the payload
      */

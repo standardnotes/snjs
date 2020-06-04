@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import WebDeviceInterface from './web_device_interface.js';
+import SNWebCrypto from 'sncrypto';
 
 export const TestTimeout = 10000;
 

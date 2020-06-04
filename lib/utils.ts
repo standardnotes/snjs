@@ -24,6 +24,22 @@ export function isWebEnvironment() {
 }
 
 /**
+ * Returns true if WebCrypto is available
+ * @access public
+ */
+export function isWebCryptoAvailable() {
+  // @ts-ignore documentMode does not exit in definitions but might exist on IE
+  return isWebEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
+}
+
+/**
+ * Whether we are in React Native app
+ */
+export function isReactNativeEnvironment()  {
+  return typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
+}
+
+/**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
