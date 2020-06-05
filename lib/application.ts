@@ -17,7 +17,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
 import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from '@Lib/protocol/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { removeFromArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
@@ -121,7 +121,7 @@ export class SNApplication {
    * @param platform The Platform that identifies your application.
    * @param namespace A unique identifier to namespace storage and
    *  other persistent properties. Defaults to empty string.
-   * @param crypto The platform-dependent instance of SNCrypto to use.
+   * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array  of key/value pairs
@@ -133,8 +133,8 @@ export class SNApplication {
     environment: Environment,
     platform: Platform,
     deviceInterface: DeviceInterface,
+    crypto: SNPureCrypto,
     namespace?: string,
-    crypto?: SNPureCrypto,
     swapClasses?: any[],
     skipClasses?: any[],
   ) {
@@ -146,6 +146,9 @@ export class SNApplication {
     }
     if (!platform) {
       throw 'Platform must be supplied when creating an application.';
+    }
+    if (!crypto) {
+      throw 'Crypto has to be supplied when creating an application.';
     }
     this.environment = environment;
     this.platform = platform;

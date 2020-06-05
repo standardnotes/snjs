@@ -14,7 +14,7 @@ export { HistorySession } from './services/history/history_session';
 export { ItemHistory } from './services/history/item_history';
 export { ItemHistoryEntry } from './services/history/item_history_entry';
 export { SNPrivileges, ProtectedAction, PrivilegeCredential } from './models/app/privileges';
-export { SNWebCrypto } from 'sncrypto';
+export * from './protocol/pure_crypto';
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';

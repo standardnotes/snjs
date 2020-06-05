@@ -14,7 +14,7 @@ An application must be supplied a custom subclass of [DeviceInterface](https://g
 
 The application interacts with a variety of services and managers to facilitate complete client functionality. While the distinction is not fully technical, a service can be thought of as a class that allows consumers to perform actions on demand, while a manager is responsible for managing and reacting to application state (but also expose on-demand functions). All managers and services live in `lib/services`.
 
-SNJS interacts with [`sncrypto`](https://github.com/standardnotes/sncrypto/tree/004) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/004/specification.md) document. This includes operations like key generation and data encryption.
+On Web platforms SNJS interacts with [`sncrypto`](https://github.com/standardnotes/sncrypto/tree/004) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/004/specification.md) document. This includes operations like key generation and data encryption.
 
 SNJS also interacts with a Standard Notes [syncing-server](https://github.com/standardnotes/syncing-server), which is dumb data and sync store that deals with encrypted data, and never learns of client secrets or sensitive information.
 
@@ -67,7 +67,7 @@ Once the app is launched, you may perform any app-related functions, including:
 
 ```javascript
 app.signIn({
-  email, 
+  email,
   password
 }).then((response) => {
 
@@ -78,7 +78,7 @@ app.signIn({
 
 ```javascript
 app.register({
-  email, 
+  email,
   password
 }).then((response) => {
 
@@ -97,7 +97,7 @@ app.setPasscode(somePasscode).then(() => {
 
 ```javascript
 const item = await app.createManagedItem({
-  contentType: ContentType.Note, 
+  contentType: ContentType.Note,
   content: {
     title: 'Ideas',
     text: 'Coming soon.'
@@ -111,7 +111,7 @@ await app.saveItem(item.uuid);
 
 ```javascript
 app.streamItems({
-  contentType: ContentType.Note, 
+  contentType: ContentType.Note,
   stream: ({ notes }) => {
     reloadUI(notes);
   }

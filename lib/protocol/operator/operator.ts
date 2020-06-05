@@ -12,7 +12,7 @@ import {
   CreateMaxPayloadFromAnyObject
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
-import { base64Encode, base64Decode, SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from '@Protocol/pure_crypto';
 import { ContentType } from '@Lib/models';
 
 export type RootKeyResponse = {
@@ -28,8 +28,8 @@ export type ItemsKeyContent = {
 
 /**w
  * An operator is responsible for performing crypto operations, such as generating keys
- * and encrypting/decrypting payloads. Operators interact directly with the 'sncrypto' lib
- * to directly access cryptographic primitives.
+ * and encrypting/decrypting payloads. Operators interact directly with
+ * platform dependent SNPureCrypto implementation to directly access cryptographic primitives.
  * Each operator is versioned according to the protocol version. Functions that are common
  * across all versions appear in this generic parent class.
  */
@@ -119,7 +119,7 @@ export abstract class SNProtocolOperator {
       );
     } else if (format === PayloadFormat.DecryptedBase64String) {
       const jsonString = JSON.stringify(payload.content);
-      const base64String = await base64Encode(jsonString);
+      const base64String = await this.crypto.base64Encode(jsonString);
       const content = ProtocolVersion.V000Base64Decrypted + base64String;
       return CreateEncryptionParameters(
         {
@@ -154,7 +154,7 @@ export abstract class SNProtocolOperator {
       );
       let decodedContent;
       try {
-        const jsonString = await base64Decode(contentString);
+        const jsonString = await this.crypto.base64Decode(contentString);
         decodedContent = JSON.parse(jsonString);
       } catch (e) {
         decodedContent = encryptedParameters.content;

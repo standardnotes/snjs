@@ -19,6 +19,7 @@ export function createApplication(namespace, environment, platform) {
     environment || Environment.Web,
     platform || Platform.MacWeb,
     deviceInterface,
+    new SNWebCrypto(),
     namespace,
     undefined,
     undefined

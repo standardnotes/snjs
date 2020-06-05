@@ -7,6 +7,15 @@ export declare function dictToArray<T>(dict: Record<any, T>): NonNullable<T>[];
  */
 export declare function isWebEnvironment(): boolean;
 /**
+ * Returns true if WebCrypto is available
+ * @access public
+ */
+export declare function isWebCryptoAvailable(): boolean;
+/**
+ * Whether we are in React Native app
+ */
+export declare function isReactNativeEnvironment(): boolean;
+/**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
@@ -32,7 +41,7 @@ export declare function isFunction(value: any): boolean;
 /**
  * @returns True if the object is null or undefined, otherwise false
  */
-export declare function isNullOrUndefined(value: any): boolean;
+export declare function isNullOrUndefined(value: any): value is null | undefined;
 /**
  * @returns Whether the value is a string
  */
@@ -69,11 +78,8 @@ export declare function extendArray<T>(inArray: T[], otherArray: T[]): void;
  */
 export declare function subtractFromArray<T>(inArray: T[], toSubtract: T[]): void;
 /**
- * Determines if value exists in array, by reference
- */
-export declare function existsInArray<T>(inArray: T[], value: T): boolean;
-/**
- * Removes an object from the array by reference equality or shallow value equality
+ * Removes the first matching element of an array by strict equality.
+ * If no matchin element is found, the array is left unchanged.
  */
 export declare function removeFromArray<T>(array: T[], value: T): void;
 /**

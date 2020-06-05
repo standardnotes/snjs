@@ -4,7 +4,7 @@ import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '../../models/app/items_key';
 import { PayloadFormat } from '../payloads/formats';
 import { ProtocolVersion } from '../versions';
-import { SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from '../pure_crypto';
 export declare type RootKeyResponse = {
     key: SNRootKey;
     keyParams: SNRootKeyParams;
@@ -16,8 +16,8 @@ export declare type ItemsKeyContent = {
 };
 /**w
  * An operator is responsible for performing crypto operations, such as generating keys
- * and encrypting/decrypting payloads. Operators interact directly with the 'sncrypto' lib
- * to directly access cryptographic primitives.
+ * and encrypting/decrypting payloads. Operators interact directly with
+ * platform dependent SNPureCrypto implementation to directly access cryptographic primitives.
  * Each operator is versioned according to the protocol version. Functions that are common
  * across all versions appear in this generic parent class.
  */

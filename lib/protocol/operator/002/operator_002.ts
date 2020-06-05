@@ -9,7 +9,6 @@ import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
-import { base64Decode } from 'sncrypto';
 
 /**
  * @deprecated
@@ -230,7 +229,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     } else {
       let authParams;
       try {
-        authParams = JSON.parse(await base64Decode(itemParams.authParams));
+        authParams = JSON.parse(await this.crypto.base64Decode(itemParams.authParams));
         // eslint-disable-next-line no-empty
       } catch (e) { }
       return CopyEncryptionParameters(

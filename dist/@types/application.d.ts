@@ -12,7 +12,7 @@ import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
 import { Challenge } from './challenges';
 import { ChallengeOrchestrator } from './services/challenge_service';
-import { SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from './protocol/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
@@ -69,7 +69,7 @@ export declare class SNApplication {
      * @param platform The Platform that identifies your application.
      * @param namespace A unique identifier to namespace storage and
      *  other persistent properties. Defaults to empty string.
-     * @param crypto The platform-dependent instance of SNCrypto to use.
+     * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
      * @param swapClasses Gives consumers the ability to provide their own custom
      * subclass for a service. swapClasses should be an array  of key/value pairs
@@ -77,7 +77,7 @@ export declare class SNApplication {
      * and 'with'  is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, namespace?: string, crypto?: SNPureCrypto, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
