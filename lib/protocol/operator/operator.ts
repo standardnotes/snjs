@@ -12,7 +12,7 @@ import {
   CreateMaxPayloadFromAnyObject
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
-import { SNPureCrypto } from '@Protocol/pure_crypto';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { ContentType } from '@Lib/models';
 
 export type RootKeyResponse = {

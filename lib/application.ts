@@ -17,7 +17,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
 import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from '@Lib/protocol/pure_crypto';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { removeFromArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
