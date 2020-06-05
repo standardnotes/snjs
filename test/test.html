@@ -7,6 +7,7 @@
         <script src="./vendor/chai-as-promised-built.js"></script>
         <script src="../node_modules/regenerator-runtime/runtime.js"></script>
         <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
           window._default_sync_server = 'http://localhost:3000';
@@ -53,6 +54,7 @@
         <script type="module" src="migrations/2020-01-15-mobile.test.js"></script>
         <script type="module" src="history.test.js"></script>
         <script type="module" src="session.test.js"></script>
+        <script type="module" src="actions.test.js"></script>
         <script type="module">
           mocha.checkLeaks();
           mocha.run();
