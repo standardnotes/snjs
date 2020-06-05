@@ -4,7 +4,7 @@ import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '../../models/app/items_key';
 import { PayloadFormat } from '../payloads/formats';
 import { ProtocolVersion } from '../versions';
-import { SNPureCrypto } from '../pure_crypto';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 export declare type RootKeyResponse = {
     key: SNRootKey;
     keyParams: SNRootKeyParams;
