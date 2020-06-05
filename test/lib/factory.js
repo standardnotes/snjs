@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import WebDeviceInterface from './web_device_interface.js';
-import SNWebCrypto from 'sncrypto';
 
 export const TestTimeout = 10000;
 
@@ -20,6 +19,7 @@ export function createApplication(namespace, environment, platform) {
     environment || Environment.Web,
     platform || Platform.MacWeb,
     deviceInterface,
+    new SNWebCrypto(),
     namespace,
     undefined,
     undefined
