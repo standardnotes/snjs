@@ -32,7 +32,6 @@ export {
   ProtectedAction,
   PrivilegeCredential
 } from './models/app/privileges';
-export * from '@Protocol/pure_crypto';
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
