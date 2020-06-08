@@ -46,6 +46,11 @@ import {
   ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
+import {
+  API_MESSAGE_GENERIC_SYNC_FAIL,
+  InsufficientPasswordMessage
+} from './services/api/messages';
+import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -1050,31 +1055,56 @@ export class SNApplication {
     currentPassword: string,
     newPassword: string,
     passcode?: string
-  ) {
+  ): Promise<{ error?: Error }> {
+    if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
+      return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
+    }
+
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
     if (canceled) {
-      return;
+      return {};
     }
-    const currentKeyParams = await this.protocolService!.getRootKeyParams();
-    this.lockSyncing();
-    const result = await this.sessionManager!.changePassword(
+
+    /** Change the password locally */
+    const [error, changePasswordResult] = await this.protocolService!.changePassword(
+      this.getUser()!.email!,
       currentPassword,
-      currentKeyParams!,
-      newPassword
+      newPassword,
+      wrappingKey
     );
-    if (!result.response.error) {
-      await this.protocolService!.setNewRootKey(
-        result.rootKey,
-        result.keyParams,
-        wrappingKey
-      );
-      await this.protocolService!.createNewDefaultItemsKey();
-      this.unlockSyncing();
-      await this.syncService!.sync();
-    } else {
-      this.unlockSyncing();
+    if (error) return { error };
+
+    const {
+      previousRootKey,
+      newRootKey,
+      newKeyParams,
+      rollback: rollbackPasswordChange
+    } = changePasswordResult!;
+
+    /** Sync the newly created items key. Roll back on failure */
+    await this.syncService!.sync({ awaitAll: true });
+    const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
+    if (!itemsKeyWasSynced) {
+      await rollbackPasswordChange();
+      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
     }
-    return result.response;
+
+    this.lockSyncing();
+
+    /** Now, change the password on the server. Roll back on failure */
+    const response = await this.sessionManager!.changePassword(
+      previousRootKey.serverPassword,
+      newRootKey.serverPassword,
+      newKeyParams
+    );
+    if (response.error) {
+      await rollbackPasswordChange();
+      await this.syncService!.sync({ awaitAll: true });
+    }
+
+    this.unlockSyncing();
+
+    return response;
   }
 
   public async signOut() {

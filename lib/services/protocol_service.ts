@@ -22,7 +22,7 @@ import { SyncEvent } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItemsKey } from '@Models/app/items_key';
+import { SNItemsKey, ItemsKeyMutator } from '@Models/app/items_key';
 import { SNRootKeyParams, KeyParamsContent } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
@@ -47,6 +47,8 @@ import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
 import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
+import { INVALID_PASSWORD } from './api/messages';
+import { HttpResponse } from './api/http_service';
 
 export type BackupFile = {
   keyParams?: any
@@ -1325,5 +1327,62 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         mutator.isDefault = true;
       }
     )
+    return itemsKey;
+  }
+
+  public async changePassword(
+    email: string,
+    currentPassword: string,
+    newPassword: string,
+    wrappingKey?: SNRootKey
+  ): Promise<[Error | null, {
+    previousRootKey: SNRootKey,
+    newRootKey: SNRootKey,
+    newKeyParams: SNRootKeyParams,
+    rollback: () => Promise<void>
+  }?]> {
+    const [currentRootKey, currentKeyParams] = await Promise.all([
+      this.getRootKey() as Promise<SNRootKey>,
+      this.getRootKeyParams() as Promise<SNRootKeyParams>,
+    ]);
+    const currentDefaultItemsKey = this.getDefaultItemsKey();
+
+    const computedRootKey = await this.computeRootKey(
+      currentPassword,
+      currentKeyParams
+    );
+    if (!currentRootKey.compare(computedRootKey)) {
+      /** Passwords do not match. */
+      return [Error(INVALID_PASSWORD)];
+    }
+
+    const {
+      key: newRootKey,
+      keyParams: newKeyParams,
+    } = await this.createRootKey(email, newPassword);
+
+    await this.setNewRootKey(newRootKey, newKeyParams, wrappingKey);
+    const newDefaultItemsKey = await this.createNewDefaultItemsKey();
+
+    return [
+      null,
+      {
+        previousRootKey: currentRootKey,
+        newRootKey,
+        newKeyParams,
+        rollback: async () => {
+          await this.setNewRootKey(currentRootKey, currentKeyParams, wrappingKey);
+          await Promise.all([
+            this.itemManager!.setItemToBeDeleted(newDefaultItemsKey.uuid),
+            this.itemManager!.changeItem<ItemsKeyMutator>(
+              currentDefaultItemsKey!.uuid,
+              (mutator) => {
+                mutator.isDefault = true;
+              }
+            )
+          ]);
+        },
+      },
+    ];
   }
 }

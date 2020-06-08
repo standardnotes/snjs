@@ -49,9 +49,12 @@ describe('upgrading', () => {
     expect(await this.application.protocolUpgradeAvailable()).to.equal(true);
   });
 
-  it('application protocol upgrade', async function () {
+  it('upgrades application protocol from 003 to 004', async function () {
     const oldVersion = ProtocolVersion.V003;
     const newVersion = ProtocolVersion.V004;
+
+    await Factory.createMappedNote(this.application);
+
     /** Register with 003 version */
     await Factory.registerOldUser({
       application: this.application,
@@ -63,7 +66,7 @@ describe('upgrading', () => {
     const passcode = '1234';
     await Factory.setOldVersionPasscode({
       application: this.application,
-      passcode: passcode,
+      passcode,
       version: oldVersion
     });
 
@@ -100,10 +103,9 @@ describe('upgrading', () => {
       const initialValues = promptForValuesForTypes(challenge.types);
       orchestrator.submitValues(initialValues);
     };
-    this.application.setLaunchCallback({
-      receiveChallenge: receiveChallenge
-    });
-    await this.application.upgradeProtocolVersion();
+    this.application.setLaunchCallback({ receiveChallenge });
+    const errors = await this.application.upgradeProtocolVersion();
+    expect(errors).to.be.empty;
 
     const wrappedRootKey = await this.application.protocolService.getWrappedRootKey();
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
@@ -118,13 +120,30 @@ describe('upgrading', () => {
     expect(
       (await this.application.protocolService.getRootKey()).version
     ).to.equal(newVersion);
-  }).timeout(5000);;
+
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    await this.application.signIn(this.email, this.password,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+    expect(this.application.itemManager.notes.length).to.equal(1);
+    expect(this.application.itemManager.invalidItems).to.be.empty;
+  }).timeout(15000);
+
+  it('can still log in and decrypt items even if the network goes down right after a server protocol upgrade');
+  it('rolls back the local protocol upgrade if the server responds with an error');
 
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
     const itemsKey = this.application.protocolService.getDefaultItemsKey();
     await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid);
     expect(this.application.itemManager.itemsKeys().length).to.equal(0);
+
+    Factory.createMappedNote(this.application);
 
     /** Register with 003 version */
     await Factory.registerOldUser({

@@ -41,6 +41,7 @@ export const UNSUPPORTED_KEY_DERIVATION             = `Your account was created 
 export const INVALID_PASSWORD_COST                 = `Unable to login due to insecure password parameters.
                                                       Please visit standardnotes.org/help/security for
                                                       more information.`;
+export const INVALID_PASSWORD                      = `Invalid password.`;
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE         = 'Update Recommended';
 export const OUTDATED_PROTOCOL_ALERT_IGNORE        = 'Sign In';
