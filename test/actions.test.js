@@ -184,9 +184,10 @@ describe('actions service', () => {
 
     const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
 
-    const response = await this.actionsManager.loadExtensionInContextOfItem(extensionItem, noteItem);
-    expect(response).to.eq(extensionItem);
-
+    const extensionWithItem = await this.actionsManager.loadExtensionInContextOfItem(extensionItem, noteItem);
+    const updatedExtensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+    
+    expect(extensionWithItem).to.eq(updatedExtensionItem);
     const extensions = this.actionsManager.getExtensions();
     expect(extensions[0].actions.map(action => action.label)).to.include('Action #4');
   });
