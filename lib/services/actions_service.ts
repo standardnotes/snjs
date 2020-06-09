@@ -107,7 +107,7 @@ export class SNActionsService extends PureService {
     return this.httpService!.getAbsolute(
       extension.url,
       params
-    ).then((response) => {
+    ).then(async (response) => {
       const description = response.description || extension.description;
       const supported_types = response.supported_types || extension.supported_types;
       const actions = (
@@ -117,7 +117,7 @@ export class SNActionsService extends PureService {
           })
           : []
       )
-      this.itemManager!.changeActionsExtension(
+      await this.itemManager!.changeActionsExtension(
         extension.uuid,
         (mutator) => {
           mutator.description = description;
@@ -125,7 +125,7 @@ export class SNActionsService extends PureService {
           mutator.actions = actions;
         }
       )
-      return extension;
+      return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
     }).catch((response) => {
       console.error('Error loading extension', response);
       return null;
