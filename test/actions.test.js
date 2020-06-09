@@ -28,7 +28,7 @@ describe('actions service', () => {
       identifier: 'org.standardnotes.testing',
       name: 'Test extension',
       content_type: 'Extension',
-      url: 'http://my-extension.sn.org/install/',
+      url: 'http://my-extension.sn.org/get_actions/',
       description: 'For testing purposes.',
       supported_types: [
         'Note'
@@ -61,24 +61,28 @@ describe('actions service', () => {
             'Note'
           ]
         },
-        {
+      ]
+    };
+
+    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/get_actions\/(.*)/, (request, params) => {
+      const urlParams = new URLSearchParams(params);
+      const extension = this.actionsExtension;
+
+      if (urlParams.has('item_uuid')) {
+        extension.actions.push({
           label: 'Action #4',
-          url: 'http://my-extension.sn.org/action_4/',
+          url: `http://my-extension.sn.org/action_4/?item_uuid=${urlParams.get('item_uuid')}`,
           verb: 'post',
           context: 'Item',
           content_types: [
             'Note'
           ],
           access_type: 'decrypted'
-        },
-      ]
-    };
+        });
+      }
 
-    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/install/', [
-      200,
-      { 'Content-Type': 'application/json' },
-      JSON.stringify(this.actionsExtension)
-    ]);
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension));
+    });
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_1/', [
       200,
@@ -105,13 +109,11 @@ describe('actions service', () => {
     ]);
 
     // Extension item
-    this.extensionItem = await this.application.itemManager.createItem(
+    const extensionItem = await this.application.itemManager.createItem(
       ContentType.ActionsExtension,
-      {
-        ...this.actionsExtension,
-        uuid: Factory.generateUuid(),
-      }
+      this.actionsExtension
     );
+    this.extensionItemUuid = extensionItem.uuid;
   });
 
   beforeEach(async function () {
@@ -164,9 +166,11 @@ describe('actions service', () => {
       }
     );
 
-    const tagActions = this.extensionItem.actionsWithContextForItem(tagItem);
-    expect(tagActions.length).to.eq(2);
-    expect(tagActions.map(action => action.label)).to.have.members(['Action #3', 'Action #4']);
+    const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+    const tagActions = extensionItem.actionsWithContextForItem(tagItem);
+
+    expect(tagActions.length).to.eq(1);
+    expect(tagActions.map(action => action.label)).to.have.members(['Action #3']);
   });
 
   it('should load extension in context of item', async function () {
@@ -178,10 +182,28 @@ describe('actions service', () => {
       }
     );
 
-    // Works
-    const result1 = await this.application.httpService.getAbsolute(this.extensionItem.url);
+    const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
 
-    // Returns 404
-    const result2 = await this.actionsManager.loadExtensionInContextOfItem(this.extensionItem, noteItem);
+    const response = await this.actionsManager.loadExtensionInContextOfItem(extensionItem, noteItem);
+    expect(response).to.eq(extensionItem);
+
+    const extensions = this.actionsManager.getExtensions();
+    expect(extensions[0].actions.map(action => action.label)).to.include('Action #4');
+  });
+
+  it('should run get action', async function () {
+
+  });
+
+  it('should run render action', async function () {
+
+  });
+
+  it('should run show action', async function () {
+
+  });
+
+  it('should run post action', async function () {
+    
   });
 });
