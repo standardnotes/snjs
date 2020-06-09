@@ -716,13 +716,11 @@ export class SNApplication {
     if (!response) {
       return;
     }
-    const errors = [];
-    let passcode: string;
+    let passcode: string | undefined;
     if (hasPasscode) {
       /* Upgrade passcode version */
       const value = response.getValueForType(ChallengeType.LocalPasscode);
       passcode = value.value as string;
-      await this.changePasscode(passcode);
     }
     if (hasAccount) {
       /* Upgrade account version */
@@ -731,13 +729,15 @@ export class SNApplication {
       const changeResponse = await this.changePassword(
         password,
         password,
-        passcode!
+        passcode
       );
       if (changeResponse?.error) {
-        errors.push(changeResponse.error);
+        return [changeResponse!.error];
+      }
+      if (passcode) {
+        await this.changePasscode(passcode);
       }
     }
-    return errors;
   }
 
   public noAccount() {
