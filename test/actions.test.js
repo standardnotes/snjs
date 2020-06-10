@@ -193,7 +193,27 @@ describe('actions service', () => {
   });
 
   it('should run get action', async function () {
+    const noteItem = await this.itemManager.createItem(
+      ContentType.Note,
+      {
+        title: 'Know what?',
+        text: 'To Live is to Die'
+      }
+    );
 
+    const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+    const getAction = extensionItem.actions[0];
+
+    const passwordRequestHandler = sinon.spy();
+    const confirmAlertService = sinon.spy(this.actionsManager.alertService, 'confirm');
+    const windowConfirm = sinon.stub(window, 'confirm').callsFake((message) => true);
+    const windowAlert = sinon.stub(window, 'alert').callsFake((message) => true);
+    await this.actionsManager.runAction(getAction, noteItem, passwordRequestHandler);
+
+    sinon.assert.calledOnce(confirmAlertService);
+    sinon.assert.calledOnceWithExactly(windowConfirm, "Are you sure you want to replace the current note contents with this action's results?");
+    sinon.assert.called(passwordRequestHandler);
+    sinon.assert.called(windowAlert);
   });
 
   it('should run render action', async function () {
