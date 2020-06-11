@@ -124,7 +124,7 @@ export class SNActionsService extends PureService {
           mutator.supported_types = supported_types;
           mutator.actions = actions;
         }
-      )
+      );
       return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
     }).catch((response) => {
       console.error('Error loading extension', response);
@@ -137,7 +137,7 @@ export class SNActionsService extends PureService {
     item: SNItem,
     passwordRequestHandler: PasswordRequestHandler
   ): Promise<ActionResponse> {
-    action.running = true;
+    // action.running = true;
     let result;
     switch (action.verb) {
       case 'get':
@@ -156,8 +156,8 @@ export class SNActionsService extends PureService {
         break;
     }
 
-    action.lastExecuted = new Date();
-    action.running = false;
+    // action.lastExecuted = new Date();
+    // action.running = false;
     return result as ActionResponse;
   }
 
@@ -176,6 +176,13 @@ export class SNActionsService extends PureService {
             .then((response) => {
               resolve(response);
             });
+        },
+        () => {
+          resolve({
+            error: {
+              message: 'Action canceled by user.' 
+            }
+          });
         }
       );
     });
@@ -190,13 +197,13 @@ export class SNActionsService extends PureService {
         const error = (response && response.error)
           || { message: 'An issue occurred while processing this action. Please try again.' };
         this.alertService!.alert(error.message);
-        action.error = true;
+        // action.error = true;
         return { error: error } as HttpResponse;
       });
     if (response.error) {
       return { response } as ActionResponse;
     }
-    action.error = false;
+    // action.error = false;
     const payload = await this.payloadByDecryptingResponse(
       response,
       passwordRequestHandler
@@ -220,7 +227,7 @@ export class SNActionsService extends PureService {
 
   private async handleRenderAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
     const response = await this.httpService!.getAbsolute(action.url).then(async (response) => {
-      action.error = false;
+      // action.error = false;
       const payload = await this.payloadByDecryptingResponse(
         response,
         passwordRequestHandler
@@ -239,7 +246,7 @@ export class SNActionsService extends PureService {
       const error = (response && response.error)
         || { message: 'An issue occurred while processing this action. Please try again.' };
       this.alertService!.alert(error.message);
-      action.error = true;
+      // action.error = true;
       return { error: error } as HttpResponse;
     });
 
@@ -313,10 +320,10 @@ export class SNActionsService extends PureService {
       items: [itemParams]
     };
     return this.httpService!.postAbsolute(action.url, params).then((response) => {
-      action.error = false;
+      // action.error = false;
       return { response: response } as ActionResponse;
     }).catch((response) => {
-      action.error = true;
+      // action.error = true;
       console.error('Action error response:', response);
       this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'

@@ -84,11 +84,14 @@ describe('actions service', () => {
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension));
     });
 
-    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_1/', [
-      200,
-      { 'Content-Type': 'application/json' },
-      JSON.stringify({})
-    ]);
+    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_1/', (request, params) => {
+      const item = Factory.createNotePayload({
+        title: 'New title.',
+        text: 'New text.'
+      });
+
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ item }));
+    });
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_2/', [
       200,
@@ -192,39 +195,81 @@ describe('actions service', () => {
     expect(extensions[0].actions.map(action => action.label)).to.include('Action #4');
   });
 
-  it('should run get action', async function () {
-    const noteItem = await this.itemManager.createItem(
-      ContentType.Note,
-      {
-        title: 'Know what?',
-        text: 'To Live is to Die'
-      }
-    );
+  describe('get action', async function () {
+    const sandbox = sinon.createSandbox();
+    const confirmMessage = 'Are you sure you want to replace the current note ' +
+                          'contents with this action\'s results?';
 
-    const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
-    const getAction = extensionItem.actions[0];
+    before(async function () {
+      this.noteItem = await this.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Know what?',
+          text: 'To Live is to Die'
+        }
+      );
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.getAction = extensionItem.actions[0];
+    });
 
-    const passwordRequestHandler = sinon.spy();
-    const confirmAlertService = sinon.spy(this.actionsManager.alertService, 'confirm');
-    const windowConfirm = sinon.stub(window, 'confirm').callsFake((message) => true);
-    const windowAlert = sinon.stub(window, 'alert').callsFake((message) => true);
-    await this.actionsManager.runAction(getAction, noteItem, passwordRequestHandler);
+    beforeEach(async function () {
+      this.passwordRequestHandler = sandbox.spy();
+      this.confirmAlertService = sandbox.spy(this.actionsManager.alertService, 'confirm');
+      this.windowConfirm = sandbox.stub(window, 'confirm').callsFake((message) => true);
+      this.syncServiceSync = sandbox.spy(this.actionsManager.syncService, 'sync');
+    });
 
-    sinon.assert.calledOnce(confirmAlertService);
-    sinon.assert.calledOnceWithExactly(windowConfirm, "Are you sure you want to replace the current note contents with this action's results?");
-    sinon.assert.called(passwordRequestHandler);
-    sinon.assert.called(windowAlert);
+    this.afterEach(async function () {
+      sandbox.restore();
+    });
+
+    it('should be canceled if requested', async function () {
+      this.windowConfirm.callsFake((message) => false);
+
+      const actionResponse = await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.calledOnce(this.confirmAlertService);
+      sinon.assert.calledOnceWithExactly(this.windowConfirm, confirmMessage);
+      expect(actionResponse.error.message).to.eq('Action canceled by user.');
+      sinon.assert.notCalled(this.syncServiceSync);
+    });
+
+    it('should show a confirmation message', async function () {
+      await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.calledOnce(this.confirmAlertService);
+      sinon.assert.calledOnceWithExactly(this.windowConfirm, confirmMessage);
+    });
+
+    it('should return response and item keys', async function () {
+      const actionResponse = await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
+
+      expect(Object.keys(actionResponse)).to.have.members(['response', 'item']);
+    });
+
+    it('should perform a sync request', async function () {
+      await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.calledOnce(this.syncServiceSync);
+    });
+
+    it('should not change the item', async function () {
+      await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
+      const refreshedNoteItem = await this.itemManager.findItem(this.noteItem.uuid);
+
+      expect(this.noteItem).to.eq(refreshedNoteItem);
+    });
   });
 
-  it('should run render action', async function () {
+  xit('should run render action', async function () {
 
   });
 
-  it('should run show action', async function () {
+  xit('should run show action', async function () {
 
   });
 
-  it('should run post action', async function () {
-    
+  xit('should run post action', async function () {
+
   });
 });
