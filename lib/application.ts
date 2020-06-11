@@ -729,7 +729,8 @@ export class SNApplication {
       const changeResponse = await this.changePassword(
         password,
         password,
-        passcode
+        passcode,
+        { validatePasswordStrength: false }
       );
       if (changeResponse?.error) {
         return [changeResponse!.error];
@@ -1054,10 +1055,13 @@ export class SNApplication {
   public async changePassword(
     currentPassword: string,
     newPassword: string,
-    passcode?: string
+    passcode?: string,
+    { validatePasswordStrength = true } = {}
   ): Promise<{ error?: Error }> {
-    if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
-      return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
+    if (validatePasswordStrength) {
+      if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
+        return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
+      }
     }
 
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
