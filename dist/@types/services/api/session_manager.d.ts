@@ -6,6 +6,7 @@ import { SNRootKeyParams } from './../../protocol/key_params';
 import { HttpResponse } from './http_service';
 import { PureService } from '../pure_service';
 import { SNAlertService } from '../alert_service';
+export declare const MINIMUM_PASSWORD_LENGTH = 8;
 declare type SessionManagerResponse = {
     response: HttpResponse;
     keyParams: SNRootKeyParams;
@@ -36,7 +37,7 @@ export declare class SNSessionManager extends PureService {
     signOut(): Promise<void>;
     register(email: string, password: string): Promise<SessionManagerResponse>;
     signIn(email: string, password: string, strict?: boolean, mfaKeyPath?: string, mfaCode?: string): Promise<SessionManagerResponse>;
-    changePassword(currentPassword: string, currentKeyParams: SNRootKeyParams, newPassword: string): Promise<SessionManagerResponse>;
+    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<HttpResponse>;
     private handleAuthResponse;
 }
 export {};

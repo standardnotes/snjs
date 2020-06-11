@@ -372,6 +372,12 @@ export declare class SNProtocolService extends PureService implements Encryption
      * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
      * and its .itemsKey value should be equal to the root key masterKey value.
      */
-    createNewDefaultItemsKey(): Promise<void>;
+    createNewDefaultItemsKey(): Promise<SNItem>;
+    changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey): Promise<[Error | null, {
+        previousRootKey: SNRootKey;
+        newRootKey: SNRootKey;
+        newKeyParams: SNRootKeyParams;
+        rollback: () => Promise<void>;
+    }?]>;
 }
 export {};
