@@ -194,6 +194,13 @@ export async function signOutApplicationAndReturnNew(application) {
   return createInitAppWithRandNamespace();
 }
 
+export async function signOutAndBackIn(application, email, password) {
+  await application.signOut();
+  const newApplication = await createInitAppWithRandNamespace();
+  await this.loginToApplication({ application: newApplication, email, password });
+  return newApplication;
+}
+
 export function createItemParams(contentType) {
   const params = {
     uuid: generateUuid(),
