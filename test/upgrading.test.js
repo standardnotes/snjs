@@ -254,10 +254,11 @@ describe('upgrading', () => {
     const notePayload003 = notePayloads[0];
     expect(notePayload003.version).to.equal(ProtocolVersion.V003);
 
-    await this.application.changePassword(
+    const { error } = await this.application.changePassword(
       this.password,
       'foobarfoo'
     );
+    expect(error).to.not.exist;
 
     const latestVersion = this.application.protocolService.getLatestVersion();
     expect(
