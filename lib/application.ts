@@ -1090,6 +1090,7 @@ export class SNApplication {
     const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
+      await this.syncService!.sync({ awaitAll: true });
       return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
     }
 
