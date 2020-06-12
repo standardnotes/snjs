@@ -230,7 +230,7 @@ export declare class SNApplication {
     /**
      * @returns An array of errors, if any.
      */
-    upgradeProtocolVersion(): Promise<any[] | undefined>;
+    upgradeProtocolVersion(): Promise<Error[] | undefined>;
     noAccount(): boolean;
     /**
   
@@ -306,7 +306,11 @@ export declare class SNApplication {
      * already has referene to the passcode, they can pass it in here so that the user
      * is not prompted again.
      */
-    changePassword(currentPassword: string, newPassword: string, passcode?: string): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    changePassword(currentPassword: string, newPassword: string, passcode?: string, { validatePasswordStrength }?: {
+        validatePasswordStrength?: boolean | undefined;
+    }): Promise<{
+        error?: Error;
+    }>;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;

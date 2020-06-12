@@ -295,9 +295,9 @@ export class ItemManager extends PureService {
    * an old item reference and mutate that, the new value will be outdated. In this case, always
    * pass the uuid of the item if you want to mutate the latest version of the item.
    */
-  async changeItem(
+  async changeItem<M extends ItemMutator = ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
@@ -339,9 +339,9 @@ export class ItemManager extends PureService {
   /**
    * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
-  public async changeItems(
+  public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
@@ -354,7 +354,7 @@ export class ItemManager extends PureService {
       }
       const mutator = this.createMutatorForItem(item, mutationType);
       if (mutate) {
-        mutate(mutator);
+        mutate(mutator as M);
       }
       const payload = mutator.getResult();
       payloads.push(payload);
