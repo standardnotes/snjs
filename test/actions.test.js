@@ -12,6 +12,8 @@ describe('actions service', () => {
     localStorage.clear();
 
     this.application = await Factory.createInitAppWithRandNamespace();
+    this.itemManager = this.application.itemManager;
+    this.actionsManager = this.application.actionsManager;
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
 
@@ -84,7 +86,7 @@ describe('actions service', () => {
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension));
     });
 
-    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_1/', (request, params) => {
+    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/, (request, params) => {
       const item = Factory.createNotePayload({
         title: 'New title.',
         text: 'New text.'
@@ -93,16 +95,10 @@ describe('actions service', () => {
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ item }));
     });
 
-    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_2/', [
-      200,
-      { 'Content-Type': 'application/json' },
-      JSON.stringify({})
-    ]);
-
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_3/', [
       200,
-      { 'Content-Type': 'application/json' },
-      JSON.stringify({})
+      { 'Content-Type': 'text/html; charset=utf-8' },
+      '<h2>Action #3</h2>'
     ]);
 
     this.fakeServer.respondWith('POST', 'http://my-extension.sn.org/action_4/', [
@@ -117,15 +113,6 @@ describe('actions service', () => {
       this.actionsExtension
     );
     this.extensionItemUuid = extensionItem.uuid;
-  });
-
-  beforeEach(async function () {
-    this.itemManager = this.application.itemManager;
-    this.actionsManager = this.application.actionsManager;
-  });
-
-  afterEach(function () {
-    
   });
 
   after(function () {
@@ -265,8 +252,31 @@ describe('actions service', () => {
 
   });
 
-  xit('should run show action', async function () {
+  describe('show action', async function () {
+    const sandbox = sinon.createSandbox();
 
+    before(async function () {
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.showAction = extensionItem.actions[2];
+    });
+
+    beforeEach(async function () {
+      // Implementing deviceInterface.openUrl
+      this.actionsManager.deviceInterface.openUrl = (url) => url;
+
+      this.deviceInterfaceOpenUrl = sandbox.spy(this.actionsManager.deviceInterface, 'openUrl');
+    });
+
+    this.afterEach(async function () {
+      sandbox.restore();
+    });
+
+    it('should open the action url', async function () {
+      const actionResponse = await this.actionsManager.runAction(this.showAction);
+
+      sandbox.assert.calledOnceWithExactly(this.deviceInterfaceOpenUrl, this.showAction.url);
+      expect(actionResponse.response).to.be.undefined;
+    });
   });
 
   xit('should run post action', async function () {
