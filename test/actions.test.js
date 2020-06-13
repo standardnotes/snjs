@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('actions service', () => {
   before(async function () {
     // Set timeout for all tests.
-    this.timeout(Factory.TestTimeout);
+    this.timeout(20000);
 
     localStorage.clear();
 
@@ -22,6 +22,9 @@ describe('actions service', () => {
       email: email,
       password: password
     });
+
+    const rootKey = await this.application.protocolService.createRootKey(email, password);
+    this.authParams = rootKey.keyParams.content;
 
     this.fakeServer = sinon.fakeServer.create();
     this.fakeServer.respondImmediately = true;
@@ -87,12 +90,20 @@ describe('actions service', () => {
     });
 
     this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/, (request, params) => {
-      const item = Factory.createNotePayload({
-        title: 'New title.',
-        text: 'New text.'
-      });
+      const item = new PurePayload(
+        {
+          uuid: Factory.generateUuid(),
+          content_type: ContentType.Note,
+          content: {
+            title: 'Testing'
+          }
+        }
+      );
 
-      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ item }));
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({
+        item,
+        auth_params: this.authParams
+      }));
     });
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_3/', [
@@ -206,7 +217,7 @@ describe('actions service', () => {
       this.syncServiceSync = sandbox.spy(this.actionsManager.syncService, 'sync');
     });
 
-    this.afterEach(async function () {
+    afterEach(async function () {
       sandbox.restore();
     });
 
@@ -248,8 +259,42 @@ describe('actions service', () => {
     });
   });
 
-  xit('should run render action', async function () {
+  describe('render action', async function () {
+    const sandbox = sinon.createSandbox();
+    const errorRenderMessageResponse = 'An issue occurred while processing this action. Please try again.';
 
+    before(async function () {
+      this.noteItem = await this.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Hey',
+          text: 'Welcome To Paradise'
+        }
+      );
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.renderAction = extensionItem.actions[1];
+    });
+
+    beforeEach(async function () {
+      this.alertServiceAlert = sandbox.spy(this.actionsManager.alertService, 'alert');
+      this.windowAlert = sandbox.stub(window, 'alert').callsFake((message) => message);
+      this.passwordRequestHandler = sandbox.spy();
+    });
+
+    afterEach(async function () {
+      sandbox.restore();
+    });
+
+    it('should show an alert if the request fails', async function () {
+      this.httpServiceGetAbsolute = sandbox.stub(this.actionsManager.httpService, 'getAbsolute')
+        .callsFake((url) => Promise.reject(new Error('Dummy error.')));
+
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.calledOnceWithExactly(this.httpServiceGetAbsolute, this.renderAction.url);
+      sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorRenderMessageResponse);
+      expect(actionResponse).to.have.property('response');
+    });
   });
 
   describe('show action', async function () {
