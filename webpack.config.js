@@ -28,7 +28,15 @@ module.exports = {
     rules: [
       {
         test: /\.(js|ts)$/,
-        loader: 'babel-loader',
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
       }
     ]
   },
