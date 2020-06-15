@@ -6,6 +6,7 @@
         "strict": true,
         "isolatedModules": true,
         "esModuleInterop": true,
+        "newLine": "lf",
         "types": [
             "node"
         ],

@@ -7,7 +7,7 @@
     "start": "webpack -w --config webpack.dev.js",
     "bundle": "webpack --config webpack.prod.js",
     "docs": "jsdoc -c jsdoc.json",
-    "tsc": "tsc --project lib/tsconfig.json --newLine lf && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
+    "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "test": "node test-server.js"
   },
   "devDependencies": {
