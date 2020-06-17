@@ -198,7 +198,7 @@ export class SNActionsService extends PureService {
           || { message: 'An issue occurred while processing this action. Please try again.' };
         this.alertService!.alert(error.message);
         // action.error = true;
-        return { error: error } as HttpResponse;
+        return { error } as HttpResponse;
       });
     if (response.error) {
       return { response } as ActionResponse;
@@ -220,7 +220,7 @@ export class SNActionsService extends PureService {
     );
     this.syncService!.sync();
     return {
-      response: response,
+      response,
       item: response.item
     } as ActionResponse;
   }
@@ -233,13 +233,13 @@ export class SNActionsService extends PureService {
         passwordRequestHandler
       );
       if (payload) {
-        const item = this.itemManager!.createItem(
+        const item = await this.itemManager!.createItem(
           payload.content_type!,
           payload.contentObject
         );
         return {
-          response: response,
-          item: item
+          response,
+          item
         } as ActionResponse;
       }
     }).catch((response) => {
@@ -247,10 +247,10 @@ export class SNActionsService extends PureService {
         || { message: 'An issue occurred while processing this action. Please try again.' };
       this.alertService!.alert(error.message);
       // action.error = true;
-      return { error: error } as HttpResponse;
+      return { error } as HttpResponse;
     });
 
-    return { response } as ActionResponse;
+    return response as ActionResponse;
   }
 
 
@@ -273,10 +273,10 @@ export class SNActionsService extends PureService {
        * Instruct the user to email us to get this remedied. 
        */
       this.alertService!.alert(
-        `We were unable to decrypt this revision using your current keys, 
-        and this revision is missing metadata that would allow us to try different 
-        keys to decrypt it. This can likely be fixed with some manual intervention. 
-        Please email hello@standardnotes.org for assistance.`
+        'We were unable to decrypt this revision using your current keys, ' +
+        'and this revision is missing metadata that would allow us to try different ' +
+        'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
+        'Please email hello@standardnotes.org for assistance.'
       );
       return undefined;
     }
@@ -305,6 +305,9 @@ export class SNActionsService extends PureService {
     }
     /** Prompt for other passwords */
     const password = await passwordRequestHandler();
+    if (triedPasswords.includes(password)) {
+      return;
+    }
     this.previousPasswords.push(password);
     return this.payloadByDecryptingResponse(
       response,
@@ -321,14 +324,14 @@ export class SNActionsService extends PureService {
     };
     return this.httpService!.postAbsolute(action.url, params).then((response) => {
       // action.error = false;
-      return { response: response } as ActionResponse;
+      return { response } as ActionResponse;
     }).catch((response) => {
       // action.error = true;
       console.error('Action error response:', response);
       this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'
       );
-      return { response: response } as ActionResponse;
+      return { response } as ActionResponse;
     });
   }
 

@@ -262,6 +262,10 @@ describe('actions service', () => {
   describe('render action', async function () {
     const sandbox = sinon.createSandbox();
     const errorRenderMessageResponse = 'An issue occurred while processing this action. Please try again.';
+    const errorDecryptingRevisionMessage = 'We were unable to decrypt this revision using your current keys, ' +
+                                          'and this revision is missing metadata that would allow us to try different ' +
+                                          'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
+                                          'Please email hello@standardnotes.org for assistance.';
 
     before(async function () {
       this.noteItem = await this.itemManager.createItem(
@@ -278,7 +282,7 @@ describe('actions service', () => {
     beforeEach(async function () {
       this.alertServiceAlert = sandbox.spy(this.actionsManager.alertService, 'alert');
       this.windowAlert = sandbox.stub(window, 'alert').callsFake((message) => message);
-      this.passwordRequestHandler = sandbox.spy();
+      this.passwordRequestHandler = () => 'previous-password';
     });
 
     afterEach(async function () {
@@ -293,7 +297,49 @@ describe('actions service', () => {
 
       sinon.assert.calledOnceWithExactly(this.httpServiceGetAbsolute, this.renderAction.url);
       sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorRenderMessageResponse);
+      expect(actionResponse.error.message).to.eq(errorRenderMessageResponse);
+    });
+
+    it('should return a response if payload is valid', async function () {
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+
       expect(actionResponse).to.have.property('response');
+      expect(actionResponse.response.item.content.title).to.eq('Testing');
+      expect(actionResponse).to.have.property('item');
+      expect(actionResponse.item.payload.content).to.eql(actionResponse.response.item.content);
+    });
+
+    it('should return undefined if payload is invalid', async function () {
+      sandbox.stub(this.actionsManager, 'payloadByDecryptingResponse').returns(null);
+
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+      expect(actionResponse).to.be.undefined;
+    });
+
+    it('should return undefined and alert if could not decrypt', async function () {
+      const itemPayload = new PurePayload({
+        uuid: Factory.generateUuid()
+      });
+
+      sandbox.stub(this.actionsManager.httpService, 'getAbsolute')
+        .resolves({ item: itemPayload });
+      sandbox.stub(this.actionsManager.protocolService, 'payloadByDecryptingPayload')
+        .returns({ errorDecrypting: true });
+
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorDecryptingRevisionMessage);
+      expect(actionResponse).to.be.undefined;
+    });
+
+    it.skip('should return undefined when decrypting a payload and all passwords have already been tried', async function () {
+      sandbox.stub(this.actionsManager.protocolService, 'payloadByDecryptingPayload')
+        .returns({ errorDecrypting: true });
+
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+
+      sinon.assert.called(this.passwordRequestHandler);
+      expect(actionResponse).to.be.undefined;
     });
   });
 
@@ -306,9 +352,7 @@ describe('actions service', () => {
     });
 
     beforeEach(async function () {
-      // Implementing deviceInterface.openUrl
       this.actionsManager.deviceInterface.openUrl = (url) => url;
-
       this.deviceInterfaceOpenUrl = sandbox.spy(this.actionsManager.deviceInterface, 'openUrl');
     });
 
