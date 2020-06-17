@@ -17,7 +17,7 @@ export { SNPrivileges, ProtectedAction, PrivilegeCredential } from './models/app
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
-export { ChallengeService, ChallengeOrchestrator } from './services/challenge_service';
+export { ChallengeService } from './services/challenge/challenge_service';
 export { PureService } from './services/pure_service';
 export { ApplicationService } from './services/application_service';
 export { SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys } from './services/storage_service';

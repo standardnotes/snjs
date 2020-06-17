@@ -17,7 +17,7 @@ export {
   SyncModes,
   SyncQueueStrategy
 } from '@Services/sync/sync_service';
-export { ChallengeService } from '@Services/challenge_service';
+export { ChallengeService } from '@Lib/services/challenge/challenge_service';
 export {
   SNStorageService,
   StorageEncryptionPolicies,

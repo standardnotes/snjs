@@ -7,7 +7,6 @@ import { ApplicationStage } from '@Lib/stages';
 import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
 import { FillItemContent } from '@Models/functions';
-import { OrchestratorFill } from './../services/challenge_service';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject, SNStorageService } from './../services/storage_service';
 import { Migration } from '@Lib/migrations/migration';
@@ -121,8 +120,8 @@ export class Migration20200115 extends Migration {
         storageValueStore
       );
     } else {
-      /** 
-       * No encrypted storage, take account keys out of raw storage 
+      /**
+       * No encrypted storage, take account keys out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const version = !isNullOrUndefined(ak)
@@ -166,34 +165,32 @@ export class Migration20200115 extends Migration {
    * Helper
    * Web/desktop only
    */
-  async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload: PurePayload) {
+  private async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload: PurePayload) {
     const rawPasscodeParams = await this.services.deviceInterface
       .getJsonParsedStorageValue(
         LegacyKeys.WebPasscodeParamsKey
       );
-    const passcodeParams = this.services.protocolService
-      .createKeyParams(rawPasscodeParams);
+    const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
     /** Decrypt it with the passcode */
     let decryptedStoragePayload: PurePayload | undefined;
     let errorDecrypting = true;
     let passcodeKey: SNRootKey;
     const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
     while (errorDecrypting) {
-      const orchestratorFill: OrchestratorFill = {};
-      const response = await this.requestChallengeResponse(challenge, false, orchestratorFill);
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
+      const [value] = await this.services.challengeService
+        .promptForChallengeResponseWithCustomValidation!(challenge);
       const passcode = value.value as string;
       passcodeKey = await this.services.protocolService.computeRootKey(
         passcode,
         passcodeParams
       );
-      decryptedStoragePayload = await this.services.protocolService
-        .payloadByDecryptingPayload(
-          encryptedPayload,
-          passcodeKey
-        );
+      decryptedStoragePayload = await this.services.protocolService.payloadByDecryptingPayload(
+        encryptedPayload,
+        passcodeKey
+      );
       errorDecrypting = decryptedStoragePayload.errorDecrypting!;
-      orchestratorFill.orchestrator!.setValidationStatus(
+      this.services.challengeService.setValidationStatusForChallenge(
+        challenge,
         value,
         !decryptedStoragePayload.errorDecrypting
       );
@@ -286,7 +283,7 @@ export class Migration20200115 extends Migration {
    * As part of the migration, we’ll need to request the raw passcode from user,
    * compare it against the keychain offline.pw value, and if correct,
    * migrate storage to new structure, and encrypt with passcode key.
-   * 
+   *
    * If account only, take the value in the keychain, and rename the values
    * (i.e mk > masterKey).
    * @access private
@@ -312,23 +309,22 @@ export class Migration20200115 extends Migration {
     };
     const keychainValue = await this.services.deviceInterface.getKeychainValue();
     if (rawPasscodeParams) {
-      const passcodeParams = this.services.protocolService
-        .createKeyParams(rawPasscodeParams);
+      const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
         /** Validate current passcode by comparing against keychain offline.pw value */
         const pwHash = keychainValue.offline.pw;
         let passcodeKey: SNRootKey;
         const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-        const orchestratorFill: OrchestratorFill = {};
         while (!passcodeKey! || passcodeKey!.serverPassword !== pwHash) {
-          const response = await this.requestChallengeResponse(challenge, false, orchestratorFill);
-          const value = response.getValueForType(ChallengeType.LocalPasscode);
+          const [value] = await this.services.challengeService
+            .promptForChallengeResponseWithCustomValidation!(challenge);
           const passcode = value.value as string;
           passcodeKey = await this.services.protocolService.computeRootKey(
             passcode,
             passcodeParams
           );
-          orchestratorFill.orchestrator!.setValidationStatus(
+          this.services.challengeService.setValidationStatusForChallenge(
+            challenge,
             value,
             passcodeKey.serverPassword === pwHash
           );
@@ -338,9 +334,9 @@ export class Migration20200115 extends Migration {
       const timing = keychainValue.offline.timing;
       rawStructure.unwrapped![StorageKey.MobilePasscodeTiming] = timing;
       if (wrappedAccountKey) {
-        /** 
+        /**
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
-         * content.accountKeys. We want to unembed these values to main content, rename 
+         * content.accountKeys. We want to unembed these values to main content, rename
          * with proper property names, wrap again, and store in new rawStructure.
          */
         const passcodeKey = await getPasscodeKey();

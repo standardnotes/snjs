@@ -24,11 +24,7 @@ export declare class Migration20200115 extends Migration {
      * Helper
      * Web/desktop only
      */
-    webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload: PurePayload): Promise<{
-        decryptedStoragePayload: PurePayload | undefined;
-        key: SNRootKey;
-        keyParams: import("../protocol/key_params").SNRootKeyParams;
-    }>;
+    private webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage;
     /**
      * Helper
      * Web/desktop only

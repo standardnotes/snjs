@@ -121,9 +121,10 @@ describe('2020-01-15 mobile migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
+    const receiveChallenge = async (challenge) => {
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      await Factory.sleep(0);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
       receiveChallenge
@@ -237,16 +238,17 @@ describe('2020-01-15 mobile migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      application.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          application.submitValuesForChallenge(challenge, values);
         },
-      );
+      });
+      await Factory.sleep(0);
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
@@ -355,16 +357,16 @@ describe('2020-01-15 mobile migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      application.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          application.submitValuesForChallenge(challenge, values);
         },
-      );
+      });
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
@@ -455,16 +457,16 @@ describe('2020-01-15 mobile migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      application.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          application.submitValuesForChallenge(challenge, values);
         },
-      );
+      });
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
