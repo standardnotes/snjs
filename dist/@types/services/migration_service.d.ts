@@ -1,7 +1,6 @@
 import { ApplicationEvent } from './../events';
 import { ApplicationStage } from '../stages';
 import { MigrationServices } from './../migrations/types';
-import { MigrationChallengeHandler } from './../migrations/migration';
 import { PureService } from './pure_service';
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -12,11 +11,10 @@ import { PureService } from './pure_service';
  * and inherit from the base Migration class.
  */
 export declare class SNMigrationService extends PureService {
-    private challengeResponder?;
-    private activeMigrations?;
     private services?;
+    private activeMigrations?;
     private handledFullSyncStage;
-    constructor(services: MigrationServices, challengeResponder: MigrationChallengeHandler);
+    constructor(services?: MigrationServices | undefined);
     deinit(): void;
     initialize(): Promise<void>;
     /**

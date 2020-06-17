@@ -3,7 +3,6 @@ import { ApplicationEvent } from './../events';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
-import { MigrationChallengeHandler } from './../migrations/migration';
 import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 import { PureService } from '@Services/pure_service';
@@ -14,30 +13,22 @@ import { isNullOrUndefined, lastElement } from '@Lib/utils';
  * The migration service orchestrates the execution of multi-stage migrations.
  * Migrations are registered during initial application launch, and listen for application
  * life-cycle events, and act accordingly. For example, a single migration may perform
- * a unique set of steps when the application first launches, and also other steps after the 
+ * a unique set of steps when the application first launches, and also other steps after the
  * application is unlocked, or after the first sync completes. Migrations live under /migrations
  * and inherit from the base Migration class.
  */
 export class SNMigrationService extends PureService {
-
-  private challengeResponder?: MigrationChallengeHandler
   private activeMigrations?: Migration[]
-  private services?: MigrationServices
-  
   private handledFullSyncStage = false
 
   constructor(
-    services: MigrationServices,
-    challengeResponder: MigrationChallengeHandler
+    private services?: MigrationServices
   ) {
     super();
-    this.services = services
-    this.challengeResponder = challengeResponder;
   }
 
   public deinit() {
     this.services = undefined;
-    this.challengeResponder = undefined;
     if (this.activeMigrations) {
       this.activeMigrations.length = 0;
     }
@@ -108,10 +99,7 @@ export class SNMigrationService extends PureService {
       const migrationTimestamp = migrationClass.timestamp();
       if (migrationTimestamp > lastMigrationTimestamp) {
         // eslint-disable-next-line new-cap
-        activeMigrations.push(new migrationClass(
-          this.services,
-          this.challengeResponder
-        ));
+        activeMigrations.push(new migrationClass(this.services));
       }
     }
     return activeMigrations;

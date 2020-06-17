@@ -13,5 +13,5 @@ export { SNPrivilegesService } from './privileges_service';
 export { SyncEvent as SyncEvent } from './sync/events';
 export { ItemManager } from './item_manager';
 export { SNSyncService, SyncModes, SyncQueueStrategy } from './sync/sync_service';
-export { ChallengeService } from './challenge_service';
+export { ChallengeService } from './challenge/challenge_service';
 export { SNStorageService, StorageEncryptionPolicies, StoragePersistencePolicies } from './storage_service';

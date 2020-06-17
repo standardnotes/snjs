@@ -38,17 +38,18 @@ describe('device authentication', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      tmpApplication.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
-      );
+      });
+      await Factory.sleep(0);
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
@@ -85,17 +86,18 @@ describe('device authentication', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      tmpApplication.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
-      );
+      });
+      await Factory.sleep(0);
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
@@ -104,7 +106,7 @@ describe('device authentication', () => {
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
     expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     tmpApplication.deinit();
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('handles application launch with passcode and account', async function () {
     const namespace = Factory.randomString();
@@ -140,17 +142,18 @@ describe('device authentication', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      tmpApplication.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
-      );
+      });
+      await Factory.sleep(0);
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({
       receiveChallenge: receiveChallenge,

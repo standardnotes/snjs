@@ -14,8 +14,8 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
-import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
+import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason, ChallengeValue } from './challenges';
+import { ValueCallback } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
@@ -57,10 +57,7 @@ import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 
 type LaunchCallback = {
-  receiveChallenge: (
-    challenge: Challenge,
-    orchestor: ChallengeOrchestrator
-  ) => void
+  receiveChallenge: (challenge: Challenge) => void
 }
 type ApplicationEventCallback = (
   event: ApplicationEvent,
@@ -187,7 +184,7 @@ export class SNApplication {
   }
 
   private setLaunchCallback(callback: LaunchCallback) {
-    this.challengeService!.challengeHandler = callback.receiveChallenge;
+    this.challengeService!.sendChallenge = callback.receiveChallenge;
   }
 
   /**
@@ -202,6 +199,9 @@ export class SNApplication {
     const launchChallenge = await this.challengeService!.getLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService!.promptForChallengeResponse(launchChallenge);
+      if (!response) {
+        throw Error('Launch challenge was cancelled.');
+      }
       await this.handleLaunchChallengeResponse(response);
     }
 
@@ -260,24 +260,6 @@ export class SNApplication {
       this.syncService!.log('Syncing from autosync');
       this.sync();
     }, DEFAULT_AUTO_SYNC_INTERVAL);
-  }
-
-  /**
-   * The migrations service is initialized with this function, so that it can retrieve
-   * raw challenge values as necessary.
-   */
-  private getMigrationChallengeResponder() {
-    return async (
-      challenge: Challenge,
-      validate: boolean,
-      orchestratorFill: OrchestratorFill
-    ) => {
-      return this.challengeService!.promptForChallengeResponse(
-        challenge,
-        validate,
-        orchestratorFill
-      );
-    };
   }
 
   private async handleStage(stage: ApplicationStage) {
@@ -884,6 +866,31 @@ export class SNApplication {
     }
   }
 
+  public setChallengeCallbacks({
+    challenge,
+    onValidValue,
+    onInvalidValue,
+    onComplete,
+    onCancel
+  }: {
+    challenge: Challenge;
+    onValidValue?: ValueCallback;
+    onInvalidValue?: ValueCallback;
+    onComplete?: () => void;
+    onCancel?: () => void;
+  }) {
+    return this.challengeService!.setChallengeCallbacks(
+      challenge, onValidValue, onInvalidValue, onComplete, onCancel);
+  }
+
+  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
+    return this.challengeService!.submitValuesForChallenge(challenge, values);
+  }
+
+  public cancelChallenge(challenge: Challenge) {
+    this.challengeService!.cancelChallenge(challenge);
+  }
+
   /**
    * Destroys the application instance.
    */
@@ -1209,13 +1216,13 @@ export class SNApplication {
     };
     this.storageService!.encryptionDelegate = encryptionDelegate;
 
+    this.createChallengeService();
     this.createMigrationService();
     this.createAlertManager();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
     this.createSyncManager();
-    this.createChallengeService();
     this.createSingletonManager();
     this.createComponentManager();
     this.createPrivilegesService();
@@ -1250,11 +1257,11 @@ export class SNApplication {
         protocolService: this.protocolService!,
         deviceInterface: this.deviceInterface!,
         storageService: this.storageService!,
+        challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
         namespace: this.namespace
-      } as MigrationServices,
-      this.getMigrationChallengeResponder()
+      }
     );
     this.services.push(this.migrationService!);
   }

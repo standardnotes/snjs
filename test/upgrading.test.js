@@ -18,17 +18,17 @@ describe('upgrading', () => {
       }
       return values;
     };
-    this.receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    this.receiveChallenge = async (challenge) => {
+      this.application.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          this.application.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
-      );
+      });
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      this.application.submitValuesForChallenge(challenge, initialValues);
     };
     localStorage.clear();
   });

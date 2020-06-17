@@ -10,8 +10,8 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
-import { Challenge } from './challenges';
-import { ChallengeOrchestrator } from './services/challenge_service';
+import { Challenge, ChallengeValue } from './challenges';
+import { ValueCallback } from './services/challenge/challenge_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
@@ -21,7 +21,7 @@ import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
-    receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
+    receiveChallenge: (challenge: Challenge) => void;
 };
 declare type ApplicationEventCallback = (event: ApplicationEvent, data?: any) => Promise<void>;
 declare type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
@@ -94,11 +94,6 @@ export declare class SNApplication {
     launch(awaitDatabaseLoad?: boolean): Promise<void>;
     private handleLaunchChallengeResponse;
     private beginAutoSyncTimer;
-    /**
-     * The migrations service is initialized with this function, so that it can retrieve
-     * raw challenge values as necessary.
-     */
-    private getMigrationChallengeResponder;
     private handleStage;
     /**
      * @param singleEvent Whether to only listen for a particular event.
@@ -275,6 +270,15 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
+    setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
+        challenge: Challenge;
+        onValidValue?: ValueCallback;
+        onInvalidValue?: ValueCallback;
+        onComplete?: () => void;
+        onCancel?: () => void;
+    }): void;
+    submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
+    cancelChallenge(challenge: Challenge): void;
     /**
      * Destroys the application instance.
      */
