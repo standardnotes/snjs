@@ -8,6 +8,7 @@ import { deepFreeze, Copy, sortedCopy, omitInPlace } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
+import { PayloadSource } from '@Lib/protocol/payloads/sources';
 
 export enum MutationType {
   /**
@@ -269,7 +270,14 @@ export class SNItem {
     if (this.isSingleton) {
       return ConflictStrategy.KeepLeft;
     }
-    if (this.deleted || item.deleted) {
+    if (this.deleted) {
+      return ConflictStrategy.KeepRight;
+    }
+    if (item.deleted) {
+      if (this.payload.source === PayloadSource.FileImport) {
+        /** Imported items take precedence */
+        return ConflictStrategy.KeepLeft;
+      }
       return ConflictStrategy.KeepRight;
     }
     const contentDiffers = ItemContentsDiffer(this, item);
