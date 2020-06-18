@@ -165,7 +165,7 @@ describe('importing', () => {
 
     expect(newNote.uuid).to.not.equal(note.uuid);
     expect(newTag.uuid).to.not.equal(tag.uuid);
-    
+
     const refreshedTag = this.application.itemManager.findItem(tag.uuid);
     expect(refreshedTag.content.references.length).to.equal(2);
     expect(refreshedTag.noteCount).to.equal(2);
@@ -232,7 +232,7 @@ describe('importing', () => {
 
       /** We expect now that the total item count is 3, not 4. */
       expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-      
+
       const refreshedTag = this.application.itemManager.findItem(tag.uuid);
       /** References from both items have merged. */
       expect(refreshedTag.content.references.length).to.equal(2);
