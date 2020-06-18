@@ -14,16 +14,16 @@ describe('actions service', () => {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.itemManager = this.application.itemManager;
     this.actionsManager = this.application.actionsManager;
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
 
     await Factory.registerUserToApplication({
       application: this.application,
-      email: email,
-      password: password
+      email: this.email,
+      password: this.password
     });
 
-    const rootKey = await this.application.protocolService.createRootKey(email, password);
+    const rootKey = await this.application.protocolService.createRootKey(this.email, this.password);
     this.authParams = rootKey.keyParams.content;
 
     this.fakeServer = sinon.fakeServer.create();
@@ -66,6 +66,15 @@ describe('actions service', () => {
             'Note'
           ]
         },
+        {
+          label: 'Action #5',
+          url: 'http://my-extension.sn.org/action_5/',
+          verb: 'render',
+          context: 'Note',
+          content_types: [
+            'Note'
+          ]
+        },
       ]
     };
 
@@ -89,19 +98,19 @@ describe('actions service', () => {
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension));
     });
 
-    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/, (request, params) => {
-      const item = new PurePayload(
-        {
-          uuid: Factory.generateUuid(),
-          content_type: ContentType.Note,
-          content: {
-            title: 'Testing'
-          }
-        }
-      );
+    const payload = new PurePayload({
+      uuid: Factory.generateUuid(),
+      content_type: ContentType.Note,
+      content: {
+        title: 'Testing'
+      }
+    });
 
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(payload, EncryptionIntent.Sync);
+
+    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/, (request, params) => {
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({
-        item,
+        item: encryptedPayload,
         auth_params: this.authParams
       }));
     });
@@ -112,11 +121,20 @@ describe('actions service', () => {
       '<h2>Action #3</h2>'
     ]);
 
-    this.fakeServer.respondWith('POST', 'http://my-extension.sn.org/action_4/', [
-      200,
-      { 'Content-Type': 'application/json' },
-      JSON.stringify({})
-    ]);
+    this.fakeServer.respondWith('POST', /http:\/\/my-extension.sn.org\/action_4\/(.*)/, (request, params) => {
+      const requestBody = JSON.parse(request.requestBody);
+
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(requestBody));
+    });
+
+    this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_5/', (request, params) => {
+      const encryptedPayloadClone = JSON.parse(JSON.stringify(encryptedPayload));
+
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({
+        item: encryptedPayloadClone,
+        auth_params: this.authParams
+      }));
+    });
 
     // Extension item
     const extensionItem = await this.application.itemManager.createItem(
@@ -282,7 +300,8 @@ describe('actions service', () => {
     beforeEach(async function () {
       this.alertServiceAlert = sandbox.spy(this.actionsManager.alertService, 'alert');
       this.windowAlert = sandbox.stub(window, 'alert').callsFake((message) => message);
-      this.passwordRequestHandler = () => 'previous-password';
+      this.newPassword = await Factory.generateUuid();
+      this.passwordRequestHandler = sandbox.stub().callsFake(() => this.newPassword);
     });
 
     afterEach(async function () {
@@ -304,9 +323,8 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
       expect(actionResponse).to.have.property('response');
-      expect(actionResponse.response.item.content.title).to.eq('Testing');
       expect(actionResponse).to.have.property('item');
-      expect(actionResponse.item.payload.content).to.eql(actionResponse.response.item.content);
+      expect(actionResponse.item.payload.content.title).to.eq('Testing');
     });
 
     it('should return undefined if payload is invalid', async function () {
@@ -332,15 +350,16 @@ describe('actions service', () => {
       expect(actionResponse).to.be.undefined;
     });
 
-    it.skip('should return undefined when decrypting a payload and all passwords have already been tried', async function () {
-      sandbox.stub(this.actionsManager.protocolService, 'payloadByDecryptingPayload')
-        .returns({ errorDecrypting: true });
+    xit('should return undefined when decrypting a payload and all passwords have already been tried', async function () {
+      // Using a custom action that returns a payload with an invalid items_key_id
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.renderAction = extensionItem.actions[3];
 
       const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
       sinon.assert.called(this.passwordRequestHandler);
       expect(actionResponse).to.be.undefined;
-    });
+    }).timeout(20000);
   });
 
   describe('show action', async function () {
@@ -368,7 +387,36 @@ describe('actions service', () => {
     });
   });
 
-  xit('should run post action', async function () {
+  describe('post action', async function () {
+    const sandbox = sinon.createSandbox();
 
+    before(async function () {
+      this.noteItem = await this.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Excuse Me',
+          text: 'Time To Be King 8)'
+        }
+      );
+      this.extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.extensionItem = await this.actionsManager.loadExtensionInContextOfItem(this.extensionItem, this.noteItem);
+      
+      this.postAction = this.extensionItem.actions[this.extensionItem.actions.length - 1];
+    });
+
+    beforeEach(async function () {
+      
+    });
+
+    this.afterEach(async function () {
+      sandbox.restore();
+    });
+
+    it('should post to the action url', async function () {
+      const actionResponse = await this.actionsManager.runAction(this.postAction, this.noteItem);
+
+      expect(actionResponse.response).to.be.ok;
+      expect(actionResponse.response.items[0].uuid).to.eq(this.noteItem.uuid);
+    });
   });
 });

@@ -305,9 +305,6 @@ export class SNActionsService extends PureService {
     }
     /** Prompt for other passwords */
     const password = await passwordRequestHandler();
-    if (triedPasswords.includes(password)) {
-      return;
-    }
     this.previousPasswords.push(password);
     return this.payloadByDecryptingResponse(
       response,
