@@ -10,7 +10,7 @@ export declare class ItemHistoryEntry {
     protected hasPreviousEntry: boolean;
     constructor(payload: PurePayload);
     setPreviousEntry(previousEntry: ItemHistoryEntry): void;
-    operationVector(): 1 | 0 | -1;
+    operationVector(): 1 | -1 | 0;
     deltaSize(): number;
     isSameAsEntry(entry: ItemHistoryEntry): boolean;
 }
