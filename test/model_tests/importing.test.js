@@ -10,6 +10,8 @@ describe('importing', () => {
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
   });
 
   afterEach(async function () {
@@ -236,5 +238,34 @@ describe('importing', () => {
       const refreshedTag = this.application.itemManager.findItem(tag.uuid);
       /** References from both items have merged. */
       expect(refreshedTag.content.references.length).to.equal(2);
+    });
+
+    it('should keep imported items that were previously deleted', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+      const [note, tag] = await Promise.all([
+        Factory.createMappedNote(this.application),
+        Factory.createMappedTag(this.application),
+      ]);
+      await this.application.sync({ awaitAll: true });
+
+      await this.application.deleteItem(note);
+      expect(this.application.findItem(note.uuid)).to.not.exist;
+
+      await this.application.deleteItem(tag);
+      expect(this.application.findItem(tag.uuid)).to.not.exist;
+
+      await this.application.importData(
+        {
+          items: [note, tag]
+        },
+        undefined,
+        true,
+      );
+      expect(this.application.findItem(tag.uuid).deleted).to.be.false;
+      expect(this.application.findItem(note.uuid).deleted).to.be.false;
     });
 });
