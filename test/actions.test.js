@@ -5,6 +5,12 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('actions service', () => {
+  const errorProcessingActionMessage = 'An issue occurred while processing this action. Please try again.';
+  const errorDecryptingRevisionMessage = 'We were unable to decrypt this revision using your current keys, ' +
+                                        'and this revision is missing metadata that would allow us to try different ' +
+                                        'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
+                                        'Please email hello@standardnotes.org for assistance.';
+
   before(async function () {
     // Set timeout for all tests.
     this.timeout(20000);
@@ -93,6 +99,17 @@ describe('actions service', () => {
           ],
           access_type: 'decrypted'
         });
+
+        extension.actions.push({
+          label: 'Action #6',
+          url: `http://my-extension.sn.org/action_6/?item_uuid=${urlParams.get('item_uuid')}`,
+          verb: 'post',
+          context: 'Item',
+          content_types: [
+            'Note'
+          ],
+          access_type: 'encrypted'
+        });
       }
 
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension));
@@ -121,14 +138,25 @@ describe('actions service', () => {
       '<h2>Action #3</h2>'
     ]);
 
-    this.fakeServer.respondWith('POST', /http:\/\/my-extension.sn.org\/action_4\/(.*)/, (request, params) => {
+    this.fakeServer.respondWith('POST', /http:\/\/my-extension.sn.org\/action_[4,6]\/(.*)/, (request, params) => {
       const requestBody = JSON.parse(request.requestBody);
 
-      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(requestBody));
+      const response = {
+        uuid: requestBody.items[0].uuid,
+        result: 'Action POSTed successfully.'
+      };
+
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(response));
     });
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_5/', (request, params) => {
       const encryptedPayloadClone = JSON.parse(JSON.stringify(encryptedPayload));
+
+      encryptedPayloadClone.items_key_id = undefined;
+      encryptedPayloadClone.content = '003:somenonsense';
+      encryptedPayloadClone.enc_item_key = '003:anothernonsense';
+      encryptedPayloadClone.version = '003';
+      encryptedPayloadClone.uuid = 'fake-uuid';
 
       request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({
         item: encryptedPayloadClone,
@@ -225,7 +253,7 @@ describe('actions service', () => {
         }
       );
       const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
-      this.getAction = extensionItem.actions[0];
+      this.getAction = extensionItem.actions.filter(action => action.verb === 'get')[0];
     });
 
     beforeEach(async function () {
@@ -279,11 +307,6 @@ describe('actions service', () => {
 
   describe('render action', async function () {
     const sandbox = sinon.createSandbox();
-    const errorRenderMessageResponse = 'An issue occurred while processing this action. Please try again.';
-    const errorDecryptingRevisionMessage = 'We were unable to decrypt this revision using your current keys, ' +
-                                          'and this revision is missing metadata that would allow us to try different ' +
-                                          'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-                                          'Please email hello@standardnotes.org for assistance.';
 
     before(async function () {
       this.noteItem = await this.itemManager.createItem(
@@ -294,7 +317,7 @@ describe('actions service', () => {
         }
       );
       const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
-      this.renderAction = extensionItem.actions[1];
+      this.renderAction = extensionItem.actions.filter(action => action.verb === 'render')[0];
     });
 
     beforeEach(async function () {
@@ -315,8 +338,8 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
       sinon.assert.calledOnceWithExactly(this.httpServiceGetAbsolute, this.renderAction.url);
-      sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorRenderMessageResponse);
-      expect(actionResponse.error.message).to.eq(errorRenderMessageResponse);
+      sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorProcessingActionMessage);
+      expect(actionResponse.error.message).to.eq(errorProcessingActionMessage);
     });
 
     it('should return a response if payload is valid', async function () {
@@ -334,7 +357,7 @@ describe('actions service', () => {
       expect(actionResponse).to.be.undefined;
     });
 
-    it('should return undefined and alert if could not decrypt', async function () {
+    it('should return undefined and alert if payload could not be decrypted and auth_params are missing', async function () {
       const itemPayload = new PurePayload({
         uuid: Factory.generateUuid()
       });
@@ -350,15 +373,14 @@ describe('actions service', () => {
       expect(actionResponse).to.be.undefined;
     });
 
-    xit('should return undefined when decrypting a payload and all passwords have already been tried', async function () {
+    it('should try previous passwords and prompt for other passwords', async function () {
       // Using a custom action that returns a payload with an invalid items_key_id
       const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
-      this.renderAction = extensionItem.actions[3];
+      this.renderAction = extensionItem.actions.filter(action => action.verb === 'render')[1];
 
-      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+      await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
       sinon.assert.called(this.passwordRequestHandler);
-      expect(actionResponse).to.be.undefined;
     }).timeout(20000);
   });
 
@@ -380,10 +402,10 @@ describe('actions service', () => {
     });
 
     it('should open the action url', async function () {
-      const actionResponse = await this.actionsManager.runAction(this.showAction);
+      const { response } = await this.actionsManager.runAction(this.showAction);
 
       sandbox.assert.calledOnceWithExactly(this.deviceInterfaceOpenUrl, this.showAction.url);
-      expect(actionResponse.response).to.be.undefined;
+      expect(response).to.be.undefined;
     });
   });
 
@@ -401,22 +423,71 @@ describe('actions service', () => {
       this.extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
       this.extensionItem = await this.actionsManager.loadExtensionInContextOfItem(this.extensionItem, this.noteItem);
       
-      this.postAction = this.extensionItem.actions[this.extensionItem.actions.length - 1];
+      this.decryptedPostAction = this.extensionItem.actions
+        .filter(action => action.access_type === 'decrypted' && action.verb === 'post')[0];
+
+      this.encryptedPostAction = this.extensionItem.actions
+        .filter(action => action.access_type === 'encrypted' && action.verb === 'post')[0];
     });
 
     beforeEach(async function () {
-      
+      this.alertServiceAlert = sandbox.spy(this.actionsManager.alertService, 'alert');
+      this.windowAlert = sandbox.stub(window, 'alert').callsFake((message) => message);
+      this.httpServicePostAbsolute = sandbox.stub(this.actionsManager.httpService, 'postAbsolute');
+      this.httpServicePostAbsolute.callsFake((url, params) => Promise.resolve(params));
     });
 
-    this.afterEach(async function () {
+    afterEach(async function () {
       sandbox.restore();
     });
 
-    it('should post to the action url', async function () {
-      const actionResponse = await this.actionsManager.runAction(this.postAction, this.noteItem);
+    it('should include generic encrypted payload within request body', async function () {
+      const { response } = await this.actionsManager.runAction(this.encryptedPostAction, this.noteItem);
 
-      expect(actionResponse.response).to.be.ok;
-      expect(actionResponse.response.items[0].uuid).to.eq(this.noteItem.uuid);
+      expect(response.items[0].enc_item_key).to.satisfy((string) => {
+        return string.startsWith(this.application.protocolService.getLatestVersion());
+      });
+      expect(response.items[0].uuid).to.eq(this.noteItem.uuid);
+      expect(response.items[0].auth_hash).to.not.be.ok;
+      expect(response.items[0].content_type).to.not.be.null;
+      expect(response.items[0].created_at).to.not.be.null;
+      expect(response.items[0].content).to.satisfy((string) => {
+        return string.startsWith(this.application.protocolService.getLatestVersion());
+      });
+    });
+
+    it('should include generic decrypted payload within request body', async function () {
+      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+
+      expect(response.items[0].uuid).to.eq(this.noteItem.uuid);
+      expect(response.items[0].enc_item_key).to.not.be.ok;
+      expect(response.items[0].auth_hash).to.not.be.ok;
+      expect(response.items[0].content_type).to.not.be.null;
+      expect(response.items[0].created_at).to.not.be.null;
+      expect(response.items[0].content.title).to.eq(this.noteItem.title);
+      expect(response.items[0].content.text).to.eq(this.noteItem.text);
+    });
+
+    it('should post to the action url', async function () {
+      this.httpServicePostAbsolute.restore();
+      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+
+      expect(response).to.be.ok;
+      expect(response.uuid).to.eq(this.noteItem.uuid);
+      expect(response.result).to.eq('Action POSTed successfully.');
+    });
+
+    it('should alert if an error occurred while processing the action', async function () {
+      this.httpServicePostAbsolute.restore();
+      const dummyError = new Error('Dummy error.');
+
+      sandbox.stub(this.actionsManager.httpService, 'postAbsolute')
+        .callsFake((url, params) => Promise.reject(dummyError));
+
+      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+
+      sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorProcessingActionMessage);
+      expect(response).to.be.eq(dummyError);
     });
   });
 });
