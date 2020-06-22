@@ -1086,7 +1086,7 @@ export class SNApplication {
     if (error) return { error };
 
     const {
-      previousRootKey,
+      currentServerPassword,
       newRootKey,
       newKeyParams,
       rollback: rollbackPasswordChange
@@ -1105,7 +1105,7 @@ export class SNApplication {
 
     /** Now, change the password on the server. Roll back on failure */
     const response = await this.sessionManager!.changePassword(
-      previousRootKey.serverPassword,
+      currentServerPassword,
       newRootKey.serverPassword,
       newKeyParams
     );

@@ -1336,7 +1336,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     newPassword: string,
     wrappingKey?: SNRootKey
   ): Promise<[Error | null, {
-    previousRootKey: SNRootKey,
+    currentServerPassword: string,
     newRootKey: SNRootKey,
     newKeyParams: SNRootKeyParams,
     rollback: () => Promise<void>
@@ -1367,7 +1367,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return [
       null,
       {
-        previousRootKey: currentRootKey,
+        currentServerPassword: computedRootKey.serverPassword,
         newRootKey,
         newKeyParams,
         rollback: async () => {
