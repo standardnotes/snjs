@@ -265,7 +265,9 @@ describe('importing', () => {
         undefined,
         true,
       );
+      expect(this.application.itemManager.notes.length).to.equal(1);
       expect(this.application.findItem(tag.uuid).deleted).to.be.false;
+      expect(this.application.itemManager.tags.length).to.equal(1);
       expect(this.application.findItem(note.uuid).deleted).to.be.false;
     });
 });
