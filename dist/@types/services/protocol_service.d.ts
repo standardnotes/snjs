@@ -343,10 +343,9 @@ export declare class SNProtocolService extends PureService implements Encryption
      */
     repersistAllItems(): Promise<void>;
     /**
-     * @access public
      * @returns All SN|ItemsKey objects synced to the account.
      */
-    get itemsKeys(): SNItemsKey[];
+    private latestItemsKeys;
     /**
      * @returns The items key used to encrypt the payload
      */

@@ -123,6 +123,7 @@ export class SNActionsService extends PureService {
           mutator.description = description;
           mutator.supported_types = supported_types;
           mutator.actions = actions;
+          mutator.hidden = false;
         }
       );
       return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
@@ -137,7 +138,6 @@ export class SNActionsService extends PureService {
     item: SNItem,
     passwordRequestHandler: PasswordRequestHandler
   ): Promise<ActionResponse> {
-    // action.running = true;
     let result;
     switch (action.verb) {
       case 'get':
@@ -155,9 +155,6 @@ export class SNActionsService extends PureService {
       default:
         break;
     }
-
-    // action.lastExecuted = new Date();
-    // action.running = false;
     return result as ActionResponse;
   }
 
@@ -197,13 +194,11 @@ export class SNActionsService extends PureService {
         const error = (response && response.error)
           || { message: 'An issue occurred while processing this action. Please try again.' };
         this.alertService!.alert(error.message);
-        // action.error = true;
         return { error } as HttpResponse;
       });
     if (response.error) {
       return { response } as ActionResponse;
     }
-    // action.error = false;
     const payload = await this.payloadByDecryptingResponse(
       response,
       passwordRequestHandler
@@ -227,7 +222,6 @@ export class SNActionsService extends PureService {
 
   private async handleRenderAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
     const response = await this.httpService!.getAbsolute(action.url).then(async (response) => {
-      // action.error = false;
       const payload = await this.payloadByDecryptingResponse(
         response,
         passwordRequestHandler
@@ -246,13 +240,11 @@ export class SNActionsService extends PureService {
       const error = (response && response.error)
         || { message: 'An issue occurred while processing this action. Please try again.' };
       this.alertService!.alert(error.message);
-      // action.error = true;
       return { error } as HttpResponse;
     });
 
     return response as ActionResponse;
   }
-
 
   private async payloadByDecryptingResponse(
     response: HttpResponse,
@@ -320,10 +312,8 @@ export class SNActionsService extends PureService {
       items: [itemParams]
     };
     return this.httpService!.postAbsolute(action.url, params).then((response) => {
-      // action.error = false;
       return { response } as ActionResponse;
     }).catch((response) => {
-      // action.error = true;
       console.error('Action error response:', response);
       this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'

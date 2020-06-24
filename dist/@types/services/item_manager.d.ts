@@ -70,7 +70,7 @@ export declare class ItemManager extends PureService {
     /**
      * Returns all non-deleted items keys
      */
-    get itemsKeys(): SNItemsKey[];
+    itemsKeys(): SNItemsKey[];
     /**
     * Returns all non-deleted notes
     */

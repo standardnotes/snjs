@@ -22,8 +22,8 @@ export class Action {
 
   constructor(json: any) {
     merge(this, json);
-    this.running = false;
-    this.error = false;
+    this.running = json.running || false;
+    this.error = json.error || false;
     if (this.lastExecuted) {
       this.lastExecuted = new Date(this.lastExecuted);
     }
