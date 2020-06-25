@@ -191,7 +191,7 @@ export class SNComponentManager extends PureService {
     (this.alertService as any) = undefined;
     this.removeItemObserver();
     this.removeItemObserver = null;
-    if (window) {
+    if (window && !this.isMobile) {
       window.removeEventListener('focus', this.detectFocusChange, true);
       window.removeEventListener('blur', this.detectFocusChange, true);
       window.removeEventListener('message', this.onWindowMessage);
@@ -214,7 +214,7 @@ export class SNComponentManager extends PureService {
             item.content_type === ContentType.Theme);
         }) as SNComponent[];
         /**
-         * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid 
+         * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid
          * recursion caused by the component being modified and saved after it is updated.
         */
         if (syncedComponents.length > 0 && source !== PayloadSource.RemoteSaved) {
@@ -433,7 +433,7 @@ export class SNComponentManager extends PureService {
   }
 
   public setComponentHidden(component: SNComponent, hidden: boolean) {
-    /* A hidden component will not receive messages. However, when a component is unhidden, 
+    /* A hidden component will not receive messages. However, when a component is unhidden,
      * we need to send it any items it may have registered streaming for. */
     const componentState = this.findOrCreateDataForComponent(component);
     if (hidden) {
@@ -533,7 +533,7 @@ export class SNComponentManager extends PureService {
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
       this.alertService!.alert(
-        `Standard Notes is trying to communicate with ${component.name}, 
+        `Standard Notes is trying to communicate with ${component.name},
         but an error is occurring. Please restart this extension and try again.`
       );
     }
@@ -1135,7 +1135,7 @@ export class SNComponentManager extends PureService {
               permissions,
               pendingDialog.permissions
             )) {
-              /* If approved, run the action block. Otherwise, if canceled, cancel any 
+              /* If approved, run the action block. Otherwise, if canceled, cancel any
               pending ones as well, since the user was explicit in their intentions */
               if (approved) {
                 pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
@@ -1151,8 +1151,8 @@ export class SNComponentManager extends PureService {
       }
 
     };
-    /** 
-     * Since these calls are asyncronous, multiple dialogs may be requested at the same time. 
+    /**
+     * Since these calls are asyncronous, multiple dialogs may be requested at the same time.
      * We only want to present one and trigger all callbacks based on one modal result
      */
     const existingDialog = find(this.permissionDialogs, { component: component });
@@ -1380,10 +1380,10 @@ export class SNComponentManager extends PureService {
         return;
       }
       setSize(iframe, data);
-      /** 
-       * On Firefox, resizing a component iframe does not seem to have an effect with 
-       * editor-stack extensions. Sizing the parent does the trick, however, we can't do 
-       * this globally, otherwise, areas like the note-tags will not be able to expand 
+      /**
+       * On Firefox, resizing a component iframe does not seem to have an effect with
+       * editor-stack extensions. Sizing the parent does the trick, however, we can't do
+       * this globally, otherwise, areas like the note-tags will not be able to expand
        * outside of the bounds (to display autocomplete, for example).
        */
       if (component.area === ComponentArea.EditorStack) {
@@ -1467,7 +1467,7 @@ export class SNComponentManager extends PureService {
         finalString += addSeparator(index, permissionsCount);
         finalString += typesString;
         if (types.length >= 2 && index < permissionsCount - 1) {
-          /* If you have a list of types, and still an additional root-level 
+          /* If you have a list of types, and still an additional root-level
              permission coming up, add a comma */
           finalString += ', ';
         }
