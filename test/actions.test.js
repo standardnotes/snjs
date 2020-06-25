@@ -81,6 +81,15 @@ describe('actions service', () => {
             'Note'
           ]
         },
+        {
+          label: 'Action #7',
+          url: 'http://my-extension.sn.org/action_7/',
+          verb: 'nested',
+          context: 'Note',
+          content_types: [
+            'Note'
+          ]
+        },
       ]
     };
 
@@ -488,6 +497,37 @@ describe('actions service', () => {
 
       sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorProcessingActionMessage);
       expect(response).to.be.eq(dummyError);
+    });
+  });
+
+  describe('nested action', async function () {
+    const sandbox = sinon.createSandbox();
+
+    before(async function () {
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.nestedAction = extensionItem.actions.filter(action => action.verb === 'nested')[0];
+    });
+
+    beforeEach(async function () {
+      this.actionsManagerRunAction = sandbox.spy(this.actionsManager, 'runAction');
+      this.httpServiceRunHttp = sandbox.spy(this.actionsManager.httpService, 'runHttp');
+      this.actionResponse = await this.actionsManager.runAction(this.nestedAction);
+    });
+
+    afterEach(async function () {
+      sandbox.restore();
+    });
+
+    it('should return undefined', async function () {
+      expect(this.actionResponse).to.be.undefined;
+    });
+
+    it('should call runAction once', async function () {
+      sandbox.assert.calledOnce(this.actionsManagerRunAction);
+    });
+
+    it('should not make any http requests', async function () {
+      sandbox.assert.notCalled(this.httpServiceRunHttp);
     });
   });
 });

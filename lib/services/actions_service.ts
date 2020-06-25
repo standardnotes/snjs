@@ -1,4 +1,4 @@
-import { Action } from './../models/app/action';
+import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -306,7 +306,7 @@ export class SNActionsService extends PureService {
   }
 
   private async handlePostAction(action: Action, item: SNItem) {
-    const decrypted = action.access_type === 'decrypted';
+    const decrypted = action.access_type === ActionAccessType.Decrypted;
     const itemParams = await this.outgoingPayloadForItem(item, decrypted);
     const params = {
       items: [itemParams]

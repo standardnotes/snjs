@@ -1,7 +1,17 @@
 import merge from 'lodash/merge';
 
-type AccessType = 'encrypted' | 'decrypted'
-type ActionVerb = 'get' | 'render' | 'show' | 'post' | 'nested'
+export enum ActionAccessType {
+  Encrypted = 'encrypted',
+  Decrypted = 'decrypted'
+};
+
+export enum ActionVerb {
+  Get = 'get',
+  Render = 'render',
+  Show = 'show',
+  Post = 'post',
+  Nested = 'nested'
+};
 
 /**
  * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
@@ -16,7 +26,7 @@ export class Action {
   public context!: string
   public verb!: ActionVerb
   public url!: string
-  public access_type!: AccessType
+  public access_type!: ActionAccessType
   public readonly subactions?: Action[]
   public subrows?: any[]
 
