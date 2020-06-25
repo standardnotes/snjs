@@ -50,7 +50,7 @@ type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent
  * The storage service is responsible for persistence of both simple key-values, and payload
  * storage. It does so by relying on deviceInterface to save and retrieve raw values and payloads.
  * For simple key/values, items are grouped together in an in-memory hash, and persisted to disk
- * as a single object (encrypted, when possible). It handles persisting payloads in the local 
+ * as a single object (encrypted, when possible). It handles persisting payloads in the local
  * database by encrypting the payloads when possible.
  * The storage service also exposes methods that allow the application to initially
  * decrypt the persisted key/values, and also a method to determine whether a particular
