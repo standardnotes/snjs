@@ -717,9 +717,9 @@ export class SNApplication {
       if (changeResponse?.error) {
         return [changeResponse!.error];
       }
-      if (passcode) {
-        await this.changePasscode(passcode);
-      }
+    }
+    if (passcode) {
+      await this.changePasscode(passcode);
     }
   }
 

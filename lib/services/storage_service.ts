@@ -108,11 +108,14 @@ export class SNStorageService extends PureService {
   }
 
   public async initializeFromDisk() {
+    this.setInitialValues(await this.getValuesFromStorage());
+  }
+
+  private async getValuesFromStorage(): Promise<StorageValuesObject | undefined> {
     const value = await this.deviceInterface!.getRawStorageValue(
       this.getPersistenceKey()
     );
-    const payload = value ? JSON.parse(value) : null;
-    this.setInitialValues(payload);
+    return value ? JSON.parse(value) : undefined;
   }
 
   /**
@@ -135,7 +138,11 @@ export class SNStorageService extends PureService {
   }
 
   public async canDecryptWithKey(key: SNRootKey) {
-    const wrappedValue = this.values[ValueModesKeys.Wrapped];
+    let wrappedValue = this.values[ValueModesKeys.Wrapped];
+    if (!wrappedValue) {
+      const values = await this.getValuesFromStorage();
+      wrappedValue = values![ValueModesKeys.Wrapped];
+    }
     const decryptedPayload = await this.decryptWrappedValue(
       wrappedValue,
       key,
@@ -149,8 +156,8 @@ export class SNStorageService extends PureService {
     * to content type. This allows a more seamless transition when both web
     * and mobile used different content types for encrypted storage.
     */
-    if (!wrappedValue.content_type) {
-      throw 'Attempting to decrypt nonexistent wrapped value';
+    if (!(wrappedValue?.content_type)) {
+      throw Error('Attempting to decrypt nonexistent wrapped value');
     }
 
     const payload = CreateMaxPayloadFromAnyObject(
