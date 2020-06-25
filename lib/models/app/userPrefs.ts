@@ -6,7 +6,7 @@ export enum WebPrefKey {
   NotesPanelWidth = 'notesPanelWidth',
   EditorWidth = 'editorWidth',
   EditorLeft = 'editorLeft',
-  EditorMonospaceEnabled = 'monospaceFont',
+  EditorMonospaceEnabled = 'monospaceEnabled',
   EditorSpellcheck = 'spellcheck',
   EditorResizersEnabled = 'marginResizersEnabled',
   SortNotesBy = 'sortBy',
