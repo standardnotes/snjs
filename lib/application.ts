@@ -1187,7 +1187,7 @@ export class SNApplication {
   }
 
 
-  public async generateUuid() {
+  public generateUuid() {
     return Uuid.GenerateUuid();
   }
 
