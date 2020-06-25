@@ -178,7 +178,7 @@ export class SNStorageService extends PureService {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
     if (decryptedPayload.errorDecrypting) {
-      throw 'Unable to decrypt storage.';
+      throw Error('Unable to decrypt storage.');
     }
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
     delete this.values[ValueModesKeys.Wrapped];
@@ -231,7 +231,7 @@ export class SNStorageService extends PureService {
 
   public async setValue(key: string, value: any, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw `Attempting to set storage key ${key} before loading local storage.`;
+      throw Error(`Attempting to set storage key ${key} before loading local storage.`);
     }
     this.values[this.domainKeyForMode(mode)]![key] = value;
     return this.repersistToDisk();
@@ -239,17 +239,17 @@ export class SNStorageService extends PureService {
 
   public async getValue(key: string, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw `Attempting to get storage key ${key} before loading local storage.`;
+      throw Error(`Attempting to get storage key ${key} before loading local storage.`);
     }
     if (!this.values[this.domainKeyForMode(mode)]) {
-      throw `Storage domain mode not available ${mode} for key ${key}`;
+      throw Error(`Storage domain mode not available ${mode} for key ${key}`);
     }
     return this.values[this.domainKeyForMode(mode)]![key];
   }
 
   public async removeValue(key: string, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw `Attempting to remove storage key ${key} before loading local storage.`;
+      throw Error(`Attempting to remove storage key ${key} before loading local storage.`);
     }
     delete this.values[this.domainKeyForMode(mode)]![key];
     return this.repersistToDisk();
@@ -292,7 +292,7 @@ export class SNStorageService extends PureService {
     } else if (mode === StorageValueModes.Nonwrapped) {
       return ValueModesKeys.Nonwrapped;
     } else {
-      throw 'Invalid mode';
+      throw Error('Invalid mode');
     }
   }
 
