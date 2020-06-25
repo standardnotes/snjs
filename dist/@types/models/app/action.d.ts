@@ -1,5 +1,14 @@
-declare type AccessType = 'encrypted' | 'decrypted';
-declare type ActionVerb = 'get' | 'render' | 'show' | 'post' | 'nested';
+export declare enum ActionAccessType {
+    Encrypted = "encrypted",
+    Decrypted = "decrypted"
+}
+export declare enum ActionVerb {
+    Get = "get",
+    Render = "render",
+    Show = "show",
+    Post = "post",
+    Nested = "nested"
+}
 /**
  * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
  */
@@ -12,9 +21,8 @@ export declare class Action {
     context: string;
     verb: ActionVerb;
     url: string;
-    access_type: AccessType;
+    access_type: ActionAccessType;
     readonly subactions?: Action[];
     subrows?: any[];
     constructor(json: any);
 }
-export {};
