@@ -104,33 +104,35 @@ export class SNActionsService extends PureService {
       content_type: item.content_type,
       item_uuid: item.uuid
     };
-    return this.httpService!.getAbsolute(
+    const response = await this.httpService!.getAbsolute(
       extension.url,
       params
-    ).then(async (response) => {
-      const description = response.description || extension.description;
-      const supported_types = response.supported_types || extension.supported_types;
-      const actions = (
-        response.actions
-          ? response.actions.map((action: any) => {
-            return new Action(action);
-          })
-          : []
-      )
-      await this.itemManager!.changeActionsExtension(
-        extension.uuid,
-        (mutator) => {
-          mutator.description = description;
-          mutator.supported_types = supported_types;
-          mutator.actions = actions;
-          mutator.hidden = false;
-        }
-      );
-      return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
-    }).catch((response) => {
+    ).catch((response) => {
       console.error('Error loading extension', response);
       return null;
     });
+    if (!response) {
+      return;
+    }
+    const description = response.description || extension.description;
+    const supported_types = response.supported_types || extension.supported_types;
+    const actions = (
+      response.actions
+        ? response.actions.map((action: any) => {
+          return new Action(action);
+        })
+        : []
+    )
+    await this.itemManager!.changeActionsExtension(
+      extension.uuid,
+      (mutator) => {
+        mutator.description = description;
+        mutator.supported_types = supported_types;
+        mutator.actions = actions;
+        mutator.hidden = false;
+      }
+    );
+    return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
   }
 
   public async runAction(
