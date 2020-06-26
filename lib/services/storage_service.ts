@@ -108,14 +108,11 @@ export class SNStorageService extends PureService {
   }
 
   public async initializeFromDisk() {
-    this.setInitialValues(await this.getValuesFromStorage());
-  }
-
-  private async getValuesFromStorage(): Promise<StorageValuesObject | undefined> {
     const value = await this.deviceInterface!.getRawStorageValue(
       this.getPersistenceKey()
     );
-    return value ? JSON.parse(value) : undefined;
+    const values = value ? JSON.parse(value) : undefined;
+    this.setInitialValues(values);
   }
 
   /**
@@ -138,11 +135,7 @@ export class SNStorageService extends PureService {
   }
 
   public async canDecryptWithKey(key: SNRootKey) {
-    let wrappedValue = this.values[ValueModesKeys.Wrapped];
-    if (!wrappedValue) {
-      const values = await this.getValuesFromStorage();
-      wrappedValue = values![ValueModesKeys.Wrapped];
-    }
+    const wrappedValue = this.values[ValueModesKeys.Wrapped];
     const decryptedPayload = await this.decryptWrappedValue(
       wrappedValue,
       key,
@@ -181,7 +174,6 @@ export class SNStorageService extends PureService {
       throw Error('Unable to decrypt storage.');
     }
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
-    delete this.values[ValueModesKeys.Wrapped];
   }
 
   /**
