@@ -109,20 +109,22 @@ describe('2020-01-15 web migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
-          const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
-        },
-      );
-      const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
-    };
+
     await application.prepareForLaunch({
-      receiveChallenge: receiveChallenge,
+      receiveChallenge: async (challenge) => {
+        application.setChallengeCallbacks({
+          challenge,
+          onInvalidValue: (value) => {
+            const values = promptForValuesForTypes([value.type]);
+            application.submitValuesForChallenge(challenge, values);
+          },
+        });
+        await Factory.sleep(0);
+        const initialValues = promptForValuesForTypes(challenge.types);
+        application.submitValuesForChallenge(challenge, initialValues);
+      },
     });
+
     await application.launch(true);
     expect(application.sessionManager.online()).to.equal(true);
     expect(application.protocolService.keyMode).to.equal(
@@ -169,7 +171,7 @@ describe('2020-01-15 web migration', () => {
     }
 
     await application.deinit();
-  });
+  }).timeout(15000);
 
   it('2020-01-15 migration with passcode only', async function () {
     const application = await Factory.createAppWithRandNamespace();
@@ -254,19 +256,19 @@ describe('2020-01-15 web migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
-          const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
-        },
-      );
-      const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
-    };
     await application.prepareForLaunch({
-      receiveChallenge: receiveChallenge,
+      receiveChallenge: async (challenge) => {
+        application.setChallengeCallbacks({
+          challenge,
+          onInvalidValue: (value) => {
+            const values = promptForValuesForTypes([value.type]);
+            application.submitValuesForChallenge(challenge, values);
+          },
+        });
+        await Factory.sleep(0);
+        const initialValues = promptForValuesForTypes(challenge.types);
+        application.submitValuesForChallenge(challenge, initialValues);
+      },
     });
     await application.launch(true);
     expect(application.protocolService.keyMode).to.equal(
@@ -370,16 +372,16 @@ describe('2020-01-15 web migration', () => {
       }
       return values;
     };
-    const receiveChallenge = async (challenge, orchestrator) => {
-      orchestrator.setCallbacks(
-        undefined,
-        (value) => {
+    const receiveChallenge = async (challenge) => {
+      application.setChallengeCallbacks({
+        challenge,
+        onInvalidValue: (value) => {
           const values = promptForValuesForTypes([value.type]);
-          orchestrator.submitValues(values);
+          application.submitValuesForChallenge(challenge, values);
         },
-      );
+      });
       const initialValues = promptForValuesForTypes(challenge.types);
-      orchestrator.submitValues(initialValues);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,

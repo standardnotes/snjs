@@ -14,10 +14,10 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason } from './challenges';
-import { ChallengeOrchestrator, OrchestratorFill } from './services/challenge_service';
+import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason, ChallengeValue } from './challenges';
+import { ValueCallback } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from 'sncrypto';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { removeFromArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
@@ -46,16 +46,18 @@ import {
   ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
+import {
+  API_MESSAGE_GENERIC_SYNC_FAIL,
+  InsufficientPasswordMessage
+} from './services/api/messages';
+import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 
 type LaunchCallback = {
-  receiveChallenge: (
-    challenge: Challenge,
-    orchestor: ChallengeOrchestrator
-  ) => void
+  receiveChallenge: (challenge: Challenge) => void
 }
 type ApplicationEventCallback = (
   event: ApplicationEvent,
@@ -121,7 +123,7 @@ export class SNApplication {
    * @param platform The Platform that identifies your application.
    * @param namespace A unique identifier to namespace storage and
    *  other persistent properties. Defaults to empty string.
-   * @param crypto The platform-dependent instance of SNCrypto to use.
+   * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array  of key/value pairs
@@ -133,8 +135,8 @@ export class SNApplication {
     environment: Environment,
     platform: Platform,
     deviceInterface: DeviceInterface,
+    crypto: SNPureCrypto,
     namespace?: string,
-    crypto?: SNPureCrypto,
     swapClasses?: any[],
     skipClasses?: any[],
   ) {
@@ -146,6 +148,9 @@ export class SNApplication {
     }
     if (!platform) {
       throw 'Platform must be supplied when creating an application.';
+    }
+    if (!crypto) {
+      throw 'Crypto has to be supplied when creating an application.';
     }
     this.environment = environment;
     this.platform = platform;
@@ -179,7 +184,7 @@ export class SNApplication {
   }
 
   private setLaunchCallback(callback: LaunchCallback) {
-    this.challengeService!.challengeHandler = callback.receiveChallenge;
+    this.challengeService!.sendChallenge = callback.receiveChallenge;
   }
 
   /**
@@ -194,6 +199,9 @@ export class SNApplication {
     const launchChallenge = await this.challengeService!.getLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService!.promptForChallengeResponse(launchChallenge);
+      if (!response) {
+        throw Error('Launch challenge was cancelled.');
+      }
       await this.handleLaunchChallengeResponse(response);
     }
 
@@ -252,24 +260,6 @@ export class SNApplication {
       this.syncService!.log('Syncing from autosync');
       this.sync();
     }, DEFAULT_AUTO_SYNC_INTERVAL);
-  }
-
-  /**
-   * The migrations service is initialized with this function, so that it can retrieve
-   * raw challenge values as necessary.
-   */
-  private getMigrationChallengeResponder() {
-    return async (
-      challenge: Challenge,
-      validate: boolean,
-      orchestratorFill: OrchestratorFill
-    ) => {
-      return this.challengeService!.promptForChallengeResponse(
-        challenge,
-        validate,
-        orchestratorFill
-      );
-    };
   }
 
   private async handleStage(stage: ApplicationStage) {
@@ -708,13 +698,11 @@ export class SNApplication {
     if (!response) {
       return;
     }
-    const errors = [];
-    let passcode: string;
+    let passcode: string | undefined;
     if (hasPasscode) {
       /* Upgrade passcode version */
       const value = response.getValueForType(ChallengeType.LocalPasscode);
       passcode = value.value as string;
-      await this.changePasscode(passcode);
     }
     if (hasAccount) {
       /* Upgrade account version */
@@ -723,13 +711,16 @@ export class SNApplication {
       const changeResponse = await this.changePassword(
         password,
         password,
-        passcode!
+        passcode,
+        { validatePasswordStrength: false }
       );
       if (changeResponse?.error) {
-        errors.push(changeResponse.error);
+        return [changeResponse!.error];
+      }
+      if (passcode) {
+        await this.changePasscode(passcode);
       }
     }
-    return errors;
   }
 
   public noAccount() {
@@ -873,6 +864,31 @@ export class SNApplication {
         sleep(maxWait)
       ])
     }
+  }
+
+  public setChallengeCallbacks({
+    challenge,
+    onValidValue,
+    onInvalidValue,
+    onComplete,
+    onCancel
+  }: {
+    challenge: Challenge;
+    onValidValue?: ValueCallback;
+    onInvalidValue?: ValueCallback;
+    onComplete?: () => void;
+    onCancel?: () => void;
+  }) {
+    return this.challengeService!.setChallengeCallbacks(
+      challenge, onValidValue, onInvalidValue, onComplete, onCancel);
+  }
+
+  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
+    return this.challengeService!.submitValuesForChallenge(challenge, values);
+  }
+
+  public cancelChallenge(challenge: Challenge) {
+    this.challengeService!.cancelChallenge(challenge);
   }
 
   /**
@@ -1046,32 +1062,61 @@ export class SNApplication {
   public async changePassword(
     currentPassword: string,
     newPassword: string,
-    passcode?: string
-  ) {
+    passcode?: string,
+    { validatePasswordStrength = true } = {}
+  ): Promise<{ error?: Error }> {
+    if (validatePasswordStrength) {
+      if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
+        return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
+      }
+    }
+
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
     if (canceled) {
-      return;
+      return {};
     }
-    const currentKeyParams = await this.protocolService!.getRootKeyParams();
-    this.lockSyncing();
-    const result = await this.sessionManager!.changePassword(
+
+    /** Change the password locally */
+    const [error, changePasswordResult] = await this.protocolService!.changePassword(
+      this.getUser()!.email!,
       currentPassword,
-      currentKeyParams!,
-      newPassword
+      newPassword,
+      wrappingKey
     );
-    if (!result.response.error) {
-      await this.protocolService!.setNewRootKey(
-        result.rootKey,
-        result.keyParams,
-        wrappingKey
-      );
-      await this.protocolService!.createNewDefaultItemsKey();
-      this.unlockSyncing();
-      await this.syncService!.sync();
-    } else {
-      this.unlockSyncing();
+    if (error) return { error };
+
+    const {
+      currentServerPassword,
+      newRootKey,
+      newKeyParams,
+      rollback: rollbackPasswordChange
+    } = changePasswordResult!;
+
+    /** Sync the newly created items key. Roll back on failure */
+    await this.syncService!.sync({ awaitAll: true });
+    const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
+    if (!itemsKeyWasSynced) {
+      await rollbackPasswordChange();
+      await this.syncService!.sync({ awaitAll: true });
+      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
     }
-    return result.response;
+
+    this.lockSyncing();
+
+    /** Now, change the password on the server. Roll back on failure */
+    const response = await this.sessionManager!.changePassword(
+      currentServerPassword,
+      newRootKey.serverPassword,
+      newKeyParams
+    );
+    if (response.error) {
+      await rollbackPasswordChange();
+      await this.syncService!.sync({ awaitAll: true });
+    }
+
+    this.unlockSyncing();
+
+    return response;
   }
 
   public async signOut() {
@@ -1171,13 +1216,13 @@ export class SNApplication {
     };
     this.storageService!.encryptionDelegate = encryptionDelegate;
 
+    this.createChallengeService();
     this.createMigrationService();
     this.createAlertManager();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
     this.createSyncManager();
-    this.createChallengeService();
     this.createSingletonManager();
     this.createComponentManager();
     this.createPrivilegesService();
@@ -1212,11 +1257,11 @@ export class SNApplication {
         protocolService: this.protocolService!,
         deviceInterface: this.deviceInterface!,
         storageService: this.storageService!,
+        challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
         namespace: this.namespace
-      } as MigrationServices,
-      this.getMigrationChallengeResponder()
+      }
     );
     this.services.push(this.migrationService!);
   }

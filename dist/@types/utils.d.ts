@@ -7,6 +7,15 @@ export declare function dictToArray<T>(dict: Record<any, T>): NonNullable<T>[];
  */
 export declare function isWebEnvironment(): boolean;
 /**
+ * Returns true if WebCrypto is available
+ * @access public
+ */
+export declare function isWebCryptoAvailable(): boolean;
+/**
+ * Whether we are in React Native app
+ */
+export declare function isReactNativeEnvironment(): boolean;
+/**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */

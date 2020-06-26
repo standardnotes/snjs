@@ -595,7 +595,7 @@ export class SNSyncService extends PureService {
     let uploadPayloads: PurePayload[] = []
     if (useMode === SyncModes.Default) {
       if (online && !this.completedOnlineDownloadFirstSync) {
-        throw 'Attempting to default mode sync without having completed initial.';
+        throw Error('Attempting to default mode sync without having completed initial.');
       }
       if (online) {
         uploadPayloads = await this.payloadsByPreparingForServer(decryptedPayloads);

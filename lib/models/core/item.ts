@@ -8,10 +8,11 @@ import { deepFreeze, Copy, sortedCopy, omitInPlace } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
+import { PayloadSource } from '@Lib/protocol/payloads/sources';
 
 export enum MutationType {
   /**
-   * The item was changed as part of a user interaction. This means that the item's 
+   * The item was changed as part of a user interaction. This means that the item's
    * user modified date will be updated
    */
   UserInteraction = 1,
@@ -191,9 +192,9 @@ export class SNItem {
    * in an isolated location. This design premise is antiquited and no longer pursued,
    * however we continue to use it as not to uncesesarily create a large data migration
    * that would require users to sync all their data.
-   * 
+   *
    * domainData[DomainKey] will give you another Record<string, any>.
-   * 
+   *
    * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
    * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
    */
@@ -212,9 +213,9 @@ export class SNItem {
   }
 
   /**
-   * During sync conflicts, when determing whether to create a duplicate for an item, 
-   * we can omit keys that have no meaningful weight and can be ignored. For example, 
-   * if one component has active = true and another component has active = false, 
+   * During sync conflicts, when determing whether to create a duplicate for an item,
+   * we can omit keys that have no meaningful weight and can be ignored. For example,
+   * if one component has active = true and another component has active = false,
    * it would be needless to duplicate them, so instead we ignore that value.
    */
   public contentKeysToIgnoreWhenCheckingEquality() {
@@ -269,7 +270,14 @@ export class SNItem {
     if (this.isSingleton) {
       return ConflictStrategy.KeepLeft;
     }
-    if (this.deleted || item.deleted) {
+    if (this.deleted) {
+      return ConflictStrategy.KeepRight;
+    }
+    if (item.deleted) {
+      if (this.payload.source === PayloadSource.FileImport) {
+        /** Imported items take precedence */
+        return ConflictStrategy.KeepLeft;
+      }
       return ConflictStrategy.KeepRight;
     }
     const contentDiffers = ItemContentsDiffer(this, item);

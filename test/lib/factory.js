@@ -19,6 +19,7 @@ export function createApplication(namespace, environment, platform) {
     environment || Environment.Web,
     platform || Platform.MacWeb,
     deviceInterface,
+    new SNWebCrypto(),
     namespace,
     undefined,
     undefined
@@ -191,6 +192,13 @@ export async function loginToApplication({ application, email, password, ephemer
 export async function signOutApplicationAndReturnNew(application) {
   await application.signOut();
   return createInitAppWithRandNamespace();
+}
+
+export async function signOutAndBackIn(application, email, password) {
+  await application.signOut();
+  const newApplication = await createInitAppWithRandNamespace();
+  await this.loginToApplication({ application: newApplication, email, password });
+  return newApplication;
 }
 
 export function createItemParams(contentType) {

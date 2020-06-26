@@ -18,51 +18,36 @@ export enum ChallengeReason {
   Migration = 4
 };
 
+/**
+ * A challenge is a stateless description of what the client needs to provide
+ * in order to proceed.
+ */
 export class Challenge {
-
-  public types: ChallengeType[]
-  public reason: ChallengeReason
-  public id: any
+  public readonly id = new Date().getTime();
 
   constructor(
-    types: ChallengeType[],
-    reason: ChallengeReason
+    public readonly types: ChallengeType[],
+    public readonly reason: ChallengeReason,
   ) {
-    this.types = types;
-    this.reason = reason;
-    this.id = new Date().getTime();
     Object.freeze(this);
   }
 }
 
 export class ChallengeValue {
-  public type: ChallengeType
-  public value: string | boolean
-
   constructor(
-    type: ChallengeType,
-    value: string | boolean
+    public readonly type: ChallengeType,
+    public readonly value: string | boolean,
   ) {
-    this.type = type;
-    this.value = value;
     Object.freeze(this);
   }
 }
 
 export class ChallengeResponse {
-
-  public challenge: Challenge
-  public values: ChallengeValue[]
-  public artifacts?: ChallengeArtifacts
-
   constructor(
-    challenge: Challenge,
-    values: ChallengeValue[],
-    artifacts?: ChallengeArtifacts
+    public readonly challenge: Challenge,
+    public readonly values: ChallengeValue[],
+    public readonly artifacts?: ChallengeArtifacts,
   ) {
-    this.challenge = challenge;
-    this.values = values;
-    this.artifacts = artifacts;
     Object.freeze(this);
   }
 

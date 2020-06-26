@@ -7,12 +7,15 @@
         <script src="./vendor/chai-as-promised-built.js"></script>
         <script src="../node_modules/regenerator-runtime/runtime.js"></script>
         <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/sncrypto/dist/sncrypto-web.js"></script>
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
           window._default_sync_server = 'http://localhost:3000';
+          Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           mocha.setup('bdd');
+          mocha.timeout(5000);
         </script>
         <script type="module" src="memory.test.js"></script>
         <script type="module" src="protocol.test.js"></script>

@@ -28,15 +28,19 @@ module.exports = {
     rules: [
       {
         test: /\.(js|ts)$/,
-        loader: 'babel-loader',
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
       }
     ]
   },
   plugins: [
-    new CopyPlugin([
-      { from: 'node_modules/sncrypto/dist/libsodium.bundle.js', to: 'libsodium.bundle.js' },
-      { from: 'node_modules/sncrypto/dist/vendors~libsodium.bundle.js', to: 'vendors~libsodium.bundle.js' },
-    ]),
     new CircularDependencyPlugin({
       // exclude detection of files based on a RegExp
       exclude: /a\.js|node_modules/,

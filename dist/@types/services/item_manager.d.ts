@@ -104,12 +104,12 @@ export declare class ItemManager extends PureService {
      * an old item reference and mutate that, the new value will be outdated. In this case, always
      * pass the uuid of the item if you want to mutate the latest version of the item.
      */
-    changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<SNItem | undefined>;
+    changeItem<M extends ItemMutator = ItemMutator>(uuid: UuidString, mutate?: (mutator: M) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<SNItem | undefined>;
     private createMutatorForItem;
     /**
      * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
      */
-    changeItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<(SNItem | undefined)[]>;
+    changeItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<(SNItem | undefined)[]>;
     changeNote(uuid: UuidString, mutate: (mutator: NoteMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
     changeComponent(uuid: UuidString, mutate: (mutator: ComponentMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
     changeActionsExtension(uuid: UuidString, mutate: (mutator: ActionsExtensionMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;

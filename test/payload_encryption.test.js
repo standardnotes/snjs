@@ -6,6 +6,7 @@ const expect = chai.expect;
 
 describe('payload encryption', function () {
   beforeEach(async function () {
+    this.timeout(Factory.TestTimeout);
     localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -20,7 +21,7 @@ describe('payload encryption', function () {
   afterEach(async function () {
     this.application.deinit();
   });
-  
+
   after(function () {
     localStorage.clear();
   });

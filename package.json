@@ -18,15 +18,14 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.7",
     "@babel/preset-react": "^7.8.3",
-    "@babel/preset-typescript": "^7.8.3",
     "@babel/register": "^7.8.6",
     "@babel/runtime": "^7.8.7",
     "@types/chai": "^4.2.11",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
     "@types/node": "^12.12.30",
-    "@typescript-eslint/eslint-plugin": "^2.23.0",
-    "@typescript-eslint/parser": "^2.23.0",
+    "@typescript-eslint/eslint-plugin": "^3.3.0",
+    "@typescript-eslint/parser": "^3.3.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
     "chai": "^4.2.0",
@@ -49,15 +48,12 @@
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
     "sinon": "^9.0.2",
-    "ts-loader": "^6.2.2",
+    "sncrypto": "github:standardnotes/sncrypto#7e76ab9977f85039d9399b935aecfe495a951edb",
+    "ts-loader": "^7.0.5",
     "tscpaths": "0.0.9",
-    "typescript": "^3.8.3",
-    "typescript-eslint": "0.0.1-alpha.0",
+    "typescript": "^3.9.5",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.2"
-  },
-  "dependencies": {
-    "sncrypto": "github:standardnotes/sncrypto#6625bbcc141161eb866475d9786238001f3c514d"
   }
 }

@@ -111,6 +111,21 @@ describe('basic auth', () => {
     expect(response.error).to.be.ok;
   }).timeout(20000);
 
+  it('fails to change password when current password is incorrect', async function () {
+    await this.application.register(
+      this.email,
+      this.password
+    );
+    const response = await this.application.changePassword(
+      'Invalid password',
+      'New password'
+    );
+    expect(response.error).to.be.ok;
+
+    /** Ensure we can still log in */
+    this.application = await Factory.signOutAndBackIn(this.application, this.email, this.password);
+  }).timeout(20000);
+
   it('successfully changes password', async function () {
     await this.application.register(
       this.email,

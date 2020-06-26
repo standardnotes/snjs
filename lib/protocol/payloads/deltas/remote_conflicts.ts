@@ -31,18 +31,14 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         payload.uuid!,
         PayloadSource.DecryptedTransient
       );
-      if (!decrypted) {
+      if (!decrypted && !payload.deleted) {
         /** Decrypted should only be missing in case of deleted payload */
-        if (!payload.deleted) {
-          throw 'Unable to find decrypted counterpart for data conflict.';
-        }
-        results.push(payload);
-        continue;
+        throw 'Unable to find decrypted counterpart for data conflict.';
       }
       const delta = new ConflictDelta(
         this.baseCollection,
         current,
-        decrypted,
+        decrypted || payload,
         PayloadSource.ConflictData
       );
       const deltaCollection = await delta.resultingCollection();

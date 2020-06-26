@@ -177,10 +177,7 @@ describe('server session', () => {
       this.password,
       this.newPassword
     );
-
-    expect(changePasswordResponse.status).to.equal(401);
-    expect(changePasswordResponse.error.tag).to.equal('invalid-auth');
-    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+    expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
 
     const loginResponse = await Factory.loginToApplication({
       application: this.application,

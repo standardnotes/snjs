@@ -15,22 +15,26 @@ export declare enum ChallengeReason {
     ProtocolUpgrade = 3,
     Migration = 4
 }
+/**
+ * A challenge is a stateless description of what the client needs to provide
+ * in order to proceed.
+ */
 export declare class Challenge {
-    types: ChallengeType[];
-    reason: ChallengeReason;
-    id: any;
+    readonly types: ChallengeType[];
+    readonly reason: ChallengeReason;
+    readonly id: number;
     constructor(types: ChallengeType[], reason: ChallengeReason);
 }
 export declare class ChallengeValue {
-    type: ChallengeType;
-    value: string | boolean;
+    readonly type: ChallengeType;
+    readonly value: string | boolean;
     constructor(type: ChallengeType, value: string | boolean);
 }
 export declare class ChallengeResponse {
-    challenge: Challenge;
-    values: ChallengeValue[];
-    artifacts?: ChallengeArtifacts;
-    constructor(challenge: Challenge, values: ChallengeValue[], artifacts?: ChallengeArtifacts);
+    readonly challenge: Challenge;
+    readonly values: ChallengeValue[];
+    readonly artifacts?: ChallengeArtifacts | undefined;
+    constructor(challenge: Challenge, values: ChallengeValue[], artifacts?: ChallengeArtifacts | undefined);
     getValueForType(type: ChallengeType): ChallengeValue;
 }
 /**

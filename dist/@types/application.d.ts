@@ -10,9 +10,9 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
-import { Challenge } from './challenges';
-import { ChallengeOrchestrator } from './services/challenge_service';
-import { SNPureCrypto } from 'sncrypto';
+import { Challenge, ChallengeValue } from './challenges';
+import { ValueCallback } from './services/challenge/challenge_service';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
 import { PayloadContent } from './protocol/payloads/generator';
@@ -21,7 +21,7 @@ import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
 declare type LaunchCallback = {
-    receiveChallenge: (challenge: Challenge, orchestor: ChallengeOrchestrator) => void;
+    receiveChallenge: (challenge: Challenge) => void;
 };
 declare type ApplicationEventCallback = (event: ApplicationEvent, data?: any) => Promise<void>;
 declare type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
@@ -69,7 +69,7 @@ export declare class SNApplication {
      * @param platform The Platform that identifies your application.
      * @param namespace A unique identifier to namespace storage and
      *  other persistent properties. Defaults to empty string.
-     * @param crypto The platform-dependent instance of SNCrypto to use.
+     * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
      * @param swapClasses Gives consumers the ability to provide their own custom
      * subclass for a service. swapClasses should be an array  of key/value pairs
@@ -77,7 +77,7 @@ export declare class SNApplication {
      * and 'with'  is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, namespace?: string, crypto?: SNPureCrypto, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
@@ -94,11 +94,6 @@ export declare class SNApplication {
     launch(awaitDatabaseLoad?: boolean): Promise<void>;
     private handleLaunchChallengeResponse;
     private beginAutoSyncTimer;
-    /**
-     * The migrations service is initialized with this function, so that it can retrieve
-     * raw challenge values as necessary.
-     */
-    private getMigrationChallengeResponder;
     private handleStage;
     /**
      * @param singleEvent Whether to only listen for a particular event.
@@ -230,7 +225,7 @@ export declare class SNApplication {
     /**
      * @returns An array of errors, if any.
      */
-    upgradeProtocolVersion(): Promise<any[] | undefined>;
+    upgradeProtocolVersion(): Promise<Error[] | undefined>;
     noAccount(): boolean;
     /**
   
@@ -275,6 +270,15 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
+    setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
+        challenge: Challenge;
+        onValidValue?: ValueCallback;
+        onInvalidValue?: ValueCallback;
+        onComplete?: () => void;
+        onCancel?: () => void;
+    }): void;
+    submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
+    cancelChallenge(challenge: Challenge): void;
     /**
      * Destroys the application instance.
      */
@@ -306,7 +310,11 @@ export declare class SNApplication {
      * already has referene to the passcode, they can pass it in here so that the user
      * is not prompted again.
      */
-    changePassword(currentPassword: string, newPassword: string, passcode?: string): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    changePassword(currentPassword: string, newPassword: string, passcode?: string, { validatePasswordStrength }?: {
+        validatePasswordStrength?: boolean | undefined;
+    }): Promise<{
+        error?: Error;
+    }>;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;

@@ -11,7 +11,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
 
-const MINIMUM_PASSWORD_LENGTH = 8;
+export const MINIMUM_PASSWORD_LENGTH = 8;
 
 type SessionManagerResponse = {
   response: HttpResponse;
@@ -234,46 +234,17 @@ export class SNSessionManager extends PureService {
   }
 
   public async changePassword(
-    currentPassword: string, 
-    currentKeyParams: SNRootKeyParams, 
-    newPassword: string
-    ) {
-    if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
-      return {
-        response: this.apiService!.createErrorResponse(
-          messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)
-        ),
-      } as SessionManagerResponse;
-    }
-    const currentServerPassword = await this.protocolService!.computeRootKey(
-      currentPassword,
-      currentKeyParams,
-    ).then((key) => {
-      return key.serverPassword;
-    });
-    const email = this.user!.email!;
-    const { newServerPassword, newRootKey, newKeyParams } = await this.protocolService!.createRootKey(
-      email,
-      newPassword
-    ).then((result) => {
-      return {
-        newRootKey: result.key,
-        newServerPassword: result.key.serverPassword,
-        newKeyParams: result.keyParams
-      };
-    });
-    return this.apiService!.changePassword(
+    currentServerPassword: string,
+    newServerPassword: string,
+    newKeyParams: SNRootKeyParams
+  ) {
+    const response = await this.apiService!.changePassword(
       currentServerPassword,
       newServerPassword,
       newKeyParams
-    ).then(async (response) => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        keyParams: newKeyParams,
-        rootKey: newRootKey
-      } as SessionManagerResponse;
-    });
+    );
+    await this.handleAuthResponse(response);
+    return response;
   }
 
   private async handleAuthResponse(response: HttpResponse) {

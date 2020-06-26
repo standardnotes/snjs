@@ -1,23 +1,23 @@
 import { isNullOrUndefined } from '@Lib/utils';
 
 /**
- * An abstract class with no instance methods. Used globally to generate uuids by any 
+ * An abstract class with no instance methods. Used globally to generate uuids by any
  * consumer. Application must call SetGenerators before use.
  */
 export class Uuid {
-  private static syncUuidFunc: () => string
+  private static syncUuidFunc?: () => string
   private static asyncUuidFunc: () => Promise<string>
 
   /**
    * Dynamically feed both a syncronous and asyncronous implementation of a UUID generator function.
    * Feeding it this way allows platforms to implement their own uuid generation schemes, without
    * this class having to import any global functions.
-   * @param {function} syncImpl - A syncronous function that returns a UUID.
    * @param {function} asyncImpl - An asyncronous function that returns a UUID.
+   * @param {function} syncImpl - A syncronous function that returns a UUID.
    */
   static SetGenerators(
-    syncImpl: () => string,
-    asyncImpl: () => Promise<string>
+    asyncImpl: () => Promise<string>,
+    syncImpl?: () => string
   ) {
     this.syncUuidFunc = syncImpl;
     this.asyncUuidFunc = asyncImpl;
@@ -45,6 +45,6 @@ export class Uuid {
    * Generates a UUID string syncronously.
    */
   public static GenerateUuidSynchronously() {
-    return this.syncUuidFunc();
+    return this.syncUuidFunc!();
   }
 }
