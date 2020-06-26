@@ -126,7 +126,7 @@ describe('basic auth', () => {
     this.application = await Factory.signOutAndBackIn(this.application, this.email, this.password);
   }).timeout(20000);
 
-  it('successfully changes password', async function () {
+  async function changePassword() {
     await this.application.register(
       this.email,
       this.password
@@ -186,6 +186,39 @@ describe('basic auth', () => {
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(this.application.itemManager.invalidItems.length).to.equal(0);
+  }
+
+  it('successfully changes password', changePassword).timeout(20000);
+
+  it('successfully changes password when passcode is set', async function () {
+    const passcode = 'passcode';
+    const promptForValuesForTypes = (types) => {
+      const values = [];
+      for (const type of types) {
+        if (type === ChallengeType.LocalPasscode) {
+          values.push(new ChallengeValue(type, passcode));
+        } else {
+          values.push(new ChallengeValue(type, this.password));
+        }
+      }
+      return values;
+    };
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        this.application.setChallengeCallbacks({
+          challenge,
+          onInvalidValue: (value) => {
+            const values = promptForValuesForTypes([value.type]);
+            this.application.submitValuesForChallenge(challenge, values);
+            numPasscodeAttempts++;
+          },
+        });
+        const initialValues = promptForValuesForTypes(challenge.types);
+        this.application.submitValuesForChallenge(challenge, initialValues);
+      }
+    });
+    await this.application.setPasscode(passcode);
+    await (changePassword.bind(this))();
   }).timeout(20000);
 
   it('changes password many times', async function () {
