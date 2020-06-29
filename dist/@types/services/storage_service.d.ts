@@ -74,6 +74,7 @@ export declare class SNStorageService extends PureService {
     setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
     getValue(key: string, mode?: StorageValueModes): Promise<any>;
     removeValue(key: string, mode?: StorageValueModes): Promise<void>;
+    getStorageEncryptionPolicy(): StorageEncryptionPolicies;
     /**
      * Default persistence key. Platforms can override as needed.
      */

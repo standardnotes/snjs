@@ -252,6 +252,10 @@ export class SNStorageService extends PureService {
     return this.persistValuesToDisk();
   }
 
+  public getStorageEncryptionPolicy() {
+    return this.encryptionPolicy;
+  }
+
   /**
    * Default persistence key. Platforms can override as needed.
    */
