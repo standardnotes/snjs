@@ -176,11 +176,35 @@ export class SNStorageService extends PureService {
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
   }
 
+  /** @todo This function should be debounced. */
+  private async persistValuesToDisk() {
+    if (!this.storagePersistable) {
+      return;
+    }
+    if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
+      return;
+    }
+    const values = await this.immediatelyPersistValuesToDisk();
+    /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
+    this.values[ValueModesKeys.Wrapped] = values[ValueModesKeys.Wrapped];
+  }
+
+  private async immediatelyPersistValuesToDisk(): Promise<StorageValuesObject> {
+    return this.executeCriticalFunction(async () => {
+      const values = await this.generatePersistableValues();
+      await this.deviceInterface!.setRawStorageValue(
+        this.getPersistenceKey(),
+        JSON.stringify(values)
+      );
+      return values;
+    });
+  }
+
   /**
    * Generates a payload that can be persisted to disk,
    * either as a plain object, or an encrypted item.
    */
-  private async generatePersistenceValue() {
+  private async generatePersistableValues() {
     const rawContent = Object.assign(
       {},
       this.values
@@ -202,31 +226,12 @@ export class SNStorageService extends PureService {
     return rawContent;
   }
 
-  /** @todo This function should be debounced. */
-  private async repersistToDisk() {
-    if (!this.storagePersistable) {
-      return;
-    }
-    if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
-      return;
-    }
-    return this.executeCriticalFunction(async () => {
-      const value = await this.generatePersistenceValue();
-      /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
-      this.values[ValueModesKeys.Wrapped] = value[ValueModesKeys.Wrapped];
-      return this.deviceInterface!.setRawStorageValue(
-        this.getPersistenceKey(),
-        JSON.stringify(value)
-      );
-    });
-  }
-
   public async setValue(key: string, value: any, mode = StorageValueModes.Default) {
     if (!this.values) {
       throw Error(`Attempting to set storage key ${key} before loading local storage.`);
     }
     this.values[this.domainKeyForMode(mode)]![key] = value;
-    return this.repersistToDisk();
+    return this.persistValuesToDisk();
   }
 
   public async getValue(key: string, mode = StorageValueModes.Default) {
@@ -244,7 +249,7 @@ export class SNStorageService extends PureService {
       throw Error(`Attempting to remove storage key ${key} before loading local storage.`);
     }
     delete this.values[this.domainKeyForMode(mode)]![key];
-    return this.repersistToDisk();
+    return this.persistValuesToDisk();
   }
 
   /**
@@ -293,7 +298,7 @@ export class SNStorageService extends PureService {
    */
   async clearValues() {
     this.setInitialValues();
-    await this.repersistToDisk();
+    await this.immediatelyPersistValuesToDisk();
   }
 
   public async getAllRawPayloads() {
