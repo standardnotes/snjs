@@ -40,6 +40,7 @@ export class ChallengeService extends PureService {
 
   /** @override */
   public deinit() {
+    this.challengeOperations = {};
     this.storageService = undefined;
     this.protocolService = undefined;
     this.sendChallenge = undefined;
