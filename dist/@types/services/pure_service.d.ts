@@ -25,7 +25,7 @@ export declare abstract class PureService {
      * parent application instance will await all criticial functions via the `blockDeinit`
      * function before signing out and deiniting.
      */
-    protected executeCriticalFunction(func: () => Promise<void>): Promise<void>;
+    protected executeCriticalFunction<T = void>(func: () => Promise<T>): Promise<T>;
     /**
     * Application instances will call this function directly when they arrive
     * at a certain migratory state.

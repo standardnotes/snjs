@@ -63,13 +63,14 @@ export declare class SNStorageService extends PureService {
     canDecryptWithKey(key: SNRootKey): Promise<boolean>;
     private decryptWrappedValue;
     decryptStorage(): Promise<void>;
+    /** @todo This function should be debounced. */
+    private persistValuesToDisk;
+    private immediatelyPersistValuesToDisk;
     /**
      * Generates a payload that can be persisted to disk,
      * either as a plain object, or an encrypted item.
      */
-    private generatePersistenceValue;
-    /** @todo This function should be debounced. */
-    private repersistToDisk;
+    private generatePersistableValues;
     setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
     getValue(key: string, mode?: StorageValueModes): Promise<any>;
     removeValue(key: string, mode?: StorageValueModes): Promise<void>;
