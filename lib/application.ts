@@ -727,8 +727,11 @@ export class SNApplication {
   }
 
   public noAccount() {
-    const user = this.getUser();
-    return isNullOrUndefined(user);
+    return !this.hasAccount();
+  }
+
+  public hasAccount() {
+    return this.protocolService!.hasAccount();
   }
 
   /**
