@@ -1,4 +1,3 @@
-import { RawPayload } from './../protocol/payloads/generator';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { EncryptionIntent } from './../protocol/intents';
 import { compareVersions } from '@Protocol/versions';
@@ -32,7 +31,6 @@ import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Uuid } from '@Lib/uuid';
 import {
-  isWebEnvironment,
   isReactNativeEnvironment,
   isString,
   isNullOrUndefined,
@@ -48,7 +46,6 @@ import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
 import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
 import { INVALID_PASSWORD } from './api/messages';
-import { HttpResponse } from './api/http_service';
 
 export type BackupFile = {
   keyParams?: any
@@ -191,6 +188,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       this.rootKey = await this.getRootKeyFromKeychain();
       await this.notifyObserversOfKeyChange();
     }
+  }
+
+  /**
+   * Returns encryption protocol display name
+   */
+  public getDefaultOperatorEncryptionDisplayName() {
+    return this.defaultOperator().getEncryptionDisplayName();
   }
 
   /**

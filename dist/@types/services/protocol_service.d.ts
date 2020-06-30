@@ -73,6 +73,10 @@ export declare class SNProtocolService extends PureService implements Encryption
     deinit(): void;
     initialize(): Promise<void>;
     /**
+     * Returns encryption protocol display name
+     */
+    getDefaultOperatorEncryptionDisplayName(): string;
+    /**
      * Returns the latest protocol version
      */
     getLatestVersion(): ProtocolVersion;
@@ -374,7 +378,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      */
     createNewDefaultItemsKey(): Promise<SNItem>;
     changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey): Promise<[Error | null, {
-        previousRootKey: SNRootKey;
+        currentServerPassword: string;
         newRootKey: SNRootKey;
         newKeyParams: SNRootKeyParams;
         rollback: () => Promise<void>;

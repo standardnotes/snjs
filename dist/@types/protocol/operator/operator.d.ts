@@ -25,6 +25,10 @@ export declare abstract class SNProtocolOperator {
     protected readonly crypto: SNPureCrypto;
     constructor(crypto: SNPureCrypto);
     /**
+     * Returns encryption protocol display name
+     */
+    abstract getEncryptionDisplayName(): string;
+    /**
      * Computes a root key given a password and previous keyParams
      * @param password - Plain string representing raw user password
      */
