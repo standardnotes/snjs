@@ -40,9 +40,11 @@ export class SNAlertService extends PureService {
   ) {
     return new Promise((resolve, reject) => {
       if (window.confirm(text)) {
+        onConfirm && onConfirm();
         resolve();
       } else {
         // eslint-disable-next-line prefer-promise-reject-errors
+        onCancel && onCancel();
         reject();
       }
     });

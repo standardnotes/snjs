@@ -1,4 +1,4 @@
-import { Action } from './../models/app/action';
+import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -104,32 +104,35 @@ export class SNActionsService extends PureService {
       content_type: item.content_type,
       item_uuid: item.uuid
     };
-    return this.httpService!.getAbsolute(
+    const response = await this.httpService!.getAbsolute(
       extension.url,
       params
-    ).then((response) => {
-      const description = response.description || extension.description;
-      const supported_types = response.supported_types || extension.supported_types;
-      const actions = (
-        response.actions
-          ? response.actions.map((action: any) => {
-            return new Action(action);
-          })
-          : []
-      )
-      this.itemManager!.changeActionsExtension(
-        extension.uuid,
-        (mutator) => {
-          mutator.description = description;
-          mutator.supported_types = supported_types;
-          mutator.actions = actions;
-        }
-      )
-      return extension;
-    }).catch((response) => {
+    ).catch((response) => {
       console.error('Error loading extension', response);
       return null;
     });
+    if (!response) {
+      return;
+    }
+    const description = response.description || extension.description;
+    const supported_types = response.supported_types || extension.supported_types;
+    const actions = (
+      response.actions
+        ? response.actions.map((action: any) => {
+          return new Action(action);
+        })
+        : []
+    )
+    await this.itemManager!.changeActionsExtension(
+      extension.uuid,
+      (mutator) => {
+        mutator.description = description;
+        mutator.supported_types = supported_types;
+        mutator.actions = actions;
+        mutator.hidden = false;
+      }
+    );
+    return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
   }
 
   public async runAction(
@@ -137,7 +140,6 @@ export class SNActionsService extends PureService {
     item: SNItem,
     passwordRequestHandler: PasswordRequestHandler
   ): Promise<ActionResponse> {
-    action.running = true;
     let result;
     switch (action.verb) {
       case 'get':
@@ -155,9 +157,6 @@ export class SNActionsService extends PureService {
       default:
         break;
     }
-
-    action.lastExecuted = new Date();
-    action.running = false;
     return result as ActionResponse;
   }
 
@@ -176,6 +175,13 @@ export class SNActionsService extends PureService {
             .then((response) => {
               resolve(response);
             });
+        },
+        () => {
+          resolve({
+            error: {
+              message: 'Action canceled by user.' 
+            }
+          });
         }
       );
     });
@@ -190,13 +196,11 @@ export class SNActionsService extends PureService {
         const error = (response && response.error)
           || { message: 'An issue occurred while processing this action. Please try again.' };
         this.alertService!.alert(error.message);
-        action.error = true;
-        return { error: error } as HttpResponse;
+        return { error } as HttpResponse;
       });
     if (response.error) {
       return { response } as ActionResponse;
     }
-    action.error = false;
     const payload = await this.payloadByDecryptingResponse(
       response,
       passwordRequestHandler
@@ -213,39 +217,36 @@ export class SNActionsService extends PureService {
     );
     this.syncService!.sync();
     return {
-      response: response,
+      response,
       item: response.item
     } as ActionResponse;
   }
 
   private async handleRenderAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
     const response = await this.httpService!.getAbsolute(action.url).then(async (response) => {
-      action.error = false;
       const payload = await this.payloadByDecryptingResponse(
         response,
         passwordRequestHandler
       );
       if (payload) {
-        const item = this.itemManager!.createItem(
+        const item = await this.itemManager!.createItem(
           payload.content_type!,
           payload.contentObject
         );
         return {
-          response: response,
-          item: item
+          response,
+          item
         } as ActionResponse;
       }
     }).catch((response) => {
       const error = (response && response.error)
         || { message: 'An issue occurred while processing this action. Please try again.' };
       this.alertService!.alert(error.message);
-      action.error = true;
-      return { error: error } as HttpResponse;
+      return { error } as HttpResponse;
     });
 
-    return { response } as ActionResponse;
+    return response as ActionResponse;
   }
-
 
   private async payloadByDecryptingResponse(
     response: HttpResponse,
@@ -266,10 +267,10 @@ export class SNActionsService extends PureService {
        * Instruct the user to email us to get this remedied. 
        */
       this.alertService!.alert(
-        `We were unable to decrypt this revision using your current keys, 
-        and this revision is missing metadata that would allow us to try different 
-        keys to decrypt it. This can likely be fixed with some manual intervention. 
-        Please email hello@standardnotes.org for assistance.`
+        'We were unable to decrypt this revision using your current keys, ' +
+        'and this revision is missing metadata that would allow us to try different ' +
+        'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
+        'Please email hello@standardnotes.org for assistance.'
       );
       return undefined;
     }
@@ -307,21 +308,19 @@ export class SNActionsService extends PureService {
   }
 
   private async handlePostAction(action: Action, item: SNItem) {
-    const decrypted = action.access_type === 'decrypted';
+    const decrypted = action.access_type === ActionAccessType.Decrypted;
     const itemParams = await this.outgoingPayloadForItem(item, decrypted);
     const params = {
       items: [itemParams]
     };
     return this.httpService!.postAbsolute(action.url, params).then((response) => {
-      action.error = false;
-      return { response: response } as ActionResponse;
+      return { response } as ActionResponse;
     }).catch((response) => {
-      action.error = true;
       console.error('Action error response:', response);
       this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'
       );
-      return { response: response } as ActionResponse;
+      return { response } as ActionResponse;
     });
   }
 

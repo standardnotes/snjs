@@ -113,8 +113,8 @@ export function createStorageItemPayload(contentType) {
   );
 }
 
-export function createNotePayload(title) {
-  return CreateMaxPayloadFromAnyObject(createNoteParams({ title }));
+export function createNotePayload(title, text = undefined) {
+  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text }));
 }
 
 export function createStorageItemTagPayload() {
