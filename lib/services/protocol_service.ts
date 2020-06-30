@@ -204,6 +204,19 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return ProtocolVersion.V004;
   }
 
+  public hasAccount() {
+    switch (this.keyMode) {
+      case KeyMode.RootKeyNone:
+      case KeyMode.WrapperOnly:
+        return false;
+      case KeyMode.RootKeyOnly:
+      case KeyMode.RootKeyPlusWrapper:
+        return true;
+      default:
+        throw Error(`Unhandled keyMode value '${this.keyMode}'.`);
+    }
+  }
+
   /**
    * Returns the protocol version associated with the user's account
    */

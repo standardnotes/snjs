@@ -80,6 +80,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * Returns the latest protocol version
      */
     getLatestVersion(): ProtocolVersion;
+    hasAccount(): boolean;
     /**
      * Returns the protocol version associated with the user's account
      */

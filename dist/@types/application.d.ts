@@ -228,6 +228,7 @@ export declare class SNApplication {
      */
     upgradeProtocolVersion(): Promise<Error[] | undefined>;
     noAccount(): boolean;
+    hasAccount(): boolean;
     /**
   
      * @returns
