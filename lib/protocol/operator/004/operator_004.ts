@@ -15,6 +15,10 @@ const PARTITION_CHARACTER = ':';
 
 export class SNProtocolOperator004 extends SNProtocolOperator003 {
 
+  public getEncryptionDisplayName(): string {
+    return 'XChaCha20';
+  }
+
   get version() {
     return ProtocolVersion.V004;
   }
@@ -29,9 +33,9 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   }
 
   /**
-   * We require both a client-side component and a server-side component in generating a 
-   * salt. This way, a comprimised server cannot benefit from sending the same seed value 
-   * for every user. We mix a client-controlled value that is globally unique 
+   * We require both a client-side component and a server-side component in generating a
+   * salt. This way, a comprimised server cannot benefit from sending the same seed value
+   * for every user. We mix a client-controlled value that is globally unique
    * (their identifier), with a server controlled value to produce a salt for our KDF.
    * @param identifier
    * @param seed
