@@ -1184,6 +1184,10 @@ export class SNApplication {
     return this.setPasscode(passcode);
   }
 
+  public getStorageEncryptionPolicy() {
+    return this.storageService!.getStorageEncryptionPolicy();
+  }
+
   public async setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies) {
     await this.storageService!.setEncryptionPolicy(encryptionPolicy);
     return this.protocolService!.repersistAllItems();
