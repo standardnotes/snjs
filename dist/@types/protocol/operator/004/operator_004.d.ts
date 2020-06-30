@@ -7,6 +7,7 @@ import { PayloadFormat } from '../../payloads/formats';
 import { ProtocolVersion } from '../../versions';
 import { SNRootKey } from '../../root_key';
 export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
+    getEncryptionDisplayName(): string;
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     /**

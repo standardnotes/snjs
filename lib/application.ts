@@ -2,7 +2,6 @@ import { CollectionSort, SortDirection } from '@Protocol/collection/item_collect
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { MigrationServices } from './migrations/types';
 import { UuidString } from './types';
 import { SyncEvent, ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
@@ -660,6 +659,10 @@ export class SNApplication {
       throw 'Attempting to access user before application unlocked';
     }
     return this.sessionManager!.getUser();
+  }
+
+  public getProtocolEncryptionDisplayName() {
+    return this.protocolService!.getDefaultOperatorEncryptionDisplayName();
   }
 
   public async getUserVersion() {

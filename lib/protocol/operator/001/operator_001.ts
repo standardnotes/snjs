@@ -18,6 +18,10 @@ const NO_IV = '00000000000000000000000000000000';
  */
 export class SNProtocolOperator001 extends SNProtocolOperator {
 
+  public getEncryptionDisplayName(): string {
+    return 'AES-256';
+  }
+
   get version() {
     return ProtocolVersion.V001;
   }

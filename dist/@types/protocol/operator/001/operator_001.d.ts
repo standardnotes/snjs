@@ -11,6 +11,7 @@ import { PurePayload } from '../../payloads/pure_payload';
  * A legacy operator no longer used to generate new accounts
  */
 export declare class SNProtocolOperator001 extends SNProtocolOperator {
+    getEncryptionDisplayName(): string;
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     createRootKey(identifier: string, password: string): Promise<{

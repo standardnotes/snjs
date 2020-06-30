@@ -42,6 +42,11 @@ export abstract class SNProtocolOperator {
   }
 
   /**
+   * Returns encryption protocol display name
+   */
+  public abstract getEncryptionDisplayName(): string;
+
+  /**
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */

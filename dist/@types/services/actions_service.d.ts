@@ -50,7 +50,7 @@ export declare class SNActionsService extends PureService {
      * relevant just to this item. The response extension is not saved,
      * just displayed as a one-time thing.
     */
-    loadExtensionInContextOfItem(extension: SNActionsExtension, item: SNItem): Promise<SNActionsExtension | null>;
+    loadExtensionInContextOfItem(extension: SNActionsExtension, item: SNItem): Promise<SNActionsExtension | undefined>;
     runAction(action: Action, item: SNItem, passwordRequestHandler: PasswordRequestHandler): Promise<ActionResponse>;
     private handleGetAction;
     private runConfirmedGetAction;
