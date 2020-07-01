@@ -109,7 +109,7 @@ export class ChallengeService extends PureService {
       StorageKey.BiometricPrefs,
       StorageValueModes.Nonwrapped
     );
-    return biometricPrefs && biometricPrefs.enabled;
+    return Boolean(biometricPrefs && biometricPrefs.enabled);
   }
 
   public async enableBiometrics() {
