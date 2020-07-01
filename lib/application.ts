@@ -1147,6 +1147,18 @@ export class SNApplication {
     return this.launched;
   }
 
+  public async hasBiometrics() {
+    return this.challengeService!.hasBiometricsEnabled()
+  }
+
+  public async enableBiometrics() {
+    return this.challengeService!.enableBiometrics()
+  }
+
+  public async disableBiometrics() {
+    return this.challengeService!.disableBiometrics()
+  }
+
   public hasPasscode() {
     return this.protocolService!.hasPasscode();
   }
