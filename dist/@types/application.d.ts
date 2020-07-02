@@ -321,6 +321,9 @@ export declare class SNApplication {
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;
     isLaunched(): boolean;
+    hasBiometrics(): Promise<boolean>;
+    enableBiometrics(): Promise<void>;
+    disableBiometrics(): Promise<void>;
     hasPasscode(): boolean;
     isLocked(): Promise<boolean>;
     lock(): Promise<void>;

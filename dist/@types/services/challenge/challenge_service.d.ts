@@ -30,7 +30,9 @@ export declare class ChallengeService extends PureService {
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
     getLaunchChallenge(): Promise<Challenge | null>;
     isPasscodeLocked(): Promise<boolean>;
+    hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;
+    disableBiometrics(): Promise<void>;
     setChallengeCallbacks(challenge: Challenge, onValidValue?: ValueCallback, onInvalidValue?: ValueCallback, onComplete?: () => void, onCancel?: () => void): void;
     private createOrGetChallengeOperation;
     private getChallengeOperation;

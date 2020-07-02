@@ -89,11 +89,7 @@ export class ChallengeService extends PureService {
     if (hasPasscode) {
       types.push(ChallengeType.LocalPasscode);
     }
-    const biometricPrefs = await this.storageService!.getValue(
-      StorageKey.BiometricPrefs,
-      StorageValueModes.Nonwrapped
-    );
-    const biometricEnabled = biometricPrefs && biometricPrefs.enabled;
+    const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
       types.push(ChallengeType.Biometric);
     }
@@ -108,10 +104,26 @@ export class ChallengeService extends PureService {
     return this.protocolService!.rootKeyNeedsUnwrapping();
   }
 
+  public async hasBiometricsEnabled() {
+    const biometricPrefs = await this.storageService!.getValue(
+      StorageKey.BiometricPrefs,
+      StorageValueModes.Nonwrapped
+    );
+    return Boolean(biometricPrefs && biometricPrefs.enabled);
+  }
+
   public async enableBiometrics() {
     await this.storageService!.setValue(
       StorageKey.BiometricPrefs,
       { enabled: true },
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  public async disableBiometrics() {
+    await this.storageService!.setValue(
+      StorageKey.BiometricPrefs,
+      { enabled: false },
       StorageValueModes.Nonwrapped
     );
   }
