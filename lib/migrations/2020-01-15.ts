@@ -333,6 +333,9 @@ export class Migration20200115 extends Migration {
       };
       const timing = keychainValue.offline.timing;
       rawStructure.unwrapped![StorageKey.MobilePasscodeTiming] = timing;
+      const biometricPrefs = keychainValue.biometrics_prefs;
+      rawStructure.unwrapped![StorageKey.BiometricPrefs] = { enabled: biometricPrefs.enabled };
+      rawStructure.unwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
       if (wrappedAccountKey) {
         /**
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
