@@ -22,6 +22,7 @@ export declare enum StorageKey {
     PaginationToken = "cursorToken",
     BiometricPrefs = "biometrics_prefs",
     MobilePasscodeTiming = "passcode_timing",
+    MobileBiometricsTiming = "biometrics_timing",
     PrivilegesExpirey = "SessionExpiresAtKey",
     PrivilegesSessionLength = "SessionLengthKey",
     SessionHistoryPersistable = "sessionHistory_persist",
