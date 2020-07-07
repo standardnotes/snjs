@@ -105,25 +105,25 @@ export class ChallengeService extends PureService {
   }
 
   public async hasBiometricsEnabled() {
-    const biometricPrefs = await this.storageService!.getValue(
-      StorageKey.BiometricPrefs,
+    const biometricsState = await this.storageService!.getValue(
+      StorageKey.BiometricsState,
       StorageValueModes.Nonwrapped
     );
-    return Boolean(biometricPrefs && biometricPrefs.enabled);
+    return Boolean(biometricsState);
   }
 
   public async enableBiometrics() {
     await this.storageService!.setValue(
-      StorageKey.BiometricPrefs,
-      { enabled: true },
+      StorageKey.BiometricsState,
+      true,
       StorageValueModes.Nonwrapped
     );
   }
 
   public async disableBiometrics() {
     await this.storageService!.setValue(
-      StorageKey.BiometricPrefs,
-      { enabled: false },
+      StorageKey.BiometricsState,
+      false,
       StorageValueModes.Nonwrapped
     );
   }
