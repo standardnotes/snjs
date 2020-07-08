@@ -98,6 +98,7 @@ export class PurePayload {
     this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined;
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
+    this.duplicate_of = rawPayload.duplicate_of;
 
     if (isString(this.content)) {
       if ((this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)) {
@@ -119,8 +120,6 @@ export class PurePayload {
     } else if (this.content) {
       this.version = (this.content as PayloadContent).version;
     }
-
-    this.duplicate_of = rawPayload.duplicate_of;
 
     deepFreeze(this);
   }

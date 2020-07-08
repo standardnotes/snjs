@@ -58,6 +58,7 @@ export async function PayloadsByDuplicating(
     dirtiedDate: new Date(),
     lastSyncBegan: null,
     lastSyncEnd: null,
+    duplicate_of: payload.uuid,
   };
   if (isConflict) {
     override.content = {
@@ -65,7 +66,6 @@ export async function PayloadsByDuplicating(
       conflict_of: payload.uuid,
     };
   }
-  override.duplicate_of = payload.uuid;
   const copy = CopyPayload(
     payload,
     override
