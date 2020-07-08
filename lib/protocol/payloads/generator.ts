@@ -42,6 +42,7 @@ export type RawPayload = {
   lastSyncEnd?: Date
   auth_hash?: string
   auth_params?: any
+  duplicate_of?: string
 }
 
 export type RawEncryptionParameters = {
@@ -75,6 +76,7 @@ const MaxPayloadFields = [
   PayloadField.WaitingForKey,
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
+  PayloadField.DuplicateOf
 ]
 
 const EncryptionParametersFields = [

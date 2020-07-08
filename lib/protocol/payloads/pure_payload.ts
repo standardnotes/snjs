@@ -53,6 +53,7 @@ export class PurePayload {
 
   readonly format: PayloadFormat
   readonly version?: ProtocolVersion
+  readonly duplicate_of?: string
 
   constructor(
     rawPayload: RawPayload,
@@ -118,6 +119,8 @@ export class PurePayload {
     } else if (this.content) {
       this.version = (this.content as PayloadContent).version;
     }
+
+    this.duplicate_of = rawPayload.duplicate_of;
 
     deepFreeze(this);
   }

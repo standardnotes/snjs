@@ -173,6 +173,10 @@ export class SNItem {
     return this.payload.auth_params;
   }
 
+  get duplicate_of() {
+    return this.payload.duplicate_of;
+  }
+
   public payloadRepresentation(override?: PayloadOverride) {
     return CopyPayload(this.payload, override);
   }

@@ -65,6 +65,7 @@ export async function PayloadsByDuplicating(
       conflict_of: payload.uuid,
     };
   }
+  override.duplicate_of = payload.uuid;
   const copy = CopyPayload(
     payload,
     override

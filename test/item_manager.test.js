@@ -246,9 +246,13 @@ describe('item manager', () => {
     const note = await this.createNote();
     await this.itemManager.duplicateItem(note.uuid);
 
+    const originalNote = this.itemManager.notes[0];
+    const duplicatedNote = this.itemManager.notes[1];
+
     expect(this.itemManager.items.length).to.equal(2);
     expect(this.itemManager.notes.length).to.equal(2);
-    expect(this.itemManager.notes[0].uuid).to.not.equal(this.itemManager.notes[1].uuid);
+    expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid);
+    expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of);
   });
 
   it('duplicate item with relationships', async function () {
