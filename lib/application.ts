@@ -683,10 +683,11 @@ export class SNApplication {
     return !isNullOrUndefined(this.getUser()) || this.hasPasscode();
   }
 
-  /**
-   * @returns An array of errors, if any.
-   */
-  public async upgradeProtocolVersion() {
+  public async upgradeProtocolVersion(): Promise<{
+    success?: true,
+    canceled?: true,
+    error?: Error,
+  }> {
     const hasPasscode = this.hasPasscode();
     const hasAccount = !this.noAccount();
     const types = [];
@@ -699,7 +700,7 @@ export class SNApplication {
     const challenge = new Challenge(types, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
     if (!response) {
-      return;
+      return { canceled: true };
     }
     let passcode: string | undefined;
     if (hasPasscode) {
@@ -718,12 +719,14 @@ export class SNApplication {
         { validatePasswordStrength: false }
       );
       if (changeResponse?.error) {
-        return [changeResponse!.error];
+        return { error: changeResponse.error };
       }
     }
     if (passcode) {
       await this.changePasscode(passcode);
     }
+
+    return { success: true };
   }
 
   public noAccount() {

@@ -223,10 +223,11 @@ export declare class SNApplication {
      * Returns true if there is an encryption source available
      */
     isEncryptionAvailable(): Promise<boolean>;
-    /**
-     * @returns An array of errors, if any.
-     */
-    upgradeProtocolVersion(): Promise<Error[] | undefined>;
+    upgradeProtocolVersion(): Promise<{
+        success?: true;
+        canceled?: true;
+        error?: Error;
+    }>;
     noAccount(): boolean;
     hasAccount(): boolean;
     /**
