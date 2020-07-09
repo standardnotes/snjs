@@ -45,7 +45,7 @@ export const INVALID_PASSWORD                      = `Invalid password.`;
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE         = 'Update Recommended';
 export const OUTDATED_PROTOCOL_ALERT_IGNORE        = 'Sign In';
-export const UPGRADING_ENCRYPTION                  = 'Upgrading the account encryption. Do not close the application.';
+export const UPGRADING_ENCRYPTION                  = `Your account's encryption version is being upgraded. Do not close the application until this process completes.`;
 
 export function InsufficientPasswordMessage(minimum: number) {
   return `
