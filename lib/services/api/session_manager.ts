@@ -252,7 +252,7 @@ export class SNSessionManager extends PureService {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    /* 
+    /*
       The token from response can be undefined if the user is using session tokens (protocol version >= 004).
       We should call setSession only if the session is updated with a new token.
     */
