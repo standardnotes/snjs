@@ -47,7 +47,8 @@ import {
 import { DeviceInterface } from './device_interface';
 import {
   API_MESSAGE_GENERIC_SYNC_FAIL,
-  InsufficientPasswordMessage
+  InsufficientPasswordMessage,
+  UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 
@@ -707,31 +708,38 @@ export class SNApplication {
     if (!response) {
       return { canceled: true };
     }
-    let passcode: string | undefined;
-    if (hasPasscode) {
-      /* Upgrade passcode version */
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
-      passcode = value.value as string;
-    }
-    if (hasAccount) {
-      /* Upgrade account version */
-      const value = response.getValueForType(ChallengeType.AccountPassword);
-      const password = value.value as string;
-      const changeResponse = await this.changePassword(
-        password,
-        password,
-        passcode,
-        { validatePasswordStrength: false }
-      );
-      if (changeResponse?.error) {
-        return { error: changeResponse.error };
+    const dismissBlockingDialog = this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
+    try {
+      let passcode: string | undefined;
+      if (hasPasscode) {
+        /* Upgrade passcode version */
+        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        passcode = value.value as string;
       }
-    }
-    if (passcode) {
-      await this.changePasscode(passcode);
-    }
+      if (hasAccount) {
+        /* Upgrade account version */
+        const value = response.getValueForType(ChallengeType.AccountPassword);
+        const password = value.value as string;
+        const changeResponse = await this.changePassword(
+          password,
+          password,
+          passcode,
+          { validatePasswordStrength: false }
+        );
+        if (changeResponse?.error) {
+          return { error: changeResponse.error };
+        }
+      }
+      if (passcode) {
+        await this.changePasscode(passcode);
+      }
 
-    return { success: true };
+      return { success: true };
+    } catch (error) {
+      return { error };
+    } finally {
+      dismissBlockingDialog();
+    }
   }
 
   public noAccount() {
