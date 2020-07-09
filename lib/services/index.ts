@@ -1,4 +1,5 @@
-export { SNAlertService } from '@Services/alert_service';
+export { ButtonType } from '@Services/alert_service';
+export type { DismissBlockingDialog, SNAlertService } from '@Services/alert_service';
 export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
 export { SNComponentManager } from '@Services/component_manager';

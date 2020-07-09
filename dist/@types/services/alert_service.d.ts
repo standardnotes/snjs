@@ -1,12 +1,10 @@
-import { PureService } from './pure_service';
-import { DeviceInterface } from '../device_interface';
-/**
- * Can be subclassed to provide custom alert/confirm implementation.
- * Defaults to using browser alert() and confirm().
- */
-export declare class SNAlertService extends PureService {
-    constructor(deviceInterface: DeviceInterface);
-    deinit(): void;
-    alert(text?: string, title?: string, closeButtonText?: string, onClose?: () => void): Promise<unknown>;
-    confirm(text?: string, title?: string, confirmButtonText?: string, cancelButtonText?: string, onConfirm?: () => void, onCancel?: () => void, destructive?: boolean): Promise<unknown>;
+export declare enum ButtonType {
+    Info = 0,
+    Danger = 1
 }
+export declare type DismissBlockingDialog = () => void;
+export declare type SNAlertService = {
+    confirm(text: string, title?: string, confirmButtonText?: string, confirmButtonType?: ButtonType, cancelButtonText?: string): Promise<boolean>;
+    alert(text: string, title?: string, closeButtonText?: string): Promise<void>;
+    blockingDialog(text: string): DismissBlockingDialog;
+};

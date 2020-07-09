@@ -185,9 +185,7 @@ export class SNSessionManager extends PureService {
         message,
         messages.OUTDATED_PROTOCOL_ALERT_TITLE,
         messages.OUTDATED_PROTOCOL_ALERT_IGNORE,
-      ).catch(() => {
-        /* No-op */
-      });
+      );
       if (!confirmed) {
         return {
           response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)

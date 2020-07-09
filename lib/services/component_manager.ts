@@ -952,12 +952,9 @@ export class SNComponentManager extends PureService {
       const itemsData = message.data.items;
       const noun = itemsData.length === 1 ? 'item' : 'items';
       let reply = null;
-      let didConfirm = true;
-      await this.alertService!.confirm(
+      const didConfirm = await this.alertService!.confirm(
         `Are you sure you want to delete ${itemsData.length} ${noun}?`
-      ).catch(() => {
-        didConfirm = false;
-      });
+      );
       if (didConfirm) {
         /* Filter for any components and deactivate before deleting */
         for (const itemData of itemsData) {

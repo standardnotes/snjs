@@ -26,7 +26,8 @@ export { SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, } from './ser
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
-export { SNAlertService } from './services/alert_service';
+export { ButtonType } from './services/alert_service';
+export type { DismissBlockingDialog, SNAlertService } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';

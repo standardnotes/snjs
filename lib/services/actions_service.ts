@@ -164,27 +164,18 @@ export class SNActionsService extends PureService {
     action: Action,
     passwordRequestHandler: PasswordRequestHandler
   ): Promise<ActionResponse> {
-    return new Promise((resolve) => {
-      this.alertService!.confirm(
-        "Are you sure you want to replace the current note contents with this action's results?",
-        undefined,
-        undefined,
-        undefined,
-        () => {
-          this.runConfirmedGetAction(action, passwordRequestHandler)
-            .then((response) => {
-              resolve(response);
-            });
-        },
-        () => {
-          resolve({
-            error: {
-              message: 'Action canceled by user.' 
-            }
-          });
+    const confirmed = await this.alertService!.confirm(
+      "Are you sure you want to replace the current note contents with this action's results?"
+    )
+    if (confirmed) {
+      return this.runConfirmedGetAction(action, passwordRequestHandler);
+    } else {
+      return {
+        error: {
+          message: 'Action canceled by user.'
         }
-      );
-    });
+      }
+    }
   }
 
   private async runConfirmedGetAction(
