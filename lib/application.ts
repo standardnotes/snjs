@@ -135,27 +135,32 @@ export class SNApplication {
     platform: Platform,
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
+    alertService: SNAlertService,
     namespace?: string,
     swapClasses?: any[],
     skipClasses?: any[],
   ) {
     if (!deviceInterface) {
-      throw 'Device Interface must be supplied.';
+      throw Error('Device Interface must be supplied.');
     }
     if (!environment) {
-      throw 'Environment must be supplied when creating an application.';
+      throw Error('Environment must be supplied when creating an application.');
     }
     if (!platform) {
-      throw 'Platform must be supplied when creating an application.';
+      throw Error('Platform must be supplied when creating an application.');
     }
     if (!crypto) {
-      throw 'Crypto has to be supplied when creating an application.';
+      throw Error('Crypto has to be supplied when creating an application.');
+    }
+    if (!alertService) {
+      throw Error('AlertService must be supplied when creating an application.');
     }
     this.environment = environment;
     this.platform = platform;
     this.namespace = namespace || '';
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
+    this.alertService = alertService;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
     this.constructServices();
@@ -1243,7 +1248,6 @@ export class SNApplication {
 
     this.createChallengeService();
     this.createMigrationService();
-    this.createAlertManager();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
@@ -1289,16 +1293,6 @@ export class SNApplication {
       }
     );
     this.services.push(this.migrationService!);
-  }
-
-  private createAlertManager() {
-    if (this.shouldSkipClass(SNAlertService)) {
-      return;
-    }
-    this.alertService = new (this.getClass(SNAlertService))(
-      this.deviceInterface
-    );
-    this.services.push(this.alertService!);
   }
 
   private createApiService() {

@@ -1,52 +1,18 @@
-import { PureService } from '@Lib/services/pure_service';
-import { DeviceInterface } from '../device_interface';
+export enum ButtonType {
+  Info = 0,
+  Danger = 1,
+}
 
-/**
- * Can be subclassed to provide custom alert/confirm implementation.
- * Defaults to using browser alert() and confirm().
- */
-export class SNAlertService extends PureService {
+export type DismissBlockingDialog = () => void;
 
-  constructor(deviceInterface: DeviceInterface) {
-    super();
-    this.deviceInterface = deviceInterface;
-  }
-
-  deinit() {
-    this.deviceInterface = undefined;
-    super.deinit();
-  }
-
-  async alert(
-    text?: string,
+export type SNAlertService = {
+  confirm(
+    text: string,
     title?: string,
-    closeButtonText = 'OK',
-    onClose?: () => void
-  ) {
-    return new Promise((resolve, reject) => {
-      window.alert(text);
-      resolve();
-    });
-  }
-
-  async confirm(
-    text?: string,
-    title?: string,
-    confirmButtonText = 'Confirm',
-    cancelButtonText = 'Cancel',
-    onConfirm?: () => void,
-    onCancel?: () => void,
-    destructive = false
-  ) {
-    return new Promise((resolve, reject) => {
-      if (window.confirm(text)) {
-        onConfirm && onConfirm();
-        resolve();
-      } else {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        onCancel && onCancel();
-        reject();
-      }
-    });
-  }
+    confirmButtonText?: string,
+    confirmButtonType?: ButtonType,
+    cancelButtonText?: string
+  ): Promise<boolean>;
+  alert(text: string, title?: string, closeButtonText?: string): Promise<void>;
+  blockingDialog(text: string): DismissBlockingDialog
 }

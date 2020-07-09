@@ -77,7 +77,7 @@ export declare class SNApplication {
      * and 'with'  is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
@@ -342,7 +342,6 @@ export declare class SNApplication {
     private constructServices;
     private clearServices;
     private createMigrationService;
-    private createAlertManager;
     private createApiService;
     private createItemManager;
     private createComponentManager;
