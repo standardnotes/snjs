@@ -105,8 +105,8 @@ describe('upgrading', () => {
     this.application.setLaunchCallback({
       receiveChallenge: this.receiveChallenge
     });
-    const errors = await this.application.upgradeProtocolVersion();
-    expect(errors).to.not.exist;
+    const result = await this.application.upgradeProtocolVersion();
+    expect(result).to.deep.equal({ success: true });
 
     const wrappedRootKey = await this.application.protocolService.getWrappedRootKey();
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
