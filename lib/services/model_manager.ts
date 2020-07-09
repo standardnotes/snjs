@@ -154,7 +154,7 @@ export class PayloadManager extends PureService {
       }
       const masterPayload = this.collection.find(payload.uuid!);
       const newPayload = masterPayload ? PayloadByMerging(masterPayload, payload) : payload;
-      /** The item has been deleted and synced, 
+      /** The item has been deleted and synced,
        * and can thus be removed from our local record */
       if (newPayload.discardable) {
         this.collection.discard(newPayload);
@@ -171,10 +171,10 @@ export class PayloadManager extends PureService {
     return { changed, inserted, discarded };
   }
 
-  /** 
+  /**
    * Notifies observers when an item has been mapped.
    * @param types - An array of content types to listen for
-   * @param priority - The lower the priority, the earlier the function is called 
+   * @param priority - The lower the priority, the earlier the function is called
    *  wrt to other observers
    */
   public addObserver(
@@ -196,7 +196,7 @@ export class PayloadManager extends PureService {
     };
   }
 
-  /** 
+  /**
    * This function is mostly for internal use, but can be used externally by consumers who
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */

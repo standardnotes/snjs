@@ -89,7 +89,7 @@ type SyncPromise = {
   options?: SyncOptions
 }
 
-/** 
+/**
  * The sync service orchestrates with the model manager, api service, and storage service
  * to ensure consistent state between the three. When a change is made to an item, consumers
  * call the sync service's sync function to first persist pending changes to local storage.
@@ -137,7 +137,7 @@ export class SNSyncService extends PureService {
   ];
   /**
    * Non-encrypted types are items whose values a server must be able to read.
-   * These include server extensions (such as a note history endpoint), and 
+   * These include server extensions (such as a note history endpoint), and
    * multi-factor authentication items, which include a secret value that the server
    * needs to be able to read in order to enforce.
    */
@@ -168,7 +168,7 @@ export class SNSyncService extends PureService {
     this.initializeState();
   }
 
-  /** 
+  /**
    * If the database has been newly created (because its new or was previously destroyed)
    * we want to reset any sync tokens we have.
    */
@@ -237,7 +237,7 @@ export class SNSyncService extends PureService {
     return this.opStatus;
   }
 
-  /** 
+  /**
    * Called by application when sign in or registration occurs.
    */
   public resetSyncState() {
@@ -248,7 +248,7 @@ export class SNSyncService extends PureService {
     return this.databaseLoaded;
   }
 
-  /** 
+  /**
    * Used in tandem with `loadDatabasePayloads`
    */
   public async getDatabasePayloads() {
@@ -258,7 +258,7 @@ export class SNSyncService extends PureService {
     });
   }
 
-  /** 
+  /**
    * @param rawPayloads - use `getDatabasePayloads` to get these payloads.
    * They are fed as a parameter so that callers don't have to await the loading, but can
    * await getting the raw payloads from storage
@@ -375,7 +375,7 @@ export class SNSyncService extends PureService {
 
   /**
    * Mark all items as dirty and needing sync, then persist to storage.
-   * @param alternateUuids  
+   * @param alternateUuids
    * In the case of signing in and merging local data, we alternate UUIDs
    * to avoid overwriting data a user may retrieve that has the same UUID.
    * Alternating here forces us to to create duplicates of the items instead.
@@ -460,9 +460,9 @@ export class SNSyncService extends PureService {
     });
   }
 
-  /** 
-   * Certain content types should not be encrypted when sending to server, 
-   * such as server extensions 
+  /**
+   * Certain content types should not be encrypted when sending to server,
+   * such as server extensions
    */
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     return this.protocolService!.payloadsByEncryptingPayloads(
@@ -484,7 +484,7 @@ export class SNSyncService extends PureService {
       return;
     }
 
-    /** 
+    /**
      * Allows us to lock this function from triggering duplicate network requests.
      * There are two types of locking checks:
      * 1. syncLocked(): If a call to sync() call has begun preparing to be sent to the server.
@@ -563,11 +563,11 @@ export class SNSyncService extends PureService {
     /** Lock syncing immediately after checking in progress above */
     this.opStatus!.setDidBegin();
     this.notifyEvent(SyncEvent.SyncWillBegin);
-    /* Subtract from array as soon as we're sure they'll be called. 
+    /* Subtract from array as soon as we're sure they'll be called.
     resolves are triggered at the end of this function call */
     subtractFromArray(this.resolveQueue, inTimeResolveQueue);
 
-    /** lastSyncBegan must be set *after* any point we may have returned above. 
+    /** lastSyncBegan must be set *after* any point we may have returned above.
      * Setting this value means the item was 100% sent to the server. */
     const beginDate = new Date();
     if (items.length > 0) {
@@ -909,8 +909,8 @@ export class SNSyncService extends PureService {
     }
   }
 
-  /** 
-   * Downloads all items and maps to lcoal items to attempt resolve out-of-sync state 
+  /**
+   * Downloads all items and maps to lcoal items to attempt resolve out-of-sync state
    */
   public async resolveOutOfSync() {
     const downloader = new AccountDownloader(
