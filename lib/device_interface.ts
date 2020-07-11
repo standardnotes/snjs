@@ -11,6 +11,7 @@ export abstract class DeviceInterface {
   public timeout: any
   public interval: any
   protected namespace: string
+  protected keychainStorageKey: string
 
   /**
     * @param {function} timeout
@@ -29,6 +30,7 @@ export abstract class DeviceInterface {
     this.namespace = namespace;
     this.timeout = timeout || setTimeout.bind(getGlobalScope());
     this.interval = interval || setInterval.bind(getGlobalScope());
+    this.keychainStorageKey = this.keyForKeychainStorage();
   }
 
   public deinit() {
@@ -69,6 +71,15 @@ export abstract class DeviceInterface {
   abstract async removeRawDatabasePayloadWithId(id: string) : Promise<void>;
 
   abstract async removeAllRawDatabasePayloads() : Promise<void>;
+
+  private keyForKeychainStorage() {
+    const keychainStorageKey = 'keychain';
+    if (this.namespace) {
+      return `${this.namespace}-${keychainStorageKey}`;
+    } else {
+      return keychainStorageKey;
+    }
+  }
 
   abstract async getKeychainValue() : Promise<any>;
 
