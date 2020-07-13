@@ -1306,7 +1306,6 @@ export class SNComponentManager extends PureService {
     }
     this.findOrCreateDataForComponent(component).sessionKey = undefined;
     this.deregisterComponent(uuid);
-    this.syncService!.sync();
   }
 
   async reloadComponent(uuid: UuidString) {
