@@ -23,7 +23,7 @@ import {
 import { Uuid } from '@Lib/uuid';
 import {
   Copy, isString, extendArray, removeFromArray,
-  searchArray, concatArrays, addIfUnique, filterFromArray
+  searchArray, concatArrays, addIfUnique, filterFromArray, sleep
 } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
@@ -1012,13 +1012,12 @@ export class SNComponentManager extends PureService {
           /* Activate current before deactivating others, so as not to flicker */
           await this.activateComponent(component.uuid);
           if (!theme.isLayerable()) {
-            setTimeout(async () => {
-              for (const candidate of activeThemes) {
-                if (candidate && !candidate.isLayerable()) {
-                  await this.deactivateComponent(candidate.uuid);
-                }
+            await sleep(10);
+            for (const candidate of activeThemes) {
+              if (candidate && !candidate.isLayerable()) {
+                await this.deactivateComponent(candidate.uuid);
               }
-            }, 10);
+            }
           }
         } else {
           await this.activateComponent(component.uuid);
