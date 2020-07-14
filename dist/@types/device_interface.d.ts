@@ -8,7 +8,6 @@ export declare abstract class DeviceInterface {
     timeout: any;
     interval: any;
     protected namespace: string;
-    protected keychainStorageKey: string;
     /**
       * @param {function} timeout
          A platform-specific function that is fed functions to run
@@ -41,7 +40,7 @@ export declare abstract class DeviceInterface {
     abstract saveRawDatabasePayloads(payloads: any[]): Promise<void>;
     abstract removeRawDatabasePayloadWithId(id: string): Promise<void>;
     abstract removeAllRawDatabasePayloads(): Promise<void>;
-    private keyForKeychainStorage;
+    protected get keychainStorageKey(): string;
     abstract getKeychainValue(): Promise<any>;
     abstract setKeychainValue(value: any): Promise<void>;
     abstract clearKeychainValue(): Promise<void>;
