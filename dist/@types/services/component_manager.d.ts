@@ -138,7 +138,7 @@ export declare class SNComponentManager extends PureService {
     presentPermissionsDialog(dialog: PermissionDialog): void;
     openModalComponent(component: SNComponent): void;
     registerHandler(handler: ComponentHandler): () => void;
-    findOrCreateDataForComponent(component: SNComponent): ComponentState;
+    findOrCreateDataForComponent(componentUuid: UuidString): ComponentState;
     setReadonlyStateForComponent(component: SNComponent, readonly: boolean, lockReadonly?: boolean): void;
     getReadonlyStateForComponent(component: SNComponent): ComponentState;
     /** Called by other views when the iframe is ready */
