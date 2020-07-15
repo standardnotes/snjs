@@ -994,8 +994,9 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage) {
-    this.toggleComponent(targetComponent);
+  async handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage) {
+    await this.toggleComponent(targetComponent);
+    this.syncService.sync();
   }
 
   async toggleComponent(component: SNComponent) {
@@ -1268,7 +1269,6 @@ export class SNComponentManager extends PureService {
       });
     }
     this.registerComponent(uuid);
-    this.syncService!.sync();
   }
 
   deregisterComponent(uuid: UuidString) {
