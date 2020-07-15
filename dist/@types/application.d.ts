@@ -175,19 +175,19 @@ export declare class SNApplication {
     /**
      * Mutates a pre-existing item, marks it as dirty, and syncs it
      */
-    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<SNItem | undefined>;
+    changeAndSaveItem<M extends ItemMutator = ItemMutator>(uuid: UuidString, mutate?: (mutator: M) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<SNItem | undefined>;
     /**
     * Mutates pre-existing items, marks them as dirty, and syncs
     */
-    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<void>;
+    changeAndSaveItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<void>;
     /**
     * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
     */
-    changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
+    changeItem<M extends ItemMutator>(uuid: UuidString, mutate?: (mutator: M) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
     /**
      * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
      */
-    changeItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
+    changeItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
     /** Returns an item's direct references */

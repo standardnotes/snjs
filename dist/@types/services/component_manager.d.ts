@@ -13,7 +13,7 @@ import { UuidString } from '../types';
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
-    activationHandler?: (component: SNComponent) => void;
+    activationHandler?: (uuid: UuidString, component?: SNComponent) => void;
     actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
     contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
