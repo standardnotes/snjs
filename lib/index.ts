@@ -10,18 +10,19 @@ export {
   SNItemsKey,
   SNPredicate,
   SNNote, NoteMutator,
-  SNTag,
+  SNTag, TagMutator,
   SNSmartTag,
   SNActionsExtension,
   Action,
   SNTheme,
   SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
-  SNUserPrefs, UserPrefsMutator, WebPrefKey
+  SNUserPrefs, UserPrefsMutator, WebPrefKey,
 } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
+export type { UuidString } from './types';
 
 export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from '@Services/history/history_session';
@@ -144,4 +145,3 @@ export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 export {
   PrivilegeSessionLength
 } from '@Services/privileges_service';
-
