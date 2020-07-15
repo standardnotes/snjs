@@ -501,9 +501,9 @@ export class SNApplication {
   /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
-  public async changeAndSaveItem(
+  public async changeAndSaveItem<M extends ItemMutator = ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
@@ -524,9 +524,9 @@ export class SNApplication {
   /**
   * Mutates pre-existing items, marks them as dirty, and syncs
   */
-  public async changeAndSaveItems(
+  public async changeAndSaveItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
@@ -543,9 +543,9 @@ export class SNApplication {
   /**
   * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
   */
-  public async changeItem(
+  public async changeItem<M extends ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false
   ) {
     if (!isString(uuid)) {
@@ -562,9 +562,9 @@ export class SNApplication {
   /**
    * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
    */
-  public async changeItems(
+  public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false
   ) {
     return this.itemManager!.changeItems(
