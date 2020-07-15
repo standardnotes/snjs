@@ -52,7 +52,7 @@ type StreamObserver = {
 type ComponentHandler = {
   identifier: string
   areas: ComponentArea[]
-  activationHandler?: (component: SNComponent) => void
+  activationHandler?: (uuid: UuidString, component?: SNComponent) => void
   actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
   contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
   componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
@@ -112,6 +112,30 @@ type ComponentState = {
   sessionKey?: string
 }
 
+class ActiveComponents {
+  uuids: UuidString[] = [];
+  areas: Record<UuidString, ComponentArea> = {};
+
+  add(uuid: UuidString, area: ComponentArea) {
+    if (addIfUnique(this.uuids, uuid)) {
+      this.areas[uuid] = area;
+    }
+  }
+
+  remove(uuid: UuidString): ComponentArea | undefined {
+    const area = this.areas[uuid];
+    if (area) {
+      removeFromArray(this.uuids, uuid);
+      delete this.areas[uuid];
+    }
+    return area;
+  }
+
+  clear() {
+    this.uuids.length = 0;
+    this.areas = {};
+  }
+}
 
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
@@ -132,7 +156,7 @@ export class SNComponentManager extends PureService {
   private removeItemObserver?: any
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
-  private activeComponents: UuidString[] = []
+  private activeComponents = new ActiveComponents();
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
@@ -183,7 +207,7 @@ export class SNComponentManager extends PureService {
     super.deinit();
     this.streamObservers.length = 0;
     this.contextStreamObservers.length = 0;
-    this.activeComponents.length = 0;
+    this.activeComponents.clear();
     this.permissionDialogs.length = 0;
     this.handlers.length = 0;
     (this.itemManager as any) = undefined;
@@ -224,7 +248,7 @@ export class SNComponentManager extends PureService {
           }
         }
         for (const component of syncedComponents) {
-          const isInActive = this.activeComponents.includes(component.uuid);
+          const isInActive = this.activeComponents.uuids.includes(component.uuid);
           if (component.active && !component.deleted && !isInActive) {
             this.activateComponent(component.uuid);
           } else if (!component.active && isInActive) {
@@ -313,7 +337,8 @@ export class SNComponentManager extends PureService {
   }
 
   detectFocusChange = () => {
-    const activeComponents = this.itemManager.findItems(this.activeComponents) as SNComponent[];
+    const activeComponents =
+      this.itemManager.findItems(this.activeComponents.uuids) as SNComponent[];
     for (const component of activeComponents) {
       if (document.activeElement === this.iframeForComponent(component.uuid)) {
         this.timeout(() => {
@@ -1244,14 +1269,14 @@ export class SNComponentManager extends PureService {
 
   registerComponent(uuid: UuidString) {
     this.log('Registering component', uuid);
-    addIfUnique(this.activeComponents, uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
+    this.activeComponents.add(uuid, component.area);
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
         handler.areas.includes(ComponentArea.Any)
       ) {
-        handler.activationHandler && handler.activationHandler(component);
+        handler.activationHandler?.(uuid, component);
       }
     }
     if (component.area === ComponentArea.Themes) {
@@ -1273,16 +1298,16 @@ export class SNComponentManager extends PureService {
 
   deregisterComponent(uuid: UuidString) {
     this.log('Degregistering component', uuid);
-    const component = this.itemManager.findItem(uuid) as SNComponent;
-    removeFromArray(this.activeComponents, uuid);
+    const component = this.itemManager.findItem(uuid) as SNComponent | undefined;
     delete this.componentState[uuid];
-    if (component) {
+    const area = this.activeComponents.remove(uuid);
+    if (area) {
       for (const handler of this.handlers) {
         if (
-          handler.areas.includes(component.area) ||
+          handler.areas.includes(area) ||
           handler.areas.includes(ComponentArea.Any)
         ) {
-          handler.activationHandler && handler.activationHandler(component);
+          handler.activationHandler?.(uuid, component);
         }
       }
     }
@@ -1292,10 +1317,8 @@ export class SNComponentManager extends PureService {
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
       return o.componentUuid !== uuid;
     });
-    if (component) {
-      if (component.area === ComponentArea.Themes) {
-        this.postActiveThemesToAllComponents();
-      }
+    if (area === ComponentArea.Themes) {
+      this.postActiveThemesToAllComponents();
     }
   }
 
