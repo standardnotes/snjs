@@ -112,31 +112,6 @@ type ComponentState = {
   sessionKey?: string
 }
 
-class ActiveComponents {
-  uuids: UuidString[] = [];
-  areas: Record<UuidString, ComponentArea> = {};
-
-  add(uuid: UuidString, area: ComponentArea) {
-    if (addIfUnique(this.uuids, uuid)) {
-      this.areas[uuid] = area;
-    }
-  }
-
-  remove(uuid: UuidString): ComponentArea | undefined {
-    const area = this.areas[uuid];
-    if (area) {
-      removeFromArray(this.uuids, uuid);
-      delete this.areas[uuid];
-    }
-    return area;
-  }
-
-  clear() {
-    this.uuids.length = 0;
-    this.areas = {};
-  }
-}
-
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
  * and other components. The component manager primarily deals with iframes, and orchestrates
@@ -156,7 +131,7 @@ export class SNComponentManager extends PureService {
   private removeItemObserver?: any
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
-  private activeComponents = new ActiveComponents();
+  private activeComponents: Partial<Record<UuidString, ComponentArea>> = {};
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
@@ -207,7 +182,7 @@ export class SNComponentManager extends PureService {
     super.deinit();
     this.streamObservers.length = 0;
     this.contextStreamObservers.length = 0;
-    this.activeComponents.clear();
+    (this.activeComponents as any) = undefined;
     this.permissionDialogs.length = 0;
     this.handlers.length = 0;
     (this.itemManager as any) = undefined;
@@ -248,7 +223,7 @@ export class SNComponentManager extends PureService {
           }
         }
         for (const component of syncedComponents) {
-          const isInActive = this.activeComponents.uuids.includes(component.uuid);
+          const isInActive = this.activeComponents[component.uuid];
           if (component.active && !component.deleted && !isInActive) {
             this.activateComponent(component.uuid);
           } else if (!component.active && isInActive) {
@@ -338,7 +313,7 @@ export class SNComponentManager extends PureService {
 
   detectFocusChange = () => {
     const activeComponents =
-      this.itemManager.findItems(this.activeComponents.uuids) as SNComponent[];
+      this.itemManager.findItems(Object.keys(this.activeComponents)) as SNComponent[];
     for (const component of activeComponents) {
       if (document.activeElement === this.iframeForComponent(component.uuid)) {
         this.timeout(() => {
@@ -1270,7 +1245,7 @@ export class SNComponentManager extends PureService {
   registerComponent(uuid: UuidString) {
     this.log('Registering component', uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
-    this.activeComponents.add(uuid, component.area);
+    this.activeComponents[uuid] = component.area;
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
@@ -1300,7 +1275,8 @@ export class SNComponentManager extends PureService {
     this.log('Degregistering component', uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent | undefined;
     delete this.componentState[uuid];
-    const area = this.activeComponents.remove(uuid);
+    const area = this.activeComponents[uuid];
+    delete this.activeComponents[uuid];
     if (area) {
       for (const handler of this.handlers) {
         if (
