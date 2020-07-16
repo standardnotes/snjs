@@ -111,6 +111,7 @@ export declare class SNComponent extends SNItem implements ComponentContent {
 export declare class ComponentMutator extends ItemMutator {
     get typedContent(): Partial<ComponentContent>;
     set active(active: boolean);
+    set isMobileDefault(isMobileDefault: boolean);
     set defaultEditor(defaultEditor: boolean);
     set componentData(componentData: Record<string, any>);
     set package_info(package_info: any);
