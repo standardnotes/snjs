@@ -284,15 +284,23 @@ export class SNItem {
     if (!contentDiffers) {
       return ConflictStrategy.KeepRight;
     }
-    const differsExclRefs = ItemContentsDiffer(
+    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(
       this,
       item,
       ['references']
     );
-    if (differsExclRefs) {
-      return ConflictStrategy.KeepLeftDuplicateRight;
+    if (itemsAreDifferentExcludingRefs) {
+      const twentySeconds = 20_000;
+      if (Date.now() - this.userModifiedDate.getTime() < twentySeconds ) {
+        /**
+         * The user may be editing our item at this time, so duplicate the incoming
+         * item to avoid creating surprises in the client's UI.
+         */
+        return ConflictStrategy.KeepLeftDuplicateRight;
+      }
+      return ConflictStrategy.DuplicateLeftKeepRight;
     } else {
-      /** Is only references change */
+      /** Only the references have changed; merge them. */
       return ConflictStrategy.KeepLeftMergeRefs;
     }
   }
