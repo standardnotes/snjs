@@ -122,7 +122,7 @@ export declare class SNItem {
      * In the default implementation, we create a duplicate if content differs.
      * However, if they only differ by references, we KEEP_LEFT_MERGE_REFS.
      */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
     isItemContentEqualWith(otherItem: SNItem): boolean;
     satisfiesPredicate(predicate: SNPredicate): any;
     updatedAtTimestamp(): number;

@@ -5,7 +5,7 @@ export declare class SNTheme extends SNComponent {
     area: ComponentArea;
     isLayerable(): any;
     /** Do not duplicate under most circumstances. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
     getMobileRules(): any;
     /** Same as getMobileRules but without default value. */
     hasMobileRules(): any;
