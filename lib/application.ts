@@ -1002,10 +1002,7 @@ export class SNApplication {
       }
       await this.notifyEvent(ApplicationEvent.SignedIn);
       this.unlockSyncing();
-      await this.syncService!.sync({
-        mode: SyncModes.DownloadFirst,
-        queueStrategy: SyncQueueStrategy.ForceSpawnNew
-      });
+      await this.syncService!.downloadFirstSync(300);
       this.protocolService!.decryptErroredItems();
     } else {
       this.unlockSyncing();
@@ -1056,10 +1053,8 @@ export class SNApplication {
       }
       await this.notifyEvent(ApplicationEvent.SignedIn);
       this.unlockSyncing();
-      const syncPromise = this.syncService!.sync({
-        mode: SyncModes.DownloadFirst,
+      const syncPromise = this.syncService!.downloadFirstSync(1_000, {
         checkIntegrity: true,
-        queueStrategy: SyncQueueStrategy.ForceSpawnNew,
         awaitAll: awaitSync,
       });
       if (awaitSync) {
