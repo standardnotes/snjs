@@ -477,6 +477,23 @@ export class SNSyncService extends PureService {
     );
   }
 
+  public async downloadFirstSync(waitTimeOnFailureMs: number, otherSyncOptions?: SyncOptions) {
+    const maxTries = 5;
+    for (let i = 0; i < maxTries; i++) {
+      await this.sync({
+        mode: SyncModes.DownloadFirst,
+        queueStrategy: SyncQueueStrategy.ForceSpawnNew,
+        ...otherSyncOptions
+      }).catch(console.error);
+      if (this.completedOnlineDownloadFirstSync) {
+        return;
+      } else {
+        await sleep(waitTimeOnFailureMs);
+      }
+    }
+    console.error(`Failed downloadFirstSync after ${maxTries} tries`);
+  }
+
   public async sync(options: SyncOptions = {}): Promise<any> {
     /** Hard locking, does not apply to locking modes below */
     if (this.locked) {
