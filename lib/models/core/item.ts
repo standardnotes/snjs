@@ -297,8 +297,9 @@ export class SNItem {
          * item to avoid creating surprises in the client's UI.
          */
         return ConflictStrategy.KeepLeftDuplicateRight;
+      } else {
+        return ConflictStrategy.DuplicateLeftKeepRight;
       }
-      return ConflictStrategy.DuplicateLeftKeepRight;
     } else {
       /** Only the references have changed; merge them. */
       return ConflictStrategy.KeepLeftMergeRefs;
