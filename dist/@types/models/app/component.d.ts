@@ -85,7 +85,7 @@ export declare class SNComponent extends SNItem implements ComponentContent {
     readonly isMobileDefault: boolean;
     constructor(payload: PurePayload);
     /** Do not duplicate components under most circumstances. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
     isEditor(): boolean;
     isTheme(): boolean;
     isDefaultEditor(): boolean;
