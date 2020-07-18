@@ -20,6 +20,11 @@ export function createApplication(namespace, environment, platform) {
     platform || Platform.MacWeb,
     deviceInterface,
     new SNWebCrypto(),
+    {
+      confirm: async () => true,
+      alert: async () => {},
+      blockingDialog: () => () => {},
+    },
     namespace,
     undefined,
     undefined

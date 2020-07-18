@@ -47,7 +47,8 @@ import {
 import { DeviceInterface } from './device_interface';
 import {
   API_MESSAGE_GENERIC_SYNC_FAIL,
-  InsufficientPasswordMessage
+  InsufficientPasswordMessage,
+  UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 
@@ -135,27 +136,32 @@ export class SNApplication {
     platform: Platform,
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
+    alertService: SNAlertService,
     namespace?: string,
     swapClasses?: any[],
     skipClasses?: any[],
   ) {
     if (!deviceInterface) {
-      throw 'Device Interface must be supplied.';
+      throw Error('Device Interface must be supplied.');
     }
     if (!environment) {
-      throw 'Environment must be supplied when creating an application.';
+      throw Error('Environment must be supplied when creating an application.');
     }
     if (!platform) {
-      throw 'Platform must be supplied when creating an application.';
+      throw Error('Platform must be supplied when creating an application.');
     }
     if (!crypto) {
-      throw 'Crypto has to be supplied when creating an application.';
+      throw Error('Crypto has to be supplied when creating an application.');
+    }
+    if (!alertService) {
+      throw Error('AlertService must be supplied when creating an application.');
     }
     this.environment = environment;
     this.platform = platform;
     this.namespace = namespace || '';
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
+    this.alertService = alertService;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
     this.constructServices();
@@ -495,9 +501,9 @@ export class SNApplication {
   /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
-  public async changeAndSaveItem(
+  public async changeAndSaveItem<M extends ItemMutator = ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
@@ -518,9 +524,9 @@ export class SNApplication {
   /**
   * Mutates pre-existing items, marks them as dirty, and syncs
   */
-  public async changeAndSaveItems(
+  public async changeAndSaveItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
@@ -537,9 +543,9 @@ export class SNApplication {
   /**
   * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
   */
-  public async changeItem(
+  public async changeItem<M extends ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false
   ) {
     if (!isString(uuid)) {
@@ -556,9 +562,9 @@ export class SNApplication {
   /**
    * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
    */
-  public async changeItems(
+  public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: ItemMutator) => void,
+    mutate?: (mutator: M) => void,
     isUserModified = false
   ) {
     return this.itemManager!.changeItems(
@@ -683,10 +689,11 @@ export class SNApplication {
     return !isNullOrUndefined(this.getUser()) || this.hasPasscode();
   }
 
-  /**
-   * @returns An array of errors, if any.
-   */
-  public async upgradeProtocolVersion() {
+  public async upgradeProtocolVersion(): Promise<{
+    success?: true,
+    canceled?: true,
+    error?: Error,
+  }> {
     const hasPasscode = this.hasPasscode();
     const hasAccount = !this.noAccount();
     const types = [];
@@ -699,30 +706,39 @@ export class SNApplication {
     const challenge = new Challenge(types, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
     if (!response) {
-      return;
+      return { canceled: true };
     }
-    let passcode: string | undefined;
-    if (hasPasscode) {
-      /* Upgrade passcode version */
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
-      passcode = value.value as string;
-    }
-    if (hasAccount) {
-      /* Upgrade account version */
-      const value = response.getValueForType(ChallengeType.AccountPassword);
-      const password = value.value as string;
-      const changeResponse = await this.changePassword(
-        password,
-        password,
-        passcode,
-        { validatePasswordStrength: false }
-      );
-      if (changeResponse?.error) {
-        return [changeResponse!.error];
+    const dismissBlockingDialog = this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
+    try {
+      let passcode: string | undefined;
+      if (hasPasscode) {
+        /* Upgrade passcode version */
+        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        passcode = value.value as string;
       }
-    }
-    if (passcode) {
-      await this.changePasscode(passcode);
+      if (hasAccount) {
+        /* Upgrade account version */
+        const value = response.getValueForType(ChallengeType.AccountPassword);
+        const password = value.value as string;
+        const changeResponse = await this.changePassword(
+          password,
+          password,
+          passcode,
+          { validatePasswordStrength: false }
+        );
+        if (changeResponse?.error) {
+          return { error: changeResponse.error };
+        }
+      }
+      if (passcode) {
+        await this.changePasscode(passcode);
+      }
+
+      return { success: true };
+    } catch (error) {
+      return { error };
+    } finally {
+      dismissBlockingDialog();
     }
   }
 
@@ -1240,7 +1256,6 @@ export class SNApplication {
 
     this.createChallengeService();
     this.createMigrationService();
-    this.createAlertManager();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
@@ -1286,16 +1301,6 @@ export class SNApplication {
       }
     );
     this.services.push(this.migrationService!);
-  }
-
-  private createAlertManager() {
-    if (this.shouldSkipClass(SNAlertService)) {
-      return;
-    }
-    this.alertService = new (this.getClass(SNAlertService))(
-      this.deviceInterface
-    );
-    this.services.push(this.alertService!);
   }
 
   private createApiService() {

@@ -17,5 +17,6 @@ export declare const INVALID_PASSWORD_COST = "Unable to login due to insecure pa
 export declare const INVALID_PASSWORD = "Invalid password.";
 export declare const OUTDATED_PROTOCOL_ALERT_TITLE = "Update Recommended";
 export declare const OUTDATED_PROTOCOL_ALERT_IGNORE = "Sign In";
+export declare const UPGRADING_ENCRYPTION = "Your account's encryption version is being upgraded. Do not close the application until this process completes.";
 export declare function InsufficientPasswordMessage(minimum: number): string;
 export declare function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string;

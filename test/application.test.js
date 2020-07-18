@@ -56,7 +56,7 @@ describe('application instances', () => {
     /** This test will always succeed but should be observed for console exceptions */
     const app = await Factory.createAndInitializeApplication('app');
     /** Don't await */
-    app.storageService.repersistToDisk();
+    app.storageService.persistValuesToDisk();
     await app.prepareForDeinit();
     app.deinit();
   });

@@ -77,7 +77,7 @@ export declare class SNApplication {
      * and 'with'  is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
@@ -175,19 +175,19 @@ export declare class SNApplication {
     /**
      * Mutates a pre-existing item, marks it as dirty, and syncs it
      */
-    changeAndSaveItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<SNItem | undefined>;
+    changeAndSaveItem<M extends ItemMutator = ItemMutator>(uuid: UuidString, mutate?: (mutator: M) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<SNItem | undefined>;
     /**
     * Mutates pre-existing items, marks them as dirty, and syncs
     */
-    changeAndSaveItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<void>;
+    changeAndSaveItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, isUserModified?: boolean, payloadSource?: PayloadSource, syncOptions?: SyncOptions): Promise<void>;
     /**
     * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
     */
-    changeItem(uuid: UuidString, mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
+    changeItem<M extends ItemMutator>(uuid: UuidString, mutate?: (mutator: M) => void, isUserModified?: boolean): Promise<SNItem | undefined>;
     /**
      * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
      */
-    changeItems(uuids: UuidString[], mutate?: (mutator: ItemMutator) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
+    changeItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
     notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
     /** Returns an item's direct references */
@@ -223,10 +223,11 @@ export declare class SNApplication {
      * Returns true if there is an encryption source available
      */
     isEncryptionAvailable(): Promise<boolean>;
-    /**
-     * @returns An array of errors, if any.
-     */
-    upgradeProtocolVersion(): Promise<Error[] | undefined>;
+    upgradeProtocolVersion(): Promise<{
+        success?: true;
+        canceled?: true;
+        error?: Error;
+    }>;
     noAccount(): boolean;
     hasAccount(): boolean;
     /**
@@ -341,7 +342,6 @@ export declare class SNApplication {
     private constructServices;
     private clearServices;
     private createMigrationService;
-    private createAlertManager;
     private createApiService;
     private createItemManager;
     private createComponentManager;

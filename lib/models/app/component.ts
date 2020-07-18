@@ -207,6 +207,10 @@ export class ComponentMutator extends ItemMutator {
     this.typedContent.active = active;
   }
 
+  set isMobileDefault(isMobileDefault: boolean) {
+    this.typedContent.isMobileDefault = isMobileDefault;
+  }
+
   set defaultEditor(defaultEditor: boolean) {
     this.setAppDataItem(AppDataField.DefaultEditor, defaultEditor);
   }

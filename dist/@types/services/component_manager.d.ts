@@ -13,7 +13,7 @@ import { UuidString } from '../types';
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
-    activationHandler?: (component: SNComponent) => void;
+    activationHandler?: (uuid: UuidString, component?: SNComponent) => void;
     actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
     contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
@@ -130,7 +130,7 @@ export declare class SNComponentManager extends PureService {
     handleDeleteItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleRequestPermissionsMessage(component: SNComponent, message: ComponentMessage): void;
     handleSetComponentDataMessage(component: SNComponent, message: ComponentMessage): void;
-    handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage): void;
+    handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage): Promise<void>;
     toggleComponent(component: SNComponent): Promise<void>;
     handleInstallLocalComponentMessage(sourceComponent: SNComponent, message: ComponentMessage): void;
     runWithPermissions(componentUuid: UuidString, requiredPermissions: ComponentPermission[], runFunction: () => void): void;
@@ -138,7 +138,7 @@ export declare class SNComponentManager extends PureService {
     presentPermissionsDialog(dialog: PermissionDialog): void;
     openModalComponent(component: SNComponent): void;
     registerHandler(handler: ComponentHandler): () => void;
-    findOrCreateDataForComponent(component: SNComponent): ComponentState;
+    findOrCreateDataForComponent(componentUuid: UuidString): ComponentState;
     setReadonlyStateForComponent(component: SNComponent, readonly: boolean, lockReadonly?: boolean): void;
     getReadonlyStateForComponent(component: SNComponent): ComponentState;
     /** Called by other views when the iframe is ready */

@@ -85,7 +85,7 @@ export declare class SNComponent extends SNItem implements ComponentContent {
     readonly isMobileDefault: boolean;
     constructor(payload: PurePayload);
     /** Do not duplicate components under most circumstances. Always keep original */
-    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy.KeepLeft | ConflictStrategy.KeepRight | ConflictStrategy.KeepLeftDuplicateRight | ConflictStrategy.KeepLeftMergeRefs;
+    strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
     isEditor(): boolean;
     isTheme(): boolean;
     isDefaultEditor(): boolean;
@@ -111,6 +111,7 @@ export declare class SNComponent extends SNItem implements ComponentContent {
 export declare class ComponentMutator extends ItemMutator {
     get typedContent(): Partial<ComponentContent>;
     set active(active: boolean);
+    set isMobileDefault(isMobileDefault: boolean);
     set defaultEditor(defaultEditor: boolean);
     set componentData(componentData: Record<string, any>);
     set package_info(package_info: any);
