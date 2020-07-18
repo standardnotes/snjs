@@ -85,8 +85,9 @@ export declare function removeFromArray<T>(array: T[], value: T): void;
 /**
  * Adds the element to the array if the array does not already include the value.
  * The array is searched via array.indexOf
+ * @returns true if value was added
  */
-export declare function addIfUnique<T>(array: T[], value: T): void;
+export declare function addIfUnique<T>(array: T[], value: T): boolean;
 /**
  * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.

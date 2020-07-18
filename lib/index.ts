@@ -10,18 +10,19 @@ export {
   SNItemsKey,
   SNPredicate,
   SNNote, NoteMutator,
-  SNTag,
+  SNTag, TagMutator,
   SNSmartTag,
   SNActionsExtension,
   Action,
   SNTheme,
   SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
-  SNUserPrefs, UserPrefsMutator, WebPrefKey
+  SNUserPrefs, UserPrefsMutator, WebPrefKey,
 } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
+export type { UuidString } from './types';
 
 export { SNComponentManager } from './services/component_manager';
 export { HistorySession } from '@Services/history/history_session';
@@ -63,7 +64,8 @@ export {
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
-export { SNAlertService } from './services/alert_service';
+export { ButtonType } from './services/alert_service';
+export type { DismissBlockingDialog, SNAlertService } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
@@ -143,4 +145,3 @@ export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 export {
   PrivilegeSessionLength
 } from '@Services/privileges_service';
-

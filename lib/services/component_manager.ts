@@ -23,7 +23,7 @@ import {
 import { Uuid } from '@Lib/uuid';
 import {
   Copy, isString, extendArray, removeFromArray,
-  searchArray, concatArrays, addIfUnique, filterFromArray
+  searchArray, concatArrays, addIfUnique, filterFromArray, sleep
 } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
@@ -52,7 +52,7 @@ type StreamObserver = {
 type ComponentHandler = {
   identifier: string
   areas: ComponentArea[]
-  activationHandler?: (component: SNComponent) => void
+  activationHandler?: (uuid: UuidString, component?: SNComponent) => void
   actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
   contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
   componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
@@ -112,7 +112,6 @@ type ComponentState = {
   sessionKey?: string
 }
 
-
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
  * and other components. The component manager primarily deals with iframes, and orchestrates
@@ -132,7 +131,7 @@ export class SNComponentManager extends PureService {
   private removeItemObserver?: any
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
-  private activeComponents: UuidString[] = []
+  private activeComponents: Partial<Record<UuidString, ComponentArea>> = {};
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
@@ -183,7 +182,7 @@ export class SNComponentManager extends PureService {
     super.deinit();
     this.streamObservers.length = 0;
     this.contextStreamObservers.length = 0;
-    this.activeComponents.length = 0;
+    (this.activeComponents as any) = undefined;
     this.permissionDialogs.length = 0;
     this.handlers.length = 0;
     (this.itemManager as any) = undefined;
@@ -224,7 +223,7 @@ export class SNComponentManager extends PureService {
           }
         }
         for (const component of syncedComponents) {
-          const isInActive = this.activeComponents.includes(component.uuid);
+          const isInActive = this.activeComponents[component.uuid];
           if (component.active && !component.deleted && !isInActive) {
             this.activateComponent(component.uuid);
           } else if (!component.active && isInActive) {
@@ -313,7 +312,8 @@ export class SNComponentManager extends PureService {
   }
 
   detectFocusChange = () => {
-    const activeComponents = this.itemManager.findItems(this.activeComponents) as SNComponent[];
+    const activeComponents =
+      this.itemManager.findItems(Object.keys(this.activeComponents)) as SNComponent[];
     for (const component of activeComponents) {
       if (document.activeElement === this.iframeForComponent(component.uuid)) {
         this.timeout(() => {
@@ -358,7 +358,7 @@ export class SNComponentManager extends PureService {
 
   postActiveThemesToAllComponents() {
     for (const component of this.components) {
-      const componentState = this.findOrCreateDataForComponent(component);
+      const componentState = this.findOrCreateDataForComponent(component.uuid);
       /* Skip over components that are themes themselves,
         or components that are not active, or components that don't have a window */
       if (component.isTheme() || !component.active || !componentState.window) {
@@ -428,14 +428,14 @@ export class SNComponentManager extends PureService {
   }
 
   public isComponentHidden(component: SNComponent) {
-    const componentState = this.findOrCreateDataForComponent(component);
+    const componentState = this.findOrCreateDataForComponent(component.uuid);
     return componentState.hidden;
   }
 
   public setComponentHidden(component: SNComponent, hidden: boolean) {
     /* A hidden component will not receive messages. However, when a component is unhidden,
      * we need to send it any items it may have registered streaming for. */
-    const componentState = this.findOrCreateDataForComponent(component);
+    const componentState = this.findOrCreateDataForComponent(component.uuid);
     if (hidden) {
       componentState.hidden = true;
     } else if (componentState.hidden) {
@@ -524,7 +524,7 @@ export class SNComponentManager extends PureService {
       ComponentAction.ComponentRegistered,
       ComponentAction.ActivateThemes
     ];
-    const componentState = this.findOrCreateDataForComponent(component);
+    const componentState = this.findOrCreateDataForComponent(component.uuid);
     if (componentState.hidden && !permissibleActionsWhileHidden.includes(message.action)) {
       this.log('Component disabled for current item, ignoring messages.', component.name);
       return;
@@ -576,7 +576,7 @@ export class SNComponentManager extends PureService {
   }
 
   public sessionKeyForComponent(component: SNComponent) {
-    const componentState = this.findOrCreateDataForComponent(component);
+    const componentState = this.findOrCreateDataForComponent(component.uuid);
     return componentState.sessionKey;
   }
 
@@ -952,12 +952,9 @@ export class SNComponentManager extends PureService {
       const itemsData = message.data.items;
       const noun = itemsData.length === 1 ? 'item' : 'items';
       let reply = null;
-      let didConfirm = true;
-      await this.alertService!.confirm(
+      const didConfirm = await this.alertService!.confirm(
         `Are you sure you want to delete ${itemsData.length} ${noun}?`
-      ).catch(() => {
-        didConfirm = false;
-      });
+      );
       if (didConfirm) {
         /* Filter for any components and deactivate before deleting */
         for (const itemData of itemsData) {
@@ -997,8 +994,9 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage) {
-    this.toggleComponent(targetComponent);
+  async handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage) {
+    await this.toggleComponent(targetComponent);
+    this.syncService.sync();
   }
 
   async toggleComponent(component: SNComponent) {
@@ -1015,13 +1013,12 @@ export class SNComponentManager extends PureService {
           /* Activate current before deactivating others, so as not to flicker */
           await this.activateComponent(component.uuid);
           if (!theme.isLayerable()) {
-            setTimeout(async () => {
-              for (const candidate of activeThemes) {
-                if (candidate && !candidate.isLayerable()) {
-                  await this.deactivateComponent(candidate.uuid);
-                }
+            await sleep(10);
+            for (const candidate of activeThemes) {
+              if (candidate && !candidate.isLayerable()) {
+                await this.deactivateComponent(candidate.uuid);
               }
-            }, 10);
+            }
           }
         } else {
           await this.activateComponent(component.uuid);
@@ -1187,11 +1184,11 @@ export class SNComponentManager extends PureService {
     };
   }
 
-  findOrCreateDataForComponent(component: SNComponent) {
-    let data = this.componentState[component.uuid];
+  findOrCreateDataForComponent(componentUuid: UuidString) {
+    let data = this.componentState[componentUuid];
     if (!data) {
       data = {} as ComponentState;
-      this.componentState[component.uuid] = data;
+      this.componentState[componentUuid] = data;
     }
     return data;
   }
@@ -1201,7 +1198,7 @@ export class SNComponentManager extends PureService {
     readonly: boolean,
     lockReadonly: boolean = false
   ) {
-    const data = this.findOrCreateDataForComponent(component);
+    const data = this.findOrCreateDataForComponent(component.uuid);
     data.readonly = readonly;
     data.lockReadonly = lockReadonly;
   }
@@ -1209,7 +1206,7 @@ export class SNComponentManager extends PureService {
   getReadonlyStateForComponent(
     component: SNComponent
   ) {
-    const data = this.findOrCreateDataForComponent(component);
+    const data = this.findOrCreateDataForComponent(component.uuid);
     return {
       readonly: data.readonly,
       lockReadonly: data.lockReadonly
@@ -1222,7 +1219,7 @@ export class SNComponentManager extends PureService {
     componentWindow: Window
   ) {
     this.log('Register component window', component);
-    const data = this.findOrCreateDataForComponent(component);
+    const data = this.findOrCreateDataForComponent(component.uuid);
     if (data.window === componentWindow) {
       this.log('Web|componentManager', 'attempting to re-register same component window.');
     }
@@ -1248,14 +1245,14 @@ export class SNComponentManager extends PureService {
 
   registerComponent(uuid: UuidString) {
     this.log('Registering component', uuid);
-    addIfUnique(this.activeComponents, uuid);
     const component = this.itemManager.findItem(uuid) as SNComponent;
+    this.activeComponents[uuid] = component.area;
     for (const handler of this.handlers) {
       if (
         handler.areas.includes(component.area) ||
         handler.areas.includes(ComponentArea.Any)
       ) {
-        handler.activationHandler && handler.activationHandler(component);
+        handler.activationHandler?.(uuid, component);
       }
     }
     if (component.area === ComponentArea.Themes) {
@@ -1272,20 +1269,22 @@ export class SNComponentManager extends PureService {
       });
     }
     this.registerComponent(uuid);
-    this.syncService!.sync();
   }
 
   deregisterComponent(uuid: UuidString) {
     this.log('Degregistering component', uuid);
-    const component = this.itemManager.findItem(uuid) as SNComponent;
-    removeFromArray(this.activeComponents, uuid);
-    delete this.componentState[component.uuid];
-    for (const handler of this.handlers) {
-      if (
-        handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentArea.Any)
-      ) {
-        handler.activationHandler && handler.activationHandler(component);
+    const component = this.itemManager.findItem(uuid) as SNComponent | undefined;
+    delete this.componentState[uuid];
+    const area = this.activeComponents[uuid];
+    delete this.activeComponents[uuid];
+    if (area) {
+      for (const handler of this.handlers) {
+        if (
+          handler.areas.includes(area) ||
+          handler.areas.includes(ComponentArea.Any)
+        ) {
+          handler.activationHandler?.(uuid, component);
+        }
       }
     }
     this.streamObservers = this.streamObservers.filter((o) => {
@@ -1294,7 +1293,7 @@ export class SNComponentManager extends PureService {
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
       return o.componentUuid !== uuid;
     });
-    if (component.area === ComponentArea.Themes) {
+    if (area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();
     }
   }
@@ -1302,14 +1301,13 @@ export class SNComponentManager extends PureService {
   async deactivateComponent(uuid: UuidString) {
     this.log('Deactivating component', uuid);
     const component = this.itemManager?.findItem(uuid) as SNComponent;
-    if (component.active) {
+    if (component?.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.active = false;
       });
     }
-    this.findOrCreateDataForComponent(component).sessionKey = undefined;
+    this.findOrCreateDataForComponent(uuid).sessionKey = undefined;
     this.deregisterComponent(uuid);
-    this.syncService!.sync();
   }
 
   async reloadComponent(uuid: UuidString) {

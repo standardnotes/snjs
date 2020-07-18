@@ -26,7 +26,7 @@ export type ActionResponse = {
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
- * Action-based extensions are mostly RESTful actions that can push a local value or 
+ * Action-based extensions are mostly RESTful actions that can push a local value or
  * retrieve a remote value and act on it accordingly.
  * There are 4 action types:
  * `get`: performs a GET request on an endpoint to retrieve an item value, and merges the
@@ -94,9 +94,9 @@ export class SNActionsService extends PureService {
   }
 
   /**
-   * Loads an extension in the context of a certain item. 
+   * Loads an extension in the context of a certain item.
    * The server then has the chance to respond with actions that are
-   * relevant just to this item. The response extension is not saved, 
+   * relevant just to this item. The response extension is not saved,
    * just displayed as a one-time thing.
   */
   public async loadExtensionInContextOfItem(extension: SNActionsExtension, item: SNItem) {
@@ -164,27 +164,18 @@ export class SNActionsService extends PureService {
     action: Action,
     passwordRequestHandler: PasswordRequestHandler
   ): Promise<ActionResponse> {
-    return new Promise((resolve) => {
-      this.alertService!.confirm(
-        "Are you sure you want to replace the current note contents with this action's results?",
-        undefined,
-        undefined,
-        undefined,
-        () => {
-          this.runConfirmedGetAction(action, passwordRequestHandler)
-            .then((response) => {
-              resolve(response);
-            });
-        },
-        () => {
-          resolve({
-            error: {
-              message: 'Action canceled by user.' 
-            }
-          });
+    const confirmed = await this.alertService!.confirm(
+      "Are you sure you want to replace the current note contents with this action's results?"
+    )
+    if (confirmed) {
+      return this.runConfirmedGetAction(action, passwordRequestHandler);
+    } else {
+      return {
+        error: {
+          message: 'Action canceled by user.'
         }
-      );
-    });
+      }
+    }
   }
 
   private async runConfirmedGetAction(
@@ -263,8 +254,8 @@ export class SNActionsService extends PureService {
     }
     if (!response.auth_params) {
       /**
-       * In some cases revisions were missing auth params. 
-       * Instruct the user to email us to get this remedied. 
+       * In some cases revisions were missing auth params.
+       * Instruct the user to email us to get this remedied.
        */
       this.alertService!.alert(
         'We were unable to decrypt this revision using your current keys, ' +

@@ -183,11 +183,14 @@ export function removeFromArray<T>(array: T[], value: T) {
 /**
  * Adds the element to the array if the array does not already include the value.
  * The array is searched via array.indexOf
+ * @returns true if value was added
  */
-export function addIfUnique<T>(array: T[], value: T) {
+export function addIfUnique<T>(array: T[], value: T): boolean {
   if (!array.includes(value)) {
     array.push(value);
+    return true;
   }
+  return false;
 }
 
 /**
