@@ -40,7 +40,11 @@ export abstract class DeviceInterface {
 
   public async getJsonParsedStorageValue(key: string) {
     const value = await this.getRawStorageValue(key);
-    return value ? JSON.parse(value) : value;
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+    }
+    return value;
   }
 
   abstract async getAllRawStorageKeyValues() : Promise<Record<string, any>[]>;
