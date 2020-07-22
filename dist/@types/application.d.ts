@@ -10,7 +10,7 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
-import { Challenge, ChallengeValue } from './challenges';
+import { Challenge, ChallengeResponse, ChallengeValue } from './challenges';
 import { ValueCallback } from './services/challenge/challenge_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
@@ -273,6 +273,7 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
+    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | null> | undefined;
     setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
         challenge: Challenge;
         onValidValue?: ValueCallback;

@@ -888,6 +888,10 @@ export class SNApplication {
     }
   }
 
+  public promptForCustomChallenge(challenge: Challenge) {
+    return this.challengeService?.promptForChallengeResponse(challenge);
+  }
+
   public setChallengeCallbacks({
     challenge,
     onValidValue,
