@@ -271,7 +271,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       /* keyParams.version >= 004 */
       return true;
     } else {
-      return !!isWebCryptoAvailable();
+      return !!isWebCryptoAvailable() || isReactNativeEnvironment();
     }
   }
 
