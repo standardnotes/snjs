@@ -105,6 +105,11 @@ export class SNPredicate {
       targetValue = this.DateFromString(targetValue);
     }
 
+    /* Process not before handling the keypath, because not does not use it. */
+    if (predicate.operator === 'not') {
+      return !this.ObjectSatisfiesPredicate(object, targetValue);
+    }
+
     const valueAtKeyPath = predicate.keypath.split('.').reduce((previous, current) => {
       return previous && previous[current];
     }, object);
