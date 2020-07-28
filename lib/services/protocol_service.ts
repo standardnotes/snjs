@@ -263,7 +263,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public platformSupportsKeyDerivation(keyParams: SNRootKeyParams) {
     /**
      * If the version is 003 or lower, key derivation is supported unless the browser is
-     * IE or Edge (or generally, where WebCrypto is not available).
+     * IE or Edge (or generally, where WebCrypto is not available) or React Native environment is detected.
      *
      * Versions 004 and above are always supported.
      */
@@ -271,7 +271,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       /* keyParams.version >= 004 */
       return true;
     } else {
-      return !!isWebCryptoAvailable();
+      return !!isWebCryptoAvailable() || isReactNativeEnvironment();
     }
   }
 
