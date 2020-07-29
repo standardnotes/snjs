@@ -767,7 +767,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   private async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface!.getKeychainValue();
+    const rawKey = await this.deviceInterface!.getNamespacedKeychainValue();
     if (isNullOrUndefined(rawKey)) {
       return undefined;
     }
@@ -786,7 +786,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const rawKey = this.rootKey!.getPersistableValue();
     return this.executeCriticalFunction(() => {
-      return this.deviceInterface!.setKeychainValue(rawKey);
+      return this.deviceInterface!.setNamespacedKeychainValue(rawKey);
     })
   }
 
@@ -962,7 +962,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else {
       throw Error('Attempting to set wrapper on already wrapped key.');
     }
-    await this.deviceInterface!.clearKeychainValue();
+    await this.deviceInterface!.clearNamespacedKeychainValue();
     if ((
       this.keyMode === KeyMode.WrapperOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -1099,7 +1099,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
   public async clearLocalKeyState() {
-    await this.deviceInterface!.clearKeychainValue();
+    await this.deviceInterface!.clearNamespacedKeychainValue();
     await this.storageService!.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped

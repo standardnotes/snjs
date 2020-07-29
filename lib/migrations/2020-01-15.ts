@@ -135,7 +135,7 @@ export class Migration20200115 extends Migration {
           version: version
         }
       );
-      await this.services.deviceInterface.setKeychainValue(
+      await this.services.deviceInterface.setNamespacedKeychainValue(
         accountKey.getPersistableValue()
       );
     }
@@ -307,7 +307,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getKeychainValue();
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
@@ -369,7 +369,7 @@ export class Migration20200115 extends Migration {
           passcodeKey,
         );
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
         const passcodeKey = await getPasscodeKey();
@@ -387,7 +387,7 @@ export class Migration20200115 extends Migration {
           passcodeKey,
         );
         rawStructure.wrapped = wrapped.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       }
     } else {
       /** No passcode, potentially account. Migrate keychain property keys. */
@@ -404,7 +404,7 @@ export class Migration20200115 extends Migration {
             version: keychainValue.version || defaultVersion
           }
         );
-        await this.services.deviceInterface.setKeychainValue(
+        await this.services.deviceInterface.setNamespacedKeychainValue(
           accountKey.getPersistableValue()
         );
       }

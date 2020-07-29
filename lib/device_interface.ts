@@ -79,11 +79,15 @@ export abstract class DeviceInterface {
     }
   }
 
-  abstract async getKeychainValue() : Promise<any>;
+  abstract async getNamespacedKeychainValue() : Promise<any>;
 
-  abstract async setKeychainValue(value: any) : Promise<void>;
+  abstract async setNamespacedKeychainValue(value: any) : Promise<void>;
 
-  abstract async clearKeychainValue() : Promise<void>;
+  abstract async clearNamespacedKeychainValue() : Promise<void>;
+
+  abstract async getRawKeychainValue() : Promise<any>;
+
+  abstract async clearRawKeychainValue() : Promise<void>;
 
   abstract openUrl(url: string): void;
 

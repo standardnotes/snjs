@@ -50,7 +50,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(accountResult.keyParams.getPortableValue())
     );
     const accountKey = accountResult.key;
-    await application.deviceInterface.setKeychainValue({
+    await application.deviceInterface.setNamespacedKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -155,7 +155,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
-    const keychainValue = await application.deviceInterface.getKeychainValue();
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue();
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -198,7 +198,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
-    await application.deviceInterface.setKeychainValue({
+    await application.deviceInterface.setNamespacedKeychainValue({
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
@@ -271,7 +271,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
-    const keychainValue = await application.deviceInterface.getKeychainValue();
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue();
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -315,7 +315,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     const accountKey = accountResult.key;
     expect(accountKey.version).to.equal(ProtocolVersion.V003);
-    await application.deviceInterface.setKeychainValue({
+    await application.deviceInterface.setNamespacedKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,

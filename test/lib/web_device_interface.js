@@ -79,16 +79,30 @@ export default class WebDeviceInterface extends DeviceInterface {
     }
   }
 
-  /** @keychian */
-  async getKeychainValue() {
+  /** @keychain */
+  async getNamespacedKeychainValue() {
+    return this.keychainValue[this.keychainStorageKey];
+  }
+
+  async setNamespacedKeychainValue(value) {
+    if (!this.keychainValue) {
+      this.keychainValue = {};
+    }
+    this.keychainValue[this.keychainStorageKey] = value;
+  }
+
+  async clearNamespacedKeychainValue() {
+    if (!this.keychainValue) {
+      this.keychainValue = {};
+    }
+    this.keychainValue[this.keychainStorageKey] = null;
+  }
+
+  async getRawKeychainValue() {
     return this.keychainValue;
   }
 
-  async setKeychainValue(value) {
-    this.keychainValue = value;
-  }
-
-  async clearKeychainValue() {
+  async clearRawKeychainValue() {
     this.keychainValue = null;
   }
 }
