@@ -109,4 +109,67 @@ describe('protocol', function () {
     expect(decrypted.errorDecrypting).to.not.be.ok;
     expect(decrypted.content.secret).to.equal(payload.content.secret);
   });
+
+  it('encrypted payload for server should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.Sync
+    );
+    expect(encryptedPayload).to.be.ok;
+    expect(encryptedPayload).to.contain.keys('duplicate_of');
+  });
+
+  it('ejected payload for server should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.Sync
+    );
+    const ejected = encryptedPayload.ejected();
+    expect(ejected).to.be.ok;
+    expect(ejected).to.contain.keys('duplicate_of');
+  });
+
+  it('encrypted payload for storage should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.LocalStorageEncrypted
+    );
+    expect(encryptedPayload).to.be.ok;
+    expect(encryptedPayload).to.contain.keys('duplicate_of');
+  });
+
+  it('ejected payload for storage should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.LocalStorageEncrypted
+    );
+    const ejected = encryptedPayload.ejected();
+    expect(ejected).to.be.ok;
+    expect(ejected).to.contain.keys('duplicate_of');
+  });
+
+  it('encrypted payload for file should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.FileEncrypted
+    );
+    expect(encryptedPayload).to.be.ok;
+    expect(encryptedPayload).to.contain.keys('duplicate_of');
+  });
+
+  it('ejected payload for file should include duplicate_of field', async function () {
+    const payload = Factory.createNotePayload('Test');
+    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+      payload,
+      EncryptionIntent.FileEncrypted
+    );
+    const ejected = encryptedPayload.ejected();
+    expect(ejected).to.be.ok;
+    expect(ejected).to.contain.keys('duplicate_of');
+  });
 });
