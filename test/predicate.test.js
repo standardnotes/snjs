@@ -120,6 +120,51 @@ describe('predicates', async function () {
     ]))).to.equal(false);
   });
 
+  it('test not operator', async function () {
+    const item = await this.createItem();
+    expect(item.satisfiesPredicate(new SNPredicate(
+      'this_field_ignored', 'not', ['content.title', '=', 'Not This Title']
+    ))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate(
+      'this_field_ignored', 'not', ['content.title', '=', 'Hello']
+    ))).to.equal(false);
+
+    expect(item.satisfiesPredicate(new SNPredicate('', 'and', [
+      ['', 'not', ['content.tags', 'includes', ['title', '=', 'far']]],
+      ['content.tags', 'includes', ['title', '=', 'foo']],
+    ]))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('', 'and', [
+      ['', 'not', ['content.tags', 'includes', ['title', '=', 'boo']]],
+      ['content.tags', 'includes', ['title', '=', 'foo']],
+    ]))).to.equal(true);
+
+    expect(item.satisfiesPredicate(new SNPredicate('', 'not', [
+      '', 'and', [
+        ['content.title', 'startsWith', 'H'],
+        ['content.tags', 'includes', ['title', '=', 'falsify']]
+      ]
+    ]))).to.equal(true);
+    expect(item.satisfiesPredicate(new SNPredicate('', 'not', [
+      '', 'and', [
+        ['content.title', 'startsWith', 'H'],
+        ['content.tags', 'includes', ['title', '=', 'foo']]
+      ]
+    ]))).to.equal(false);
+
+    expect(item.satisfiesPredicate(new SNPredicate('', 'not', [
+      '', 'or', [
+        ['content.title', 'startsWith', 'H'],
+        ['content.tags', 'includes', ['title', '=', 'falsify']]
+      ]
+    ]))).to.equal(false);
+    expect(item.satisfiesPredicate(new SNPredicate('', 'not', [
+      '', 'or', [
+        ['content.title', 'startsWith', 'Z'],
+        ['content.tags', 'includes', ['title', '=', 'falsify']]
+      ]
+    ]))).to.equal(true);
+  });
+
   it('test deep nested recursive operator', async function () {
     const item = await this.createItem();
     expect(item.satisfiesPredicate(new SNPredicate('this_field_ignored', 'and', [

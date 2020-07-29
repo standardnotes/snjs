@@ -29,7 +29,7 @@ export function isWebEnvironment() {
  */
 export function isWebCryptoAvailable() {
   // @ts-ignore documentMode does not exit in definitions but might exist on IE
-  return isWebEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
+  return isWebEnvironment() && !isReactNativeEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
 }
 
 /**

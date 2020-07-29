@@ -70,6 +70,15 @@ export abstract class DeviceInterface {
 
   abstract async removeAllRawDatabasePayloads() : Promise<void>;
 
+  protected get keychainStorageKey() {
+    const keychainStorageKey = 'keychain';
+    if (this.namespace) {
+      return `${this.namespace}-${keychainStorageKey}`;
+    } else {
+      return keychainStorageKey;
+    }
+  }
+
   abstract async getKeychainValue() : Promise<any>;
 
   abstract async setKeychainValue(value: any) : Promise<void>;
