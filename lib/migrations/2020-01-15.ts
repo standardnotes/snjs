@@ -27,6 +27,7 @@ const LegacyKeys = {
   AllAccountKeyParamsKey: 'auth_params',
   WebEncryptedStorageKey: 'encryptedStorage',
   MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  MobilePasscodeKeyboardTypeKey: 'passcodeKeyboardType',
   AllMigrations: 'migrations'
 };
 
@@ -298,13 +299,18 @@ export class Migration20200115 extends Migration {
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedStorageValue(
       LegacyKeys.MobilePasscodeParamsKey
     );
+    const rawPasscodeKeyboardType = await this.services.deviceInterface.getJsonParsedStorageValue(
+      LegacyKeys.MobilePasscodeKeyboardTypeKey
+    );
     const rawStructure: StorageValuesObject = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
         [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
-        [StorageKey.RootKeyParams]: rawAccountKeyParams
+        [StorageKey.RootKeyParams]: rawAccountKeyParams,
       },
-      [ValueModesKeys.Unwrapped]: {},
+      [ValueModesKeys.Unwrapped]: {
+        [StorageKey.MobilePasscodeKeyboardType]: rawPasscodeKeyboardType,
+      },
       [ValueModesKeys.Wrapped]: {},
     };
     const keychainValue = await this.services.deviceInterface.getKeychainValue();
