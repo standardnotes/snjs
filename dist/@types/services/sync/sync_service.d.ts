@@ -153,6 +153,7 @@ export declare class SNSyncService extends PureService {
      * such as server extensions
      */
     private payloadsByPreparingForServer;
+    downloadFirstSync(waitTimeOnFailureMs: number, otherSyncOptions?: SyncOptions): Promise<void>;
     sync(options?: SyncOptions): Promise<any>;
     private syncOnlineOperation;
     private syncOfflineOperation;

@@ -23,6 +23,7 @@ export declare enum StorageKey {
     BiometricsState = "biometrics_state",
     MobilePasscodeTiming = "passcode_timing",
     MobileBiometricsTiming = "biometrics_timing",
+    MobilePasscodeKeyboardType = "passcodeKeyboardType",
     PrivilegesExpirey = "SessionExpiresAtKey",
     PrivilegesSessionLength = "SessionLengthKey",
     SessionHistoryPersistable = "sessionHistory_persist",

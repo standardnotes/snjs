@@ -13,7 +13,7 @@ export declare enum StorageEncryptionPolicies {
     Disabled = 2
 }
 export declare enum StorageValueModes {
-    /** Stored inside wrapped encrpyed storage object */
+    /** Stored inside wrapped encrypted storage object */
     Default = 1,
     /** Stored outside storage object, unencrypted */
     Nonwrapped = 2
