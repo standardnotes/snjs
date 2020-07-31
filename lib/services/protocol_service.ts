@@ -522,6 +522,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (format === PayloadFormat.DecryptedBareObject) {
       return payload;
     }
+    /** We check if the key can decrypt the encrypted payload. */
+    if (
+      payload.usesItemKeyEncryption() &&
+      key?.content_type === ContentType.RootKey
+    ) {
+      key = undefined;
+    }
     if (!key && format === PayloadFormat.EncryptedString) {
       key = await this.keyToUseForDecryptionOfPayload(payload);
       if (!key) {
@@ -572,21 +579,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         continue;
       }
       try {
-        let keyForPayload = key;
-        const version = encryptedPayload!.version;
-        const payloadContentType = encryptedPayload!.content_type;
-        const keyContentType = key?.content_type;
-        /** We check if the key can decrypt the encrypted payload. */
-        if (
-          version === ProtocolVersion.V004 &&
-          keyContentType === ContentType.RootKey &&
-          payloadContentType !== ContentType.ItemsKey
-        ) {
-          keyForPayload = undefined;
-        }
         const decryptedPayload = await this.payloadByDecryptingPayload(
           encryptedPayload,
-          keyForPayload
+          key
         );
         decryptedPayloads.push(decryptedPayload);
       } catch (e) {
