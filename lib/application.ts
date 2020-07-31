@@ -765,10 +765,10 @@ export class SNApplication {
       data,
       password
     );
-    const validPayloads = decryptedPayloads.sort((payload) => { 
+    const validPayloads = decryptedPayloads.sort((payload) => {
       return payload.content_type === ContentType.ItemsKey ? 0 : 1;
     }).filter((payload) => {
-      return !payload.errorDecrypting || payload.waitingForKey;
+      return !payload.errorDecrypting;
     }).map((payload) => {
       /* Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess */
@@ -781,12 +781,22 @@ export class SNApplication {
               active: false
             }
           }
-        )
+        );
       } else {
         return payload;
       }
-    })
-    const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
+    });
+    let affectedUuids = await this.modelManager!.importPayloads(validPayloads);
+    if (affectedUuids.length > 0) {
+      const payloadsWaitingForKeys = decryptedPayloads.filter((payload) => {
+        return payload.waitingForKey;
+      });
+      const decryptedPendingPayloads = await this.protocolService!.payloadsByDecryptingPayloads(
+        payloadsWaitingForKeys
+      );
+      const importedUuids = await this.modelManager!.importPayloads(decryptedPendingPayloads);
+      affectedUuids = affectedUuids.concat(importedUuids);
+    }
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -794,7 +804,7 @@ export class SNApplication {
     const affectedItems = this.getAll(affectedUuids) as SNItem[];
     return {
       affectedItems: affectedItems,
-      errorCount: decryptedPayloads.length - validPayloads.length
+      errorCount: decryptedPayloads.length - affectedUuids.length
     };
   }
 
