@@ -270,4 +270,103 @@ describe('importing', () => {
       expect(this.application.itemManager.tags.length).to.equal(1);
       expect(this.application.findItem(note.uuid).deleted).to.be.false;
     });
+
+    it('should import data from 003 encrypted payload', async function () {
+      const oldVersion = ProtocolVersion.V003;
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: oldVersion
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 003.'
+        }
+      );
+
+      const payload = CreateSourcedPayloadFromObject(
+        noteItem.payload,
+        PayloadSource.FileImport
+      );
+      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.FilePreferEncrypted
+      );
+
+      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
+      const keyParams = rootkeyParams.getPortableValue();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const itemsToImport = [encryptedPayload];
+      const result = await this.application.importData(
+        {
+          keyParams: keyParams,
+          items: itemsToImport
+        },
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(itemsToImport.length);
+      expect(result.errorCount).to.be.eq(0);
+
+      const decryptedNote = result.affectedItems[0];
+      expect(decryptedNote.title).to.be.eq('Encrypted note');
+      expect(decryptedNote.text).to.be.eq('On protocol version 003.');
+    });
+
+    it('should import data from 004 encrypted payload', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const payload = CreateSourcedPayloadFromObject(
+        noteItem.payload,
+        PayloadSource.FileImport
+      );
+      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.FilePreferEncrypted
+      );
+      const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
+
+      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
+      const keyParams = rootkeyParams.getPortableValue();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const itemsToImport = [encryptedPayload, itemsKey];
+      const result = await this.application.importData(
+        {
+          keyParams,
+          items: itemsToImport
+        },
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(itemsToImport.length);
+      expect(result.errorCount).to.be.eq(0);
+
+      const decryptedNote = this.application.itemManager.findItem(encryptedPayload.uuid);
+      expect(decryptedNote.title).to.be.eq('Encrypted note');
+      expect(decryptedNote.text).to.be.eq('On protocol version 004.');
+    });
 });
