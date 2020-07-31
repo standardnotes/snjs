@@ -124,7 +124,7 @@ export declare class SNItem {
      */
     strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
     isItemContentEqualWith(otherItem: SNItem): boolean;
-    satisfiesPredicate(predicate: SNPredicate): any;
+    satisfiesPredicate(predicate: SNPredicate): boolean;
     updatedAtTimestamp(): number;
     private dateToLocalizedString;
 }
