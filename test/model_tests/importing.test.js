@@ -336,38 +336,24 @@ describe('importing', () => {
         }
       );
 
-      const payload = CreateSourcedPayloadFromObject(
-        noteItem.payload,
-        PayloadSource.FileImport
-      );
-      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-        payload,
-        EncryptionIntent.FilePreferEncrypted
-      );
-      const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
-
-      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
-      const keyParams = rootkeyParams.getPortableValue();
+      const backupData = await this.application.protocolService.createBackupFile();
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
 
-      const itemsToImport = [encryptedPayload, itemsKey];
       const result = await this.application.importData(
-        {
-          keyParams,
-          items: itemsToImport
-        },
+        JSON.parse(backupData),
         this.password,
         true,
       );
       expect(result).to.not.be.undefined;
-      expect(result.affectedItems.length).to.be.eq(itemsToImport.length);
+      expect(result.affectedItems.length).to.be.eq(2);
       expect(result.errorCount).to.be.eq(0);
 
-      const decryptedNote = this.application.itemManager.findItem(encryptedPayload.uuid);
+      const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
       expect(decryptedNote.title).to.be.eq('Encrypted note');
       expect(decryptedNote.text).to.be.eq('On protocol version 004.');
+      expect(this.application.itemManager.notes.length).to.equal(1);
     });
 
     it('should return correct errorCount', async function () {
