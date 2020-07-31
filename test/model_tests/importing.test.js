@@ -288,37 +288,25 @@ describe('importing', () => {
         }
       );
 
-      const payload = CreateSourcedPayloadFromObject(
-        noteItem.payload,
-        PayloadSource.FileImport
-      );
-      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-        payload,
-        EncryptionIntent.FilePreferEncrypted
-      );
-
-      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
-      const keyParams = rootkeyParams.getPortableValue();
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
 
-      const itemsToImport = [encryptedPayload];
       const result = await this.application.importData(
-        {
-          keyParams: keyParams,
-          items: itemsToImport
-        },
+        backupData,
         this.password,
         true,
       );
       expect(result).to.not.be.undefined;
-      expect(result.affectedItems.length).to.be.eq(itemsToImport.length);
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length);
       expect(result.errorCount).to.be.eq(0);
 
-      const decryptedNote = result.affectedItems[0];
+      const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
       expect(decryptedNote.title).to.be.eq('Encrypted note');
       expect(decryptedNote.text).to.be.eq('On protocol version 003.');
+      expect(this.application.itemManager.notes.length).to.equal(1);
     });
 
     it('should import data from 004 encrypted payload', async function () {
@@ -336,18 +324,19 @@ describe('importing', () => {
         }
       );
 
-      const backupData = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
 
       const result = await this.application.importData(
-        JSON.parse(backupData),
+        backupData,
         this.password,
         true,
       );
       expect(result).to.not.be.undefined;
-      expect(result.affectedItems.length).to.be.eq(2);
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length);
       expect(result.errorCount).to.be.eq(0);
 
       const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
@@ -371,23 +360,13 @@ describe('importing', () => {
         }
       );
 
-      const payload = CreateSourcedPayloadFromObject(
-        noteItem.payload,
-        PayloadSource.FileImport
-      );
-      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-        payload,
-        EncryptionIntent.FilePreferEncrypted
-      );
-      const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
-
-      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
-      const keyParams = rootkeyParams.getPortableValue();
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
 
-      const madeUpPayload = JSON.parse(JSON.stringify(encryptedPayload));
+      const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
 
       madeUpPayload.items_key_id = undefined;
       madeUpPayload.content = '004:somenonsense';
@@ -395,17 +374,18 @@ describe('importing', () => {
       madeUpPayload.version = '004';
       madeUpPayload.uuid = 'fake-uuid';
 
-      const itemsToImport = [encryptedPayload, itemsKey, madeUpPayload];
+      backupData.items = [
+        ...backupData.items,
+        madeUpPayload
+      ];
+
       const result = await this.application.importData(
-        {
-          keyParams,
-          items: itemsToImport
-        },
+        backupData,
         this.password,
         true,
       );
       expect(result).to.not.be.undefined;
-      expect(result.affectedItems.length).to.be.eq(itemsToImport.length - 1);
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length - 1);
       expect(result.errorCount).to.be.eq(1);
     });
 
