@@ -369,4 +369,57 @@ describe('importing', () => {
       expect(decryptedNote.title).to.be.eq('Encrypted note');
       expect(decryptedNote.text).to.be.eq('On protocol version 004.');
     });
+
+    it('should return correct errorCount', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'This is a valid, encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const payload = CreateSourcedPayloadFromObject(
+        noteItem.payload,
+        PayloadSource.FileImport
+      );
+      const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+        payload,
+        EncryptionIntent.FilePreferEncrypted
+      );
+      const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload);
+
+      const rootkeyParams = await this.application.protocolService.getRootKeyParams();
+      const keyParams = rootkeyParams.getPortableValue();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const madeUpPayload = JSON.parse(JSON.stringify(encryptedPayload));
+
+      madeUpPayload.items_key_id = undefined;
+      madeUpPayload.content = '004:somenonsense';
+      madeUpPayload.enc_item_key = '003:anothernonsense';
+      madeUpPayload.version = '004';
+      madeUpPayload.uuid = 'fake-uuid';
+
+      const itemsToImport = [encryptedPayload, itemsKey, madeUpPayload];
+      const result = await this.application.importData(
+        {
+          keyParams,
+          items: itemsToImport
+        },
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(itemsToImport.length - 1);
+      expect(result.errorCount).to.be.eq(1);
+    });
 });
