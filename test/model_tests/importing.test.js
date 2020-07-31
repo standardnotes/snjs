@@ -422,4 +422,68 @@ describe('importing', () => {
       expect(result.affectedItems.length).to.be.eq(itemsToImport.length - 1);
       expect(result.errorCount).to.be.eq(1);
     });
+
+    it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
+      const oldVersion = ProtocolVersion.V003;
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: oldVersion
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 003.'
+        }
+      );
+
+      const backupData = await this.application.protocolService.createBackupFile();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        JSON.parse(backupData),
+        'not-the-correct-password-1234',
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(2);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
+
+    it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'This is a valid, encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const backupData = await this.application.protocolService.createBackupFile();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+      
+      const result = await this.application.importData(
+        JSON.parse(backupData),
+        'not-the-correct-password-1234',
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(2);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
 });
