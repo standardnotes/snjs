@@ -765,18 +765,8 @@ export class SNApplication {
       data,
       password
     );
-    /**
-     * Payloads that are waitingForKey, must be imported in order to decrypt them later.
-     */
-    const payloadsWaitingForKeys = decryptedPayloads.filter((payload) => {
-      return payload.waitingForKey && payload.errorDecrypting;
-    });
-    let affectedUuids: string[] = [];
-    if (payloadsWaitingForKeys.length > 0) {
-      affectedUuids = await this.modelManager!.importPayloads(payloadsWaitingForKeys);
-    }
     const validPayloads = decryptedPayloads.filter((payload) => {
-      return !payload.errorDecrypting;
+      return !payload.errorDecrypting || payload.errorDecrypting;
     }).map((payload) => {
       /* Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess */
@@ -793,9 +783,8 @@ export class SNApplication {
       } else {
         return payload;
       }
-    });
-    const validPayloadsUuids = await this.modelManager!.importPayloads(validPayloads);
-    affectedUuids = affectedUuids.concat(validPayloadsUuids);
+    })
+    const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -803,7 +792,7 @@ export class SNApplication {
     const affectedItems = this.getAll(affectedUuids) as SNItem[];
     return {
       affectedItems: affectedItems,
-      errorCount: decryptedPayloads.length - validPayloads.length - payloadsWaitingForKeys.length
+      errorCount: decryptedPayloads.length - validPayloads.length
     };
   }
 
