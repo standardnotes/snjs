@@ -765,7 +765,9 @@ export class SNApplication {
       data,
       password
     );
-    const validPayloads = decryptedPayloads.filter((payload) => {
+    const validPayloads = decryptedPayloads.sort((payload) => { 
+      return payload.content_type === ContentType.ItemsKey ? 0 : 1;
+    }).filter((payload) => {
       return !payload.errorDecrypting || payload.errorDecrypting;
     }).map((payload) => {
       /* Don't want to activate any components during import process in
