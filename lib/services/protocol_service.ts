@@ -572,9 +572,21 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         continue;
       }
       try {
+        let keyForPayload = key;
+        const version = encryptedPayload!.version;
+        const payloadContentType = encryptedPayload!.content_type;
+        const keyContentType = key?.content_type;
+        /** We check if the key can decrypt the encrypted payload. */
+        if (
+          version === ProtocolVersion.V004 &&
+          keyContentType === ContentType.RootKey &&
+          payloadContentType !== ContentType.ItemsKey
+        ) {
+          keyForPayload = undefined;
+        }
         const decryptedPayload = await this.payloadByDecryptingPayload(
           encryptedPayload,
-          key
+          keyForPayload
         );
         decryptedPayloads.push(decryptedPayload);
       } catch (e) {
@@ -620,7 +632,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     data: BackupFile,
     password?: string
   ) {
-    const keyParams = data.keyParams || data.auth_params;
+    const keyParamsData = data.keyParams || data.auth_params;
     const rawItems = data.items;
     const encryptedPayloads = rawItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
@@ -629,7 +641,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       );
     });
     let decryptedPayloads;
-    if (keyParams) {
+    if (keyParamsData) {
+      const keyParams = this.createKeyParams(keyParamsData);
       const key = await this.computeRootKey(
         password!,
         keyParams
