@@ -197,7 +197,7 @@ export class PurePayload {
   /**
    * Whether a payload uses ItemsKey encryption or not.
    */
-  usesItemKeyEncryption() {
+  usesItemsKeyEncryption() {
     return this.items_key_id !== undefined;
   }
 }
