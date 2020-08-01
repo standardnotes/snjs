@@ -751,7 +751,6 @@ export class SNApplication {
   }
 
   /**
-
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
    * .errorCount: The number of items that were not imported due to failure to decrypt.
@@ -765,9 +764,7 @@ export class SNApplication {
       data,
       password
     );
-    const validPayloads = decryptedPayloads.sort((payload) => {
-      return payload.content_type === ContentType.ItemsKey ? 0 : 1;
-    }).filter((payload) => {
+    const validPayloads = decryptedPayloads.filter((payload) => {
       return !payload.errorDecrypting;
     }).map((payload) => {
       /* Don't want to activate any components during import process in
@@ -781,22 +778,12 @@ export class SNApplication {
               active: false
             }
           }
-        );
+        )
       } else {
         return payload;
       }
     });
-    let affectedUuids = await this.modelManager!.importPayloads(validPayloads);
-    if (affectedUuids.length > 0) {
-      const payloadsWaitingForKeys = decryptedPayloads.filter((payload) => {
-        return payload.waitingForKey;
-      });
-      const decryptedPendingPayloads = await this.protocolService!.payloadsByDecryptingPayloads(
-        payloadsWaitingForKeys
-      );
-      const importedUuids = await this.modelManager!.importPayloads(decryptedPendingPayloads);
-      affectedUuids = affectedUuids.concat(importedUuids);
-    }
+    const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -804,7 +791,7 @@ export class SNApplication {
     const affectedItems = this.getAll(affectedUuids) as SNItem[];
     return {
       affectedItems: affectedItems,
-      errorCount: decryptedPayloads.length - affectedUuids.length
+      errorCount: decryptedPayloads.length - validPayloads.length
     };
   }
 
