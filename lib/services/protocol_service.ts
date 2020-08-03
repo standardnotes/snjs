@@ -658,9 +658,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
             const candidate = decryptedItemsKeysPayloads.find((itemsKeyPayload) => {
               return encryptedPayload.items_key_id === itemsKeyPayload.uuid;
             });
+            const payloadVersion = encryptedPayload.version as ProtocolVersion;
             if (candidate) {
               itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
-            } else {
+            } 
+            /**
+             * Payloads with versions <= 003 use root key directly for encryption.
+             */
+            else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
               itemsKey = key;
             }
           }
