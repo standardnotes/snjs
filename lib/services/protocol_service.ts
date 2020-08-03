@@ -523,13 +523,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (format === PayloadFormat.DecryptedBareObject) {
       return payload;
     }
-    /** We check if the key can decrypt the encrypted payload. */
-    if (
-      payload.usesItemsKeyEncryption() &&
-      key?.content_type === ContentType.RootKey
-    ) {
-      key = undefined;
-    }
     if (!key && format === PayloadFormat.EncryptedString) {
       key = await this.keyToUseForDecryptionOfPayload(payload);
       if (!key) {

@@ -193,11 +193,4 @@ export class PurePayload {
   get discardable() {
     return this.deleted && !this.dirty;
   }
-
-  /**
-   * Whether a payload uses ItemsKey encryption or not.
-   */
-  usesItemsKeyEncryption() {
-    return this.items_key_id !== undefined;
-  }
 }
