@@ -126,9 +126,9 @@ export class SNApplication {
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param swapClasses Gives consumers the ability to provide their own custom
-   * subclass for a service. swapClasses should be an array  of key/value pairs
-   * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace,
-   * and 'with'  is the custom subclass to use.
+   * subclass for a service. swapClasses should be an array of key/value pairs
+   * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
+   * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    */
   constructor(
@@ -138,7 +138,7 @@ export class SNApplication {
     crypto: SNPureCrypto,
     alertService: SNAlertService,
     namespace?: string,
-    swapClasses?: any[],
+    swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
   ) {
     if (!deviceInterface) {
@@ -1319,7 +1319,8 @@ export class SNApplication {
     if (this.shouldSkipClass(SNComponentManager)) {
       return;
     }
-    this.componentManager = new SNComponentManager(
+    const MaybeSwappedComponentManager = this.getClass<typeof SNComponentManager>(SNComponentManager)
+    this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager!,
       this.syncService!,
       this.alertService!,
@@ -1449,10 +1450,10 @@ export class SNApplication {
     return this.skipClasses && this.skipClasses.includes(classCandidate);
   }
 
-  private getClass(base: any) {
+  private getClass<T>(base: T) {
     const swapClass = this.swapClasses && this.swapClasses.find((candidate) => candidate.swap === base);
     if (swapClass) {
-      return swapClass.with;
+      return swapClass.with as T;
     } else {
       return base;
     }
