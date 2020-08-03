@@ -291,11 +291,18 @@ export class SNItem {
     );
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
-      if (Date.now() - this.userModifiedDate.getTime() < twentySeconds ) {
+      if (
         /**
-         * The user may be editing our item at this time, so duplicate the incoming
-         * item to avoid creating surprises in the client's UI.
+         * If the incoming item comes from an import, treat it as
+         * less important than the existing one.
          */
+        item.payload.source === PayloadSource.FileImport ||
+        /**
+         * If the user is actively editing our item, duplicate the incoming item
+         * to avoid creating surprises in the client's UI.
+         */
+        Date.now() - this.userModifiedDate.getTime() < twentySeconds
+      ) {
         return ConflictStrategy.KeepLeftDuplicateRight;
       } else {
         return ConflictStrategy.DuplicateLeftKeepRight;
