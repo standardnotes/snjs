@@ -538,14 +538,25 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const version = payload.version!;
     const operator = this.operatorForVersion(version);
     const encryptionParameters = CreateEncryptionParameters(payload);
-    const decryptedParameters = await operator.generateDecryptedParameters(
-      encryptionParameters,
-      key
-    );
-    return CreateMaxPayloadFromAnyObject(
-      payload,
-      decryptedParameters
-    );
+    try {
+      const decryptedParameters = await operator.generateDecryptedParameters(
+        encryptionParameters,
+        key
+      );
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        decryptedParameters
+      );
+    } catch (e) {
+      console.error('Error decrypting payload', payload, e);
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        {
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !payload.errorDecrypting
+        }
+      );
+    }
   }
 
   /**
@@ -572,22 +583,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         decryptedPayloads.push(encryptedPayload);
         continue;
       }
-      try {
-        const decryptedPayload = await this.payloadByDecryptingPayload(
-          encryptedPayload,
-          key
-        );
-        decryptedPayloads.push(decryptedPayload);
-      } catch (e) {
-        decryptedPayloads.push(CreateMaxPayloadFromAnyObject(
-          encryptedPayload,
-          {
-            errorDecrypting: true,
-            errorDecryptingValueChanged: !encryptedPayload.errorDecrypting
-          }
-        ));
-        console.error('Error decrypting payload', encryptedPayload, e);
-      }
+      const decryptedPayload = await this.payloadByDecryptingPayload(
+        encryptedPayload,
+        key
+      );
+      decryptedPayloads.push(decryptedPayload);
     }
     return decryptedPayloads;
   }
