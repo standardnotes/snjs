@@ -74,7 +74,7 @@ declare type ComponentState = {
 export declare class SNComponentManager extends PureService {
     private itemManager;
     private syncService;
-    private alertService;
+    protected alertService: SNAlertService;
     private environment;
     private platform;
     private timeout;
