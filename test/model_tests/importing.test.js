@@ -452,4 +452,40 @@ describe('importing', () => {
       expect(result.errorCount).to.be.eq(2);
       expect(this.application.itemManager.notes.length).to.equal(0);
     });
+
+    it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      let backupData = JSON.parse(rawBackupFile);
+      backupData = {
+        ...backupData,
+        items: backupData.items.filter((payload) => payload.content_type !== ContentType.ItemsKey),
+      };
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(1);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
 });
