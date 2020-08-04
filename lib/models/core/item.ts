@@ -209,7 +209,10 @@ export class SNItem {
 
   public getAppDomainValue(key: AppDataField) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
-    return appData![key];
+    if (appData?.hasOwnProperty(key)) {
+      return appData![key];
+    }
+    return undefined;
   }
 
   /**
