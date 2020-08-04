@@ -72,12 +72,15 @@ export declare class SNApplication {
      * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
      * @param swapClasses Gives consumers the ability to provide their own custom
-     * subclass for a service. swapClasses should be an array  of key/value pairs
-     * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace,
-     * and 'with'  is the custom subclass to use.
+     * subclass for a service. swapClasses should be an array of key/value pairs
+     * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
+     * and 'with' is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: {
+        swap: any;
+        with: any;
+    }[], skipClasses?: any[]);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
