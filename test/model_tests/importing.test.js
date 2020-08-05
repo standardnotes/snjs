@@ -270,4 +270,222 @@ describe('importing', () => {
       expect(this.application.itemManager.tags.length).to.equal(1);
       expect(this.application.findItem(note.uuid).deleted).to.be.false;
     });
+
+    it('should import data from 003 encrypted payload', async function () {
+      const oldVersion = ProtocolVersion.V003;
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: oldVersion
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 003.'
+        }
+      );
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length);
+      expect(result.errorCount).to.be.eq(0);
+
+      const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
+      expect(decryptedNote.title).to.be.eq('Encrypted note');
+      expect(decryptedNote.text).to.be.eq('On protocol version 003.');
+      expect(this.application.itemManager.notes.length).to.equal(1);
+    });
+
+    it('should import data from 004 encrypted payload', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length);
+      expect(result.errorCount).to.be.eq(0);
+
+      const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
+      expect(decryptedNote.title).to.be.eq('Encrypted note');
+      expect(decryptedNote.text).to.be.eq('On protocol version 004.');
+      expect(this.application.itemManager.notes.length).to.equal(1);
+    });
+
+    it('should return correct errorCount', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const noteItem = await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'This is a valid, encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
+
+      madeUpPayload.items_key_id = undefined;
+      madeUpPayload.content = '004:somenonsense';
+      madeUpPayload.enc_item_key = '003:anothernonsense';
+      madeUpPayload.version = '004';
+      madeUpPayload.uuid = 'fake-uuid';
+
+      backupData.items = [
+        ...backupData.items,
+        madeUpPayload
+      ];
+
+      const result = await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(backupData.items.length - 1);
+      expect(result.errorCount).to.be.eq(1);
+    });
+
+    it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
+      const oldVersion = ProtocolVersion.V003;
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: oldVersion
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 003.'
+        }
+      );
+
+      const backupData = await this.application.protocolService.createBackupFile();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        JSON.parse(backupData),
+        'not-the-correct-password-1234',
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(2);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
+
+    it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'This is a valid, encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const backupData = await this.application.protocolService.createBackupFile();
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+      
+      const result = await this.application.importData(
+        JSON.parse(backupData),
+        'not-the-correct-password-1234',
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(2);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
+
+    it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'Encrypted note',
+          text: 'On protocol version 004.'
+        }
+      );
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      let backupData = JSON.parse(rawBackupFile);
+      backupData = {
+        ...backupData,
+        items: backupData.items.filter((payload) => payload.content_type !== ContentType.ItemsKey),
+      };
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      const result = await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(result).to.not.be.undefined;
+      expect(result.affectedItems.length).to.be.eq(0);
+      expect(result.errorCount).to.be.eq(1);
+      expect(this.application.itemManager.notes.length).to.equal(0);
+    });
 });

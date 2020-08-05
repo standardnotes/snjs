@@ -36,7 +36,8 @@ import {
   isNullOrUndefined,
   isFunction,
   removeFromArray,
-  isWebCryptoAvailable
+  isWebCryptoAvailable,
+  extendArray
 } from '@Lib/utils';
 
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
@@ -537,14 +538,25 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const version = payload.version!;
     const operator = this.operatorForVersion(version);
     const encryptionParameters = CreateEncryptionParameters(payload);
-    const decryptedParameters = await operator.generateDecryptedParameters(
-      encryptionParameters,
-      key
-    );
-    return CreateMaxPayloadFromAnyObject(
-      payload,
-      decryptedParameters
-    );
+    try {
+      const decryptedParameters = await operator.generateDecryptedParameters(
+        encryptionParameters,
+        key
+      );
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        decryptedParameters
+      );
+    } catch (e) {
+      console.error('Error decrypting payload', payload, e);
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        {
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !payload.errorDecrypting
+        }
+      );
+    }
   }
 
   /**
@@ -571,22 +583,11 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         decryptedPayloads.push(encryptedPayload);
         continue;
       }
-      try {
-        const decryptedPayload = await this.payloadByDecryptingPayload(
-          encryptedPayload,
-          key
-        );
-        decryptedPayloads.push(decryptedPayload);
-      } catch (e) {
-        decryptedPayloads.push(CreateMaxPayloadFromAnyObject(
-          encryptedPayload,
-          {
-            errorDecrypting: true,
-            errorDecryptingValueChanged: !encryptedPayload.errorDecrypting
-          }
-        ));
-        console.error('Error decrypting payload', encryptedPayload, e);
-      }
+      const decryptedPayload = await this.payloadByDecryptingPayload(
+        encryptedPayload,
+        key
+      );
+      decryptedPayloads.push(decryptedPayload);
     }
     return decryptedPayloads;
   }
@@ -620,7 +621,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     data: BackupFile,
     password?: string
   ) {
-    const keyParams = data.keyParams || data.auth_params;
+    const keyParamsData = data.keyParams || data.auth_params;
     const rawItems = data.items;
     const encryptedPayloads = rawItems.map((rawItem) => {
       return CreateSourcedPayloadFromObject(
@@ -628,16 +629,62 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         PayloadSource.FileImport,
       );
     });
-    let decryptedPayloads;
-    if (keyParams) {
+    let decryptedPayloads: PurePayload[] = [];
+    if (keyParamsData) {
+      const keyParams = this.createKeyParams(keyParamsData);
       const key = await this.computeRootKey(
         password!,
         keyParams
       );
-      decryptedPayloads = await this.payloadsByDecryptingPayloads(
-        encryptedPayloads,
+      const itemsKeysPayloads = encryptedPayloads.filter((payload) => {
+        return payload.content_type === ContentType.ItemsKey
+      });
+      /**
+       * First decrypt items keys, in case we need to reference these keys for the
+       * decryption of other items below
+       */
+      const decryptedItemsKeysPayloads = await this.payloadsByDecryptingPayloads(
+        itemsKeysPayloads,
         key
       );
+      extendArray(decryptedPayloads, decryptedItemsKeysPayloads);
+      for (const encryptedPayload of encryptedPayloads) {
+        if (encryptedPayload.content_type === ContentType.ItemsKey) {
+          continue;
+        }
+        try {
+          let itemsKey = await this.keyToUseForDecryptionOfPayload(encryptedPayload);
+          if (!itemsKey) {
+            const candidate = decryptedItemsKeysPayloads.find((itemsKeyPayload) => {
+              return encryptedPayload.items_key_id === itemsKeyPayload.uuid;
+            });
+            const payloadVersion = encryptedPayload.version as ProtocolVersion;
+            if (candidate) {
+              itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
+            } 
+            /**
+             * Payloads with versions <= 003 use root key directly for encryption.
+             */
+            else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
+              itemsKey = key;
+            }
+          }
+          const decryptedPayload = await this.payloadByDecryptingPayload(
+            encryptedPayload,
+            itemsKey
+          );
+          decryptedPayloads.push(decryptedPayload);
+        } catch (e) {
+          decryptedPayloads.push(CreateMaxPayloadFromAnyObject(
+            encryptedPayload,
+            {
+              errorDecrypting: true,
+              errorDecryptingValueChanged: !encryptedPayload.errorDecrypting
+            }
+          ));
+          console.error('Error decrypting payload', encryptedPayload, e);
+        }
+      }
     } else {
       decryptedPayloads = encryptedPayloads;
     }

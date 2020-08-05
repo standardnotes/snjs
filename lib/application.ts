@@ -751,7 +751,6 @@ export class SNApplication {
   }
 
   /**
-
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
    * .errorCount: The number of items that were not imported due to failure to decrypt.
@@ -783,7 +782,7 @@ export class SNApplication {
       } else {
         return payload;
       }
-    })
+    });
     const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
