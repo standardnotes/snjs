@@ -117,27 +117,29 @@ export class ItemCollection extends MutableCollection<SNItem> {
       /** Filtered content type map */
       const filteredCTMap = this.filteredMap[contentType]!;
       const sortedElements = this.sortedMap[contentType]!;
+
+      const currentIndex = filteredCTMap[element.uuid];
+      const currentElement = !isNullOrUndefined(currentIndex) ? sortedElements[currentIndex] : undefined;
+      if (currentElement?.errorDecrypting) {
+        if (element.errorDecrypting) {
+         /** if both elements are encrypted skip compare */
+          sortedElements[currentIndex] = element;
+          continue;
+        } else {
+           /** if new element is not encrypted do a resort */
+          sortedElements[currentIndex] = element;
+          typesNeedingResort.add(contentType);
+          continue;
+        }
+      }
       /** If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
       const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
-      const currentIndex = filteredCTMap[element.uuid];
       if (passes) {
         if (!isNullOrUndefined(currentIndex)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort */
           const currentElement = sortedElements[currentIndex];
-          if (currentElement?.errorDecrypting) {
-            if (element.errorDecrypting) {
-             /** if both elements are encrypted skip compare */
-              sortedElements[currentIndex] = element;
-              continue;
-            } else {
-               /** if new element is not encrypted do a resort */
-              sortedElements[currentIndex] = element;
-              typesNeedingResort.add(contentType);
-              continue;
-            }
-          }
           const previousValue = (currentElement as any)[sortBy.key];
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
