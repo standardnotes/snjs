@@ -125,7 +125,8 @@ export class ItemCollection extends MutableCollection<SNItem> {
           /** if new element is not encrypted do a resort */
          typesNeedingResort.add(contentType);
         }
-         /** if both previous and new element is encrypted skip compare */
+         /** If both previous and new values of element are errored, we simply replace the value, as a re-sort
+          is not necessary, and the element will not be usable by forthcoming filters */
         sortedElements[previousIndex] = element;
         continue;
       }
