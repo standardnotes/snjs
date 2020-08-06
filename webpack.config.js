@@ -23,6 +23,9 @@ module.exports = {
     umdNamedDefine: true,
     publicPath: '/dist/'
   },
+  optimization: {
+    minimize: false,
+  },
   module: {
     rules: [
       {
