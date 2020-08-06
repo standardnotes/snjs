@@ -118,32 +118,29 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const filteredCTMap = this.filteredMap[contentType]!;
       const sortedElements = this.sortedMap[contentType]!;
 
-      const currentIndex = filteredCTMap[element.uuid];
-      const currentElement = !isNullOrUndefined(currentIndex) ? sortedElements[currentIndex] : undefined;
-      if (currentElement?.errorDecrypting) {
-        if (element.errorDecrypting) {
-         /** if both elements are encrypted skip compare */
-          sortedElements[currentIndex] = element;
-          continue;
-        } else {
-           /** if new element is not encrypted do a resort */
-          sortedElements[currentIndex] = element;
-          typesNeedingResort.add(contentType);
-          continue;
+      const previousIndex = filteredCTMap[element.uuid];
+      const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined;
+      if (element.errorDecrypting || previousElement?.errorDecrypting) {
+        if (!element.errorDecrypting && previousElement?.errorDecrypting) {
+          /** if new element is not encrypted do a resort */
+         typesNeedingResort.add(contentType);
         }
+         /** if both previous and new element is encrypted skip compare */
+        sortedElements[previousIndex] = element;
+        continue;
       }
       /** If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
       const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
       if (passes) {
-        if (!isNullOrUndefined(currentIndex)) {
+        if (!isNullOrUndefined(previousIndex)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort */
-          const currentElement = sortedElements[currentIndex];
+          const currentElement = sortedElements[previousIndex];
           const previousValue = (currentElement as any)[sortBy.key];
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
-          sortedElements[currentIndex] = element;
+          sortedElements[previousIndex] = element;
           /** If the pinned status of the element has changed, it needs to be resorted */
           const pinChanged = currentElement!.pinned !== element.pinned;
           if (!compareValues(previousValue, newValue) || pinChanged) {
@@ -159,11 +156,11 @@ export class ItemCollection extends MutableCollection<SNItem> {
         }
       } else {
         /** Doesn't pass filter, remove from sorted and filtered */
-        if (!isNullOrUndefined(currentIndex)) {
+        if (!isNullOrUndefined(previousIndex)) {
           delete filteredCTMap[element.uuid];
           /** We don't yet remove the element directly from the array, since mutating
            * the array inside a loop could render all other upcoming indexes invalid */
-          (sortedElements[currentIndex] as any) = undefined;
+          (sortedElements[previousIndex] as any) = undefined;
           /** Since an element is being removed from the array, we need to recompute
            * the new positions for elements that are staying */
           typesNeedingResort.add(contentType);
