@@ -121,11 +121,12 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const previousIndex = filteredCTMap[element.uuid];
       const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined;
       if (element.errorDecrypting || previousElement?.errorDecrypting) {
-        if (!element.errorDecrypting && previousElement?.errorDecrypting) {
-          /** If new element is not encrypted do a resort */
+        if (element.errorDecrypting !== previousElement?.errorDecrypting) {
+          /** If errorDecrypting value changes a re-sort is necessary.
+           * If previous value is undefined we don't need to care about it. */
          typesNeedingResort.add(contentType);
         }
-         /** If both previous and new values of element are errored, we simply replace the value, as a re-sort
+         /** If the errorDecrypting value stayed the same, we simply replace the value, as a re-sort
           is not necessary, and the element will not be usable by forthcoming filters */
         sortedElements[previousIndex] = element;
         continue;
