@@ -123,9 +123,21 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
       const currentIndex = filteredCTMap[element.uuid];
       if (passes) {
-        if (!isNullOrUndefined(currentIndex) && !element.errorDecrypting) {
+        if (!isNullOrUndefined(currentIndex)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort */
           const currentElement = sortedElements[currentIndex];
+          if (currentElement?.errorDecrypting) {
+            if (element.errorDecrypting) {
+             /** if both elements are decrypted skip compare */
+              sortedElements[currentIndex] = element;
+              continue;
+            } else {
+               /** if new element is not encrypted do a resort */
+              sortedElements[currentIndex] = element;
+              typesNeedingResort.add(contentType);
+              continue;
+            }
+          }
           const previousValue = (currentElement as any)[sortBy.key];
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
