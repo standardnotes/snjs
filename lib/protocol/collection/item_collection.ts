@@ -122,7 +122,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined;
       if (element.errorDecrypting || previousElement?.errorDecrypting) {
         if (!element.errorDecrypting && previousElement?.errorDecrypting) {
-          /** if new element is not encrypted do a resort */
+          /** If new element is not encrypted do a resort */
          typesNeedingResort.add(contentType);
         }
          /** If both previous and new values of element are errored, we simply replace the value, as a re-sort
