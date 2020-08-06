@@ -128,7 +128,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
           const currentElement = sortedElements[currentIndex];
           if (currentElement?.errorDecrypting) {
             if (element.errorDecrypting) {
-             /** if both elements are decrypted skip compare */
+             /** if both elements are encrypted skip compare */
               sortedElements[currentIndex] = element;
               continue;
             } else {
@@ -191,7 +191,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
         if (a.pinned) { return -1; }
         if (b.pinned) { return 1; }
       }
-       /** If the elements are not encrypted, move them to beggining */
+       /** If the elements are not decrypted, move them to beggining */
       if (a.errorDecrypting || b.errorDecrypting) {
         if (a.errorDecrypting && b.errorDecrypting) { return 0 }
         if (a.errorDecrypting) { return -1 }
