@@ -81,28 +81,36 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   /** @keychain */
   async getNamespacedKeychainValue() {
-    return this.keychainValue[this.keychainStorageKey];
+    const keychain = await this.getRawKeychainValue();
+    return keychain[this.namespace];
   }
 
   async setNamespacedKeychainValue(value) {
-    if (!this.keychainValue) {
-      this.keychainValue = {};
+    let keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      keychain = {};
     }
-    this.keychainValue[this.keychainStorageKey] = value;
+    localStorage.setItem('keychain', JSON.stringify({
+      ...keychain,
+      [this.namespace]: value,
+    }));
   }
 
   async clearNamespacedKeychainValue() {
-    if (!this.keychainValue) {
-      this.keychainValue = {};
+    const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
     }
-    this.keychainValue[this.keychainStorageKey] = null;
+    delete keychain[this.namespace];
+    localStorage.setItem('keychain', JSON.stringify(keychain));
   }
 
   async getRawKeychainValue() {
-    return this.keychainValue;
+    const keychain = localStorage.getItem('keychain');
+    return JSON.parse(keychain);
   }
 
   async clearRawKeychainValue() {
-    this.keychainValue = null;
+    localStorage.removeItem('keychain');
   }
 }
