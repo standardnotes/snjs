@@ -45,8 +45,8 @@ export class ItemCollection extends MutableCollection<SNItem> {
   /**
    * Sets an optional sortBy and filter for a given content type. These options will be
    * applied against a separate "display-only" record and not the master record. Passing
-   * null options removes any existing options. sortBy is always required, but a filter is 
-   * not always required. 
+   * null options removes any existing options. sortBy is always required, but a filter is
+   * not always required.
    * Note that sorting and filtering only applies to collections of type SNItem, and not
    * payloads. This is because we access item properties such as `pinned` and `title`.
    * @param filter A function that receives an element and returns a boolean indicating
@@ -89,7 +89,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
     const elements = this.sortedMap[contentType];
     if (!elements) {
       throw Error(
-        `Attempting to access display elements for 
+        `Attempting to access display elements for
         non-configured content type ${contentType}`
       );
     }
@@ -100,9 +100,9 @@ export class ItemCollection extends MutableCollection<SNItem> {
     if (Object.keys(this.displaySortBy).length === 0) {
       return;
     }
-    /** If a content type is added to this set, we are indicating the entire sorted 
-     * array will need to be re-sorted. The reason for sorting the entire array and not 
-     * just inserting an element using binary search is that we need to keep track of the 
+    /** If a content type is added to this set, we are indicating the entire sorted
+     * array will need to be re-sorted. The reason for sorting the entire array and not
+     * just inserting an element using binary search is that we need to keep track of the
      * sorted index of an item so that we can look up and change its value without having
      * to search the array for it. */
     const typesNeedingResort = new Set<ContentType>();
@@ -118,12 +118,12 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const filteredCTMap = this.filteredMap[contentType]!;
       const sortedElements = this.sortedMap[contentType]!;
       /** If the element is deleted, or if it no longer exists in the primary map (because
-       * it was discarded without neccessarily being marked as deleted), it does not pass 
+       * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
       const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
       const currentIndex = filteredCTMap[element.uuid];
       if (passes) {
-        if (!isNullOrUndefined(currentIndex)) {
+        if (!isNullOrUndefined(currentIndex) && !element.errorDecrypting) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort */
           const currentElement = sortedElements[currentIndex];
           const previousValue = (currentElement as any)[sortBy.key];
@@ -133,7 +133,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
           /** If the pinned status of the element has changed, it needs to be resorted */
           const pinChanged = currentElement!.pinned !== element.pinned;
           if (!compareValues(previousValue, newValue) || pinChanged) {
-            /** Needs resort because its re-sort value has changed, 
+            /** Needs resort because its re-sort value has changed,
              * and thus its position might change */
             typesNeedingResort.add(contentType);
           }
@@ -179,6 +179,12 @@ export class ItemCollection extends MutableCollection<SNItem> {
         if (a.pinned) { return -1; }
         if (b.pinned) { return 1; }
       }
+       /** If the elements are not decrypted, move them to beggining */
+      if (a.errorDecrypting || b.errorDecrypting) {
+        if (a.errorDecrypting && b.errorDecrypting) { return 0 }
+        if (a.errorDecrypting) { return -1 }
+        if (b.errorDecrypting) { return 1 }
+      }
       let aValue = (a as any)[sortBy.key] || '';
       let bValue = (b as any)[sortBy.key] || '';
       let vector = 1;
@@ -205,7 +211,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
     const resorted = sortedElements.sort((a, b) => {
       return sortFn(a, b);
     });
-    /** Now that resorted contains the sorted elements (but also can contain undefined element) 
+    /** Now that resorted contains the sorted elements (but also can contain undefined element)
      * we create another array that filters out any of the undefinedes. We also keep track of the
      * current index while we loop and set that in the filteredCTMap. */
     const cleaned = [] as SNItem[];
