@@ -1,4 +1,7 @@
 /* eslint-disable no-undef */
+
+const KEYCHAIN_STORAGE_KEY = 'keychain';
+
 export default class WebDeviceInterface extends DeviceInterface {
 
   async getRawStorageValue(key) {
@@ -90,7 +93,7 @@ export default class WebDeviceInterface extends DeviceInterface {
     if (!keychain) {
       keychain = {};
     }
-    localStorage.setItem('keychain', JSON.stringify({
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify({
       ...keychain,
       [this.namespace]: value,
     }));
@@ -102,15 +105,15 @@ export default class WebDeviceInterface extends DeviceInterface {
       return;
     }
     delete keychain[this.namespace];
-    localStorage.setItem('keychain', JSON.stringify(keychain));
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
   }
 
   async getRawKeychainValue() {
-    const keychain = localStorage.getItem('keychain');
+    const keychain = localStorage.getItem(KEYCHAIN_STORAGE_KEY);
     return JSON.parse(keychain);
   }
 
   async clearRawKeychainValue() {
-    localStorage.removeItem('keychain');
+    localStorage.removeItem(KEYCHAIN_STORAGE_KEY);
   }
 }
