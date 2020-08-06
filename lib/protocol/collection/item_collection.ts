@@ -191,7 +191,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
         if (a.pinned) { return -1; }
         if (b.pinned) { return 1; }
       }
-       /** If the elements are not decrypted, move them to beggining */
+       /** If the elements are not encrypted, move them to beggining */
       if (a.errorDecrypting || b.errorDecrypting) {
         if (a.errorDecrypting && b.errorDecrypting) { return 0 }
         if (a.errorDecrypting) { return -1 }
