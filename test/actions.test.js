@@ -329,8 +329,7 @@ describe('actions service', () => {
     beforeEach(async function () {
       this.alertServiceAlert = sandbox.spy(this.actionsManager.alertService, 'alert');
       this.windowAlert = sandbox.stub(window, 'alert').callsFake((message) => message);
-      this.newPassword = await Factory.generateUuid();
-      this.passwordRequestHandler = sandbox.stub().callsFake(() => this.newPassword);
+      this.passwordRequestHandler = sandbox.stub().callsFake(() => this.password);
     });
 
     afterEach(async function () {
@@ -380,13 +379,22 @@ describe('actions service', () => {
     });
 
     it('should try previous passwords and prompt for other passwords', async function () {
-      // Using a custom action that returns a payload with an invalid items_key_id
+      /** Using a custom action that returns a payload with an invalid items_key_id. */
       const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
       this.renderAction = extensionItem.actions.filter(action => action.verb === 'render')[1];
 
       await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
       sinon.assert.called(this.passwordRequestHandler);
+    }).timeout(20000);
+
+    it('should return decrypted payload if password is valid', async function () {
+      const extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
+      this.renderAction = extensionItem.actions.filter(action => action.verb === 'render')[0];
+      const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
+
+      expect(actionResponse.item).to.be.ok;
+      expect(actionResponse.item.title).to.be.equal('Testing');
     }).timeout(20000);
   });
 
