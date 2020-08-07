@@ -267,8 +267,7 @@ describe('actions service', () => {
 
     beforeEach(async function () {
       this.passwordRequestHandler = sandbox.spy();
-      this.confirmAlertService = sandbox.spy(this.actionsManager.alertService, 'confirm');
-      this.windowConfirm = sandbox.stub(window, 'confirm').callsFake((message) => true);
+      this.confirmAlertService = sandbox.stub(this.actionsManager.alertService, 'confirm').callsFake((message) => true);
       this.syncServiceSync = sandbox.spy(this.actionsManager.syncService, 'sync');
     });
 
@@ -277,12 +276,11 @@ describe('actions service', () => {
     });
 
     it('should be canceled if requested', async function () {
-      this.windowConfirm.callsFake((message) => false);
+      this.confirmAlertService.callsFake((message) => false);
 
       const actionResponse = await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
 
-      sinon.assert.calledOnce(this.confirmAlertService);
-      sinon.assert.calledOnceWithExactly(this.windowConfirm, confirmMessage);
+      sinon.assert.calledOnceWithExactly(this.confirmAlertService, confirmMessage);
       expect(actionResponse.error.message).to.eq('Action canceled by user.');
       sinon.assert.notCalled(this.syncServiceSync);
     });
@@ -290,8 +288,7 @@ describe('actions service', () => {
     it('should show a confirmation message', async function () {
       await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
 
-      sinon.assert.calledOnce(this.confirmAlertService);
-      sinon.assert.calledOnceWithExactly(this.windowConfirm, confirmMessage);
+      sinon.assert.calledOnceWithExactly(this.confirmAlertService, confirmMessage);
     });
 
     it('should return response and item keys', async function () {
