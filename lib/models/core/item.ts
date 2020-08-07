@@ -82,7 +82,7 @@ export class SNItem {
     this.conflictOf = payload.safeContent.conflict_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
-      this.userModifiedDate = this.getAppDomainValue(AppDataField.UserModifiedDate);
+      this.userModifiedDate = new Date(this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at);
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
       this.trashed = this.payload.safeContent.trashed;
