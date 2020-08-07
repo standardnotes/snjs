@@ -15,11 +15,24 @@ export declare enum WebPrefKey {
     NotesHideNotePreview = "hideNotePreview",
     NotesHideDate = "hideDate"
 }
+export declare enum MobilePrefKey {
+    SortNotesBy = "sortBy",
+    SortNotesReverse = "sortReverse",
+    NotesShowArchived = "showArchived",
+    NotesHidePinned = "hidePinned",
+    NotesHideNotePreview = "hideNotePreview",
+    NotesHideDate = "hideDate",
+    ThemeData = "themePreferences",
+    LastExportDate = "lastExportDate",
+    DoNotWarnUnsupportedEditors = "doNotShowAgainUnsupportedEditors"
+}
+export declare type PrefKey = WebPrefKey | MobilePrefKey;
 export declare class SNUserPrefs extends SNItem {
     get isSingleton(): boolean;
     get singletonPredicate(): SNPredicate;
-    getPref(key: WebPrefKey): any;
+    getPref(key: PrefKey): any;
 }
 export declare class UserPrefsMutator extends ItemMutator {
     setWebPref(key: WebPrefKey, value: any): void;
+    setMobilePref(key: MobilePrefKey, value: any): void;
 }

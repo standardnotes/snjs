@@ -9513,6 +9513,20 @@ var WebPrefKey;
 })(WebPrefKey || (WebPrefKey = {}));
 
 ;
+var MobilePrefKey;
+
+(function (MobilePrefKey) {
+  MobilePrefKey["SortNotesBy"] = "sortBy";
+  MobilePrefKey["SortNotesReverse"] = "sortReverse";
+  MobilePrefKey["NotesShowArchived"] = "showArchived";
+  MobilePrefKey["NotesHidePinned"] = "hidePinned";
+  MobilePrefKey["NotesHideNotePreview"] = "hideNotePreview";
+  MobilePrefKey["NotesHideDate"] = "hideDate";
+  MobilePrefKey["ThemeData"] = "themePreferences";
+  MobilePrefKey["LastExportDate"] = "lastExportDate";
+  MobilePrefKey["DoNotWarnUnsupportedEditors"] = "doNotShowAgainUnsupportedEditors";
+})(MobilePrefKey || (MobilePrefKey = {}));
+
 class userPrefs_SNUserPrefs extends core_item["d" /* SNItem */] {
   get isSingleton() {
     return true;
@@ -9529,6 +9543,10 @@ class userPrefs_SNUserPrefs extends core_item["d" /* SNItem */] {
 }
 class userPrefs_UserPrefsMutator extends core_item["b" /* ItemMutator */] {
   setWebPref(key, value) {
+    this.setAppDataItem(key, value);
+  }
+
+  setMobilePref(key, value) {
     this.setAppDataItem(key, value);
   }
 
