@@ -120,31 +120,41 @@ export class ItemCollection extends MutableCollection<SNItem> {
 
       const previousIndex = filteredCTMap[element.uuid];
       const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined;
+      /**  New value errorDecrypting  | previous value errorDecrypting | action(s)
+       * 1.           true            |           undefined            |    sort + change, continue loop
+       * 2.           false           |           undefined            |    not going inside clause
+       * 3.           true            |           true                 |    save, continue loop
+       * 4.           false           |           true                 |    sort + save
+       * 5.           true            |           false                |    sort + save, continue loop
+       * 6.           false           |           false                |    not going inside clause
+       */
       if (element.errorDecrypting || previousElement?.errorDecrypting) {
         if (element.errorDecrypting !== previousElement?.errorDecrypting) {
-          /** If errorDecrypting property changes a re-sort is necessary.
-           * If previous value is undefined we don't need to care about it. */
+          /** If errorDecrypting property changes a re-sort is necessary. */
          typesNeedingResort.add(contentType);
         }
-         /** If the errorDecrypting property stayed the same, we simply replace the value, as a re-sort
-          is not necessary, and the element will not be usable by forthcoming filters */
+         /** We always save the value, but we don't continue in the for loop
+          * in case the errorDecrypting is false in the new value as we want filters to check it.  */
         sortedElements[previousIndex] = element;
-        continue;
+        if (!element.errorDecrypting) {
+          continue;
+        }
       }
       /** If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
       const passes = (element.deleted || !this.map[element.uuid]) ? false : (filter ? filter(element) : true);
       if (passes) {
-        if (!isNullOrUndefined(previousIndex)) {
-          /** Check to see if the element has changed its sort value. If so, we need to re-sort */
-          const currentElement = sortedElements[previousIndex];
-          const previousValue = (currentElement as any)[sortBy.key];
+        if (!isNullOrUndefined(previousElement)) {
+          /** Check to see if the element has changed its sort value. If so, we need to re-sort.
+           * Previous element might be encrypted.
+           */
+          const previousValue: SNItem | undefined = previousElement.errorDecrypting ? undefined : previousElement[sortBy.key as keyof SNItem];
           const newValue = (element as any)[sortBy.key];
           /** Replace the current element with the new one. */
           sortedElements[previousIndex] = element;
           /** If the pinned status of the element has changed, it needs to be resorted */
-          const pinChanged = currentElement!.pinned !== element.pinned;
+          const pinChanged = previousElement!.pinned !== element.pinned;
           if (!compareValues(previousValue, newValue) || pinChanged) {
             /** Needs resort because its re-sort value has changed,
              * and thus its position might change */
