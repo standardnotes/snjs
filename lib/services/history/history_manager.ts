@@ -25,8 +25,6 @@ export class SNHistoryManager extends PureService {
 
   private itemManager?: ItemManager
   private storageService?: SNStorageService
-  private apiService?: SNApiService
-  private protocolService?: SNProtocolService
   private contentTypes: ContentType[] = []
   private timeout: any
   private sessionHistory?: SessionHistory
@@ -47,8 +45,6 @@ export class SNHistoryManager extends PureService {
     super();
     this.itemManager = itemManager;
     this.storageService = storageService;
-    this.apiService = apiService;
-    this.protocolService = protocolService;
     this.contentTypes = contentTypes;
     this.timeout = timeout;
     this.remoteHistory = new RemoteHistory(apiService, protocolService);
@@ -57,8 +53,6 @@ export class SNHistoryManager extends PureService {
   public deinit() {
     this.itemManager = undefined;
     this.storageService = undefined;
-    this.apiService = undefined;
-    this.protocolService = undefined;
     this.contentTypes.length = 0;
     this.sessionHistory = undefined;
     this.remoteHistory = undefined;
