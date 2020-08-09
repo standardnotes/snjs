@@ -1,6 +1,5 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItem } from '@Models/core/item';
-import { ItemHistoryEntry } from '@Services/history/item_history_entry';
+import { ItemHistoryEntry, ItemHistorySource } from '@Services/history/item_history_entry';
 import { CreateHistoryEntryForPayload } from './functions';
 /**
  * The amount of characters added or removed that
@@ -26,9 +25,9 @@ export class ItemHistory {
     }
   }
 
-  static FromJson(entryJson: ItemHistoryJson) {
+  static FromJson(entryJson: ItemHistoryJson, source: ItemHistorySource) {
     const entries = entryJson.entries.map((rawHistoryEntry: any) => {
-      return CreateHistoryEntryForPayload(rawHistoryEntry.payload);
+      return CreateHistoryEntryForPayload(rawHistoryEntry.payload, source);
     })
     return new ItemHistory(entries);
   }
@@ -37,8 +36,8 @@ export class ItemHistory {
     return this.entries[this.entries.length - 1];
   }
 
-  addHistoryEntryForItem(payload: PurePayload) {
-    const prospectiveEntry = CreateHistoryEntryForPayload(payload);
+  addHistoryEntryForItem(payload: PurePayload, source: ItemHistorySource) {
+    const prospectiveEntry = CreateHistoryEntryForPayload(payload, source);
     const previousEntry = this.getLastEntry();
     prospectiveEntry.setPreviousEntry(previousEntry);
     if (prospectiveEntry.isSameAsEntry(previousEntry)) {

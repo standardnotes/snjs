@@ -25,7 +25,7 @@ export { LiveItem } from './models/live_item';
 export type { UuidString } from './types';
 
 export { SNComponentManager } from './services/component_manager';
-export { HistorySession } from '@Services/history/history_session';
+export { SessionHistory as HistorySession } from '@Lib/services/history/sources/session_history';
 export { ItemHistory } from '@Services/history/item_history';
 export { ItemHistoryEntry } from '@Services/history/item_history_entry';
 export {

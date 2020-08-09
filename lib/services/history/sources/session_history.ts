@@ -2,12 +2,13 @@ import { AnyRecord } from '@Lib/types';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemHistory } from '@Services/history/item_history';
+import { ItemHistorySource } from '../item_history_entry';
 
 /** The amount of revisions which above, call for an optimization. */
 const DEFAULT_ITEM_REVISIONS_THRESHOLD = 60;
 
 /**
- * HistorySession is the only object in the session history domain that is
+ * SessionHistory is the only object in the session history domain that is
  * persistable. A history session contains one main content object: the
  * itemUUIDToItemHistoryMapping. This is a dictionary whose keys are item uuids,
  * and each value is an ItemHistory object.
@@ -16,16 +17,16 @@ const DEFAULT_ITEM_REVISIONS_THRESHOLD = 60;
  * `ItemHistory` (or subclasses thereof) entries.
  */
 
-type HistorySessionContent = {
+type SessionHistoryContent = {
   itemUUIDToItemHistoryMapping: Record<string, ItemHistory>
 }
 
-export class HistorySession {
+export class SessionHistory {
 
-  private content?: HistorySessionContent
+  private content?: SessionHistoryContent
   private itemRevisionThreshold = DEFAULT_ITEM_REVISIONS_THRESHOLD
 
-  constructor(content?: HistorySessionContent) {
+  constructor(content?: SessionHistoryContent) {
     this.content = content;
     if(!this.content) {
       this.content = {
@@ -34,24 +35,24 @@ export class HistorySession {
     }
   }
 
-  static FromJson(historySessionJson?: AnyRecord) {
-    if(historySessionJson) {
-      const content = historySessionJson.content;
+  static FromJson(sessionHistoryJson?: AnyRecord) {
+    if(sessionHistoryJson) {
+      const content = sessionHistoryJson.content;
       const uuids = Object.keys(content.itemUUIDToItemHistoryMapping);
       uuids.forEach((itemUUID) => {
         const rawItemHistory = content.itemUUIDToItemHistoryMapping[itemUUID];
         content.itemUUIDToItemHistoryMapping[itemUUID] =
-          ItemHistory.FromJson(rawItemHistory);
+          ItemHistory.FromJson(rawItemHistory, ItemHistorySource.Session);
       });
-      return new HistorySession(content);
+      return new SessionHistory(content);
     } else {
-      return new HistorySession();
+      return new SessionHistory();
     }
   }
 
   addEntryForPayload(payload: PurePayload) {
     const itemHistory = this.historyForItem(payload.uuid!);
-    return itemHistory.addHistoryEntryForItem(payload);
+    return itemHistory.addHistoryEntryForItem(payload, ItemHistorySource.Session);
   }
 
   historyForItem(uuid: string) {

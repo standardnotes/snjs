@@ -4,27 +4,33 @@ import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
-import { HistorySession } from '@Services/history/history_session';
+import { SessionHistory } from '@Lib/services/history/sources/session_history';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined, concatArrays } from '@Lib/utils';
+import { SNApiService } from '@Lib/services/api/api_service';
+import { SNProtocolService } from '@Lib/services/protocol_service';
+import { RemoteHistory } from './sources/remote_history';
 
 const PERSIST_TIMEOUT = 2000;
 
 /**
- * The history manager is presently responsible for transient 'session history',
+ * The history manager is responsible for transient 'session history',
  * which include keeping track of changes made in the current application session.
  * These change logs (unless otherwise configured) are ephemeral and do not persist
  * past application restart.
- * In the future the history manager will also be responsible for remote server history.
+ * The history manager is also responsible for remote server history.
  */
 export class SNHistoryManager extends PureService {
 
   private itemManager?: ItemManager
   private storageService?: SNStorageService
+  private apiService?: SNApiService
+  private protocolService?: SNProtocolService
   private contentTypes: ContentType[] = []
   private timeout: any
-  private historySession?: HistorySession
+  private sessionHistory?: SessionHistory
+  private remoteHistory?: RemoteHistory
   private removeChangeObserver: any
   private persistable = false
   public autoOptimize = false
@@ -33,21 +39,29 @@ export class SNHistoryManager extends PureService {
   constructor(
     itemManager: ItemManager,
     storageService: SNStorageService,
+    apiService: SNApiService,
+    protocolService: SNProtocolService,
     contentTypes: ContentType[],
     timeout: any
   ) {
     super();
     this.itemManager = itemManager;
     this.storageService = storageService;
+    this.apiService = apiService;
+    this.protocolService = protocolService;
     this.contentTypes = contentTypes;
     this.timeout = timeout;
+    this.remoteHistory = new RemoteHistory(apiService, protocolService);
   }
 
   public deinit() {
     this.itemManager = undefined;
     this.storageService = undefined;
+    this.apiService = undefined;
+    this.protocolService = undefined;
     this.contentTypes.length = 0;
-    this.historySession = undefined;
+    this.sessionHistory = undefined;
+    this.remoteHistory = undefined;
     this.timeout = null;
     if (this.removeChangeObserver) {
       this.removeChangeObserver();
@@ -60,10 +74,10 @@ export class SNHistoryManager extends PureService {
     this.persistable = await this.storageService!.getValue(
       StorageKey.SessionHistoryPersistable
     );
-    this.historySession = await this.storageService!.getValue(
+    this.sessionHistory = await this.storageService!.getValue(
       StorageKey.SessionHistoryRevisions
     ).then((historyValue) => {
-      return HistorySession.FromJson(historyValue);
+      return SessionHistory.FromJson(historyValue);
     });
     const autoOptimize = await this.storageService!.getValue(
       StorageKey.SessionHistoryOptimize
@@ -112,19 +126,19 @@ export class SNHistoryManager extends PureService {
     }
     this.storageService!.setValue(
       StorageKey.SessionHistoryRevisions,
-      this.historySession
+      this.sessionHistory
     );
   }
 
   setSessionItemRevisionThreshold(threshold: number) {
-    this.historySession!.setItemRevisionThreshold(threshold);
+    this.sessionHistory!.setItemRevisionThreshold(threshold);
   }
 
   async addHistoryEntryForItem(item: SNItem) {
     const payload = CreateSourcedPayloadFromObject(item, PayloadSource.SessionHistory)
-    const entry = this.historySession!.addEntryForPayload(payload);
+    const entry = this.sessionHistory!.addEntryForPayload(payload);
     if (this.autoOptimize) {
-      this.historySession!.optimizeHistoryForItem(item.uuid);
+      this.sessionHistory!.optimizeHistoryForItem(item.uuid);
     }
     if (entry && this.persistable) {
       /** Debounce, clear existing timeout */
@@ -141,17 +155,17 @@ export class SNHistoryManager extends PureService {
     }
   }
 
-  historyForItem(item: SNItem) {
-    return this.historySession!.historyForItem(item.uuid);
+  sessionHistoryForItem(item: SNItem) {
+    return this.sessionHistory!.historyForItem(item.uuid);
   }
 
   async clearHistoryForItem(item: SNItem) {
-    this.historySession!.clearItemHistory(item);
+    this.sessionHistory!.clearItemHistory(item);
     return this.saveToDisk();
   }
 
   async clearAllHistory() {
-    this.historySession!.clearAllHistory();
+    this.sessionHistory!.clearAllHistory();
     return this.storageService!.removeValue(
       StorageKey.SessionHistoryRevisions
     );
@@ -189,5 +203,13 @@ export class SNHistoryManager extends PureService {
         false
       );
     }
+  }
+
+  async serverHistoryForItem(item: SNItem) {
+    return this.remoteHistory!.fetchItemHistory(item.uuid);
+  }
+
+  async fetchRevisionForItem(itemUuid: string, revisionUuid: string) {
+    return this.remoteHistory!.fetchItemRevision(itemUuid, revisionUuid);
   }
 }

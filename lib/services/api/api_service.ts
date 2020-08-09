@@ -18,6 +18,8 @@ const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 const REQUEST_PATH_SYNC = '/items/sync';
 const REQUEST_PATH_LOGOUT = '/auth/sign_out';
 const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
+const REQUEST_PATH_ITEM_REVISIONS = '/items/:item_id/revisions';
+const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
 const API_VERSION = '20200115';
 
@@ -312,6 +314,44 @@ export class SNApiService extends PureService {
     });
     this.refreshingSession = false;
     return result;
+  }
+
+  async getItemRevisions(itemId: string) {
+    if (!this.session) {
+      return undefined;
+    }
+    const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
+    const url = await this.path(path);
+    const response = await this.httpService!.getAbsolute(
+      url,
+      undefined,
+      this.session!.accessToken
+    ).catch((errorResponse: HttpResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    });
+    return response;
+  }
+
+  async getRevisionForItem(itemId: string, revisionId: string) {
+    if (!this.session) {
+      return undefined;
+    }
+    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
+    const url = await this.path(path);
+    const response = await this.httpService!.getAbsolute(
+      url,
+      undefined,
+      this.session!.accessToken
+    ).catch((errorResponse: HttpResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    });
+    return response;
   }
 
 }
