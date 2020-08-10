@@ -201,8 +201,9 @@ export class SNApiService extends PureService {
     if (this.changing) {
       return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
     }
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
@@ -242,8 +243,9 @@ export class SNApiService extends PureService {
     contentType?: ContentType,
     customEvent?: string
   ) {
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
@@ -290,8 +292,9 @@ export class SNApiService extends PureService {
   }
 
   async refreshSession() {
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
@@ -317,8 +320,9 @@ export class SNApiService extends PureService {
   }
 
   async getItemRevisions(itemId: string) {
-    if (!this.session) {
-      return undefined;
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
     const url = await this.path(path);
@@ -336,8 +340,9 @@ export class SNApiService extends PureService {
   }
 
   async getRevisionForItem(itemId: string, revisionId: string) {
-    if (!this.session) {
-      return undefined;
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
     const url = await this.path(path);
@@ -352,6 +357,16 @@ export class SNApiService extends PureService {
       );
     });
     return response;
+  }
+
+  private preprocessingError() {
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
+    if (!this.session) {
+      return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
+    }
+    return undefined;
   }
 
 }
