@@ -51,6 +51,7 @@ export declare class SNItem {
     readonly pinned = false;
     readonly archived = false;
     readonly locked = false;
+    readonly userModifiedDate: Date;
     private static sharedDateFormatter;
     constructor(payload: PurePayload);
     static DefaultAppDomain(): string;
@@ -62,7 +63,6 @@ export declare class SNItem {
     get content_type(): import("../content_types").ContentType;
     get created_at(): Date;
     get updated_at(): Date;
-    get userModifiedDate(): Date;
     get dirtiedDate(): Date | undefined;
     get dirty(): boolean | undefined;
     get errorDecrypting(): boolean | undefined;

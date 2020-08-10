@@ -234,7 +234,6 @@ export declare class SNApplication {
     noAccount(): boolean;
     hasAccount(): boolean;
     /**
-  
      * @returns
      * .affectedItems: Items that were either created or dirtied by this import
      * .errorCount: The number of items that were not imported due to failure to decrypt.

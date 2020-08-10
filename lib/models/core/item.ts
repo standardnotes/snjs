@@ -65,6 +65,7 @@ export class SNItem {
   public readonly pinned = false
   public readonly archived = false
   public readonly locked = false
+  public readonly userModifiedDate: Date
   private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
@@ -81,12 +82,15 @@ export class SNItem {
     this.conflictOf = payload.safeContent.conflict_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
+      this.userModifiedDate = new Date(this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at);
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
       this.trashed = this.payload.safeContent.trashed;
       this.pinned = this.getAppDomainValue(AppDataField.Pinned);
       this.archived = this.getAppDomainValue(AppDataField.Archived);
       this.locked = this.getAppDomainValue(AppDataField.Locked);
+    } else {
+      this.userModifiedDate = this.updated_at;
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -128,11 +132,6 @@ export class SNItem {
 
   get updated_at() {
     return this.payload.updated_at!;
-  }
-
-  get userModifiedDate() {
-    const value = this.getAppDomainValue(AppDataField.UserModifiedDate);
-    return new Date(value || this.updated_at);
   }
 
   get dirtiedDate() {
