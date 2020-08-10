@@ -33,7 +33,7 @@ export class RemoteHistory {
 
   public async fetchItemHistory(itemUuid: string) {
     const serverResponse = await this.apiService!.getItemRevisions(itemUuid);
-    if (!serverResponse) {
+    if (serverResponse.error) {
       return {
         entries: []
       };
@@ -56,7 +56,7 @@ export class RemoteHistory {
 
   public async fetchItemRevision(itemUuid: string, revisionUuid: string) {
     const serverResponse = await this.apiService!.getRevisionForItem(itemUuid, revisionUuid);
-    if (!serverResponse) {
+    if (serverResponse.error) {
       return undefined;
     }
     const payload = this.responseToPayload(serverResponse);
