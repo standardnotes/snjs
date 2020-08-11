@@ -51,6 +51,7 @@ import {
   UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
+import { SNNamespaceService } from '@Services/namespace_service';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -78,7 +79,7 @@ export class SNApplication {
 
   public environment: Environment
   public platform: Platform
-  public namespace: string
+  private fixedNamespace?: string
   private swapClasses?: any[]
   private skipClasses?: any[]
 
@@ -101,6 +102,7 @@ export class SNApplication {
   public actionsManager?: SNActionsService
   public historyManager?: SNHistoryManager
   private itemManager?: ItemManager
+  public namespaceService?: SNNamespaceService
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -137,7 +139,7 @@ export class SNApplication {
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
     alertService: SNAlertService,
-    namespace?: string,
+    fixedNamespace?: string,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
   ) {
@@ -158,7 +160,7 @@ export class SNApplication {
     }
     this.environment = environment;
     this.platform = platform;
-    this.namespace = namespace || '';
+    this.fixedNamespace = fixedNamespace;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -179,6 +181,9 @@ export class SNApplication {
         return undefined;
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
+    if (!this.fixedNamespace) {
+      await this.namespaceService!.initialize();
+    }
     await this.migrationService!.initialize();
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService!.initializeFromDisk();
@@ -1241,6 +1246,7 @@ export class SNApplication {
   }
 
   private constructServices() {
+    this.createNamespaceService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1282,6 +1288,7 @@ export class SNApplication {
     this.actionsManager = undefined;
     this.historyManager = undefined;
     this.itemManager = undefined;
+    this.namespaceService = undefined;
 
     this.services = [];
   }
@@ -1295,7 +1302,7 @@ export class SNApplication {
         challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
-        namespace: this.namespace
+        namespaceService: this.namespaceService!
       }
     );
     this.services.push(this.migrationService!);
@@ -1351,7 +1358,7 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
-      this.namespace,
+      this.namespaceService!,
     );
     this.services.push(this.storageService!);
   }
@@ -1443,6 +1450,14 @@ export class SNApplication {
       this.syncService!,
     );
     this.services.push(this.actionsManager!);
+  }
+
+  private createNamespaceService() {
+    this.namespaceService = new SNNamespaceService(this.deviceInterface!);
+    if (this.fixedNamespace) {
+      this.namespaceService!.createFixedNamespace(this.fixedNamespace);
+    }
+    this.services.push(this.namespaceService!);
   }
 
   private shouldSkipClass(classCandidate: any) {

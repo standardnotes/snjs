@@ -1,4 +1,5 @@
 import { getGlobalScope } from '@Lib/utils';
+import { SNNamespace } from '@Services/namespace_service';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -10,7 +11,7 @@ export abstract class DeviceInterface {
 
   public timeout: any
   public interval: any
-  protected namespace: string
+  protected namespace?: SNNamespace
 
   /**
     * @param {function} timeout
@@ -22,11 +23,9 @@ export abstract class DeviceInterface {
        perform repeatedly. Similar to setInterval.
   */
   constructor(
-    namespace: string,
     timeout: any,
     interval: any
   ) {
-    this.namespace = namespace;
     this.timeout = timeout || setTimeout.bind(getGlobalScope());
     this.interval = interval || setInterval.bind(getGlobalScope());
   }
@@ -79,6 +78,10 @@ export abstract class DeviceInterface {
   abstract async getRawKeychainValue() : Promise<any>;
 
   abstract async clearRawKeychainValue() : Promise<void>;
+
+  public switchToNamespace(namespace: SNNamespace) {
+    this.namespace = namespace;
+  }
 
   abstract openUrl(url: string): void;
 
