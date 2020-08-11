@@ -120,26 +120,6 @@ export class ItemCollection extends MutableCollection<SNItem> {
 
       const previousIndex = filteredCTMap[element.uuid];
       const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined;
-      /**  New value errorDecrypting  | previous value errorDecrypting | action(s)
-       * 1.           true            |           undefined            |    sort + change, continue loop
-       * 2.           false           |           undefined            |    not going inside clause
-       * 3.           true            |           true                 |    save, continue loop
-       * 4.           false           |           true                 |    sort + save
-       * 5.           true            |           false                |    sort + save, continue loop
-       * 6.           false           |           false                |    not going inside clause
-       */
-      if (element.errorDecrypting || previousElement?.errorDecrypting) {
-        if (element.errorDecrypting !== previousElement?.errorDecrypting) {
-          /** If errorDecrypting property changes a re-sort is necessary. */
-         typesNeedingResort.add(contentType);
-        }
-         /** We always save the value, but we don't continue in the for loop
-          * in case the errorDecrypting is false in the new value as we want filters to check it.  */
-        sortedElements[previousIndex] = element;
-        if (!element.errorDecrypting) {
-          continue;
-        }
-      }
       /** If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
@@ -201,12 +181,6 @@ export class ItemCollection extends MutableCollection<SNItem> {
         }
         if (a.pinned) { return -1; }
         if (b.pinned) { return 1; }
-      }
-       /** If the elements are not decrypted, move them to beggining */
-      if (a.errorDecrypting || b.errorDecrypting) {
-        if (a.errorDecrypting && b.errorDecrypting) { return 0 }
-        if (a.errorDecrypting) { return -1 }
-        if (b.errorDecrypting) { return 1 }
       }
       let aValue = (a as any)[sortBy.key] || '';
       let bValue = (b as any)[sortBy.key] || '';
