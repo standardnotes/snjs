@@ -38,7 +38,7 @@ export enum PayloadSource {
    * values of lastSyncBegan. Payloads emitted from this source indicate that these payloads
    * have been saved to disk, and are about to be synced */
   PreSyncSave = 19,
-  ServerHistory = 20,
+  RemoteHistory = 20,
 };
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {

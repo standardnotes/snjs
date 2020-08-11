@@ -167,7 +167,7 @@ const ServerSavedPayloadFields = [
   PayloadField.LastSyncEnd
 ]
 
-const ServerHistoryPayloadFields = ServerPayloadFields.slice();
+const RemoteHistoryPayloadFields = ServerPayloadFields.slice();
 
 export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
@@ -330,8 +330,8 @@ export function payloadFieldsForSource(source: PayloadSource) {
     return SessionHistoryPayloadFields.slice();
   }
 
-  if (source === PayloadSource.ServerHistory) {
-    return ServerHistoryPayloadFields.slice();
+  if (source === PayloadSource.RemoteHistory) {
+    return RemoteHistoryPayloadFields.slice();
   }
 
   if (source === PayloadSource.ComponentRetrieved) {

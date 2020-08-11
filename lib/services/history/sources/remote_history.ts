@@ -56,7 +56,7 @@ export class RemoteHistory {
       return undefined;
     }
     const payload = this.responseToPayload(serverResponse);
-    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.ServerHistory, {
+    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory, {
       ...serverResponse,
       uuid: itemUuid,
     });
