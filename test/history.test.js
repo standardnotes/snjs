@@ -274,7 +274,7 @@ describe('history manager', () => {
       /** Sync with same contents, should not create new entry */
       await this.application.saveItem(item.uuid);
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(0);
+      expect(itemHistory.entries.length).to.equal(1);
 
       /** Sync with different contents, should create new entry */
       await this.application.changeAndSaveItem(
@@ -287,7 +287,7 @@ describe('history manager', () => {
         syncOptions
       );
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.entries.length).to.equal(2);
 
       /** Item source should be 'Remote' */
       const revisionEntry = itemHistory.entries[0];
