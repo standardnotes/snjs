@@ -36,8 +36,8 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   _getDatabaseKeyPrefix() {
-    if (this.namespace) {
-      return `${this.namespace}-item-`;
+    if (this.namespace.identifier) {
+      return `${this.namespace.identifier}-item-`;
     } else {
       return 'item-';
     }
@@ -85,7 +85,7 @@ export default class WebDeviceInterface extends DeviceInterface {
   /** @keychain */
   async getNamespacedKeychainValue() {
     const keychain = await this.getRawKeychainValue();
-    return keychain[this.namespace];
+    return keychain[this.namespace.identifier];
   }
 
   async setNamespacedKeychainValue(value) {
@@ -95,7 +95,7 @@ export default class WebDeviceInterface extends DeviceInterface {
     }
     localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify({
       ...keychain,
-      [this.namespace]: value,
+      [this.namespace.identifier]: value,
     }));
   }
 
@@ -104,7 +104,7 @@ export default class WebDeviceInterface extends DeviceInterface {
     if (!keychain) {
       return;
     }
-    delete keychain[this.namespace];
+    delete keychain[this.namespace.identifier];
     localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
   }
 
