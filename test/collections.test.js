@@ -239,7 +239,7 @@ describe('payload collections', () => {
     expect(resorted[1].uuid).to.equal(unpinned1.uuid);
   });
 
-  it('setDisplayOptions should not fail for encrypted items and should add them at the beggining', async () => {
+  it('setDisplayOptions should not fail for encrypted items', async () => {
     const collection = new ItemCollection();
     const regularPayload1 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText'));
     const regularPayload2 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText2'));
