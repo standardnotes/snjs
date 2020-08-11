@@ -199,7 +199,7 @@ export class SNHistoryManager extends PureService {
     }
   }
 
-  async serverHistoryForItem(item: SNItem) {
+  async remoteHistoryForItem(item: SNItem) {
     return this.remoteHistory!.fetchItemHistory(item.uuid);
   }
 

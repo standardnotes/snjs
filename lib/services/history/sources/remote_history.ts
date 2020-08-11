@@ -17,10 +17,9 @@ export class RemoteHistory {
 
   /**
    * Iterates over the response and creates a payload from each entry.
-   * @param response
    */
   private responseToPayloadArray(response: HttpResponse) {
-    let revisions: RawPayload[] = response!.revisions;
+    const revisions: RawPayload[] = response!.revisions;
     const revisionEntries = revisions.map((revision) => {
       return {
         payload: CreateMaxPayloadFromAnyObject(revision)
@@ -45,12 +44,9 @@ export class RemoteHistory {
 
   /**
    * Creates a PurePayload from the response.
-   * @param response
    */
   private responseToPayload(response: HttpResponse) {
-    delete response.error;
-    delete response.status;
-    const rawPayload = response as unknown as RawPayload;
+    const rawPayload = response as Partial<RawPayload> as RawPayload;
     return CreateMaxPayloadFromAnyObject(rawPayload);
   }
 

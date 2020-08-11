@@ -18,7 +18,7 @@ export class ItemHistoryEntry {
   protected defaultContentKeyToDiffOn = 'text'
   protected textCharDiffLength = 0
   protected hasPreviousEntry = false
-  protected source: ItemHistorySource
+  protected readonly source: ItemHistorySource
 
   constructor(payload: PurePayload, source: ItemHistorySource) {
     /**
@@ -45,7 +45,7 @@ export class ItemHistoryEntry {
     /** We'll try to compute the delta based on an assumed
      * content property of `text`, if it exists.
      */
-    if (this.payload.content && this.payload.contentObject[this.defaultContentKeyToDiffOn]) {
+    if (this.payload.safeContent[this.defaultContentKeyToDiffOn]) {
       if (previousEntry) {
         this.textCharDiffLength =
           this.payload.contentObject[this.defaultContentKeyToDiffOn].length
@@ -107,7 +107,7 @@ export class ItemHistoryEntry {
     return lhs.isItemContentEqualWith(rhs);
   }
 
-  isFromServer() {
+  isRemoteSource() {
     return this.source === ItemHistorySource.Remote;
   }
 }
