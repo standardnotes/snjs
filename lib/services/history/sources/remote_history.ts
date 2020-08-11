@@ -6,6 +6,18 @@ import { RawPayload, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObje
 import { ItemHistorySource, ItemHistoryEntry } from "../item_history_entry";
 import { PayloadSource } from "@Lib/protocol/payloads";
 
+type RevisionResponse = {
+  error?: any
+  revision?: RawPayload
+  status?: number
+}
+
+type RevisionsResponse = {
+  error?: any
+  revisions?: RawPayload[]
+  status?: number
+}
+
 export class RemoteHistory {
   private apiService: SNApiService
   private protocolService: SNProtocolService
@@ -18,8 +30,8 @@ export class RemoteHistory {
   /**
    * Iterates over the response and creates a payload from each entry.
    */
-  private responseToPayloadArray(response: HttpResponse) {
-    const revisions: RawPayload[] = response!.revisions;
+  private responseToPayloadArray(response: RevisionsResponse) {
+    const revisions = response.revisions!;
     const revisionEntries = revisions.map((revision) => {
       return {
         payload: CreateMaxPayloadFromAnyObject(revision)
@@ -45,9 +57,8 @@ export class RemoteHistory {
   /**
    * Creates a PurePayload from the response.
    */
-  private responseToPayload(response: HttpResponse) {
-    const rawPayload = response as Partial<RawPayload> as RawPayload;
-    return CreateMaxPayloadFromAnyObject(rawPayload);
+  private responseToPayload(response: RevisionResponse) {
+    return response.revision!;
   }
 
   public async fetchItemRevision(itemUuid: string, revisionUuid: string) {
