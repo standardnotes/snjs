@@ -14,7 +14,7 @@ export declare class SNApiService extends PureService {
     private authenticating;
     private changing;
     private refreshingSession;
-    constructor(httpService: SNHttpService, storageService: SNStorageService);
+    constructor(httpService: SNHttpService, storageService: SNStorageService, defaultHost?: string);
     /** @override */
     deinit(): void;
     loadHost(): Promise<void>;

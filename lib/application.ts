@@ -41,7 +41,6 @@ import {
   SNSyncService,
   ChallengeService,
   SyncModes,
-  SyncQueueStrategy,
   ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -81,6 +80,7 @@ export class SNApplication {
   public namespace: string
   private swapClasses?: any[]
   private skipClasses?: any[]
+  private defaultHost?: string
 
   private crypto?: SNPureCrypto
   public deviceInterface?: DeviceInterface
@@ -121,15 +121,18 @@ export class SNApplication {
   /**
    * @param environment The Environment that identifies your application.
    * @param platform The Platform that identifies your application.
-   * @param namespace A unique identifier to namespace storage and
-   *  other persistent properties. Defaults to empty string.
+   * @param deviceInterfaceThe platform-dependent implementation of utilities.
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
+   * @param alertService The platform-dependent implementation of alert service.
+   * @param namespace A unique identifier to namespace storage and
+   * other persistent properties. Defaults to empty string.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
+   * @param defaultHost Default host to use in ApiService.
    */
   constructor(
     environment: Environment,
@@ -140,6 +143,7 @@ export class SNApplication {
     namespace?: string,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
+    defaultHost?: string,
   ) {
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
@@ -164,6 +168,7 @@ export class SNApplication {
     this.alertService = alertService;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
+    this.defaultHost = defaultHost;
     this.constructServices();
   }
 
@@ -1305,6 +1310,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService!,
       this.storageService!,
+      this.defaultHost
     );
     this.services.push(this.apiService!);
   }
