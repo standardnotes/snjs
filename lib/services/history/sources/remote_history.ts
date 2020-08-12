@@ -5,17 +5,17 @@ import { HttpResponse } from "@Lib/services/api/http_service";
 import { RawPayload, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject } from "@Lib/protocol/payloads/generator";
 import { ItemHistorySource, ItemHistoryEntry } from "../item_history_entry";
 import { PayloadSource } from "@Lib/protocol/payloads";
+import { ContentType } from "@Lib/models";
 
-type RevisionResponse = {
-  error?: any
-  revision?: RawPayload
-  status?: number
+type RawRevision = RawPayload & {
+  item_id: string
 }
 
-type RevisionsResponse = {
-  error?: any
-  revisions?: RawPayload[]
-  status?: number
+type RawRevisionListItem = {
+  uuid: string
+  content_type: ContentType
+  created_at: Date
+  updated_at: Date
 }
 
 export class RemoteHistory {
@@ -30,35 +30,28 @@ export class RemoteHistory {
   /**
    * Iterates over the response and creates a payload from each entry.
    */
-  private responseToPayloadArray(response: RevisionsResponse) {
-    const revisions = response.revisions!;
-    const revisionEntries = revisions.map((revision) => {
+  private responseToPayloadArray(response: HttpResponse) {
+    delete response.error;
+    delete response.status;
+    return Object.keys(response).map((key) => {
+      const revision = response[key] as RawRevisionListItem;
       return {
         payload: CreateMaxPayloadFromAnyObject(revision)
-      };
+      }
     });
-    return {
-      entries: revisionEntries
-    };
   }
 
   public async fetchItemHistory(itemUuid: string) {
+    const payloadArray = {
+      entries: new Array
+    };
     const serverResponse = await this.apiService!.getItemRevisions(itemUuid);
     if (serverResponse.error) {
-      return {
-        entries: []
-      };
+      return payloadArray;
     }
-    const payloadArray = this.responseToPayloadArray(serverResponse);
+    payloadArray.entries = this.responseToPayloadArray(serverResponse);
     const itemHistory = ItemHistory.FromJson(payloadArray, ItemHistorySource.Remote);
     return itemHistory;
-  }
-
-  /**
-   * Creates a PurePayload from the response.
-   */
-  private responseToPayload(response: RevisionResponse) {
-    return response.revision!;
   }
 
   public async fetchItemRevision(itemUuid: string, revisionUuid: string) {
@@ -66,9 +59,8 @@ export class RemoteHistory {
     if (serverResponse.error) {
       return undefined;
     }
-    const payload = this.responseToPayload(serverResponse);
+    const payload = serverResponse as unknown as RawRevision;
     const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory, {
-      ...serverResponse,
       uuid: itemUuid,
     });
     const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(encryptedPayload);
