@@ -34,10 +34,11 @@ export class SNApiService extends PureService {
   private changing = false
   private refreshingSession = false
 
-  constructor(httpService: SNHttpService, storageService: SNStorageService) {
+  constructor(httpService: SNHttpService, storageService: SNStorageService, defaultHost?: string) {
     super();
     this.httpService = httpService;
     this.storageService = storageService;
+    this.host = defaultHost;
   }
 
   /** @override */
@@ -51,7 +52,7 @@ export class SNApiService extends PureService {
 
   public async loadHost() {
     const storedValue = await this.storageService!.getValue(StorageKey.ServerHost);
-    this.host = storedValue || (window as any)._default_sync_server;
+    this.host = storedValue || this.host || (window as any)._default_sync_server;
   }
 
   public async setHost(host: string) {
@@ -284,7 +285,7 @@ export class SNApiService extends PureService {
         return sessionResponse;
       } else {
         return this.httpService!.runHttp({
-          ...httpRequest, 
+          ...httpRequest,
           authentication: this.session!.accessToken
         });
       }
