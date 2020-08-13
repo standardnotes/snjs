@@ -243,6 +243,7 @@ export class SNActionsService extends PureService {
     response: HttpResponse,
     passwordRequestHandler: PasswordRequestHandler,
     key?: SNRootKey,
+    triedPasswords: string[] = []
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
     const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
@@ -252,7 +253,8 @@ export class SNActionsService extends PureService {
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload;
     }
-    if (!response.auth_params) {
+    const keyParamsData = response.keyParams || response.auth_params;
+    if (!keyParamsData) {
       /**
        * In some cases revisions were missing auth params.
        * Instruct the user to email us to get this remedied.
@@ -265,8 +267,8 @@ export class SNActionsService extends PureService {
       );
       return undefined;
     }
+    const keyParams = this.protocolService!.createKeyParams(keyParamsData);
     /* Try previous passwords */
-    const triedPasswords: string[] = [];
     for (const passwordCandidate of this.previousPasswords) {
       if (triedPasswords.includes(passwordCandidate)) {
         continue;
@@ -274,7 +276,7 @@ export class SNActionsService extends PureService {
       triedPasswords.push(passwordCandidate);
       const key = await this.protocolService!.computeRootKey(
         passwordCandidate,
-        response.auth_params
+        keyParams
       );
       if (!key) {
         continue;
@@ -283,6 +285,7 @@ export class SNActionsService extends PureService {
         response,
         passwordRequestHandler,
         key,
+        triedPasswords,
       );
       if (nestedResponse) {
         return nestedResponse;
@@ -290,6 +293,9 @@ export class SNActionsService extends PureService {
     }
     /** Prompt for other passwords */
     const password = await passwordRequestHandler();
+    if (this.previousPasswords.includes(password)) {
+      return undefined;
+    }
     this.previousPasswords.push(password);
     return this.payloadByDecryptingResponse(
       response,
