@@ -15,7 +15,7 @@ export declare class ItemHistoryEntry {
     protected readonly source: ItemHistorySource;
     constructor(payload: PurePayload, source: ItemHistorySource);
     setPreviousEntry(previousEntry: ItemHistoryEntry): void;
-    operationVector(): 1 | 0 | -1;
+    operationVector(): 1 | -1 | 0;
     deltaSize(): number;
     isSameAsEntry(entry: ItemHistoryEntry): boolean;
     isRemoteSource(): boolean;
