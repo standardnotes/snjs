@@ -9,7 +9,7 @@ import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined, concatArrays, Copy } from '@Lib/utils';
+import { isNullOrUndefined, concatArrays } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 
@@ -248,7 +248,7 @@ export class SNHistoryManager extends PureService {
     if (serverResponse.error) {
       return undefined;
     }
-    const payload = Copy(serverResponse.object) as RawRevisionPayload;
+    const payload = serverResponse.object as RawRevisionPayload;
     const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory, {
       uuid: itemUuid,
     });

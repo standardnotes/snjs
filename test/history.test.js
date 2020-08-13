@@ -55,12 +55,6 @@ describe('history manager', () => {
       expect(itemHistory).to.be.ok;
       expect(itemHistory.entries.length).to.equal(1);
 
-      /** Item source should be 'Session' */
-      const firstHistoryEntry = itemHistory.entries[0];
-      expect(firstHistoryEntry.source).to.equal('session');
-      const isRemoteSource = firstHistoryEntry.isRemoteSource();
-      expect(isRemoteSource).to.be.false;
-
       /** Sync with same contents, should not create new entry */
       await this.application.saveItem(item.uuid);
       expect(itemHistory.entries.length).to.equal(1);
@@ -259,8 +253,7 @@ describe('history manager', () => {
       const item = await Factory.createSyncedNote(this.application);
       await this.application.syncService.sync(syncOptions);
       const itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory).to.be.ok;
-      expect(itemHistory.entries.length).to.equal(0);
+      expect(itemHistory).to.be.undefined;
     });
 
     it('create basic history entries', async function () {
@@ -271,10 +264,10 @@ describe('history manager', () => {
       expect(itemHistory).to.be.ok;
       expect(itemHistory.entries.length).to.equal(0);
 
-      /** Sync with same contents, should not create new entry */
+      /** Sync with same contents, should create new entry */
       await this.application.saveItem(item.uuid);
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.length).to.equal(1);
 
       /** Sync with different contents, should create new entry */
       await this.application.changeAndSaveItem(
@@ -287,13 +280,7 @@ describe('history manager', () => {
         syncOptions
       );
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(2);
-
-      /** Item source should be 'Remote' */
-      const revisionEntry = itemHistory.entries[0];
-      expect(revisionEntry.source).to.equal('remote');
-      const isRemoteSource = revisionEntry.isRemoteSource();
-      expect(isRemoteSource).to.be.true;
+      expect(itemHistory.length).to.equal(2);
     });
 
     it('returns revisions from server', async function () {
@@ -311,9 +298,9 @@ describe('history manager', () => {
         syncOptions
       );
       let itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.length).to.equal(1);
 
-      let revisionEntry = itemHistory.entries[0];
+      let revisionEntry = itemHistory[0];
       let revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry);
       expect(revisionFromServer).to.be.ok;
 
@@ -336,10 +323,10 @@ describe('history manager', () => {
         syncOptions
       );
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(itemHistory.length).to.equal(2);
 
       /** The first entry from response should be the previous revision before the actual, current item. */
-      revisionEntry = itemHistory.entries[0];
+      revisionEntry = itemHistory[0];
       revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry);
       expect(revisionFromServer).to.be.ok;
 
