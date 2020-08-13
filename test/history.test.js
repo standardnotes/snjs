@@ -314,7 +314,7 @@ describe('history manager', () => {
       expect(itemHistory.entries.length).to.equal(1);
 
       let revisionEntry = itemHistory.entries[0];
-      let revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry.payload.uuid);
+      let revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry);
       expect(revisionFromServer).to.be.ok;
 
       let payloadFromServer = revisionFromServer.payload;
@@ -340,7 +340,7 @@ describe('history manager', () => {
 
       /** The first entry from response should be the previous revision before the actual, current item. */
       revisionEntry = itemHistory.entries[0];
-      revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry.payload.uuid);
+      revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry);
       expect(revisionFromServer).to.be.ok;
 
       payloadFromServer = revisionFromServer.payload;
