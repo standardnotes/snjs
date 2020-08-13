@@ -18,6 +18,8 @@ const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 const REQUEST_PATH_SYNC = '/items/sync';
 const REQUEST_PATH_LOGOUT = '/auth/sign_out';
 const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
+const REQUEST_PATH_ITEM_REVISIONS = '/items/:item_id/revisions';
+const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
 const API_VERSION = '20200115';
 
@@ -200,8 +202,9 @@ export class SNApiService extends PureService {
     if (this.changing) {
       return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
     }
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
@@ -241,8 +244,9 @@ export class SNApiService extends PureService {
     contentType?: ContentType,
     customEvent?: string
   ) {
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     const url = await this.path(REQUEST_PATH_SYNC);
     const params = this.params({
@@ -289,8 +293,9 @@ export class SNApiService extends PureService {
   }
 
   async refreshSession() {
-    if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
     }
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
@@ -313,6 +318,56 @@ export class SNApiService extends PureService {
     });
     this.refreshingSession = false;
     return result;
+  }
+
+  async getItemRevisions(itemId: string) {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
+    const url = await this.path(path);
+    const response = await this.httpService!.getAbsolute(
+      url,
+      undefined,
+      this.session!.accessToken
+    ).catch((errorResponse: HttpResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    });
+    return response;
+  }
+
+  async getRevisionForItem(itemId: string, revisionId: string) {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
+    const url = await this.path(path);
+    const response = await this.httpService!.getAbsolute(
+      url,
+      undefined,
+      this.session!.accessToken
+    ).catch((errorResponse: HttpResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    });
+    return response;
+  }
+
+  private preprocessingError() {
+    if (this.refreshingSession) {
+      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+    }
+    if (!this.session) {
+      return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
+    }
+    return undefined;
   }
 
 }

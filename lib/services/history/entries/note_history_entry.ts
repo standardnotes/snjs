@@ -1,4 +1,4 @@
-import { ItemHistoryEntry } from '@Services/history/item_history_entry';
+import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 
 export class NoteHistoryEntry extends ItemHistoryEntry {
 
