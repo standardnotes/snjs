@@ -7,7 +7,7 @@ import { CreateHistoryEntryForPayload } from './functions';
  */
 const LARGE_ENTRY_DELTA_THRESHOLD = 15;
 
-type ItemHistoryJson = {
+export type ItemHistoryJson = {
   entries: any[]
 }
 

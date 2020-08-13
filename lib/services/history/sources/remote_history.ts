@@ -1,17 +1,22 @@
 import { SNApiService } from "@Lib/services/api/api_service";
 import { SNProtocolService } from "@Lib/services/protocol_service";
-import { ItemHistory } from "../item_history";
+import { ItemHistory, ItemHistoryJson } from "../item_history";
 import { HttpResponse } from "@Lib/services/api/http_service";
-import { RawPayload, CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject } from "@Lib/protocol/payloads/generator";
+import { 
+  RawPayload,
+  CreateMaxPayloadFromAnyObject,
+  CreateSourcedPayloadFromObject
+} from "@Lib/protocol/payloads/generator";
 import { ItemHistorySource, ItemHistoryEntry } from "../item_history_entry";
 import { PayloadSource } from "@Lib/protocol/payloads";
 import { ContentType } from "@Lib/models";
+import { Copy } from "@Lib/utils";
 
-type RawRevision = RawPayload & {
+type RawRevisionPayload = RawPayload & {
   item_id: string
 }
 
-type RawRevisionListItem = {
+type ItemHistoryJsonEntry = {
   uuid: string
   content_type: ContentType
   created_at: Date
@@ -30,27 +35,29 @@ export class RemoteHistory {
   /**
    * Iterates over the response and creates a payload from each entry.
    */
-  private responseToPayloadArray(response: HttpResponse) {
-    delete response.error;
-    delete response.status;
-    return Object.keys(response).map((key) => {
-      const revision = response[key] as RawRevisionListItem;
-      return {
-        payload: CreateMaxPayloadFromAnyObject(revision)
+  private responseToItemHistoryJson(response: HttpResponse) {
+    const result: ItemHistoryJson = {
+      entries: []
+    };
+    Object.keys(response).map((key) => {
+      if (key === 'error' || key === 'status') {
+        return;
       }
+      const historyEntry = response[key] as ItemHistoryJsonEntry;
+      result.entries.push({
+        payload: CreateMaxPayloadFromAnyObject(historyEntry)
+      });
     });
+    return result;
   }
 
   public async fetchItemHistory(itemUuid: string) {
-    const payloadArray = {
-      entries: new Array
-    };
     const serverResponse = await this.apiService!.getItemRevisions(itemUuid);
     if (serverResponse.error) {
-      return payloadArray;
+      return new ItemHistory();
     }
-    payloadArray.entries = this.responseToPayloadArray(serverResponse);
-    const itemHistory = ItemHistory.FromJson(payloadArray, ItemHistorySource.Remote);
+    const entryJson = this.responseToItemHistoryJson(serverResponse);
+    const itemHistory = ItemHistory.FromJson(entryJson, ItemHistorySource.Remote);
     return itemHistory;
   }
 
@@ -59,7 +66,7 @@ export class RemoteHistory {
     if (serverResponse.error) {
       return undefined;
     }
-    const payload = serverResponse as unknown as RawRevision;
+    const payload = Copy(serverResponse) as RawRevisionPayload;
     const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory, {
       uuid: itemUuid,
     });
