@@ -1,4 +1,4 @@
-import { PurePayload } from '../../protocol/payloads/pure_payload';
+import { PurePayload } from '../../../protocol/payloads/pure_payload';
 export declare enum ItemHistorySource {
     Session = "session",
     Remote = "remote"

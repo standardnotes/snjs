@@ -40,4 +40,7 @@ export declare class SNApiService extends PureService {
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
     private refreshSessionThenRetryRequest;
     refreshSession(): Promise<HttpResponse>;
+    getItemRevisions(itemId: string): Promise<HttpResponse>;
+    getRevisionForItem(itemId: string, revisionId: string): Promise<HttpResponse>;
+    private preprocessingError;
 }

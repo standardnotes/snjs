@@ -49,7 +49,7 @@ export class ItemHistoryEntry {
       if (previousEntry) {
         this.textCharDiffLength =
           this.payload.contentObject[this.defaultContentKeyToDiffOn].length
-        - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
+          - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
       } else {
         this.textCharDiffLength =
           this.payload.contentObject[this.defaultContentKeyToDiffOn].length;

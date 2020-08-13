@@ -1,10 +1,9 @@
-import { PayloadField } from './../../protocol/payloads/fields';
+import { PayloadField } from '@Protocol/payloads/fields';
 import { PurePayload } from '@Payloads/pure_payload';
-import { NoteHistoryEntry } from './note_history_entry';
+import { NoteHistoryEntry } from '@Services/history/entries/note_history_entry';
 import { ContentType } from '@Models/content_types';
-import { ItemHistorySource } from './item_history_entry';
 
-export function CreateHistoryEntryForPayload(payload: PurePayload, source: ItemHistorySource) {
+export function CreateHistoryEntryForPayload(payload: PurePayload) {
   const mapping = {
     [ContentType.Note]: NoteHistoryEntry
   } as Partial<Record<ContentType, any>>;
@@ -14,6 +13,6 @@ export function CreateHistoryEntryForPayload(payload: PurePayload, source: ItemH
     throw 'Invalid item history class';
   }
   // eslint-disable-next-line new-cap
-  const entry = new historyItemClass(payload, source);
+  const entry = new historyItemClass(payload);
   return entry;
 }

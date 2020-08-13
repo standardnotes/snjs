@@ -28,7 +28,7 @@ describe('history manager', () => {
       /** Automatically optimize after every revision by setting this to 0 */
       this.historyManager.setSessionItemRevisionThreshold(0);
     });
-  
+
     afterEach(async function () {
       await this.application.deinit();
     });
@@ -44,7 +44,7 @@ describe('history manager', () => {
         syncOptions
       );
     }
-  
+
     function deleteCharsFromString(string, amount) {
       return string.substring(0, string.length - amount);
     }
@@ -54,7 +54,7 @@ describe('history manager', () => {
       const itemHistory = this.historyManager.sessionHistoryForItem(item);
       expect(itemHistory).to.be.ok;
       expect(itemHistory.entries.length).to.equal(1);
-  
+
       /** Item source should be 'Session' */
       const firstHistoryEntry = itemHistory.entries[0];
       expect(firstHistoryEntry.source).to.equal('session');
@@ -64,7 +64,7 @@ describe('history manager', () => {
       /** Sync with same contents, should not create new entry */
       await this.application.saveItem(item.uuid);
       expect(itemHistory.entries.length).to.equal(1);
-  
+
       /** Sync with different contents, should create new entry */
       await this.application.changeAndSaveItem(
         item.uuid,
@@ -76,18 +76,18 @@ describe('history manager', () => {
         syncOptions
       );
       expect(itemHistory.entries.length).to.equal(2);
-  
+
       this.historyManager.clearHistoryForItem(item);
       const newItemHistory = this.historyManager.sessionHistoryForItem(item);
       expect(newItemHistory.entries.length).to.equal(0);
-  
+
       await this.application.saveItem(item.uuid);
       expect(newItemHistory.entries.length).to.equal(1);
-  
+
       this.historyManager.clearAllHistory();
       expect(this.historyManager.sessionHistoryForItem(item).entries.length).to.equal(0);
     });
-  
+
     it('should optimize basic entries', async function () {
       let item = await Factory.createSyncedNote(this.application);
       const itemHistory = this.historyManager.sessionHistoryForItem(item);
@@ -103,7 +103,7 @@ describe('history manager', () => {
         item.content.text + Factory.randomString(1)
       );
       expect(itemHistory.entries.length).to.equal(2);
-  
+
       /**
        * Now changing it by one character should discard this entry,
        * keeping the total at 2.
@@ -135,7 +135,7 @@ describe('history manager', () => {
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
       expect(itemHistory.entries.length).to.equal(3);
-  
+
       /** Delete over threshold text. It should keep this revision. */
       item = await setTextAndSync(
         this.application,
@@ -161,7 +161,7 @@ describe('history manager', () => {
       );
       expect(itemHistory.entries.length).to.equal(5);
     });
-  
+
     it('should keep the entry right before a large deletion, regardless of its delta',
       async function () {
         const payload = CreateMaxPayloadFromAnyObject(
@@ -232,7 +232,7 @@ describe('history manager', () => {
         expect(itemHistory.entries.length).to.equal(4);
       });
   });
-  
+
   describe('remote', async function () {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
@@ -246,7 +246,7 @@ describe('history manager', () => {
         password: this.password
       });
     });
-  
+
     afterEach(async function () {
       await this.application.deinit();
     });
@@ -298,7 +298,7 @@ describe('history manager', () => {
 
     it('returns revisions from server', async function () {
       let item = await Factory.createSyncedNote(this.application);
-      
+
       /** Sync with different contents, should create new entry */
       const newTitleAfterFirstChange = `The title should be: ${Math.random()}`;
       await this.application.changeAndSaveItem(
@@ -314,14 +314,14 @@ describe('history manager', () => {
       expect(itemHistory.entries.length).to.equal(1);
 
       let revisionEntry = itemHistory.entries[0];
-      let revisionFromServer = await this.historyManager.fetchRevisionForItem(item.uuid, revisionEntry.payload.uuid);
+      let revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry.payload.uuid);
       expect(revisionFromServer).to.be.ok;
 
       let payloadFromServer = revisionFromServer.payload;
       expect(payloadFromServer.errorDecrypting).to.be.false;
       expect(payloadFromServer.uuid).to.eq(item.payload.uuid);
       expect(payloadFromServer.content).to.eql(item.payload.content);
-      
+
       item = this.application.itemManager.findItem(item.uuid);
       expect(payloadFromServer.content).to.not.eql(item.payload.content);
 
@@ -340,7 +340,7 @@ describe('history manager', () => {
 
       /** The first entry from response should be the previous revision before the actual, current item. */
       revisionEntry = itemHistory.entries[0];
-      revisionFromServer = await this.historyManager.fetchRevisionForItem(item.uuid, revisionEntry.payload.uuid);
+      revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, revisionEntry.payload.uuid);
       expect(revisionFromServer).to.be.ok;
 
       payloadFromServer = revisionFromServer.payload;
