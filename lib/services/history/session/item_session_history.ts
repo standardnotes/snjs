@@ -1,7 +1,7 @@
+import { RawPayload } from '@Protocol/payloads/generator';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItem } from '@Models/core/item';
-import { ItemHistoryEntry } from '@Services/history/item_history_entry';
-import { CreateHistoryEntryForPayload } from './functions';
+import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
+import { CreateHistoryEntryForPayload } from '@Services/history/functions';
 /**
  * The amount of characters added or removed that
  * constitute a keepable entry after optimization.
@@ -9,10 +9,10 @@ import { CreateHistoryEntryForPayload } from './functions';
 const LARGE_ENTRY_DELTA_THRESHOLD = 15;
 
 type ItemHistoryJson = {
-  entries: any[]
+  entries: RawPayload[]
 }
 
-export class ItemHistory {
+export class ItemSessionHistory {
 
   public entries: ItemHistoryEntry[] = []
 
@@ -30,7 +30,7 @@ export class ItemHistory {
     const entries = entryJson.entries.map((rawHistoryEntry: any) => {
       return CreateHistoryEntryForPayload(rawHistoryEntry.payload);
     })
-    return new ItemHistory(entries);
+    return new ItemSessionHistory(entries);
   }
 
   getLastEntry() {

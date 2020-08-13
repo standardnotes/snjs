@@ -1,8 +1,12 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItem } from '@Models/core/item';
-import { deepMerge, isString } from '@Lib/utils';
+import { isString } from '@Lib/utils';
 import { CopyPayload } from '@Payloads/generator';
 import { CreateItemFromPayload } from '@Lib/models';
+
+export enum ItemHistorySource {
+  Session = 'session',
+  Remote = 'remote',
+}
 
 export class ItemHistoryEntry {
 
@@ -14,8 +18,9 @@ export class ItemHistoryEntry {
   protected defaultContentKeyToDiffOn = 'text'
   protected textCharDiffLength = 0
   protected hasPreviousEntry = false
+  protected readonly source: ItemHistorySource
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PurePayload, source: ItemHistorySource) {
     /**
      * Whatever values `item` has will be persisted,
      * so be sure that the values are picked beforehand.
@@ -31,6 +36,7 @@ export class ItemHistoryEntry {
         updated_at: updated_at
       }
     );
+    this.source = source;
   }
 
   setPreviousEntry(previousEntry: ItemHistoryEntry) {
@@ -39,11 +45,11 @@ export class ItemHistoryEntry {
     /** We'll try to compute the delta based on an assumed
      * content property of `text`, if it exists.
      */
-    if (this.payload.contentObject[this.defaultContentKeyToDiffOn]) {
+    if (this.payload.safeContent[this.defaultContentKeyToDiffOn]) {
       if (previousEntry) {
         this.textCharDiffLength =
           this.payload.contentObject[this.defaultContentKeyToDiffOn].length
-        - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
+          - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
       } else {
         this.textCharDiffLength =
           this.payload.contentObject[this.defaultContentKeyToDiffOn].length;
@@ -99,5 +105,9 @@ export class ItemHistoryEntry {
     const lhs = CreateItemFromPayload(this.payload);
     const rhs = CreateItemFromPayload(entry.payload);
     return lhs.isItemContentEqualWith(rhs);
+  }
+
+  isRemoteSource() {
+    return this.source === ItemHistorySource.Remote;
   }
 }
