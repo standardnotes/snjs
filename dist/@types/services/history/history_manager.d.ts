@@ -6,7 +6,7 @@ import { ContentType } from '../../models/content_types';
 import { PureService } from '../pure_service';
 import { SNApiService } from '../api/api_service';
 import { SNProtocolService } from '../protocol_service';
-declare type RemoteHistoryListEntry = {
+export declare type RemoteHistoryListEntry = {
     /** The uuid of the revision, not the item */
     uuid: string;
     content_type: ContentType;
@@ -70,4 +70,3 @@ export declare class SNHistoryManager extends PureService {
      */
     fetchRemoteRevision(itemUuid: string, revisionListEntry: RemoteHistoryListEntry): Promise<ItemHistoryEntry | undefined>;
 }
-export {};
