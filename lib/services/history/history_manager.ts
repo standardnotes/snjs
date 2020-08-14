@@ -1,6 +1,6 @@
 import { SessionHistoryMap } from '@Services/history/session/session_history_map';
 import { RawPayload } from './../../protocol/payloads/generator';
-import { ItemHistorySource, ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
+import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
@@ -253,6 +253,6 @@ export class SNHistoryManager extends PureService {
       uuid: itemUuid,
     });
     const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(encryptedPayload);
-    return new ItemHistoryEntry(decryptedPayload, ItemHistorySource.Remote);
+    return new ItemHistoryEntry(decryptedPayload);
   }
 }
