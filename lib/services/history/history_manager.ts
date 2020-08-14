@@ -17,7 +17,7 @@ type RawRevisionPayload = RawPayload & {
   item_id: string
 }
 
-type RemoteHistoryListEntry = {
+export type RemoteHistoryListEntry = {
   /** The uuid of the revision, not the item */
   uuid: string
   content_type: ContentType
