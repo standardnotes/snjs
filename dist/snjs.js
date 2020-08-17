@@ -10548,8 +10548,12 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
       throw Error("Attempting to remove storage key ".concat(key, " before loading local storage."));
     }
 
-    delete this.values[this.domainKeyForMode(mode)][key];
-    return this.persistValuesToDisk();
+    const domain = this.values[this.domainKeyForMode(mode)];
+
+    if (domain === null || domain === void 0 ? void 0 : domain[key]) {
+      delete domain[key];
+      return this.persistValuesToDisk();
+    }
   }
 
   getStorageEncryptionPolicy() {
@@ -10650,8 +10654,12 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     });
   }
 
-  async clearAllData() {
-    return Promise.all([this.clearValues(), this.clearAllPayloads()]);
+  clearAllData() {
+    return this.executeCriticalFunction(async () => {
+      await this.clearValues();
+      await this.clearAllPayloads();
+      await this.deviceInterface.removeRawStorageValue(this.getPersistenceKey());
+    });
   }
 
 }
