@@ -212,6 +212,10 @@ export declare class SNApplication {
      * items matching the constraint are added, changed, or deleted.
      */
     streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
+    /**
+     * Activates or deactivates a component, depending on its
+     * current state, and syncs.
+     */
     toggleComponent(component: SNComponent): Promise<any>;
     /**
      * Set the server's URL
