@@ -50,6 +50,7 @@ import {
   UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
+import { SNComponent } from './models';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -652,6 +653,11 @@ export class SNApplication {
       observer();
       removeFromArray(this.streamRemovers, observer);
     };
+  }
+
+  public async toggleComponent(component: SNComponent) {
+    await this.componentManager!.toggleComponent(component)
+    return this.syncService!.sync();
   }
 
   /**

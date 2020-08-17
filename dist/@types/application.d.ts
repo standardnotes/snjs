@@ -20,6 +20,7 @@ import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
+import { SNComponent } from './models';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
 };
@@ -211,6 +212,7 @@ export declare class SNApplication {
      * items matching the constraint are added, changed, or deleted.
      */
     streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
+    toggleComponent(component: SNComponent): Promise<any>;
     /**
      * Set the server's URL
      */
