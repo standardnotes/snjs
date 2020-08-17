@@ -363,10 +363,11 @@ export class SNStorageService extends PureService {
     });
   }
 
-  public async clearAllData() {
-    return Promise.all([
-      this.clearValues(),
-      this.clearAllPayloads()
-    ]);
+  public clearAllData(): Promise<void> {
+    return this.executeCriticalFunction(async () => {
+      await this.clearValues();
+      await this.clearAllPayloads();
+      await this.deviceInterface!.removeRawStorageValue(this.getPersistenceKey());
+    });
   }
 }
