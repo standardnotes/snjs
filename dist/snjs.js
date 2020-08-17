@@ -10651,7 +10651,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   }
 
   async clearAllData() {
-    return Promise.all([this.clearValues(), this.clearAllPayloads()]); // await this.deviceInterface!.removeAllRawStorageValues();
+    return Promise.all([this.clearValues(), this.clearAllPayloads()]);
   }
 
 }
@@ -21744,6 +21744,11 @@ class application_SNApplication {
       Object(utils["B" /* removeFromArray */])(this.streamRemovers, observer);
     };
   }
+  /**
+   * Activates or deactivates a component, depending on its
+   * current state, and syncs.
+   */
+
 
   async toggleComponent(component) {
     await this.componentManager.toggleComponent(component);
