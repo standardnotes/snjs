@@ -655,6 +655,10 @@ export class SNApplication {
     };
   }
 
+  /**
+   * Activates or deactivates a component, depending on its
+   * current state, and syncs.
+   */
   public async toggleComponent(component: SNComponent) {
     await this.componentManager!.toggleComponent(component)
     return this.syncService!.sync();
