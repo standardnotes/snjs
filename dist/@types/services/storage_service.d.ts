@@ -92,6 +92,6 @@ export declare class SNStorageService extends PureService {
     deletePayloads(payloads: PurePayload[]): Promise<void>;
     deletePayloadWithId(id: string): Promise<void>;
     clearAllPayloads(): Promise<void>;
-    clearAllData(): Promise<[void, void]>;
+    clearAllData(): Promise<void>;
 }
 export {};
