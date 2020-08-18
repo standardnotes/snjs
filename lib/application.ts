@@ -1133,7 +1133,7 @@ export class SNApplication {
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
-      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
+      return this.apiService!.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
     }
 
     this.lockSyncing();
