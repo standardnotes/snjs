@@ -244,15 +244,13 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKey()).version
     ).to.equal(ProtocolVersion.V003);
 
-    /** Create note and ensure its encrypted with 003 */
-    await Factory.createSyncedNote(this.application);
-
+    /** Ensure note is encrypted with 003 */
     const notePayloads = await Factory.getStoragePayloadsOfType(
       this.application,
       ContentType.Note
     );
-    const notePayload003 = notePayloads[0];
-    expect(notePayload003.version).to.equal(ProtocolVersion.V003);
+    expect(notePayloads.length).to.equal(1);
+    expect(notePayloads[0].version).to.equal(ProtocolVersion.V003);
 
     const { error } = await this.application.changePassword(
       this.password,
