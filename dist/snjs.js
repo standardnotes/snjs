@@ -727,7 +727,7 @@ function CreatePayload(object, fields, source, override) {
   }
 
   const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "K"])(fields.concat(overrideFields));
-  return new _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"](rawPayload, newFields, source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__[/* PayloadSource */ "a"].Constructor);
+  return new _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"](rawPayload, newFields, source || object.source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__[/* PayloadSource */ "a"].Constructor);
 }
 
 function CreateEncryptionParameters(raw) {
