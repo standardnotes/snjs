@@ -347,6 +347,7 @@ export declare class SNApplication {
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;
     setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
     generateUuid(): Promise<string>;
+    getAbsoluteUrl(url: string): Promise<import("./services/api/http_service").HttpResponse> | undefined;
     /**
      * Dynamically change the device interface, i.e when Desktop wants to override
      * default web interface.

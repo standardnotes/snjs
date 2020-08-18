@@ -1242,6 +1242,10 @@ export class SNApplication {
     return Uuid.GenerateUuid();
   }
 
+  public getAbsoluteUrl(url: string) {
+    return this.httpService?.getAbsolute(url);
+  }
+
   /**
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.

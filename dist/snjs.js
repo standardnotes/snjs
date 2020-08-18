@@ -22362,6 +22362,12 @@ class application_SNApplication {
   generateUuid() {
     return uuid_Uuid.GenerateUuid();
   }
+
+  getAbsoluteUrl(url) {
+    var _this$httpService;
+
+    return (_this$httpService = this.httpService) === null || _this$httpService === void 0 ? void 0 : _this$httpService.getAbsolute(url);
+  }
   /**
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.
