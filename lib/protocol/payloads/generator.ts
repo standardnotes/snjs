@@ -268,7 +268,7 @@ function CreatePayload(
   return new PurePayload(
     rawPayload,
     newFields,
-    source || PayloadSource.Constructor
+    source || object.source || PayloadSource.Constructor
   );
 }
 
