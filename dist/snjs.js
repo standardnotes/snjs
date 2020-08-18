@@ -9228,6 +9228,7 @@ __webpack_require__.d(__webpack_exports__, "SNSmartTag", function() { return /* 
 __webpack_require__.d(__webpack_exports__, "SNActionsExtension", function() { return /* reexport */ extension_SNActionsExtension; });
 __webpack_require__.d(__webpack_exports__, "Action", function() { return /* reexport */ action_Action; });
 __webpack_require__.d(__webpack_exports__, "SNTheme", function() { return /* reexport */ theme_SNTheme; });
+__webpack_require__.d(__webpack_exports__, "ThemeMutator", function() { return /* reexport */ theme_ThemeMutator; });
 __webpack_require__.d(__webpack_exports__, "SNComponent", function() { return /* reexport */ component_SNComponent; });
 __webpack_require__.d(__webpack_exports__, "ComponentAction", function() { return /* reexport */ ComponentAction; });
 __webpack_require__.d(__webpack_exports__, "ComponentMutator", function() { return /* reexport */ component_ComponentMutator; });
@@ -18485,6 +18486,7 @@ class item_collection_ItemCollection extends collection_MutableCollection {
 
 
 
+
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -18733,6 +18735,8 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
       return new privileges_PrivilegeMutator(item, type);
     } else if (item.content_type === content_types["a" /* ContentType */].UserPrefs) {
       return new userPrefs_UserPrefsMutator(item, type);
+    } else if (item.content_type === content_types["a" /* ContentType */].Theme) {
+      return new theme_ThemeMutator(item, type);
     } else {
       return new core_item["b" /* ItemMutator */](item, type);
     }
