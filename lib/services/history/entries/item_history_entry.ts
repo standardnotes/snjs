@@ -24,6 +24,9 @@ export class ItemHistoryEntry {
     if (isString(updated_at)) {
       updated_at = new Date(updated_at);
     }
+    if (updated_at.getTime() === 0) {
+      updated_at = new Date();
+    }
     this.payload = CopyPayload(
       payload,
       {

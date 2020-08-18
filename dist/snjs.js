@@ -17450,6 +17450,10 @@ class item_history_entry_ItemHistoryEntry {
       updated_at = new Date(updated_at);
     }
 
+    if (updated_at.getTime() === 0) {
+      updated_at = new Date();
+    }
+
     this.payload = Object(generator["b" /* CopyPayload */])(payload, {
       updated_at: updated_at
     });
