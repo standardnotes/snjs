@@ -369,6 +369,11 @@ export class SNComponentManager extends PureService {
   }
 
   getActiveThemes() {
+    if (this.environment === Environment.Mobile) {
+      return this.componentsForArea(ComponentArea.Themes).filter((theme) => {
+        return (theme as SNTheme).isMobileActive();
+      }) as SNTheme[];
+    }
     return this.componentsForArea(ComponentArea.Themes).filter((theme) => {
       return theme.active;
     }) as SNTheme[];

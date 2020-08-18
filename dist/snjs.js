@@ -11758,6 +11758,12 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
   }
 
   getActiveThemes() {
+    if (this.environment === Environment.Mobile) {
+      return this.componentsForArea(ComponentArea.Themes).filter(theme => {
+        return theme.isMobileActive();
+      });
+    }
+
     return this.componentsForArea(ComponentArea.Themes).filter(theme => {
       return theme.active;
     });
