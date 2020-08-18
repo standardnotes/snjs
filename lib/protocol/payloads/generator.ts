@@ -171,12 +171,13 @@ const RemoteHistoryPayloadFields = ServerPayloadFields.slice();
 
 export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
-  override?: PayloadOverride
+  override?: PayloadOverride,
+  source?: PayloadSource
 ) {
   return CreatePayload(
     object,
     MaxPayloadFields.slice(),
-    undefined,
+    source,
     override
   );
 }
@@ -273,12 +274,14 @@ function CreatePayload(
 }
 
 export function CreateEncryptionParameters(
-  raw: RawEncryptionParameters
+  raw: RawEncryptionParameters,
+  source?: PayloadSource
 ): PurePayload {
   const fields = Object.keys(raw) as PayloadField[];
   return CreatePayload(
     raw,
-    fields
+    fields,
+    source
   );
 }
 

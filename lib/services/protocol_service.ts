@@ -536,8 +536,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
     }
     const version = payload.version!;
+    const source = payload.source;
     const operator = this.operatorForVersion(version);
-    const encryptionParameters = CreateEncryptionParameters(payload);
+    const encryptionParameters = CreateEncryptionParameters(payload, source);
     try {
       const decryptedParameters = await operator.generateDecryptedParameters(
         encryptionParameters,
@@ -545,7 +546,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       );
       return CreateMaxPayloadFromAnyObject(
         payload,
-        decryptedParameters
+        decryptedParameters,
+        source
       );
     } catch (e) {
       console.error('Error decrypting payload', payload, e);

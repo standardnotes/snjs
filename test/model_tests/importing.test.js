@@ -240,7 +240,7 @@ describe('importing', () => {
       expect(refreshedTag.content.references.length).to.equal(2);
     });
 
-    it('should keep imported items that were previously deleted', async function () {
+    it('should import decrypted data and keep items that were previously deleted', async function () {
       await Factory.registerUserToApplication({
         application: this.application,
         email: this.email,
@@ -269,6 +269,99 @@ describe('importing', () => {
       expect(this.application.findItem(tag.uuid).deleted).to.be.false;
       expect(this.application.itemManager.tags.length).to.equal(1);
       expect(this.application.findItem(note.uuid).deleted).to.be.false;
+    });
+
+    it('should import encrypted data and keep items that were previously deleted', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+      const [note, tag] = await Promise.all([
+        Factory.createMappedNote(this.application),
+        Factory.createMappedTag(this.application),
+      ]);
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.sync({ awaitAll: true });
+
+      await this.application.deleteItem(note);
+      expect(this.application.findItem(note.uuid)).to.not.exist;
+
+      await this.application.deleteItem(tag);
+      expect(this.application.findItem(tag.uuid)).to.not.exist;
+
+      await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+      expect(this.application.itemManager.notes.length).to.equal(1);
+      expect(this.application.findItem(tag.uuid).deleted).to.be.false;
+      expect(this.application.itemManager.tags.length).to.equal(1);
+      expect(this.application.findItem(note.uuid).deleted).to.be.false;
+    });
+
+    it('should import decrypted data and all items payload source should be FileImport', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const [note, tag] = await Promise.all([
+        Factory.createMappedNote(this.application),
+        Factory.createMappedTag(this.application),
+      ]);
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+
+      const importedNote = this.application.findItem(note.uuid);
+      const importedTag = this.application.findItem(tag.uuid);
+      expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
+      expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
+    });
+
+    it('should import encrypted data and all items payload source should be FileImport', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      const [note, tag] = await Promise.all([
+        Factory.createMappedNote(this.application),
+        Factory.createMappedTag(this.application),
+      ]);
+
+      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const backupData = JSON.parse(rawBackupFile);
+
+      await this.application.deinit();
+      this.application = await Factory.createInitAppWithRandNamespace();
+
+      await this.application.importData(
+        backupData,
+        this.password,
+        true,
+      );
+
+      const importedNote = this.application.findItem(note.uuid);
+      const importedTag = this.application.findItem(tag.uuid);
+      expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
+      expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
     });
 
     it('should import data from 003 encrypted payload', async function () {
