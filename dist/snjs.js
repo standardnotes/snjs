@@ -22252,9 +22252,7 @@ class application_SNApplication {
       await this.syncService.sync({
         awaitAll: true
       });
-      return {
-        error: Error(API_MESSAGE_GENERIC_SYNC_FAIL)
-      };
+      return this.apiService.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
     }
 
     this.lockSyncing();
