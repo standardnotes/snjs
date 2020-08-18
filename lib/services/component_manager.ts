@@ -100,7 +100,7 @@ type ItemMessagePayload = {
   /** isMetadataUpdate implies that the extension should make reference of updated
   * metadata, but not update content values as they may be stale relative to what the
   * extension currently has. Changes are always metadata updates if the mapping source
-  * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
+  * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
   isMetadataUpdate: any
 };
 
@@ -454,7 +454,8 @@ export class SNComponentManager extends PureService {
   jsonForItem(item: SNItem, component: SNComponent, source?: PayloadSource) {
     const isMetadatUpdate =
       source === PayloadSource.RemoteSaved ||
-      source === PayloadSource.LocalSaved;
+      source === PayloadSource.LocalSaved ||
+      source === PayloadSource.PreSyncSave;
     /** The data all components store into */
     const componentData = item.getDomainData(ComponentDataDomain) || {};
     /** The data for this particular component */

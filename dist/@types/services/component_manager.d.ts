@@ -56,7 +56,7 @@ declare type ItemMessagePayload = {
     /** isMetadataUpdate implies that the extension should make reference of updated
     * metadata, but not update content values as they may be stale relative to what the
     * extension currently has. Changes are always metadata updates if the mapping source
-    * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
+    * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
     isMetadataUpdate: any;
 };
 declare type ComponentState = {
