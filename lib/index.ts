@@ -15,6 +15,7 @@ export {
   SNActionsExtension,
   Action,
   SNTheme,
+  ThemeMutator,
   SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
   SNUserPrefs, UserPrefsMutator, WebPrefKey,

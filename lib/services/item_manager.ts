@@ -25,6 +25,7 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
+import { ThemeMutator } from '@Lib/models';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -330,6 +331,8 @@ export class ItemManager extends PureService {
       return new PrivilegeMutator(item, type);
     } else if (item.content_type === ContentType.UserPrefs) {
       return new UserPrefsMutator(item, type);
+    } else if (item.content_type === ContentType.Theme) {
+      return new ThemeMutator(item, type);
     }
     else {
       return new ItemMutator(item, type);
