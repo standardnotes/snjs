@@ -156,7 +156,7 @@ export class Migration20200115 extends Migration {
     );
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(
-      namespacedKey(this.services.namespace, RawStorageKey.StorageObject),
+      namespacedKey(this.namespace.identifier, RawStorageKey.StorageObject),
       JSON.stringify(newStructure)
     );
   }
@@ -428,11 +428,11 @@ export class Migration20200115 extends Migration {
       try { return JSON.parse(value); }
       catch (e) { return value; }
     };
-    const namespace = this.services.namespace;
+    const namespaceIdentifier = this.namespace!.identifier;
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key;
       const value = keyValuePair.value;
-      const isNameSpacedKey = namespace && namespace.length > 0 && key.startsWith(namespace);
+      const isNameSpacedKey = namespaceIdentifier && namespaceIdentifier.length > 0 && key.startsWith(namespaceIdentifier);
       if (legacyKeys.includes(key) || isNameSpacedKey) {
         continue;
       }

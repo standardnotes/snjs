@@ -11,7 +11,6 @@ const syncOptions = {
 
 export function createApplication(namespace, environment, platform) {
   const deviceInterface = new WebDeviceInterface(
-    namespace,
     setTimeout.bind(window),
     setInterval.bind(window)
   );
