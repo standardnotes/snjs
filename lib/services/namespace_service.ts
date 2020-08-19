@@ -55,43 +55,25 @@ export class SNNamespaceService extends PureService {
     await this.setNamespaces(namespaces);
   }
 
-  private async setCurrentNamespace(namespace: SNNamespace) {
+  private async switchToNamespace(namespace: SNNamespace) {
     this.namespace = namespace;
     this.deviceInterface!.switchToNamespace(namespace);
     await this.pushNamespace(namespace);
   }
 
-  private async createNamespace(isDefault: boolean = false, label?: string) {
-    if (isDefault) {
-      const defaultNamespace = await this.getDefaultNamespace();
-      if (defaultNamespace) {
-        throw Error('Can not create default namespace: a default namespace already exists.');
-      }
-    }
-    const uuid = await Uuid.GenerateUuid();
-    const namespace: SNNamespace = {
-      identifier: uuid,
-      userUuid: undefined,
-      label: isDefault ? 'Default namespace' : label || uuid,
-      isDefault
-    };
-    return namespace;
-  }
-
   /**
-   * Creates a new namespace if necessary, if not use an existing one.
+   * Creates a new namespace if necessary. If not, use an existing one.
    */
   public async initialize() {
     const defaultNamespace = await this.getDefaultNamespace();
     if (defaultNamespace) {
-      await this.setCurrentNamespace(defaultNamespace);
+      await this.switchToNamespace(defaultNamespace);
       return;
     }
     const namespaces = await this.getNamespaces();
     /** If no namespaces exist, then we should create a new one. */
     if (namespaces.length === 0) {
-      const namespace = await this.createNamespace(true);
-      await this.setCurrentNamespace(namespace);
+      await this.createNamespace(true);
     }
     /**
      * If one (1) namespace exist, then it means it is not the default one at this point.
@@ -101,30 +83,30 @@ export class SNNamespaceService extends PureService {
       const namespace = namespaces[0];
       namespace.isDefault = true;
       namespace.label = 'Default namespace';
-      await this.setCurrentNamespace(namespace);
+      await this.switchToNamespace(namespace);
     }
     /**
      * In the future, if a user has multiple accounts signed into a client, each account
      * will use its own keychain/storage namespace. This service will be in charge of displaying
      * a UI for selecting which namespace to sign into (if no default namespace is set).
      */
-    else if (namespaces.length > 1) {
+    else {
       throw Error('Multiple namespaces not supported yet ;)')
     }
   }
 
-  /**
-   * Creates a namespace with a fixed identifier.
-   * @param identifier The namespace identifier.
-   */
-  public createFixedNamespace(identifier: string) {
+  public async createNamespace(isDefault = false, identifier?: string, label?: string) {
+    if (isDefault && await this.getDefaultNamespace()) {
+      throw Error('Can not create default namespace: a default namespace already exists.');
+    }
+    const uuid = await Uuid.GenerateUuid();
     const namespace: SNNamespace = {
-      identifier: identifier,
+      identifier: identifier || uuid,
       userUuid: undefined,
-      label: identifier,
-      isDefault: false
+      label: isDefault ? 'Default namespace' : label || identifier || uuid,
+      isDefault
     };
-    this.setCurrentNamespace(namespace);
+    await this.switchToNamespace(namespace);
   }
 
   /**

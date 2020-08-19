@@ -79,7 +79,7 @@ export class SNApplication {
 
   public environment: Environment
   public platform: Platform
-  private fixedNamespace?: string
+  private namespaceIdentifier?: string
   private swapClasses?: any[]
   private skipClasses?: any[]
 
@@ -123,8 +123,11 @@ export class SNApplication {
   /**
    * @param environment The Environment that identifies your application.
    * @param platform The Platform that identifies your application.
-   * @param namespace A unique identifier to namespace storage and
-   *  other persistent properties. Defaults to empty string.
+   * @param deviceInterface The device interface that provides platform specific
+   * utilities that are used to read/write raw values from/to the database or value storage.
+   * @param namespaceIdentifier A unique identifier to namespace storage and other
+   * persistent properties. This parameter is kept for backward compatibility and/or in case
+   * you don't want SNNamespaceService to assign a dynamic namespace for you.
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param swapClasses Gives consumers the ability to provide their own custom
@@ -139,7 +142,7 @@ export class SNApplication {
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
     alertService: SNAlertService,
-    fixedNamespace?: string,
+    namespaceIdentifier?: string,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
   ) {
@@ -160,7 +163,7 @@ export class SNApplication {
     }
     this.environment = environment;
     this.platform = platform;
-    this.fixedNamespace = fixedNamespace;
+    this.namespaceIdentifier = namespaceIdentifier;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -174,6 +177,11 @@ export class SNApplication {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback) {
+    if (!this.namespaceIdentifier) {
+      await this.namespaceService!.initialize();
+    } else {
+      await this.namespaceService!.createNamespace(false, this.namespaceIdentifier);
+    }
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface!.openDatabase()
       .catch((error) => {
@@ -181,9 +189,6 @@ export class SNApplication {
         return undefined;
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
-    if (!this.fixedNamespace) {
-      await this.namespaceService!.initialize();
-    }
     await this.migrationService!.initialize();
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService!.initializeFromDisk();
@@ -1454,9 +1459,6 @@ export class SNApplication {
 
   private createNamespaceService() {
     this.namespaceService = new SNNamespaceService(this.deviceInterface!);
-    if (this.fixedNamespace) {
-      this.namespaceService!.createFixedNamespace(this.fixedNamespace);
-    }
     this.services.push(this.namespaceService!);
   }
 

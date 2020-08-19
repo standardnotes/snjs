@@ -36,7 +36,7 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   _getDatabaseKeyPrefix() {
-    if (this.namespace.identifier) {
+    if (this.namespace) {
       return `${this.namespace.identifier}-item-`;
     } else {
       return 'item-';
