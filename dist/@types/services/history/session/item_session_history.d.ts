@@ -7,7 +7,7 @@ export declare class ItemSessionHistory {
     entries: ItemHistoryEntry[];
     constructor(entries?: ItemHistoryEntry[]);
     static FromJson(entryJson: ItemHistoryJson): ItemSessionHistory;
-    getLastEntry(): ItemHistoryEntry;
+    getMostRecentEntry(): ItemHistoryEntry;
     addHistoryEntryForItem(payload: PurePayload): any;
     clear(): void;
     optimize(): void;

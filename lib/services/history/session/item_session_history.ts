@@ -19,7 +19,7 @@ export class ItemSessionHistory {
     /** Deserialize the entries into entry objects. */
     if (entries) {
       for (const entry of entries) {
-        entry.setPreviousEntry(this.getLastEntry());
+        entry.setPreviousEntry(this.getMostRecentEntry());
         this.entries.unshift(entry);
       }
     }
@@ -32,14 +32,14 @@ export class ItemSessionHistory {
     return new ItemSessionHistory(entries);
   }
 
-  getLastEntry() {
+  getMostRecentEntry() {
     /** First element in the array should be the last entry. */
     return this.entries[0];
   }
 
   addHistoryEntryForItem(payload: PurePayload) {
     const prospectiveEntry = CreateHistoryEntryForPayload(payload);
-    const previousEntry = this.getLastEntry();
+    const previousEntry = this.getMostRecentEntry();
     prospectiveEntry.setPreviousEntry(previousEntry);
     if (prospectiveEntry.isSameAsEntry(previousEntry)) {
       return;
