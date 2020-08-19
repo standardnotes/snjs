@@ -1,4 +1,3 @@
-import { RawPayload } from '@Protocol/payloads/generator';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 import { CreateHistoryEntryForPayload } from '@Services/history/functions';
@@ -9,7 +8,7 @@ import { CreateHistoryEntryForPayload } from '@Services/history/functions';
 const LARGE_ENTRY_DELTA_THRESHOLD = 15;
 
 type ItemHistoryJson = {
-  entries: RawPayload[]
+  entries: ItemHistoryEntry[]
 }
 
 export class ItemSessionHistory {
@@ -21,7 +20,7 @@ export class ItemSessionHistory {
     if (entries) {
       for (const entry of entries) {
         entry.setPreviousEntry(this.getLastEntry());
-        this.entries.push(entry);
+        this.entries.unshift(entry);
       }
     }
   }
@@ -29,12 +28,13 @@ export class ItemSessionHistory {
   static FromJson(entryJson: ItemHistoryJson) {
     const entries = entryJson.entries.map((rawHistoryEntry: any) => {
       return CreateHistoryEntryForPayload(rawHistoryEntry.payload);
-    })
+    });
     return new ItemSessionHistory(entries);
   }
 
   getLastEntry() {
-    return this.entries[this.entries.length - 1];
+    /** First element in the array should be the last entry. */
+    return this.entries[0];
   }
 
   addHistoryEntryForItem(payload: PurePayload) {
@@ -44,7 +44,7 @@ export class ItemSessionHistory {
     if (prospectiveEntry.isSameAsEntry(previousEntry)) {
       return;
     }
-    this.entries.push(prospectiveEntry);
+    this.entries.unshift(prospectiveEntry);
     return prospectiveEntry;
   }
 
@@ -63,7 +63,7 @@ export class ItemSessionHistory {
        * decided to be deleted, then an upcoming processing can change that.
        */
       if (keep) {
-        keepEntries.push(entry);
+        keepEntries.unshift(entry);
       } else {
         /** Remove if in keep */
         const index = keepEntries.indexOf(entry);
@@ -75,7 +75,7 @@ export class ItemSessionHistory {
         /** This is a large negative change. Hang on to the previous entry. */
         const previousEntry = this.entries[index - 1];
         if (previousEntry) {
-          keepEntries.push(previousEntry);
+          keepEntries.unshift(previousEntry);
         }
       }
     };

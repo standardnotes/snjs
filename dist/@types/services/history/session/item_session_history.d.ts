@@ -1,8 +1,7 @@
-import { RawPayload } from '../../../protocol/payloads/generator';
 import { PurePayload } from '../../../protocol/payloads/pure_payload';
 import { ItemHistoryEntry } from '../entries/item_history_entry';
 declare type ItemHistoryJson = {
-    entries: RawPayload[];
+    entries: ItemHistoryEntry[];
 };
 export declare class ItemSessionHistory {
     entries: ItemHistoryEntry[];
