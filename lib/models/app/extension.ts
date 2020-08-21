@@ -14,6 +14,7 @@ export class SNActionsExtension extends SNItem {
   public readonly package_info!: Record<string, any>
   public readonly supported_types!: string[]
   public readonly hidden: boolean
+  public readonly loading: boolean
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -23,6 +24,7 @@ export class SNActionsExtension extends SNItem {
     this.package_info = payload.safeContent.package_info;
     this.supported_types = payload.safeContent.supported_types;
     this.hidden = payload.safeContent.hidden;
+    this.loading = payload.safeContent.loading;
     if (payload.safeContent.actions) {
       this.actions = payload.safeContent.actions.map((action: any) => {
         return new Action(action);
@@ -56,5 +58,9 @@ export class ActionsExtensionMutator extends ItemMutator {
 
   set hidden(hidden: boolean) {
     this.content!.hidden = hidden;
+  }
+
+  set loading(loading: boolean) {
+    this.content!.loading = loading;
   }
 }
