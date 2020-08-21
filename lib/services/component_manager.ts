@@ -3,7 +3,7 @@ import { ComponentMutator } from './../models/app/component';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ContentType, displayStringForContentType } from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
-import { RawPayload, CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import { RawPayload, CreateSourcedPayloadFromObject, PayloadContent } from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -475,11 +475,10 @@ export class SNComponentManager extends PureService {
       content: item.content,
       clientData: clientData
     };
-    this.removePrivatePropertiesFromResponseItems(
+    return this.removePrivatePropertiesFromResponseItems(
       [params],
       component
-    );
-    return params;
+    )[0];
   }
 
   sendItemsInReply(
@@ -670,17 +669,16 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  removePrivatePropertiesFromResponseItems(
-    responseItems: any[],
+  removePrivatePropertiesFromResponseItems<T extends RawPayload>(
+    responseItems: T[],
     component: SNComponent,
     includeUrls = false
-  ) {
-    if (component) {
+  ): T[] {
+    if (component && this.isNativeExtension(component)) {
       /* System extensions can bypass this step */
-      if (this.isNativeExtension(component)) {
-        return;
-      }
+      return responseItems;
     }
+
     /* Don't allow component to overwrite these properties. */
     let privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
     if (includeUrls) {
@@ -688,11 +686,23 @@ export class SNComponentManager extends PureService {
         'url', 'hosted_url', 'local_url'
       ]);
     }
-    for (const responseItem of responseItems) {
-      for (const prop of privateContentProperties) {
-        delete responseItem.content[prop];
+
+    return responseItems.map((responseItem) => {
+      if (!responseItem.content || typeof responseItem.content === 'string') {
+        return responseItem;
       }
-    }
+      const content: Partial<PayloadContent> = {};
+      for (const [key, value] of Object.entries(responseItem.content)) {
+        /** Only include non-private properties */
+        if (!privateContentProperties.includes(key)) {
+          content[key] = value;
+        }
+      }
+      return {
+        ...responseItem,
+        content
+      };
+    });
   }
 
   handleStreamItemsMessage(component: SNComponent, message: ComponentMessage) {
@@ -777,7 +787,7 @@ export class SNComponentManager extends PureService {
   }
 
   async handleSaveItemsMessage(component: SNComponent, message: ComponentMessage) {
-    const responsePayloads = message.data.items as ComponentRawPayload[];
+    let responsePayloads = message.data.items as ComponentRawPayload[];
     const requiredPermissions = [];
     const itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
     /* Pending as in needed to be accounted for in permissions. */
@@ -803,7 +813,7 @@ export class SNComponentManager extends PureService {
       } as ComponentPermission);
     }
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      this.removePrivatePropertiesFromResponseItems(
+      responsePayloads = this.removePrivatePropertiesFromResponseItems(
         responsePayloads,
         component,
         true
@@ -898,7 +908,7 @@ export class SNComponentManager extends PureService {
   }
 
   handleCreateItemsMessage(component: SNComponent, message: ComponentMessage) {
-    const responseItems = message.data.item ? [message.data.item] : message.data.items;
+    let responseItems = message.data.item ? [message.data.item] : message.data.items;
     const uniqueContentTypes = uniq(
       responseItems.map((item: any) => { return item.content_type; })
     ) as ContentType[];
@@ -909,7 +919,7 @@ export class SNComponentManager extends PureService {
       }
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      this.removePrivatePropertiesFromResponseItems(responseItems, component);
+      responseItems = this.removePrivatePropertiesFromResponseItems(responseItems, component);
       const processedItems = [];
       for (const responseItem of responseItems) {
         if (!responseItem.uuid) {

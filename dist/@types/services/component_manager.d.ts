@@ -1,5 +1,6 @@
 import { ContentType } from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
+import { RawPayload } from '../protocol/payloads/generator';
 import { ItemManager } from './item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -118,7 +119,7 @@ export declare class SNComponentManager extends PureService {
     sessionKeyForComponent(component: SNComponent): string | undefined;
     componentForSessionKey(key: string): SNComponent | undefined;
     handleMessage(component: SNComponent, message: ComponentMessage): void;
-    removePrivatePropertiesFromResponseItems(responseItems: any[], component: SNComponent, includeUrls?: boolean): void;
+    removePrivatePropertiesFromResponseItems<T extends RawPayload>(responseItems: T[], component: SNComponent, includeUrls?: boolean): T[];
     handleStreamItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage): void;
     isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent): boolean;
