@@ -23,8 +23,8 @@ export class SNActionsExtension extends SNItem {
     this.name = payload.safeContent.name;
     this.package_info = payload.safeContent.package_info;
     this.supported_types = payload.safeContent.supported_types;
-    this.hidden = payload.safeContent.hidden;
-    this.loading = payload.safeContent.loading;
+    this.hidden = payload.safeContent.hidden || false;
+    this.loading = payload.safeContent.loading || false;
     if (payload.safeContent.actions) {
       this.actions = payload.safeContent.actions.map((action: any) => {
         return new Action(action);
