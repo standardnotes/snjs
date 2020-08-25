@@ -129,7 +129,6 @@ export class SNActionsService extends PureService {
         mutator.description = description;
         mutator.supported_types = supported_types;
         mutator.actions = actions;
-        mutator.hidden = false;
       }
     );
     return this.itemManager!.findItem(extension.uuid) as SNActionsExtension;
