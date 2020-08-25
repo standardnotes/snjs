@@ -9996,7 +9996,6 @@ class extension_SNActionsExtension extends core_item["d" /* SNItem */] {
     this.name = payload.safeContent.name;
     this.package_info = payload.safeContent.package_info;
     this.supported_types = payload.safeContent.supported_types;
-    this.hidden = payload.safeContent.hidden;
 
     if (payload.safeContent.actions) {
       this.actions = payload.safeContent.actions.map(action => {
@@ -10023,10 +10022,6 @@ class extension_ActionsExtensionMutator extends core_item["b" /* ItemMutator */]
 
   set actions(actions) {
     this.content.actions = actions;
-  }
-
-  set hidden(hidden) {
-    this.content.hidden = hidden;
   }
 
 }
@@ -14200,7 +14195,6 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
       mutator.description = description;
       mutator.supported_types = supported_types;
       mutator.actions = actions;
-      mutator.hidden = false;
     });
     return this.itemManager.findItem(extension.uuid);
   }
