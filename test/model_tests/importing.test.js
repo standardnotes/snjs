@@ -596,7 +596,7 @@ describe('importing', () => {
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
-      
+
       const result = await this.application.importData(
         JSON.parse(backupData),
         'not-the-correct-password-1234',
