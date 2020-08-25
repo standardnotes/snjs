@@ -9519,8 +9519,6 @@ var MobilePrefKey;
 (function (MobilePrefKey) {
   MobilePrefKey["SortNotesBy"] = "mobileSortBy";
   MobilePrefKey["SortNotesReverse"] = "mobileSortReverse";
-  MobilePrefKey["NotesShowArchived"] = "mobileShowArchived";
-  MobilePrefKey["NotesHidePinned"] = "mobileHidePinned";
   MobilePrefKey["NotesHideTags"] = "mobileHideTags";
   MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
   MobilePrefKey["NotesHideDate"] = "mobileHideDate";
