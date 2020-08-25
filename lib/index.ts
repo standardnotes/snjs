@@ -18,7 +18,7 @@ export {
   ThemeMutator,
   SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
-  SNUserPrefs, UserPrefsMutator, WebPrefKey,
+  SNUserPrefs, UserPrefsMutator, WebPrefKey, MobilePrefKey,
 } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
