@@ -34,18 +34,21 @@ export declare class PayloadManager extends PureService {
      * One of many mapping helpers available.
      * This function maps a collection of payloads.
      */
-    emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string): Promise<unknown>;
+    emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string): Promise<PurePayload[]>;
     /**
      * One of many mapping helpers available.
      * This function maps a payload to an item
-     * @returns The mapped item
+     * @returns every paylod altered as a result of this operation, to be
+     * saved to storage by the caller
      */
-    emitPayload(payload: PurePayload, source: PayloadSource, sourceKey?: string): Promise<void>;
+    emitPayload(payload: PurePayload, source: PayloadSource, sourceKey?: string): Promise<PurePayload[]>;
     /**
      * This function maps multiple payloads to items, and is the authoratative mapping
      * function that all other mapping helpers rely on
+     * @returns every paylod altered as a result of this operation, to be
+     * saved to storage by the caller
      */
-    emitPayloads(payloads: PurePayload[], source: PayloadSource, sourceKey?: string): Promise<unknown>;
+    emitPayloads(payloads: PurePayload[], source: PayloadSource, sourceKey?: string): Promise<PurePayload[]>;
     private popQueue;
     private mergePayloadsOntoMaster;
     /**
