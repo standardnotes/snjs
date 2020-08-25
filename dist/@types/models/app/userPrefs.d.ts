@@ -20,6 +20,7 @@ export declare enum MobilePrefKey {
     SortNotesReverse = "mobileSortReverse",
     NotesShowArchived = "mobileShowArchived",
     NotesHidePinned = "mobileHidePinned",
+    NotesHideTags = "mobileHideTags",
     NotesHideNotePreview = "mobileHideNotePreview",
     NotesHideDate = "mobileHideDate",
     ThemeData = "mobileThemePreferences",
