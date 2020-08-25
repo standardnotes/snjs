@@ -271,6 +271,68 @@ describe('importing', () => {
       expect(this.application.findItem(note.uuid).deleted).to.be.false;
     });
 
+    it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+      const note = await Factory.createSyncedNote(this.application);
+
+      /** Sign into another account and import the same item. It should get a different UUID. */
+      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+      this.email = Uuid.GenerateUuidSynchronously();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.importData(
+        {
+          items: [note]
+        },
+        undefined,
+        true,
+      );
+
+      expect(this.application.itemManager.notes.length).to.equal(1);
+      expect(this.application.itemManager.notes[0].uuid).to.not.equal(note.uuid);
+    });
+
+    it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+      const note = await Factory.createSyncedNote(this.application);
+
+      /** Sign into another account and import the same items. They should get a different UUID. */
+      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+      this.email = Uuid.GenerateUuidSynchronously();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      await this.application.importData(
+        {
+          items: [note]
+        },
+        undefined,
+        true,
+      );
+
+      const storedPayloads = await this.application.storageService.getAllRawPayloads();
+      expect(this.application.itemManager.items.length).to.equal(storedPayloads.length);
+      const notes = storedPayloads.filter(p => p.content_type === ContentType.Note);
+      const itemsKeys = storedPayloads.filter(p => p.content_type === ContentType.ItemsKey);
+      expect(notes.length).to.equal(1);
+      expect(itemsKeys.length).to.equal(1);
+    });
+
     it('should import encrypted data and keep items that were previously deleted', async function () {
       await Factory.registerUserToApplication({
         application: this.application,
@@ -534,7 +596,7 @@ describe('importing', () => {
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
-      
+
       const result = await this.application.importData(
         JSON.parse(backupData),
         'not-the-correct-password-1234',

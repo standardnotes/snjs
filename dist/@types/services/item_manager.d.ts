@@ -110,10 +110,10 @@ export declare class ItemManager extends PureService {
      * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
      */
     changeItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<(SNItem | undefined)[]>;
-    changeNote(uuid: UuidString, mutate: (mutator: NoteMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
-    changeComponent(uuid: UuidString, mutate: (mutator: ComponentMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
-    changeActionsExtension(uuid: UuidString, mutate: (mutator: ActionsExtensionMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
-    changeItemsKey(uuid: UuidString, mutate: (mutator: ItemsKeyMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<void>;
+    changeNote(uuid: UuidString, mutate: (mutator: NoteMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<PurePayload[]>;
+    changeComponent(uuid: UuidString, mutate: (mutator: ComponentMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<PurePayload[]>;
+    changeActionsExtension(uuid: UuidString, mutate: (mutator: ActionsExtensionMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<PurePayload[]>;
+    changeItemsKey(uuid: UuidString, mutate: (mutator: ItemsKeyMutator) => void, mutationType?: MutationType, payloadSource?: PayloadSource, payloadSourceKey?: string): Promise<PurePayload[]>;
     private applyTransform;
     /**
       * Sets the item as needing sync. The item is then run through the mapping function,

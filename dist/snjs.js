@@ -13711,16 +13711,19 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
   /**
    * One of many mapping helpers available.
    * This function maps a payload to an item
-   * @returns The mapped item
+   * @returns every paylod altered as a result of this operation, to be
+   * saved to storage by the caller
    */
 
 
   async emitPayload(payload, source, sourceKey) {
-    await this.emitPayloads([payload], source, sourceKey);
+    return this.emitPayloads([payload], source, sourceKey);
   }
   /**
    * This function maps multiple payloads to items, and is the authoratative mapping
    * function that all other mapping helpers rely on
+   * @returns every paylod altered as a result of this operation, to be
+   * saved to storage by the caller
    */
 
 
@@ -13752,7 +13755,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     } = this.mergePayloadsOntoMaster(first.payloads);
     this.notifyChangeObservers(changed, inserted, discarded, first.source, first.sourceKey);
     Object(utils["B" /* removeFromArray */])(this.emitQueue, first);
-    first.resolve();
+    first.resolve(changed.concat(inserted, discarded));
 
     if (this.emitQueue.length > 0) {
       this.popQueue();
@@ -20819,8 +20822,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const collections = await resolver.collectionsByProcessingResponse();
 
     for (const collection of collections) {
-      await this.modelManager.emitCollection(collection);
-      const payloadsToPersist = this.modelManager.find(collection.uuids());
+      const payloadsToPersist = await this.modelManager.emitCollection(collection);
       await this.persistPayloads(payloadsToPersist);
     }
 
