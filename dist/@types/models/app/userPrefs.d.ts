@@ -16,15 +16,14 @@ export declare enum WebPrefKey {
     NotesHideDate = "hideDate"
 }
 export declare enum MobilePrefKey {
-    SortNotesBy = "sortBy",
-    SortNotesReverse = "sortReverse",
-    NotesShowArchived = "showArchived",
-    NotesHidePinned = "hidePinned",
-    NotesHideNotePreview = "hideNotePreview",
-    NotesHideDate = "hideDate",
-    ThemeData = "themePreferences",
-    LastExportDate = "lastExportDate",
-    DoNotWarnUnsupportedEditors = "doNotShowAgainUnsupportedEditors"
+    SortNotesBy = "mobileSortBy",
+    SortNotesReverse = "mobileSortReverse",
+    NotesShowArchived = "mobileShowArchived",
+    NotesHidePinned = "mobileHidePinned",
+    NotesHideNotePreview = "mobileHideNotePreview",
+    NotesHideDate = "mobileHideDate",
+    ThemeData = "mobileThemePreferences",
+    DoNotWarnUnsupportedEditors = "mobileDoNotShowAgainUnsupportedEditors"
 }
 export declare type PrefKey = WebPrefKey | MobilePrefKey;
 export declare class SNUserPrefs extends SNItem {

@@ -9516,15 +9516,14 @@ var WebPrefKey;
 var MobilePrefKey;
 
 (function (MobilePrefKey) {
-  MobilePrefKey["SortNotesBy"] = "sortBy";
-  MobilePrefKey["SortNotesReverse"] = "sortReverse";
-  MobilePrefKey["NotesShowArchived"] = "showArchived";
-  MobilePrefKey["NotesHidePinned"] = "hidePinned";
-  MobilePrefKey["NotesHideNotePreview"] = "hideNotePreview";
-  MobilePrefKey["NotesHideDate"] = "hideDate";
-  MobilePrefKey["ThemeData"] = "themePreferences";
-  MobilePrefKey["LastExportDate"] = "lastExportDate";
-  MobilePrefKey["DoNotWarnUnsupportedEditors"] = "doNotShowAgainUnsupportedEditors";
+  MobilePrefKey["SortNotesBy"] = "mobileSortBy";
+  MobilePrefKey["SortNotesReverse"] = "mobileSortReverse";
+  MobilePrefKey["NotesShowArchived"] = "mobileShowArchived";
+  MobilePrefKey["NotesHidePinned"] = "mobileHidePinned";
+  MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
+  MobilePrefKey["NotesHideDate"] = "mobileHideDate";
+  MobilePrefKey["ThemeData"] = "mobileThemePreferences";
+  MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";
 })(MobilePrefKey || (MobilePrefKey = {}));
 
 class userPrefs_SNUserPrefs extends core_item["d" /* SNItem */] {
