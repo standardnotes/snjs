@@ -21848,13 +21848,13 @@ class application_SNApplication {
    */
 
 
-  async isEncryptionAvailable() {
-    return !Object(utils["p" /* isNullOrUndefined */])(this.getUser()) || this.hasPasscode();
+  isEncryptionAvailable() {
+    return this.hasAccount() || this.hasPasscode();
   }
 
   async upgradeProtocolVersion() {
     const hasPasscode = this.hasPasscode();
-    const hasAccount = !this.noAccount();
+    const hasAccount = this.hasAccount();
     const types = [];
 
     if (hasPasscode) {

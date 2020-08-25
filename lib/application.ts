@@ -700,8 +700,8 @@ export class SNApplication {
   /**
    * Returns true if there is an encryption source available
    */
-  public async isEncryptionAvailable() {
-    return !isNullOrUndefined(this.getUser()) || this.hasPasscode();
+  public isEncryptionAvailable() {
+    return this.hasAccount() || this.hasPasscode();
   }
 
   public async upgradeProtocolVersion(): Promise<{
@@ -710,7 +710,7 @@ export class SNApplication {
     error?: Error,
   }> {
     const hasPasscode = this.hasPasscode();
-    const hasAccount = !this.noAccount();
+    const hasAccount = this.hasAccount();
     const types = [];
     if (hasPasscode) {
       types.push(ChallengeType.LocalPasscode);
