@@ -47,7 +47,10 @@ import { DeviceInterface } from './device_interface';
 import {
   API_MESSAGE_GENERIC_SYNC_FAIL,
   InsufficientPasswordMessage,
-  UPGRADING_ENCRYPTION
+  UPGRADING_ENCRYPTION,
+  SETTING_PASSCODE,
+  REMOVING_PASSCODE,
+  CHANGING_PASSCODE
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent } from './models';
@@ -1208,6 +1211,34 @@ export class SNApplication {
   }
 
   public async setPasscode(passcode: string) {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(SETTING_PASSCODE);
+    try {
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  public async removePasscode() {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(REMOVING_PASSCODE);
+    try {
+      await this.removePasscodeWithoutWarning();
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  public async changePasscode(passcode: string) {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(CHANGING_PASSCODE);
+    try {
+      await this.removePasscodeWithoutWarning();
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  private async setPasscodeWithoutWarning(passcode: string) {
     const identifier = await this.generateUuid();
     const { key, keyParams } = await this.protocolService!.createRootKey(
       identifier,
@@ -1218,14 +1249,9 @@ export class SNApplication {
     await this.syncService!.sync();
   }
 
-  public async removePasscode() {
+  private async removePasscodeWithoutWarning() {
     await this.protocolService!.removeRootKeyWrapper();
     await this.rewriteItemsKeys();
-  }
-
-  public async changePasscode(passcode: string) {
-    await this.removePasscode();
-    return this.setPasscode(passcode);
   }
 
   public getStorageEncryptionPolicy() {
