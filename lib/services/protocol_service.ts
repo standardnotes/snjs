@@ -663,7 +663,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
             const payloadVersion = encryptedPayload.version as ProtocolVersion;
             if (candidate) {
               itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
-            } 
+            }
             /**
              * Payloads with versions <= 003 use root key directly for encryption.
              */
