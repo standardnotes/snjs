@@ -37,9 +37,19 @@ export abstract class DeviceInterface {
 
   abstract async getRawStorageValue(key: string) : Promise<any>;
 
+  /**
+   * Gets the parsed raw storage value.
+   * The return value from getRawStorageValue could be an object.
+   * This is most likely the case for legacy values.
+   * So we return the value as-is if JSON.parse throws an exception.
+   */
   public async getJsonParsedStorageValue(key: string) {
     const value = await this.getRawStorageValue(key);
-    return value ? JSON.parse(value) : value;
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
   }
 
   abstract async getAllRawStorageKeyValues() : Promise<Record<string, any>[]>;

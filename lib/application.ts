@@ -41,17 +41,20 @@ import {
   SNSyncService,
   ChallengeService,
   SyncModes,
-  SyncQueueStrategy,
   ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
 import {
   API_MESSAGE_GENERIC_SYNC_FAIL,
   InsufficientPasswordMessage,
-  UPGRADING_ENCRYPTION
+  UPGRADING_ENCRYPTION,
+  SETTING_PASSCODE,
+  REMOVING_PASSCODE,
+  CHANGING_PASSCODE
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNNamespaceService } from '@Services/namespace_service';
+import { SNComponent } from './models';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -82,6 +85,7 @@ export class SNApplication {
   private namespaceIdentifier?: string
   private swapClasses?: any[]
   private skipClasses?: any[]
+  private defaultHost?: string
 
   private crypto?: SNPureCrypto
   public deviceInterface?: DeviceInterface
@@ -125,16 +129,18 @@ export class SNApplication {
    * @param platform The Platform that identifies your application.
    * @param deviceInterface The device interface that provides platform specific
    * utilities that are used to read/write raw values from/to the database or value storage.
+   * @param crypto The platform-dependent implementation of SNPureCrypto to use.
+   * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
+   * @param alertService The platform-dependent implementation of alert service.
    * @param namespaceIdentifier A unique identifier to namespace storage and other
    * persistent properties. This parameter is kept for backward compatibility and/or in case
    * you don't want SNNamespaceService to assign a dynamic namespace for you.
-   * @param crypto The platform-dependent implementation of SNPureCrypto to use.
-   * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
+   * @param defaultHost Default host to use in ApiService.
    */
   constructor(
     environment: Environment,
@@ -145,6 +151,7 @@ export class SNApplication {
     namespaceIdentifier?: string,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
+    defaultHost?: string,
   ) {
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
@@ -169,6 +176,7 @@ export class SNApplication {
     this.alertService = alertService;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
+    this.defaultHost = defaultHost;
     this.constructServices();
   }
 
@@ -660,6 +668,15 @@ export class SNApplication {
   }
 
   /**
+   * Activates or deactivates a component, depending on its
+   * current state, and syncs.
+   */
+  public async toggleComponent(component: SNComponent) {
+    await this.componentManager!.toggleComponent(component)
+    return this.syncService!.sync();
+  }
+
+  /**
    * Set the server's URL
    */
   public async setHost(host: string) {
@@ -718,7 +735,7 @@ export class SNApplication {
     if (!response) {
       return { canceled: true };
     }
-    const dismissBlockingDialog = this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
     try {
       let passcode: string | undefined;
       if (hasPasscode) {
@@ -1128,7 +1145,7 @@ export class SNApplication {
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
-      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
+      return this.apiService!.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
     }
 
     this.lockSyncing();
@@ -1203,6 +1220,34 @@ export class SNApplication {
   }
 
   public async setPasscode(passcode: string) {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(SETTING_PASSCODE);
+    try {
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  public async removePasscode() {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(REMOVING_PASSCODE);
+    try {
+      await this.removePasscodeWithoutWarning();
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  public async changePasscode(passcode: string) {
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(CHANGING_PASSCODE);
+    try {
+      await this.removePasscodeWithoutWarning();
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  private async setPasscodeWithoutWarning(passcode: string) {
     const identifier = await this.generateUuid();
     const { key, keyParams } = await this.protocolService!.createRootKey(
       identifier,
@@ -1213,14 +1258,9 @@ export class SNApplication {
     await this.syncService!.sync();
   }
 
-  public async removePasscode() {
+  private async removePasscodeWithoutWarning() {
     await this.protocolService!.removeRootKeyWrapper();
     await this.rewriteItemsKeys();
-  }
-
-  public async changePasscode(passcode: string) {
-    await this.removePasscode();
-    return this.setPasscode(passcode);
   }
 
   public getStorageEncryptionPolicy() {
@@ -1317,6 +1357,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService!,
       this.storageService!,
+      this.defaultHost
     );
     this.services.push(this.apiService!);
   }
@@ -1438,6 +1479,8 @@ export class SNApplication {
     this.historyManager = new SNHistoryManager(
       this.itemManager!,
       this.storageService!,
+      this.apiService!,
+      this.protocolService!,
       [ContentType.Note],
       this.deviceInterface!.timeout
     );

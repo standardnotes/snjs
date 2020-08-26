@@ -44,6 +44,7 @@ export declare enum SingletonStrategy {
 export declare class SNItem {
     readonly payload: PurePayload;
     readonly conflictOf?: UuidString;
+    readonly duplicateOf?: UuidString;
     readonly createdAtString?: string;
     readonly updatedAtString?: string;
     readonly protected = false;
@@ -51,6 +52,7 @@ export declare class SNItem {
     readonly pinned = false;
     readonly archived = false;
     readonly locked = false;
+    readonly userModifiedDate: Date;
     private static sharedDateFormatter;
     constructor(payload: PurePayload);
     static DefaultAppDomain(): string;
@@ -62,7 +64,6 @@ export declare class SNItem {
     get content_type(): import("../content_types").ContentType;
     get created_at(): Date;
     get updated_at(): Date;
-    get userModifiedDate(): Date;
     get dirtiedDate(): Date | undefined;
     get dirty(): boolean | undefined;
     get errorDecrypting(): boolean | undefined;
@@ -74,6 +75,7 @@ export declare class SNItem {
     get auth_hash(): string | undefined;
     /** @deprecated */
     get auth_params(): any;
+    get duplicate_of(): string | undefined;
     payloadRepresentation(override?: PayloadOverride): PurePayload;
     hasRelationshipWithItem(item: SNItem): boolean;
     /**

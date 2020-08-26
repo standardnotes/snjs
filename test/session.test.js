@@ -190,7 +190,7 @@ describe('server session', () => {
   }).timeout(20000);
 
   it('change password request should fail with an expired refresh token', async function () {
-    // Waiting for the refresh token to expire.
+    /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(this.application, false);
 
     const changePasswordResponse = await this.application.changePassword(
@@ -198,18 +198,26 @@ describe('server session', () => {
       this.newPassword
     );
 
-    expect(changePasswordResponse.status).to.equal(401);
-    expect(changePasswordResponse.error.tag).to.equal('invalid-auth');
-    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+    expect(changePasswordResponse).to.be.ok;
+    expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
 
-    const loginResponse = await Factory.loginToApplication({
+    const loginResponseWithNewPassword = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.newPassword
     });
 
-    expect(loginResponse).to.be.ok;
-    expect(loginResponse.status).to.be.equal(401);
+    expect(loginResponseWithNewPassword).to.be.ok;
+    expect(loginResponseWithNewPassword.status).to.equal(401);
+
+    const loginResponseWithOldPassword = await Factory.loginToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+
+    expect(loginResponseWithOldPassword).to.be.ok;
+    expect(loginResponseWithOldPassword.status).to.be.equal(200);
   }).timeout(25000);
 
   it('should sign in successfully after signing out', async function () {

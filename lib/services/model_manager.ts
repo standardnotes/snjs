@@ -28,7 +28,7 @@ type QueueElement = {
   payloads: PurePayload[],
   source: PayloadSource,
   sourceKey?: string
-  resolve: () => void
+  resolve: (alteredPayloads: PurePayload[]) => void
 }
 
 /**
@@ -93,14 +93,15 @@ export class PayloadManager extends PureService {
   /**
    * One of many mapping helpers available.
    * This function maps a payload to an item
-   * @returns The mapped item
+   * @returns every paylod altered as a result of this operation, to be
+   * saved to storage by the caller
    */
   public async emitPayload(
     payload: PurePayload,
     source: PayloadSource,
     sourceKey?: string
-  ) {
-    await this.emitPayloads(
+  ): Promise<PurePayload[]> {
+    return this.emitPayloads(
       [payload],
       source,
       sourceKey
@@ -110,12 +111,14 @@ export class PayloadManager extends PureService {
   /**
    * This function maps multiple payloads to items, and is the authoratative mapping
    * function that all other mapping helpers rely on
+   * @returns every paylod altered as a result of this operation, to be
+   * saved to storage by the caller
    */
   public async emitPayloads(
     payloads: PurePayload[],
     source: PayloadSource,
     sourceKey?: string
-    ) {
+  ): Promise<PurePayload[]> {
     if (payloads.length === 0) {
       console.warn("Attempting to emit 0 payloads.");
     }
@@ -137,7 +140,7 @@ export class PayloadManager extends PureService {
     const { changed, inserted, discarded } = this.mergePayloadsOntoMaster(first.payloads);
     this.notifyChangeObservers(changed, inserted, discarded, first.source, first.sourceKey);
     removeFromArray(this.emitQueue, first);
-    first.resolve();
+    first.resolve(changed.concat(inserted, discarded));
     if (this.emitQueue.length > 0) {
       this.popQueue();
     }

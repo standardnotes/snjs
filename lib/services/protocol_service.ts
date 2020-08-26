@@ -536,8 +536,9 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
     }
     const version = payload.version!;
+    const source = payload.source;
     const operator = this.operatorForVersion(version);
-    const encryptionParameters = CreateEncryptionParameters(payload);
+    const encryptionParameters = CreateEncryptionParameters(payload, source);
     try {
       const decryptedParameters = await operator.generateDecryptedParameters(
         encryptionParameters,
@@ -545,7 +546,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       );
       return CreateMaxPayloadFromAnyObject(
         payload,
-        decryptedParameters
+        decryptedParameters,
+        source
       );
     } catch (e) {
       console.error('Error decrypting payload', payload, e);
@@ -661,7 +663,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
             const payloadVersion = encryptedPayload.version as ProtocolVersion;
             if (candidate) {
               itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
-            } 
+            }
             /**
              * Payloads with versions <= 003 use root key directly for encryption.
              */
@@ -1017,7 +1019,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       this.keyMode !== KeyMode.WrapperOnly &&
       this.keyMode !== KeyMode.RootKeyPlusWrapper
     )) {
-      throw 'Attempting to remove root key wrapper on unwrapped key.';
+      throw Error('Attempting to remove root key wrapper on unwrapped key.');
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
       this.keyMode = KeyMode.RootKeyNone;

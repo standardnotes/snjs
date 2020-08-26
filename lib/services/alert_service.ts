@@ -14,5 +14,5 @@ export type SNAlertService = {
     cancelButtonText?: string
   ): Promise<boolean>;
   alert(text: string, title?: string, closeButtonText?: string): Promise<void>;
-  blockingDialog(text: string): DismissBlockingDialog
+  blockingDialog(text: string): DismissBlockingDialog | Promise<DismissBlockingDialog>;
 }

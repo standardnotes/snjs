@@ -848,8 +848,7 @@ export class SNSyncService extends PureService {
 
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      await this.modelManager!.emitCollection(collection);
-      const payloadsToPersist = this.modelManager!.find(collection.uuids()) as PurePayload[];
+      const payloadsToPersist = await this.modelManager!.emitCollection(collection);
       await this.persistPayloads(payloadsToPersist);
     }
     const deletedPayloads = response.deletedPayloads;

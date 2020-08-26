@@ -58,6 +58,7 @@ export async function PayloadsByDuplicating(
     dirtiedDate: new Date(),
     lastSyncBegan: null,
     lastSyncEnd: null,
+    duplicate_of: payload.uuid,
   };
   if (isConflict) {
     override.content = {
