@@ -1019,7 +1019,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       this.keyMode !== KeyMode.WrapperOnly &&
       this.keyMode !== KeyMode.RootKeyPlusWrapper
     )) {
-      throw 'Attempting to remove root key wrapper on unwrapped key.';
+      throw Error('Attempting to remove root key wrapper on unwrapped key.');
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
       this.keyMode = KeyMode.RootKeyNone;
