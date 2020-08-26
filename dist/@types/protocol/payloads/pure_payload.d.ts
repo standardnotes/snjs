@@ -48,6 +48,7 @@ export declare class PurePayload {
     readonly auth_params?: any;
     readonly format: PayloadFormat;
     readonly version?: ProtocolVersion;
+    readonly duplicate_of?: string;
     constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource);
     /**
      * Returns a generic object with all payload fields except any that are meta-data

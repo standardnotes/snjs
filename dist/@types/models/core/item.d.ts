@@ -44,6 +44,7 @@ export declare enum SingletonStrategy {
 export declare class SNItem {
     readonly payload: PurePayload;
     readonly conflictOf?: UuidString;
+    readonly duplicateOf?: UuidString;
     readonly createdAtString?: string;
     readonly updatedAtString?: string;
     readonly protected = false;
@@ -74,6 +75,7 @@ export declare class SNItem {
     get auth_hash(): string | undefined;
     /** @deprecated */
     get auth_params(): any;
+    get duplicate_of(): string | undefined;
     payloadRepresentation(override?: PayloadOverride): PurePayload;
     hasRelationshipWithItem(item: SNItem): boolean;
     /**
