@@ -10751,6 +10751,9 @@ const INVALID_PASSWORD = "Invalid password.";
 const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
 const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
 const UPGRADING_ENCRYPTION = "Your account's encryption version is being upgraded. Do not close the application until this process completes.";
+const SETTING_PASSCODE = "Setting passcode. Do not close the application until this process completes.";
+const CHANGING_PASSCODE = "Changing passcode. Do not close the application until this process completes.";
+const REMOVING_PASSCODE = "Removing passcode. Do not close the application until this process completes.";
 function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
@@ -17035,7 +17038,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async removeRootKeyWrapper() {
     if (this.keyMode !== KeyMode.WrapperOnly && this.keyMode !== KeyMode.RootKeyPlusWrapper) {
-      throw 'Attempting to remove root key wrapper on unwrapped key.';
+      throw Error('Attempting to remove root key wrapper on unwrapped key.');
     }
 
     if (this.keyMode === KeyMode.WrapperOnly) {
@@ -21882,7 +21885,7 @@ class application_SNApplication {
       };
     }
 
-    const dismissBlockingDialog = this.alertService.blockingDialog(UPGRADING_ENCRYPTION);
+    const dismissBlockingDialog = await this.alertService.blockingDialog(UPGRADING_ENCRYPTION);
 
     try {
       let passcode;
@@ -22381,6 +22384,37 @@ class application_SNApplication {
   }
 
   async setPasscode(passcode) {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(SETTING_PASSCODE);
+
+    try {
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  async removePasscode() {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(REMOVING_PASSCODE);
+
+    try {
+      await this.removePasscodeWithoutWarning();
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  async changePasscode(passcode) {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(CHANGING_PASSCODE);
+
+    try {
+      await this.removePasscodeWithoutWarning();
+      await this.setPasscodeWithoutWarning(passcode);
+    } finally {
+      dismissBlockingDialog();
+    }
+  }
+
+  async setPasscodeWithoutWarning(passcode) {
     const identifier = await this.generateUuid();
     const {
       key,
@@ -22391,14 +22425,9 @@ class application_SNApplication {
     await this.syncService.sync();
   }
 
-  async removePasscode() {
+  async removePasscodeWithoutWarning() {
     await this.protocolService.removeRootKeyWrapper();
     await this.rewriteItemsKeys();
-  }
-
-  async changePasscode(passcode) {
-    await this.removePasscode();
-    return this.setPasscode(passcode);
   }
 
   getStorageEncryptionPolicy() {

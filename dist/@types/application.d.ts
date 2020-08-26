@@ -344,6 +344,8 @@ export declare class SNApplication {
     setPasscode(passcode: string): Promise<void>;
     removePasscode(): Promise<void>;
     changePasscode(passcode: string): Promise<void>;
+    private setPasscodeWithoutWarning;
+    private removePasscodeWithoutWarning;
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;
     setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
     generateUuid(): Promise<string>;
