@@ -15,5 +15,6 @@ export enum PayloadField {
   ErrorDecrypting = 'errorDecrypting',
   ErrorDecryptingChanged = 'errorDecryptingValueChanged',
   LastSyncBegan = 'lastSyncBegan',
-  LastSyncEnd = 'lastSyncEnd'
+  LastSyncEnd = 'lastSyncEnd',
+  DuplicateOf = 'duplicate_of'
 };

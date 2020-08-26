@@ -32,6 +32,7 @@ export declare type RawPayload = {
     lastSyncEnd?: Date;
     auth_hash?: string;
     auth_params?: any;
+    duplicate_of?: string;
 };
 export declare type RawEncryptionParameters = {
     uuid?: string;

@@ -58,6 +58,7 @@ export class SNItem {
 
   public readonly payload: PurePayload
   public readonly conflictOf?: UuidString
+  public readonly duplicateOf?: UuidString
   public readonly createdAtString?: string
   public readonly updatedAtString?: string
   public readonly protected = false
@@ -80,6 +81,7 @@ export class SNItem {
     }
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
+    this.duplicateOf = payload.duplicate_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at);
@@ -170,6 +172,10 @@ export class SNItem {
   /** @deprecated */
   get auth_params() {
     return this.payload.auth_params;
+  }
+
+  get duplicate_of() {
+    return this.payload.duplicate_of;
   }
 
   public payloadRepresentation(override?: PayloadOverride) {

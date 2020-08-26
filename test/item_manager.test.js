@@ -242,13 +242,49 @@ describe('item manager', () => {
     expect(dirtyItems[0].dirty).to.equal(true);
   });
 
-  it('duplicate item', async function () {
-    const note = await this.createNote();
-    await this.itemManager.duplicateItem(note.uuid);
+  describe('duplicateItem', async function () {
+    const sandbox = sinon.createSandbox();
 
-    expect(this.itemManager.items.length).to.equal(2);
-    expect(this.itemManager.notes.length).to.equal(2);
-    expect(this.itemManager.notes[0].uuid).to.not.equal(this.itemManager.notes[1].uuid);
+    beforeEach(async function () {
+      this.note = await this.createNote();
+      this.emitPayloads = sandbox.spy(this.itemManager.modelManager, 'emitPayloads');
+    });
+
+    afterEach(function () {
+      sandbox.restore();
+    });
+
+    it('should duplicate the item and set the duplicate_of property', async function () {
+      await this.itemManager.duplicateItem(this.note.uuid);
+      sinon.assert.calledOnce(this.emitPayloads);
+
+      const originalNote = this.itemManager.notes[0];
+      const duplicatedNote = this.itemManager.notes[1];
+
+      expect(this.itemManager.items.length).to.equal(2);
+      expect(this.itemManager.notes.length).to.equal(2);
+      expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid);
+      expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf);
+      expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of);
+      expect(duplicatedNote.conflictOf).to.be.undefined;
+      expect(duplicatedNote.payload.content.conflict_of).to.be.undefined;
+    });
+    
+    it('should duplicate the item and set the duplicate_of and conflict_of properties', async function () {
+      await this.itemManager.duplicateItem(this.note.uuid, true);
+      sinon.assert.calledOnce(this.emitPayloads);
+  
+      const originalNote = this.itemManager.notes[0];
+      const duplicatedNote = this.itemManager.notes[1];
+  
+      expect(this.itemManager.items.length).to.equal(2);
+      expect(this.itemManager.notes.length).to.equal(2);
+      expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid);
+      expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf);
+      expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of);
+      expect(originalNote.uuid).to.equal(duplicatedNote.conflictOf);
+      expect(originalNote.uuid).to.equal(duplicatedNote.payload.content.conflict_of);
+    });
   });
 
   it('duplicate item with relationships', async function () {

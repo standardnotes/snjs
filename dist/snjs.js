@@ -654,11 +654,11 @@ async function sleep(milliseconds) {
 
 /** The MaxItemPayload represents a payload with all possible fields */
 
-const MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].LastSyncEnd];
+const MaxPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].LastSyncBegan, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].LastSyncEnd, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DuplicateOf];
 const EncryptionParametersFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecryptingChanged, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].WaitingForKey];
-const FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash];
-const StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].WaitingForKey];
-const ServerPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash];
+const FilePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DuplicateOf];
+const StoragePayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthParams, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Dirty, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DirtiedDate, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ErrorDecrypting, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].WaitingForKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DuplicateOf];
+const ServerPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ItemsKeyId, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].EncItemKey, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Deleted, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Legacy003AuthHash, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].DuplicateOf];
 const SessionHistoryPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].UpdatedAt];
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
@@ -937,6 +937,7 @@ var PayloadField;
   PayloadField["ErrorDecryptingChanged"] = "errorDecryptingValueChanged";
   PayloadField["LastSyncBegan"] = "lastSyncBegan";
   PayloadField["LastSyncEnd"] = "lastSyncEnd";
+  PayloadField["DuplicateOf"] = "duplicate_of";
 })(PayloadField || (PayloadField = {}));
 
 ;
@@ -1034,6 +1035,7 @@ class SNItem {
 
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
+    this.duplicateOf = payload.duplicate_of;
     this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
 
     if (payload.format === _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__[/* PayloadFormat */ "a"].DecryptedBareObject) {
@@ -1129,6 +1131,10 @@ class SNItem {
 
   get auth_params() {
     return this.payload.auth_params;
+  }
+
+  get duplicate_of() {
+    return this.payload.duplicate_of;
   }
 
   payloadRepresentation(override) {
@@ -2684,6 +2690,7 @@ class PurePayload {
     this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined;
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
+    this.duplicate_of = rawPayload.duplicate_of;
 
     if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isString */ "s"])(this.content)) {
       if (this.content.startsWith(_Protocol_versions__WEBPACK_IMPORTED_MODULE_3__[/* ProtocolVersion */ "a"].V000Base64Decrypted)) {
@@ -13371,7 +13378,8 @@ async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: null,
-    lastSyncEnd: null
+    lastSyncEnd: null,
+    duplicate_of: payload.uuid
   };
 
   if (isConflict) {

@@ -42,6 +42,7 @@ export type RawPayload = {
   lastSyncEnd?: Date
   auth_hash?: string
   auth_params?: any
+  duplicate_of?: string
 }
 
 export type RawEncryptionParameters = {
@@ -75,6 +76,7 @@ const MaxPayloadFields = [
   PayloadField.WaitingForKey,
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
+  PayloadField.DuplicateOf
 ]
 
 const EncryptionParametersFields = [
@@ -96,7 +98,8 @@ const FilePayloadFields = [
   PayloadField.Content,
   PayloadField.CreatedAt,
   PayloadField.UpdatedAt,
-  PayloadField.Legacy003AuthHash
+  PayloadField.Legacy003AuthHash,
+  PayloadField.DuplicateOf
 ]
 
 const StoragePayloadFields = [
@@ -113,7 +116,8 @@ const StoragePayloadFields = [
   PayloadField.Dirty,
   PayloadField.DirtiedDate,
   PayloadField.ErrorDecrypting,
-  PayloadField.WaitingForKey
+  PayloadField.WaitingForKey,
+  PayloadField.DuplicateOf
 ]
 
 const ServerPayloadFields = [
@@ -125,7 +129,8 @@ const ServerPayloadFields = [
   PayloadField.CreatedAt,
   PayloadField.UpdatedAt,
   PayloadField.Deleted,
-  PayloadField.Legacy003AuthHash
+  PayloadField.Legacy003AuthHash,
+  PayloadField.DuplicateOf
 ]
 
 const SessionHistoryPayloadFields = [
