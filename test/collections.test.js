@@ -239,5 +239,30 @@ describe('payload collections', () => {
     expect(resorted[1].uuid).to.equal(unpinned1.uuid);
   });
 
+  it('setDisplayOptions should not fail for encrypted items', async () => {
+    const collection = new ItemCollection();
+    const regularPayload1 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText'));
+    const regularPayload2 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText2'));
+    const encryptedPayloadUpdated = CreateItemFromPayload(CopyPayload(
+      regularPayload1.payload,
+      {
+        ...regularPayload1.payload,
+        errorDecrypting: true,
+        content: 'ssss',
+        uuid: Factory.generateUuidish()
+      }
+    ));
+    collection.set([regularPayload1, encryptedPayloadUpdated, regularPayload2]);
+    collection.setDisplayOptions(
+      ContentType.Note,
+      CollectionSort.UpdatedAt,
+      'asc'
+    );
+    const displayed = collection.displayElements(ContentType.Note);
+    expect(displayed.length).to.equal(3);
+    expect(displayed[0].text).to.equal('noteText');
+    expect(displayed[1].errorDecrypting).to.equal(true);
+    expect(displayed[2].text).to.equal('noteText2');
+  });
 
 });

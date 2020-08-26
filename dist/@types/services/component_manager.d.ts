@@ -1,5 +1,6 @@
 import { ContentType } from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
+import { RawPayload } from '../protocol/payloads/generator';
 import { ItemManager } from './item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -56,7 +57,7 @@ declare type ItemMessagePayload = {
     /** isMetadataUpdate implies that the extension should make reference of updated
     * metadata, but not update content values as they may be stale relative to what the
     * extension currently has. Changes are always metadata updates if the mapping source
-    * is PayloadSource.RemoteSaved || source === PayloadSource.LocalSaved. */
+    * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
     isMetadataUpdate: any;
 };
 declare type ComponentState = {
@@ -74,7 +75,7 @@ declare type ComponentState = {
 export declare class SNComponentManager extends PureService {
     private itemManager;
     private syncService;
-    private alertService;
+    protected alertService: SNAlertService;
     private environment;
     private platform;
     private timeout;
@@ -118,7 +119,7 @@ export declare class SNComponentManager extends PureService {
     sessionKeyForComponent(component: SNComponent): string | undefined;
     componentForSessionKey(key: string): SNComponent | undefined;
     handleMessage(component: SNComponent, message: ComponentMessage): void;
-    removePrivatePropertiesFromResponseItems(responseItems: any[], component: SNComponent, includeUrls?: boolean): void;
+    removePrivatePropertiesFromResponseItems<T extends RawPayload>(responseItems: T[], component: SNComponent, includeUrls?: boolean): T[];
     handleStreamItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage): void;
     isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent): boolean;

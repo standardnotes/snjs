@@ -2,7 +2,7 @@ import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
 type PredicateType = string[] | SNPredicate
 type PredicateArray = Array<string[]> | SNPredicate[]
-type PredicateValue = string | Date | boolean | PredicateArray;
+type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
 
 /**
  * A local-only construct that defines a built query that can be used to 
@@ -74,7 +74,7 @@ export class SNPredicate {
     );
   }
 
-  static ObjectSatisfiesPredicate(object: any, predicate: PredicateType) {
+  static ObjectSatisfiesPredicate(object: any, predicate: PredicateType): boolean {
     /* Predicates may not always be created using the official constructor
        so if it's still an array here, convert to object */
     if (Array.isArray(predicate)) {
@@ -107,7 +107,7 @@ export class SNPredicate {
 
     /* Process not before handling the keypath, because not does not use it. */
     if (predicate.operator === 'not') {
-      return !this.ObjectSatisfiesPredicate(object, targetValue);
+      return !this.ObjectSatisfiesPredicate(object, targetValue as PredicateType);
     }
 
     const valueAtKeyPath = predicate.keypath.split('.').reduce((previous, current) => {

@@ -20,6 +20,12 @@ export declare abstract class DeviceInterface {
     constructor(namespace: string, timeout: any, interval: any);
     deinit(): void;
     abstract getRawStorageValue(key: string): Promise<any>;
+    /**
+     * Gets the parsed raw storage value.
+     * The return value from getRawStorageValue could be an object.
+     * This is most likely the case for legacy values.
+     * So we return the value as-is if JSON.parse throws an exception.
+     */
     getJsonParsedStorageValue(key: string): Promise<any>;
     abstract getAllRawStorageKeyValues(): Promise<Record<string, any>[]>;
     abstract setRawStorageValue(key: string, value: any): Promise<void>;

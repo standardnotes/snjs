@@ -41,7 +41,6 @@ import {
   SNSyncService,
   ChallengeService,
   SyncModes,
-  SyncQueueStrategy,
   ItemManager
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -51,6 +50,7 @@ import {
   UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
+import { SNComponent } from './models';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -81,6 +81,7 @@ export class SNApplication {
   public namespace: string
   private swapClasses?: any[]
   private skipClasses?: any[]
+  private defaultHost?: string
 
   private crypto?: SNPureCrypto
   public deviceInterface?: DeviceInterface
@@ -121,15 +122,18 @@ export class SNApplication {
   /**
    * @param environment The Environment that identifies your application.
    * @param platform The Platform that identifies your application.
-   * @param namespace A unique identifier to namespace storage and
-   *  other persistent properties. Defaults to empty string.
+   * @param deviceInterfaceThe platform-dependent implementation of utilities.
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
+   * @param alertService The platform-dependent implementation of alert service.
+   * @param namespace A unique identifier to namespace storage and
+   * other persistent properties. Defaults to empty string.
    * @param swapClasses Gives consumers the ability to provide their own custom
-   * subclass for a service. swapClasses should be an array  of key/value pairs
-   * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace,
-   * and 'with'  is the custom subclass to use.
+   * subclass for a service. swapClasses should be an array of key/value pairs
+   * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
+   * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
+   * @param defaultHost Default host to use in ApiService.
    */
   constructor(
     environment: Environment,
@@ -138,8 +142,9 @@ export class SNApplication {
     crypto: SNPureCrypto,
     alertService: SNAlertService,
     namespace?: string,
-    swapClasses?: any[],
+    swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
+    defaultHost?: string,
   ) {
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
@@ -164,6 +169,7 @@ export class SNApplication {
     this.alertService = alertService;
     this.swapClasses = swapClasses;
     this.skipClasses = skipClasses;
+    this.defaultHost = defaultHost;
     this.constructServices();
   }
 
@@ -650,6 +656,15 @@ export class SNApplication {
   }
 
   /**
+   * Activates or deactivates a component, depending on its
+   * current state, and syncs.
+   */
+  public async toggleComponent(component: SNComponent) {
+    await this.componentManager!.toggleComponent(component)
+    return this.syncService!.sync();
+  }
+
+  /**
    * Set the server's URL
    */
   public async setHost(host: string) {
@@ -751,7 +766,6 @@ export class SNApplication {
   }
 
   /**
-
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
    * .errorCount: The number of items that were not imported due to failure to decrypt.
@@ -783,7 +797,7 @@ export class SNApplication {
       } else {
         return payload;
       }
-    })
+    });
     const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
@@ -1119,7 +1133,7 @@ export class SNApplication {
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
-      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) }
+      return this.apiService!.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
     }
 
     this.lockSyncing();
@@ -1306,6 +1320,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService!,
       this.storageService!,
+      this.defaultHost
     );
     this.services.push(this.apiService!);
   }
@@ -1319,7 +1334,8 @@ export class SNApplication {
     if (this.shouldSkipClass(SNComponentManager)) {
       return;
     }
-    this.componentManager = new SNComponentManager(
+    const MaybeSwappedComponentManager = this.getClass<typeof SNComponentManager>(SNComponentManager)
+    this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager!,
       this.syncService!,
       this.alertService!,
@@ -1426,6 +1442,8 @@ export class SNApplication {
     this.historyManager = new SNHistoryManager(
       this.itemManager!,
       this.storageService!,
+      this.apiService!,
+      this.protocolService!,
       [ContentType.Note],
       this.deviceInterface!.timeout
     );
@@ -1449,10 +1467,10 @@ export class SNApplication {
     return this.skipClasses && this.skipClasses.includes(classCandidate);
   }
 
-  private getClass(base: any) {
+  private getClass<T>(base: T) {
     const swapClass = this.swapClasses && this.swapClasses.find((candidate) => candidate.swap === base);
     if (swapClass) {
-      return swapClass.with;
+      return swapClass.with as T;
     } else {
       return base;
     }

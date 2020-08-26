@@ -1,5 +1,4 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
@@ -23,6 +22,9 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true,
     publicPath: '/dist/'
+  },
+  optimization: {
+    minimize: false,
   },
   module: {
     rules: [

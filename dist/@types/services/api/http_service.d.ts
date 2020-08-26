@@ -7,6 +7,7 @@ export declare enum HttpVerb {
 export declare type HttpResponse = {
     status: number;
     error?: any;
+    object?: any;
     [key: string]: any;
 };
 declare type HttpParams = Record<string, any>;
