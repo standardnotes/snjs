@@ -726,7 +726,7 @@ export class SNApplication {
     if (!response) {
       return { canceled: true };
     }
-    const dismissBlockingDialog = this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
     try {
       let passcode: string | undefined;
       if (hasPasscode) {
