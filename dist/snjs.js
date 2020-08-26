@@ -22612,10 +22612,22 @@ class device_interface_DeviceInterface {
     this.timeout = null;
     this.interval = null;
   }
+  /**
+   * Gets the parsed raw storage value.
+   * The return value from getRawStorageValue could be an object.
+   * This is most likely the case for legacy values.
+   * So we return the value as-is if JSON.parse throws an exception.
+   */
+
 
   async getJsonParsedStorageValue(key) {
     const value = await this.getRawStorageValue(key);
-    return value ? JSON.parse(value) : value;
+
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
   }
 
   get keychainStorageKey() {
