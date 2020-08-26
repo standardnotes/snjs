@@ -1,7 +1,6 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItem } from '@Models/core/item';
-import { ItemHistoryEntry } from '@Services/history/item_history_entry';
-import { CreateHistoryEntryForPayload } from './functions';
+import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
+import { CreateHistoryEntryForPayload } from '@Services/history/functions';
 /**
  * The amount of characters added or removed that
  * constitute a keepable entry after optimization.
@@ -9,10 +8,10 @@ import { CreateHistoryEntryForPayload } from './functions';
 const LARGE_ENTRY_DELTA_THRESHOLD = 15;
 
 type ItemHistoryJson = {
-  entries: any[]
+  entries: ItemHistoryEntry[]
 }
 
-export class ItemHistory {
+export class ItemSessionHistory {
 
   public entries: ItemHistoryEntry[] = []
 
@@ -20,8 +19,8 @@ export class ItemHistory {
     /** Deserialize the entries into entry objects. */
     if (entries) {
       for (const entry of entries) {
-        entry.setPreviousEntry(this.getLastEntry());
-        this.entries.push(entry);
+        entry.setPreviousEntry(this.getMostRecentEntry());
+        this.entries.unshift(entry);
       }
     }
   }
@@ -29,22 +28,23 @@ export class ItemHistory {
   static FromJson(entryJson: ItemHistoryJson) {
     const entries = entryJson.entries.map((rawHistoryEntry: any) => {
       return CreateHistoryEntryForPayload(rawHistoryEntry.payload);
-    })
-    return new ItemHistory(entries);
+    });
+    return new ItemSessionHistory(entries);
   }
 
-  getLastEntry() {
-    return this.entries[this.entries.length - 1];
+  getMostRecentEntry() {
+    /** First element in the array should be the last entry. */
+    return this.entries[0];
   }
 
   addHistoryEntryForItem(payload: PurePayload) {
     const prospectiveEntry = CreateHistoryEntryForPayload(payload);
-    const previousEntry = this.getLastEntry();
+    const previousEntry = this.getMostRecentEntry();
     prospectiveEntry.setPreviousEntry(previousEntry);
     if (prospectiveEntry.isSameAsEntry(previousEntry)) {
       return;
     }
-    this.entries.push(prospectiveEntry);
+    this.entries.unshift(prospectiveEntry);
     return prospectiveEntry;
   }
 
@@ -63,7 +63,7 @@ export class ItemHistory {
        * decided to be deleted, then an upcoming processing can change that.
        */
       if (keep) {
-        keepEntries.push(entry);
+        keepEntries.unshift(entry);
       } else {
         /** Remove if in keep */
         const index = keepEntries.indexOf(entry);
@@ -75,7 +75,7 @@ export class ItemHistory {
         /** This is a large negative change. Hang on to the previous entry. */
         const previousEntry = this.entries[index - 1];
         if (previousEntry) {
-          keepEntries.push(previousEntry);
+          keepEntries.unshift(previousEntry);
         }
       }
     };

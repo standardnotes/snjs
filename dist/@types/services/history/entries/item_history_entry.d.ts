@@ -1,8 +1,4 @@
-import { PurePayload } from '../../protocol/payloads/pure_payload';
-export declare enum ItemHistorySource {
-    Session = "session",
-    Remote = "remote"
-}
+import { PurePayload } from '../../../protocol/payloads/pure_payload';
 export declare class ItemHistoryEntry {
     payload: PurePayload;
     /**
@@ -12,11 +8,9 @@ export declare class ItemHistoryEntry {
     protected defaultContentKeyToDiffOn: string;
     protected textCharDiffLength: number;
     protected hasPreviousEntry: boolean;
-    protected readonly source: ItemHistorySource;
-    constructor(payload: PurePayload, source: ItemHistorySource);
+    constructor(payload: PurePayload);
     setPreviousEntry(previousEntry: ItemHistoryEntry): void;
-    operationVector(): 1 | 0 | -1;
+    operationVector(): 1 | -1 | 0;
     deltaSize(): number;
     isSameAsEntry(entry: ItemHistoryEntry): boolean;
-    isRemoteSource(): boolean;
 }

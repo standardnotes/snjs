@@ -20,7 +20,7 @@ SNJS also interacts with a Standard Notes [syncing-server](https://github.com/st
 
 ## Installation
 
-`npm install --save snjs`
+`npm install snjs`
 
 ## Integrating in module environment
 
@@ -40,14 +40,15 @@ Object.assign(window, SNLibrary);
 1. Initialize an application:
 
 ```javascript
-const serverUrl = getServerURL();
 const deviceInterface = new DeviceInterfaceSubclass();
-const app = new SNApplication({
-   deviceInterface: deviceInterface,
-   environment: Environment.Web,
-   platform: Platform.MacWeb,
-   host: serverUrl
-});
+const alertService = new SNAlertServiceSubclass();
+const app = new SNApplication(
+  Environment.Web,
+  Platform.LinuxWeb,
+  deviceInterface,
+  new SNWebCrypto(),
+  alertService,
+);
 ```
 
 2. Launch the application:
@@ -58,7 +59,7 @@ const app = new SNApplication({
 
   }
  });
- await application.launch();
+ await app.launch();
 ```
 
 Once the app is launched, you may perform any app-related functions, including:
@@ -66,10 +67,10 @@ Once the app is launched, you may perform any app-related functions, including:
 ### Signing into an account
 
 ```javascript
-app.signIn({
+app.signIn(
   email,
   password
-}).then((response) => {
+).then((response) => {
 
 });
 ```
@@ -77,10 +78,10 @@ app.signIn({
 ### Registering a new account
 
 ```javascript
-app.register({
+app.register(
   email,
   password
-}).then((response) => {
+).then((response) => {
 
 });
 ```
@@ -96,13 +97,13 @@ app.setPasscode(somePasscode).then(() => {
 ### Create a note
 
 ```javascript
-const item = await app.createManagedItem({
-  contentType: ContentType.Note,
-  content: {
+const item = await app.createManagedItem(
+  ContentType.Note,
+  {
     title: 'Ideas',
     text: 'Coming soon.'
   }
-});
+);
 /** Save the item both locally and sync with server */
 await app.saveItem(item.uuid);
 ```
@@ -110,12 +111,12 @@ await app.saveItem(item.uuid);
 ### Stream notes
 
 ```javascript
-app.streamItems({
+app.streamItems(
   contentType: ContentType.Note,
-  stream: ({ notes }) => {
+  (notes) => {
     reloadUI(notes);
   }
-});
+);
 ```
 
 ## Building
@@ -127,15 +128,15 @@ app.streamItems({
 
 Tests must be run in the browser due to WebCrypto dependency.
 
-1. `node test-server.js`
+1. `npm test`
 2. Open browser to `http://localhost:9001/test/test.html`.
 
-Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000 (branch `004` of the server repository as well). This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
+Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000 (branch `develop` of the server repository). This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
 
 _Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test. Note that the browser tab which runs the tests must remain in the foreground while the tests are running due to browsers de-optimizing inactive tabs.
 
 ## Notes
-- SNJS uses an asynchronous API. All functions are asynchronous, and return immediately even if they have not finished. Add `.then()` to every call to be notified of the result, or use `await` if you don't want to use callbacks.
+- Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
 ## Help
 Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.

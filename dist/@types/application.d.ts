@@ -20,6 +20,7 @@ import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
+import { SNComponent } from './models';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
 };
@@ -32,6 +33,7 @@ export declare class SNApplication {
     namespace: string;
     private swapClasses?;
     private skipClasses?;
+    private defaultHost?;
     private crypto?;
     deviceInterface?: DeviceInterface;
     private migrationService?;
@@ -67,17 +69,23 @@ export declare class SNApplication {
     /**
      * @param environment The Environment that identifies your application.
      * @param platform The Platform that identifies your application.
-     * @param namespace A unique identifier to namespace storage and
-     *  other persistent properties. Defaults to empty string.
+     * @param deviceInterfaceThe platform-dependent implementation of utilities.
      * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
+     * @param alertService The platform-dependent implementation of alert service.
+     * @param namespace A unique identifier to namespace storage and
+     * other persistent properties. Defaults to empty string.
      * @param swapClasses Gives consumers the ability to provide their own custom
-     * subclass for a service. swapClasses should be an array  of key/value pairs
-     * consisting of keys 'swap' and 'with'.  'swap' is the base class you wish to replace,
-     * and 'with'  is the custom subclass to use.
+     * subclass for a service. swapClasses should be an array of key/value pairs
+     * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
+     * and 'with' is the custom subclass to use.
      * @param skipClasses An array of classes to skip making services for.
+     * @param defaultHost Default host to use in ApiService.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: any[], skipClasses?: any[]);
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: {
+        swap: any;
+        with: any;
+    }[], skipClasses?: any[], defaultHost?: string);
     /**
      * The first thing consumers should call when starting their app.
      * This function will load all services in their correct order.
@@ -205,6 +213,11 @@ export declare class SNApplication {
      */
     streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void;
     /**
+     * Activates or deactivates a component, depending on its
+     * current state, and syncs.
+     */
+    toggleComponent(component: SNComponent): Promise<any>;
+    /**
      * Set the server's URL
      */
     setHost(host: string): Promise<void>;
@@ -231,7 +244,6 @@ export declare class SNApplication {
     noAccount(): boolean;
     hasAccount(): boolean;
     /**
-  
      * @returns
      * .affectedItems: Items that were either created or dirtied by this import
      * .errorCount: The number of items that were not imported due to failure to decrypt.

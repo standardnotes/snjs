@@ -10,6 +10,7 @@ export enum HttpVerb {
 export type HttpResponse = {
   status: number
   error?: any
+  object?: any
   [key: string]: any
 }
 
@@ -108,7 +109,8 @@ export class SNHttpService extends PureService {
       status: httpStatus
     }
     try {
-      const body = JSON.parse(request.responseText)
+      const body = JSON.parse(request.responseText);
+      response.object = body;
       Object.assign(response, body);
     } catch (error) { }
     if ((httpStatus >= HTTP_STATUS_MIN_SUCCESS
