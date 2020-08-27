@@ -11667,6 +11667,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
 
       for (const component of syncedComponents) {
         if (component.isEditor()) {
+          /** Editors shouldn't get activated or deactivated */
           continue;
         }
 
