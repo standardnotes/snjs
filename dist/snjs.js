@@ -11666,6 +11666,10 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       for (const component of syncedComponents) {
+        if (component.isEditor()) {
+          continue;
+        }
+
         const isInActive = this.activeComponents[component.uuid];
 
         if (component.active && !component.deleted && !isInActive) {
