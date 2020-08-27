@@ -224,6 +224,7 @@ export class SNComponentManager extends PureService {
         }
         for (const component of syncedComponents) {
           if (component.isEditor()) {
+            /** Editors shouldn't get activated or deactivated */
             continue;
           }
           const isInActive = this.activeComponents[component.uuid];
