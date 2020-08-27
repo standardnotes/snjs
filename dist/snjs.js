@@ -9529,7 +9529,6 @@ var MobilePrefKey;
   MobilePrefKey["NotesHideTags"] = "mobileHideTags";
   MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
   MobilePrefKey["NotesHideDate"] = "mobileHideDate";
-  MobilePrefKey["ThemeData"] = "mobileThemePreferences";
   MobilePrefKey["DarkTheme"] = "mobileDarkTheme";
   MobilePrefKey["LightTgeme"] = "mobileLightTheme";
   MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";

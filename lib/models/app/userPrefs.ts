@@ -23,7 +23,6 @@ export enum MobilePrefKey {
   NotesHideTags = 'mobileHideTags',
   NotesHideNotePreview = 'mobileHideNotePreview',
   NotesHideDate = 'mobileHideDate',
-  ThemeData = 'mobileThemePreferences',
   DarkTheme = 'mobileDarkTheme',
   LightTgeme = 'mobileLightTheme',
   DoNotWarnUnsupportedEditors = 'mobileDoNotShowAgainUnsupportedEditors'
