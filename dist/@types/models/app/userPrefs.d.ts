@@ -22,6 +22,8 @@ export declare enum MobilePrefKey {
     NotesHideNotePreview = "mobileHideNotePreview",
     NotesHideDate = "mobileHideDate",
     ThemeData = "mobileThemePreferences",
+    DarkTheme = "mobileDarkTheme",
+    LightTgeme = "mobileLightTheme",
     DoNotWarnUnsupportedEditors = "mobileDoNotShowAgainUnsupportedEditors"
 }
 export declare type PrefKey = WebPrefKey | MobilePrefKey;
