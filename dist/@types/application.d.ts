@@ -235,7 +235,7 @@ export declare class SNApplication {
     /**
      * Returns true if there is an encryption source available
      */
-    isEncryptionAvailable(): Promise<boolean>;
+    isEncryptionAvailable(): boolean;
     upgradeProtocolVersion(): Promise<{
         success?: true;
         canceled?: true;
