@@ -51,7 +51,7 @@ This flow means that when a new protocol version is available or when a user cha
 
 ### Key Rotation
 
-By default, upgrading an account's protocol version will create a new `itemsKey` for that version, and that key will be used to encrypt all data going forward. To prevent large-scale data modification that may take hours to complete, any data encrypted with a previous `itemsKey` will be re-encrypted with the new `itemsKey` _progressively_, and not all at once. This progressive re-encryption occurs when an item is explicitly modified by the user. Applications can also be designed to bulk-modify items during idle-capacity, without user interaction.
+By default, upgrading an account's protocol version will create a new `itemsKey` for that version, and that key will be used to encrypt all data going forward. To prevent large-scale data modification that may take hours to complete, any data encrypted with a previous `itemsKey` will be re-encrypted with the new `itemsKey` progressively, and not all at once. This progressive re-encryption occurs when an item is explicitly modified by the user. Applications can also be designed to bulk-modify items during idle-capacity, without user interaction.
 
 **When changing the account password:**
 
@@ -61,7 +61,7 @@ By default, upgrading an account's protocol version will create a new `itemsKey`
 ## Encryption Flow
 
 _For each_ item (such as a note) the client wants to encrypt:
-1. Client generates random `item_key` (note: singular. Not related to `itemsKey`). 
+1. Client generates random `item_key` (note: singular. Not related to `itemsKey`).
 2. Client encrypts note content with `item_key`.
 3. Client encrypts `item_key` with default `itemsKey` as `enc_item_key`.
 4. Client notes `itemsKey` UUID and associates it with encrypted item payload as `items_key_id`, and uploads payload to server.
@@ -79,7 +79,7 @@ Registering for an account involves generating a `rootKey` and respective `keyPa
 - salt seed
 - protocol version
 
-To sign into an account, clients first make a request to the server to retrieve the key params for a given email. This endpoint is public and non-authenticated (unless the account has two-factor authentication enabled). The client then uses the retrieved key params to generate a `rootKey`, and uses the `rootKey.serverPassword` to authenticate the account. 
+To sign into an account, clients first make a request to the server to retrieve the key params for a given email. This endpoint is public and non-authenticated (unless the account has two-factor authentication enabled). The client then uses the retrieved key params to generate a `rootKey`, and uses the `rootKey.serverPassword` to authenticate the account.
 
 Note that by default, the client trusts the protocol version the server reports. The client uses this protocol version to determine which cryptographic primitives (and their parameters) to use for key generation. This raises the question of, what happens if a malicious server underreports an account's version in order to weaken key generation parameters? For example, if a user's account is 004, but the server reports 002, the client will proceed to generate a `serverPassword` using outdated primitives.
 
@@ -129,11 +129,11 @@ _No root key and no root key wrapper (no account and no passcode)_
 - **Payload storage**: Plain, unencrypted
 - **Root key storage**: Not applicable
 
-### Scenario B 
+### Scenario B
 _Root key but no root key wrapper (account but no passcode):_
 - **Value storage**: Encrypted with root key
 - **Payload storage:** Encrypted with root key
-- **Root key storage**: 
+- **Root key storage**:
     - With device keychain: Plainly in secure keychain
     - With no device keychain: Plainly in device storage
 
@@ -191,10 +191,10 @@ Given a user `identifier` (email) and `password` (user password):
    2. `salt = hash.substring(0, 32)`
 3. Generate `derivedKey = argon2(password, salt, ITERATIONS, MEMORY, OUTPUT_LENGTH) `
 4. Generate `rootKey` as:
-   ``` 
+   ```
     {
-      masterKey: derivedKey.firstHalf, 
-      serverPassword: derivedKey.secondHalf, 
+      masterKey: derivedKey.firstHalf,
+      serverPassword: derivedKey.secondHalf,
       version: '004'
     }
     ```
