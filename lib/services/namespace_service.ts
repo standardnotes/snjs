@@ -92,7 +92,7 @@ export class SNNamespaceService extends PureService {
     else if (namespaces.length === 1) {
       const namespace = namespaces[0];
       namespace.isDefault = true;
-      namespace.label = 'Default namespace';
+      namespace.label = 'Default application';
       await this.switchToNamespace(namespace);
     }
     /**
@@ -113,7 +113,7 @@ export class SNNamespaceService extends PureService {
     const namespace: SNNamespace = {
       identifier: identifier || uuid,
       userUuid: undefined,
-      label: isDefault ? 'Default namespace' : label || identifier || uuid,
+      label: isDefault ? 'Default application' : label || identifier || uuid,
       isDefault
     };
     await this.switchToNamespace(namespace);
