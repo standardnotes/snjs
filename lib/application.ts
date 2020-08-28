@@ -710,8 +710,8 @@ export class SNApplication {
   /**
    * Returns true if there is an encryption source available
    */
-  public isEncryptionAvailable() {
-    return this.hasAccount() || this.hasPasscode();
+  public async isEncryptionAvailable() {
+    return !isNullOrUndefined(this.getUser()) || this.hasPasscode();
   }
 
   public async upgradeProtocolVersion(): Promise<{
@@ -720,7 +720,7 @@ export class SNApplication {
     error?: Error,
   }> {
     const hasPasscode = this.hasPasscode();
-    const hasAccount = this.hasAccount();
+    const hasAccount = !this.noAccount();
     const types = [];
     if (hasPasscode) {
       types.push(ChallengeType.LocalPasscode);
@@ -1499,10 +1499,7 @@ export class SNApplication {
   }
 
   private createNamespaceService() {
-    this.namespaceService = new SNNamespaceService(this.deviceInterface!);
-    if (this.namespaceIdentifier) {
-      this.namespaceService!.setStaticNamespace(this.namespaceIdentifier);
-    }
+    this.namespaceService = new SNNamespaceService(this.deviceInterface!, this.namespaceIdentifier);
     this.services.push(this.namespaceService!);
   }
 
