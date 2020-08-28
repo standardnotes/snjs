@@ -14837,7 +14837,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       };
 
       const timing = keychainValue.offline.timing;
-      rawStructure.unwrapped[StorageKey.MobilePasscodeTiming] = timing;
+      rawStructure.nonwrapped[StorageKey.MobilePasscodeTiming] = timing;
 
       if (wrappedAccountKey) {
         /**
