@@ -52,6 +52,6 @@ export declare abstract class DeviceInterface {
     abstract clearNamespacedKeychainValue(): Promise<void>;
     abstract getRawKeychainValue(): Promise<any>;
     abstract clearRawKeychainValue(): Promise<void>;
-    switchToNamespace(namespace: SNNamespace): void;
+    setNamespace(namespace: SNNamespace): void;
     abstract openUrl(url: string): void;
 }

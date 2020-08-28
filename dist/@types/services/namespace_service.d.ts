@@ -13,7 +13,7 @@ export declare type SNNamespace = {
  */
 export declare class SNNamespaceService extends PureService {
     private namespace?;
-    constructor(deviceInterface: DeviceInterface);
+    constructor(deviceInterface: DeviceInterface, namespaceIdentifier?: string);
     private getNamespaces;
     private setNamespaces;
     private getDefaultNamespace;
@@ -23,7 +23,7 @@ export declare class SNNamespaceService extends PureService {
      * Creates a new namespace if necessary. If not, use an existing one.
      */
     initialize(): Promise<void>;
-    createNamespace(isDefault?: boolean, identifier?: string, label?: string): Promise<void>;
+    private createNamespace;
     /**
      * Gets the current namespace in use.
      */
