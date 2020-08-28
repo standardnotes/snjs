@@ -187,8 +187,6 @@ export class SNApplication {
   async prepareForLaunch(callback: LaunchCallback) {
     if (!this.namespaceIdentifier) {
       await this.namespaceService!.initialize();
-    } else {
-      await this.namespaceService!.createNamespace(false, this.namespaceIdentifier);
     }
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface!.openDatabase()
@@ -1502,6 +1500,9 @@ export class SNApplication {
 
   private createNamespaceService() {
     this.namespaceService = new SNNamespaceService(this.deviceInterface!);
+    if (this.namespaceIdentifier) {
+      this.namespaceService!.setStaticNamespace(this.namespaceIdentifier);
+    }
     this.services.push(this.namespaceService!);
   }
 
