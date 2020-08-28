@@ -27,6 +27,7 @@ const LegacyKeys = {
   AllAccountKeyParamsKey: 'auth_params',
   WebEncryptedStorageKey: 'encryptedStorage',
   MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  MobileBiometricsPrefs: 'biometrics_prefs',
   AllMigrations: 'migrations'
 };
 
@@ -308,6 +309,16 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {},
     };
     const keychainValue = await this.services.deviceInterface.getKeychainValue();
+
+    const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(
+      LegacyKeys.MobileBiometricsPrefs
+    );
+
+    if (biometricPrefs) {
+      rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
+      rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
+    }
+
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
@@ -333,9 +344,6 @@ export class Migration20200115 extends Migration {
       };
       const timing = keychainValue.offline.timing;
       rawStructure.unwrapped![StorageKey.MobilePasscodeTiming] = timing;
-      const biometricPrefs = keychainValue.biometrics_prefs;
-      rawStructure.unwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
-      rawStructure.unwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
       if (wrappedAccountKey) {
         /**
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
