@@ -10389,13 +10389,13 @@ var ValueModesKeys;
  */
 
 class storage_service_SNStorageService extends pure_service["a" /* PureService */] {
-  constructor(deviceInterface, namespace) {
+  constructor(deviceInterface, namespaceService) {
     super();
     /** Wait until application has been unlocked before trying to persist */
 
     this.storagePersistable = false;
     this.deviceInterface = deviceInterface;
-    this.namespace = namespace;
+    this.namespaceService = namespaceService;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
   }
@@ -10403,6 +10403,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
+    this.namespaceService = undefined;
     super.deinit();
   }
 
@@ -10586,7 +10587,8 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
 
   getPersistenceKey() {
-    return namespacedKey(this.namespace, RawStorageKey.StorageObject);
+    const namespace = this.namespaceService.getCurrentNamespace();
+    return namespacedKey(namespace.identifier, RawStorageKey.StorageObject);
   }
 
   defaultValuesObject(wrapped, unwrapped, nonwrapped) {
@@ -14530,6 +14532,7 @@ class Migration {
     this.services = services;
     this.stageHandlers = {};
     this.registerStageHandlers();
+    this.namespace = services.namespaceService.getCurrentNamespace();
   }
 
   static timestamp() {
@@ -14680,7 +14683,7 @@ class _2020_01_15_Migration20200115 extends Migration {
         dataAuthenticationKey: ak,
         version: version
       });
-      await this.services.deviceInterface.setKeychainValue(accountKey.getPersistableValue());
+      await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue());
     }
     /** Persist storage under new key and structure */
 
@@ -14696,7 +14699,7 @@ class _2020_01_15_Migration20200115 extends Migration {
   async allPlatformHelperSetStorageStructure(rawStructure) {
     const newStructure = storage_service_SNStorageService.defaultValuesObject(rawStructure.wrapped, rawStructure.unwrapped, rawStructure.nonwrapped);
     newStructure[ValueModesKeys.Unwrapped] = undefined;
-    await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.namespace, RawStorageKey.StorageObject), JSON.stringify(newStructure));
+    await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.namespace.identifier, RawStorageKey.StorageObject), JSON.stringify(newStructure));
   }
   /**
    * Helper
@@ -14809,7 +14812,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {}
     };
-    const keychainValue = await this.services.deviceInterface.getKeychainValue();
+    const keychainValue = await this.services.deviceInterface.getNamespacedKeychainValue();
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileBiometricsPrefs);
 
     if (biometricPrefs) {
@@ -14860,7 +14863,7 @@ class _2020_01_15_Migration20200115 extends Migration {
         });
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(newAccountKey, intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
         const passcodeKey = await getPasscodeKey();
@@ -14873,7 +14876,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
         const wrapped = await this.services.protocolService.payloadByEncryptingPayload(payload, intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
         rawStructure.wrapped = wrapped.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       }
     } else {
       /** No passcode, potentially account. Migrate keychain property keys. */
@@ -14887,7 +14890,7 @@ class _2020_01_15_Migration20200115 extends Migration {
           dataAuthenticationKey: keychainValue.ak,
           version: keychainValue.version || defaultVersion
         });
-        await this.services.deviceInterface.setKeychainValue(accountKey.getPersistableValue());
+        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue());
       }
     }
     /** Move encrypted account key into place where it is now expected */
@@ -14915,12 +14918,12 @@ class _2020_01_15_Migration20200115 extends Migration {
       }
     };
 
-    const namespace = this.services.namespace;
+    const namespaceIdentifier = this.namespace.identifier;
 
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key;
       const value = keyValuePair.value;
-      const isNameSpacedKey = namespace && namespace.length > 0 && key.startsWith(namespace);
+      const isNameSpacedKey = namespaceIdentifier && namespaceIdentifier.length > 0 && key.startsWith(namespaceIdentifier);
 
       if (legacyKeys.includes(key) || isNameSpacedKey) {
         continue;
@@ -15051,7 +15054,7 @@ class _2020_01_01_base_BaseMigration extends Migration {
       }
     }
 
-    const newKey = namespacedKey(this.services.namespace, RawStorageKey.LastMigrationTimestamp);
+    const newKey = namespacedKey(this.namespace.identifier, RawStorageKey.LastMigrationTimestamp);
     const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
     const hasNewStructure = !Object(utils["p" /* isNullOrUndefined */])(lastDate);
 
@@ -15181,7 +15184,8 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
 
 
   getTimeStampKey() {
-    return namespacedKey(this.services.namespace, RawStorageKey.LastMigrationTimestamp);
+    const namespace = this.services.namespaceService.getCurrentNamespace();
+    return namespacedKey(namespace.identifier, RawStorageKey.LastMigrationTimestamp);
   }
 
   async getLastMigrationTimestamp() {
@@ -16827,7 +16831,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   }
 
   async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface.getKeychainValue();
+    const rawKey = await this.deviceInterface.getNamespacedKeychainValue();
 
     if (Object(utils["p" /* isNullOrUndefined */])(rawKey)) {
       return undefined;
@@ -16848,7 +16852,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
     const rawKey = this.rootKey.getPersistableValue();
     return this.executeCriticalFunction(() => {
-      return this.deviceInterface.setKeychainValue(rawKey);
+      return this.deviceInterface.setNamespacedKeychainValue(rawKey);
     });
   }
   /**
@@ -17012,7 +17016,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       throw Error('Attempting to set wrapper on already wrapped key.');
     }
 
-    await this.deviceInterface.clearKeychainValue();
+    await this.deviceInterface.clearNamespacedKeychainValue();
 
     if (this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       if (this.keyMode === KeyMode.WrapperOnly) {
@@ -17127,7 +17131,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async clearLocalKeyState() {
-    await this.deviceInterface.clearKeychainValue();
+    await this.deviceInterface.clearNamespacedKeychainValue();
     await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped);
     await this.storageService.removeValue(StorageKey.RootKeyWrapperKeyParams, StorageValueModes.Nonwrapped);
     await this.storageService.removeValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped);
@@ -21259,12 +21263,146 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
 
 
 
+// CONCATENATED MODULE: ./lib/services/namespace_service.ts
+
+
+const NAMESPACES_STORAGE_KEY = 'namespaces';
+/**
+ * The namespace service is responsible of setting the namespace to be used by
+ * the DeviceInterface.
+ */
+
+class namespace_service_SNNamespaceService extends pure_service["a" /* PureService */] {
+  constructor(deviceInterface, namespaceIdentifier) {
+    super();
+    this.deviceInterface = deviceInterface;
+
+    if (namespaceIdentifier) {
+      const namespace = {
+        identifier: namespaceIdentifier,
+        label: namespaceIdentifier,
+        isDefault: true
+      };
+      this.namespace = namespace;
+      this.deviceInterface.setNamespace(namespace);
+    }
+  }
+
+  async getNamespaces() {
+    const namespaces = await this.deviceInterface.getRawStorageValue(NAMESPACES_STORAGE_KEY);
+
+    if (!namespaces) {
+      return [];
+    }
+
+    return JSON.parse(namespaces);
+  }
+
+  async setNamespaces(namespaces) {
+    this.deviceInterface.setRawStorageValue(NAMESPACES_STORAGE_KEY, JSON.stringify(namespaces));
+  }
+
+  async getDefaultNamespace() {
+    const namespaces = await this.getNamespaces();
+    return namespaces.find(namespace => namespace.isDefault === true);
+  }
+
+  async pushNamespace(namespace) {
+    const namespaces = await this.getNamespaces();
+    const namespaceIndex = namespaces.findIndex(n => n.identifier === namespace.identifier);
+
+    if (namespaceIndex === -1) {
+      namespaces.push(namespace);
+    } else {
+      namespaces[namespaceIndex] = namespace;
+    }
+
+    await this.setNamespaces(namespaces);
+  }
+
+  async switchToNamespace(namespace) {
+    this.namespace = namespace;
+    this.deviceInterface.setNamespace(namespace);
+    await this.pushNamespace(namespace);
+  }
+  /**
+   * Creates a new namespace if necessary. If not, use an existing one.
+   */
+
+
+  async initialize() {
+    const defaultNamespace = await this.getDefaultNamespace();
+
+    if (defaultNamespace) {
+      await this.switchToNamespace(defaultNamespace);
+      return;
+    }
+
+    const namespaces = await this.getNamespaces();
+    /** If no namespaces exist, then we should create a new one. */
+
+    if (namespaces.length === 0) {
+      await this.createNamespace(true);
+    }
+    /**
+     * If one (1) namespace exist, then it means it is not the default one at this point.
+     * Let's set it as the default namespace and return it.
+     */
+    else if (namespaces.length === 1) {
+        const namespace = namespaces[0];
+        namespace.isDefault = true;
+        namespace.label = 'Default application';
+        await this.switchToNamespace(namespace);
+      }
+      /**
+       * In the future, if a user has multiple accounts signed into a client, each account
+       * will use its own keychain/storage namespace. This service will be in charge of displaying
+       * a UI for selecting which namespace to sign into (if no default namespace is set).
+       */
+      else {
+          throw Error('Multiple namespaces not supported yet ;)');
+        }
+  }
+
+  async createNamespace() {
+    let isDefault = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    let identifier = arguments.length > 1 ? arguments[1] : undefined;
+    let label = arguments.length > 2 ? arguments[2] : undefined;
+
+    if (isDefault && (await this.getDefaultNamespace())) {
+      throw Error('Can not create default namespace: a default namespace already exists.');
+    }
+
+    const uuid = await uuid_Uuid.GenerateUuid();
+    const namespace = {
+      identifier: identifier || uuid,
+      userUuid: undefined,
+      label: isDefault ? 'Default application' : label || identifier || uuid,
+      isDefault
+    };
+    await this.switchToNamespace(namespace);
+  }
+  /**
+   * Gets the current namespace in use.
+   */
+
+
+  getCurrentNamespace() {
+    if (!this.namespace) {
+      throw Error('No namespace set, please initialize first.');
+    }
+
+    return this.namespace;
+  }
+
+}
 // CONCATENATED MODULE: ./lib/application.ts
 function application_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function application_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { application_ownKeys(Object(source), true).forEach(function (key) { application_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { application_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function application_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -21290,12 +21428,14 @@ class application_SNApplication {
   /**
    * @param environment The Environment that identifies your application.
    * @param platform The Platform that identifies your application.
-   * @param deviceInterfaceThe platform-dependent implementation of utilities.
+   * @param deviceInterface The device interface that provides platform specific
+   * utilities that are used to read/write raw values from/to the database or value storage.
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param namespace A unique identifier to namespace storage and
-   * other persistent properties. Defaults to empty string.
+   * @param namespaceIdentifier A unique identifier to namespace storage and other
+   * persistent properties. This parameter is kept for backward compatibility and/or in case
+   * you don't want SNNamespaceService to assign a dynamic namespace for you.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
@@ -21303,7 +21443,7 @@ class application_SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    */
-  constructor(environment, platform, deviceInterface, crypto, alertService, namespace, swapClasses, skipClasses, defaultHost) {
+  constructor(environment, platform, deviceInterface, crypto, alertService, namespaceIdentifier, swapClasses, skipClasses, defaultHost) {
     this.eventHandlers = [];
     this.services = [];
     this.streamRemovers = [];
@@ -21344,7 +21484,7 @@ class application_SNApplication {
 
     this.environment = environment;
     this.platform = platform;
-    this.namespace = namespace || '';
+    this.namespaceIdentifier = namespaceIdentifier;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -21360,6 +21500,10 @@ class application_SNApplication {
 
 
   async prepareForLaunch(callback) {
+    if (!this.namespaceIdentifier) {
+      await this.namespaceService.initialize();
+    }
+
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface.openDatabase().catch(error => {
       this.notifyEvent(events["a" /* ApplicationEvent */].LocalDatabaseReadError, error);
@@ -22469,6 +22613,7 @@ class application_SNApplication {
   }
 
   constructServices() {
+    this.createNamespaceService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -22508,6 +22653,7 @@ class application_SNApplication {
     this.actionsManager = undefined;
     this.historyManager = undefined;
     this.itemManager = undefined;
+    this.namespaceService = undefined;
     this.services = [];
   }
 
@@ -22519,7 +22665,7 @@ class application_SNApplication {
       challengeService: this.challengeService,
       itemManager: this.itemManager,
       environment: this.environment,
-      namespace: this.namespace
+      namespaceService: this.namespaceService
     });
     this.services.push(this.migrationService);
   }
@@ -22560,7 +22706,7 @@ class application_SNApplication {
   }
 
   createStorageManager() {
-    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.namespace);
+    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.namespaceService);
     this.services.push(this.storageService);
   }
 
@@ -22615,6 +22761,11 @@ class application_SNApplication {
     this.services.push(this.actionsManager);
   }
 
+  createNamespaceService() {
+    this.namespaceService = new namespace_service_SNNamespaceService(this.deviceInterface, this.namespaceIdentifier);
+    this.services.push(this.namespaceService);
+  }
+
   shouldSkipClass(classCandidate) {
     return this.skipClasses && this.skipClasses.includes(classCandidate);
   }
@@ -22649,8 +22800,7 @@ class device_interface_DeviceInterface {
        A platform-specific function that is fed functions to
        perform repeatedly. Similar to setInterval.
   */
-  constructor(namespace, timeout, interval) {
-    this.namespace = namespace;
+  constructor(timeout, interval) {
     this.timeout = timeout || setTimeout.bind(Object(utils["m" /* getGlobalScope */])());
     this.interval = interval || setInterval.bind(Object(utils["m" /* getGlobalScope */])());
   }
@@ -22677,14 +22827,8 @@ class device_interface_DeviceInterface {
     }
   }
 
-  get keychainStorageKey() {
-    const keychainStorageKey = 'keychain';
-
-    if (this.namespace) {
-      return "".concat(this.namespace, "-").concat(keychainStorageKey);
-    } else {
-      return keychainStorageKey;
-    }
+  setNamespace(namespace) {
+    this.namespace = namespace;
   }
 
 }
