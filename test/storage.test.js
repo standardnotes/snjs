@@ -7,9 +7,9 @@ const expect = chai.expect;
 describe('storage manager', () => {
   /**
    * Items are saved in localStorage in tests.
-   * Base keys are `storage`, `last_migration_timestamp`, `namespaces` and `keychain`
+   * Base keys are `storage`, `last_migration_timestamp`, and `keychain`
    */
-  const BASE_KEY_COUNT = 4;
+  const BASE_KEY_COUNT = 3;
   const BASE_ITEM_COUNT = 1; /** Default items key */
   const sharedApplication = Factory.createApplication();
 
