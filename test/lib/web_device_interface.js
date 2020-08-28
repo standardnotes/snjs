@@ -85,6 +85,9 @@ export default class WebDeviceInterface extends DeviceInterface {
   /** @keychain */
   async getNamespacedKeychainValue() {
     const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
+    }
     return keychain[this.namespace.identifier];
   }
 
