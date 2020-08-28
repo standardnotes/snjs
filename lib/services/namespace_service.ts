@@ -19,9 +19,19 @@ const NAMESPACES_STORAGE_KEY = 'namespaces';
 export class SNNamespaceService extends PureService {
   private namespace?: SNNamespace
 
-  constructor(deviceInterface: DeviceInterface) {
+  constructor(deviceInterface: DeviceInterface, namespaceIdentifier?: string) {
     super();
     this.deviceInterface = deviceInterface;
+
+    if (namespaceIdentifier) {
+      const namespace: SNNamespace = {
+        identifier: namespaceIdentifier,
+        label: namespaceIdentifier,
+        isDefault: true
+      };
+      this.namespace = namespace;
+      this.deviceInterface!.switchToNamespace(namespace);
+    }
   }
 
   private async getNamespaces() {
@@ -95,7 +105,7 @@ export class SNNamespaceService extends PureService {
     }
   }
 
-  public async createNamespace(isDefault = false, identifier?: string, label?: string) {
+  private async createNamespace(isDefault = false, identifier?: string, label?: string) {
     if (isDefault && await this.getDefaultNamespace()) {
       throw Error('Can not create default namespace: a default namespace already exists.');
     }
