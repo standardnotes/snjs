@@ -4,6 +4,7 @@ import { SNRootKey } from '../protocol/root_key';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { PureService } from './pure_service';
 import { DeviceInterface } from '../device_interface';
+import { SNNamespaceService } from './namespace_service';
 export declare enum StoragePersistencePolicies {
     Default = 1,
     Ephemeral = 2
@@ -41,13 +42,13 @@ export declare type StorageValuesObject = {
  */
 export declare class SNStorageService extends PureService {
     encryptionDelegate?: EncryptionDelegate;
-    private namespace;
+    private namespaceService?;
     /** Wait until application has been unlocked before trying to persist */
     private storagePersistable;
     private persistencePolicy;
     private encryptionPolicy;
     private values;
-    constructor(deviceInterface: DeviceInterface, namespace: string);
+    constructor(deviceInterface: DeviceInterface, namespaceService: SNNamespaceService);
     deinit(): void;
     handleApplicationStage(stage: ApplicationStage): Promise<void>;
     setPersistencePolicy(persistencePolicy: StoragePersistencePolicies): Promise<void>;
