@@ -9529,7 +9529,8 @@ var MobilePrefKey;
   MobilePrefKey["NotesHideTags"] = "mobileHideTags";
   MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
   MobilePrefKey["NotesHideDate"] = "mobileHideDate";
-  MobilePrefKey["ThemeData"] = "mobileThemePreferences";
+  MobilePrefKey["DarkTheme"] = "mobileDarkTheme";
+  MobilePrefKey["LightTgeme"] = "mobileLightTheme";
   MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";
 })(MobilePrefKey || (MobilePrefKey = {}));
 
@@ -11666,6 +11667,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       for (const component of syncedComponents) {
+        if (component.isEditor()) {
+          /** Editors shouldn't get activated or deactivated */
+          continue;
+        }
+
         const isInActive = this.activeComponents[component.uuid];
 
         if (component.active && !component.deleted && !isInActive) {
@@ -14579,6 +14585,7 @@ const LegacyKeys = {
   AllAccountKeyParamsKey: 'auth_params',
   WebEncryptedStorageKey: 'encryptedStorage',
   MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  MobileBiometricsPrefs: 'biometrics_prefs',
   AllMigrations: 'migrations'
 };
 class _2020_01_15_Migration20200115 extends Migration {
@@ -14803,6 +14810,12 @@ class _2020_01_15_Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {}
     };
     const keychainValue = await this.services.deviceInterface.getKeychainValue();
+    const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileBiometricsPrefs);
+
+    if (biometricPrefs) {
+      rawStructure.nonwrapped[StorageKey.BiometricsState] = biometricPrefs.enabled;
+      rawStructure.nonwrapped[StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
+    }
 
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
@@ -14825,9 +14838,6 @@ class _2020_01_15_Migration20200115 extends Migration {
 
       const timing = keychainValue.offline.timing;
       rawStructure.unwrapped[StorageKey.MobilePasscodeTiming] = timing;
-      const biometricPrefs = keychainValue.biometrics_prefs;
-      rawStructure.unwrapped[StorageKey.BiometricsState] = biometricPrefs.enabled;
-      rawStructure.unwrapped[StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
 
       if (wrappedAccountKey) {
         /**
@@ -21859,13 +21869,13 @@ class application_SNApplication {
    */
 
 
-  async isEncryptionAvailable() {
-    return !Object(utils["p" /* isNullOrUndefined */])(this.getUser()) || this.hasPasscode();
+  isEncryptionAvailable() {
+    return this.hasAccount() || this.hasPasscode();
   }
 
   async upgradeProtocolVersion() {
     const hasPasscode = this.hasPasscode();
-    const hasAccount = !this.noAccount();
+    const hasAccount = this.hasAccount();
     const types = [];
 
     if (hasPasscode) {

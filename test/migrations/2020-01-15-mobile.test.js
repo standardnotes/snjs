@@ -94,6 +94,7 @@ describe('2020-01-15 mobile migration', () => {
       'biometrics_prefs',
       JSON.stringify(biometricPrefs)
     );
+
     await application.deviceInterface.setRawStorageValue(
       'first_run',
       false
@@ -110,13 +111,15 @@ describe('2020-01-15 mobile migration', () => {
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
-
     /** Run migration */
     const promptForValuesForTypes = (types) => {
       const values = [];
       for (const type of types) {
         if (type === ChallengeType.LocalPasscode) {
           values.push(new ChallengeValue(type, passcode));
+        }
+        if (type === ChallengeType.Biometric) {
+          values.push(new ChallengeValue(type, true));
         }
       }
       return values;
@@ -147,7 +150,6 @@ describe('2020-01-15 mobile migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(typeof keyParams).to.equal('object');
-
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
@@ -166,9 +168,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue('first_run')
     ).to.equal(false);
-    expect(
-      await application.storageService.getValue('biometrics_prefs')
-    ).to.eql(biometricPrefs);
+
+    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
+    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
 
     await application.deinit();
   });
@@ -235,6 +237,10 @@ describe('2020-01-15 mobile migration', () => {
         if (type === ChallengeType.LocalPasscode) {
           values.push(new ChallengeValue(type, passcode));
         }
+        if (type === ChallengeType.Biometric) {
+          values.push(new ChallengeValue(type, true));
+        }
+
       }
       return values;
     };
@@ -282,9 +288,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue('first_run')
     ).to.equal(false);
-    expect(
-      await application.storageService.getValue('biometrics_prefs')
-    ).to.eql(biometricPrefs);
+    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
+    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
     expect(
       await application.storageService.getValue(StorageKey.MobilePasscodeTiming)
     ).to.eql(passcodeTiming);
@@ -354,6 +359,9 @@ describe('2020-01-15 mobile migration', () => {
         if (type === ChallengeType.LocalPasscode) {
           values.push(new ChallengeValue(type, passcode));
         }
+        if (type === ChallengeType.Biometric) {
+          values.push(new ChallengeValue(type, true));
+        }
       }
       return values;
     };
@@ -403,9 +411,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue('first_run')
     ).to.equal(false);
-    expect(
-      await application.storageService.getValue('biometrics_prefs')
-    ).to.eql(biometricPrefs);
+    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
+    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
 
     await application.deinit();
   }).timeout(10000);
@@ -454,6 +461,9 @@ describe('2020-01-15 mobile migration', () => {
         if (type === ChallengeType.LocalPasscode) {
           values.push(new ChallengeValue(type, passcode));
         }
+        if (type === ChallengeType.Biometric) {
+          values.push(new ChallengeValue(type, true));
+        }
       }
       return values;
     };
@@ -495,9 +505,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue('first_run')
     ).to.equal(false);
-    expect(
-      await application.storageService.getValue('biometrics_prefs')
-    ).to.eql(biometricPrefs);
+    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
+    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
 
     await application.deinit();
   });
