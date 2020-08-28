@@ -291,7 +291,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
     expect(
-      await application.storageService.getValue(StorageKey.MobilePasscodeTiming)
+      await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped)
     ).to.eql(passcodeTiming);
     await application.deinit();
   });

@@ -343,7 +343,7 @@ export class Migration20200115 extends Migration {
         return passcodeKey!;
       };
       const timing = keychainValue.offline.timing;
-      rawStructure.unwrapped![StorageKey.MobilePasscodeTiming] = timing;
+      rawStructure.nonwrapped![StorageKey.MobilePasscodeTiming] = timing;
       if (wrappedAccountKey) {
         /**
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
