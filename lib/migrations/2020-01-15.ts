@@ -309,7 +309,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {},
     };
 
-    const keychainValue = await this.services.deviceInterface.getKeychainValue();
+    const keychainValue = await this.services.deviceInterface.getNamespacedKeychainValue();
 
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(
       LegacyKeys.MobileBiometricsPrefs
