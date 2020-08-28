@@ -89,7 +89,7 @@ export abstract class DeviceInterface {
 
   abstract async clearRawKeychainValue() : Promise<void>;
 
-  public switchToNamespace(namespace: SNNamespace) {
+  public setNamespace(namespace: SNNamespace) {
     this.namespace = namespace;
   }
 

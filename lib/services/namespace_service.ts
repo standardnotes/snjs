@@ -30,7 +30,7 @@ export class SNNamespaceService extends PureService {
         isDefault: true
       };
       this.namespace = namespace;
-      this.deviceInterface!.switchToNamespace(namespace);
+      this.deviceInterface!.setNamespace(namespace);
     }
   }
 
@@ -67,7 +67,7 @@ export class SNNamespaceService extends PureService {
 
   private async switchToNamespace(namespace: SNNamespace) {
     this.namespace = namespace;
-    this.deviceInterface!.switchToNamespace(namespace);
+    this.deviceInterface!.setNamespace(namespace);
     await this.pushNamespace(namespace);
   }
 
