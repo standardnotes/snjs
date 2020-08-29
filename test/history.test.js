@@ -225,6 +225,68 @@ describe('history manager', () => {
         ));
         expect(itemHistory.entries.length).to.equal(4);
       });
+    
+    it('entries should be ordered from newest to oldest', async function () {
+      const payload = CreateMaxPayloadFromAnyObject(
+        Factory.createNoteParams({
+          text: Factory.randomString(200)
+        })
+      );
+
+      let item = await this.application.itemManager.emitItemFromPayload(
+        payload,
+        PayloadSource.LocalChanged
+      );
+
+      await this.application.itemManager.setItemDirty(item.uuid);
+      await this.application.syncService.sync(syncOptions);
+      await Factory.sleep(0.5);
+
+      const itemHistory = this.historyManager.sessionHistoryForItem(item);
+
+      item = await setTextAndSync(
+        this.application,
+        item,
+        item.content.text + Factory.randomString(1)
+      );
+      await Factory.sleep(0.5);
+
+      item = await setTextAndSync(
+        this.application,
+        item,
+        deleteCharsFromString(item.content.text, largeCharacterChange + 1)
+      );
+      await Factory.sleep(0.5);
+
+      item = await setTextAndSync(
+        this.application,
+        item,
+        item.content.text + Factory.randomString(1)
+      );
+      await Factory.sleep(0.5);
+
+      item = await setTextAndSync(
+        this.application,
+        item,
+        item.content.text + Factory.randomString(largeCharacterChange + 1)
+      );
+      await Factory.sleep(0.5);
+
+      /** We should have a total of 4 revisions. */
+      expect(itemHistory.entries.length).to.equal(4);
+
+      /** First entry should be the latest revision. */
+      const latestRevision = itemHistory.entries[0];
+      /** Last entry should be the initial revision. */
+      const initialRevision = itemHistory.entries[itemHistory.entries.length - 1];
+
+      /** The latest entry should have the latest change of 16 characters. */
+      expect(latestRevision.textCharDiffLength).to.equal(16);
+      /** The oldest entry should have the initial text length of 200 characters. */
+      expect(initialRevision.textCharDiffLength).to.equal(200);
+      /** Finally, the latest revision updated_at value date should be more recent than the initial revision one. */
+      expect(latestRevision.payload.updated_at).to.be.greaterThan(initialRevision.payload.updated_at);
+    }).timeout(10000);
   });
 
   describe('remote', async function () {
