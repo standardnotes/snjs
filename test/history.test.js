@@ -221,8 +221,8 @@ describe('history manager', () => {
         item = await setTextAndSync(
           this.application,
           item,
-          item.content.text + Factory.randomString(largeCharacterChange + 1
-        ));
+          item.content.text + Factory.randomString(largeCharacterChange + 1)
+        );
         expect(itemHistory.entries.length).to.equal(4);
       });
     
