@@ -73,7 +73,7 @@ export class ItemSessionHistory {
       }
       if (keep && isEntrySignificant(entry) && entry.operationVector() === -1) {
         /** This is a large negative change. Hang on to the previous entry. */
-        const previousEntry = this.entries[index - 1];
+        const previousEntry = this.entries[index + 1];
         if (previousEntry) {
           keepEntries.unshift(previousEntry);
         }
