@@ -79,7 +79,8 @@ export class ItemSessionHistory {
         }
       }
     };
-    this.entries.forEach((entry, index) => {
+    for (let index = this.entries.length; index--;) {
+      const entry = this.entries[index];
       if (index === 0 || index === this.entries.length - 1) {
         /** Keep the first and last */
         processEntry(entry, index, true);
@@ -87,7 +88,7 @@ export class ItemSessionHistory {
         const significant = isEntrySignificant(entry);
         processEntry(entry, index, significant);
       }
-    });
+    }
     this.entries = this.entries.filter((entry, index) => {
       return keepEntries.indexOf(entry) !== -1;
     });
