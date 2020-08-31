@@ -17695,7 +17695,7 @@ class item_session_history_ItemSessionHistory {
 
       if (keep && isEntrySignificant(entry) && entry.operationVector() === -1) {
         /** This is a large negative change. Hang on to the previous entry. */
-        const previousEntry = this.entries[index - 1];
+        const previousEntry = this.entries[index + 1];
 
         if (previousEntry) {
           keepEntries.unshift(previousEntry);
@@ -17703,7 +17703,9 @@ class item_session_history_ItemSessionHistory {
       }
     };
 
-    this.entries.forEach((entry, index) => {
+    for (let index = this.entries.length; index--;) {
+      const entry = this.entries[index];
+
       if (index === 0 || index === this.entries.length - 1) {
         /** Keep the first and last */
         processEntry(entry, index, true);
@@ -17711,7 +17713,8 @@ class item_session_history_ItemSessionHistory {
         const significant = isEntrySignificant(entry);
         processEntry(entry, index, significant);
       }
-    });
+    }
+
     this.entries = this.entries.filter((entry, index) => {
       return keepEntries.indexOf(entry) !== -1;
     });
