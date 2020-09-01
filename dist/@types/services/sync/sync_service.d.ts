@@ -113,7 +113,7 @@ export declare class SNSyncService extends PureService {
     /**
      * Used in tandem with `loadDatabasePayloads`
      */
-    getDatabasePayloads(): Promise<any[]>;
+    getDatabasePayloads(): Promise<unknown[]>;
     /**
      * @param rawPayloads - use `getDatabasePayloads` to get these payloads.
      * They are fed as a parameter so that callers don't have to await the loading, but can

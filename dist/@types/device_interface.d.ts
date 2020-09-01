@@ -28,7 +28,10 @@ export declare abstract class DeviceInterface {
      * So we return the value as-is if JSON.parse throws an exception.
      */
     getJsonParsedStorageValue(key: string): Promise<any>;
-    abstract getAllRawStorageKeyValues(): Promise<Record<string, any>[]>;
+    abstract getAllRawStorageKeyValues(): Promise<{
+        key: string;
+        value: unknown;
+    }[]>;
     abstract setRawStorageValue(key: string, value: any): Promise<void>;
     abstract removeRawStorageValue(key: string): Promise<void>;
     abstract removeAllRawStorageValues(): Promise<void>;
@@ -42,7 +45,7 @@ export declare abstract class DeviceInterface {
     abstract openDatabase(): Promise<{
         isNewDatabase?: boolean;
     } | undefined>;
-    abstract getAllRawDatabasePayloads(): Promise<any[]>;
+    abstract getAllRawDatabasePayloads(): Promise<unknown[]>;
     abstract saveRawDatabasePayload(payload: any): Promise<void>;
     abstract saveRawDatabasePayloads(payloads: any[]): Promise<void>;
     abstract removeRawDatabasePayloadWithId(id: string): Promise<void>;
