@@ -16,7 +16,7 @@ const PARTITION_CHARACTER = ':';
 export class SNProtocolOperator004 extends SNProtocolOperator003 {
 
   public getEncryptionDisplayName(): string {
-    return 'XChaCha20';
+    return 'XChaCha20-Poly1305';
   }
 
   get version() {

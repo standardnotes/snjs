@@ -40,5 +40,5 @@ export function InsufficientPasswordMessage(minimum: number) {
 }
 
 export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion) {
-  return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a  version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`;
+  return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`;
 }

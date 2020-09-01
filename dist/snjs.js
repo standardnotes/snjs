@@ -10759,7 +10759,7 @@ function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
 function StrictSignInFailed(current, latest) {
-  return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a  version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
+  return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
 }
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
 
@@ -15879,7 +15879,7 @@ class operator_003_SNProtocolOperator003 extends operator_002_SNProtocolOperator
 const PARTITION_CHARACTER = ':';
 class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator003 {
   getEncryptionDisplayName() {
-    return 'XChaCha20';
+    return 'XChaCha20-Poly1305';
   }
 
   get version() {
