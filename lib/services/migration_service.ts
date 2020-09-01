@@ -107,8 +107,9 @@ export class SNMigrationService extends PureService {
 
   /** @access private */
   getTimeStampKey() {
+    const namespace = this.services!.namespaceService.getCurrentNamespace();
     return namespacedKey(
-      this.services!.namespace,
+      namespace!.identifier,
       RawStorageKey.LastMigrationTimestamp
     );
   }

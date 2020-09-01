@@ -4,6 +4,7 @@ import { SNStorageService } from '../services/storage_service';
 import { SNProtocolService } from './../services/protocol_service';
 import { DeviceInterface } from '../device_interface';
 import { ChallengeService } from '../services';
+import { SNNamespaceService } from '../services/namespace_service';
 /** Services that the migration service needs to function */
 export declare type MigrationServices = {
     protocolService: SNProtocolService;
@@ -12,5 +13,5 @@ export declare type MigrationServices = {
     challengeService: ChallengeService;
     itemManager: ItemManager;
     environment: Environment;
-    namespace: string;
+    namespaceService: SNNamespaceService;
 };

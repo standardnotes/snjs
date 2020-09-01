@@ -1,4 +1,7 @@
 /* eslint-disable no-undef */
+
+const KEYCHAIN_STORAGE_KEY = 'keychain';
+
 export default class WebDeviceInterface extends DeviceInterface {
 
   async getRawStorageValue(key) {
@@ -34,7 +37,7 @@ export default class WebDeviceInterface extends DeviceInterface {
 
   _getDatabaseKeyPrefix() {
     if (this.namespace) {
-      return `${this.namespace}-item-`;
+      return `${this.namespace.identifier}-item-`;
     } else {
       return 'item-';
     }
@@ -79,16 +82,41 @@ export default class WebDeviceInterface extends DeviceInterface {
     }
   }
 
-  /** @keychian */
-  async getKeychainValue() {
-    return this.keychainValue;
+  /** @keychain */
+  async getNamespacedKeychainValue() {
+    const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
+    }
+    return keychain[this.namespace.identifier];
   }
 
-  async setKeychainValue(value) {
-    this.keychainValue = value;
+  async setNamespacedKeychainValue(value) {
+    let keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      keychain = {};
+    }
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify({
+      ...keychain,
+      [this.namespace.identifier]: value,
+    }));
   }
 
-  async clearKeychainValue() {
-    this.keychainValue = null;
+  async clearNamespacedKeychainValue() {
+    const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
+    }
+    delete keychain[this.namespace.identifier];
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
+  }
+
+  async getRawKeychainValue() {
+    const keychain = localStorage.getItem(KEYCHAIN_STORAGE_KEY);
+    return JSON.parse(keychain);
+  }
+
+  async clearRawKeychainValue() {
+    localStorage.removeItem(KEYCHAIN_STORAGE_KEY);
   }
 }

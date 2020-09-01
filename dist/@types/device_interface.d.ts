@@ -1,3 +1,4 @@
+import { SNNamespace } from './services/namespace_service';
 /**
  * Platforms must override this class to provide platform specific utilities
  * and access to the migration service, such as exposing an interface to read
@@ -7,7 +8,7 @@
 export declare abstract class DeviceInterface {
     timeout: any;
     interval: any;
-    protected namespace: string;
+    protected namespace?: SNNamespace;
     /**
       * @param {function} timeout
          A platform-specific function that is fed functions to run
@@ -17,7 +18,7 @@ export declare abstract class DeviceInterface {
          A platform-specific function that is fed functions to
          perform repeatedly. Similar to setInterval.
     */
-    constructor(namespace: string, timeout: any, interval: any);
+    constructor(timeout: any, interval: any);
     deinit(): void;
     abstract getRawStorageValue(key: string): Promise<any>;
     /**
@@ -46,9 +47,11 @@ export declare abstract class DeviceInterface {
     abstract saveRawDatabasePayloads(payloads: any[]): Promise<void>;
     abstract removeRawDatabasePayloadWithId(id: string): Promise<void>;
     abstract removeAllRawDatabasePayloads(): Promise<void>;
-    protected get keychainStorageKey(): string;
-    abstract getKeychainValue(): Promise<any>;
-    abstract setKeychainValue(value: any): Promise<void>;
-    abstract clearKeychainValue(): Promise<void>;
+    abstract getNamespacedKeychainValue(): Promise<any>;
+    abstract setNamespacedKeychainValue(value: any): Promise<void>;
+    abstract clearNamespacedKeychainValue(): Promise<void>;
+    abstract getRawKeychainValue(): Promise<any>;
+    abstract clearRawKeychainValue(): Promise<void>;
+    setNamespace(namespace: SNNamespace): void;
     abstract openUrl(url: string): void;
 }

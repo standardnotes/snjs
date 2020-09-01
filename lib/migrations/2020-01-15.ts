@@ -136,7 +136,7 @@ export class Migration20200115 extends Migration {
           version: version
         }
       );
-      await this.services.deviceInterface.setKeychainValue(
+      await this.services.deviceInterface.setNamespacedKeychainValue(
         accountKey.getPersistableValue()
       );
     }
@@ -157,7 +157,7 @@ export class Migration20200115 extends Migration {
     );
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(
-      namespacedKey(this.services.namespace, RawStorageKey.StorageObject),
+      namespacedKey(this.namespace.identifier, RawStorageKey.StorageObject),
       JSON.stringify(newStructure)
     );
   }
@@ -308,7 +308,8 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getKeychainValue();
+
+    const keychainValue = await this.services.deviceInterface.getNamespacedKeychainValue();
 
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(
       LegacyKeys.MobileBiometricsPrefs
@@ -377,7 +378,7 @@ export class Migration20200115 extends Migration {
           passcodeKey,
         );
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
         const passcodeKey = await getPasscodeKey();
@@ -395,7 +396,7 @@ export class Migration20200115 extends Migration {
           passcodeKey,
         );
         rawStructure.wrapped = wrapped.ejected();
-        await this.services.deviceInterface.clearKeychainValue();
+        await this.services.deviceInterface.clearRawKeychainValue();
       }
     } else {
       /** No passcode, potentially account. Migrate keychain property keys. */
@@ -412,7 +413,7 @@ export class Migration20200115 extends Migration {
             version: keychainValue.version || defaultVersion
           }
         );
-        await this.services.deviceInterface.setKeychainValue(
+        await this.services.deviceInterface.setNamespacedKeychainValue(
           accountKey.getPersistableValue()
         );
       }
@@ -436,11 +437,11 @@ export class Migration20200115 extends Migration {
       try { return JSON.parse(value); }
       catch (e) { return value; }
     };
-    const namespace = this.services.namespace;
+    const namespaceIdentifier = this.namespace!.identifier;
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key;
       const value = keyValuePair.value;
-      const isNameSpacedKey = namespace && namespace.length > 0 && key.startsWith(namespace);
+      const isNameSpacedKey = namespaceIdentifier && namespaceIdentifier.length > 0 && key.startsWith(namespaceIdentifier);
       if (legacyKeys.includes(key) || isNameSpacedKey) {
         continue;
       }

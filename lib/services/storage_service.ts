@@ -10,6 +10,7 @@ import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';
+import { SNNamespaceService } from '@Services/namespace_service';
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -59,7 +60,7 @@ type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent
 export class SNStorageService extends PureService {
 
   public encryptionDelegate?: EncryptionDelegate
-  private namespace: string
+  private namespaceService?: SNNamespaceService
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
@@ -69,11 +70,11 @@ export class SNStorageService extends PureService {
 
   constructor(
     deviceInterface: DeviceInterface,
-    namespace: string
+    namespaceService: SNNamespaceService
   ) {
     super();
     this.deviceInterface = deviceInterface;
-    this.namespace = namespace;
+    this.namespaceService = namespaceService;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
   }
@@ -81,6 +82,7 @@ export class SNStorageService extends PureService {
   public deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
+    this.namespaceService = undefined;
     super.deinit();
   }
 
@@ -263,7 +265,8 @@ export class SNStorageService extends PureService {
    * Default persistence key. Platforms can override as needed.
    */
   private getPersistenceKey() {
-    return namespacedKey(this.namespace, RawStorageKey.StorageObject);
+    const namespace = this.namespaceService!.getCurrentNamespace();
+    return namespacedKey(namespace.identifier, RawStorageKey.StorageObject);
   }
 
   private defaultValuesObject(

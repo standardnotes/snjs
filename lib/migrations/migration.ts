@@ -1,14 +1,17 @@
 import { MigrationServices } from './types';
 import { ApplicationStage } from '../stages';
+import { SNNamespace } from '@Lib/services/namespace_service';
 
 type StageHandler = () => Promise<void>
 
 export abstract class Migration {
   private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {}
   private onDoneHandler?: () => void
+  protected readonly namespace: SNNamespace
 
   constructor(protected services: MigrationServices) {
     this.registerStageHandlers();
+    this.namespace = services!.namespaceService.getCurrentNamespace();
   }
 
   public static timestamp(): number {

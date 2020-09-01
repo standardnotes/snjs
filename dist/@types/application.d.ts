@@ -20,6 +20,7 @@ import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
+import { SNNamespaceService } from './services/namespace_service';
 import { SNComponent } from './models';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
@@ -30,7 +31,7 @@ declare type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
 export declare class SNApplication {
     environment: Environment;
     platform: Platform;
-    namespace: string;
+    private namespaceIdentifier?;
     private swapClasses?;
     private skipClasses?;
     private defaultHost?;
@@ -52,6 +53,7 @@ export declare class SNApplication {
     actionsManager?: SNActionsService;
     historyManager?: SNHistoryManager;
     private itemManager?;
+    namespaceService?: SNNamespaceService;
     private eventHandlers;
     private services;
     private streamRemovers;
@@ -69,12 +71,14 @@ export declare class SNApplication {
     /**
      * @param environment The Environment that identifies your application.
      * @param platform The Platform that identifies your application.
-     * @param deviceInterfaceThe platform-dependent implementation of utilities.
+     * @param deviceInterface The device interface that provides platform specific
+     * utilities that are used to read/write raw values from/to the database or value storage.
      * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
      * @param alertService The platform-dependent implementation of alert service.
-     * @param namespace A unique identifier to namespace storage and
-     * other persistent properties. Defaults to empty string.
+     * @param namespaceIdentifier A unique identifier to namespace storage and other
+     * persistent properties. This parameter is kept for backward compatibility and/or in case
+     * you don't want SNNamespaceService to assign a dynamic namespace for you.
      * @param swapClasses Gives consumers the ability to provide their own custom
      * subclass for a service. swapClasses should be an array of key/value pairs
      * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
@@ -82,7 +86,7 @@ export declare class SNApplication {
      * @param skipClasses An array of classes to skip making services for.
      * @param defaultHost Default host to use in ApiService.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespace?: string, swapClasses?: {
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespaceIdentifier?: string, swapClasses?: {
         swap: any;
         with: any;
     }[], skipClasses?: any[], defaultHost?: string);
@@ -371,6 +375,7 @@ export declare class SNApplication {
     private createPrivilegesService;
     private createHistoryManager;
     private createActionsManager;
+    private createNamespaceService;
     private shouldSkipClass;
     private getClass;
 }

@@ -1,4 +1,5 @@
 import { getGlobalScope } from '@Lib/utils';
+import { SNNamespace } from '@Services/namespace_service';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -10,7 +11,7 @@ export abstract class DeviceInterface {
 
   public timeout: any
   public interval: any
-  protected namespace: string
+  protected namespace?: SNNamespace
 
   /**
     * @param {function} timeout
@@ -22,11 +23,9 @@ export abstract class DeviceInterface {
        perform repeatedly. Similar to setInterval.
   */
   constructor(
-    namespace: string,
     timeout: any,
     interval: any
   ) {
-    this.namespace = namespace;
     this.timeout = timeout || setTimeout.bind(getGlobalScope());
     this.interval = interval || setInterval.bind(getGlobalScope());
   }
@@ -80,20 +79,19 @@ export abstract class DeviceInterface {
 
   abstract async removeAllRawDatabasePayloads() : Promise<void>;
 
-  protected get keychainStorageKey() {
-    const keychainStorageKey = 'keychain';
-    if (this.namespace) {
-      return `${this.namespace}-${keychainStorageKey}`;
-    } else {
-      return keychainStorageKey;
-    }
+  abstract async getNamespacedKeychainValue() : Promise<any>;
+
+  abstract async setNamespacedKeychainValue(value: any) : Promise<void>;
+
+  abstract async clearNamespacedKeychainValue() : Promise<void>;
+
+  abstract async getRawKeychainValue() : Promise<any>;
+
+  abstract async clearRawKeychainValue() : Promise<void>;
+
+  public setNamespace(namespace: SNNamespace) {
+    this.namespace = namespace;
   }
-
-  abstract async getKeychainValue() : Promise<any>;
-
-  abstract async setKeychainValue(value: any) : Promise<void>;
-
-  abstract async clearKeychainValue() : Promise<void>;
 
   abstract openUrl(url: string): void;
 

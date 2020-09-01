@@ -53,6 +53,7 @@ import {
   CHANGING_PASSCODE
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
+import { SNNamespaceService } from '@Services/namespace_service';
 import { SNComponent } from './models';
 
 
@@ -81,7 +82,7 @@ export class SNApplication {
 
   public environment: Environment
   public platform: Platform
-  public namespace: string
+  private namespaceIdentifier?: string
   private swapClasses?: any[]
   private skipClasses?: any[]
   private defaultHost?: string
@@ -105,6 +106,7 @@ export class SNApplication {
   public actionsManager?: SNActionsService
   public historyManager?: SNHistoryManager
   private itemManager?: ItemManager
+  public namespaceService?: SNNamespaceService
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -125,12 +127,14 @@ export class SNApplication {
   /**
    * @param environment The Environment that identifies your application.
    * @param platform The Platform that identifies your application.
-   * @param deviceInterfaceThe platform-dependent implementation of utilities.
+   * @param deviceInterface The device interface that provides platform specific
+   * utilities that are used to read/write raw values from/to the database or value storage.
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param namespace A unique identifier to namespace storage and
-   * other persistent properties. Defaults to empty string.
+   * @param namespaceIdentifier A unique identifier to namespace storage and other
+   * persistent properties. This parameter is kept for backward compatibility and/or in case
+   * you don't want SNNamespaceService to assign a dynamic namespace for you.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
@@ -144,7 +148,7 @@ export class SNApplication {
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
     alertService: SNAlertService,
-    namespace?: string,
+    namespaceIdentifier?: string,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
     defaultHost?: string,
@@ -166,7 +170,7 @@ export class SNApplication {
     }
     this.environment = environment;
     this.platform = platform;
-    this.namespace = namespace || '';
+    this.namespaceIdentifier = namespaceIdentifier;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -181,6 +185,9 @@ export class SNApplication {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback) {
+    if (!this.namespaceIdentifier) {
+      await this.namespaceService!.initialize();
+    }
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface!.openDatabase()
       .catch((error) => {
@@ -1282,6 +1289,7 @@ export class SNApplication {
   }
 
   private constructServices() {
+    this.createNamespaceService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1323,6 +1331,7 @@ export class SNApplication {
     this.actionsManager = undefined;
     this.historyManager = undefined;
     this.itemManager = undefined;
+    this.namespaceService = undefined;
 
     this.services = [];
   }
@@ -1336,7 +1345,7 @@ export class SNApplication {
         challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
-        namespace: this.namespace
+        namespaceService: this.namespaceService!
       }
     );
     this.services.push(this.migrationService!);
@@ -1393,7 +1402,7 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
-      this.namespace,
+      this.namespaceService!,
     );
     this.services.push(this.storageService!);
   }
@@ -1487,6 +1496,11 @@ export class SNApplication {
       this.syncService!,
     );
     this.services.push(this.actionsManager!);
+  }
+
+  private createNamespaceService() {
+    this.namespaceService = new SNNamespaceService(this.deviceInterface!, this.namespaceIdentifier);
+    this.services.push(this.namespaceService!);
   }
 
   private shouldSkipClass(classCandidate: any) {

@@ -7,9 +7,9 @@ const expect = chai.expect;
 describe('storage manager', () => {
   /**
    * Items are saved in localStorage in tests.
-   * Base keys are `storage` and `last_migration_timestamp`
+   * Base keys are `storage`, `last_migration_timestamp`, and `keychain`
    */
-  const BASE_KEY_COUNT = 2;
+  const BASE_KEY_COUNT = 3;
   const BASE_ITEM_COUNT = 1; /** Default items key */
   const sharedApplication = Factory.createApplication();
 
@@ -65,7 +65,7 @@ describe('storage manager', () => {
       password: this.password,
       ephemeral: false
     });
-    const keychainValue = await this.application.deviceInterface.getKeychainValue();
+    const keychainValue = await this.application.deviceInterface.getNamespacedKeychainValue();
     expect(keychainValue.masterKey).to.be.ok;
     expect(keychainValue.serverPassword).to.not.be.ok;
   });
@@ -162,13 +162,13 @@ describe('storage manager', () => {
       email: this.email,
       password: this.password,
     });
-    expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.be.ok;
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
-    expect(await this.application.deviceInterface.getKeychainValue()).to.not.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.not.be.ok;
     await this.application.setValue('bar', 'foo');
     await this.application.removePasscode();
-    expect(await this.application.deviceInterface.getKeychainValue()).to.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.be.ok;
 
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject(
