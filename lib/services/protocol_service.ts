@@ -102,7 +102,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private itemManager?: ItemManager
   private modelManager?: PayloadManager
   private storageService?: SNStorageService
-  public crypto?: SNPureCrypto
+  public crypto: SNPureCrypto
   private operators: Record<string, SNProtocolOperator> = {}
   private keyMode = KeyMode.RootKeyNone
   private keyObservers: KeyChangeObserver[] = []
@@ -156,8 +156,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     this.modelManager = undefined;
     this.deviceInterface = undefined;
     this.storageService = undefined;
-    this.crypto!.deinit();
-    this.crypto = undefined;
+    this.crypto.deinit();
+    (this.crypto as any) = undefined;
     this.operators = {};
     this.keyObservers.length = 0;
     this.removeItemsObserver();
@@ -337,13 +337,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
 
   private createOperatorForVersion(version: ProtocolVersion): SNProtocolOperator {
     if (version === ProtocolVersion.V001) {
-      return new SNProtocolOperator001(this.crypto!);
+      return new SNProtocolOperator001(this.crypto);
     } else if (version === ProtocolVersion.V002) {
-      return new SNProtocolOperator002(this.crypto!);
+      return new SNProtocolOperator002(this.crypto);
     } else if (version === ProtocolVersion.V003) {
-      return new SNProtocolOperator003(this.crypto!);
+      return new SNProtocolOperator003(this.crypto);
     } else if (version === ProtocolVersion.V004) {
-      return new SNProtocolOperator004(this.crypto!);
+      return new SNProtocolOperator004(this.crypto);
     } else if (version === ProtocolVersion.V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {

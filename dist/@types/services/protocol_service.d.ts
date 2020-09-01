@@ -62,7 +62,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     private itemManager?;
     private modelManager?;
     private storageService?;
-    crypto?: SNPureCrypto;
+    crypto: SNPureCrypto;
     private operators;
     private keyMode;
     private keyObservers;
