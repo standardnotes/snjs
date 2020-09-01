@@ -49,6 +49,10 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountResult.keyParams.getPortableValue())
     );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier })
+    );
     const accountKey = accountResult.key;
     await application.deviceInterface.setNamespacedKeychainValue({
       mk: accountKey.masterKey,
@@ -171,6 +175,7 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
+    expect(await application.getUser().email).to.equal(identifier);
 
     await application.deinit();
   });
@@ -318,6 +323,10 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountResult.keyParams.getPortableValue())
     );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier })
+    );
     const accountKey = accountResult.key;
     expect(accountKey.version).to.equal(ProtocolVersion.V003);
     await application.deviceInterface.setNamespacedKeychainValue({
@@ -413,7 +422,7 @@ describe('2020-01-15 mobile migration', () => {
     ).to.equal(false);
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
-
+    expect(await application.getUser().email).to.equal(identifier);
     await application.deinit();
   }).timeout(10000);
 
