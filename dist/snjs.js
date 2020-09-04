@@ -9933,6 +9933,10 @@ class theme_ThemeMutator extends core_item["b" /* ItemMutator */] {
   setNotAvailOnMobile(notAvailable) {
     this.setAppDataItem(core_item["a" /* AppDataField */].NotAvailableOnMobile, notAvailable);
   }
+
+  set local_url(local_url) {
+    this.content.local_url = local_url;
+  }
   /**
    * We must not use .active because if you set that to true, it will also
    * activate that theme on desktop/web
