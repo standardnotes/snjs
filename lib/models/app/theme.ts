@@ -47,6 +47,10 @@ export class ThemeMutator extends ItemMutator {
     this.setAppDataItem(AppDataField.NotAvailableOnMobile, notAvailable);
   }
 
+  set local_url(local_url: string) {
+    this.content!.local_url = local_url;
+  }
+
   /**
    * We must not use .active because if you set that to true, it will also
    * activate that theme on desktop/web
