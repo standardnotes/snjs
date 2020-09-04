@@ -15,6 +15,7 @@ export declare class SNTheme extends SNComponent {
 export declare class ThemeMutator extends ItemMutator {
     setMobileRules(rules: any): void;
     setNotAvailOnMobile(notAvailable: boolean): void;
+    set local_url(local_url: string);
     /**
      * We must not use .active because if you set that to true, it will also
      * activate that theme on desktop/web
