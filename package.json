@@ -5,7 +5,7 @@
   "types": "dist/@types",
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
-    "bundle": "webpack --config webpack.prod.js",
+    "bundle": "webpack --config webpack.prod.js && npm run tsc",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "test": "node test-server.js"
@@ -40,7 +40,7 @@
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
     "sinon": "^9.0.2",
-    "sncrypto": "github:standardnotes/sncrypto#563e1a8b846c32c5a39897da88073417816b90c7",
+    "sncrypto": "github:standardnotes/sncrypto#0b00a2e97894743cafde05364b4917e7d799bfbf",
     "ts-loader": "^7.0.5",
     "tscpaths": "0.0.9",
     "typescript": "^3.9.5",
