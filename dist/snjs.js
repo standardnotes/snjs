@@ -17378,15 +17378,14 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     const defaultKey = itemsKeys.find(key => {
       return key.isDefault;
     });
-    /**
-     * The default key appears to be either newer or older than the user's account version
-     * We could throw an exception here, but will instead fall back to a corrective action:
-     * return any items key that corresponds to the user's version
-     */
-
     const userVersion = await this.getUserVersion();
 
     if (userVersion && userVersion !== (defaultKey === null || defaultKey === void 0 ? void 0 : defaultKey.version)) {
+      /**
+       * The default key appears to be either newer or older than the user's account version
+       * We could throw an exception here, but will instead fall back to a corrective action:
+       * return any items key that corresponds to the user's version
+       */
       console.warn("The user's default items key version is not equal to the account version.");
       return itemsKeys.find(key => key.version === userVersion);
     } else {
