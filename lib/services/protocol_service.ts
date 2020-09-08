@@ -517,7 +517,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     key?: SNRootKey | SNItemsKey
   ): Promise<PurePayload> {
     if (!payload.content) {
-      throw 'Attempting to decrypt payload that has no content.';
+      throw Error('Attempting to decrypt payload that has no content.');
     }
     const format = payload.format;
     if (format === PayloadFormat.DecryptedBareObject) {
@@ -1207,7 +1207,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const payloadVersion = payload.version!;
     if (payloadVersion === this.getLatestVersion()) {
-      throw 'No associated key found for item encrypted with latest protocol version.';
+      throw Error('No associated key found for item encrypted with latest protocol version.');
     }
     return this.defaultItemsKeyForItemVersion(payloadVersion);
   }
