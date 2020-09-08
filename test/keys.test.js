@@ -145,7 +145,7 @@ describe('keys', () => {
 
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: this.application });
-    const itemsKey = this.application.protocolService.getDefaultItemsKey();
+    const itemsKey = await this.application.protocolService.getDefaultItemsKey();
     /** Encrypt items key */
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
       itemsKey.payloadRepresentation(),
@@ -311,7 +311,7 @@ describe('keys', () => {
        * Upon signing into an 003 account, the application should delete any neverSynced items keys,
        * and create a new default items key that is the default for a given protocol version.
        */
-      const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
+      const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
       const latestVersion = this.application.protocolService.getLatestVersion();
       expect(defaultItemsKey.version).to.equal(latestVersion);
 
@@ -425,7 +425,7 @@ describe('keys', () => {
     });
     const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);
-    const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
+    const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
 
     await this.application.changePassword(
       this.password,
@@ -433,7 +433,7 @@ describe('keys', () => {
     );
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(2);
-    const newDefaultItemsKey = this.application.protocolService.getDefaultItemsKey();
+    const newDefaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
   }).timeout(5000);
 });

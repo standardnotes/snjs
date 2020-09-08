@@ -17324,7 +17324,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async handleFullSyncCompletion() {
     /** Always create a new items key after full sync, if no items key is found */
-    const currentItemsKey = this.getDefaultItemsKey();
+    const currentItemsKey = await this.getDefaultItemsKey();
 
     if (!currentItemsKey) {
       await this.createNewDefaultItemsKey();
@@ -17368,16 +17368,29 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  getDefaultItemsKey() {
+  async getDefaultItemsKey() {
     const itemsKeys = this.latestItemsKeys();
 
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
     }
 
-    return itemsKeys.find(key => {
+    const defaultKey = itemsKeys.find(key => {
       return key.isDefault;
     });
+    const userVersion = await this.getUserVersion();
+
+    if (userVersion && userVersion !== (defaultKey === null || defaultKey === void 0 ? void 0 : defaultKey.version)) {
+      /**
+       * The default key appears to be either newer or older than the user's account version
+       * We could throw an exception here, but will instead fall back to a corrective action:
+       * return any items key that corresponds to the user's version
+       */
+      console.warn("The user's default items key version is not equal to the account version.");
+      return itemsKeys.find(key => key.version === userVersion);
+    } else {
+      return defaultKey;
+    }
   }
   /**
    * When the root key changes (non-null only), we must re-encrypt all items
@@ -17440,7 +17453,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       itemTemplate = await this.operatorForVersion(operatorVersion).createItemsKey();
     }
 
-    const currentDefault = this.getDefaultItemsKey();
+    const currentDefault = await this.getDefaultItemsKey();
 
     if (currentDefault) {
       await this.itemManager.changeItemsKey(currentDefault.uuid, mutator => {
@@ -17457,7 +17470,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async changePassword(email, currentPassword, newPassword, wrappingKey) {
     const [currentRootKey, currentKeyParams] = await Promise.all([this.getRootKey(), this.getRootKeyParams()]);
-    const currentDefaultItemsKey = this.getDefaultItemsKey();
+    const currentDefaultItemsKey = await this.getDefaultItemsKey();
     const computedRootKey = await this.computeRootKey(currentPassword, currentKeyParams);
 
     if (!currentRootKey.compare(computedRootKey)) {
@@ -22462,7 +22475,7 @@ class application_SNApplication {
     await this.syncService.sync({
       awaitAll: true
     });
-    const itemsKeyWasSynced = this.protocolService.getDefaultItemsKey().updated_at.getTime() > 0;
+    const itemsKeyWasSynced = (await this.protocolService.getDefaultItemsKey()).updated_at.getTime() > 0;
 
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
