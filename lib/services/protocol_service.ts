@@ -1184,7 +1184,20 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
       return rootKey;
     } else {
-      return this.getDefaultItemsKey();
+      const defaultKey = this.getDefaultItemsKey();
+      const userVersion = await this.getUserVersion();
+      if (userVersion && userVersion !== defaultKey?.version) {
+        /**
+         * The default key appears to be either newer or older than the user's account version
+         * We could throw an exception here, but will instead fall back to a corrective action:
+         * return any items key that corresponds to the user's version
+         */
+        console.warn("The user's default items key version is not equal to the account version.");
+        const itemsKeys = this.latestItemsKeys();
+        return itemsKeys.find((key) => key.version === userVersion);
+      } else {
+        return defaultKey;
+      }
     }
   }
 
@@ -1273,7 +1286,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
 
   private async handleFullSyncCompletion() {
     /** Always create a new items key after full sync, if no items key is found */
-    const currentItemsKey = await this.getDefaultItemsKey();
+    const currentItemsKey = this.getDefaultItemsKey();
     if (!currentItemsKey) {
       await this.createNewDefaultItemsKey();
       if (this.keyMode === KeyMode.WrapperOnly) {
@@ -1311,27 +1324,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
-  public async getDefaultItemsKey() {
+  public getDefaultItemsKey() {
     const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
     }
-    const defaultKey = itemsKeys.find((key) => {
+    return itemsKeys.find((key) => {
       return key.isDefault;
     });
-
-    const userVersion = await this.getUserVersion();
-    if (userVersion && userVersion !== defaultKey?.version) {
-      /**
-       * The default key appears to be either newer or older than the user's account version
-       * We could throw an exception here, but will instead fall back to a corrective action:
-       * return any items key that corresponds to the user's version
-       */
-      console.warn("The user's default items key version is not equal to the account version.");
-      return itemsKeys.find((key) => key.version === userVersion);
-    } else {
-      return defaultKey;
-    }
   }
 
   /**
@@ -1390,7 +1390,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       /** Create independent items key */
       itemTemplate = await this.operatorForVersion(operatorVersion).createItemsKey();
     }
-    const currentDefault = await this.getDefaultItemsKey();
+    const currentDefault = this.getDefaultItemsKey();
     if (currentDefault) {
       await this.itemManager!.changeItemsKey(
         currentDefault.uuid,
@@ -1424,7 +1424,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       this.getRootKey() as Promise<SNRootKey>,
       this.getRootKeyParams() as Promise<SNRootKeyParams>,
     ]);
-    const currentDefaultItemsKey = await this.getDefaultItemsKey();
+    const currentDefaultItemsKey = this.getDefaultItemsKey();
 
     const computedRootKey = await this.computeRootKey(
       currentPassword,

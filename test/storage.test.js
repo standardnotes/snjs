@@ -4,7 +4,8 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('storage manager', () => {
+describe('storage manager', function() {
+  this.timeout(Factory.TestTimeout);
   /**
    * Items are saved in localStorage in tests.
    * Base keys are `storage`, `last_migration_timestamp`, and `keychain`
@@ -149,11 +150,11 @@ describe('storage manager', () => {
       wrappedValue
     );
     expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject);
-  }).timeout(5000);
+  });
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
-    /** 
-     * After setting passcode, we expect that the keychain has been cleared, as the account keys 
+    /**
+     * After setting passcode, we expect that the keychain has been cleared, as the account keys
      * are now wrapped in storage with the passcode. Once the passcode is removed, we expect
      * the account keys to be moved to the keychain.
      * */
@@ -175,7 +176,7 @@ describe('storage manager', () => {
       wrappedValue
     );
     expect(payload.format).to.equal(PayloadFormat.EncryptedString);
-  }).timeout(5000);
+  });
 
   it('adding account should encrypt storage with account keys', async function () {
     await this.application.setValue('foo', 'bar');
@@ -205,7 +206,7 @@ describe('storage manager', () => {
     );
     expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject);
   });
-  
+
   it('adding account then passcode should encrypt storage with account keys', async function () {
     /** Should encrypt storage with account keys and encrypt account keys with passcode */
     await this.application.setValue('foo', 'bar');
@@ -218,14 +219,14 @@ describe('storage manager', () => {
 
     /** Should not be wrapped root key yet */
     expect(await this.application.protocolService.getWrappedRootKey()).to.not.be.ok;
-    
+
     const passcode = '123';
     await this.application.setPasscode(passcode);
     await this.application.setValue('bar', 'foo');
-    
+
     /** Root key should now be wrapped */
     expect(await this.application.protocolService.getWrappedRootKey()).to.be.ok;
-  
+
     const accountKey = await this.application.protocolService.getRootKey();
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true);
     const passcodeKey = await this.application.protocolService.computeWrappingKey(passcode);
@@ -238,7 +239,7 @@ describe('storage manager', () => {
     );
     expect(decrypted.errorDecrypting).to.equal(false);
     expect(decrypted.format).to.equal(PayloadFormat.DecryptedBareObject);
-  }).timeout(5000);
+  });
 
   it('disabling storage encryption should store items without encryption', async function () {
     await Factory.registerUserToApplication({

@@ -1139,7 +1139,7 @@ export class SNApplication {
 
     /** Sync the newly created items key. Roll back on failure */
     await this.syncService!.sync({ awaitAll: true });
-    const itemsKeyWasSynced = (await this.protocolService!.getDefaultItemsKey())!.updated_at.getTime() > 0;
+    const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });

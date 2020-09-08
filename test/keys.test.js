@@ -4,7 +4,8 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('keys', () => {
+describe('keys', function() {
+  this.timeout(Factory.TestTimeout);
 
   before(async function () {
     localStorage.clear();
@@ -88,7 +89,7 @@ describe('keys', () => {
     await Factory.registerUserToApplication({ application: this.application });
     expect(this.application.protocolService.getRootKey()).to.be.ok;
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
-  }).timeout(5000);
+  });
 
   it('should use root key for encryption of storage', async function () {
     const email = 'foo';
@@ -141,7 +142,7 @@ describe('keys', () => {
     await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
       expect(error).to.not.be.ok;
     });
-  }).timeout(5000);
+  })
 
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: this.application });
@@ -184,7 +185,7 @@ describe('keys', () => {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const newestItemsKey = this.application.itemManager.itemsKeys()[0];
     expect(newestItemsKey.uuid).to.not.equal(originalItemsKey.uuid);
-  }).timeout(5000);
+  });
 
   it('should use items key for encryption of note', async function () {
     const note = Factory.createNotePayload();
@@ -302,7 +303,7 @@ describe('keys', () => {
     await this.application.setPasscode('foo');
     expect((await this.application.protocolService.validatePasscode('wrong')).valid).to.equal(false);
     expect((await this.application.protocolService.validatePasscode(passcode)).valid).to.equal(true);
-  }).timeout(5000);
+  });
 
   it('signing into 003 account should delete latest offline items key and create 003 items key',
     async function () {
@@ -330,7 +331,7 @@ describe('keys', () => {
       const rootKey = await this.application.protocolService.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
-    });
+  });
 
   it('reencrypts existing notes when logging into an 003 account', async function () {
     await Factory.createManyMappedNotes(this.application, 10);
@@ -417,7 +418,7 @@ describe('keys', () => {
       newRootKey
     );
     expect(decrypted3.errorDecrypting).to.not.be.ok;
-  }).timeout(5000);
+  });
 
   it('changing account password should create new items key', async function () {
     await Factory.registerUserToApplication({
@@ -435,5 +436,5 @@ describe('keys', () => {
     expect(this.application.itemManager.itemsKeys().length).to.equal(2);
     const newDefaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
-  }).timeout(5000);
+  });
 });
