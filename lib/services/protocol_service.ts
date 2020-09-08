@@ -49,6 +49,7 @@ import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
 import { INVALID_PASSWORD } from './api/messages';
 
 export type BackupFile = {
+  version?: ProtocolVersion
   keyParams?: any
   auth_params?: any
   items: any[]
@@ -740,6 +741,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
     }
     const data: BackupFile = {
+      version: this.getLatestVersion(),
       items: encryptedPayloads.map((p) => p.ejected())
     };
     const keyParams = await this.getRootKeyParams();
