@@ -36,11 +36,11 @@ describe('003 protocol operations', () => {
   it('generates random key', async () => {
     const length = 128;
     const key = await protocol003.crypto.generateRandomKey(length);
-    expect(key.length).to.equal(length/4);
+    expect(key.length).to.equal(length / 4);
   });
 
   it('cost minimum should throw', () => {
-    expect(() => {sharedApplication.protocolService.costMinimumForVersion('003')})
+    expect(() => { sharedApplication.protocolService.costMinimumForVersion('003') })
       .to.throw('Cost minimums only apply to versions <= 002');
   });
 
@@ -76,6 +76,32 @@ describe('003 protocol operations', () => {
     expect(key.dataAuthenticationKey).to.equal('24dfba6f42ffc07a5223440a28a574d463e99d8d4aeb68fe95f55aa8ed5fd39f');
   });
 
+  it('can decrypt item generated with web version 3.3.6', async () => {
+    const identifier = 'demo@standardnotes.org';
+    const password = 'password';
+    const keyParams = sharedApplication.protocolService.createKeyParams({
+      pw_nonce: '31107837b44d86179140b7c602a55d694243e2e9ced0c4c914ac21ad90215055',
+      identifier: identifier,
+      version: '003'
+    });
+    const key = await protocol003.computeRootKey(
+      password,
+      keyParams,
+    );
+    const payload = CreateMaxPayloadFromAnyObject({
+      'uuid': '80488ade-933a-4570-8852-5282a094fafc',
+      'content_type': 'Note',
+      'enc_item_key': '003:f385f1af03c6e16844ba685b0766a93f65c6e1813c56146376994188c40902ef:80488ade-933a-4570-8852-5282a094fafc:8af48228d965847a3fb7904e801f3958:xM1UKtXEpXytu0amQ405rpJ8KvTcNNjqNcZEWfhefZQo+25cZfNgFRniZuO2ysXyR4qWiLQlWb5pptQi1gSNakOmCNl7WiQgH7t7ia7gwz667i6nrrwVJ8vauXeyTzspr4J/NHa1LM/f8/MDxiHWVG7MvXkWqGT7qBCzcY1BXXQaMlf6g1VEDq+INPnzSZG/:eyJpZGVudGlmaWVyIjoiZGVtb0BzdGFuZGFyZG5vdGVzLm9yZyIsInB3X2Nvc3QiOjExMDAwMCwicHdfbm9uY2UiOiIzMTEwNzgzN2I0NGQ4NjE3OTE0MGI3YzYwMmE1NWQ2OTQyNDNlMmU5Y2VkMGM0YzkxNGFjMjFhZDkwMjE1MDU1IiwidmVyc2lvbiI6IjAwMyJ9',
+      'content': '003:ca505a223d3ef3ad5cd4e6f4e0d06a2bb34b8b032f60180165c37acd5a4718e3:80488ade-933a-4570-8852-5282a094fafc:bad25bb4ba935646148fe7f118c5f60d:g+eHtGG+M4ZdIevpx9xkK9mmFYo8/1JTlaDysM18nGrA3Oe3wvFTfG5PPvH50uY6PgBbWZPS+BNpsH/gVMH8T9LCreRLPVw5yRhunyva0pgsk/k4Dmi4PTsvvNqhA2F8X2LZTwuw7QlLkvOneX9cNmNDzVGmsedSWhEZXbD5jmb1Ev77Gq1kjqh2eFc7lPa/WBb52fs8FHKbO9HUGqXF49/JOunpvp76/bAydavGQ2n/abkGCoYvrtmyM1lqthBb8w60KidkC/Hm4cGAm8wNKyg58YUHCYPAlaUI0DxPGXu24Ur/6M7HdP/9puitJGUSlXA32DXABMd8DbUk6JPvJRKvQ/v4Dd3UR0h7Gdm/YME=:eyJpZGVudGlmaWVyIjoiZGVtb0BzdGFuZGFyZG5vdGVzLm9yZyIsInB3X2Nvc3QiOjExMDAwMCwicHdfbm9uY2UiOiIzMTEwNzgzN2I0NGQ4NjE3OTE0MGI3YzYwMmE1NWQ2OTQyNDNlMmU5Y2VkMGM0YzkxNGFjMjFhZDkwMjE1MDU1IiwidmVyc2lvbiI6IjAwMyJ9',
+    });
+    const decrypted = await protocol003.generateDecryptedParameters(
+      payload,
+      key
+    );
+    expect(decrypted.content.title).to.equal('Secret key');
+    expect(decrypted.content.text).to.equal('TaW8uq4cZRCNf3e4L8c7xFhsJkJdt6');
+  });
+
   it('properly encrypts and decrypts', async () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
@@ -87,7 +113,7 @@ describe('003 protocol operations', () => {
 
   it('generates existing keys for key params', async () => {
     const key = await protocol003.computeRootKey(
-      _password, 
+      _password,
       _keyParams
     );
     expect(key.compare(_key)).to.be.true;
@@ -97,9 +123,9 @@ describe('003 protocol operations', () => {
     const payload = Factory.createNotePayload();
     const key = await protocol003.createItemsKey();
     const params = await protocol003.generateEncryptedParameters(
-      payload, 
+      payload,
       PayloadFormat.EncryptedString,
-      key, 
+      key,
     );
     expect(params.content).to.be.ok;
     expect(params.enc_item_key).to.be.ok;
