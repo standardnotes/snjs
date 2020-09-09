@@ -55,7 +55,7 @@ import {
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNNamespaceService } from '@Services/namespace_service';
-import { SNComponent } from './models';
+import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion } from './protocol/versions';
 
 
@@ -483,6 +483,15 @@ export class SNApplication {
     filter?: (element: T) => boolean
   ) {
     this.itemManager!.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  public setNotesDisplayOptions(
+    tag?: SNTag,
+    sortBy?: CollectionSort,
+    direction?: SortDirection,
+    filter?: (element: SNNote) => boolean
+  ) {
+    this.itemManager!.setNotesDisplayOptions(tag, sortBy, direction, filter);
   }
 
   public getDisplayableItems(contentType: ContentType) {
