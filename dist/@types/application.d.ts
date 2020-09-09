@@ -21,7 +21,7 @@ import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
 import { SNNamespaceService } from './services/namespace_service';
-import { SNComponent } from './models';
+import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion } from './protocol/versions';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
@@ -172,8 +172,9 @@ export declare class SNApplication {
     deleteItem(item: SNItem): Promise<any>;
     deleteItemLocally(item: SNItem): Promise<void>;
     emptyTrash(): Promise<any>;
-    getTrashedItems(): import("./models").SNNote[];
+    getTrashedItems(): SNNote[];
     setDisplayOptions<T extends SNItem>(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: T) => boolean): void;
+    setNotesDisplayOptions(tag?: SNTag, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: SNNote) => boolean): void;
     getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
     /**
      * Inserts the input item by its payload properties, and marks the item as dirty.
@@ -202,13 +203,13 @@ export declare class SNApplication {
      */
     changeItems<M extends ItemMutator = ItemMutator>(uuids: UuidString[], mutate?: (mutator: M) => void, isUserModified?: boolean): Promise<(SNItem | undefined)[]>;
     getItems(contentType: ContentType | ContentType[]): SNItem[];
-    notesMatchingSmartTag(smartTag: SNSmartTag): import("./models").SNNote[];
+    notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[];
     /** Returns an item's direct references */
     referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
     /** Returns items referencing an item */
     referencingForItem(item: SNItem, contentType?: ContentType): SNItem[];
-    findTagByTitle(title: string): import("./models").SNTag | undefined;
-    findOrCreateTag(title: string): Promise<import("./models").SNTag>;
+    findTagByTitle(title: string): SNTag | undefined;
+    findOrCreateTag(title: string): Promise<SNTag>;
     getSmartTags(): SNSmartTag[];
     getNoteCount(): number;
     /**

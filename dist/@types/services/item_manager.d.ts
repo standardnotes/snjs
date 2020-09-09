@@ -38,13 +38,15 @@ export declare class ItemManager extends PureService {
     private unsubChangeObserver;
     private observers;
     private collection;
+    private notesCollection;
     private systemSmartTags;
     constructor(modelManager: PayloadManager);
+    private createCollection;
     setDisplayOptions(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
+    setNotesDisplayOptions(tag?: SNTag, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
     getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
     deinit(): void;
     resetState(): void;
-    private createCollection;
     /**
      * Returns an item for a given id
      */
@@ -92,7 +94,6 @@ export declare class ItemManager extends PureService {
      * Returns all items that an item directly references
      */
     referencesForItem(uuid: UuidString): SNItem[];
-    private onPayloadChange;
     private setPayloads;
     private notifyObservers;
     /**
