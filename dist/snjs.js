@@ -18637,7 +18637,7 @@ class item_collection_notes_view_ItemCollectionNotesView {
     if (tag === null || tag === void 0 ? void 0 : tag.isSmartTag()) {
       this.displayedList = this.notesMatchingSmartTag(tag, notes);
     } else if (tag) {
-      this.displayedList = notes.filter(note => !note.deleted && !note.trashed && tag.hasRelationshipWithItem(note));
+      this.displayedList = this.collection.elementsReferencingElement(tag).filter(element => element.content_type === content_types["a" /* ContentType */].Note && !element.deleted && !element.trashed);
     } else {
       this.displayedList = notes;
     }
