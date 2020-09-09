@@ -266,5 +266,5 @@ describe('basic auth', () => {
       expect(signinResponse.error).to.not.be.ok;
       expect(await this.application.protocolService.getRootKey()).to.be.ok;
     }
-  }).timeout(30000);
+  }).timeout(60000);
 });

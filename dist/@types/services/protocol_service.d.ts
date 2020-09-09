@@ -358,7 +358,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /**
      * @returns The SNItemsKey object to use to encrypt new or updated items.
      */
-    getDefaultItemsKey(): Promise<SNItemsKey | undefined>;
+    getDefaultItemsKey(): SNItemsKey | undefined;
     /**
      * When the root key changes (non-null only), we must re-encrypt all items
      * keys with this new root key (by simply re-syncing).

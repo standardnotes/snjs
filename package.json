@@ -40,7 +40,7 @@
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
     "sinon": "^9.0.2",
-    "sncrypto": "github:standardnotes/sncrypto#0b12b9748fde7c82e48609836838953b03c9200a",
+    "sncrypto": "github:standardnotes/sncrypto#8794c88daa967eaae493cd5fdec7506d52b257ad",
     "ts-loader": "^7.0.5",
     "tscpaths": "0.0.9",
     "typescript": "^3.9.5",
