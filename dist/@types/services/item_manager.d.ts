@@ -38,7 +38,7 @@ export declare class ItemManager extends PureService {
     private unsubChangeObserver;
     private observers;
     private collection;
-    private notesCollection;
+    private notesView;
     private systemSmartTags;
     constructor(modelManager: PayloadManager);
     private createCollection;

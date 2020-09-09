@@ -241,7 +241,7 @@ export class ItemManager extends PureService {
     for (const item of discardedItems) {
       this.collection.discard(item);
     }
-    this.notesView.needsRebuilding = true;
+    this.notesView.setNeedsRebuilding();
     await this.notifyObservers(
       changedItems,
       insertedItems,

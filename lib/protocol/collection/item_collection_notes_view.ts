@@ -1,6 +1,5 @@
 import { SNNote, SNTag, SNSmartTag, SNPredicate, SNItem, ContentType } from '../../models'
 import { ItemCollection, CollectionSort, SortDirection } from "./item_collection";
-import { SNNoteWithTags } from '@Lib/models/app/note_with_tags';
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart tag.
@@ -8,13 +7,9 @@ import { SNNoteWithTags } from '@Lib/models/app/note_with_tags';
 export class ItemCollectionNotesView {
   private displayedList: SNNote[] = [];
   private tag?: SNTag;
-  needsRebuilding = true;
+  private needsRebuilding = true;
 
   constructor(private collection: ItemCollection) {
-  }
-
-  private tags() {
-    return (this.collection.typedMap[ContentType.Tag] || []) as SNTag[];
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag, notes: SNNote[]): SNNote[] {
@@ -26,24 +21,33 @@ export class ItemCollectionNotesView {
     } else if (smartTag.isTrashTag) {
       return notes.filter(note => note.trashed && !note.deleted);
     }
-    let matchingNotes: SNNote[] = notes.filter(
+    const allNotes: SNNote[] = notes.filter(
       note => !note.trashed && !note.deleted
     );
     if (smartTag.isAllTag) {
-      return matchingNotes as SNNote[];
+      return allNotes as SNNote[];
     }
 
     if (predicate.keypathIncludesVerb('tags')) {
-      const tags = this.tags();
-      /** Populate notes with their tags */
-      matchingNotes = notes.map(note => new SNNoteWithTags(
-        note.payload,
-        tags.filter(tag => tag.hasRelationshipWithItem(note))
-      ));
+      /**
+       * A note object doesn't come with its tags, so we map the list to
+       * flattened note-like objects that also contain
+       * their tags. Having the payload properties on the same level as the note
+       * properties is necessary because SNNote has many getters that are
+       * proxies to its inner payload object.
+       */
+      return allNotes.map(note => ({
+        ...note,
+        ...note.payload,
+        tags: this.collection.elementsReferencingElement(note),
+      }))
+      .filter(note => SNPredicate.ObjectSatisfiesPredicate(note, predicate))
+      /** Map our special-case items back to notes */
+      .map(note => this.collection.map[note.uuid] as SNNote);
+    } else {
+      return allNotes
+        .filter(note => SNPredicate.ObjectSatisfiesPredicate(note, predicate));
     }
-
-    return matchingNotes
-      .filter(note => SNPredicate.ObjectSatisfiesPredicate(note, predicate));
   }
 
 
@@ -79,6 +83,10 @@ export class ItemCollectionNotesView {
     } else {
       this.displayedList = notes;
     }
+  }
+
+  setNeedsRebuilding() {
+    this.needsRebuilding = true;
   }
 
   displayElements() {
