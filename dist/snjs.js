@@ -10767,6 +10767,7 @@ function InsufficientPasswordMessage(minimum) {
 function StrictSignInFailed(current, latest) {
   return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
 }
+const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
 
 
@@ -15432,7 +15433,7 @@ class operator_SNProtocolOperator {
         content: decodedContent
       });
     } else {
-      throw "Must override generateDecryptedParameters to handle format ".concat(format, ".");
+      throw Error("Must override generateDecryptedParameters to handle format ".concat(format, "."));
     }
   }
 
@@ -16592,7 +16593,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async payloadByDecryptingPayload(payload, key) {
     if (!payload.content) {
-      throw 'Attempting to decrypt payload that has no content.';
+      throw Error('Attempting to decrypt payload that has no content.');
     }
 
     const format = payload.format;
@@ -16803,6 +16804,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
 
     const data = {
+      version: this.getLatestVersion(),
       items: encryptedPayloads.map(p => p.ejected())
     };
     const keyParams = await this.getRootKeyParams();
@@ -17264,7 +17266,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     const payloadVersion = payload.version;
 
     if (payloadVersion === this.getLatestVersion()) {
-      throw 'No associated key found for item encrypted with latest protocol version.';
+      throw Error('No associated key found for item encrypted with latest protocol version.');
     }
 
     return this.defaultItemsKeyForItemVersion(payloadVersion);
@@ -22118,6 +22120,22 @@ class application_SNApplication {
 
   async importData(data, password) {
     let awaitSync = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    if (data.version) {
+      /**
+       * Prior to 003 backup files did not have a version field so we cannot
+       * stop importing if there is no backup file version, only if there is
+       * an unsupported version.
+       */
+      const supportedVersions = this.protocolService.supportedVersions();
+
+      if (!supportedVersions.includes(data.version)) {
+        return {
+          error: UNSUPPORTED_BACKUP_FILE_VERSION
+        };
+      }
+    }
+
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(data, password);
     const validPayloads = decryptedPayloads.filter(payload => {
       return !payload.errorDecrypting;

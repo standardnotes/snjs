@@ -25,6 +25,12 @@ describe('backups', () => {
     this.application = null;
   });
 
+  it('backup file should have a version number', async function () {
+    const backupString = await this.application.createBackupFile();
+    const data = JSON.parse(backupString);
+    expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
+  });
+
   it('backup file should have correct number of items', async function () {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);

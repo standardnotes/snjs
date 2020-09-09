@@ -16,6 +16,7 @@ import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '../models/content_types';
 import { DeviceInterface } from '../device_interface';
 export declare type BackupFile = {
+    version?: ProtocolVersion;
     keyParams?: any;
     auth_params?: any;
     items: any[];
