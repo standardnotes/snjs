@@ -26,7 +26,7 @@ import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
-import { NotesCollection } from '@Lib/protocol/collection/notes_collection';
+import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -60,7 +60,7 @@ export class ItemManager extends PureService {
   private unsubChangeObserver: any
   private observers: Observer[] = []
   private collection!: ItemCollection
-  private notesCollection!: NotesCollection;
+  private notesView!: ItemCollectionNotesView;
   private systemSmartTags: SNSmartTag[]
 
   constructor(modelManager: PayloadManager) {
@@ -79,7 +79,7 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
-    this.notesCollection = new NotesCollection(this.collection);
+    this.notesView = new ItemCollectionNotesView(this.collection);
   }
 
   public setDisplayOptions(
@@ -97,12 +97,12 @@ export class ItemManager extends PureService {
     direction?: SortDirection,
     filter?: (element: any) => boolean
   ) {
-    this.notesCollection.setDisplayOptions(tag, sortBy, direction, filter);
+    this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
   }
 
   public getDisplayableItems(contentType: ContentType) {
     if (contentType === ContentType.Note) {
-      return this.notesCollection.displayElements();
+      return this.notesView.displayElements();
     }
     return this.collection.displayElements(contentType);
   }
@@ -112,7 +112,7 @@ export class ItemManager extends PureService {
     this.unsubChangeObserver = undefined;
     this.modelManager = undefined;
     (this.collection as any) = undefined;
-    (this.notesCollection as any) = undefined;
+    (this.notesView as any) = undefined;
   }
 
   resetState() {
@@ -241,7 +241,7 @@ export class ItemManager extends PureService {
     for (const item of discardedItems) {
       this.collection.discard(item);
     }
-    this.notesCollection.needsRebuilding = true;
+    this.notesView.needsRebuilding = true;
     await this.notifyObservers(
       changedItems,
       insertedItems,
@@ -714,7 +714,7 @@ export class ItemManager extends PureService {
    * Returns all notes matching the smart tag
    */
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.notesCollection.notesMatchingSmartTag(smartTag, this.notesCollection.all())
+    return this.notesView.notesMatchingSmartTag(smartTag, this.notesView.all())
   }
 
   /**

@@ -1,8 +1,11 @@
 import { SNNote, SNTag, SNSmartTag, SNPredicate, SNItem, ContentType } from '../../models'
 import { ItemCollection, CollectionSort, SortDirection } from "./item_collection";
-import { UuidString } from "@Lib/types";
+import { SNNoteWithTags } from '@Lib/models/app/note_with_tags';
 
-export class NotesCollection {
+/**
+ * A view into ItemCollection that allows filtering by tag and smart tag.
+ */
+export class ItemCollectionNotesView {
   private displayedList: SNNote[] = [];
   private tag?: SNTag;
   needsRebuilding = true;
@@ -15,7 +18,7 @@ export class NotesCollection {
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag, notes: SNNote[]): SNNote[] {
-    let predicate = smartTag.predicate;
+    const predicate = smartTag.predicate;
 
     /** Optimized special cases */
     if (smartTag.isArchiveTag) {
@@ -23,7 +26,7 @@ export class NotesCollection {
     } else if (smartTag.isTrashTag) {
       return notes.filter(note => note.trashed && !note.deleted);
     }
-    let matchingNotes: Pick<SNNote, 'uuid'>[] = notes.filter(
+    let matchingNotes: SNNote[] = notes.filter(
       note => !note.trashed && !note.deleted
     );
     if (smartTag.isAllTag) {
@@ -31,18 +34,16 @@ export class NotesCollection {
     }
 
     if (predicate.keypathIncludesVerb('tags')) {
-      /** Populate notes with their tags */
       const tags = this.tags();
-      matchingNotes = notes.map(note => ({
-        ...note,
-        ...note.payload,
-        tags: tags.filter(tag => tag.hasRelationshipWithItem(note))
-      }));
+      /** Populate notes with their tags */
+      matchingNotes = notes.map(note => new SNNoteWithTags(
+        note.payload,
+        tags.filter(tag => tag.hasRelationshipWithItem(note))
+      ));
     }
 
     return matchingNotes
-      .filter(note => SNPredicate.ObjectSatisfiesPredicate(note, predicate))
-      .map(note => this.collection.map[note.uuid] as SNNote);
+      .filter(note => SNPredicate.ObjectSatisfiesPredicate(note, predicate));
   }
 
 

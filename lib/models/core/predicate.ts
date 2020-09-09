@@ -1,6 +1,5 @@
 import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
-import { version } from 'punycode';
 type PredicateType = string[] | SNPredicate
 type PredicateArray = Array<string[]> | SNPredicate[]
 type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
