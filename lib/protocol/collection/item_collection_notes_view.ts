@@ -76,10 +76,12 @@ export class ItemCollectionNotesView {
         notes
       );
     } else if (tag) {
-      this.displayedList = notes.filter(note =>
-        !note.deleted && !note.trashed &&
-        tag.hasRelationshipWithItem(note)
-      )
+      this.displayedList = this.collection.elementsReferencingElement(tag)
+        .filter(element =>
+          element.content_type === ContentType.Note &&
+          !element.deleted &&
+          !element.trashed
+      ) as SNNote[];
     } else {
       this.displayedList = notes;
     }
