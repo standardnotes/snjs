@@ -4,7 +4,8 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online syncing', () => {
+describe('online syncing', function() {
+  this.timeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -21,7 +22,6 @@ describe('online syncing', () => {
   });
 
   beforeEach(async function () {
-    this.timeout(Factory.TestTimeout);
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -1041,7 +1041,7 @@ describe('online syncing', () => {
   });
 
   it('handles stale data in bulk', async function () {
-    /** This number must be greater than the pagination limit per sync request. 
+    /** This number must be greater than the pagination limit per sync request.
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
     const largeItemCount = 160;

@@ -221,7 +221,7 @@ describe('upgrading', () => {
 
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
-    const itemsKey = this.application.protocolService.getDefaultItemsKey();
+    const itemsKey = await this.application.protocolService.getDefaultItemsKey();
     await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid);
     expect(this.application.itemManager.itemsKeys().length).to.equal(0);
 
@@ -266,7 +266,7 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKey()).version
     ).to.equal(latestVersion);
 
-    const defaultItemsKey = this.application.protocolService.getDefaultItemsKey();
+    const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
     expect(defaultItemsKey.version).to.equal(latestVersion);
 
     /** After change, note should now be encrypted with latest protocol version */

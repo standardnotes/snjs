@@ -4,7 +4,9 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('singletons', () => {
+describe('singletons', function() {
+  this.timeout(Factory.TestTimeout);
+
   const syncOptions = {
     checkIntegrity: true
   };
@@ -138,7 +140,7 @@ describe('singletons', () => {
     expect(refreshedUserPrefs).to.be.ok;
     await this.application.sync(syncOptions);
     expect(this.application.itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
-  }).timeout(Factory.TestTimeout);
+  });
 
   it('resolves registered predicate with signing in/out', async function () {
     await this.registerUser();
@@ -160,7 +162,7 @@ describe('singletons', () => {
     this.application.sync(syncOptions);
     await this.signIn();
     await Factory.sleep(0.5);
-  }).timeout(5000);
+  });
 
   it('singletons that are deleted after download first sync should not sync to server', async function () {
     await this.registerUser();
@@ -210,7 +212,7 @@ describe('singletons', () => {
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
     const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
-  }).timeout(Factory.TestTimeout);
+  });
 
   it('resolving singleton before first sync, then signing in, should result in correct number of instances', async function () {
     await this.registerUser();
@@ -232,7 +234,7 @@ describe('singletons', () => {
     expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
     const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
     expect(allPrivs.length).to.equal(1);
-  }).timeout(Factory.TestTimeout);
+  });
 
   it('if only result is errorDecrypting, create new item', async function () {
     const payload = createPrivsPayload();

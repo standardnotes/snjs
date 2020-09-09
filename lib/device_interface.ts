@@ -52,7 +52,7 @@ export abstract class DeviceInterface {
     }
   }
 
-  abstract async getAllRawStorageKeyValues() : Promise<Record<string, any>[]>;
+  abstract async getAllRawStorageKeyValues() : Promise<{ key: string, value: unknown }[]>;
 
   abstract async setRawStorageValue(key: string, value: any) : Promise<void>;
 
@@ -62,14 +62,14 @@ export abstract class DeviceInterface {
 
   /**
    * On web platforms, databased created may be new.
-   * New databases can be because of new sessions, or if the browser deleted it. 
+   * New databases can be because of new sessions, or if the browser deleted it.
    * In this case, callers should orchestrate with the server to redownload all items
    * from scratch.
    * @returns { isNewDatabase } - True if the database was newly created
    */
   abstract async openDatabase() : Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract async getAllRawDatabasePayloads() : Promise<any[]>;
+  abstract async getAllRawDatabasePayloads() : Promise<unknown[]>;
 
   abstract async saveRawDatabasePayload(payload: any) : Promise<void>;
 

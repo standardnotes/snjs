@@ -620,7 +620,7 @@ function truncateHexString(string, desiredBits) {
  */
 
 async function sleep(milliseconds) {
-  console.warn('Sleeping for', milliseconds);
+  console.warn("Sleeping for ".concat(milliseconds, "ms"));
   return new Promise((resolve, reject) => {
     setTimeout(function () {
       resolve();
@@ -17225,7 +17225,21 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
       return rootKey;
     } else {
-      return this.getDefaultItemsKey();
+      const defaultKey = this.getDefaultItemsKey();
+      const userVersion = await this.getUserVersion();
+
+      if (userVersion && userVersion !== (defaultKey === null || defaultKey === void 0 ? void 0 : defaultKey.version)) {
+        /**
+         * The default key appears to be either newer or older than the user's account version
+         * We could throw an exception here, but will instead fall back to a corrective action:
+         * return any items key that corresponds to the user's version
+         */
+        console.warn("The user's default items key version is not equal to the account version.");
+        const itemsKeys = this.latestItemsKeys();
+        return itemsKeys.find(key => key.version === userVersion);
+      } else {
+        return defaultKey;
+      }
     }
   }
   /**

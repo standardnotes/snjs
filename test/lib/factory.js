@@ -276,6 +276,7 @@ export function tomorrow() {
 }
 
 export async function sleep(seconds) {
+  console.warn(`Test sleeping for ${seconds}s`);
   return new Promise((resolve, reject) => {
     setTimeout(function () {
       resolve();
