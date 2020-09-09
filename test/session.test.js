@@ -4,7 +4,9 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('server session', () => {
+describe('server session', function() {
+  this.timeout(Factory.TestTimeout);
+
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   const syncOptions = {
@@ -17,7 +19,6 @@ describe('server session', () => {
   });
 
   beforeEach(async function () {
-    this.timeout(Factory.TestTimeout);
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -40,7 +41,7 @@ describe('server session', () => {
     const currentSession = application.apiService.getSession();
     const timestamp = basedOnAccessToken ? currentSession.expireAt : currentSession.validUntil;
     const timeRemaining = (timestamp - Date.now()) / 1000; // in ms
-    /* 
+    /*
       If the token has not expired yet, we will return the remaining time.
       Else, there's no need to add a delay.
     */
@@ -58,7 +59,7 @@ describe('server session', () => {
     const response = await this.application.apiService.sync([]);
 
     expect(response.status).to.equal(200);
-  }).timeout(20000);
+  });
 
   it('should return the new session in the response when refreshed', async function () {
     const response = await this.application.apiService.refreshSession();
@@ -68,7 +69,7 @@ describe('server session', () => {
     expect(response.token).to.not.be.empty;
     expect(response.session.expire_at).to.be.a('number');
     expect(response.session.refresh_token).to.not.be.empty;
-  }).timeout(20000);
+  });
 
   it('should be refreshed if access token is expired', async function () {
     // Saving the current session information for later...
@@ -89,7 +90,7 @@ describe('server session', () => {
     expect(sessionBeforeSync.expireAt).to.be.lessThan(sessionAfterSync.expireAt);
     // New token should expire in the future.
     expect(sessionAfterSync.expireAt).to.be.greaterThan(Date.now());
-  }).timeout(20000);
+  });
 
   it('should be consistent between storage and apiService', async function () {
     const sessionFromStorage = await getSessionFromStorage(this.application);
@@ -113,7 +114,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(20000);
+  });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
     // Waiting enough time for the access token to expire, before performing a sign out request.
@@ -126,7 +127,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(20000);
+  });
 
   it('change password request should be successful with a valid access token', async function () {
     const changePasswordResponse = await this.application.changePassword(
@@ -145,7 +146,7 @@ describe('server session', () => {
 
     expect(loginResponse).to.be.ok;
     expect(loginResponse.status).to.be.equal(200);
-  }).timeout(20000);
+  });
 
   it('change password request should be successful after the expired access token is refreshed', async function () {
     // Waiting enough time for the access token to expire.
@@ -167,7 +168,7 @@ describe('server session', () => {
 
     expect(loginResponse).to.be.ok;
     expect(loginResponse.status).to.be.equal(200);
-  }).timeout(20000);
+  });
 
   it('change password request should fail with an invalid access token', async function () {
     const fakeSession = this.application.apiService.getSession();
@@ -187,7 +188,7 @@ describe('server session', () => {
 
     expect(loginResponse).to.be.ok;
     expect(loginResponse.status).to.be.equal(401);
-  }).timeout(20000);
+  });
 
   it('change password request should fail with an expired refresh token', async function () {
     /** Waiting for the refresh token to expire. */
@@ -235,7 +236,7 @@ describe('server session', () => {
     expect(currentSession.accessToken).to.be.ok;
     expect(currentSession.refreshToken).to.be.ok;
     expect(currentSession.expireAt).to.be.greaterThan(Date.now());
-  }).timeout(20000);
+  });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
     await sleepUntilSessionExpires(this.application, false);
@@ -254,7 +255,7 @@ describe('server session', () => {
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
-  }).timeout(20000);
+  });
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
     const fakeSession = this.application.apiService.getSession();
@@ -271,7 +272,7 @@ describe('server session', () => {
     // Access token should remain valid.
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(200);
-  }).timeout(20000);
+  });
 
   it('should fail if syncing while a session refresh is in progress', async function () {
     this.application.apiService.refreshSession();
@@ -281,7 +282,7 @@ describe('server session', () => {
 
     const errorMessage = 'Your account session is being renewed with the server. Please try your request again.';
     expect(syncResponse.error.message).to.be.equal(errorMessage);
-  }).timeout(20000);
+  });
 
   it('notes should be synced as expected after refreshing a session', async function () {
     const notesBeforeSync = await Factory.createManyMappedNotes(this.application, 5);
@@ -307,5 +308,5 @@ describe('server session', () => {
       const noteResult = await this.application.itemManager.findItem(aNoteBeforeSync.uuid);
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).to.equal(true);
     }
-  }).timeout(20000);
+  });
 });

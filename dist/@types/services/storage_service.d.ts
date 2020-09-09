@@ -87,7 +87,7 @@ export declare class SNStorageService extends PureService {
      * Clears simple values from storage only. Does not affect payloads.
      */
     clearValues(): Promise<void>;
-    getAllRawPayloads(): Promise<any[]>;
+    getAllRawPayloads(): Promise<unknown[]>;
     savePayload(payload: PurePayload): Promise<void>;
     savePayloads(decryptedPayloads: PurePayload[]): Promise<void>;
     deletePayloads(payloads: PurePayload[]): Promise<void>;

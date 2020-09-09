@@ -1186,7 +1186,20 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
       return rootKey;
     } else {
-      return this.getDefaultItemsKey();
+      const defaultKey = this.getDefaultItemsKey();
+      const userVersion = await this.getUserVersion();
+      if (userVersion && userVersion !== defaultKey?.version) {
+        /**
+         * The default key appears to be either newer or older than the user's account version
+         * We could throw an exception here, but will instead fall back to a corrective action:
+         * return any items key that corresponds to the user's version
+         */
+        console.warn("The user's default items key version is not equal to the account version.");
+        const itemsKeys = this.latestItemsKeys();
+        return itemsKeys.find((key) => key.version === userVersion);
+      } else {
+        return defaultKey;
+      }
     }
   }
 
