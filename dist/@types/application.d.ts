@@ -22,6 +22,7 @@ import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryMana
 import { DeviceInterface } from './device_interface';
 import { SNNamespaceService } from './services/namespace_service';
 import { SNComponent } from './models';
+import { ProtocolVersion } from './protocol/versions';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
 };
@@ -231,7 +232,7 @@ export declare class SNApplication {
         email?: string | undefined;
     } | undefined;
     getProtocolEncryptionDisplayName(): string;
-    getUserVersion(): Promise<import("./protocol").ProtocolVersion | undefined>;
+    getUserVersion(): Promise<ProtocolVersion | undefined>;
     /**
      * Returns true if there is an upgrade available for the account or passcode
      */
@@ -255,6 +256,8 @@ export declare class SNApplication {
     importData(data: BackupFile, password?: string, awaitSync?: boolean): Promise<{
         affectedItems: SNItem[];
         errorCount: number;
+    } | {
+        error: string;
     }>;
     /**
      * Creates a JSON string representing the backup format of all items, or just subItems

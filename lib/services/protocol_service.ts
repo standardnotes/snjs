@@ -49,6 +49,7 @@ import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
 import { INVALID_PASSWORD } from './api/messages';
 
 export type BackupFile = {
+  version?: ProtocolVersion
   keyParams?: any
   auth_params?: any
   items: any[]
@@ -517,7 +518,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     key?: SNRootKey | SNItemsKey
   ): Promise<PurePayload> {
     if (!payload.content) {
-      throw 'Attempting to decrypt payload that has no content.';
+      throw Error('Attempting to decrypt payload that has no content.');
     }
     const format = payload.format;
     if (format === PayloadFormat.DecryptedBareObject) {
@@ -740,6 +741,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       }
     }
     const data: BackupFile = {
+      version: this.getLatestVersion(),
       items: encryptedPayloads.map((p) => p.ejected())
     };
     const keyParams = await this.getRootKeyParams();
@@ -1220,7 +1222,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const payloadVersion = payload.version!;
     if (payloadVersion === this.getLatestVersion()) {
-      throw 'No associated key found for item encrypted with latest protocol version.';
+      throw Error('No associated key found for item encrypted with latest protocol version.');
     }
     return this.defaultItemsKeyForItemVersion(payloadVersion);
   }

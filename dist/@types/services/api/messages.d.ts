@@ -24,3 +24,4 @@ export declare const CHANGING_PASSCODE = "Changing passcode. Do not close the ap
 export declare const REMOVING_PASSCODE = "Removing passcode. Do not close the application until this process completes.";
 export declare function InsufficientPasswordMessage(minimum: number): string;
 export declare function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string;
+export declare const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";

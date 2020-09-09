@@ -171,7 +171,7 @@ export abstract class SNProtocolOperator {
         }
       );
     } else {
-      throw `Must override generateDecryptedParameters to handle format ${format}.`;
+      throw Error(`Must override generateDecryptedParameters to handle format ${format}.`);
     }
   }
 }

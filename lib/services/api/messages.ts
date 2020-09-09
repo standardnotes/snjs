@@ -42,3 +42,5 @@ export function InsufficientPasswordMessage(minimum: number) {
 export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion) {
   return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`;
 }
+
+export const UNSUPPORTED_BACKUP_FILE_VERSION = `This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.`

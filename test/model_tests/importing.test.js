@@ -18,6 +18,16 @@ describe('importing', () => {
     await this.application.deinit();
   });
 
+  it('should not import backups made from unsupported versions', async function () {
+    const result = await this.application.importData(
+      {
+        version: '-1',
+        items: []
+      }
+    );
+    expect(result.error).to.exist;
+  });
+
   it('importing existing data should keep relationships valid', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
