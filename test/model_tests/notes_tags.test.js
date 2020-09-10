@@ -343,6 +343,350 @@ describe('notes and tags', () => {
     note = this.application.itemManager.findItem(note.uuid);
     expect(note.content.title).to.equal('Foo');
   });
+
+  describe('Tags', function () {
+    it('should match a tag', async function () {
+      const taggedNote = await Factory.createMappedNote(this.application);
+      const tag = await this.application.findOrCreateTag('A');
+      await this.application.changeItem(tag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(taggedNote);
+      });
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      this.application.setNotesDisplayOptions(tag);
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes.length).to.equal(1);
+      expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
+    });
+  });
+
+  describe('Smart tags', function () {
+
+    it('"title", "startsWith", "Foo"', async function () {
+      const note = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'Foo 🎲' }
+        )
+      );
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'Not Foo 🎲' }
+        )
+      );
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Foo Notes',
+          predicate: {
+            keypath: 'title',
+            operator: 'startsWith',
+            value: 'Foo'
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(note.uuid);
+    });
+
+    it('"pinned", "=", true', async function () {
+      const note = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(note.uuid, (mutator) => {
+        mutator.pinned = true;
+      });
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B', pinned: false }
+        )
+      );
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Pinned',
+          predicate: {
+            keypath: 'pinned',
+            operator: '=',
+            value: true
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(note.uuid);
+    });
+
+    it('"pinned", "=", false', async function () {
+      const pinnedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(pinnedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+      });
+      const unpinnedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B' }
+        )
+      );
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Not pinned',
+          predicate: {
+            keypath: 'pinned',
+            operator: '=',
+            value: false
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(unpinnedNote.uuid);
+    });
+
+    it('"text.length", ">", 500', async function () {
+      const longNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A', text: Array(501).fill(0).join('') }
+        )
+      );
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B', text: 'b' }
+        )
+      );
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Long',
+          predicate: {
+            keypath: 'text.length',
+            operator: '>',
+            value: 500
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(longNote.uuid);
+    });
+
+    it('"updated_at", ">", "1.days.ago"', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Factory.generateUuid(),
+        password: Factory.generateUuid(),
+      });
+      const recentNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.sync();
+      const olderNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B', text: 'b' }
+        )
+      );
+      await this.application.changeItem(olderNote.uuid, (mutator) => {
+        const threeDays = 3 * 24 * 60 * 60 * 1000;
+        mutator.updated_at = new Date(Date.now() - threeDays);
+      });
+
+      /** Create an unsynced note which shouldn't get an updated_at */
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B', text: 'b' }
+        )
+      );
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'One day ago',
+          predicate: {
+            keypath: 'updated_at',
+            operator: '>',
+            value: '1.days.ago'
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(recentNote.uuid);
+    });
+
+    it('"tags.length", "=", 0', async function () {
+      const untaggedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      const taggedNote = await Factory.createMappedNote(this.application);
+      const tag = await this.application.findOrCreateTag('A');
+      await this.application.changeItem(tag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(taggedNote);
+      });
+
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Untagged',
+          predicate: {
+            keypath: 'tags.length',
+            operator: '=',
+            value: 0
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(untaggedNote.uuid);
+    });
+
+    it('"tags", "includes", ["title", "startsWith", "b"]', async function () {
+      const taggedNote = await Factory.createMappedNote(this.application);
+      const tag = await this.application.findOrCreateTag('B');
+      await this.application.changeItem(tag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(taggedNote);
+      });
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'B-tags',
+          predicate: {
+            keypath: 'tags',
+            operator: 'includes',
+            value: ['title', 'startsWith', 'B']
+          }
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(taggedNote.uuid);
+    });
+
+    it('"ignored", "and", [["pinned", "=", true], ["locked", "=", true]]', async function () {
+      const pinnedAndLockedNote = await Factory.createMappedNote(this.application);
+      await this.application.changeItem(pinnedAndLockedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+        mutator.locked = true;
+      });
+
+      const pinnedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(pinnedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+      });
+
+      const lockedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(lockedNote.uuid, (mutator) => {
+        mutator.locked = true;
+      });
+
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Pinned & Locked',
+          predicate: SNPredicate.FromArray([
+            'ignored',
+            'and',
+            [['pinned', '=', true], ['locked', '=', true]]
+          ])
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.deep.equal(matches);
+      expect(matches.length).to.equal(1);
+      expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid);
+    });
+
+    it('"ignored", "or", [["content.protected", "=", true], ["pinned", "=", true]]', async function () {
+      const protectedNote = await Factory.createMappedNote(this.application);
+      await this.application.changeItem(protectedNote.uuid, (mutator) => {
+        mutator.protected = true;
+      });
+
+      const pinnedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(pinnedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+      });
+
+      const pinnedAndProtectedNote = await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+      await this.application.changeItem(pinnedAndProtectedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+        mutator.protected = true;
+      });
+
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'A' }
+        )
+      );
+
+      const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
+        ContentType.SmartTag, {
+          title: 'Protected or Pinned',
+          predicate: SNPredicate.FromArray([
+            'ignored',
+            'or',
+            [['content.protected', '=', true], ['pinned', '=', true]]
+          ])
+        }
+      ));
+      const matches = this.application.notesMatchingSmartTag(smartTag);
+      this.application.setNotesDisplayOptions(smartTag, 'created_at', 'asc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes.length).to.equal(matches.length);
+      expect(matches.length).to.equal(3);
+      expect(matches.find(note => note.uuid === protectedNote.uuid)).to.exist;
+      expect(matches.find(note => note.uuid === pinnedNote.uuid)).to.exist;
+      expect(matches.find(note => note.uuid === pinnedAndProtectedNote.uuid)).to.exist;
+    });
+  });
 });
 
 // it.skip('deleting a tag from a note with bi-directional relationship', async function () {

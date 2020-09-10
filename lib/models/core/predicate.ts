@@ -4,8 +4,17 @@ type PredicateType = string[] | SNPredicate
 type PredicateArray = Array<string[]> | SNPredicate[]
 type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
 
+function toPredicate(object: unknown): SNPredicate {
+  if (object instanceof SNPredicate) {
+    return object;
+  }
+  if (Array.isArray(object)) {
+    return SNPredicate.FromArray(object);
+  }
+  return SNPredicate.FromJson(object);
+}
 /**
- * A local-only construct that defines a built query that can be used to 
+ * A local-only construct that defines a built query that can be used to
  * dynamically search items.
  */
 export class SNPredicate {
@@ -25,13 +34,7 @@ export class SNPredicate {
 
     if (this.isRecursive()) {
       const array = this.value as Array<any>;
-      this.value = array.map((element: any) => {
-        if (Array.isArray(element)) {
-          return SNPredicate.FromArray(element);
-        } else {
-          return element;
-        }
-      });
+      this.value = array.map(element => toPredicate(element));
     } else if(this.value === 'true' || this.value === 'false') {
       /* If value is boolean string, convert to boolean */
       this.value = JSON.parse(this.value);
@@ -66,6 +69,19 @@ export class SNPredicate {
     return this.value as PredicateArray;
   }
 
+  keypathIncludesVerb(verb: string): boolean {
+    if (this.isRecursive()) {
+      for (const value of this.value as SNPredicate[]) {
+        if (value.keypathIncludesVerb(verb)) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return this.keypath.includes(verb);
+    }
+  }
+
   static CompoundPredicate(predicates: PredicateArray) {
     return new SNPredicate(
       'ignored',
@@ -77,9 +93,7 @@ export class SNPredicate {
   static ObjectSatisfiesPredicate(object: any, predicate: PredicateType): boolean {
     /* Predicates may not always be created using the official constructor
        so if it's still an array here, convert to object */
-    if (Array.isArray(predicate)) {
-      predicate = this.FromArray(predicate);
-    }
+    predicate = toPredicate(predicate);
 
     if (predicate.isRecursive()) {
       if (predicate.operator === 'and') {
@@ -115,7 +129,7 @@ export class SNPredicate {
     }, object);
 
     const falseyValues = [false, '', null, undefined, NaN];
-    /* If the value at keyPath is undefined, either because the 
+    /* If the value at keyPath is undefined, either because the
       property is nonexistent or the value is null. */
     if (valueAtKeyPath === undefined) {
       if (predicate.operator === '!=') {
@@ -197,9 +211,6 @@ export class SNPredicate {
   }
 
   static ItemSatisfiesPredicate(item: SNItem, predicate: SNPredicate) {
-    if (Array.isArray(predicate)) {
-      predicate = SNPredicate.FromArray(predicate);
-    }
     return this.ObjectSatisfiesPredicate(item, predicate);
   }
 

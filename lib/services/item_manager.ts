@@ -26,6 +26,7 @@ import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
+import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -59,39 +60,16 @@ export class ItemManager extends PureService {
   private unsubChangeObserver: any
   private observers: Observer[] = []
   private collection!: ItemCollection
+  private notesView!: ItemCollectionNotesView;
   private systemSmartTags: SNSmartTag[]
 
   constructor(modelManager: PayloadManager) {
     super();
     this.modelManager = modelManager;
+    this.systemSmartTags = BuildSmartTags();
     this.createCollection();
     this.unsubChangeObserver = this.modelManager
-      .addObserver(ContentType.Any, this.onPayloadChange.bind(this));
-    this.systemSmartTags = BuildSmartTags();
-  }
-
-  public setDisplayOptions(
-    contentType: ContentType,
-    sortBy?: CollectionSort,
-    direction?: SortDirection,
-    filter?: (element: any) => boolean
-  ) {
-    this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
-  }
-
-  public getDisplayableItems(contentType: ContentType) {
-    return this.collection.displayElements(contentType);
-  }
-
-  public deinit() {
-    this.unsubChangeObserver();
-    this.unsubChangeObserver = undefined;
-    this.modelManager = undefined;
-    (this.collection as any) = undefined;
-  }
-
-  resetState() {
-    this.createCollection();
+      .addObserver(ContentType.Any, this.setPayloads.bind(this));
   }
 
   private createCollection() {
@@ -101,6 +79,50 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
+    this.notesView = new ItemCollectionNotesView(this.collection);
+  }
+
+  public setDisplayOptions(
+    contentType: ContentType,
+    sortBy?: CollectionSort,
+    direction?: SortDirection,
+    filter?: (element: any) => boolean
+  ) {
+    if (contentType === ContentType.Note) {
+      console.warn(
+        `Called setDisplayOptions with ContentType.Note. ` +
+        `setNotesDisplayOptions should be used instead.`
+      );
+    }
+    this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  public setNotesDisplayOptions(
+    tag?: SNTag,
+    sortBy?: CollectionSort,
+    direction?: SortDirection,
+    filter?: (element: any) => boolean
+  ) {
+    this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
+  }
+
+  public getDisplayableItems(contentType: ContentType) {
+    if (contentType === ContentType.Note) {
+      return this.notesView.displayElements();
+    }
+    return this.collection.displayElements(contentType);
+  }
+
+  public deinit() {
+    this.unsubChangeObserver();
+    this.unsubChangeObserver = undefined;
+    this.modelManager = undefined;
+    (this.collection as any) = undefined;
+    (this.notesView as any) = undefined;
+  }
+
+  resetState() {
+    this.createCollection();
   }
 
   /**
@@ -151,7 +173,7 @@ export class ItemManager extends PureService {
   * Returns all non-deleted notes
   */
   get notes() {
-    return this.collection.displayElements(ContentType.Note) as SNNote[];
+    return this.notesView.displayElements();
   }
 
   /**
@@ -208,22 +230,6 @@ export class ItemManager extends PureService {
     return this.findItems(uuids) as SNItem[];
   }
 
-  private async onPayloadChange(
-    changed: PurePayload[],
-    inserted: PurePayload[],
-    discarded: PurePayload[],
-    source?: PayloadSource,
-    sourceKey?: string
-  ) {
-    return this.setPayloads(
-      changed,
-      inserted,
-      discarded,
-      source,
-      sourceKey
-    );
-  }
-
   private async setPayloads(
     changed: PurePayload[],
     inserted: PurePayload[],
@@ -241,6 +247,7 @@ export class ItemManager extends PureService {
     for (const item of discardedItems) {
       this.collection.discard(item);
     }
+    this.notesView.setNeedsRebuilding();
     await this.notifyObservers(
       changedItems,
       insertedItems,
@@ -277,7 +284,7 @@ export class ItemManager extends PureService {
       ) {
         continue;
       }
-      await observer.callback(
+      observer.callback(
         filteredChanged,
         filteredInserted,
         filteredDiscarded,
@@ -713,13 +720,7 @@ export class ItemManager extends PureService {
    * Returns all notes matching the smart tag
    */
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    const contentTypePredicate = new SNPredicate('content_type', '=', ContentType.Note);
-    const predicates = [contentTypePredicate, smartTag.predicate];
-    if (!smartTag.isTrashTag) {
-      const notTrashedPredicate = new SNPredicate('content.trashed', '=', false);
-      predicates.push(notTrashedPredicate);
-    }
-    return this.itemsMatchingPredicates(predicates) as SNNote[];
+    return this.notesView.notesMatchingSmartTag(smartTag, this.notesView.all())
   }
 
   /**

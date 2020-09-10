@@ -16,6 +16,7 @@ export declare class SNPredicate {
     isRecursive(): boolean;
     arrayRepresentation(): PredicateValue[];
     valueAsArray(): PredicateArray;
+    keypathIncludesVerb(verb: string): boolean;
     static CompoundPredicate(predicates: PredicateArray): SNPredicate;
     static ObjectSatisfiesPredicate(object: any, predicate: PredicateType): boolean;
     /**

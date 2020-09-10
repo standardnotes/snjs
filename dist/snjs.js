@@ -1939,10 +1939,23 @@ var ConflictStrategy;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SNPredicate; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 
+
+function toPredicate(object) {
+  if (object instanceof SNPredicate) {
+    return object;
+  }
+
+  if (Array.isArray(object)) {
+    return SNPredicate.FromArray(object);
+  }
+
+  return SNPredicate.FromJson(object);
+}
 /**
  * A local-only construct that defines a built query that can be used to
  * dynamically search items.
  */
+
 
 class SNPredicate {
   constructor(keypath, operator, value) {
@@ -1952,13 +1965,7 @@ class SNPredicate {
 
     if (this.isRecursive()) {
       const array = this.value;
-      this.value = array.map(element => {
-        if (Array.isArray(element)) {
-          return SNPredicate.FromArray(element);
-        } else {
-          return element;
-        }
-      });
+      this.value = array.map(element => toPredicate(element));
     } else if (this.value === 'true' || this.value === 'false') {
       /* If value is boolean string, convert to boolean */
       this.value = JSON.parse(this.value);
@@ -1985,6 +1992,20 @@ class SNPredicate {
     return this.value;
   }
 
+  keypathIncludesVerb(verb) {
+    if (this.isRecursive()) {
+      for (const value of this.value) {
+        if (value.keypathIncludesVerb(verb)) {
+          return true;
+        }
+      }
+
+      return false;
+    } else {
+      return this.keypath.includes(verb);
+    }
+  }
+
   static CompoundPredicate(predicates) {
     return new SNPredicate('ignored', 'and', predicates);
   }
@@ -1992,9 +2013,7 @@ class SNPredicate {
   static ObjectSatisfiesPredicate(object, predicate) {
     /* Predicates may not always be created using the official constructor
        so if it's still an array here, convert to object */
-    if (Array.isArray(predicate)) {
-      predicate = this.FromArray(predicate);
-    }
+    predicate = toPredicate(predicate);
 
     if (predicate.isRecursive()) {
       if (predicate.operator === 'and') {
@@ -2113,10 +2132,6 @@ class SNPredicate {
   }
 
   static ItemSatisfiesPredicate(item, predicate) {
-    if (Array.isArray(predicate)) {
-      predicate = SNPredicate.FromArray(predicate);
-    }
-
     return this.ObjectSatisfiesPredicate(item, predicate);
   }
 
@@ -13282,6 +13297,11 @@ class collection_MutableCollection {
     return this.findAll(uuids);
   }
 
+  referencesForElement(element) {
+    const uuids = this.referenceMap.getDirectRelationships(element.uuid);
+    return this.findAll(uuids);
+  }
+
   conflictsOf(uuid) {
     const uuids = this.conflictMap.getDirectRelationships(uuid);
     return this.findAll(uuids);
@@ -18556,7 +18576,98 @@ class item_collection_ItemCollection extends collection_MutableCollection {
   }
 
 }
+// CONCATENATED MODULE: ./lib/protocol/collection/item_collection_notes_view.ts
+function item_collection_notes_view_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function item_collection_notes_view_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { item_collection_notes_view_ownKeys(Object(source), true).forEach(function (key) { item_collection_notes_view_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { item_collection_notes_view_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function item_collection_notes_view_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+/**
+ * A view into ItemCollection that allows filtering by tag and smart tag.
+ */
+
+class item_collection_notes_view_ItemCollectionNotesView {
+  constructor(collection) {
+    this.collection = collection;
+    this.displayedList = [];
+    this.needsRebuilding = true;
+  }
+
+  notesMatchingSmartTag(smartTag, notes) {
+    const predicate = smartTag.predicate;
+    /** Optimized special cases */
+
+    if (smartTag.isArchiveTag) {
+      return notes.filter(note => note.archived && !note.trashed && !note.deleted);
+    } else if (smartTag.isTrashTag) {
+      return notes.filter(note => note.trashed && !note.deleted);
+    }
+
+    const allNotes = notes.filter(note => !note.trashed && !note.deleted);
+
+    if (smartTag.isAllTag) {
+      return allNotes;
+    }
+
+    if (predicate.keypathIncludesVerb('tags')) {
+      /**
+       * A note object doesn't come with its tags, so we map the list to
+       * flattened note-like objects that also contain
+       * their tags. Having the payload properties on the same level as the note
+       * properties is necessary because SNNote has many getters that are
+       * proxies to its inner payload object.
+       */
+      return allNotes.map(note => item_collection_notes_view_objectSpread(item_collection_notes_view_objectSpread(item_collection_notes_view_objectSpread({}, note), note.payload), {}, {
+        tags: this.collection.elementsReferencingElement(note)
+      })).filter(note => core_predicate["a" /* SNPredicate */].ObjectSatisfiesPredicate(note, predicate))
+      /** Map our special-case items back to notes */
+      .map(note => this.collection.map[note.uuid]);
+    } else {
+      return allNotes.filter(note => core_predicate["a" /* SNPredicate */].ObjectSatisfiesPredicate(note, predicate));
+    }
+  }
+
+  setDisplayOptions(tag, sortBy, direction, filter) {
+    this.collection.setDisplayOptions(content_types["a" /* ContentType */].Note, sortBy, direction, filter);
+    this.tag = tag;
+    this.needsRebuilding = true;
+  }
+
+  rebuildList() {
+    const tag = this.tag;
+    const notes = this.collection.displayElements(content_types["a" /* ContentType */].Note);
+
+    if (tag === null || tag === void 0 ? void 0 : tag.isSmartTag()) {
+      this.displayedList = this.notesMatchingSmartTag(tag, notes);
+    } else if (tag) {
+      this.displayedList = this.collection.referencesForElement(tag).filter(element => element.content_type === content_types["a" /* ContentType */].Note && !element.deleted && !element.trashed);
+    } else {
+      this.displayedList = notes;
+    }
+  }
+
+  setNeedsRebuilding() {
+    this.needsRebuilding = true;
+  }
+
+  displayElements() {
+    if (this.needsRebuilding) {
+      this.rebuildList();
+      this.needsRebuilding = false;
+    }
+
+    return this.displayedList.slice();
+  }
+
+  all() {
+    return this.collection.all(content_types["a" /* ContentType */].Note);
+  }
+
+}
 // CONCATENATED MODULE: ./lib/services/item_manager.ts
+
 
 
 
@@ -18593,28 +18704,9 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     super();
     this.observers = [];
     this.modelManager = modelManager;
-    this.createCollection();
-    this.unsubChangeObserver = this.modelManager.addObserver(content_types["a" /* ContentType */].Any, this.onPayloadChange.bind(this));
     this.systemSmartTags = BuildSmartTags();
-  }
-
-  setDisplayOptions(contentType, sortBy, direction, filter) {
-    this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
-  }
-
-  getDisplayableItems(contentType) {
-    return this.collection.displayElements(contentType);
-  }
-
-  deinit() {
-    this.unsubChangeObserver();
-    this.unsubChangeObserver = undefined;
-    this.modelManager = undefined;
-    this.collection = undefined;
-  }
-
-  resetState() {
     this.createCollection();
+    this.unsubChangeObserver = this.modelManager.addObserver(content_types["a" /* ContentType */].Any, this.setPayloads.bind(this));
   }
 
   createCollection() {
@@ -18624,6 +18716,39 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].Component, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].SmartTag, CollectionSort.Title, 'asc');
+    this.notesView = new item_collection_notes_view_ItemCollectionNotesView(this.collection);
+  }
+
+  setDisplayOptions(contentType, sortBy, direction, filter) {
+    if (contentType === content_types["a" /* ContentType */].Note) {
+      console.warn("Called setDisplayOptions with ContentType.Note. " + "setNotesDisplayOptions should be used instead.");
+    }
+
+    this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  setNotesDisplayOptions(tag, sortBy, direction, filter) {
+    this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
+  }
+
+  getDisplayableItems(contentType) {
+    if (contentType === content_types["a" /* ContentType */].Note) {
+      return this.notesView.displayElements();
+    }
+
+    return this.collection.displayElements(contentType);
+  }
+
+  deinit() {
+    this.unsubChangeObserver();
+    this.unsubChangeObserver = undefined;
+    this.modelManager = undefined;
+    this.collection = undefined;
+    this.notesView = undefined;
+  }
+
+  resetState() {
+    this.createCollection();
   }
   /**
    * Returns an item for a given id
@@ -18682,7 +18807,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   get notes() {
-    return this.collection.displayElements(content_types["a" /* ContentType */].Note);
+    return this.notesView.displayElements();
   }
   /**
   * Returns all non-deleted tags
@@ -18743,10 +18868,6 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     return this.findItems(uuids);
   }
 
-  async onPayloadChange(changed, inserted, discarded, source, sourceKey) {
-    return this.setPayloads(changed, inserted, discarded, source, sourceKey);
-  }
-
   async setPayloads(changed, inserted, discarded, source, sourceKey) {
     const changedItems = changed.map(p => CreateItemFromPayload(p));
     const insertedItems = inserted.map(p => CreateItemFromPayload(p));
@@ -18762,6 +18883,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
       this.collection.discard(item);
     }
 
+    this.notesView.setNeedsRebuilding();
     await this.notifyObservers(changedItems, insertedItems, discardedItems, source, sourceKey);
   }
 
@@ -18783,7 +18905,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
         continue;
       }
 
-      await observer.callback(filteredChanged, filteredInserted, filteredDiscarded, source, sourceKey);
+      observer.callback(filteredChanged, filteredInserted, filteredDiscarded, source, sourceKey);
     }
   }
   /**
@@ -19169,15 +19291,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   notesMatchingSmartTag(smartTag) {
-    const contentTypePredicate = new core_predicate["a" /* SNPredicate */]('content_type', '=', content_types["a" /* ContentType */].Note);
-    const predicates = [contentTypePredicate, smartTag.predicate];
-
-    if (!smartTag.isTrashTag) {
-      const notTrashedPredicate = new core_predicate["a" /* SNPredicate */]('content.trashed', '=', false);
-      predicates.push(notTrashedPredicate);
-    }
-
-    return this.itemsMatchingPredicates(predicates);
+    return this.notesView.notesMatchingSmartTag(smartTag, this.notesView.all());
   }
   /**
    * Returns the smart tag corresponding to the "Trash" tag.
@@ -21815,6 +21929,10 @@ class application_SNApplication {
 
   setDisplayOptions(contentType, sortBy, direction, filter) {
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
+  }
+
+  setNotesDisplayOptions(tag, sortBy, direction, filter) {
+    this.itemManager.setNotesDisplayOptions(tag, sortBy, direction, filter);
   }
 
   getDisplayableItems(contentType) {
