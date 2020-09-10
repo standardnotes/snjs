@@ -14817,7 +14817,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {}
     };
-    const keychainValue = await this.services.deviceInterface.getNamespacedKeychainValue();
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileBiometricsPrefs);
 
     if (biometricPrefs) {
