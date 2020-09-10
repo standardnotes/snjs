@@ -107,6 +107,10 @@ export class ItemManager extends PureService {
     return this.collection.displayElements(contentType);
   }
 
+  public getDisplayableNotes(): SNNote[] {
+    return this.notesView.displayElements();
+  }
+
   public deinit() {
     this.unsubChangeObserver();
     this.unsubChangeObserver = undefined;

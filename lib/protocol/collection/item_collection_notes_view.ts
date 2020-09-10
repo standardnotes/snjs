@@ -76,7 +76,7 @@ export class ItemCollectionNotesView {
         notes
       );
     } else if (tag) {
-      this.displayedList = this.collection.elementsReferencingElement(tag)
+      this.displayedList = this.collection.referencesForElement(tag)
         .filter(element =>
           element.content_type === ContentType.Note &&
           !element.deleted &&

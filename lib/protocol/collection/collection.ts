@@ -22,17 +22,17 @@ export class MutableCollection<T extends Payloadable> {
   /** An array of uuids of items that are not marked as deleted */
   nondeletedIndex: Set<UuidString> = new Set();
 
-  /** Maintains an index where the direct map for each item id is an array 
-   * of item ids that the item references. This is essentially equivalent to 
-   * item.content.references, but keeps state even when the item is deleted. 
-   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid]. 
-   * The inverse map for each item is an array of item ids where the items reference the 
-   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid]. 
-   * This allows callers to determine for a given item, who references it? 
+  /** Maintains an index where the direct map for each item id is an array
+   * of item ids that the item references. This is essentially equivalent to
+   * item.content.references, but keeps state even when the item is deleted.
+   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid].
+   * The inverse map for each item is an array of item ids where the items reference the
+   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid].
+   * This allows callers to determine for a given item, who references it?
    * It would be prohibitive to look this up on demand */
   readonly referenceMap: UuidMap
   /** Maintains an index for each item uuid where the value is an array of uuids that are
-   * conflicts of that item. So if Note B and C are conflicts of Note A, 
+   * conflicts of that item. So if Note B and C are conflicts of Note A,
    * conflictMap[A.uuid] == [B.uuid, C.uuid] */
   readonly conflictMap: UuidMap
 
@@ -186,6 +186,11 @@ export class MutableCollection<T extends Payloadable> {
 
   public elementsReferencingElement(element: T) {
     const uuids = this.uuidsThatReferenceUuid(element.uuid);
+    return this.findAll(uuids) as T[];
+  }
+
+  public referencesForElement(element: T) {
+    const uuids = this.referenceMap.getDirectRelationships(element.uuid);
     return this.findAll(uuids) as T[];
   }
 
