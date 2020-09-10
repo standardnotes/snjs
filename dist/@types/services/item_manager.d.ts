@@ -45,6 +45,7 @@ export declare class ItemManager extends PureService {
     setDisplayOptions(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
     setNotesDisplayOptions(tag?: SNTag, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: any) => boolean): void;
     getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
+    getDisplayableNotes(): SNNote[];
     deinit(): void;
     resetState(): void;
     /**

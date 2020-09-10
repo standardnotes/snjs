@@ -13297,6 +13297,11 @@ class collection_MutableCollection {
     return this.findAll(uuids);
   }
 
+  referencesForElement(element) {
+    const uuids = this.referenceMap.getDirectRelationships(element.uuid);
+    return this.findAll(uuids);
+  }
+
   conflictsOf(uuid) {
     const uuids = this.conflictMap.getDirectRelationships(uuid);
     return this.findAll(uuids);
@@ -18637,7 +18642,7 @@ class item_collection_notes_view_ItemCollectionNotesView {
     if (tag === null || tag === void 0 ? void 0 : tag.isSmartTag()) {
       this.displayedList = this.notesMatchingSmartTag(tag, notes);
     } else if (tag) {
-      this.displayedList = this.collection.elementsReferencingElement(tag).filter(element => element.content_type === content_types["a" /* ContentType */].Note && !element.deleted && !element.trashed);
+      this.displayedList = this.collection.referencesForElement(tag).filter(element => element.content_type === content_types["a" /* ContentType */].Note && !element.deleted && !element.trashed);
     } else {
       this.displayedList = notes;
     }
@@ -18728,6 +18733,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     }
 
     return this.collection.displayElements(contentType);
+  }
+
+  getDisplayableNotes() {
+    return this.notesView.displayElements();
   }
 
   deinit() {
@@ -21928,6 +21937,10 @@ class application_SNApplication {
 
   getDisplayableItems(contentType) {
     return this.itemManager.getDisplayableItems(contentType);
+  }
+
+  getDisplayableNotes() {
+    return this.itemManager.getDisplayableNotes();
   }
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.
