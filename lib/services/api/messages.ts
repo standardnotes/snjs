@@ -29,11 +29,13 @@ export const INVALID_PASSWORD                      = `Invalid password.`;
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE         = 'Update Recommended';
 export const OUTDATED_PROTOCOL_ALERT_IGNORE        = 'Sign In';
-export const UPGRADING_ENCRYPTION                  = `Your account's encryption version is being upgraded. Do not close the application until this process completes.`;
+export const UPGRADING_ENCRYPTION                  = `Upgrading your account's encryption version…`;
 
-export const SETTING_PASSCODE                      = `Setting passcode. Do not close the application until this process completes.`;
-export const CHANGING_PASSCODE                     = `Changing passcode. Do not close the application until this process completes.`;
-export const REMOVING_PASSCODE                     = `Removing passcode. Do not close the application until this process completes.`;
+export const SETTING_PASSCODE                      = `Setting passcode…`;
+export const CHANGING_PASSCODE                     = `Changing passcode…`;
+export const REMOVING_PASSCODE                     = `Removing passcode…`;
+
+export const DO_NOT_CLOSE_APPLICATION              = 'Do not close the application until this process completes.';
 
 export function InsufficientPasswordMessage(minimum: number) {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;

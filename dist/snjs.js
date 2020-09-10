@@ -10772,10 +10772,11 @@ const INVALID_PASSWORD_COST = "Unable to login due to insecure password paramete
 const INVALID_PASSWORD = "Invalid password.";
 const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
 const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
-const UPGRADING_ENCRYPTION = "Your account's encryption version is being upgraded. Do not close the application until this process completes.";
-const SETTING_PASSCODE = "Setting passcode. Do not close the application until this process completes.";
-const CHANGING_PASSCODE = "Changing passcode. Do not close the application until this process completes.";
-const REMOVING_PASSCODE = "Removing passcode. Do not close the application until this process completes.";
+const UPGRADING_ENCRYPTION = "Upgrading your account's encryption version\u2026";
+const SETTING_PASSCODE = "Setting passcode\u2026";
+const CHANGING_PASSCODE = "Changing passcode\u2026";
+const REMOVING_PASSCODE = "Removing passcode\u2026";
+const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
 function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
@@ -22180,7 +22181,7 @@ class application_SNApplication {
       };
     }
 
-    const dismissBlockingDialog = await this.alertService.blockingDialog(UPGRADING_ENCRYPTION);
+    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, UPGRADING_ENCRYPTION);
 
     try {
       let passcode;
@@ -22695,7 +22696,7 @@ class application_SNApplication {
   }
 
   async setPasscode(passcode) {
-    const dismissBlockingDialog = await this.alertService.blockingDialog(SETTING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, SETTING_PASSCODE);
 
     try {
       await this.setPasscodeWithoutWarning(passcode);
@@ -22705,7 +22706,7 @@ class application_SNApplication {
   }
 
   async removePasscode() {
-    const dismissBlockingDialog = await this.alertService.blockingDialog(REMOVING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, REMOVING_PASSCODE);
 
     try {
       await this.removePasscodeWithoutWarning();
@@ -22715,7 +22716,7 @@ class application_SNApplication {
   }
 
   async changePasscode(passcode) {
-    const dismissBlockingDialog = await this.alertService.blockingDialog(CHANGING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, CHANGING_PASSCODE);
 
     try {
       await this.removePasscodeWithoutWarning();
