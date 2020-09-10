@@ -54,7 +54,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify({ email: identifier })
     );
     const accountKey = accountResult.key;
-    await application.deviceInterface.setNamespacedKeychainValue({
+    await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -205,7 +205,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
-    await application.deviceInterface.setNamespacedKeychainValue({
+    await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
@@ -329,7 +329,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     const accountKey = accountResult.key;
     expect(accountKey.version).to.equal(ProtocolVersion.V003);
-    await application.deviceInterface.setNamespacedKeychainValue({
+    await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,

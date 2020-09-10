@@ -308,18 +308,14 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
-
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     );
-
     if (biometricPrefs) {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
-
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
