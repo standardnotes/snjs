@@ -10,7 +10,7 @@ export enum ProtocolVersion {
 /**
  *  -1 if a < b
  *  0 if a == b
- *  1 is a > b
+ *  1 if a > b
  */
 export function compareVersions(a: ProtocolVersion, b: ProtocolVersion) {
   const aNum = Number(a);

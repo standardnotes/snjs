@@ -28,6 +28,20 @@ describe('importing', () => {
     expect(result.error).to.exist;
   });
 
+  it('should not import backups made from 004 into 003 account', async function () {
+    await Factory.registerOldUser({
+      ...this,
+      version: ProtocolVersion.V003,
+    });
+    const result = await this.application.importData(
+      {
+        version: ProtocolVersion.V004,
+        items: []
+      }
+    );
+    expect(result.error).to.exist;
+  });
+
   it('importing existing data should keep relationships valid', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];

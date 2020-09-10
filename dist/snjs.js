@@ -1596,7 +1596,7 @@ var ProtocolVersion;
 /**
  *  -1 if a < b
  *  0 if a == b
- *  1 is a > b
+ *  1 if a > b
  */
 
 function compareVersions(a, b) {
@@ -10784,6 +10784,7 @@ function StrictSignInFailed(current, latest) {
   return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
 }
 const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
+const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
 
 
@@ -16326,7 +16327,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async getUserVersion() {
     const keyParams = await this.getAccountKeyParams();
-    return keyParams && keyParams.version;
+    return keyParams === null || keyParams === void 0 ? void 0 : keyParams.version;
   }
   /**
    * Returns true if there is an upgrade available for the account or passcode
@@ -21557,6 +21558,7 @@ function application_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
+
 /** How often to automatically sync, in milliseconds */
 
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -22139,7 +22141,7 @@ class application_SNApplication {
     return this.protocolService.getDefaultOperatorEncryptionDisplayName();
   }
 
-  async getUserVersion() {
+  getUserVersion() {
     return this.protocolService.getUserVersion();
   }
   /**
@@ -22246,11 +22248,21 @@ class application_SNApplication {
        * stop importing if there is no backup file version, only if there is
        * an unsupported version.
        */
+      const version = data.version;
       const supportedVersions = this.protocolService.supportedVersions();
 
-      if (!supportedVersions.includes(data.version)) {
+      if (!supportedVersions.includes(version)) {
         return {
           error: UNSUPPORTED_BACKUP_FILE_VERSION
+        };
+      }
+
+      const userVersion = await this.getUserVersion();
+
+      if (userVersion && Object(versions["b" /* compareVersions */])(version, userVersion) === 1) {
+        /** File was made with a greater version than the user's account */
+        return {
+          error: BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT
         };
       }
     }
