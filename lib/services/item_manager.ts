@@ -90,7 +90,7 @@ export class ItemManager extends PureService {
   ) {
     if (contentType === ContentType.Note) {
       console.warn(
-        `Called setDisplayableItems with ContentType.Note. ` +
+        `Called setDisplayOptions with ContentType.Note. ` +
         `setNotesDisplayOptions should be used instead.`
       );
     }
