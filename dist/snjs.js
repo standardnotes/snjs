@@ -18721,7 +18721,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
   setDisplayOptions(contentType, sortBy, direction, filter) {
     if (contentType === content_types["a" /* ContentType */].Note) {
-      console.warn("Called setDisplayableItems with ContentType.Note. " + "setNotesDisplayOptions should be used instead.");
+      console.warn("Called setDisplayOptions with ContentType.Note. " + "setNotesDisplayOptions should be used instead.");
     }
 
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
