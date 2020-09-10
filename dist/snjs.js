@@ -1424,6 +1424,13 @@ class ItemMutator {
     });
   }
 
+  set errorDecryptingValueChanged(errorDecryptingValueChanged) {
+    this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__[/* CopyPayload */ "b"])(this.payload, {
+      content: this.content,
+      errorDecryptingValueChanged: errorDecryptingValueChanged
+    });
+  }
+
   set updated_at(updated_at) {
     this.payload = Object(_Payloads_generator__WEBPACK_IMPORTED_MODULE_2__[/* CopyPayload */ "b"])(this.payload, {
       updated_at: updated_at

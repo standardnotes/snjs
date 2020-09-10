@@ -150,6 +150,7 @@ export declare class ItemMutator {
     setDeleted(): void;
     set lastSyncBegan(began: Date);
     set errorDecrypting(errorDecrypting: boolean);
+    set errorDecryptingValueChanged(errorDecryptingValueChanged: boolean);
     set updated_at(updated_at: Date);
     set userModifiedDate(date: Date);
     set conflictOf(conflictOf: UuidString | undefined);
