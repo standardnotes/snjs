@@ -13990,7 +13990,22 @@ class singleton_manager_SNSingletonManager extends pure_service["a" /* PureServi
 
 
   addObservers() {
-    this.removeItemObserver = this.itemManager.addObserver(content_types["a" /* ContentType */].Any, (_, inserted) => {
+    this.removeItemObserver = this.itemManager.addObserver(content_types["a" /* ContentType */].Any, (changed, inserted) => {
+      if (changed.length > 0) {
+        /**
+         * For performance reasons, we typically only queue items in the resolveQueue once,
+         * when they are inserted. However, items recently inserted could still be errorDecrypting.
+         * We want to re-run singleton logic on any items whose decryption status has changed,
+         * due to the fact that singleton logic does not apply properly if an item is not
+         * decrypted.
+         */
+        const decryptionStatusChanged = changed.filter(i => i.errorDecryptingValueChanged);
+
+        if (decryptionStatusChanged.length > 0) {
+          this.resolveQueue = this.resolveQueue.concat(decryptionStatusChanged);
+        }
+      }
+
       if (inserted.length > 0) {
         this.resolveQueue = this.resolveQueue.concat(inserted);
       }

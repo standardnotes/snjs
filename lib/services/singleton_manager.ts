@@ -15,12 +15,12 @@ import { Uuids } from '@Models/functions';
  * predicate. For example, consumers may want to ensure that only one item of contentType
  * UserPreferences exist. The singleton manager allows consumers to do this via 2 methods:
  * 1. Consumers may use `findOrCreateSingleton` to retrieve an item if it exists, or create
- *    it otherwise. While this method may serve most cases, it does not allow the consumer 
+ *    it otherwise. While this method may serve most cases, it does not allow the consumer
  *    to subscribe to changes, such as if after this method is called, a UserPreferences object
  *    is downloaded from a remote source.
  * 2. Consumers may use `registerPredicate` in order to constantly monitor a particular
  *    predicate and ensure that only 1 value exists for that predicate. This may be used in
- *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we 
+ *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we
  *    intitially create the item.
  */
 export class SNSingletonManager extends PureService {
@@ -59,18 +59,31 @@ export class SNSingletonManager extends PureService {
   }
 
   /**
-   * We only want to resolve singletons for items that are newly created (because this 
+   * We only want to resolve singletons for items that are newly created (because this
    * is when items proliferate). However, we don't want to resolve immediately on creation,
    * but instead wait for the next full sync to complete. This is so that when you download
-   * a singleton and create the object, but the items key for the item has not yet been 
-   * downloaded, the singleton will be errorDecrypting, and would be mishandled in the 
-   * overall singleton logic. By waiting for a full sync to complete, we can be sure that 
+   * a singleton and create the object, but the items key for the item has not yet been
+   * downloaded, the singleton will be errorDecrypting, and would be mishandled in the
+   * overall singleton logic. By waiting for a full sync to complete, we can be sure that
    * all items keys have been downloaded.
    */
   private addObservers() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      (_, inserted) => {
+      (changed, inserted) => {
+        if(changed.length > 0) {
+          /**
+           * For performance reasons, we typically only queue items in the resolveQueue once,
+           * when they are inserted. However, items recently inserted could still be errorDecrypting.
+           * We want to re-run singleton logic on any items whose decryption status has changed,
+           * due to the fact that singleton logic does not apply properly if an item is not
+           * decrypted.
+           */
+          const decryptionStatusChanged = changed.filter(i => i.errorDecryptingValueChanged);
+          if(decryptionStatusChanged.length > 0) {
+            this.resolveQueue = this.resolveQueue.concat(decryptionStatusChanged);
+          }
+        }
         if (inserted.length > 0) {
           this.resolveQueue = this.resolveQueue.concat(inserted);
         }
@@ -144,17 +157,17 @@ export class SNSingletonManager extends PureService {
         item.singletonStrategy
       );
     }
-    /** 
+    /**
      * Only sync if event source is FullSyncCompleted.
      * If it is on DownloadFirstSyncCompleted, we don't need to sync,
      * as a sync request will automatically be made as part of the second phase
      * of a download-first request.
      */
     if (handled.length > 0 && eventSource === SyncEvent.FullSyncCompleted) {
-      /** 
-       * Do not await. We want any local-side changes to 
+      /**
+       * Do not await. We want any local-side changes to
        * be awaited but the actual sync shouldn't be since it's non-essential
-       * Perform after timeout so that we can yield to event notifier that triggered us 
+       * Perform after timeout so that we can yield to event notifier that triggered us
        */
       setTimeout(() => {
         this.syncService!.sync();
@@ -234,7 +247,7 @@ export class SNSingletonManager extends PureService {
         }
       );
       const item = await this.itemManager!.emitItemFromPayload(dirtyPayload);
-      if(!item) {
+      if (!item) {
         throw Error(`Created singleton item should not be null ${createContentType}`);
       }
       await this.syncService!.sync();
