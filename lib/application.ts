@@ -51,7 +51,8 @@ import {
   SETTING_PASSCODE,
   REMOVING_PASSCODE,
   CHANGING_PASSCODE,
-  UNSUPPORTED_BACKUP_FILE_VERSION
+  UNSUPPORTED_BACKUP_FILE_VERSION,
+  DO_NOT_CLOSE_APPLICATION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNNamespaceService } from '@Services/namespace_service';
@@ -744,7 +745,10 @@ export class SNApplication {
     if (!response) {
       return { canceled: true };
     }
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(UPGRADING_ENCRYPTION);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+      DO_NOT_CLOSE_APPLICATION,
+      UPGRADING_ENCRYPTION
+    );
     try {
       let passcode: string | undefined;
       if (hasPasscode) {
@@ -1245,7 +1249,10 @@ export class SNApplication {
   }
 
   public async setPasscode(passcode: string) {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(SETTING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+      DO_NOT_CLOSE_APPLICATION,
+      SETTING_PASSCODE,
+    );
     try {
       await this.setPasscodeWithoutWarning(passcode);
     } finally {
@@ -1254,7 +1261,10 @@ export class SNApplication {
   }
 
   public async removePasscode() {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(REMOVING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+      DO_NOT_CLOSE_APPLICATION,
+      REMOVING_PASSCODE,
+    );
     try {
       await this.removePasscodeWithoutWarning();
     } finally {
@@ -1263,7 +1273,10 @@ export class SNApplication {
   }
 
   public async changePasscode(passcode: string) {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(CHANGING_PASSCODE);
+    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+      DO_NOT_CLOSE_APPLICATION,
+      CHANGING_PASSCODE,
+    );
     try {
       await this.removePasscodeWithoutWarning();
       await this.setPasscodeWithoutWarning(passcode);
