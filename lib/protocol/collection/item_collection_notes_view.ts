@@ -21,11 +21,11 @@ export class ItemCollectionNotesView {
     } else if (smartTag.isTrashTag) {
       return notes.filter(note => note.trashed && !note.deleted);
     }
-    const allNotes: SNNote[] = notes.filter(
+    const allNotes = notes.filter(
       note => !note.trashed && !note.deleted
     );
     if (smartTag.isAllTag) {
-      return allNotes as SNNote[];
+      return allNotes;
     }
 
     if (predicate.keypathIncludesVerb('tags')) {

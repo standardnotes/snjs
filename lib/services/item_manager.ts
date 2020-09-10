@@ -88,6 +88,12 @@ export class ItemManager extends PureService {
     direction?: SortDirection,
     filter?: (element: any) => boolean
   ) {
+    if (contentType === ContentType.Note) {
+      console.warn(
+        `Called setDisplayableItems with ContentType.Note. ` +
+        `setNotesDisplayOptions should be used instead.`
+      );
+    }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
@@ -105,10 +111,6 @@ export class ItemManager extends PureService {
       return this.notesView.displayElements();
     }
     return this.collection.displayElements(contentType);
-  }
-
-  public getDisplayableNotes(): SNNote[] {
-    return this.notesView.displayElements();
   }
 
   public deinit() {
@@ -171,7 +173,7 @@ export class ItemManager extends PureService {
   * Returns all non-deleted notes
   */
   get notes() {
-    return this.collection.displayElements(ContentType.Note) as SNNote[];
+    return this.notesView.displayElements();
   }
 
   /**

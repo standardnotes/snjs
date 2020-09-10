@@ -357,7 +357,7 @@ describe('notes and tags', () => {
         )
       );
       this.application.setNotesDisplayOptions(tag);
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
     });
@@ -388,7 +388,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(note.uuid);
@@ -420,7 +420,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(note.uuid);
@@ -452,7 +452,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid);
@@ -481,7 +481,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(longNote.uuid);
@@ -527,7 +527,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(recentNote.uuid);
@@ -557,7 +557,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(untaggedNote.uuid);
@@ -587,7 +587,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(taggedNote.uuid);
@@ -630,7 +630,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid);
@@ -679,7 +679,7 @@ describe('notes and tags', () => {
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
       this.application.setNotesDisplayOptions(smartTag, 'created_at', 'asc');
-      const displayedNotes = this.application.getDisplayableNotes();
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(matches.length);
       expect(matches.length).to.equal(3);
       expect(matches.find(note => note.uuid === protectedNote.uuid)).to.exist;

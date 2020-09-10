@@ -498,10 +498,6 @@ export class SNApplication {
     return this.itemManager!.getDisplayableItems(contentType);
   }
 
-  public getDisplayableNotes() {
-    return this.itemManager!.getDisplayableNotes();
-  }
-
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
