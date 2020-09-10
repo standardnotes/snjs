@@ -18720,6 +18720,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
   }
 
   setDisplayOptions(contentType, sortBy, direction, filter) {
+    if (contentType === content_types["a" /* ContentType */].Note) {
+      console.warn("Called setDisplayableItems with ContentType.Note. " + "setNotesDisplayOptions should be used instead.");
+    }
+
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
@@ -18733,10 +18737,6 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     }
 
     return this.collection.displayElements(contentType);
-  }
-
-  getDisplayableNotes() {
-    return this.notesView.displayElements();
   }
 
   deinit() {
@@ -18807,7 +18807,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   get notes() {
-    return this.collection.displayElements(content_types["a" /* ContentType */].Note);
+    return this.notesView.displayElements();
   }
   /**
   * Returns all non-deleted tags
@@ -21937,10 +21937,6 @@ class application_SNApplication {
 
   getDisplayableItems(contentType) {
     return this.itemManager.getDisplayableItems(contentType);
-  }
-
-  getDisplayableNotes() {
-    return this.itemManager.getDisplayableNotes();
   }
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.

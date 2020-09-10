@@ -176,7 +176,6 @@ export declare class SNApplication {
     setDisplayOptions<T extends SNItem>(contentType: ContentType, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: T) => boolean): void;
     setNotesDisplayOptions(tag?: SNTag, sortBy?: CollectionSort, direction?: SortDirection, filter?: (element: SNNote) => boolean): void;
     getDisplayableItems(contentType: ContentType): (SNItem | undefined)[];
-    getDisplayableNotes(): SNNote[];
     /**
      * Inserts the input item by its payload properties, and marks the item as dirty.
      * A sync is not performed after an item is inserted. This must be handled by the caller.
