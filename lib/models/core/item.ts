@@ -469,7 +469,6 @@ export class ItemMutator {
     )
   }
 
-
   public set updated_at(updated_at: Date) {
     this.payload = CopyPayload(
       this.payload,

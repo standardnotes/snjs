@@ -260,6 +260,60 @@ describe('singletons', function() {
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
 
+  it('if two items and one is error decrypting, should resolve after download first sync', async function () {
+    /**
+     * While signing in, a singleton item may be inserted that hasn't yet had the chance to decrypt
+     * When the singleton logic runs, it will ignore this item, and matching singletons will result
+     * in just 1, meaning the two items will not be consolidated. We want to make sure that when the item
+     * is then subsequently decrypted, singleton logic runs again for the item.
+     */
+
+    this.application.singletonManager.registerPredicate(this.extPred);
+
+    await this.application.createManagedItem(
+      ContentType.Component,
+      {
+        package_info: {
+          name: 'Extensions',
+          identifier: this.extManagerId
+        }
+      },
+      true,
+      {
+        errorDecrypting: false
+      }
+    );
+
+    const errored = await this.application.createManagedItem(
+      ContentType.Component,
+      {
+        package_info: {
+          name: 'Extensions',
+          identifier: this.extManagerId
+        }
+      },
+      true,
+      {
+        errorDecrypting: true
+      }
+    );
+
+    this.expectedItemCount += 1;
+    await this.application.sync(syncOptions);
+    /** Now mark errored as not errorDecrypting and sync */
+    const notErrored = CreateMaxPayloadFromAnyObject(
+      errored,
+      {
+        errorDecrypting: false,
+        errorDecryptingValueChanged: true
+      }
+    );
+    await this.application.modelManager.emitPayload(notErrored);
+    await this.application.syncService.sync(syncOptions);
+
+    expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
+  });
+
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrivsPayload();
     const item = await this.application.itemManager.emitItemFromPayload(
