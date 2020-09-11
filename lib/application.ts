@@ -2,7 +2,7 @@ import { CollectionSort, SortDirection } from '@Protocol/collection/item_collect
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { UuidString } from './types';
+import { UuidString, ApplicationIdentifier } from './types';
 import { SyncEvent, ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
@@ -56,7 +56,6 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
-import { SNNamespaceService } from '@Services/namespace_service';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 
@@ -86,31 +85,31 @@ export class SNApplication {
 
   public environment: Environment
   public platform: Platform
-  private namespaceIdentifier?: string
+  public identifier: ApplicationIdentifier
   private swapClasses?: any[]
   private skipClasses?: any[]
   private defaultHost?: string
+  private onDeinit?: (app: SNApplication) => void
 
   private crypto?: SNPureCrypto
   public deviceInterface?: DeviceInterface
 
-  private migrationService?: SNMigrationService
-  public alertService?: SNAlertService
-  private httpService?: SNHttpService
-  private modelManager?: PayloadManager
-  public protocolService?: SNProtocolService
-  private storageService?: SNStorageService
-  private apiService?: SNApiService
-  private sessionManager?: SNSessionManager
-  private syncService?: SNSyncService
-  private challengeService?: ChallengeService
-  public singletonManager?: SNSingletonManager
-  public componentManager?: SNComponentManager
-  public privilegesService?: SNPrivilegesService
-  public actionsManager?: SNActionsService
-  public historyManager?: SNHistoryManager
-  private itemManager?: ItemManager
-  public namespaceService?: SNNamespaceService
+  private migrationService!: SNMigrationService
+  public alertService!: SNAlertService
+  private httpService!: SNHttpService
+  private modelManager!: PayloadManager
+  public protocolService!: SNProtocolService
+  private storageService!: SNStorageService
+  private apiService!: SNApiService
+  private sessionManager!: SNSessionManager
+  private syncService!: SNSyncService
+  private challengeService!: ChallengeService
+  public singletonManager!: SNSingletonManager
+  public componentManager!: SNComponentManager
+  public privilegesService!: SNPrivilegesService
+  public actionsManager!: SNActionsService
+  public historyManager!: SNHistoryManager
+  private itemManager!: ItemManager
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -136,7 +135,7 @@ export class SNApplication {
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param namespaceIdentifier A unique identifier to namespace storage and other
+   * @param identifier A unique identifier to namespace storage and other
    * persistent properties. This parameter is kept for backward compatibility and/or in case
    * you don't want SNNamespaceService to assign a dynamic namespace for you.
    * @param swapClasses Gives consumers the ability to provide their own custom
@@ -152,10 +151,10 @@ export class SNApplication {
     deviceInterface: DeviceInterface,
     crypto: SNPureCrypto,
     alertService: SNAlertService,
-    namespaceIdentifier?: string,
+    identifier: ApplicationIdentifier,
     swapClasses?: { swap: any, with: any }[],
     skipClasses?: any[],
-    defaultHost?: string,
+    defaultHost?: string
   ) {
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
@@ -174,7 +173,7 @@ export class SNApplication {
     }
     this.environment = environment;
     this.platform = platform;
-    this.namespaceIdentifier = namespaceIdentifier;
+    this.identifier = identifier;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -189,11 +188,8 @@ export class SNApplication {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback) {
-    if (!this.namespaceIdentifier) {
-      await this.namespaceService!.initialize();
-    }
     this.setLaunchCallback(callback);
-    const databaseResult = await this.deviceInterface!.openDatabase()
+    const databaseResult = await this.deviceInterface!.openDatabase(this.identifier)
       .catch((error) => {
         this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error);
         return undefined;
@@ -668,7 +664,7 @@ export class SNApplication {
     );
     /** Push current values now */
     const matches = this.itemManager!.getItems(contentType);
-    if(matches.length > 0) {
+    if (matches.length > 0) {
       stream(matches);
     }
     this.streamRemovers.push(observer);
@@ -941,7 +937,7 @@ export class SNApplication {
    */
   async prepareForDeinit(maxWait = 0) {
     const promise = Promise.all(this.services.map((service) => service.blockDeinit()));
-    if(maxWait === 0) {
+    if (maxWait === 0) {
       await promise;
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
@@ -981,6 +977,11 @@ export class SNApplication {
     this.challengeService!.cancelChallenge(challenge);
   }
 
+  /** Set a function to be called when this application deinits */
+  public setOnDeinit(onDeinit: (app: SNApplication) => void) {
+    this.onDeinit = onDeinit;
+  }
+
   /**
    * Destroys the application instance.
    */
@@ -995,6 +996,8 @@ export class SNApplication {
     for (const service of this.services) {
       service.deinit();
     }
+    this.onDeinit && this.onDeinit!(this);
+    this.onDeinit = undefined;
     this.deviceInterface!.deinit();
     this.deviceInterface = undefined;
     this.crypto = undefined;
@@ -1338,7 +1341,6 @@ export class SNApplication {
   }
 
   private constructServices() {
-    this.createNamespaceService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1364,23 +1366,22 @@ export class SNApplication {
   }
 
   private clearServices() {
-    this.migrationService = undefined;
-    this.alertService = undefined;
-    this.httpService = undefined;
-    this.modelManager = undefined;
-    this.protocolService = undefined;
-    this.storageService = undefined;
-    this.apiService = undefined;
-    this.sessionManager = undefined;
-    this.syncService = undefined;
-    this.challengeService = undefined;
-    this.singletonManager = undefined;
-    this.componentManager = undefined;
-    this.privilegesService = undefined;
-    this.actionsManager = undefined;
-    this.historyManager = undefined;
-    this.itemManager = undefined;
-    this.namespaceService = undefined;
+    (this.migrationService as any) = undefined;
+    (this.alertService as any) = undefined;
+    (this.httpService as any) = undefined;
+    (this.modelManager as any) = undefined;
+    (this.protocolService as any) = undefined;
+    (this.storageService as any) = undefined;
+    (this.apiService as any) = undefined;
+    (this.sessionManager as any) = undefined;
+    (this.syncService as any) = undefined;
+    (this.challengeService as any) = undefined;
+    (this.singletonManager as any) = undefined;
+    (this.componentManager as any) = undefined;
+    (this.privilegesService as any) = undefined;
+    (this.actionsManager as any) = undefined;
+    (this.historyManager as any) = undefined;
+    (this.itemManager as any) = undefined;
 
     this.services = [];
   }
@@ -1394,7 +1395,7 @@ export class SNApplication {
         challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
-        namespaceService: this.namespaceService!
+        identifier: this.identifier
       }
     );
     this.services.push(this.migrationService!);
@@ -1451,7 +1452,7 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
-      this.namespaceService!,
+      this.identifier!,
     );
     this.services.push(this.storageService!);
   }
@@ -1462,6 +1463,7 @@ export class SNApplication {
       this.modelManager!,
       this.deviceInterface!,
       this.storageService!,
+      this.identifier,
       this.crypto!
     );
     this.protocolService!.onKeyStatusChange(async () => {
@@ -1545,11 +1547,6 @@ export class SNApplication {
       this.syncService!,
     );
     this.services.push(this.actionsManager!);
-  }
-
-  private createNamespaceService() {
-    this.namespaceService = new SNNamespaceService(this.deviceInterface!, this.namespaceIdentifier);
-    this.services.push(this.namespaceService!);
   }
 
   private shouldSkipClass(classCandidate: any) {

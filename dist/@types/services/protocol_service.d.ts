@@ -1,3 +1,4 @@
+import { ApplicationIdentifier } from './../types';
 import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ItemManager } from './item_manager';
@@ -60,6 +61,7 @@ export declare enum KeyMode {
  * for a particular payload, and also retrieve all available items keys.
 */
 export declare class SNProtocolService extends PureService implements EncryptionDelegate {
+    private identifier;
     private itemManager?;
     private modelManager?;
     private storageService?;
@@ -69,7 +71,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     private keyObservers;
     private rootKey?;
     private removeItemsObserver;
-    constructor(itemManager: ItemManager, modelManager: PayloadManager, deviceInterface: DeviceInterface, storageService: SNStorageService, crypto: SNPureCrypto);
+    constructor(itemManager: ItemManager, modelManager: PayloadManager, deviceInterface: DeviceInterface, storageService: SNStorageService, identifier: ApplicationIdentifier, crypto: SNPureCrypto);
     /** @override */
     deinit(): void;
     initialize(): Promise<void>;

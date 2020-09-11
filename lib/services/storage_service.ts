@@ -10,7 +10,6 @@ import { ContentType } from '@Models/content_types';
 import { isNullOrUndefined, Copy } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';
-import { SNNamespaceService } from '@Services/namespace_service';
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -60,21 +59,21 @@ type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent
 export class SNStorageService extends PureService {
 
   public encryptionDelegate?: EncryptionDelegate
-  private namespaceService?: SNNamespaceService
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicies
+  private identifier: string
 
   private values!: StorageValuesObject
 
   constructor(
     deviceInterface: DeviceInterface,
-    namespaceService: SNNamespaceService
+    identifier: string
   ) {
     super();
     this.deviceInterface = deviceInterface;
-    this.namespaceService = namespaceService;
+    this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
   }
@@ -82,7 +81,6 @@ export class SNStorageService extends PureService {
   public deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
-    this.namespaceService = undefined;
     super.deinit();
   }
 
@@ -265,8 +263,7 @@ export class SNStorageService extends PureService {
    * Default persistence key. Platforms can override as needed.
    */
   private getPersistenceKey() {
-    const namespace = this.namespaceService!.getCurrentNamespace();
-    return namespacedKey(namespace.identifier, RawStorageKey.StorageObject);
+    return namespacedKey(this.identifier, RawStorageKey.StorageObject);
   }
 
   private defaultValuesObject(
@@ -312,7 +309,7 @@ export class SNStorageService extends PureService {
   }
 
   public async getAllRawPayloads() {
-    return this.deviceInterface!.getAllRawDatabasePayloads();
+    return this.deviceInterface!.getAllRawDatabasePayloads(this.identifier);
   }
 
   public async savePayload(payload: PurePayload) {
@@ -344,7 +341,7 @@ export class SNStorageService extends PureService {
     }
 
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.saveRawDatabasePayloads(nondeleted);
+      return this.deviceInterface!.saveRawDatabasePayloads(nondeleted, this.identifier);
     });
   }
 
@@ -356,13 +353,13 @@ export class SNStorageService extends PureService {
 
   public async deletePayloadWithId(id: string) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeRawDatabasePayloadWithId(id);
+      return this.deviceInterface!.removeRawDatabasePayloadWithId(id, this.identifier);
     });
   }
 
   public async clearAllPayloads() {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeAllRawDatabasePayloads();
+      return this.deviceInterface!.removeAllRawDatabasePayloads(this.identifier);
     });
   }
 

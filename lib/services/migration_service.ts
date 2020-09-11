@@ -12,23 +12,23 @@ import { isNullOrUndefined, lastElement } from '@Lib/utils';
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
  * Migrations are registered during initial application launch, and listen for application
- * life-cycle events, and act accordingly. For example, a single migration may perform
- * a unique set of steps when the application first launches, and also other steps after the
- * application is unlocked, or after the first sync completes. Migrations live under /migrations
- * and inherit from the base Migration class.
+ * life-cycle events, and act accordingly. Migrations operate on the app-level, and not global level.
+ * For example, a single migration may perform a unique set of steps when the application
+ * first launches, and also other steps after the application is unlocked, or after the
+ * first sync completes. Migrations live under /migrations and inherit from the base Migration class.
  */
 export class SNMigrationService extends PureService {
   private activeMigrations?: Migration[]
   private handledFullSyncStage = false
 
   constructor(
-    private services?: MigrationServices
+    private services: MigrationServices
   ) {
     super();
   }
 
   public deinit() {
-    this.services = undefined;
+    (this.services as any) = undefined;
     if (this.activeMigrations) {
       this.activeMigrations.length = 0;
     }
@@ -73,7 +73,7 @@ export class SNMigrationService extends PureService {
   }
 
   private async runBaseMigration() {
-    const baseMigration = new BaseMigration(this.services!);
+    const baseMigration = new BaseMigration(this.services);
     await baseMigration.handleStage(
       ApplicationStage.PreparingForLaunch_0
     );
@@ -105,18 +105,16 @@ export class SNMigrationService extends PureService {
     return activeMigrations;
   }
 
-  /** @access private */
-  getTimeStampKey() {
-    const namespace = this.services!.namespaceService.getCurrentNamespace();
+  private getNamespacedTimeStampKey() {
     return namespacedKey(
-      namespace!.identifier,
+      this.services.identifier,
       RawStorageKey.LastMigrationTimestamp
     );
   }
 
   private async getLastMigrationTimestamp() {
-    const timestamp = await this.services!.deviceInterface.getRawStorageValue(
-      this.getTimeStampKey()
+    const timestamp = await this.services.deviceInterface.getRawStorageValue(
+      this.getNamespacedTimeStampKey()
     );
     if (isNullOrUndefined(timestamp)) {
       throw 'Timestamp should not be null. Be sure to run base migration first.';
@@ -125,8 +123,8 @@ export class SNMigrationService extends PureService {
   }
 
   private async saveLastMigrationTimestamp(timestamp: number) {
-    await this.services!.deviceInterface.setRawStorageValue(
-      this.getTimeStampKey(),
+    await this.services.deviceInterface.setRawStorageValue(
+      this.getNamespacedTimeStampKey(),
       JSON.stringify(timestamp)
     );
   }

@@ -1,4 +1,4 @@
-import { SNNamespace } from './services/namespace_service';
+import { ApplicationIdentifier } from './types';
 /**
  * Platforms must override this class to provide platform specific utilities
  * and access to the migration service, such as exposing an interface to read
@@ -6,9 +6,8 @@ import { SNNamespace } from './services/namespace_service';
  * This avoids the need for platforms to override migrations directly.
  */
 export declare abstract class DeviceInterface {
-    timeout: any;
     interval: any;
-    protected namespace?: SNNamespace;
+    timeout: any;
     /**
       * @param {function} timeout
          A platform-specific function that is fed functions to run
@@ -27,7 +26,7 @@ export declare abstract class DeviceInterface {
      * This is most likely the case for legacy values.
      * So we return the value as-is if JSON.parse throws an exception.
      */
-    getJsonParsedStorageValue(key: string): Promise<any>;
+    getJsonParsedRawStorageValue(key: string): Promise<any>;
     abstract getAllRawStorageKeyValues(): Promise<{
         key: string;
         value: unknown;
@@ -42,19 +41,18 @@ export declare abstract class DeviceInterface {
      * from scratch.
      * @returns { isNewDatabase } - True if the database was newly created
      */
-    abstract openDatabase(): Promise<{
+    abstract openDatabase(identifier: ApplicationIdentifier): Promise<{
         isNewDatabase?: boolean;
     } | undefined>;
-    abstract getAllRawDatabasePayloads(): Promise<unknown[]>;
-    abstract saveRawDatabasePayload(payload: any): Promise<void>;
-    abstract saveRawDatabasePayloads(payloads: any[]): Promise<void>;
-    abstract removeRawDatabasePayloadWithId(id: string): Promise<void>;
-    abstract removeAllRawDatabasePayloads(): Promise<void>;
-    abstract getNamespacedKeychainValue(): Promise<any>;
-    abstract setNamespacedKeychainValue(value: any): Promise<void>;
-    abstract clearNamespacedKeychainValue(): Promise<void>;
+    abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<unknown[]>;
+    abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>;
+    abstract saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>;
+    abstract removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>;
+    abstract removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>;
+    abstract getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
+    abstract setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
+    abstract clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
     abstract getRawKeychainValue(): Promise<any>;
     abstract clearRawKeychainValue(): Promise<void>;
-    setNamespace(namespace: SNNamespace): void;
     abstract openUrl(url: string): void;
 }

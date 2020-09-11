@@ -43,7 +43,7 @@ export class BaseMigration extends Migration {
         break;
       }
     }
-    const newKey = namespacedKey(this.namespace!.identifier, RawStorageKey.LastMigrationTimestamp);
+    const newKey = namespacedKey(this.services!.identifier, RawStorageKey.LastMigrationTimestamp);
     const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
     const hasNewStructure = !isNullOrUndefined(lastDate);
     if (!hasNewStructure && hasLegacyValue) {
