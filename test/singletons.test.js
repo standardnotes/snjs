@@ -301,10 +301,14 @@ describe('singletons', function() {
     this.expectedItemCount += 1;
     await this.application.sync(syncOptions);
     /** Now mark errored as not errorDecrypting and sync */
-    await this.application.itemManager.changeItem(errored.uuid, (mutator) => {
-      mutator.errorDecrypting = false;
-      mutator.errorDecryptingValueChanged = true;
-    });
+    const notErrored = CreateMaxPayloadFromAnyObject(
+      errored,
+      {
+        errorDecrypting: false,
+        errorDecryptingValueChanged: true
+      }
+    );
+    await this.application.modelManager.emitPayload(notErrored);
     await this.application.syncService.sync(syncOptions);
 
     expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
