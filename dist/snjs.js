@@ -3830,13 +3830,14 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
   if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
     return false;
-  } // Assume cyclic values are equal.
+  } // Check that cyclic values are equal.
 
 
-  var stacked = stack.get(array);
+  var arrStacked = stack.get(array);
+  var othStacked = stack.get(other);
 
-  if (stacked && stack.get(other)) {
-    return stacked == other;
+  if (arrStacked && othStacked) {
+    return arrStacked == other && othStacked == array;
   }
 
   var index = -1,
@@ -6010,13 +6011,14 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
     if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
       return false;
     }
-  } // Assume cyclic values are equal.
+  } // Check that cyclic values are equal.
 
 
-  var stacked = stack.get(object);
+  var objStacked = stack.get(object);
+  var othStacked = stack.get(other);
 
-  if (stacked && stack.get(other)) {
-    return stacked == other;
+  if (objStacked && othStacked) {
+    return objStacked == other && othStacked == object;
   }
 
   var result = true;
@@ -16656,13 +16658,10 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async payloadsByDecryptingPayloads(payloads, key) {
-    const decryptedPayloads = [];
-
-    for (const encryptedPayload of payloads) {
-      if (!encryptedPayload) {
+    const decryptItem = async item => {
+      if (!item) {
         /** Keep in-counts similar to out-counts */
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return item;
       }
       /**
        * We still want to decrypt deleted payloads if they have content in case
@@ -16670,23 +16669,20 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
        */
 
 
-      if (encryptedPayload.deleted === true && Object(utils["p" /* isNullOrUndefined */])(encryptedPayload.content)) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+      if (item.deleted === true && Object(utils["p" /* isNullOrUndefined */])(item.content)) {
+        return item;
       }
 
-      const isDecryptable = Object(utils["s" /* isString */])(encryptedPayload.content);
+      const isDecryptable = Object(utils["s" /* isString */])(item.content);
 
       if (!isDecryptable) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return item;
       }
 
-      const decryptedPayload = await this.payloadByDecryptingPayload(encryptedPayload, key);
-      decryptedPayloads.push(decryptedPayload);
-    }
+      return this.payloadByDecryptingPayload(item, key);
+    };
 
-    return decryptedPayloads;
+    return Promise.all(payloads.map(payload => decryptItem(payload)));
   }
   /**
    * If an item was attempting to decrypt, but failed, either because the keys
