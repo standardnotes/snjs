@@ -9236,6 +9236,7 @@ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator001", function() {
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator002", function() { return /* reexport */ operator_002_SNProtocolOperator002; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator003", function() { return /* reexport */ operator_003_SNProtocolOperator003; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return /* reexport */ operator_004_SNProtocolOperator004; });
+__webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return /* reexport */ root_key_SNRootKey; });
 __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return /* reexport */ device_interface_DeviceInterface; });
 __webpack_require__.d(__webpack_exports__, "SNItem", function() { return /* reexport */ core_item["d" /* SNItem */]; });
 __webpack_require__.d(__webpack_exports__, "ItemMutator", function() { return /* reexport */ core_item["b" /* ItemMutator */]; });
@@ -14461,7 +14462,31 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
   }
 
 }
+// CONCATENATED MODULE: ./node_modules/sncrypto/lib/common/utils.ts
+/**
+ * Constant-time string comparison
+ * @param a
+ * @param b
+ */
+function timingSafeEqual(a, b) {
+  const strA = String(a);
+  let strB = String(b);
+  const lenA = strA.length;
+  let result = 0;
+
+  if (lenA !== strB.length) {
+    strB = strA;
+    result = 1;
+  }
+
+  for (let i = 0; i < lenA; i++) {
+    result |= strA.charCodeAt(i) ^ strB.charCodeAt(i);
+  }
+
+  return result === 0;
+}
 // CONCATENATED MODULE: ./lib/protocol/root_key.ts
+
 
 
 
@@ -14544,7 +14569,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
     }
 
     const hasServerPassword = this.serverPassword && otherKey.serverPassword;
-    return this.masterKey === otherKey.masterKey && (!hasServerPassword || this.serverPassword === otherKey.serverPassword);
+    return timingSafeEqual(this.masterKey, otherKey.masterKey) && (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword));
   }
   /**
    * @returns Object containg key/values that should be extracted from key for local saving.
@@ -23048,6 +23073,7 @@ var application_service = __webpack_require__(77);
 var pure_payload = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
 
 
 
