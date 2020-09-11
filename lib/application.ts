@@ -51,13 +51,14 @@ import {
   SETTING_PASSCODE,
   REMOVING_PASSCODE,
   CHANGING_PASSCODE,
-  UNSUPPORTED_BACKUP_FILE_VERSION,
-  DO_NOT_CLOSE_APPLICATION
+  BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
+  DO_NOT_CLOSE_APPLICATION,
+  UNSUPPORTED_BACKUP_FILE_VERSION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNNamespaceService } from '@Services/namespace_service';
 import { SNComponent, SNTag, SNNote } from './models';
-import { ProtocolVersion } from './protocol/versions';
+import { ProtocolVersion, compareVersions } from './protocol/versions';
 
 
 /** How often to automatically sync, in milliseconds */
@@ -708,7 +709,7 @@ export class SNApplication {
     return this.protocolService!.getDefaultOperatorEncryptionDisplayName();
   }
 
-  public async getUserVersion() {
+  public getUserVersion() {
     return this.protocolService!.getUserVersion();
   }
 
@@ -811,9 +812,17 @@ export class SNApplication {
        * stop importing if there is no backup file version, only if there is
        * an unsupported version.
        */
+      const version = data.version as ProtocolVersion;
+
       const supportedVersions = this.protocolService!.supportedVersions();
-      if (!supportedVersions.includes(data.version as ProtocolVersion)) {
+      if (!supportedVersions.includes(version)) {
         return { error: UNSUPPORTED_BACKUP_FILE_VERSION };
+      }
+
+      const userVersion = await this.getUserVersion();
+      if (userVersion && compareVersions(version, userVersion) === 1) {
+        /** File was made with a greater version than the user's account */
+        return { error: BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT };
       }
     }
     const decryptedPayloads = await this.protocolService!.payloadsByDecryptingBackupFile(

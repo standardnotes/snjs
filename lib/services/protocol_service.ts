@@ -224,7 +224,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async getUserVersion() {
     const keyParams = await this.getAccountKeyParams();
-    return keyParams && keyParams.version;
+    return keyParams?.version;
   }
 
   /**
