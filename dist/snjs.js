@@ -16658,10 +16658,10 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async payloadsByDecryptingPayloads(payloads, key) {
-    const decryptItem = async item => {
-      if (!item) {
+    const decryptItem = async encryptedPayload => {
+      if (!encryptedPayload) {
         /** Keep in-counts similar to out-counts */
-        return item;
+        return encryptedPayload;
       }
       /**
        * We still want to decrypt deleted payloads if they have content in case
@@ -16669,17 +16669,17 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
        */
 
 
-      if (item.deleted === true && Object(utils["p" /* isNullOrUndefined */])(item.content)) {
-        return item;
+      if (encryptedPayload.deleted === true && Object(utils["p" /* isNullOrUndefined */])(encryptedPayload.content)) {
+        return encryptedPayload;
       }
 
-      const isDecryptable = Object(utils["s" /* isString */])(item.content);
+      const isDecryptable = Object(utils["s" /* isString */])(encryptedPayload.content);
 
       if (!isDecryptable) {
-        return item;
+        return encryptedPayload;
       }
 
-      return this.payloadByDecryptingPayload(item, key);
+      return this.payloadByDecryptingPayload(encryptedPayload, key);
     };
 
     return Promise.all(payloads.map(payload => decryptItem(payload)));
