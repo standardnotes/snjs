@@ -120,7 +120,6 @@ export class SNApplicationGroup extends PureService {
     }
     const changed = this.primaryApplication && this.primaryApplication !== application;
     this.primaryApplication = application;
-    this.notifyObserversOfAppChange();
     if (changed) {
       const descriptor = this.descriptorForApplication(application);
       descriptor.primary = true;
@@ -128,6 +127,7 @@ export class SNApplicationGroup extends PureService {
       if (currentPrimaryDescriptor) {
         currentPrimaryDescriptor.primary = false;
       }
+      this.notifyObserversOfAppChange();
       await this.persistDescriptors();
     }
   }
