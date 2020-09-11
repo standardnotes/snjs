@@ -118,16 +118,18 @@ export class SNApplicationGroup extends PureService {
     if(!this.applications.includes(application)) {
       throw Error('Application must be inserted before attempting to switch to it');
     }
-    const changed = this.primaryApplication && this.primaryApplication !== application;
+    /** If primaryApplication is presently null, we are setting it for the first time,
+     * and do not need to persist any descriptor changes */
+    const statusChange = this.primaryApplication && this.primaryApplication !== application;
     this.primaryApplication = application;
-    if (changed) {
+    this.notifyObserversOfAppChange();
+    if (statusChange) {
       const descriptor = this.descriptorForApplication(application);
       descriptor.primary = true;
       const currentPrimaryDescriptor = this.findPrimaryDescriptor();
       if (currentPrimaryDescriptor) {
         currentPrimaryDescriptor.primary = false;
       }
-      this.notifyObserversOfAppChange();
       await this.persistDescriptors();
     }
   }
