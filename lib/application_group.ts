@@ -36,6 +36,12 @@ export class SNApplicationGroup extends PureService {
     super();
   }
 
+  deinit() {
+    super.deinit();
+    this.deviceInterface.deinit();
+    (this.deviceInterface as any) = undefined;
+  }
+
   public async initialize(callback: AppGroupCallback) {
     this.callback = callback;
     this.descriptorRecord = (
@@ -59,6 +65,7 @@ export class SNApplicationGroup extends PureService {
       /** The identifier 'standardnotes' is used because this was the database name of
        * Standard Notes web/desktop */
       identifier: "standardnotes",
+      label: 'Main Application',
       primary: true
     } as ApplicationDescriptor;
     descriptorRecord[descriptor.identifier] = descriptor;
@@ -93,11 +100,8 @@ export class SNApplicationGroup extends PureService {
       this.removeDescriptor(this.descriptorForApplication(application));
     }
     const descriptors = this.getDescriptors();
-    if(descriptors.length === 0) {
+    if (descriptors.length === 0) {
       this.addNewApplication();
-    } else {
-      const descriptor = descriptors[0];
-      this.loadApplicationForDescriptor(descriptor);
     }
   }
 
@@ -129,6 +133,10 @@ export class SNApplicationGroup extends PureService {
     /** If primaryApplication is presently null, we are setting it for the first time,
      * and do not need to persist any descriptor changes */
     const statusChange = this.primaryApplication && this.primaryApplication !== application;
+    const currentPrimary = this.primaryApplication;
+    if(currentPrimary) {
+      await this.unloadApplication(currentPrimary);
+    }
     this.primaryApplication = application;
     this.notifyObserversOfAppChange();
     if (statusChange) {
@@ -142,11 +150,21 @@ export class SNApplicationGroup extends PureService {
     }
   }
 
+  public async unloadApplication(application: SNApplication) {
+    await application.lock();
+    removeFromArray(this.applications, application);
+  }
+
   private async persistDescriptors() {
     this.deviceInterface!.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
       JSON.stringify(this.descriptorRecord)
     );
+  }
+
+  public async renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
+    descriptor.label = label;
+    await this.persistDescriptors();
   }
 
   public async removeDescriptor(descriptor: ApplicationDescriptor) {
@@ -160,9 +178,10 @@ export class SNApplicationGroup extends PureService {
 
   public async addNewApplication(label?: string) {
     const identifier = await Uuid.GenerateUuid();
+    const index = this.getDescriptors().length + 1;
     const descriptor = {
       identifier: identifier,
-      label: label || identifier,
+      label: label || `Application ${index}`,
       primary: !this.primaryApplication
     } as ApplicationDescriptor;
     const application = this.buildApplication(descriptor);

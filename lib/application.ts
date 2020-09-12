@@ -997,8 +997,6 @@ export class SNApplication {
     }
     this.onDeinit && this.onDeinit!(this, source);
     this.onDeinit = undefined;
-    this.deviceInterface!.deinit();
-    this.deviceInterface = undefined;
     this.crypto = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;

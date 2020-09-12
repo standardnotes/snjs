@@ -37,6 +37,7 @@ export declare class SNApplicationGroup extends PureService {
     private notifyObserversOfAppChange;
     setPrimaryApplication(application: SNApplication): Promise<void>;
     private persistDescriptors;
+    renameDescriptor(descriptor: ApplicationDescriptor, label: string): Promise<void>;
     removeDescriptor(descriptor: ApplicationDescriptor): Promise<void>;
     private descriptorForApplication;
     addNewApplication(label?: string): Promise<void>;
