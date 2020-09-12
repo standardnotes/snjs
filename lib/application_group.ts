@@ -26,7 +26,7 @@ type AppGroupCallback = {
 type AppGroupChangeCallback = () => void
 
 export class SNApplicationGroup extends PureService {
-  public primaryApplication!: SNApplication
+  public primaryApplication?: SNApplication
   private descriptorRecord!: DescriptorRecord
   private changeObservers: AppGroupChangeCallback[] = []
   callback!: AppGroupCallback
@@ -48,7 +48,7 @@ export class SNApplicationGroup extends PureService {
       await this.deviceInterface!.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord)
     ) as DescriptorRecord;
     if (!this.descriptorRecord) {
-      this.descriptorRecord = await this.createDescriptorRecord();
+      await this.createDescriptorRecord();
     }
     const primaryDescriptor = this.findPrimaryDescriptor();
     if (!primaryDescriptor) {
@@ -56,7 +56,7 @@ export class SNApplicationGroup extends PureService {
     }
     const application = this.buildApplication(primaryDescriptor);
     this.applications.push(application);
-    this.setPrimaryApplication(application);
+    this.setPrimaryApplication(application, false);
   }
 
   private async createDescriptorRecord() {
@@ -73,7 +73,8 @@ export class SNApplicationGroup extends PureService {
       RawStorageKey.DescriptorRecord,
       JSON.stringify(descriptorRecord)
     );
-    return descriptorRecord;
+    this.descriptorRecord = descriptorRecord;
+    this.persistDescriptors();
   }
 
   public getApplications() {
@@ -95,13 +96,27 @@ export class SNApplicationGroup extends PureService {
 
   /** @callback */
   onApplicationDeinit = (application: SNApplication, source: DeinitSource) => {
+    /** If we are initiaitng this unloading via function below,
+     * we don't want any side-effects */
+    const sideffects = source !== DeinitSource.AppGroupUnload;
+    if (this.primaryApplication === application) {
+      this.primaryApplication = undefined;
+    }
     removeFromArray(this.applications, application);
     if (source === DeinitSource.SignOut) {
       this.removeDescriptor(this.descriptorForApplication(application));
-    }
-    const descriptors = this.getDescriptors();
-    if (descriptors.length === 0) {
-      this.addNewApplication();
+      if(sideffects) {
+        /** If there are no more descriptors (all accounts have been signed out),
+           * create a new blank slate app */
+        const descriptors = this.getDescriptors();
+        if (descriptors.length === 0) {
+          return this.addNewApplication();
+        }
+      }
+    } else if (source === DeinitSource.Lock && sideffects) {
+      /** Recreate the same application from scratch */
+      const descriptor = this.descriptorForApplication(application);
+      return this.loadApplicationForDescriptor(descriptor);
     }
   }
 
@@ -126,33 +141,24 @@ export class SNApplicationGroup extends PureService {
     }
   }
 
-  public async setPrimaryApplication(application: SNApplication) {
+  public async setPrimaryApplication(application: SNApplication, persist = true) {
     if (!this.applications.includes(application)) {
       throw Error('Application must be inserted before attempting to switch to it');
     }
-    /** If primaryApplication is presently null, we are setting it for the first time,
-     * and do not need to persist any descriptor changes */
-    const statusChange = this.primaryApplication && this.primaryApplication !== application;
-    const currentPrimary = this.primaryApplication;
-    if(currentPrimary) {
-      await this.unloadApplication(currentPrimary);
+    const currentPrimaryDescriptor = this.findPrimaryDescriptor();
+    if (this.primaryApplication) {
+      this.primaryApplication.deinit(DeinitSource.AppGroupUnload);
     }
     this.primaryApplication = application;
+    const descriptor = this.descriptorForApplication(application);
+    descriptor.primary = true;
+    if (currentPrimaryDescriptor) {
+      currentPrimaryDescriptor.primary = false;
+    }
     this.notifyObserversOfAppChange();
-    if (statusChange) {
-      const currentPrimaryDescriptor = this.findPrimaryDescriptor();
-      const descriptor = this.descriptorForApplication(application);
-      descriptor.primary = true;
-      if (currentPrimaryDescriptor) {
-        currentPrimaryDescriptor.primary = false;
-      }
+    if (persist) {
       await this.persistDescriptors();
     }
-  }
-
-  public async unloadApplication(application: SNApplication) {
-    await application.lock();
-    removeFromArray(this.applications, application);
   }
 
   private async persistDescriptors() {
@@ -167,9 +173,9 @@ export class SNApplicationGroup extends PureService {
     await this.persistDescriptors();
   }
 
-  public async removeDescriptor(descriptor: ApplicationDescriptor) {
+  public removeDescriptor(descriptor: ApplicationDescriptor) {
     delete this.descriptorRecord[descriptor.identifier];
-    await this.persistDescriptors();
+    return this.persistDescriptors();
   }
 
   private descriptorForApplication(application: SNApplication) {
@@ -181,8 +187,7 @@ export class SNApplicationGroup extends PureService {
     const index = this.getDescriptors().length + 1;
     const descriptor = {
       identifier: identifier,
-      label: label || `Application ${index}`,
-      primary: !this.primaryApplication
+      label: label || `Application ${index}`
     } as ApplicationDescriptor;
     const application = this.buildApplication(descriptor);
     this.applications.push(application);
