@@ -9413,6 +9413,13 @@ function namespacedKey(namespace, key) {
 // EXTERNAL MODULE: ./lib/utils.ts
 var utils = __webpack_require__(0);
 
+// CONCATENATED MODULE: ./lib/types.ts
+var DeinitSource;
+
+(function (DeinitSource) {
+  DeinitSource[DeinitSource["SignOut"] = 1] = "SignOut";
+  DeinitSource[DeinitSource["Lock"] = 2] = "Lock";
+})(DeinitSource || (DeinitSource = {}));
 // EXTERNAL MODULE: ./lib/services/pure_service.ts
 var pure_service = __webpack_require__(11);
 
@@ -9470,6 +9477,7 @@ class uuid_Uuid {
 
 
 
+
 class application_group_SNApplicationGroup extends pure_service["a" /* PureService */] {
   constructor(deviceInterface) {
     super();
@@ -9478,15 +9486,20 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     this.applications = [];
     /** @callback */
 
-    this.onApplicationDeinit = application => {
+    this.onApplicationDeinit = (application, source) => {
       Object(utils["B" /* removeFromArray */])(this.applications, application);
 
-      if (this.primaryApplication === application) {
-        this.primaryApplication = undefined;
+      if (source === DeinitSource.SignOut) {
+        this.removeDescriptor(this.descriptorForApplication(application));
       }
 
-      if (this.applications.length === 0) {
+      const descriptors = this.getDescriptors();
+
+      if (descriptors.length === 0) {
         this.addNewApplication();
+      } else {
+        const descriptor = descriptors[0];
+        this.loadApplicationForDescriptor(descriptor);
       }
     };
   }
@@ -9525,6 +9538,10 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
 
   getApplications() {
     return this.applications;
+  }
+
+  getDescriptors() {
+    return Object.keys(this.descriptorRecord).map(key => this.descriptorRecord[key]);
   }
 
   findPrimaryDescriptor() {
@@ -9574,9 +9591,9 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     this.notifyObserversOfAppChange();
 
     if (statusChange) {
+      const currentPrimaryDescriptor = this.findPrimaryDescriptor();
       const descriptor = this.descriptorForApplication(application);
       descriptor.primary = true;
-      const currentPrimaryDescriptor = this.findPrimaryDescriptor();
 
       if (currentPrimaryDescriptor) {
         currentPrimaryDescriptor.primary = false;
@@ -9588,6 +9605,11 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
 
   async persistDescriptors() {
     this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord));
+  }
+
+  async removeDescriptor(descriptor) {
+    delete this.descriptorRecord[descriptor.identifier];
+    await this.persistDescriptors();
   }
 
   descriptorForApplication(application) {
@@ -9606,6 +9628,21 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     this.descriptorRecord[identifier] = descriptor;
     await this.setPrimaryApplication(application);
     await this.persistDescriptors();
+  }
+
+  applicationForDescriptor(descriptor) {
+    return this.applications.find(app => app.identifier === descriptor.identifier);
+  }
+
+  async loadApplicationForDescriptor(descriptor) {
+    let application = this.applicationForDescriptor(descriptor);
+
+    if (!application) {
+      application = this.buildApplication(descriptor);
+      this.applications.push(application);
+    }
+
+    await this.setPrimaryApplication(application);
   }
 
   buildApplication(descriptor) {
@@ -21613,6 +21650,7 @@ function application_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
+
 /** How often to automatically sync, in milliseconds */
 
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -22470,7 +22508,7 @@ class application_SNApplication {
    */
 
 
-  deinit() {
+  deinit(source) {
     clearInterval(this.autoSyncInterval);
 
     for (const uninstallObserver of this.serviceObservers) {
@@ -22485,7 +22523,7 @@ class application_SNApplication {
       service.deinit();
     }
 
-    this.onDeinit && this.onDeinit(this);
+    this.onDeinit && this.onDeinit(this, source);
     this.onDeinit = undefined;
     this.deviceInterface.deinit();
     this.deviceInterface = undefined;
@@ -22715,7 +22753,7 @@ class application_SNApplication {
     await this.storageService.clearAllData();
     await this.notifyEvent(events["a" /* ApplicationEvent */].SignedOut);
     await this.prepareForDeinit();
-    this.deinit();
+    this.deinit(DeinitSource.SignOut);
   }
 
   async validateAccountPassword(password) {
@@ -22762,7 +22800,7 @@ class application_SNApplication {
      * but only up to a certain limit. */
     const MaximumWaitTime = 500;
     await this.prepareForDeinit(MaximumWaitTime);
-    return this.deinit();
+    return this.deinit(DeinitSource.Lock);
   }
 
   async setPasscode(passcode) {

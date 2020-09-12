@@ -1,6 +1,6 @@
 import { CollectionSort, SortDirection } from './protocol/collection/item_collection';
 import { PayloadOverride } from './protocol/payloads/generator';
-import { UuidString, ApplicationIdentifier } from './types';
+import { UuidString, ApplicationIdentifier, DeinitSource } from './types';
 import { ApplicationEvent } from './events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
@@ -302,11 +302,12 @@ export declare class SNApplication {
     }): void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     cancelChallenge(challenge: Challenge): void;
-    setOnDeinit(onDeinit: (app: SNApplication) => void): void;
+    /** Set a function to be called when this application deinits */
+    setOnDeinit(onDeinit: (app: SNApplication, source: DeinitSource) => void): void;
     /**
      * Destroys the application instance.
      */
-    deinit(): void;
+    deinit(source: DeinitSource): void;
     /**
      * Returns the wrapping key for operations that require resaving the root key
      * (changing the account password, signing in, registering, or upgrading protocol)

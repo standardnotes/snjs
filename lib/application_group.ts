@@ -1,6 +1,6 @@
 import { RawStorageKey } from '@Lib/storage_keys';
 import { removeFromArray, findInArray } from '@Lib/utils';
-import { UuidString } from './types';
+import { UuidString, DeinitSource } from './types';
 import { SNApplication } from './application';
 import { PureService } from '@Services/pure_service';
 import { DeviceInterface } from '@Lib/device_interface';
@@ -73,6 +73,10 @@ export class SNApplicationGroup extends PureService {
     return this.applications;
   }
 
+  public getDescriptors() {
+    return Object.keys(this.descriptorRecord).map(key => this.descriptorRecord[key]!);
+  }
+
   private findPrimaryDescriptor() {
     for (const key of Object.keys(this.descriptorRecord)) {
       const descriptor = this.descriptorRecord[key]!;
@@ -83,13 +87,17 @@ export class SNApplicationGroup extends PureService {
   }
 
   /** @callback */
-  onApplicationDeinit = (application: SNApplication) => {
+  onApplicationDeinit = (application: SNApplication, source: DeinitSource) => {
     removeFromArray(this.applications, application);
-    if (this.primaryApplication === application) {
-      (this.primaryApplication as any) = undefined;
+    if (source === DeinitSource.SignOut) {
+      this.removeDescriptor(this.descriptorForApplication(application));
     }
-    if (this.applications.length === 0) {
+    const descriptors = this.getDescriptors();
+    if(descriptors.length === 0) {
       this.addNewApplication();
+    } else {
+      const descriptor = descriptors[0];
+      this.loadApplicationForDescriptor(descriptor);
     }
   }
 
@@ -114,8 +122,8 @@ export class SNApplicationGroup extends PureService {
     }
   }
 
-  private async setPrimaryApplication(application: SNApplication) {
-    if(!this.applications.includes(application)) {
+  public async setPrimaryApplication(application: SNApplication) {
+    if (!this.applications.includes(application)) {
       throw Error('Application must be inserted before attempting to switch to it');
     }
     /** If primaryApplication is presently null, we are setting it for the first time,
@@ -124,9 +132,9 @@ export class SNApplicationGroup extends PureService {
     this.primaryApplication = application;
     this.notifyObserversOfAppChange();
     if (statusChange) {
+      const currentPrimaryDescriptor = this.findPrimaryDescriptor();
       const descriptor = this.descriptorForApplication(application);
       descriptor.primary = true;
-      const currentPrimaryDescriptor = this.findPrimaryDescriptor();
       if (currentPrimaryDescriptor) {
         currentPrimaryDescriptor.primary = false;
       }
@@ -139,6 +147,11 @@ export class SNApplicationGroup extends PureService {
       RawStorageKey.DescriptorRecord,
       JSON.stringify(this.descriptorRecord)
     );
+  }
+
+  public async removeDescriptor(descriptor: ApplicationDescriptor) {
+    delete this.descriptorRecord[descriptor.identifier];
+    await this.persistDescriptors();
   }
 
   private descriptorForApplication(application: SNApplication) {
@@ -157,6 +170,19 @@ export class SNApplicationGroup extends PureService {
     this.descriptorRecord[identifier] = descriptor;
     await this.setPrimaryApplication(application);
     await this.persistDescriptors();
+  }
+
+  private applicationForDescriptor(descriptor: ApplicationDescriptor) {
+    return this.applications.find(app => app.identifier === descriptor.identifier);
+  }
+
+  public async loadApplicationForDescriptor(descriptor: ApplicationDescriptor) {
+    let application = this.applicationForDescriptor(descriptor);
+    if (!application) {
+      application = this.buildApplication(descriptor);
+      this.applications.push(application);
+    }
+    await this.setPrimaryApplication(application);
   }
 
   private buildApplication(descriptor: ApplicationDescriptor) {

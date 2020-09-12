@@ -2,7 +2,7 @@ import { CollectionSort, SortDirection } from '@Protocol/collection/item_collect
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { UuidString, ApplicationIdentifier } from './types';
+import { UuidString, ApplicationIdentifier, DeinitSource } from './types';
 import { SyncEvent, ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
@@ -18,7 +18,7 @@ import { ValueCallback } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
-import { removeFromArray, isNullOrUndefined, isString, sleep } from '@Lib/utils';
+import { removeFromArray, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -59,7 +59,6 @@ import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 
-
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 
@@ -89,7 +88,7 @@ export class SNApplication {
   private swapClasses?: any[]
   private skipClasses?: any[]
   private defaultHost?: string
-  private onDeinit?: (app: SNApplication) => void
+  private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
   private crypto?: SNPureCrypto
   public deviceInterface?: DeviceInterface
@@ -978,14 +977,14 @@ export class SNApplication {
   }
 
   /** Set a function to be called when this application deinits */
-  public setOnDeinit(onDeinit: (app: SNApplication) => void) {
+  public setOnDeinit(onDeinit: (app: SNApplication, source: DeinitSource) => void) {
     this.onDeinit = onDeinit;
   }
 
   /**
    * Destroys the application instance.
    */
-  public deinit() {
+  public deinit(source: DeinitSource) {
     clearInterval(this.autoSyncInterval);
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver();
@@ -996,7 +995,7 @@ export class SNApplication {
     for (const service of this.services) {
       service.deinit();
     }
-    this.onDeinit && this.onDeinit!(this);
+    this.onDeinit && this.onDeinit!(this, source);
     this.onDeinit = undefined;
     this.deviceInterface!.deinit();
     this.deviceInterface = undefined;
@@ -1213,7 +1212,7 @@ export class SNApplication {
     await this.storageService!.clearAllData();
     await this.notifyEvent(ApplicationEvent.SignedOut);
     await this.prepareForDeinit();
-    this.deinit();
+    this.deinit(DeinitSource.SignOut);
   }
 
   public async validateAccountPassword(password: string) {
@@ -1257,7 +1256,7 @@ export class SNApplication {
      * but only up to a certain limit. */
     const MaximumWaitTime = 500;
     await this.prepareForDeinit(MaximumWaitTime);
-    return this.deinit();
+    return this.deinit(DeinitSource.Lock);
   }
 
   public async setPasscode(passcode: string) {
