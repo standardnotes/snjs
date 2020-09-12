@@ -111,6 +111,8 @@ export class SNApplicationGroup extends PureService {
         const descriptors = this.getDescriptors();
         if (descriptors.length === 0) {
           return this.addNewApplication();
+        } else {
+          return this.loadApplicationForDescriptor(descriptors[0]);
         }
       }
     } else if (source === DeinitSource.Lock && sideffects) {
@@ -142,22 +144,27 @@ export class SNApplicationGroup extends PureService {
   }
 
   public async setPrimaryApplication(application: SNApplication, persist = true) {
+    if(this.primaryApplication === application) {
+      return;
+    }
     if (!this.applications.includes(application)) {
       throw Error('Application must be inserted before attempting to switch to it');
     }
-    const currentPrimaryDescriptor = this.findPrimaryDescriptor();
     if (this.primaryApplication) {
       this.primaryApplication.deinit(DeinitSource.AppGroupUnload);
     }
     this.primaryApplication = application;
     const descriptor = this.descriptorForApplication(application);
-    descriptor.primary = true;
-    if (currentPrimaryDescriptor) {
-      currentPrimaryDescriptor.primary = false;
-    }
+    this.setDescriptorAsPrimary(descriptor);
     this.notifyObserversOfAppChange();
     if (persist) {
       await this.persistDescriptors();
+    }
+  }
+
+  setDescriptorAsPrimary(primaryDescriptor: ApplicationDescriptor) {
+    for(const descriptor of this.getDescriptors()) {
+      descriptor.primary = descriptor === primaryDescriptor;
     }
   }
 
