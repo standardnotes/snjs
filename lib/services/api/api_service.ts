@@ -25,8 +25,8 @@ const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 const API_VERSION = '20200115';
 
 export class SNApiService extends PureService {
-  private httpService?: SNHttpService
-  private storageService?: SNStorageService
+  private httpService: SNHttpService
+  private storageService: SNStorageService
   private host?: string
   private session?: Session
 
@@ -44,8 +44,8 @@ export class SNApiService extends PureService {
 
   /** @override */
   deinit() {
-    this.httpService = undefined;
-    this.storageService = undefined;
+    (this.httpService as any) = undefined;
+    (this.storageService as any) = undefined;
     this.host = undefined;
     this.session = undefined;
     super.deinit();
@@ -58,7 +58,7 @@ export class SNApiService extends PureService {
 
   public async setHost(host: string) {
     this.host = host;
-    await this.storageService!.setValue(StorageKey.ServerHost, host);
+    await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
   public async getHost() {
@@ -68,7 +68,7 @@ export class SNApiService extends PureService {
   public async setSession(session: Session, persist: boolean = true) {
     this.session = session;
     if (persist) {
-      await this.storageService!.setValue(StorageKey.Session, session);
+      await this.storageService.setValue(StorageKey.Session, session);
     }
   }
 

@@ -1200,7 +1200,7 @@ export class SNApplication {
     }
 
     this.unlockSyncing();
-    return { error: response.error }
+    return response;
   }
 
   public async signOut() {

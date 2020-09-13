@@ -275,13 +275,15 @@ describe('server session', function() {
   });
 
   it('should fail if syncing while a session refresh is in progress', async function () {
-    this.application.apiService.refreshSession();
+    const refreshPromise = this.application.apiService.refreshSession();
     const syncResponse = await this.application.apiService.sync([]);
 
     expect(syncResponse.error).to.be.ok;
 
     const errorMessage = 'Your account session is being renewed with the server. Please try your request again.';
     expect(syncResponse.error.message).to.be.equal(errorMessage);
+    /** Wait for finish so that test cleans up properly */
+    await refreshPromise;
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {

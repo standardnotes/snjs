@@ -7,8 +7,8 @@ import { SNStorageService } from './../storage_service';
 import { SNHttpService, HttpResponse } from './http_service';
 import { PureService } from '../pure_service';
 export declare class SNApiService extends PureService {
-    private httpService?;
-    private storageService?;
+    private httpService;
+    private storageService;
     private host?;
     private session?;
     private registering;
