@@ -53,7 +53,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
     const salt = await this.generateSalt004(
       keyParams.identifier!,
-      keyParams.seed
+      keyParams.seed!
     );
     const key = await this.deriveKey(
       password,

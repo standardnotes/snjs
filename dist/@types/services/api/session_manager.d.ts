@@ -1,3 +1,4 @@
+import { RegistrationResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
@@ -37,7 +38,7 @@ export declare class SNSessionManager extends PureService {
     signOut(): Promise<void>;
     register(email: string, password: string): Promise<SessionManagerResponse>;
     signIn(email: string, password: string, strict?: boolean, mfaKeyPath?: string, mfaCode?: string): Promise<SessionManagerResponse>;
-    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<HttpResponse>;
+    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<RegistrationResponse>;
     private handleAuthResponse;
 }
 export {};

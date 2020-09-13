@@ -668,7 +668,7 @@ export class SNApplication {
     );
     /** Push current values now */
     const matches = this.itemManager!.getItems(contentType);
-    if(matches.length > 0) {
+    if (matches.length > 0) {
       stream(matches);
     }
     this.streamRemovers.push(observer);
@@ -730,7 +730,7 @@ export class SNApplication {
   public async upgradeProtocolVersion(): Promise<{
     success?: true,
     canceled?: true,
-    error?: Error,
+    error?: { message: string }
   }> {
     const hasPasscode = this.hasPasscode();
     const hasAccount = this.hasAccount();
@@ -941,7 +941,7 @@ export class SNApplication {
    */
   async prepareForDeinit(maxWait = 0) {
     const promise = Promise.all(this.services.map((service) => service.blockDeinit()));
-    if(maxWait === 0) {
+    if (maxWait === 0) {
       await promise;
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
@@ -1149,7 +1149,7 @@ export class SNApplication {
     newPassword: string,
     passcode?: string,
     { validatePasswordStrength = true } = {}
-  ): Promise<{ error?: Error }> {
+  ): Promise<{ error?: { message: string } }> {
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
         return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
@@ -1183,7 +1183,7 @@ export class SNApplication {
     if (!itemsKeyWasSynced) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
-      return this.apiService!.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
+      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) };
     }
 
     this.lockSyncing();
@@ -1200,8 +1200,7 @@ export class SNApplication {
     }
 
     this.unlockSyncing();
-
-    return response;
+    return { error: response.error }
   }
 
   public async signOut() {

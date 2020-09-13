@@ -1,7 +1,7 @@
 import { ProtocolVersion } from './versions';
 export declare type KeyParamsContent = {
-    pw_cost: number;
-    pw_nonce: string;
+    pw_cost?: number;
+    pw_nonce?: string;
     identifier?: string;
     email?: string;
     pw_salt?: string;
@@ -21,8 +21,8 @@ export declare class SNRootKeyParams {
      * working with is a proper RootKeyParams object.
      */
     get isKeyParamsObject(): boolean;
-    get kdfIterations(): number;
-    get seed(): string;
+    get kdfIterations(): number | undefined;
+    get seed(): string | undefined;
     get identifier(): string | undefined;
     get salt(): string | undefined;
     get version(): ProtocolVersion;

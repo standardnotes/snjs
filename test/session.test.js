@@ -39,7 +39,7 @@ describe('server session', function() {
 
   async function sleepUntilSessionExpires(application, basedOnAccessToken = true) {
     const currentSession = application.apiService.getSession();
-    const timestamp = basedOnAccessToken ? currentSession.expireAt : currentSession.validUntil;
+    const timestamp = basedOnAccessToken ? currentSession.accessExpiration : currentSession.refreshExpiration;
     const timeRemaining = (timestamp - Date.now()) / 1000; // in ms
     /*
       If the token has not expired yet, we will return the remaining time.
@@ -87,9 +87,9 @@ describe('server session', function() {
     expect(sessionBeforeSync).to.not.equal(sessionAfterSync);
     expect(sessionBeforeSync.accessToken).to.not.equal(sessionAfterSync.accessToken);
     expect(sessionBeforeSync.refreshToken).to.not.equal(sessionAfterSync.refreshToken);
-    expect(sessionBeforeSync.expireAt).to.be.lessThan(sessionAfterSync.expireAt);
+    expect(sessionBeforeSync.accessExpiration).to.be.lessThan(sessionAfterSync.accessExpiration);
     // New token should expire in the future.
-    expect(sessionAfterSync.expireAt).to.be.greaterThan(Date.now());
+    expect(sessionAfterSync.accessExpiration).to.be.greaterThan(Date.now());
   });
 
   it('should be consistent between storage and apiService', async function () {
@@ -235,7 +235,7 @@ describe('server session', function() {
     expect(currentSession).to.be.ok;
     expect(currentSession.accessToken).to.be.ok;
     expect(currentSession.refreshToken).to.be.ok;
-    expect(currentSession.expireAt).to.be.greaterThan(Date.now());
+    expect(currentSession.accessExpiration).to.be.greaterThan(Date.now());
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {

@@ -9,7 +9,7 @@ export enum HttpVerb {
 
 export type HttpResponse = {
   status: number
-  error?: any
+  error?: { message: string, status: number }
   object?: any
   [key: string]: any
 }
@@ -118,7 +118,7 @@ export class SNHttpService extends PureService {
       resolve(response);
     } else {
       if (!response.error) {
-        response.error = { status: httpStatus };
+        response.error = { message: 'Unknown error', status: httpStatus };
       }
       reject(response);
     }

@@ -2,8 +2,8 @@ import { omitByCopy } from '@Lib/utils';
 import { ProtocolVersion, compareVersions } from '@Protocol/versions';
 
 export type KeyParamsContent = {
-  pw_cost: number
-  pw_nonce: string
+  pw_cost?: number
+  pw_nonce?: string
   identifier?: string
   email?: string
   pw_salt?: string
@@ -55,9 +55,9 @@ export class SNRootKeyParams {
     return this.content.version;
   }
 
-  /** 
-   * @access public 
-   * When saving in a file or communicating with server, 
+  /**
+   * @access public
+   * When saving in a file or communicating with server,
    * use the original values.
    */
   getPortableValue() {

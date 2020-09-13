@@ -1,3 +1,4 @@
+import { SessionRenewalResponse, RegistrationResponse, KeyParamsResponse } from './responses';
 import { Session } from './session';
 import { ContentType } from '../../models/content_types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
@@ -32,14 +33,14 @@ export declare class SNApiService extends PureService {
      *                    would receive parameters as params['foo'] with value equal to mfaCode.
      * @param mfaCode     The mfa challenge response value.
      */
-    getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
-    register(email: string, serverPassword: string, keyParams: SNRootKeyParams): Promise<HttpResponse>;
-    signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<HttpResponse>;
+    getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string): Promise<KeyParamsResponse>;
+    register(email: string, serverPassword: string, keyParams: SNRootKeyParams): Promise<RegistrationResponse>;
+    signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<RegistrationResponse>;
     signOut(): Promise<HttpResponse>;
-    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<HttpResponse>;
+    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<RegistrationResponse>;
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
     private refreshSessionThenRetryRequest;
-    refreshSession(): Promise<HttpResponse>;
+    refreshSession(): Promise<SessionRenewalResponse>;
     getItemRevisions(itemId: string): Promise<HttpResponse>;
     getRevisionForItem(itemId: string, revisionId: string): Promise<HttpResponse>;
     private preprocessingError;
