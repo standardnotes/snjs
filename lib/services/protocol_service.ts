@@ -566,33 +566,29 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Similar to `payloadByDecryptingPayload`, but operates on an array of payloads.
    */
   public async payloadsByDecryptingPayloads(payloads: PurePayload[], key?: SNRootKey | SNItemsKey) {
-    const decryptedPayloads = [];
-    for (const encryptedPayload of payloads) {
+    const decryptItem = async (encryptedPayload: PurePayload) => {
       if (!encryptedPayload) {
         /** Keep in-counts similar to out-counts */
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return encryptedPayload;
       }
       /**
        * We still want to decrypt deleted payloads if they have content in case
        * they were marked as dirty but not yet synced.
        */
       if (encryptedPayload.deleted === true && isNullOrUndefined(encryptedPayload.content)) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return encryptedPayload;
       }
       const isDecryptable = isString(encryptedPayload.content);
       if (!isDecryptable) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+       return encryptedPayload;
       }
-      const decryptedPayload = await this.payloadByDecryptingPayload(
+      return this.payloadByDecryptingPayload(
         encryptedPayload,
         key
       );
-      decryptedPayloads.push(decryptedPayload);
     }
-    return decryptedPayloads;
+
+    return Promise.all(payloads.map(payload => decryptItem(payload)))
   }
 
   /**
