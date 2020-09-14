@@ -1,12 +1,23 @@
 import { SessionRenewalResponse } from './responses';
 
+type RawJwtPayload = {
+  jwt?: string
+}
+type RawSessionPayload = {
+  accessToken: string
+  refreshToken: string
+  accessExpiration: number
+  refreshExpiration: number
+}
+type RawStorageValue = RawJwtPayload & RawSessionPayload
+
 export abstract class Session {
   public abstract canExpire(): boolean;
 
   /** Return the token that should be included in the header of authorized network requests */
   public abstract get authorizationValue(): string;
 
-  static FromRawStorageValue(raw: any) {
+  static FromRawStorageValue(raw: RawStorageValue) {
     if (raw.jwt) {
       return new JwtSession(
         raw.jwt

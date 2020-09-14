@@ -37,6 +37,8 @@ export const REMOVING_PASSCODE                     = `Removing passcode…`;
 
 export const DO_NOT_CLOSE_APPLICATION              = 'Do not close the application until this process completes.';
 
+export const UNKNOWN_ERROR                         = 'Unknown error.';
+
 export function InsufficientPasswordMessage(minimum: number) {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;
 }

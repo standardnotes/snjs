@@ -10802,6 +10802,7 @@ const SETTING_PASSCODE = "Setting passcode\u2026";
 const CHANGING_PASSCODE = "Changing passcode\u2026";
 const REMOVING_PASSCODE = "Removing passcode\u2026";
 const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
+const UNKNOWN_ERROR = 'Unknown error.';
 function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
@@ -10885,7 +10886,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const session = this.apiService.getSession();
 
     if (session && session.canExpire()) {
-      this.apiService.signOut();
+      await this.apiService.signOut();
     }
   }
 
@@ -11035,6 +11036,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 }
 // CONCATENATED MODULE: ./lib/services/api/http_service.ts
 
+
 var HttpVerb;
 
 (function (HttpVerb) {
@@ -11136,7 +11138,7 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
     } else {
       if (!response.error) {
         response.error = {
-          message: 'Unknown error',
+          message: UNKNOWN_ERROR,
           status: httpStatus
         };
       }

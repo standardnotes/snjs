@@ -98,7 +98,7 @@ export class SNSessionManager extends PureService {
     this.user = undefined;
     const session = this.apiService!.getSession();
     if (session && session.canExpire()) {
-      this.apiService!.signOut();
+      await this.apiService!.signOut();
     }
   }
 

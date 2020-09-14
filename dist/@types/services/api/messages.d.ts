@@ -23,6 +23,7 @@ export declare const SETTING_PASSCODE = "Setting passcode\u2026";
 export declare const CHANGING_PASSCODE = "Changing passcode\u2026";
 export declare const REMOVING_PASSCODE = "Removing passcode\u2026";
 export declare const DO_NOT_CLOSE_APPLICATION = "Do not close the application until this process completes.";
+export declare const UNKNOWN_ERROR = "Unknown error.";
 export declare function InsufficientPasswordMessage(minimum: number): string;
 export declare function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string;
 export declare const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
