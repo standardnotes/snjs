@@ -57,6 +57,7 @@ export class AccountSyncOperation {
   }
 
   async run() : Promise<void> {
+    await this.receiver(SyncSignal.StatusChanged);
     const payloads = this.popPayloads(this.upLimit);
     const rawResponse = await this.apiService.sync(
       payloads,
@@ -80,11 +81,11 @@ export class AccountSyncOperation {
     }
   }
 
-  pendingUploadCount() {
+  get pendingUploadCount() {
     return this.pendingPayloads.length;
   }
 
-  totalUploadCount() {
+  get totalUploadCount() {
     return this.payloads.length;
   }
 
@@ -92,11 +93,11 @@ export class AccountSyncOperation {
     return this.pendingPayloads.length === 0 && !this.paginationToken;
   }
 
-  get upLimit() {
+  private get upLimit() {
     return DEFAULT_UP_DOWN_LIMIT;
   }
 
-  get downLimit() {
+  private get downLimit() {
     return DEFAULT_UP_DOWN_LIMIT;
   }
 

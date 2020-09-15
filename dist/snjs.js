@@ -3830,14 +3830,13 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
   if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
     return false;
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var arrStacked = stack.get(array);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(array);
 
-  if (arrStacked && othStacked) {
-    return arrStacked == other && othStacked == array;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var index = -1,
@@ -6011,14 +6010,13 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
     if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
       return false;
     }
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var objStacked = stack.get(object);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(object);
 
-  if (objStacked && othStacked) {
-    return objStacked == other && othStacked == object;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var result = true;
@@ -20155,6 +20153,7 @@ class operation_AccountSyncOperation {
   }
 
   async run() {
+    await this.receiver(SyncSignal.StatusChanged);
     const payloads = this.popPayloads(this.upLimit);
     const rawResponse = await this.apiService.sync(payloads, this.lastSyncToken, this.paginationToken, this.downLimit, this.checkIntegrity, undefined, undefined);
     const response = new response_SyncResponse(rawResponse);
@@ -20168,11 +20167,11 @@ class operation_AccountSyncOperation {
     }
   }
 
-  pendingUploadCount() {
+  get pendingUploadCount() {
     return this.pendingPayloads.length;
   }
 
-  totalUploadCount() {
+  get totalUploadCount() {
     return this.payloads.length;
   }
 
@@ -20973,8 +20972,8 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
   }
 
   async handleStatusChange(operation) {
-    const pendingUploadCount = operation.pendingUploadCount();
-    const totalUploadCount = operation.totalUploadCount();
+    const pendingUploadCount = operation.pendingUploadCount;
+    const totalUploadCount = operation.totalUploadCount;
     const completedUploadCount = totalUploadCount - pendingUploadCount;
     this.opStatus.setUploadStatus(completedUploadCount, totalUploadCount);
   }

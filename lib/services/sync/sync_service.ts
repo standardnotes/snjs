@@ -108,7 +108,7 @@ export class SNSyncService extends PureService {
   private apiService?: SNApiService
   private interval: any
   private state?: SyncState
-  private opStatus?: SyncOpStatus
+  private opStatus!: SyncOpStatus
 
   private resolveQueue: SyncPromise[] = []
   private spawnQueue: SyncPromise[] = []
@@ -189,7 +189,7 @@ export class SNSyncService extends PureService {
     this.state!.reset();
     this.opStatus!.reset();
     this.state = undefined;
-    this.opStatus = undefined;
+    (this.opStatus as any) = undefined;
     this.resolveQueue.length = 0;
     this.spawnQueue.length = 0;
     super.deinit();
@@ -770,8 +770,8 @@ export class SNSyncService extends PureService {
   }
 
   private async handleStatusChange(operation: AccountSyncOperation) {
-    const pendingUploadCount = operation.pendingUploadCount();
-    const totalUploadCount = operation.totalUploadCount();
+    const pendingUploadCount = operation.pendingUploadCount;
+    const totalUploadCount = operation.totalUploadCount;
     const completedUploadCount = totalUploadCount - pendingUploadCount;
     this.opStatus!.setUploadStatus(
       completedUploadCount,
