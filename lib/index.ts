@@ -1,6 +1,6 @@
 export { SNApplicationGroup } from './application_group';
 export type { ApplicationDescriptor } from './application_group';
-export type { UuidString, ApplicationIdentifier } from './types';
+export type { UuidString, ApplicationIdentifier, DeinitSource } from './types';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
