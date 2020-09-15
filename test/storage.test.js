@@ -66,7 +66,7 @@ describe('storage manager', function() {
       password: this.password,
       ephemeral: false
     });
-    const keychainValue = await this.application.deviceInterface.getNamespacedKeychainValue();
+    const keychainValue = await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier);
     expect(keychainValue.masterKey).to.be.ok;
     expect(keychainValue.serverPassword).to.not.be.ok;
   });
@@ -163,13 +163,13 @@ describe('storage manager', function() {
       email: this.email,
       password: this.password,
     });
-    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.be.ok;
     await this.application.setValue('foo', 'bar');
     await this.application.setPasscode('123');
-    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.not.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.not.be.ok;
     await this.application.setValue('bar', 'foo');
     await this.application.removePasscode();
-    expect(await this.application.deviceInterface.getNamespacedKeychainValue()).to.be.ok;
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.be.ok;
 
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped];
     const payload = CreateMaxPayloadFromAnyObject(

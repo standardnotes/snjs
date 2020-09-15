@@ -97,7 +97,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {
@@ -244,7 +244,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {
@@ -360,7 +360,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {
@@ -472,7 +472,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       noteParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
 
     /** Run migration */
     await application.prepareForLaunch({

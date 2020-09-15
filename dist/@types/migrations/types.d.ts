@@ -1,10 +1,10 @@
+import { ApplicationIdentifier } from './../types';
 import { ItemManager } from '../services/item_manager';
 import { Environment } from './../platforms';
 import { SNStorageService } from '../services/storage_service';
 import { SNProtocolService } from './../services/protocol_service';
 import { DeviceInterface } from '../device_interface';
 import { ChallengeService } from '../services';
-import { SNNamespaceService } from '../services/namespace_service';
 /** Services that the migration service needs to function */
 export declare type MigrationServices = {
     protocolService: SNProtocolService;
@@ -13,5 +13,6 @@ export declare type MigrationServices = {
     challengeService: ChallengeService;
     itemManager: ItemManager;
     environment: Environment;
-    namespaceService: SNNamespaceService;
+    /** The application identifier */
+    identifier: ApplicationIdentifier;
 };
