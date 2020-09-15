@@ -61,7 +61,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const key = await this.deriveKey(
       password,
       keyParams.salt!,
-      keyParams.kdfIterations
+      keyParams.kdfIterations!
     );
     return key;
   }

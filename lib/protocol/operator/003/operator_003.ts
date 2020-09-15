@@ -18,7 +18,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
     /** Unlike 002, 003 uses a hardcoded cost and not a variable one.
-     * Therefore, we always use our own hardcoded value and not what is offered by 
+     * Therefore, we always use our own hardcoded value and not what is offered by
      * input keyParams. */
     const pwCost = V003Algorithm.PbkdfCost;
     const version = this.version;
@@ -26,7 +26,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
       keyParams.identifier!,
       version,
       pwCost,
-      keyParams.seed
+      keyParams.seed!
     );
     const key = await this.deriveKey(
       password,

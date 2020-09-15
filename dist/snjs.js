@@ -3830,14 +3830,13 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
   if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
     return false;
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var arrStacked = stack.get(array);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(array);
 
-  if (arrStacked && othStacked) {
-    return arrStacked == other && othStacked == array;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var index = -1,
@@ -6011,14 +6010,13 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
     if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
       return false;
     }
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var objStacked = stack.get(object);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(object);
 
-  if (objStacked && othStacked) {
-    return objStacked == other && othStacked == object;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var result = true;
@@ -10941,40 +10939,65 @@ var ButtonType;
 })(ButtonType || (ButtonType = {}));
 // CONCATENATED MODULE: ./lib/services/api/session.ts
 class Session {
-  constructor(accessToken, expireAt, refreshToken, validUntil) {
-    this.accessToken = accessToken;
-    this.expireAt = expireAt;
-    this.refreshToken = refreshToken;
-    this.validUntil = validUntil;
+  static FromRawStorageValue(raw) {
+    if (raw.jwt) {
+      return new JwtSession(raw.jwt);
+    } else {
+      const rawSession = raw;
+      return new TokenSession(rawSession.accessToken, rawSession.accessExpiration, rawSession.refreshToken, rawSession.refreshExpiration);
+    }
   }
 
-  static FromRaw(raw) {
-    return new Session(raw.accessToken, raw.expireAt, raw.refreshToken, raw.validUntil);
+}
+/** Legacy, for protocol versions <= 003 */
+
+class JwtSession extends Session {
+  constructor(jwt) {
+    super();
+    this.jwt = jwt;
   }
 
-  static FromResponse(response) {
-    var _response$session, _response$session2, _response$session3;
-
-    const accessToken = response.token;
-    const expireAt = (_response$session = response.session) === null || _response$session === void 0 ? void 0 : _response$session.expire_at;
-    const refreshToken = (_response$session2 = response.session) === null || _response$session2 === void 0 ? void 0 : _response$session2.refresh_token;
-    const validUntil = (_response$session3 = response.session) === null || _response$session3 === void 0 ? void 0 : _response$session3.valid_until;
-    return new Session(accessToken, expireAt, refreshToken, validUntil);
-  }
-
-  getExpireAt() {
-    return this.expireAt || 0;
+  get authorizationValue() {
+    return this.jwt;
   }
 
   canExpire() {
-    return this.getExpireAt() > 0;
+    return false;
+  }
+
+}
+/** For protocol versions >= 004 */
+
+class TokenSession extends Session {
+  constructor(accessToken, accessExpiration, refreshToken, refreshExpiration) {
+    super();
+    this.accessToken = accessToken;
+    this.accessExpiration = accessExpiration;
+    this.refreshToken = refreshToken;
+    this.refreshExpiration = refreshExpiration;
+  }
+
+  static FromApiResponse(response) {
+    const accessToken = response.session.access_token;
+    const refreshToken = response.session.refresh_token;
+    const accessExpiration = response.session.access_expiration;
+    const refreshExpiration = response.session.refresh_expiration;
+    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration);
+  }
+
+  getExpireAt() {
+    return this.accessExpiration || 0;
+  }
+
+  get authorizationValue() {
+    return this.accessToken;
+  }
+
+  canExpire() {
+    return true;
   }
 
   isExpired() {
-    if (!this.canExpire()) {
-      return false;
-    }
-
     return this.getExpireAt() < Date.now();
   }
 
@@ -11004,6 +11027,7 @@ const SETTING_PASSCODE = "Setting passcode\u2026";
 const CHANGING_PASSCODE = "Changing passcode\u2026";
 const REMOVING_PASSCODE = "Removing passcode\u2026";
 const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
+const UNKNOWN_ERROR = 'Unknown error.';
 function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
@@ -11013,6 +11037,7 @@ function StrictSignInFailed(current, latest) {
 const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
+
 
 
 
@@ -11060,7 +11085,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const rawSession = await this.storageService.getValue(StorageKey.Session);
 
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession), false);
+      await this.setSession(Session.FromRawStorageValue(rawSession), false);
     }
   }
 
@@ -11083,10 +11108,10 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 
   async signOut() {
     this.user = undefined;
-    const session = await this.apiService.getSession();
+    const session = this.apiService.getSession();
 
     if (session && session.canExpire()) {
-      this.apiService.signOut();
+      await this.apiService.signOut();
     }
   }
 
@@ -11221,19 +11246,21 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const user = response.user;
     this.user = user;
     await this.storageService.setValue(StorageKey.User, user);
-    /*
-      The token from response can be undefined if the user is using session tokens (protocol version >= 004).
-      We should call setSession only if the session is updated with a new token.
-    */
 
     if (response.token) {
-      const session = Session.FromResponse(response);
+      /** Legacy JWT response */
+      const session = new JwtSession(response.token);
+      await this.setSession(session);
+    } else {
+      /** Non-legacy expirable sessions */
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
   }
 
 }
 // CONCATENATED MODULE: ./lib/services/api/http_service.ts
+
 
 var HttpVerb;
 
@@ -11336,6 +11363,7 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
     } else {
       if (!response.error) {
         response.error = {
+          message: UNKNOWN_ERROR,
           status: httpStatus
         };
       }
@@ -11552,7 +11580,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
   async signOut() {
     const url = await this.path(REQUEST_PATH_LOGOUT);
-    return this.httpService.postAbsolute(url, undefined, this.session.accessToken);
+    return this.httpService.postAbsolute(url, undefined, this.session.authorizationValue);
   }
 
   async changePassword(currentServerPassword, newServerPassword, newKeyParams) {
@@ -11572,7 +11600,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       current_password: currentServerPassword,
       new_password: newServerPassword
     }, newKeyParams.getPortableValue()));
-    const response = await this.httpService.postAbsolute(url, params, this.session.accessToken).catch(async errorResponse => {
+    const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
       if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
@@ -11607,7 +11635,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       content_type: contentType,
       event: customEvent
     });
-    const response = await this.httpService.postAbsolute(url, params, this.session.accessToken).catch(async errorResponse => {
+    const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
       if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
@@ -11627,7 +11655,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
         return sessionResponse;
       } else {
         return this.httpService.runHttp(_objectSpread(_objectSpread({}, httpRequest), {}, {
-          authentication: this.session.accessToken
+          authentication: this.session.authorizationValue
         }));
       }
     });
@@ -11642,12 +11670,13 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const session = this.session;
     const params = this.params({
-      access_token: this.session.accessToken,
-      refresh_token: this.session.refreshToken
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken
     });
     const result = await this.httpService.postAbsolute(url, params).then(async response => {
-      const session = Session.FromResponse(response);
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
       return response;
     }).catch(errorResponse => {
@@ -11666,7 +11695,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
     const url = await this.path(path);
-    const response = await this.httpService.getAbsolute(url, undefined, this.session.accessToken).catch(errorResponse => {
+    const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -11681,7 +11710,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
     const url = await this.path(path);
-    const response = await this.httpService.getAbsolute(url, undefined, this.session.accessToken).catch(errorResponse => {
+    const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -15261,7 +15290,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       return;
     }
 
-    const session = new Session(currentToken);
+    const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
   }
   /**
@@ -22758,7 +22787,9 @@ class application_SNApplication {
       await this.syncService.sync({
         awaitAll: true
       });
-      return this.apiService.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
+      return {
+        error: Error(API_MESSAGE_GENERIC_SYNC_FAIL)
+      };
     }
 
     this.lockSyncing();

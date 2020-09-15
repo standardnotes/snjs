@@ -244,7 +244,9 @@ export declare class SNApplication {
     upgradeProtocolVersion(): Promise<{
         success?: true;
         canceled?: true;
-        error?: Error;
+        error?: {
+            message: string;
+        };
     }>;
     noAccount(): boolean;
     hasAccount(): boolean;
@@ -338,7 +340,9 @@ export declare class SNApplication {
     changePassword(currentPassword: string, newPassword: string, passcode?: string, { validatePasswordStrength }?: {
         validatePasswordStrength?: boolean | undefined;
     }): Promise<{
-        error?: Error;
+        error?: {
+            message: string;
+        };
     }>;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;

@@ -1,4 +1,5 @@
-import { Session } from './session';
+import { SessionRenewalResponse, RegistrationResponse, SignInResponse, SignOutResponse, ChangePasswordResponse, KeyParamsResponse } from './responses';
+import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
@@ -8,7 +9,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { isObject, isString, joinPaths } from '@Lib/utils';
+import { joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 
 const REQUEST_PATH_KEY_PARAMS = '/auth/params';
@@ -24,8 +25,8 @@ const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 const API_VERSION = '20200115';
 
 export class SNApiService extends PureService {
-  private httpService?: SNHttpService
-  private storageService?: SNStorageService
+  private httpService: SNHttpService
+  private storageService: SNStorageService
   private host?: string
   private session?: Session
 
@@ -43,8 +44,8 @@ export class SNApiService extends PureService {
 
   /** @override */
   deinit() {
-    this.httpService = undefined;
-    this.storageService = undefined;
+    (this.httpService as any) = undefined;
+    (this.storageService as any) = undefined;
     this.host = undefined;
     this.session = undefined;
     super.deinit();
@@ -57,7 +58,7 @@ export class SNApiService extends PureService {
 
   public async setHost(host: string) {
     this.host = host;
-    await this.storageService!.setValue(StorageKey.ServerHost, host);
+    await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
   public async getHost() {
@@ -67,7 +68,7 @@ export class SNApiService extends PureService {
   public async setSession(session: Session, persist: boolean = true) {
     this.session = session;
     if (persist) {
-      await this.storageService!.setValue(StorageKey.Session, session);
+      await this.storageService.setValue(StorageKey.Session, session);
     }
   }
 
@@ -101,8 +102,8 @@ export class SNApiService extends PureService {
     response: HttpResponse,
     message: string
   ) {
-    if (!response.error.message) {
-      response.error.message = message;
+    if (!response.error!.message) {
+      response.error!.message = message;
     }
     return response;
   }
@@ -128,12 +129,12 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_INVALID_LOGIN
         );
       });
-    return response;
+    return response as KeyParamsResponse;
   }
 
   async register(email: string, serverPassword: string, keyParams: SNRootKeyParams) {
     if (this.registering) {
-      return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS);
+      return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS) as RegistrationResponse;
     }
     this.registering = true;
     const url = await this.path(REQUEST_PATH_REGISTER);
@@ -150,7 +151,7 @@ export class SNApiService extends PureService {
           );
         });
     this.registering = false;
-    return response;
+    return response as RegistrationResponse;
   }
 
   async signIn(
@@ -160,7 +161,7 @@ export class SNApiService extends PureService {
     mfaCode?: string
   ) {
     if (this.authenticating) {
-      return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS);
+      return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as SignInResponse;
     }
     this.authenticating = true;
     const url = await this.path(REQUEST_PATH_LOGIN);
@@ -182,7 +183,7 @@ export class SNApiService extends PureService {
     });
 
     this.authenticating = false;
-    return response;
+    return response as SignInResponse;
   }
 
   async signOut() {
@@ -190,8 +191,8 @@ export class SNApiService extends PureService {
     return this.httpService!.postAbsolute(
       url,
       undefined,
-      this.session!.accessToken
-    );
+      this.session!.authorizationValue
+    ) as Promise<SignOutResponse>;
   }
 
   async changePassword(
@@ -200,11 +201,11 @@ export class SNApiService extends PureService {
     newKeyParams: SNRootKeyParams
   ) {
     if (this.changing) {
-      return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
+      return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS) as ChangePasswordResponse;
     }
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
-      return preprocessingError;
+      return preprocessingError as ChangePasswordResponse;
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
@@ -216,7 +217,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.accessToken
+      this.session!.authorizationValue
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
@@ -232,7 +233,7 @@ export class SNApiService extends PureService {
     });
 
     this.changing = false;
-    return response;
+    return response as ChangePasswordResponse;
   }
 
   async sync(
@@ -261,7 +262,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.postAbsolute(
       url,
       params,
-      this.session!.accessToken
+      this.session!.authorizationValue
     ).catch(async (errorResponse) => {
       if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
@@ -286,7 +287,7 @@ export class SNApiService extends PureService {
       } else {
         return this.httpService!.runHttp({
           ...httpRequest,
-          authentication: this.session!.accessToken
+          authentication: this.session!.authorizationValue
         });
       }
     });
@@ -295,19 +296,20 @@ export class SNApiService extends PureService {
   async refreshSession() {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
-      return preprocessingError;
+      return preprocessingError as SessionRenewalResponse;
     }
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const session = this.session! as TokenSession;
     const params = this.params({
-      access_token: this.session!.accessToken,
-      refresh_token: this.session!.refreshToken
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken
     });
     const result = await this.httpService!.postAbsolute(
       url,
       params
     ).then(async (response) => {
-      const session = Session.FromResponse(response);
+      const session = TokenSession.FromApiResponse(response as SessionRenewalResponse);
       await this.setSession(session);
       return response;
     }).catch((errorResponse) => {
@@ -317,7 +319,7 @@ export class SNApiService extends PureService {
       );
     });
     this.refreshingSession = false;
-    return result;
+    return result as SessionRenewalResponse;
   }
 
   async getItemRevisions(itemId: string) {
@@ -330,7 +332,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.getAbsolute(
       url,
       undefined,
-      this.session!.accessToken
+      this.session!.authorizationValue
     ).catch((errorResponse: HttpResponse) => {
       return this.errorResponseWithFallbackMessage(
         errorResponse,
@@ -350,7 +352,7 @@ export class SNApiService extends PureService {
     const response = await this.httpService!.getAbsolute(
       url,
       undefined,
-      this.session!.accessToken
+      this.session!.authorizationValue
     ).catch((errorResponse: HttpResponse) => {
       return this.errorResponseWithFallbackMessage(
         errorResponse,

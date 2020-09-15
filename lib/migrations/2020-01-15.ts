@@ -1,3 +1,4 @@
+import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
 import { SNRootKey } from './../protocol/root_key';
@@ -490,7 +491,7 @@ export class Migration20200115 extends Migration {
     if (!currentToken) {
       return;
     }
-    const session = new Session(currentToken);
+    const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
   }
 

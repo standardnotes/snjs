@@ -1,5 +1,5 @@
+import { UNKNOWN_ERROR } from './messages';
 import { PureService } from '@Lib/services/pure_service';
-import { isString, isObject } from '@Lib/utils';
 
 export enum HttpVerb {
   Get = 'get',
@@ -9,7 +9,7 @@ export enum HttpVerb {
 
 export type HttpResponse = {
   status: number
-  error?: any
+  error?: { message: string, status: number }
   object?: any
   [key: string]: any
 }
@@ -118,7 +118,7 @@ export class SNHttpService extends PureService {
       resolve(response);
     } else {
       if (!response.error) {
-        response.error = { status: httpStatus };
+        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
       }
       reject(response);
     }
