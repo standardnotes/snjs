@@ -1,6 +1,6 @@
 import { CollectionSort, SortDirection } from './protocol/collection/item_collection';
 import { PayloadOverride } from './protocol/payloads/generator';
-import { UuidString } from './types';
+import { UuidString, ApplicationIdentifier, DeinitSource } from './types';
 import { ApplicationEvent } from './events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
@@ -20,7 +20,6 @@ import { PayloadSource } from './protocol/payloads/sources';
 import { StorageValueModes } from './services/storage_service';
 import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryManager, SNAlertService, SNComponentManager, SNSingletonManager } from './services';
 import { DeviceInterface } from './device_interface';
-import { SNNamespaceService } from './services/namespace_service';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion } from './protocol/versions';
 declare type LaunchCallback = {
@@ -32,29 +31,29 @@ declare type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
 export declare class SNApplication {
     environment: Environment;
     platform: Platform;
-    private namespaceIdentifier?;
+    identifier: ApplicationIdentifier;
     private swapClasses?;
     private skipClasses?;
     private defaultHost?;
+    private onDeinit?;
     private crypto?;
     deviceInterface?: DeviceInterface;
-    private migrationService?;
-    alertService?: SNAlertService;
-    private httpService?;
-    private modelManager?;
-    protocolService?: SNProtocolService;
-    private storageService?;
-    private apiService?;
-    private sessionManager?;
-    private syncService?;
-    private challengeService?;
-    singletonManager?: SNSingletonManager;
-    componentManager?: SNComponentManager;
-    privilegesService?: SNPrivilegesService;
-    actionsManager?: SNActionsService;
-    historyManager?: SNHistoryManager;
-    private itemManager?;
-    namespaceService?: SNNamespaceService;
+    private migrationService;
+    alertService: SNAlertService;
+    private httpService;
+    private modelManager;
+    protocolService: SNProtocolService;
+    private storageService;
+    private apiService;
+    private sessionManager;
+    private syncService;
+    private challengeService;
+    singletonManager: SNSingletonManager;
+    componentManager: SNComponentManager;
+    privilegesService: SNPrivilegesService;
+    actionsManager: SNActionsService;
+    historyManager: SNHistoryManager;
+    private itemManager;
     private eventHandlers;
     private services;
     private streamRemovers;
@@ -77,7 +76,7 @@ export declare class SNApplication {
      * @param crypto The platform-dependent implementation of SNPureCrypto to use.
      * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
      * @param alertService The platform-dependent implementation of alert service.
-     * @param namespaceIdentifier A unique identifier to namespace storage and other
+     * @param identifier A unique identifier to namespace storage and other
      * persistent properties. This parameter is kept for backward compatibility and/or in case
      * you don't want SNNamespaceService to assign a dynamic namespace for you.
      * @param swapClasses Gives consumers the ability to provide their own custom
@@ -87,7 +86,7 @@ export declare class SNApplication {
      * @param skipClasses An array of classes to skip making services for.
      * @param defaultHost Default host to use in ApiService.
      */
-    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, namespaceIdentifier?: string, swapClasses?: {
+    constructor(environment: Environment, platform: Platform, deviceInterface: DeviceInterface, crypto: SNPureCrypto, alertService: SNAlertService, identifier: ApplicationIdentifier, swapClasses?: {
         swap: any;
         with: any;
     }[], skipClasses?: any[], defaultHost?: string);
@@ -295,7 +294,7 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
-    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | null> | undefined;
+    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | null>;
     setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
         challenge: Challenge;
         onValidValue?: ValueCallback;
@@ -305,10 +304,12 @@ export declare class SNApplication {
     }): void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     cancelChallenge(challenge: Challenge): void;
+    /** Set a function to be called when this application deinits */
+    setOnDeinit(onDeinit: (app: SNApplication, source: DeinitSource) => void): void;
     /**
      * Destroys the application instance.
      */
-    deinit(): void;
+    deinit(source: DeinitSource): void;
     /**
      * Returns the wrapping key for operations that require resaving the root key
      * (changing the account password, signing in, registering, or upgrading protocol)
@@ -383,7 +384,6 @@ export declare class SNApplication {
     private createPrivilegesService;
     private createHistoryManager;
     private createActionsManager;
-    private createNamespaceService;
     private shouldSkipClass;
     private getClass;
 }

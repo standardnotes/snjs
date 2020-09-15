@@ -9,7 +9,7 @@ const syncOptions = {
   awaitAll: true
 };
 
-export function createApplication(namespace, environment, platform) {
+export function createApplication(identifier, environment, platform) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -24,7 +24,7 @@ export function createApplication(namespace, environment, platform) {
       alert: async () => {},
       blockingDialog: () => () => {},
     },
-    namespace,
+    identifier,
     undefined,
     undefined
   );

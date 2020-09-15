@@ -1,3 +1,7 @@
+export { SNApplicationGroup } from './application_group';
+export type { ApplicationDescriptor } from './application_group';
+export type { UuidString, ApplicationIdentifier } from './types';
+export { DeinitSource } from './types';
 export { SNApplication } from './application';
 export { SNProtocolService, KeyMode } from './services/protocol_service';
 export { SNProtocolOperator001 } from './protocol/operator/001/operator_001';
@@ -10,7 +14,6 @@ export { SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, Not
 export { MutationType } from './models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
-export type { UuidString } from './types';
 export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
@@ -53,7 +56,7 @@ export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';
 export { PurePayload } from './protocol/payloads/pure_payload';
 export { PayloadField } from './protocol/payloads/fields';
-export { StorageKey } from './storage_keys';
+export { StorageKey, RawStorageKey } from './storage_keys';
 /** Migrations */
 export { BaseMigration } from './migrations/2020-01-01-base';
 /** Privileges */

@@ -114,7 +114,7 @@ describe('2020-01-15 mobile migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
     /** Run migration */
     const promptForValuesForTypes = (types) => {
       const values = [];
@@ -161,7 +161,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue();
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -233,7 +233,7 @@ describe('2020-01-15 mobile migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {
@@ -282,7 +282,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.version).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue();
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -359,7 +359,7 @@ describe('2020-01-15 mobile migration', () => {
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {
@@ -461,7 +461,7 @@ describe('2020-01-15 mobile migration', () => {
       notePayload,
       noteParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload);
+    await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
 
     /** Run migration */
     const promptForValuesForTypes = (types) => {

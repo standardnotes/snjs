@@ -1,3 +1,4 @@
+import { ApplicationIdentifier } from './../types';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { EncryptionIntent } from './../protocol/intents';
 import { compareVersions } from '@Protocol/versions';
@@ -115,6 +116,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     modelManager: PayloadManager,
     deviceInterface: DeviceInterface,
     storageService: SNStorageService,
+    private identifier: ApplicationIdentifier,
     crypto: SNPureCrypto
   ) {
     super();
@@ -566,33 +568,29 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Similar to `payloadByDecryptingPayload`, but operates on an array of payloads.
    */
   public async payloadsByDecryptingPayloads(payloads: PurePayload[], key?: SNRootKey | SNItemsKey) {
-    const decryptedPayloads = [];
-    for (const encryptedPayload of payloads) {
+    const decryptItem = async (encryptedPayload: PurePayload) => {
       if (!encryptedPayload) {
         /** Keep in-counts similar to out-counts */
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return encryptedPayload;
       }
       /**
        * We still want to decrypt deleted payloads if they have content in case
        * they were marked as dirty but not yet synced.
        */
       if (encryptedPayload.deleted === true && isNullOrUndefined(encryptedPayload.content)) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+        return encryptedPayload;
       }
       const isDecryptable = isString(encryptedPayload.content);
       if (!isDecryptable) {
-        decryptedPayloads.push(encryptedPayload);
-        continue;
+       return encryptedPayload;
       }
-      const decryptedPayload = await this.payloadByDecryptingPayload(
+      return this.payloadByDecryptingPayload(
         encryptedPayload,
         key
       );
-      decryptedPayloads.push(decryptedPayload);
     }
-    return decryptedPayloads;
+
+    return Promise.all(payloads.map(payload => decryptItem(payload)))
   }
 
   /**
@@ -771,7 +769,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   private async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface!.getNamespacedKeychainValue();
+    const rawKey = await this.deviceInterface!.getNamespacedKeychainValue(this.identifier);
     if (isNullOrUndefined(rawKey)) {
       return undefined;
     }
@@ -790,7 +788,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const rawKey = this.rootKey!.getPersistableValue();
     return this.executeCriticalFunction(() => {
-      return this.deviceInterface!.setNamespacedKeychainValue(rawKey);
+      return this.deviceInterface!.setNamespacedKeychainValue(rawKey, this.identifier);
     })
   }
 
@@ -966,7 +964,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else {
       throw Error('Attempting to set wrapper on already wrapped key.');
     }
-    await this.deviceInterface!.clearNamespacedKeychainValue();
+    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
     if ((
       this.keyMode === KeyMode.WrapperOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -1103,7 +1101,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
   public async clearLocalKeyState() {
-    await this.deviceInterface!.clearNamespacedKeychainValue();
+    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
     await this.storageService!.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped

@@ -31,83 +31,83 @@ export default class WebDeviceInterface extends DeviceInterface {
     localStorage.clear();
   }
 
-  async openDatabase() {
+  async openDatabase(identifier) {
     return {};
   }
 
-  _getDatabaseKeyPrefix() {
-    if (this.namespace) {
-      return `${this.namespace.identifier}-item-`;
+  _getDatabaseKeyPrefix(identifier) {
+    if (identifier) {
+      return `${identifier}-item-`;
     } else {
       return 'item-';
     }
   }
 
-  _keyForPayloadId(id) {
-    return `${this._getDatabaseKeyPrefix()}${id}`;
+  _keyForPayloadId(id, identifier) {
+    return `${this._getDatabaseKeyPrefix(identifier)}${id}`;
   }
 
-  async getAllRawDatabasePayloads() {
+  async getAllRawDatabasePayloads(identifier) {
     const models = [];
     for (const key in localStorage) {
-      if (key.startsWith(this._getDatabaseKeyPrefix())) {
+      if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
         models.push(JSON.parse(localStorage[key]));
       }
     }
     return models;
   }
 
-  async saveRawDatabasePayload(payload) {
+  async saveRawDatabasePayload(payload, identifier) {
     localStorage.setItem(
-      this._keyForPayloadId(payload.uuid),
+      this._keyForPayloadId(payload.uuid, identifier),
       JSON.stringify(payload)
     );
   }
 
-  async saveRawDatabasePayloads(payloads) {
+  async saveRawDatabasePayloads(payloads, identifier) {
     for (const payload of payloads) {
-      await this.saveRawDatabasePayload(payload);
+      await this.saveRawDatabasePayload(payload, identifier);
     }
   }
 
-  async removeRawDatabasePayloadWithId(id) {
-    localStorage.removeItem(this._keyForPayloadId(id));
+  async removeRawDatabasePayloadWithId(id, identifier) {
+    localStorage.removeItem(this._keyForPayloadId(id, identifier));
   }
 
-  async removeAllRawDatabasePayloads() {
+  async removeAllRawDatabasePayloads(identifier) {
     for (const key in localStorage) {
-      if (key.startsWith(this._getDatabaseKeyPrefix())) {
+      if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
         delete localStorage[key];
       }
     }
   }
 
   /** @keychain */
-  async getNamespacedKeychainValue() {
-    const keychain = await this.getRawKeychainValue();
+  async getNamespacedKeychainValue(identifier) {
+    const keychain = await this.getRawKeychainValue(identifier);
     if (!keychain) {
       return;
     }
-    return keychain[this.namespace.identifier];
+    return keychain[identifier];
   }
 
-  async setNamespacedKeychainValue(value) {
+  async setNamespacedKeychainValue(value, identifier) {
     let keychain = await this.getRawKeychainValue();
     if (!keychain) {
       keychain = {};
     }
     localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify({
       ...keychain,
-      [this.namespace.identifier]: value,
+      [identifier]: value,
     }));
   }
 
-  async clearNamespacedKeychainValue() {
+  async clearNamespacedKeychainValue(identifier) {
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
     }
-    delete keychain[this.namespace.identifier];
+    delete keychain[identifier];
     localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
   }
 

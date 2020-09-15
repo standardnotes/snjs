@@ -73,7 +73,7 @@ describe('application instances', () => {
          * app deinit. */
         await Factory.sleep(MaximumWaitTime - 0.05);
         /** Access any deviceInterface function */
-        app.storageService.deviceInterface.getAllRawDatabasePayloads();
+        app.storageService.deviceInterface.getAllRawDatabasePayloads(app.identifier);
       });
       await app.lock();
     });

@@ -5,6 +5,7 @@ export enum RawStorageKey {
   StorageObject = 'storage',
   /** Raw storage keys exist outside of StorageManager domain */
   LastMigrationTimestamp = 'last_migration_timestamp',
+  DescriptorRecord = "descriptors"
 };
 
 /**
