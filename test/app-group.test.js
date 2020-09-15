@@ -12,11 +12,11 @@ describe('application group', () => {
     setInterval.bind(window)
   );
 
-  before(async () => {
+  beforeEach(async () => {
     localStorage.clear();
   });
 
-  after(async () => {
+  afterEach(async () => {
     localStorage.clear();
   });
 
@@ -63,7 +63,7 @@ describe('application group', () => {
     expect(descriptorRecord2[group.primaryApplication.identifier].primary).to.equal(true);
   });
 
-  it('adding new application should incrememnt total app count', async () => {
+  it('adding new application should incrememnt total descriptor count', async () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -73,11 +73,11 @@ describe('application group', () => {
     const currentIdentifier = group.primaryApplication.identifier;
     await group.addNewApplication();
 
-    expect(group.applications.length).to.equal(2);
+    expect(group.getDescriptors().length).to.equal(2);
     expect(group.primaryApplication.identifier).to.not.equal(currentIdentifier);
   });
 
-  it('de-initing application should remove from group and create new', async () => {
+  it('signing out of application should remove from group and create new', async () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -86,7 +86,7 @@ describe('application group', () => {
     });
     const application = group.primaryApplication;
     const identifier = application.identifier;
-    await application.deinit();
+    await application.deinit(DeinitSource.SignOut);
 
     expect(group.applications.length).to.equal(1);
 

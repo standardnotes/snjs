@@ -8,7 +8,6 @@ import { Uuid } from '@Lib/uuid';
 
 export type ApplicationDescriptor = {
   identifier: string | UuidString,
-  // userUuid?: UuidString,
   label: string,
   /** Whether the application is the primary user-facing selected application */
   primary: boolean,
@@ -60,15 +59,16 @@ export class SNApplicationGroup extends PureService {
   }
 
   private async createDescriptorRecord() {
-    const descriptorRecord = {} as DescriptorRecord;
-    const descriptor = {
-      /** The identifier 'standardnotes' is used because this was the database name of
-       * Standard Notes web/desktop */
-      identifier: "standardnotes",
-      label: 'Main Application',
-      primary: true
-    } as ApplicationDescriptor;
-    descriptorRecord[descriptor.identifier] = descriptor;
+    /** The identifier 'standardnotes' is used because this was the
+     * database name of Standard Notes web/desktop */
+    const identifier = 'standardnotes';
+    const descriptorRecord: DescriptorRecord = {
+      [identifier]: {
+        identifier: identifier,
+        label: 'Main Application',
+        primary: true
+      }
+    };
     this.deviceInterface.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
       JSON.stringify(descriptorRecord)
@@ -82,12 +82,11 @@ export class SNApplicationGroup extends PureService {
   }
 
   public getDescriptors() {
-    return Object.keys(this.descriptorRecord).map(key => this.descriptorRecord[key]!);
+    return Object.values(this.descriptorRecord);
   }
 
   private findPrimaryDescriptor() {
-    for (const key of Object.keys(this.descriptorRecord)) {
-      const descriptor = this.descriptorRecord[key]!;
+    for (const descriptor of this.getDescriptors()) {
       if (descriptor.primary) {
         return descriptor;
       }
@@ -105,7 +104,7 @@ export class SNApplicationGroup extends PureService {
     removeFromArray(this.applications, application);
     if (source === DeinitSource.SignOut) {
       this.removeDescriptor(this.descriptorForApplication(application));
-      if(sideffects) {
+      if (sideffects) {
         /** If there are no more descriptors (all accounts have been signed out),
            * create a new blank slate app */
         const descriptors = this.getDescriptors();
@@ -144,7 +143,7 @@ export class SNApplicationGroup extends PureService {
   }
 
   public async setPrimaryApplication(application: SNApplication, persist = true) {
-    if(this.primaryApplication === application) {
+    if (this.primaryApplication === application) {
       return;
     }
     if (!this.applications.includes(application)) {
@@ -163,7 +162,7 @@ export class SNApplicationGroup extends PureService {
   }
 
   setDescriptorAsPrimary(primaryDescriptor: ApplicationDescriptor) {
-    for(const descriptor of this.getDescriptors()) {
+    for (const descriptor of this.getDescriptors()) {
       descriptor.primary = descriptor === primaryDescriptor;
     }
   }
@@ -192,10 +191,11 @@ export class SNApplicationGroup extends PureService {
   public async addNewApplication(label?: string) {
     const identifier = await Uuid.GenerateUuid();
     const index = this.getDescriptors().length + 1;
-    const descriptor = {
+    const descriptor: ApplicationDescriptor = {
       identifier: identifier,
-      label: label || `Application ${index}`
-    } as ApplicationDescriptor;
+      label: label || `Application ${index}`,
+      primary: false
+    };
     const application = this.buildApplication(descriptor);
     this.applications.push(application);
     this.descriptorRecord[identifier] = descriptor;

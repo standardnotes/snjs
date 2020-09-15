@@ -9230,6 +9230,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, "SNApplicationGroup", function() { return /* reexport */ application_group_SNApplicationGroup; });
+__webpack_require__.d(__webpack_exports__, "DeinitSource", function() { return /* reexport */ DeinitSource; });
 __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return /* reexport */ application_SNApplication; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return /* reexport */ protocol_service_SNProtocolService; });
 __webpack_require__.d(__webpack_exports__, "KeyMode", function() { return /* reexport */ KeyMode; });
@@ -9546,15 +9547,16 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
   }
 
   async createDescriptorRecord() {
-    const descriptorRecord = {};
-    const descriptor = {
-      /** The identifier 'standardnotes' is used because this was the database name of
-       * Standard Notes web/desktop */
-      identifier: "standardnotes",
-      label: 'Main Application',
-      primary: true
+    /** The identifier 'standardnotes' is used because this was the
+     * database name of Standard Notes web/desktop */
+    const identifier = 'standardnotes';
+    const descriptorRecord = {
+      [identifier]: {
+        identifier: identifier,
+        label: 'Main Application',
+        primary: true
+      }
     };
-    descriptorRecord[descriptor.identifier] = descriptor;
     this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(descriptorRecord));
     this.descriptorRecord = descriptorRecord;
     this.persistDescriptors();
@@ -9565,13 +9567,11 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
   }
 
   getDescriptors() {
-    return Object.keys(this.descriptorRecord).map(key => this.descriptorRecord[key]);
+    return Object.values(this.descriptorRecord);
   }
 
   findPrimaryDescriptor() {
-    for (const key of Object.keys(this.descriptorRecord)) {
-      const descriptor = this.descriptorRecord[key];
-
+    for (const descriptor of this.getDescriptors()) {
       if (descriptor.primary) {
         return descriptor;
       }
@@ -9656,7 +9656,8 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     const index = this.getDescriptors().length + 1;
     const descriptor = {
       identifier: identifier,
-      label: label || "Application ".concat(index)
+      label: label || "Application ".concat(index),
+      primary: false
     };
     const application = this.buildApplication(descriptor);
     this.applications.push(application);
@@ -23151,6 +23152,7 @@ var application_service = __webpack_require__(77);
 var pure_payload = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
 
 
 
