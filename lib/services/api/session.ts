@@ -9,7 +9,7 @@ type RawSessionPayload = {
   accessExpiration: number
   refreshExpiration: number
 }
-type RawStorageValue = RawJwtPayload & RawSessionPayload
+type RawStorageValue = RawJwtPayload | RawSessionPayload
 
 export abstract class Session {
   public abstract canExpire(): boolean;
@@ -18,16 +18,17 @@ export abstract class Session {
   public abstract get authorizationValue(): string;
 
   static FromRawStorageValue(raw: RawStorageValue) {
-    if (raw.jwt) {
+    if ((raw as RawJwtPayload).jwt) {
       return new JwtSession(
-        raw.jwt
+        (raw as RawJwtPayload).jwt!
       );
     } else {
+      const rawSession = raw as RawSessionPayload;
       return new TokenSession(
-        raw.accessToken,
-        raw.accessExpiration,
-        raw.refreshToken,
-        raw.refreshExpiration
+        rawSession.accessToken,
+        rawSession.accessExpiration,
+        rawSession.refreshToken,
+        rawSession.refreshExpiration
       );
     }
   }

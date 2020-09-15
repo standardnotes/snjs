@@ -3830,14 +3830,13 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
   if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
     return false;
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var arrStacked = stack.get(array);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(array);
 
-  if (arrStacked && othStacked) {
-    return arrStacked == other && othStacked == array;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var index = -1,
@@ -6011,14 +6010,13 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
     if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
       return false;
     }
-  } // Check that cyclic values are equal.
+  } // Assume cyclic values are equal.
 
 
-  var objStacked = stack.get(object);
-  var othStacked = stack.get(other);
+  var stacked = stack.get(object);
 
-  if (objStacked && othStacked) {
-    return objStacked == other && othStacked == object;
+  if (stacked && stack.get(other)) {
+    return stacked == other;
   }
 
   var result = true;
@@ -10945,7 +10943,8 @@ class Session {
     if (raw.jwt) {
       return new JwtSession(raw.jwt);
     } else {
-      return new TokenSession(raw.accessToken, raw.accessExpiration, raw.refreshToken, raw.refreshExpiration);
+      const rawSession = raw;
+      return new TokenSession(rawSession.accessToken, rawSession.accessExpiration, rawSession.refreshToken, rawSession.refreshExpiration);
     }
   }
 

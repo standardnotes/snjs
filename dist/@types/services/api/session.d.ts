@@ -8,7 +8,7 @@ declare type RawSessionPayload = {
     accessExpiration: number;
     refreshExpiration: number;
 };
-declare type RawStorageValue = RawJwtPayload & RawSessionPayload;
+declare type RawStorageValue = RawJwtPayload | RawSessionPayload;
 export declare abstract class Session {
     abstract canExpire(): boolean;
     /** Return the token that should be included in the header of authorized network requests */
