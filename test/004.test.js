@@ -15,12 +15,11 @@ describe('004 protocol operations', () => {
 
   before(async () => {
     await Factory.initializeApplication(application);
-    const result = await protocol004.createRootKey(
+    _key = await protocol004.createRootKey(
       _identifier,
       _password
     );
-    _keyParams = result.keyParams;
-    _key = result.key;
+    _keyParams = _key.keyParams;
   });
 
   after(() => {
@@ -33,24 +32,21 @@ describe('004 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await application.protocolService.createRootKey(
+    const key = await application.protocolService.createRootKey(
       _identifier,
       _password
     );
 
-    expect(result).to.have.property('key');
-    expect(result).to.have.property('keyParams');
+    expect(key.masterKey).to.be.ok;
 
-    expect(result.key.masterKey).to.be.ok;
+    expect(key.serverPassword).to.be.ok;
+    expect(key.mk).to.not.be.ok;
+    expect(key.dataAuthenticationKey).to.not.be.ok;
 
-    expect(result.key.serverPassword).to.not.be.null;
-    expect(result.key.mk).to.not.be.ok;
-    expect(result.key.dataAuthenticationKey).to.not.be.ok;
-
-    expect(result.keyParams.seed).to.not.be.null;
-    expect(result.keyParams.kdfIterations).to.not.be.null;
-    expect(result.keyParams.salt).to.not.be.ok;
-    expect(result.keyParams.identifier).to.be.ok;
+    expect(key.keyParams.content004.pw_nonce).to.be.ok;
+    expect(key.keyParams.content004.pw_cost).to.not.be.ok;
+    expect(key.keyParams.content004.salt).to.not.be.ok;
+    expect(key.keyParams.content004.identifier).to.be.ok;
   });
 
   it('computes proper keys for sign in', async () => {
@@ -80,18 +76,19 @@ describe('004 protocol operations', () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
+    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
     const additionalData = {foo: 'bar'};
-    const encString = await application.protocolService.defaultOperator().encryptString004(
+    const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
-      additionalData
+      await operator.attachedDataStringRepresentation(additionalData)
     );
-    const decString = await application.protocolService.defaultOperator().decryptString004(
+    const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
-      additionalData
+      await operator.attachedDataStringRepresentation(additionalData)
     );
     expect(decString).to.equal(text);
   });
@@ -100,19 +97,20 @@ describe('004 protocol operations', () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
+    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
     const aad = {foo: 'bar'};
     const nonmatchingAad = {foo: 'rab'};
-    const encString = await application.protocolService.defaultOperator().encryptString004(
+    const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
-      aad
+      await operator.attachedDataStringRepresentation(aad)
     );
-    const decString = await application.protocolService.defaultOperator().decryptString004(
+    const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
-      nonmatchingAad
+      await operator.attachedDataStringRepresentation(nonmatchingAad)
     );
     expect(decString).to.not.be.ok;
   });

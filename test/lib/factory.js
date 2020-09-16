@@ -66,13 +66,12 @@ export async function registerUserToApplication(
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
-  const { key, keyParams } = await operator.createRootKey(
+  const key = await operator.createRootKey(
     identifier,
     passcode
   );
   await application.protocolService.setNewRootKeyWrapper(
-    key,
-    keyParams
+    key
   );
   await application.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
@@ -86,22 +85,19 @@ export async function registerOldUser({ application, email, password, version })
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
-  const result = await operator.createRootKey(
+  const accountKey = await operator.createRootKey(
     email,
     password
   );
-  const accountKey = result.key;
-  const accountKeyParams = result.keyParams;
 
   const response = await application.apiService.register(
     email,
     accountKey.serverPassword,
-    accountKeyParams
+    accountKey.keyParams
   );
   await application.sessionManager.handleAuthResponse(response);
   await application.protocolService.setNewRootKey(
-    accountKey,
-    accountKeyParams
+    accountKey
   );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({

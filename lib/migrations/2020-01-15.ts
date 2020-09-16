@@ -101,8 +101,8 @@ export class Migration20200115 extends Migration {
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams]
-        = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      const accountKeyParams = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = accountKeyParams;
 
       let keyToEncryptStorageWith = passcodeKey;
       /** Extract account key (mk, pw, ak) if it exists */
@@ -110,6 +110,7 @@ export class Migration20200115 extends Migration {
       if (hasAccountKeys) {
         const { accountKey, wrappedKey } = await this.webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
           passcodeKey,
+          accountKeyParams,
           storageValueStore
         );
         keyToEncryptStorageWith = accountKey;
@@ -134,7 +135,8 @@ export class Migration20200115 extends Migration {
           masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
           serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
           dataAuthenticationKey: ak,
-          version: version
+          version: version,
+          keyParams: rawAccountKeyParams
         }
       );
       await this.services.deviceInterface.setNamespacedKeychainValue(
@@ -211,6 +213,7 @@ export class Migration20200115 extends Migration {
    */
   private async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
     passcodeKey: SNRootKey,
+    accountKeyParams: any,
     storageValueStore: Record<string, any>
   ) {
     const version = storageValueStore.ak
@@ -221,7 +224,8 @@ export class Migration20200115 extends Migration {
         masterKey: storageValueStore.mk,
         serverPassword: storageValueStore.pw,
         dataAuthenticationKey: storageValueStore.ak,
-        version: version
+        version: version,
+        keyParams: accountKeyParams
       }
     );
     delete storageValueStore.mk;
@@ -408,7 +412,8 @@ export class Migration20200115 extends Migration {
             masterKey: keychainValue.mk,
             serverPassword: keychainValue.pw,
             dataAuthenticationKey: keychainValue.ak,
-            version: keychainValue.version || defaultVersion
+            version: keychainValue.version || defaultVersion,
+            keyParams: rawAccountKeyParams
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(

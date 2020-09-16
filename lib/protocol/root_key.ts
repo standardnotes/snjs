@@ -1,3 +1,5 @@
+import { PurePayload } from './payloads/pure_payload';
+import { AnyKeyParamsContent, SNRootKeyParams } from './key_params';
 import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
@@ -11,6 +13,7 @@ export type RootKeyContent = {
   masterKey: string;
   serverPassword: string;
   dataAuthenticationKey?: string;
+  keyParams: SNRootKeyParams | AnyKeyParamsContent
 }
 
 /**
@@ -19,6 +22,8 @@ export type RootKeyContent = {
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 export class SNRootKey extends SNItem {
+
+  public readonly keyParams: SNRootKeyParams
 
   static async Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
@@ -42,7 +47,17 @@ export class SNRootKey extends SNItem {
         content: FillItemContent(content)
       }
     )
-    return new SNRootKey(payload);
+    const keyParamsInput = content.keyParams;
+    const keyParams = keyParamsInput instanceof SNRootKeyParams
+      ? keyParamsInput
+      : new SNRootKeyParams(keyParamsInput);
+
+      return new SNRootKey(payload, keyParams);
+  }
+
+  constructor(payload: PurePayload, keyParams: SNRootKeyParams) {
+    super(payload);
+    this.keyParams = keyParams;
   }
 
   public get version() {
@@ -94,7 +109,7 @@ export class SNRootKey extends SNItem {
    * @returns Object containg key/values that should be extracted from key for local saving.
    */
   public getPersistableValue() {
-    const values: any = {
+    const values: Partial<RootKeyContent> = {
       version: this.version
     };
     if (this.masterKey) {

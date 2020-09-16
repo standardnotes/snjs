@@ -1,16 +1,68 @@
-import { omitByCopy } from '@Lib/utils';
 import { ProtocolVersion, compareVersions } from '@Protocol/versions';
 
-export type KeyParamsContent = {
-  pw_cost?: number
-  pw_nonce?: string
-  identifier?: string
-  email?: string
-  pw_salt?: string
+/**
+ *  001, 002:
+ *  - Nonce is not uploaded to server, instead used to compute salt locally and send to server
+ *  - Salt is returned from server
+ *  - Cost/iteration count is returned from the server
+ *  - Account identifier is returned as 'email'
+ *  003, 004:
+ *  - Salt is computed locally via the seed (pw_nonce) returned from the server
+ *  - Cost/iteration count is determined locally by the protocol version
+ *  - Account identifier is returned as 'identifier'
+ */
+
+type BaseKeyParams = {
+  created_at?: Date
+  origination?: string
   version: ProtocolVersion
 }
 
-export function CreateKeyParams(keyParams: KeyParamsContent) {
+ export type KeyParamsContent001 = BaseKeyParams & {
+  email: string
+  pw_cost: number
+  pw_salt: string
+}
+
+export type KeyParamsContent002 = BaseKeyParams & {
+  email: string
+  pw_cost: number
+  pw_salt: string
+}
+
+export type KeyParamsContent003 = BaseKeyParams & {
+  identifier: string
+  pw_nonce: string
+}
+
+export type KeyParamsContent004 = BaseKeyParams & {
+  identifier: string
+  pw_nonce: string
+}
+
+export type AnyKeyParamsContent =
+  KeyParamsContent001 |
+  KeyParamsContent002 |
+  KeyParamsContent003 |
+  KeyParamsContent004;
+
+export function Create001KeyParams(keyParams: KeyParamsContent001) {
+  return new SNRootKeyParams(keyParams);
+}
+
+export function Create002KeyParams(keyParams: KeyParamsContent002) {
+  return new SNRootKeyParams(keyParams);
+}
+
+export function Create003KeyParams(keyParams: KeyParamsContent003) {
+  return new SNRootKeyParams(keyParams);
+}
+
+export function Create004KeyParams(keyParams: KeyParamsContent004) {
+  return new SNRootKeyParams(keyParams);
+}
+
+export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   return new SNRootKeyParams(keyParams);
 }
 
@@ -21,9 +73,9 @@ export function CreateKeyParams(keyParams: KeyParamsContent) {
  */
 export class SNRootKeyParams {
 
-  public readonly content: KeyParamsContent
+  public readonly content: AnyKeyParamsContent
 
-  constructor(content: KeyParamsContent) {
+  constructor(content: AnyKeyParamsContent) {
     this.content = content;
   }
 
@@ -35,24 +87,24 @@ export class SNRootKeyParams {
     return true;
   }
 
-  get kdfIterations() {
-    return this.content.pw_cost;
-  }
-
-  get seed() {
-    return this.content.pw_nonce;
-  }
-
-  get identifier() {
-    return this.content.identifier || this.content.email;
-  }
-
-  get salt() {
-    return this.content.pw_salt;
-  }
-
   get version() {
     return this.content.version;
+  }
+
+  get content001() {
+    return this.content as KeyParamsContent001;
+  }
+
+  get content002() {
+    return this.content as KeyParamsContent002;
+  }
+
+  get content003() {
+    return this.content as KeyParamsContent003;
+  }
+
+  get content004() {
+    return this.content as KeyParamsContent004;
   }
 
   /**
@@ -61,15 +113,6 @@ export class SNRootKeyParams {
    * use the original values.
    */
   getPortableValue() {
-    /**
-     * For version >= 003, do not send kdfIterations, as this value is always deduced
-     * locally depending on the version.
-     * Versions <= 002 had dynamic kdfIterations, so these values must be transfered.
-     */
-    if(compareVersions(this.version, ProtocolVersion.V003) >= 0) {
-      return omitByCopy(this.content, ['pw_cost']);
-    } else {
-      return this.content;
-    }
+    return this.content;
   }
 }

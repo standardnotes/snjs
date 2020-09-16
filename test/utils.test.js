@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 describe('utils', () => {
   it('findInArray', async () => {
-    expect(findInArray).to.not.be.null;
+    expect(findInArray).to.be.ok;
     const array = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
     expect(findInArray(array, 'id', 1)).to.be.ok;
     expect(findInArray(array, 'id', 'foo')).to.not.be.ok;

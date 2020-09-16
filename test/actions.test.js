@@ -242,7 +242,7 @@ describe('actions service', () => {
 
     const extensionWithItem = await this.actionsManager.loadExtensionInContextOfItem(extensionItem, noteItem);
     const updatedExtensionItem = await this.itemManager.findItem(this.extensionItemUuid);
-    
+
     expect(extensionWithItem).to.eq(updatedExtensionItem);
     const extensions = this.actionsManager.getExtensions();
     expect(extensions[0].actions.map(action => action.label)).to.include('Action #4');
@@ -436,7 +436,7 @@ describe('actions service', () => {
       );
       this.extensionItem = await this.itemManager.findItem(this.extensionItemUuid);
       this.extensionItem = await this.actionsManager.loadExtensionInContextOfItem(this.extensionItem, this.noteItem);
-      
+
       this.decryptedPostAction = this.extensionItem.actions
         .filter(action => action.access_type === 'decrypted' && action.verb === 'post')[0];
 
@@ -463,8 +463,8 @@ describe('actions service', () => {
       });
       expect(response.items[0].uuid).to.eq(this.noteItem.uuid);
       expect(response.items[0].auth_hash).to.not.be.ok;
-      expect(response.items[0].content_type).to.not.be.null;
-      expect(response.items[0].created_at).to.not.be.null;
+      expect(response.items[0].content_type).to.be.ok;
+      expect(response.items[0].created_at).to.be.ok;
       expect(response.items[0].content).to.satisfy((string) => {
         return string.startsWith(this.application.protocolService.getLatestVersion());
       });
@@ -476,8 +476,8 @@ describe('actions service', () => {
       expect(response.items[0].uuid).to.eq(this.noteItem.uuid);
       expect(response.items[0].enc_item_key).to.not.be.ok;
       expect(response.items[0].auth_hash).to.not.be.ok;
-      expect(response.items[0].content_type).to.not.be.null;
-      expect(response.items[0].created_at).to.not.be.null;
+      expect(response.items[0].content_type).to.be.ok;
+      expect(response.items[0].created_at).to.be.ok;
       expect(response.items[0].content.title).to.eq(this.noteItem.title);
       expect(response.items[0].content.text).to.eq(this.noteItem.text);
     });

@@ -13,10 +13,7 @@ import { SNRootKey } from '../../root_key';
 export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
-    createRootKey(identifier: string, password: string): Promise<{
-        key: SNRootKey;
-        keyParams: SNRootKeyParams;
-    }>;
+    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
     /**
      * Note that version 002 supported "dynamic" iteration counts. Some accounts
      * may have had costs of 5000, and others of 101000. Therefore, when computing
@@ -29,7 +26,7 @@ export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
     decryptTextParams(ciphertextToAuth: string, contentCiphertext: string, encryptionKey: string, iv: string, authHash: string, authKey: string): Promise<string | null>;
     generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     generateDecryptedParameters(encryptedParameters: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
-    protected deriveKey(password: string, pwSalt: string, pwCost: number): Promise<SNRootKey>;
+    protected deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     encryptionComponentsFromString002(string: string, encryptionKey: string, authKey: string): {
         encryptionVersion: string;
         authHash: string;

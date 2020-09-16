@@ -25,13 +25,13 @@ describe('2020-01-15 web migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
 
     /** Create arbitrary storage values and make sure they're migrated */
@@ -48,20 +48,19 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
 
     /** Create legacy storage and encrypt it with passcode */
-    const accountKey = accountResult.key;
     const embeddedStorage = {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
       jwt: 'anything',
       /** Legacy versions would store json strings inside of embedded storage */
-      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue())
     };
     const storagePayload = CreateMaxPayloadFromAnyObject(
       {
@@ -75,7 +74,7 @@ describe('2020-01-15 web migration', () => {
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
       PayloadFormat.EncryptedString,
-      passcodeResult.key,
+      passcodeKey,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
       storagePayload,
@@ -184,15 +183,14 @@ describe('2020-01-15 web migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
 
     /** Create arbitrary storage values and make sure they're migrated */
     const arbitraryValues = {
@@ -222,7 +220,7 @@ describe('2020-01-15 web migration', () => {
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
       PayloadFormat.EncryptedString,
-      passcodeResult.key,
+      passcodeKey,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
       storagePayload,
@@ -326,11 +324,11 @@ describe('2020-01-15 web migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
-    const accountKey = accountResult.key;
+
     /** Create arbitrary storage values and make sure they're migrated */
     const storage = {
       foo: 'bar',
@@ -341,7 +339,7 @@ describe('2020-01-15 web migration', () => {
       pw: accountKey.serverPassword,
       jwt: 'anything',
       /** Legacy versions would store json strings inside of embedded storage */
-      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue())
     };
     for (const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
@@ -402,7 +400,7 @@ describe('2020-01-15 web migration', () => {
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(migratedKeyParams).to.eql(accountResult.keyParams.getPortableValue());
+    expect(migratedKeyParams).to.eql(accountKey.keyParams.getPortableValue());
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey).to.be.ok;
 

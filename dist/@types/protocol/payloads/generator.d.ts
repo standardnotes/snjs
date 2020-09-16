@@ -1,3 +1,6 @@
+import { AnyKeyParamsContent } from './../key_params';
+import { ProtocolVersion } from './../versions';
+import { UuidString } from './../../types';
 import { PurePayload } from './pure_payload';
 import { PayloadSource } from './sources';
 import { ContentType } from '../../models/content_types';
@@ -45,6 +48,18 @@ export declare type RawEncryptionParameters = {
     auth_hash?: string;
     auth_params?: any;
 };
+export declare type GenericAttachedData = {
+    /** The UUID of the item */
+    u: UuidString;
+    /** The encryption version of the item */
+    v: ProtocolVersion;
+};
+export declare type NonItemsKeyAttachedData = GenericAttachedData;
+export declare type ItemsKeyAttachedData = GenericAttachedData & {
+    /** The key params used to generate the root key that encrypts this item key */
+    kp: AnyKeyParamsContent;
+};
+export declare type AttachedData = NonItemsKeyAttachedData | ItemsKeyAttachedData;
 export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, override?: PayloadOverride, source?: PayloadSource): PurePayload;
 /**
  * Makes a new payload by starting with input payload, then overriding values of all
@@ -57,5 +72,5 @@ export declare function CreateIntentPayloadFromObject(object: RawPayload, intent
 export declare function CreateSourcedPayloadFromObject(object: RawPayload, source: PayloadSource, override?: PayloadOverride): PurePayload;
 export declare function CopyPayload(payload: PurePayload, override?: PayloadOverride): PurePayload;
 export declare function CreateEncryptionParameters(raw: RawEncryptionParameters, source?: PayloadSource): PurePayload;
-export declare function CopyEncryptionParameters(raw: RawEncryptionParameters, override?: PayloadOverride): PurePayload;
+export declare function CopyEncryptionParameters(raw: RawEncryptionParameters, override?: RawEncryptionParameters): PurePayload;
 export declare function payloadFieldsForSource(source: PayloadSource): PayloadField[];

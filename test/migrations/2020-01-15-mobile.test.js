@@ -28,32 +28,30 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams.getPortableValue())
+      JSON.stringify(accountKey.keyParams.getPortableValue())
     );
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier })
     );
-    const accountKey = accountResult.key;
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -195,15 +193,14 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
     await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
@@ -315,19 +312,18 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams.getPortableValue())
+      JSON.stringify(accountKey.keyParams.getPortableValue())
     );
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier })
     );
-    const accountKey = accountResult.key;
     expect(accountKey.version).to.equal(ProtocolVersion.V003);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,

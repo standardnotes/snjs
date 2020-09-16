@@ -4,7 +4,7 @@ import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNRootKeyParams, KeyParamsContent } from './../../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent } from './../../protocol/key_params';
 import { HttpResponse } from './http_service';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -17,7 +17,6 @@ export const MINIMUM_PASSWORD_LENGTH = 8;
 
 type SessionManagerResponse = {
   response: HttpResponse;
-  keyParams: SNRootKeyParams;
   rootKey: SNRootKey;
 }
 
@@ -110,13 +109,12 @@ export class SNSessionManager extends PureService {
         )
       } as SessionManagerResponse;
     }
-    const result = await this.protocolService!.createRootKey(
+    const rootKey = await this.protocolService!.createRootKey(
       email,
       password
     );
-    const serverPassword = result.key.serverPassword;
-    const keyParams = result.keyParams;
-    const rootKey = result.key;
+    const serverPassword = rootKey.serverPassword;
+    const keyParams = rootKey.keyParams;
 
     return this.apiService!.register(
       email,
@@ -126,7 +124,6 @@ export class SNSessionManager extends PureService {
       await this.handleAuthResponse(response);
       return {
         response: response,
-        keyParams: keyParams,
         rootKey: rootKey
       } as SessionManagerResponse;
     });
@@ -149,15 +146,7 @@ export class SNSessionManager extends PureService {
         response: paramsResponse
       } as SessionManagerResponse;
     }
-    const rawKeyParams: KeyParamsContent = {
-      pw_cost: paramsResponse.pw_cost,
-      pw_nonce: paramsResponse.pw_nonce!,
-      identifier: paramsResponse.identifier,
-      email: paramsResponse.email,
-      pw_salt: paramsResponse.pw_salt,
-      version: paramsResponse.version!
-    }
-    const keyParams = this.protocolService!.createKeyParams(rawKeyParams);
+    const keyParams = this.protocolService!.createKeyParams(paramsResponse as AnyKeyParamsContent);
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
@@ -177,7 +166,7 @@ export class SNSessionManager extends PureService {
     if (this.protocolService!.isProtocolVersionOutdated(keyParams.version)) {
       /* Cost minimums only apply to now outdated versions (001 and 002) */
       const minimum = this.protocolService!.costMinimumForVersion(keyParams.version);
-      if (keyParams.kdfIterations! < minimum) {
+      if (keyParams.content002.pw_cost < minimum) {
         return {
           response: this.apiService!.createErrorResponse(messages.INVALID_PASSWORD_COST)
         } as SessionManagerResponse;
@@ -227,7 +216,6 @@ export class SNSessionManager extends PureService {
       await this.handleAuthResponse(response);
       return {
         response: response,
-        keyParams: keyParams,
         rootKey: rootKey
       } as SessionManagerResponse;
     });

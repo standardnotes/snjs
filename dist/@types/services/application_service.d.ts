@@ -7,7 +7,7 @@ export declare class ApplicationService extends PureService {
     constructor(application: SNApplication);
     deinit(): void;
     addAppEventObserver(): void;
-    onAppEvent(event: ApplicationEvent): void;
+    onAppEvent(_event: ApplicationEvent): void;
     onAppStart(): Promise<void>;
     onAppLaunch(): Promise<void>;
     onAppKeyChange(): Promise<void>;

@@ -24,9 +24,8 @@ describe('003 protocol operations', () => {
   // runs once before all tests in this block
   before(async () => {
     await Factory.initializeApplication(sharedApplication);
-    const result = await protocol003.createRootKey(_identifier, _password);
-    _keyParams = result.keyParams;
-    _key = result.key;
+    _key = await protocol003.createRootKey(_identifier, _password);
+    _keyParams = _key.keyParams;
   });
 
   after(() => {
@@ -45,18 +44,16 @@ describe('003 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol003.createRootKey(_identifier, _password);
-    expect(result).to.have.property('key');
-    expect(result).to.have.property('keyParams');
+    const key = await protocol003.createRootKey(_identifier, _password);
 
-    expect(result.key.dataAuthenticationKey).to.not.be.null;
-    expect(result.key.serverPassword).to.not.be.null;
-    expect(result.key.masterKey).to.not.be.null;
+    expect(key.dataAuthenticationKey).to.be.ok;
+    expect(key.serverPassword).to.be.ok;
+    expect(key.masterKey).to.be.ok;
 
-    expect(result.keyParams.seed).to.not.be.null;
-    expect(result.keyParams.kdfIterations).to.not.be.null;
-    expect(result.keyParams.salt).to.not.be.ok;
-    expect(result.keyParams.identifier).to.be.ok;
+    expect(key.keyParams.content.pw_nonce).to.be.ok;
+    expect(key.keyParams.content.pw_cost).to.not.be.ok;
+    expect(key.keyParams.content.pw_salt).to.not.be.ok;
+    expect(key.keyParams.content.identifier).to.be.ok;
   });
 
   it('computes proper keys for sign in', async () => {

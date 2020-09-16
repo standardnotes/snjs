@@ -101,7 +101,8 @@ export {
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
-  intentRequiresEncryption
+  intentRequiresEncryption,
+  ContentTypeUsesRootKeyEncryption
 } from '@Protocol/intents';
 export { ContentType } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';

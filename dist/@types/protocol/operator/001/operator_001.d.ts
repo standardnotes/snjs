@@ -14,15 +14,12 @@ export declare class SNProtocolOperator001 extends SNProtocolOperator {
     getEncryptionDisplayName(): string;
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
-    createRootKey(identifier: string, password: string): Promise<{
-        key: SNRootKey;
-        keyParams: SNRootKeyParams;
-    }>;
+    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
     computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     private decryptString;
     private encryptString;
     generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     generateDecryptedParameters(encryptedParameters: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     private encryptionComponentsFromString;
-    protected deriveKey(password: string, pwSalt: string, pwCost: number): Promise<SNRootKey>;
+    protected deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
 }

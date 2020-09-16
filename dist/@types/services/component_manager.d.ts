@@ -131,13 +131,13 @@ export declare class SNComponentManager extends PureService {
     handleDeleteItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleRequestPermissionsMessage(component: SNComponent, message: ComponentMessage): void;
     handleSetComponentDataMessage(component: SNComponent, message: ComponentMessage): void;
-    handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage): Promise<void>;
+    handleToggleComponentMessage(targetComponent: SNComponent): Promise<void>;
     toggleComponent(component: SNComponent): Promise<void>;
     handleInstallLocalComponentMessage(sourceComponent: SNComponent, message: ComponentMessage): void;
     runWithPermissions(componentUuid: UuidString, requiredPermissions: ComponentPermission[], runFunction: () => void): void;
     promptForPermissions(component: SNComponent, permissions: ComponentPermission[], callback: (approved: boolean) => Promise<void>): void;
-    presentPermissionsDialog(dialog: PermissionDialog): void;
-    openModalComponent(component: SNComponent): void;
+    presentPermissionsDialog(_dialog: PermissionDialog): void;
+    openModalComponent(_component: SNComponent): void;
     registerHandler(handler: ComponentHandler): () => void;
     findOrCreateDataForComponent(componentUuid: UuidString): ComponentState;
     setReadonlyStateForComponent(component: SNComponent, readonly: boolean, lockReadonly?: boolean): void;

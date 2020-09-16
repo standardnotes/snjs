@@ -1,3 +1,18 @@
+import { ContentType } from './../models/content_types';
+/**
+ * Only three types of items should be encrypted with a root key:
+ * - A root key is encrypted with another root key in the case of root key wrapping
+ * - An SNItemsKey object
+ * - An encrypted storage object (local)
+ */
+export function ContentTypeUsesRootKeyEncryption(contentType: ContentType) {
+  return (
+    contentType === ContentType.RootKey ||
+    contentType === ContentType.ItemsKey ||
+    contentType === ContentType.EncryptedStorage
+  );
+}
+
 export enum EncryptionIntent {
   Sync = 0,
   /** Permissible only for server extensions */

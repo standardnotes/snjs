@@ -5,10 +5,6 @@ import { SNItemsKey } from '../../models/app/items_key';
 import { PayloadFormat } from '../payloads/formats';
 import { ProtocolVersion } from '../versions';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
-export declare type RootKeyResponse = {
-    key: SNRootKey;
-    keyParams: SNRootKeyParams;
-};
 export declare type ItemsKeyContent = {
     itemsKey: string;
     dataAuthenticationKey?: string;
@@ -39,7 +35,7 @@ export declare abstract class SNProtocolOperator {
      *    for the user
      * @param password - Plain string representing raw user password
      */
-    abstract createRootKey(identifier: string, password: string): Promise<RootKeyResponse>;
+    abstract createRootKey(identifier: string, password: string): Promise<SNRootKey>;
     protected abstract generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     protected firstHalfOfKey(key: string): Promise<string>;
     protected secondHalfOfKey(key: string): Promise<string>;
@@ -57,7 +53,7 @@ export declare abstract class SNProtocolOperator {
     * items keys), or an ItemsKey (if encrypted regular items)
     * @param format - The desired result format
     */
-    generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
+    generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, _key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     /**
     * Converts encrypted parameters (a subset of a Payload) into decrypted counterpart.
     * @param encryptedParameters - The encrypted payload object to decrypt
@@ -65,5 +61,5 @@ export declare abstract class SNProtocolOperator {
     *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
     * items keys), or an ItemsKey (if encrypted regular items)
     */
-    generateDecryptedParameters(encryptedParameters: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
+    generateDecryptedParameters(encryptedParameters: PurePayload, _key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
 }

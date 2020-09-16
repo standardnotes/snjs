@@ -1053,7 +1053,6 @@ export class SNApplication {
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
         result.rootKey,
-        result.keyParams,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1104,7 +1103,6 @@ export class SNApplication {
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
         result.rootKey,
-        result.keyParams,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1295,11 +1293,11 @@ export class SNApplication {
 
   private async setPasscodeWithoutWarning(passcode: string) {
     const identifier = await this.generateUuid();
-    const { key, keyParams } = await this.protocolService!.createRootKey(
+    const key = await this.protocolService!.createRootKey(
       identifier,
       passcode
     );
-    await this.protocolService!.setNewRootKeyWrapper(key, keyParams);
+    await this.protocolService!.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
     await this.syncService!.sync();
   }

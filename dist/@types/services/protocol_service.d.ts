@@ -7,14 +7,13 @@ import { SyncEvent } from '../events';
 import { SNItem } from '../models/core/item';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { SNItemsKey } from '../models/app/items_key';
-import { SNRootKeyParams, KeyParamsContent } from './../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '../protocol/root_key';
 import { PayloadManager } from './model_manager';
 import { PureService } from './pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ContentType } from '../models/content_types';
 import { DeviceInterface } from '../device_interface';
 export declare type BackupFile = {
     version?: ProtocolVersion;
@@ -138,7 +137,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /**
      * Creates a root key using the latest protocol version
     */
-    createRootKey(identifier: string, password: string): Promise<import("../protocol/operator/operator").RootKeyResponse>;
+    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
     /**
      * Given a key and intent, returns the proper PayloadFormat,
      * or throws an exception if unsupported configuration of parameters.
@@ -189,7 +188,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * Creates a key params object from a raw object
      * @param keyParams - The raw key params object to create a KeyParams object from
      */
-    createKeyParams(keyParams: KeyParamsContent): SNRootKeyParams;
+    createKeyParams(keyParams: AnyKeyParamsContent): SNRootKeyParams;
     /**
      * Creates a JSON string representing the backup format of all items, or just subitems
      * if supplied.
@@ -261,7 +260,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * payloads in the keychain. If the root key is not wrapped, it is stored
      * in plain form in the user's secure keychain.
     */
-    setNewRootKeyWrapper(wrappingKey: SNRootKey, keyParams: SNRootKeyParams): Promise<void>;
+    setNewRootKeyWrapper(wrappingKey: SNRootKey): Promise<void>;
     /**
      * Wraps the current in-memory root key value using the wrappingKey,
      * then persists the wrapped value to disk.
@@ -278,7 +277,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @param wrappingKey If a passcode is configured, the wrapping key
      * must be supplied, so that the new root key can be wrapped with the wrapping key.
      */
-    setNewRootKey(key: SNRootKey, keyParams: SNRootKeyParams, wrappingKey?: SNRootKey): Promise<void>;
+    setNewRootKey(key: SNRootKey, wrappingKey?: SNRootKey): Promise<void>;
     /**
      * Returns the in-memory root key value.
      */
@@ -311,12 +310,6 @@ export declare class SNProtocolService extends PureService implements Encryption
         valid: boolean;
         artifacts?: undefined;
     }>;
-    /**
-     * Only two types of items should be encrypted with a root key:
-     * - An SNItemsKey object
-     * - An encrypted storage object (local)
-     */
-    contentTypeUsesRootKeyEncryption(contentType: ContentType): boolean;
     /**
      * Determines which key to use for encryption of the payload
      * The key object to use for encrypting the payload.

@@ -4,6 +4,12 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+/**
+ * Tests needed:
+ * - ensure root key keychain persistable value does not include key params
+ * - ensure structure of attached data and that it can be decoded manually
+ */
+
 describe('keys', function () {
   this.timeout(Factory.TestTimeout);
 
@@ -67,10 +73,10 @@ describe('keys', function () {
   });
 
   it('validates content types requiring root encryption', async function () {
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.ItemsKey)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.EncryptedStorage)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Item)).to.equal(false);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Note)).to.equal(false);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.ItemsKey)).to.equal(true);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.EncryptedStorage)).to.equal(true);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.Item)).to.equal(false);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.Note)).to.equal(false);
   });
 
   it('generating export params with no account or passcode should produce encrypted payload',
@@ -94,8 +100,8 @@ describe('keys', function () {
   it('should use root key for encryption of storage', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey(email, password);
-    this.application.protocolService.setNewRootKey(result.key, result.keyParams);
+    const key = await this.application.protocolService.createRootKey(email, password);
+    this.application.protocolService.setNewRootKey(key);
 
     const payload = CreateMaxPayloadFromAnyObject(
       {
@@ -115,8 +121,8 @@ describe('keys', function () {
   it('changing root key should with passcode should re-wrap root key', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey(email, password);
-    await this.application.protocolService.setNewRootKey(result.key, result.keyParams);
+    const key = await this.application.protocolService.createRootKey(email, password);
+    await this.application.protocolService.setNewRootKey(key);
     await this.application.setPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
@@ -130,19 +136,18 @@ describe('keys', function () {
     });
 
     const newPassword = 'bar';
-    const newResult = await this.application.protocolService.createRootKey(
+    const newKey = await this.application.protocolService.createRootKey(
       email,
       newPassword
     );
     await this.application.protocolService.setNewRootKey(
-      newResult.key,
-      newResult.keyParams,
+      newKey,
       wrappingKey
     );
     await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
       expect(error).to.not.be.ok;
     });
-  })
+  });
 
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: this.application });
@@ -331,7 +336,7 @@ describe('keys', function () {
       const rootKey = await this.application.protocolService.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
-  });
+    });
 
   it('reencrypts existing notes when logging into an 003 account', async function () {
     await Factory.createManyMappedNotes(this.application, 10);

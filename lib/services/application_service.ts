@@ -10,7 +10,7 @@ export class ApplicationService extends PureService {
   constructor(application: SNApplication) {
     super();
     this.application = application;
-    
+
     /* Allow caller constructor to finish setting instance variables before triggering callbacks */
     setImmediate(() => {
       this.addAppEventObserver();
@@ -47,7 +47,7 @@ export class ApplicationService extends PureService {
     });
   }
 
-  onAppEvent(event: ApplicationEvent) {
+  onAppEvent(_event: ApplicationEvent) {
     /** Optional override */
   }
 

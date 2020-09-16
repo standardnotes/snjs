@@ -137,11 +137,11 @@ describe('payload encryption', function () {
         payload,
         EncryptionIntent.Sync
       );
-    expect(encryptedPayload.enc_item_key).to.not.be.null;
-    expect(encryptedPayload.uuid).to.not.be.null;
+    expect(encryptedPayload.enc_item_key).to.be.ok;
+    expect(encryptedPayload.uuid).to.be.ok;
     expect(encryptedPayload.auth_hash).to.not.be.ok;
-    expect(encryptedPayload.content_type).to.not.be.null;
-    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.content_type).to.be.ok;
+    expect(encryptedPayload.created_at).to.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(this.application.protocolService.getLatestVersion());
     });
@@ -157,9 +157,9 @@ describe('payload encryption', function () {
 
     expect(encodedPayload.enc_item_key).to.not.be.ok;
     expect(encodedPayload.auth_hash).to.not.be.ok;
-    expect(encodedPayload.uuid).to.not.be.null;
-    expect(encodedPayload.content_type).to.not.be.null;
-    expect(encodedPayload.created_at).to.not.be.null;
+    expect(encodedPayload.uuid).to.be.ok;
+    expect(encodedPayload.content_type).to.be.ok;
+    expect(encodedPayload.created_at).to.be.ok;
     /** File decrypted will result in bare object */
     expect(encodedPayload.content.title).to.equal(payload.content.title);
   });
@@ -173,14 +173,14 @@ describe('payload encryption', function () {
         EncryptionIntent.LocalStorageEncrypted
       );
 
-    expect(encryptedPayload.enc_item_key).to.not.be.null;
+    expect(encryptedPayload.enc_item_key).to.be.ok;
     expect(encryptedPayload.auth_hash).to.not.be.ok;
-    expect(encryptedPayload.uuid).to.not.be.null;
-    expect(encryptedPayload.content_type).to.not.be.null;
-    expect(encryptedPayload.created_at).to.not.be.null;
-    expect(encryptedPayload.updated_at).to.not.be.null;
-    expect(encryptedPayload.deleted).to.not.be.null;
-    expect(encryptedPayload.errorDecrypting).to.not.be.null;
+    expect(encryptedPayload.uuid).to.be.ok;
+    expect(encryptedPayload.content_type).to.be.ok;
+    expect(encryptedPayload.created_at).to.be.ok;
+    expect(encryptedPayload.updated_at).to.be.ok;
+    expect(encryptedPayload.deleted).to.not.be.ok;
+    expect(encryptedPayload.errorDecrypting).to.not.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(this.application.protocolService.getLatestVersion());
     });
@@ -193,10 +193,10 @@ describe('payload encryption', function () {
         payload,
         EncryptionIntent.FileEncrypted
       );
-    expect(encryptedPayload.enc_item_key).to.not.be.null;
-    expect(encryptedPayload.uuid).to.not.be.null;
-    expect(encryptedPayload.content_type).to.not.be.null;
-    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.enc_item_key).to.be.ok;
+    expect(encryptedPayload.uuid).to.be.ok;
+    expect(encryptedPayload.content_type).to.be.ok;
+    expect(encryptedPayload.created_at).to.be.ok;
     expect(encryptedPayload.deleted).to.not.be.ok;
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(this.application.protocolService.getLatestVersion());
@@ -208,6 +208,7 @@ describe('payload encryption', function () {
     const mutatedPayload = CreateMaxPayloadFromAnyObject(
       payload,
       {
+        enc_item_key: 'foo',
         errorDecrypting: true
       }
     );
@@ -217,9 +218,9 @@ describe('payload encryption', function () {
         EncryptionIntent.Sync
       );
     expect(encryptedPayload.content).to.eql(payload.content);
-    expect(encryptedPayload.enc_item_key).to.not.be.null;
-    expect(encryptedPayload.uuid).to.not.be.null;
-    expect(encryptedPayload.content_type).to.not.be.null;
-    expect(encryptedPayload.created_at).to.not.be.null;
+    expect(encryptedPayload.enc_item_key).to.be.ok;
+    expect(encryptedPayload.uuid).to.be.ok;
+    expect(encryptedPayload.content_type).to.be.ok;
+    expect(encryptedPayload.created_at).to.be.ok;
   });
 });

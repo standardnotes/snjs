@@ -442,7 +442,7 @@ export function truncateHexString(string: string, desiredBits: number) {
  */
 export async function sleep(milliseconds: number) {
   console.warn(`Sleeping for ${milliseconds}ms`);
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(function () {
       resolve();
     }, milliseconds);

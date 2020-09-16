@@ -16,6 +16,5 @@
   "env": {
     "browser": true
   },
-  "globals": {
-  }
+  "globals": {}
 }

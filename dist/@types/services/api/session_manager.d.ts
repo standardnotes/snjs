@@ -10,7 +10,6 @@ import { SNAlertService } from '../alert_service';
 export declare const MINIMUM_PASSWORD_LENGTH = 8;
 declare type SessionManagerResponse = {
     response: HttpResponse;
-    keyParams: SNRootKeyParams;
     rootKey: SNRootKey;
 };
 declare type User = {

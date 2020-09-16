@@ -44,7 +44,7 @@ describe('sync discordance', () => {
     expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.ok;
 
     await this.application.syncService.sync({ checkIntegrity: true });
-    expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.null;
+    expect(this.application.syncService.state.getLastClientIntegrityHash()).to.be.ok;
 
     // integrity should be valid
     expect(this.application.syncService.state.discordance).to.equal(0);
@@ -55,7 +55,7 @@ describe('sync discordance', () => {
 
     // we expect another integrity check here
     await this.application.syncService.sync({ checkIntegrity: true });
-    expect(this.application.syncService.state.getLastClientIntegrityHash()).to.not.be.null;
+    expect(this.application.syncService.state.getLastClientIntegrityHash()).to.be.ok;
 
     // integrity should be valid
     expect(this.application.syncService.state.discordance).to.equal(0);

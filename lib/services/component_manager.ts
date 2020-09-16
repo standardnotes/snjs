@@ -653,7 +653,7 @@ export class SNComponentManager extends PureService {
       this.handleSaveItemsMessage(component, message);
     } else if (message.action === ComponentAction.ToggleActivateComponent) {
       const componentToToggle = this.itemManager!.findItem(message.data.uuid) as SNComponent;
-      this.handleToggleComponentMessage(componentToToggle, message);
+      this.handleToggleComponentMessage(componentToToggle);
     } else if (message.action === ComponentAction.RequestPermissions) {
       this.handleRequestPermissionsMessage(component, message);
     } else if (message.action === ComponentAction.InstallLocalComponent) {
@@ -1014,7 +1014,7 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  async handleToggleComponentMessage(targetComponent: SNComponent, message: ComponentMessage) {
+  async handleToggleComponentMessage(targetComponent: SNComponent) {
     await this.toggleComponent(targetComponent);
     this.syncService.sync();
   }
@@ -1181,11 +1181,11 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  presentPermissionsDialog(dialog: PermissionDialog) {
+  presentPermissionsDialog(_dialog: PermissionDialog) {
     throw 'Must override SNComponentManager.presentPermissionsDialog';
   }
 
-  openModalComponent(component: SNComponent) {
+  openModalComponent(_component: SNComponent) {
     throw 'Must override SNComponentManager.presentPermissionsDialog';
   }
 

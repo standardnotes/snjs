@@ -30,7 +30,7 @@ export declare abstract class PureService {
     * Application instances will call this function directly when they arrive
     * at a certain migratory state.
     */
-    handleApplicationStage(stage: ApplicationStage): Promise<void>;
+    handleApplicationStage(_stage: ApplicationStage): Promise<void>;
     log(message: string, ...args: any[]): void;
 }
 export {};

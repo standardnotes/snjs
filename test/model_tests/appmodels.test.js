@@ -29,11 +29,11 @@ describe('app models', () => {
   });
 
   it('modelManager should be defined', () => {
-    expect(sharedApplication.modelManager).to.not.be.null;
+    expect(sharedApplication.modelManager).to.be.ok;
   });
 
   it('item should be defined', () => {
-    expect(SNItem).to.not.be.null;
+    expect(SNItem).to.be.ok;
   });
 
   it('item content should be assigned', () => {
@@ -104,7 +104,7 @@ describe('app models', () => {
       PayloadSource.LocalChanged
     );
     let item = items[0];
-    expect(item).to.not.be.null;
+    expect(item).to.be.ok;
 
     items = await this.application.itemManager.emitItemsFromPayloads(
       [mutated],
@@ -141,7 +141,7 @@ describe('app models', () => {
     await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
       mutator.addItemAsRelationship(item1);
     });
-    
+
     const refreshedItem1 = this.application.itemManager.findItem(item1.uuid);
     const refreshedItem2 = this.application.itemManager.findItem(item2.uuid);
 
@@ -222,7 +222,7 @@ describe('app models', () => {
     const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
-    
+
     expect(refreshedItem1.content.references.length).to.equal(1);
 
     const duplicate = await this.application.itemManager.duplicateItem(item1.uuid);
@@ -231,7 +231,7 @@ describe('app models', () => {
 
     expect(this.application.itemManager.itemsReferencingItem(item1.uuid).length).to.equal(0);
     expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(2);
-    
+
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid);
     expect(refreshedItem1_2.isItemContentEqualWith(duplicate)).to.equal(true);
     expect(refreshedItem1_2.created_at.toISOString()).to.equal(duplicate.created_at.toISOString());

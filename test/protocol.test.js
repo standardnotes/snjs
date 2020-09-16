@@ -48,14 +48,6 @@ describe('protocol', function () {
     expect(keyParams002.getPortableValue().pw_cost).to.be.ok;
   });
 
-  it('key params versions >= 003 should not include pw_cost in portable value', function () {
-    const keyParams003 = this.application.protocolService.createKeyParams({
-      version: '003',
-      pw_cost: 110000
-    });
-    expect(keyParams003.getPortableValue().pw_cost).to.not.be.ok;
-  });
-
   it('version comparison of 002 should be older than library version', function () {
     expect(this.application.protocolService.isVersionNewerThanLibraryVersion('002')).to.equal(false);
   });

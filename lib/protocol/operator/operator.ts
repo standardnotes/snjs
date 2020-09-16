@@ -15,11 +15,6 @@ import { ProtocolVersion } from '@Protocol/versions';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { ContentType } from '@Lib/models';
 
-export type RootKeyResponse = {
-  key: SNRootKey,
-  keyParams: SNRootKeyParams
-}
-
 export type ItemsKeyContent = {
   itemsKey: string,
   dataAuthenticationKey?: string,
@@ -58,7 +53,7 @@ export abstract class SNProtocolOperator {
    *    for the user
    * @param password - Plain string representing raw user password
    */
-  public abstract async createRootKey(identifier: string, password: string): Promise<RootKeyResponse>;
+  public abstract async createRootKey(identifier: string, password: string): Promise<SNRootKey>;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 
@@ -114,7 +109,7 @@ export abstract class SNProtocolOperator {
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey,
   ) {
     if (format === PayloadFormat.DecryptedBareObject) {
       return CreateEncryptionParameters(
@@ -145,7 +140,7 @@ export abstract class SNProtocolOperator {
   */
   public async generateDecryptedParameters(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey,
   ) {
     const format = encryptedParameters.format;
     if (format === PayloadFormat.DecryptedBareObject) {

@@ -16,7 +16,7 @@ export declare class SyncOpStatus {
     private error?;
     constructor(interval: any, receiver: SyncEventReceiver);
     deinit(): void;
-    setSyncInProgress(inProgress: boolean): void;
+    setSyncInProgress(): void;
     setUploadStatus(completed: number, total: number): void;
     setDownloadStatus(downloaded: number): void;
     setDatabaseLoadStatus(current: number, total: number, done: boolean): void;
