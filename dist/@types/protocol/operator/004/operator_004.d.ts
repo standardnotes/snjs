@@ -36,15 +36,15 @@ export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
      * @param plaintext - The plaintext to encrypt.
      * @param rawKey - The key to use to encrypt the plaintext.
      * @param nonce - The nonce for encryption.
-     * @param attachedData - JavaScript object (will be stringified) representing
+     * @param authenticatedData - JavaScript object (will be stringified) representing
                   'Additional authenticated data': data you want to be included in authentication.
      */
     private encryptString004;
     /**
-     * @param {string} ciphertext  The encrypted text to decrypt.
-     * @param {string} rawKey  The key to use to decrypt the ciphertext.
-     * @param {string} nonce  The nonce for decryption.
-     * @param {object} attachedData  JavaScript object (will be stringified) representing
+     * @param ciphertext  The encrypted text to decrypt.
+     * @param rawKey  The key to use to decrypt the ciphertext.
+     * @param nonce  The nonce for decryption.
+     * @param rawAuthenticatedData String representing
                   'Additional authenticated data' - data you want to be included in authentication.
      */
     private decryptString004;
@@ -54,8 +54,14 @@ export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
      * @param itemUuid  The uuid of the item being encrypted
      */
     private generateEncryptedProtocolString;
-    private generateAttachedDataForPayload;
-    private attachedDataStringRepresentation;
+    /**
+     * For items that are encrypted with a root key, we append the root key's key params, so
+     * that in the event the client/user loses a reference to their root key, they may still
+     * decrypt data by regenerating the key based on the attached key params.
+     */
+    private generateAuthenticatedDataForPayload;
+    private authenticatedDataToString;
+    private stringToAuthenticatedData;
     generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     generateDecryptedParameters(payload: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     private deconstructEncryptedPayloadString;

@@ -307,3 +307,18 @@ export function generateUuidish() {
 export function randomArrayValue(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
+
+export async function expectThrowsAsync(method, errorMessage) {
+  let error = null;
+  try {
+    await method();
+  }
+  catch (err) {
+    error = err;
+  }
+  const expect = chai.expect;
+  expect(error).to.be.an('Error');
+  if (errorMessage) {
+    expect(error.message).to.be.a('string').and.satisfy(msg => msg.startsWith(errorMessage));
+  }
+};

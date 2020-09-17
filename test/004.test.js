@@ -28,7 +28,7 @@ describe('004 protocol operations', () => {
   });
 
   it('cost minimum should throw', () => {
-    expect(() => {application.protocolService.costMinimumForVersion('004')})
+    expect(() => { application.protocolService.costMinimumForVersion('004') })
       .to.throw('Cost minimums only apply to versions <= 002');
   });
 
@@ -71,7 +71,7 @@ describe('004 protocol operations', () => {
   it('generates random key', async () => {
     const length = 96;
     const key = await application.protocolService.crypto.generateRandomKey(length);
-    expect(key.length).to.equal(length/4);
+    expect(key.length).to.equal(length / 4);
   });
 
   it('properly encrypts and decrypts', async () => {
@@ -79,18 +79,18 @@ describe('004 protocol operations', () => {
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
-    const additionalData = {foo: 'bar'};
+    const authenticatedData = { foo: 'bar' };
     const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
-      await operator.attachedDataStringRepresentation(additionalData)
+      authenticatedData
     );
     const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
-      await operator.attachedDataStringRepresentation(additionalData)
+      await operator.authenticatedDataToString(authenticatedData)
     );
     expect(decString).to.equal(text);
   });
@@ -100,19 +100,19 @@ describe('004 protocol operations', () => {
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
     const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
-    const aad = {foo: 'bar'};
-    const nonmatchingAad = {foo: 'rab'};
+    const aad = { foo: 'bar' };
+    const nonmatchingAad = { foo: 'rab' };
     const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
-      await operator.attachedDataStringRepresentation(aad)
+      aad
     );
     const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
-      await operator.attachedDataStringRepresentation(nonmatchingAad)
+      nonmatchingAad
     );
     expect(decString).to.not.be.ok;
   });
@@ -137,7 +137,22 @@ describe('004 protocol operations', () => {
       params,
       key
     );
-    expect(decrypted.errorDecrypted).to.not.be.ok;
+    expect(decrypted.errorDecrypting).to.not.be.ok;
     expect(decrypted.content).to.eql(payload.content);
+  });
+
+  it('modifying the uuid of the payload should fail to decrypt', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol004.createItemsKey();
+    const params = await protocol004.generateEncryptedParameters(
+      payload,
+      PayloadFormat.EncryptedString,
+      key,
+    );
+    const modifiedParams = CopyPayload(params, { uuid: 'foo' });
+    await Factory.expectThrowsAsync(() => protocol004.generateDecryptedParameters(
+      modifiedParams,
+      key
+    ), 'The uuid/version in authenticated data');
   });
 });

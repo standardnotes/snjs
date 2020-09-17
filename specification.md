@@ -117,7 +117,7 @@ When a root key is wrapped, no information about the wrapper is persisted locall
 
 Because account password changes (or, in general, root key changes) require all existing items keys to be re-encrypted with the new root key, it is possible that items keys eventually fall into an inconsistent state, such that some are encrypted with a newer root key, while others are encrypted with the new root key. Clients encountering an items key they cannot encrypt with the current account root key parameters would then reach a dead end, and users would see undecryptable data.
 
-To recover the ability to decrypt an items key, clients can use the `kp` (key params) included the items key's attached_data payload. These parameters represent the the key params of the root key used to encrypt this items key.
+To recover the ability to decrypt an items key, clients can use the `kp` (key params) included the items key's authenticated_data payload. These parameters represent the the key params of the root key used to encrypt this items key.
 
 For example, when the account password changes, and thus the root key changes, all items keys are re-encrypted with the new root key on client A. Another client (client B) who may have a valid API session, but an outdated root key, will be able to download these new items keys. However, when client B attempts to decrypt these keys using its root key, the decryption will fail. Client B enters a state where it can save items to the server (wherein those items are encrypted using its existing default readable items key), but cannot read new data encrypted with items keys encrypted with client A's root key.
 
@@ -140,7 +140,7 @@ B. When a client encounters an items key it cannot decrypt, regardless of its cr
 
 In such cases, the client will present a "key recovery wizard", which all attempt to decrypt the stale items key:
 
-1. Retrieve the key parameters associated with the attached_data of the items key's payload.
+1. Retrieve the key parameters associated with the authenticated_data of the items key's payload.
 2. Prompt the user for their account password as it was on the date the key parameters were created. For example, _"Enter your account password as it was on Oct 20, 2019, 6:15AM."_
 3. Generate a root key from the account password using the relevant key params, and use that root key to decrypt the stale items key. If the decryption is successful, the client will then decrypt any items associated with that items key. It will then mark the key as needing sync.
 4. When the key subsequently runs through normal syncing logic, it will then proceed to be encrypted by the account's current root key, and synced to the account.
@@ -265,18 +265,18 @@ An encrypted payload consists of:
   - protocol version
   - encryption nonce
   - ciphertext
-  - attached_data
+  - authenticated_data
 - `content`: An encrypted protocol string joined by colons `:` of the following components:
   - protocol version
   - encryption nonce
   - ciphertext
-  - attached_data
+  - authenticated_data
 
 **Procedure to encrypt an item (such as a note):**
 
 1. Generate a random 256-bit key `item_key` (in `hex` format).
-2. Encrypt `item.content` using `item_key` to form `content`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `attached_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
-3. Encrypt `item_key` using the the default `itemsKey.itemsKey` to form `enc_item_key`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `attached_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
+2. Encrypt `item.content` using `item_key` to form `content`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `authenticated_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
+3. Encrypt `item_key` using the the default `itemsKey.itemsKey` to form `enc_item_key`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `authenticated_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
 5. Generate an encrypted payload as:
     ```
     {
@@ -288,17 +288,17 @@ An encrypted payload consists of:
 
 ### Encrypting a string using the 004 scheme:
 
-Given a `string_to_encrypt`, an `encryption_key`, `attached_data`, and an item's `uuid`:
+Given a `string_to_encrypt`, an `encryption_key`, `authenticated_data`, and an item's `uuid`:
 
 1. Generate a random 192-bit string called `nonce`.
 
-2. Encode `attached_data` as a base64 encoded json string (`base64(json(attached_data))`) where the embedded data is recursively sorted by key for stringification (i.e `{v: '2', 'u': '1'}` should be stringified as `{u: '1', 'v': '2'}`), to get `encoded_attached_data`.
+2. Encode `authenticated_data` as a base64 encoded json string (`base64(json(authenticated_data))`) where the embedded data is recursively sorted by key for stringification (i.e `{v: '2', 'u': '1'}` should be stringified as `{u: '1', 'v': '2'}`), to get `encoded_authenticated_data`.
 
-3. Encrypt `string_to_encrypt` using `XChaCha20+Poly1305:Base64`, `encryption_key`, `nonce`, and `encoded_attached_data`:
+3. Encrypt `string_to_encrypt` using `XChaCha20+Poly1305:Base64`, `encryption_key`, `nonce`, and `encoded_authenticated_data`:
   ```
-  ciphertext = XChaCha20Poly1305(string_to_encrypt, encryption_key, nonce, encoded_attached_data)
+  ciphertext = XChaCha20Poly1305(string_to_encrypt, encryption_key, nonce, encoded_authenticated_data)
   ```
 4. Generate the final result by combining components into a `:` separated string:
   ```
-  result = ['004', nonce, ciphertext, encoded_attached_data].join(':')
+  result = ['004', nonce, ciphertext, encoded_authenticated_data].join(':')
   ```

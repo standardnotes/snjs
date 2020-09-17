@@ -48,18 +48,17 @@ export declare type RawEncryptionParameters = {
     auth_hash?: string;
     auth_params?: any;
 };
-export declare type GenericAttachedData = {
+export declare type ItemAuthenticatedData = {
     /** The UUID of the item */
     u: UuidString;
     /** The encryption version of the item */
     v: ProtocolVersion;
 };
-export declare type NonItemsKeyAttachedData = GenericAttachedData;
-export declare type ItemsKeyAttachedData = GenericAttachedData & {
+/** Data that is attached to items that are encrypted with a root key */
+export declare type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
     /** The key params used to generate the root key that encrypts this item key */
     kp: AnyKeyParamsContent;
 };
-export declare type AttachedData = NonItemsKeyAttachedData | ItemsKeyAttachedData;
 export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, override?: PayloadOverride, source?: PayloadSource): PurePayload;
 /**
  * Makes a new payload by starting with input payload, then overriding values of all

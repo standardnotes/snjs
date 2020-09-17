@@ -4,12 +4,6 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-/**
- * Tests needed:
- * - ensure root key keychain persistable value does not include key params
- * - ensure structure of attached data and that it can be decoded manually
- */
-
 describe('keys', function () {
   this.timeout(Factory.TestTimeout);
 
@@ -306,6 +300,23 @@ describe('keys', function () {
       itemsKeyRawPayload
     );
     expect(itemsKeyPayload.format).to.equal(PayloadFormat.EncryptedString);
+  });
+
+  it('items key encrypted payload should contain root key params', async function () {
+    await this.application.setPasscode('foo');
+    const itemsKey = this.application.itemManager.itemsKeys()[0];
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
+    const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
+    const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload);
+    const operator = this.application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const comps = operator.deconstructEncryptedPayloadString(itemsKeyPayload.content);
+    const rawAuthenticatedData = comps.rawAuthenticatedData;
+    const authenticatedData = await operator.stringToAuthenticatedData(rawAuthenticatedData);
+    const rootKeyParams = await this.application.protocolService.getRootKeyParams();
+
+    expect(authenticatedData.kp).to.be.ok;
+    expect(authenticatedData.kp).to.eql(rootKeyParams.getPortableValue());
+    expect(authenticatedData.kp.origination).to.equal(KeyParamsOrigination.Passcode);
   });
 
   it('correctly validates local passcode', async function () {

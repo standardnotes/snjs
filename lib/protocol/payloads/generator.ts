@@ -59,18 +59,17 @@ export type RawEncryptionParameters = {
   auth_params?: any
 }
 
-export type GenericAttachedData = {
+export type ItemAuthenticatedData = {
   /** The UUID of the item */
   u: UuidString
   /** The encryption version of the item */
   v: ProtocolVersion
 }
-export type NonItemsKeyAttachedData = GenericAttachedData;
-export type ItemsKeyAttachedData = GenericAttachedData & {
+/** Data that is attached to items that are encrypted with a root key */
+export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
   /** The key params used to generate the root key that encrypts this item key */
   kp: AnyKeyParamsContent
 }
-export type AttachedData = NonItemsKeyAttachedData | ItemsKeyAttachedData;
 
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [

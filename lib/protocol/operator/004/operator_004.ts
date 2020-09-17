@@ -1,11 +1,4 @@
-import { ContentType } from '@Models/content_types';
-import {
-  ItemsKeyAttachedData,
-  NonItemsKeyAttachedData,
-  AttachedData,
-  GenericAttachedData
-} from '@Payloads/generator';
-import { UuidString } from './../../../types';
+import { ItemAuthenticatedData, RootKeyEncryptedAuthenticatedData } from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
 import { Create004KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
@@ -92,28 +85,48 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
    * @param plaintext - The plaintext to encrypt.
    * @param rawKey - The key to use to encrypt the plaintext.
    * @param nonce - The nonce for encryption.
-   * @param attachedData - JavaScript object (will be stringified) representing
+   * @param authenticatedData - JavaScript object (will be stringified) representing
                 'Additional authenticated data': data you want to be included in authentication.
    */
-  private async encryptString004(plaintext: string, rawKey: string, nonce: string, attachedData: string) {
+  private async encryptString004(
+    plaintext: string,
+    rawKey: string,
+    nonce: string,
+    authenticatedData: ItemAuthenticatedData
+  ) {
     if (!nonce) {
       throw 'encryptString null nonce';
     }
     if (!rawKey) {
       throw 'encryptString null rawKey';
     }
-    return this.crypto.xchacha20Encrypt(plaintext, nonce, rawKey, attachedData);
+    return this.crypto.xchacha20Encrypt(
+      plaintext,
+      nonce,
+      rawKey,
+      await this.authenticatedDataToString(authenticatedData)
+    );
   }
 
   /**
-   * @param {string} ciphertext  The encrypted text to decrypt.
-   * @param {string} rawKey  The key to use to decrypt the ciphertext.
-   * @param {string} nonce  The nonce for decryption.
-   * @param {object} attachedData  JavaScript object (will be stringified) representing
+   * @param ciphertext  The encrypted text to decrypt.
+   * @param rawKey  The key to use to decrypt the ciphertext.
+   * @param nonce  The nonce for decryption.
+   * @param rawAuthenticatedData String representing
                 'Additional authenticated data' - data you want to be included in authentication.
    */
-  private async decryptString004(ciphertext: string, rawKey: string, nonce: string, attachedData: string) {
-    return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, attachedData);
+  private async decryptString004(
+    ciphertext: string,
+    rawKey: string,
+    nonce: string,
+    rawAuthenticatedData: string
+  ) {
+    return this.crypto.xchacha20Decrypt(
+      ciphertext,
+      nonce,
+      rawKey,
+      rawAuthenticatedData
+    );
   }
 
   /**
@@ -124,7 +137,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   private async generateEncryptedProtocolString(
     plaintext: string,
     rawKey: string,
-    attachedData: string
+    authenticatedData: ItemAuthenticatedData,
   ) {
     const nonce = await this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength);
     const version = ProtocolVersion.V004;
@@ -132,41 +145,53 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       plaintext,
       rawKey,
       nonce,
-      attachedData
+      authenticatedData
     );
-    const payload = [version, nonce, ciphertext, attachedData].join(PARTITION_CHARACTER);
-    return payload;
+    const components: string[] = [
+      version as string,
+      nonce,
+      ciphertext,
+      await this.authenticatedDataToString(authenticatedData)
+    ];
+    return components.join(PARTITION_CHARACTER);
   }
 
-  private generateAttachedDataForPayload(
-    payloadUuid: UuidString,
-    payloadVersion: ProtocolVersion,
-    contentType: ContentType,
+  /**
+   * For items that are encrypted with a root key, we append the root key's key params, so
+   * that in the event the client/user loses a reference to their root key, they may still
+   * decrypt data by regenerating the key based on the attached key params.
+   */
+  private generateAuthenticatedDataForPayload(
+    payload: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): ItemsKeyAttachedData | NonItemsKeyAttachedData {
-    const baseData: GenericAttachedData = {
-      u: payloadUuid,
-      v: payloadVersion,
-    }
-    if (ContentTypeUsesRootKeyEncryption(contentType)) {
-      const itemsKeyData: ItemsKeyAttachedData = {
+  ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
+    const baseData: ItemAuthenticatedData = {
+      u: payload.uuid,
+      v: ProtocolVersion.V004
+    };
+    if (ContentTypeUsesRootKeyEncryption(payload.content_type)) {
+      return {
         ...baseData,
-        kp: sortedCopy((key as SNRootKey).keyParams.content)
+        kp: (key as SNRootKey).keyParams.content
       };
-      return itemsKeyData;
     } else {
       if (!(key instanceof SNItemsKey)) {
-        throw Error('Attempting to use non-items key for regular item');
+        throw Error('Attempting to use non-items key for regular item.');
       }
-      const nonItemsKeyData: NonItemsKeyAttachedData = {
-        ...baseData,
-      };
-      return nonItemsKeyData;
+      return baseData;
     }
   }
 
-  private async attachedDataStringRepresentation(attachedData: AttachedData) {
+  private async authenticatedDataToString(
+    attachedData: ItemAuthenticatedData
+  ) {
     return this.crypto.base64Encode(JSON.stringify(sortedCopy(attachedData)));
+  }
+
+  private async stringToAuthenticatedData(
+    rawAuthenticatedData: string
+  ): Promise<ItemAuthenticatedData> {
+    return JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
   }
 
   public async generateEncryptedParameters(
@@ -192,20 +217,18 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     const itemKey = await this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength);
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content);
-    const attachedData = this.generateAttachedDataForPayload(
-      payload.uuid, ProtocolVersion.V004, payload.content_type, key
-    );
-    const attachedDataString = await this.attachedDataStringRepresentation(attachedData);
+
+    const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key);
     const encryptedContentString = await this.generateEncryptedProtocolString(
       contentPlaintext,
       itemKey,
-      attachedDataString
+      authenticatedData,
     );
     /** Encrypt item_key with master itemEncryptionKey */
     const encryptedItemKey = await this.generateEncryptedProtocolString(
       itemKey,
       key.itemsKey,
-      attachedDataString
+      authenticatedData,
     );
     return CreateEncryptionParameters(
       {
@@ -238,23 +261,16 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(
       payload.enc_item_key!
     );
-    /**
-     * Rebuild our own version of the attached data string using what we know to be correct
-     * The generated result must match what is stored inside the encrypted payload components
-     * in order to decrypt properly
-     */
-    const attachedData = this.generateAttachedDataForPayload(
-      payload.uuid,
-      payload.version!,
-      payload.content_type,
-      key
-    );
-    const attachedDataString = await this.attachedDataStringRepresentation(attachedData);
+    const rawAuthenticatedData = itemKeyComponents.rawAuthenticatedData;
+    const authenticatedData = await this.stringToAuthenticatedData(rawAuthenticatedData);
+    if (authenticatedData.u !== payload.uuid || authenticatedData.v !== payload.version) {
+      throw Error(`The uuid/version in authenticated data doesn't match payload's.`);
+    }
     const itemKey = await this.decryptString004(
       itemKeyComponents.ciphertext,
       key.itemsKey,
       itemKeyComponents.nonce,
-      attachedDataString
+      rawAuthenticatedData
     );
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload);
@@ -274,7 +290,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       contentComponents.ciphertext,
       itemKey,
       contentComponents.nonce,
-      attachedDataString
+      rawAuthenticatedData
     );
     if (!content) {
       return CopyEncryptionParameters(
@@ -305,7 +321,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       version: components[0],
       nonce: components[1],
       ciphertext: components[2],
-      rawAttachedData: components[3]
+      rawAuthenticatedData: components[3]
     };
   }
 
