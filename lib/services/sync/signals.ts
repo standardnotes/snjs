@@ -5,4 +5,13 @@ export enum SyncSignal {
   StatusChanged = 2
 }
 
-export type ResponseSignalReceiver = (signal: SyncSignal, response?: SyncResponse, ) => Promise<void>
+export type SyncStats = {
+  completedUploadCount: number,
+  totalUploadCount: number,
+}
+
+export type ResponseSignalReceiver = (
+  signal: SyncSignal,
+  response?: SyncResponse,
+  stats?: SyncStats
+) => Promise<void>
