@@ -25,9 +25,9 @@ export declare class AccountSyncOperation {
     get payloadsSavedOrSaving(): PurePayload[];
     popPayloads(count: number): PurePayload[];
     run(): Promise<void>;
-    get pendingUploadCount(): number;
-    get totalUploadCount(): number;
     get done(): boolean;
+    private get pendingUploadCount();
+    private get totalUploadCount();
     private get upLimit();
     private get downLimit();
     get numberOfItemsInvolved(): number;

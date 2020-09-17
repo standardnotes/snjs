@@ -157,7 +157,6 @@ export declare class SNSyncService extends PureService {
     sync(options?: SyncOptions): Promise<any>;
     private syncOnlineOperation;
     private syncOfflineOperation;
-    private handleStatusChange;
     private handleOfflineResponse;
     private handleErrorServerResponse;
     private handleSuccessServerResponse;

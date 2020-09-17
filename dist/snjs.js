@@ -20405,7 +20405,10 @@ class operation_AccountSyncOperation {
   }
 
   async run() {
-    await this.receiver(SyncSignal.StatusChanged);
+    await this.receiver(SyncSignal.StatusChanged, undefined, {
+      completedUploadCount: this.totalUploadCount - this.pendingUploadCount,
+      totalUploadCount: this.totalUploadCount
+    });
     const payloads = this.popPayloads(this.upLimit);
     const rawResponse = await this.apiService.sync(payloads, this.lastSyncToken, this.paginationToken, this.downLimit, this.checkIntegrity, undefined, undefined);
     const response = new response_SyncResponse(rawResponse);
@@ -20419,16 +20422,16 @@ class operation_AccountSyncOperation {
     }
   }
 
+  get done() {
+    return this.pendingPayloads.length === 0 && !this.paginationToken;
+  }
+
   get pendingUploadCount() {
     return this.pendingPayloads.length;
   }
 
   get totalUploadCount() {
     return this.payloads.length;
-  }
-
-  get done() {
-    return this.pendingPayloads.length === 0 && !this.paginationToken;
   }
 
   get upLimit() {
@@ -21199,15 +21202,20 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async syncOnlineOperation(payloads, checkIntegrity, source, mode) {
     this.log('Syncing online user', 'source:', source, "integrity check", checkIntegrity, 'mode:', mode, 'payloads:', payloads);
-    const operation = new operation_AccountSyncOperation(payloads, async (type, response) => {
-      if (type === SyncSignal.Response) {
-        if (response.hasError) {
-          await this.handleErrorServerResponse(response);
-        } else {
-          await this.handleSuccessServerResponse(operation, response);
-        }
-      } else if (type === SyncSignal.StatusChanged) {
-        await this.handleStatusChange(operation);
+    const operation = new operation_AccountSyncOperation(payloads, async (type, response, stats) => {
+      switch (type) {
+        case SyncSignal.Response:
+          if (response.hasError) {
+            await this.handleErrorServerResponse(response);
+          } else {
+            await this.handleSuccessServerResponse(operation, response);
+          }
+
+          break;
+
+        case SyncSignal.StatusChanged:
+          this.opStatus.setUploadStatus(stats.completedUploadCount, stats.totalUploadCount);
+          break;
       }
     }, await this.getLastSyncToken(), await this.getPaginationToken(), checkIntegrity, this.apiService);
     return operation;
@@ -21221,13 +21229,6 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
       }
     });
     return operation;
-  }
-
-  async handleStatusChange(operation) {
-    const pendingUploadCount = operation.pendingUploadCount;
-    const totalUploadCount = operation.totalUploadCount;
-    const completedUploadCount = totalUploadCount - pendingUploadCount;
-    this.opStatus.setUploadStatus(completedUploadCount, totalUploadCount);
   }
 
   async handleOfflineResponse(response) {
